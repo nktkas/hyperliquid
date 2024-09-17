@@ -72,7 +72,7 @@ Each method in these classes is fully documented with TypeScript types and JSDoc
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a pull request or open an issue for any bugs or feature requests.
+Contributions are welcome! Please see the [CONTRIBUTING](./CONTRIBUTING.md) file for guidelines on how to contribute to this project.
 
 ## License
 
