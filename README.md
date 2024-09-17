@@ -11,13 +11,7 @@ A low-level SDK for interacting with Hyperliquid's APIs in TypeScript.
 
 ## Installation
 
-Install the package via [npm](https://www.npmjs.com/@nktkas/hyperliquid):
-
-```bash
-npm install @nktkas/hyperliquid
-```
-
-Alternatively, you can install it using [jsr](https://jsr.io/@nktkas/hyperliquid)
+Use [jsr](https://jsr.io/@nktkas/hyperliquid) to install. Compatible with Deno, Node.js, Bun, and works with npm, Yarn, or pnpm.
 
 ## Usage
 
