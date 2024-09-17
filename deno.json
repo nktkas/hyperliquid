@@ -1,0 +1,9 @@
+{
+	"name": "@nktkas/hyperliquid",
+	"version": "0.1.0",
+	"exports": "./index.ts",
+	"imports": {
+		"@msgpack/msgpack": "npm:@msgpack/msgpack@^3.0.0-beta2",
+		"viem": "npm:viem@^2.21.7"
+	}
+}
