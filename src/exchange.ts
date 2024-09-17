@@ -13,8 +13,6 @@ import {
 } from "viem";
 import { encode } from "@msgpack/msgpack";
 import type {
-    BaseExchangeRequest,
-    BaseExchangeResponse,
     BatchModifyRequest,
     CancelByCloidRequest,
     CancelRequest,
@@ -641,7 +639,7 @@ export class HyperliquidExchangeClient {
     protected async request<T extends Withdraw3Request>(body: T): Promise<SuccessResponse>;
     protected async request<T extends SpotUserRequest>(body: T): Promise<SuccessResponse>;
     protected async request<T extends VaultTransferRequest>(body: T): Promise<SuccessResponse>;
-    protected async request<T extends BaseExchangeRequest>(body: T): Promise<BaseExchangeResponse> {
+    protected async request<T extends unknown>(body: T): Promise<unknown> {
         const res = await fetch(
             this.endpoint,
             {
