@@ -5,5 +5,10 @@
 	"imports": {
 		"@msgpack/msgpack": "npm:@msgpack/msgpack@^3.0.0-beta2",
 		"viem": "npm:viem@^2.21.7"
+	},
+	"publish": {
+		"exclude": [
+			"test"
+		]
 	}
 }
