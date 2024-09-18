@@ -64,6 +64,11 @@ The SDK provides 2 main classes:
 
 Each method in these classes is fully documented with TypeScript types and JSDoc comments. Refer to the source code for detailed information on each method and its parameters.
 
+## TODO
+
+- [ ] Add WebSocket support
+- [ ] Make tests more thorough
+
 ## Contributing
 
 Contributions are welcome! Please see the [CONTRIBUTING](./CONTRIBUTING.md) file for guidelines on how to contribute to this project.
