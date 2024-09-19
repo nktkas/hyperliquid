@@ -15,9 +15,11 @@ export function assertJsonSchema(schema: Definition, data: unknown): void {
 }
 
 export function recursiveTraversal(
+    // deno-lint-ignore no-explicit-any
     obj: Record<PropertyKey, any> | any[],
+    // deno-lint-ignore no-explicit-any
     func: (key: string | number, value: any) => void,
-) {
+): void {
     if (typeof obj === "object" && obj !== null) {
         for (const [key, value] of Object.entries(obj)) {
             func(key, value);
