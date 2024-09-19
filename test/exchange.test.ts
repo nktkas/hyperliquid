@@ -89,7 +89,11 @@ Deno.test("HyperliquidExchangeClient", async (t) => {
 
             recursiveTraversal(data, (key, value) => {
                 if (Array.isArray(value)) {
-                    assertGreater(value.length, 0, `WARNING: Unable to fully validate the type due to an empty array. Key: ${key}`);
+                    assertGreater(
+                        value.length,
+                        0,
+                        `WARNING: Unable to fully validate the type due to an empty array. Key: ${key}`,
+                    );
                 }
             });
         },
@@ -131,7 +135,11 @@ Deno.test("HyperliquidExchangeClient", async (t) => {
 
             recursiveTraversal(data, (key, value) => {
                 if (Array.isArray(value)) {
-                    assertGreater(value.length, 0, `WARNING: Unable to fully validate the type due to an empty array. Key: ${key}`);
+                    assertGreater(
+                        value.length,
+                        0,
+                        `WARNING: Unable to fully validate the type due to an empty array. Key: ${key}`,
+                    );
                 }
             });
         },
@@ -256,7 +264,11 @@ Deno.test("HyperliquidExchangeClient", async (t) => {
 
             recursiveTraversal(data, (key, value) => {
                 if (Array.isArray(value)) {
-                    assertGreater(value.length, 0, `WARNING: Unable to fully validate the type due to an empty array. Key: ${key}`);
+                    assertGreater(
+                        value.length,
+                        0,
+                        `WARNING: Unable to fully validate the type due to an empty array. Key: ${key}`,
+                    );
                 }
             });
 
