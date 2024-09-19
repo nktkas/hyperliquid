@@ -9,8 +9,12 @@ import { HyperliquidExchangeClient, HyperliquidInfoClient } from "../index.ts";
 import { assertJsonSchema, recursiveTraversal } from "./utils.ts";
 import type { OrderResponse } from "../src/types/exchange.d.ts";
 
-const TEST_PRIVATE_KEY: Hex = "0x";
-const TEST_ASSET: string = "ETH";
+const TEST_PRIVATE_KEY = Deno.args[0];
+const TEST_ASSET = Deno.args[1];
+
+if (!isHex(TEST_PRIVATE_KEY)) {
+    throw new Error(`Expected a hex string, but got ${TEST_PRIVATE_KEY}`);
+}
 
 Deno.test("HyperliquidExchangeClient", async (t) => {
     // Private key to WalletClient
@@ -434,4 +438,8 @@ function getPxDecimals(marketType: "perp" | "spot", szDecimals: number): number 
     const MAX_DECIMALS = marketType === "perp" ? 5 : 7;
     const maxPxDecimals = MAX_DECIMALS - szDecimals;
     return Math.max(0, maxPxDecimals);
+}
+
+function isHex(data: unknown): data is Hex {
+    return typeof data === "string" && /^0x[0-9a-fA-F]+$/.test(data);
 }
