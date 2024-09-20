@@ -1,6 +1,6 @@
 # @nktkas/hyperliquid
 
-A low-level SDK for interacting with Hyperliquid's APIs in TypeScript.
+A low-level SDK for interacting with [Hyperliquid's](https://hyperliquid.xyz/) APIs in TypeScript.
 
 ## Features
 
