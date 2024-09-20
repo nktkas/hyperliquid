@@ -567,7 +567,7 @@ export interface BaseInfoRequest {
 // ———————————————API (Requests)———————————————
 
 /**
- * Request to retrieve mid prices (average of bid and ask) for all actively traded coins.
+ * Request to retrieves mid prices for all actively traded coins.
  *
  * @requestWeight 2
  * @response {@link AllMidsResponse}
@@ -578,9 +578,9 @@ export interface AllMidsRequest extends BaseInfoRequest {
 }
 
 /**
- * Request to retrieve a user's open orders.
+ * Request to retrieves a user's active open orders.
  *
- * @requestWeight 2
+ * @requestWeight 20
  * @response Array of {@link OpenOrder}
  */
 export interface OpenOrdersRequest extends BaseInfoRequest {
@@ -592,7 +592,7 @@ export interface OpenOrdersRequest extends BaseInfoRequest {
 }
 
 /**
- * Request to retrieve a user's open orders with additional frontend information.
+ * Request to retrieves an open order with additional frontend information.
  *
  * @requestWeight 20
  * @response Array of {@link FrontendOpenOrder}
@@ -606,7 +606,7 @@ export interface FrontendOpenOrdersRequest extends BaseInfoRequest {
 }
 
 /**
- * Request to retrieve a user's trade fills.
+ * Request to retrieves a user's trade fills.
  *
  * @requestWeight 20
  * @response Array of {@link UserFill}
@@ -620,7 +620,7 @@ export interface UserFillsRequest extends BaseInfoRequest {
 }
 
 /**
- * Request to retrieve a user's trade fills within a specific time range.
+ * Request to retrieves a user's trade fills within a specific time range.
  *
  * @requestWeight 20
  * @response Array of {@link UserFill}
@@ -640,7 +640,7 @@ export interface UserFillsByTimeRequest extends BaseInfoRequest {
 }
 
 /**
- * Request to query a user's rate limits.
+ * Request to retrieves a user's rate limits.
  *
  * @requestWeight 20
  * @response {@link UserRateLimitResponse}
@@ -654,7 +654,7 @@ export interface UserRateLimitRequest extends BaseInfoRequest {
 }
 
 /**
- * Request to query the status of an order by order ID.
+ * Request to retrieves the status of a specific order.
  *
  * @requestWeight 2
  * @response {@link OrderStatusResponse}
@@ -676,7 +676,7 @@ export interface OrderStatusRequest extends BaseInfoRequest {
 }
 
 /**
- * Request to retrieve L2 order book snapshot.
+ * Request to retrieves a Level 2 (L2) order book snapshot.
  *
  * @requestWeight 2
  * @response {@link L2BookResponse}
@@ -696,9 +696,9 @@ export interface L2BookRequest extends BaseInfoRequest {
 }
 
 /**
- * Request to retrieve candlestick data for charting.
+ * Request to retrieves a candlestick data point for charting.
  *
- * @requestWeight 2
+ * @requestWeight 20
  * @response Array of {@link CandleSnapshot}
  */
 export interface CandleSnapshotRequest extends BaseInfoRequest {
@@ -722,7 +722,7 @@ export interface CandleSnapshotRequest extends BaseInfoRequest {
 }
 
 /**
- * Request to retrieve metadata for perpetual assets.
+ * Request to retrieves metadata for perpetual assets.
  *
  * @requestWeight 20
  * @response {@link MetaResponse}
@@ -733,7 +733,7 @@ export interface MetaRequest extends BaseInfoRequest {
 }
 
 /**
- * Request to retrieve both metadata and context information for perpetual assets.
+ * Request to retrieves both metadata and context information for perpetual assets.
  *
  * @requestWeight 20
  * @response {@link MetaAndAssetCtxsResponse}
@@ -744,7 +744,7 @@ export interface MetaAndAssetCtxsRequest extends BaseInfoRequest {
 }
 
 /**
- * Request to retrieve a user's account summary for perpetual trading.
+ * Request to retrieves a user's account summary for perpetual trading.
  *
  * @requestWeight 2
  * @response {@link ClearinghouseStateResponse}
@@ -758,9 +758,7 @@ export interface ClearinghouseStateRequest extends BaseInfoRequest {
 }
 
 /**
- * Request to retrieve a user's funding or non-funding ledger updates.
- *
- * Note: Non-funding ledger updates include deposits, withdrawals, and transfers.
+ * Request to retrieves a user's funding history or non-funding ledger updates.
  *
  * @requestWeight 20
  * @response Array of {@link UserFunding}
@@ -785,7 +783,7 @@ export interface UserFundingRequest extends BaseInfoRequest {
 }
 
 /**
- * Request to retrieve historical funding rates for an asset.
+ * Request to retrieves historical funding rate data for an asset.
  *
  * @requestWeight 20
  * @response Array of {@link FundingHistory}
@@ -805,9 +803,9 @@ export interface FundingHistoryRequest extends BaseInfoRequest {
 }
 
 /**
- * Request to retrieve metadata for spot trading.
+ * Request to retrieves metadata for spot trading.
  *
- * @requestWeight 2
+ * @requestWeight 20
  * @response {@link SpotMetaResponse}
  */
 export interface SpotMetaRequest extends BaseInfoRequest {
@@ -816,9 +814,9 @@ export interface SpotMetaRequest extends BaseInfoRequest {
 }
 
 /**
- * Request to retrieve both metadata and context information for spot assets.
+ * Request to retrieves both metadata and context information for spot assets.
  *
- * @requestWeight 2
+ * @requestWeight 20
  * @response {@link SpotMetaAndAssetCtxsResponse}
  */
 export interface SpotMetaAndAssetCtxsRequest extends BaseInfoRequest {
@@ -827,7 +825,7 @@ export interface SpotMetaAndAssetCtxsRequest extends BaseInfoRequest {
 }
 
 /**
- * Request to retrieve a user's balances for spot tokens.
+ * Request to retrieves a user's balances for spot tokens.
  *
  * @requestWeight 2
  * @response {@link SpotClearinghouseStateResponse}

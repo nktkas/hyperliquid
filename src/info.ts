@@ -192,7 +192,6 @@ export class HyperliquidInfoClient {
      * Retrieves mid prices for all actively traded coins.
      *
      * @requestWeight 2
-     * @returns - {@link AllMidsResponse}.
      */
     async allMids(): Promise<AllMidsResponse> {
         return await this.request({ type: "allMids" });
@@ -201,9 +200,7 @@ export class HyperliquidInfoClient {
     /**
      * Retrieves a user's active open orders.
      *
-     * @requestWeight 2
-     * @param args - {@link OpenOrdersParameters}.
-     * @returns - {@link OpenOrder}[].
+     * @requestWeight 20
      */
     async openOrders(args: OpenOrdersParameters): Promise<OpenOrder[]> {
         return await this.request({ type: "openOrders", ...args });
@@ -213,8 +210,6 @@ export class HyperliquidInfoClient {
      * Retrieves an open order with additional frontend information.
      *
      * @requestWeight 20
-     * @param args - {@link FrontendOpenOrdersParameters}.
-     * @returns - {@link FrontendOpenOrder}[].
      */
     async frontendOpenOrders(args: FrontendOpenOrdersParameters): Promise<FrontendOpenOrder[]> {
         return await this.request({ type: "frontendOpenOrders", ...args });
@@ -224,8 +219,6 @@ export class HyperliquidInfoClient {
      * Retrieves a user's trade fills.
      *
      * @requestWeight 20
-     * @param args - {@link UserFillsParameters}.
-     * @returns - {@link UserFill}[].
      */
     async userFills(args: UserFillsParameters): Promise<UserFill[]> {
         return await this.request({ type: "userFills", ...args });
@@ -235,8 +228,6 @@ export class HyperliquidInfoClient {
      * Retrieves a user's trade fills within a specific time range.
      *
      * @requestWeight 20
-     * @param args - {@link UserFillsByTimeParameters}.
-     * @returns - {@link UserFill}[].
      */
     async userFillsByTime(args: UserFillsByTimeParameters): Promise<UserFill[]> {
         return await this.request({ type: "userFillsByTime", ...args });
@@ -246,8 +237,6 @@ export class HyperliquidInfoClient {
      * Retrieves a user's rate limits.
      *
      * @requestWeight 20
-     * @param args - {@link UserRateLimitParameters}.
-     * @returns - {@link UserRateLimitResponse}.
      */
     async userRateLimit(args: UserRateLimitParameters): Promise<UserRateLimitResponse> {
         return await this.request({ type: "userRateLimit", ...args });
@@ -257,8 +246,6 @@ export class HyperliquidInfoClient {
      * Retrieves the status of a specific order.
      *
      * @requestWeight 2
-     * @param args - {@link OrderStatusParameters}.
-     * @returns - {@link OrderStatusResponse}.
      */
     async orderStatus(args: OrderStatusParameters): Promise<OrderStatusResponse> {
         return await this.request({ type: "orderStatus", ...args });
@@ -268,8 +255,6 @@ export class HyperliquidInfoClient {
      * Retrieves a Level 2 (L2) order book snapshot.
      *
      * @requestWeight 2
-     * @param args - {@link L2BookParameters}.
-     * @returns - {@link L2BookResponse}.
      */
     async l2Book(args: L2BookParameters): Promise<L2BookResponse> {
         return await this.request({ type: "l2Book", ...args });
@@ -278,9 +263,7 @@ export class HyperliquidInfoClient {
     /**
      * Retrieves a candlestick data point for charting.
      *
-     * @requestWeight 2
-     * @param args - {@link CandleSnapshotParameters}.
-     * @returns - {@link CandleSnapshot}[].
+     * @requestWeight 20
      */
     async candleSnapshot(args: CandleSnapshotParameters): Promise<CandleSnapshot[]> {
         return await this.request({ type: "candleSnapshot", req: args });
@@ -290,7 +273,6 @@ export class HyperliquidInfoClient {
      * Retrieves metadata for perpetual assets.
      *
      * @requestWeight 20
-     * @returns - {@link MetaResponse}.
      */
     async meta(): Promise<MetaResponse> {
         return await this.request({ type: "meta" });
@@ -300,7 +282,6 @@ export class HyperliquidInfoClient {
      * Retrieves both metadata and context information for perpetual assets.
      *
      * @requestWeight 20
-     * @returns - {@link MetaAndAssetCtxsResponse}.
      */
     async metaAndAssetCtxs(): Promise<MetaAndAssetCtxsResponse> {
         return await this.request({ type: "metaAndAssetCtxs" });
@@ -310,8 +291,6 @@ export class HyperliquidInfoClient {
      * Retrieves a user's account summary for perpetual trading.
      *
      * @requestWeight 2
-     * @param args - {@link ClearinghouseStateParameters}.
-     * @returns - {@link ClearinghouseStateResponse}.
      */
     async clearinghouseState(args: ClearinghouseStateParameters): Promise<ClearinghouseStateResponse> {
         return await this.request({ type: "clearinghouseState", ...args });
@@ -321,8 +300,6 @@ export class HyperliquidInfoClient {
      * Retrieves a user's funding history or non-funding ledger updates.
      *
      * @requestWeight 20
-     * @param args - {@link UserFundingParameters}.
-     * @returns - {@link UserFunding}[].
      */
     async userFunding(args: UserFundingParameters): Promise<UserFunding[]> {
         return await this.request({ type: "userFunding", ...args });
@@ -332,8 +309,6 @@ export class HyperliquidInfoClient {
      * Retrieves historical funding rate data for an asset.
      *
      * @requestWeight 20
-     * @param args - {@link FundingHistoryParameters}.
-     * @returns - {@link FundingHistory}[].
      */
     async fundingHistory(args: FundingHistoryParameters): Promise<FundingHistory[]> {
         return await this.request({ type: "fundingHistory", ...args });
@@ -342,8 +317,7 @@ export class HyperliquidInfoClient {
     /**
      * Retrieves metadata for spot trading.
      *
-     * @requestWeight 2
-     * @returns - {@link SpotMetaResponse}.
+     * @requestWeight 20
      */
     async spotMeta(): Promise<SpotMetaResponse> {
         return await this.request({ type: "spotMeta" });
@@ -352,8 +326,7 @@ export class HyperliquidInfoClient {
     /**
      * Retrieves both metadata and context information for spot assets.
      *
-     * @requestWeight 2
-     * @returns - {@link SpotMetaAndAssetCtxsResponse}.
+     * @requestWeight 20
      */
     async spotMetaAndAssetCtxs(): Promise<SpotMetaAndAssetCtxsResponse> {
         return await this.request({ type: "spotMetaAndAssetCtxs" });
@@ -363,8 +336,6 @@ export class HyperliquidInfoClient {
      * Retrieves a user's balances for spot tokens.
      *
      * @requestWeight 2
-     * @param args - {@link SpotClearinghouseStateParameters}.
-     * @returns - {@link SpotClearinghouseStateResponse}.
      */
     async spotClearinghouseState(args: SpotClearinghouseStateParameters): Promise<SpotClearinghouseStateResponse> {
         return await this.request({ type: "spotClearinghouseState", ...args });

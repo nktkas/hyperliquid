@@ -140,6 +140,7 @@ export interface OrderRequest extends BaseExchangeRequest {
  *
  * @requestWeight 1
  * @response {@link CancelResponse}
+ * @throws {HyperliquidBatchAPIError} If the API returns an error.
  */
 export interface CancelRequest extends BaseExchangeRequest {
     action: {
@@ -162,6 +163,7 @@ export interface CancelRequest extends BaseExchangeRequest {
  *
  * @requestWeight 1
  * @response {@link CancelResponse}
+ * @throws {HyperliquidBatchAPIError} If the API returns an error.
  */
 export interface CancelByCloidRequest extends BaseExchangeRequest {
     action: {
@@ -180,10 +182,11 @@ export interface CancelByCloidRequest extends BaseExchangeRequest {
 }
 
 /**
- * Schedules a cancel operation (dead man's switch).
+ * Schedules a cancel-all operation (dead man's switch).
  *
  * @requestWeight 1
  * @response {@link SuccessResponse}
+ * @throws {HyperliquidAPIError} If the API returns an error.
  */
 export interface ScheduleCancelRequest extends BaseExchangeRequest {
     action: {
@@ -200,6 +203,7 @@ export interface ScheduleCancelRequest extends BaseExchangeRequest {
  *
  * @requestWeight 1
  * @response {@link SuccessResponse}
+ * @throws {HyperliquidAPIError} If the API returns an error.
  */
 export interface ModifyRequest extends BaseExchangeRequest {
     action: {
@@ -219,6 +223,7 @@ export interface ModifyRequest extends BaseExchangeRequest {
  *
  * @requestWeight 1
  * @response {@link OrderResponse}
+ * @throws {HyperliquidBatchAPIError} If the API returns an error.
  */
 export interface BatchModifyRequest extends BaseExchangeRequest {
     action: {
@@ -237,10 +242,11 @@ export interface BatchModifyRequest extends BaseExchangeRequest {
 }
 
 /**
- * Updates cross or isolated leverage on a coin.
+ * Updates cross or isolated leverage for a coin.
  *
  * @requestWeight 1
  * @response {@link SuccessResponse}
+ * @throws {HyperliquidAPIError} If the API returns an error.
  */
 export interface UpdateLeverageRequest extends BaseExchangeRequest {
     action: {
@@ -263,6 +269,7 @@ export interface UpdateLeverageRequest extends BaseExchangeRequest {
  *
  * @requestWeight 1
  * @response {@link SuccessResponse}
+ * @throws {HyperliquidAPIError} If the API returns an error.
  */
 export interface UpdateIsolatedMarginRequest extends BaseExchangeRequest {
     action: {
@@ -281,10 +288,11 @@ export interface UpdateIsolatedMarginRequest extends BaseExchangeRequest {
 }
 
 /**
- * Transfers L1 USDC to another address.
+ * Transfers USDC on L1 to another address.
  *
  * @requestWeight 1
  * @response {@link SuccessResponse}
+ * @throws {HyperliquidAPIError} If the API returns an error.
  */
 export interface UsdSendRequest extends BaseExchangeRequest {
     action: {
@@ -310,10 +318,11 @@ export interface UsdSendRequest extends BaseExchangeRequest {
 }
 
 /**
- * Transfers L1 spot funds to another address.
+ * Transfers a spot asset on L1 to another address.
  *
  * @requestWeight 1
  * @response {@link SuccessResponse}
+ * @throws {HyperliquidAPIError} If the API returns an error.
  */
 export interface SpotSendRequest extends BaseExchangeRequest {
     action: {
@@ -346,6 +355,7 @@ export interface SpotSendRequest extends BaseExchangeRequest {
  *
  * @requestWeight 1
  * @response {@link SuccessResponse}
+ * @throws {HyperliquidAPIError} If the API returns an error.
  */
 export interface Withdraw3Request extends BaseExchangeRequest {
     action: {
@@ -375,6 +385,7 @@ export interface Withdraw3Request extends BaseExchangeRequest {
  *
  * @requestWeight 1
  * @response {@link SuccessResponse}
+ * @throws {HyperliquidAPIError} If the API returns an error.
  */
 export interface SpotUserRequest extends BaseExchangeRequest {
     action: {
@@ -398,6 +409,7 @@ export interface SpotUserRequest extends BaseExchangeRequest {
  *
  * @requestWeight 1
  * @response {@link SuccessResponse}
+ * @throws {HyperliquidAPIError} If the API returns an error.
  */
 export interface VaultTransferRequest extends BaseExchangeRequest {
     action: {

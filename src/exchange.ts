@@ -164,7 +164,7 @@ export interface UpdateIsolatedMarginParameters {
     /** Position side (`true` for long, `false` for short). Has no effect until hedge mode is implemented. */
     isBuy: boolean;
 
-    /** Amount to add or remove. */
+    /** Amount to add or remove (in USD). */
     ntli: number;
 
     /** On-chain address of the vault (if trading on behalf of a vault). */
@@ -293,8 +293,6 @@ export class HyperliquidExchangeClient {
      * Places an order.
      *
      * @requestWeight 1
-     * @param args - Order parameters; {@link OrderParameters}.
-     * @returns - {@link OrderResponse}.
      * @throws {HyperliquidBatchAPIError} If the API returns an error.
      */
     async order(args: OrderParameters): Promise<OrderResponse> {
@@ -329,8 +327,6 @@ export class HyperliquidExchangeClient {
      * Cancels order(s).
      *
      * @requestWeight 1
-     * @param args - Parameters for the cancel operation; {@link CancelParameters}.
-     * @returns - {@link CancelResponse}.
      * @throws {HyperliquidBatchAPIError} If the API returns an error.
      */
     async cancel(args: CancelParameters): Promise<CancelResponse> {
@@ -347,8 +343,6 @@ export class HyperliquidExchangeClient {
      * Cancels order(s) by client order ID.
      *
      * @requestWeight 1
-     * @param args - Parameters for the cancel by client order ID operation; {@link CancelByCloidParameters}.
-     * @returns - {@link CancelResponse}.
      * @throws {HyperliquidBatchAPIError} If the API returns an error.
      */
     async cancelByCloid(args: CancelByCloidParameters): Promise<CancelResponse> {
@@ -365,8 +359,6 @@ export class HyperliquidExchangeClient {
      * Schedules a cancel-all operation (dead man's switch).
      *
      * @requestWeight 1
-     * @param args - Parameters for scheduling a cancel; {@link ScheduleCancelParameters}.
-     * @returns - {@link SuccessResponse}.
      * @throws {HyperliquidAPIError} If the API returns an error.
      */
     async scheduleCancel(args: ScheduleCancelParameters): Promise<SuccessResponse> {
@@ -383,8 +375,6 @@ export class HyperliquidExchangeClient {
      * Modifies an order.
      *
      * @requestWeight 1
-     * @param args - Parameters for the modify operation; {@link ModifyParameters}.
-     * @returns - {@link SuccessResponse}.
      * @throws {HyperliquidAPIError} If the API returns an error.
      */
     async modify(args: ModifyParameters): Promise<SuccessResponse> {
@@ -416,8 +406,6 @@ export class HyperliquidExchangeClient {
      * Modifies multiple orders.
      *
      * @requestWeight 1
-     * @param args - Parameters for the batch modify operation; {@link BatchModifyParameters}.
-     * @returns - {@link OrderResponse}.
      * @throws {HyperliquidBatchAPIError} If the API returns an error.
      */
     async batchModify(args: BatchModifyParameters): Promise<OrderResponse> {
@@ -454,8 +442,6 @@ export class HyperliquidExchangeClient {
      * Updates cross or isolated leverage for a coin.
      *
      * @requestWeight 1
-     * @param args - Parameters for updating leverage; {@link UpdateLeverageParameters}.
-     * @returns - {@link SuccessResponse}.
      * @throws {HyperliquidAPIError} If the API returns an error.
      */
     async updateLeverage(args: UpdateLeverageParameters): Promise<SuccessResponse> {
@@ -474,8 +460,6 @@ export class HyperliquidExchangeClient {
      * Adds or removes margin from an isolated position.
      *
      * @requestWeight 1
-     * @param args - Parameters for updating isolated margin; {@link UpdateIsolatedMarginParameters}.
-     * @returns - {@link SuccessResponse}.
      * @throws {HyperliquidAPIError} If the API returns an error.
      */
     async updateIsolatedMargin(args: UpdateIsolatedMarginParameters): Promise<SuccessResponse> {
@@ -494,8 +478,6 @@ export class HyperliquidExchangeClient {
      * Transfers USDC on L1 to another address.
      *
      * @requestWeight 1
-     * @param args - Parameters for the USDC transfer; {@link UsdSendParameters}.
-     * @returns - {@link SuccessResponse}.
      * @throws {HyperliquidAPIError} If the API returns an error.
      */
     async usdSend(args: UsdSendParameters): Promise<SuccessResponse> {
@@ -525,8 +507,6 @@ export class HyperliquidExchangeClient {
      * Transfers a spot asset on L1 to another address.
      *
      * @requestWeight 1
-     * @param args - Parameters for the spot asset transfer; {@link SpotSendParameters}.
-     * @returns - {@link SuccessResponse}.
      * @throws {HyperliquidAPIError} If the API returns an error.
      */
     async spotSend(args: SpotSendParameters): Promise<SuccessResponse> {
@@ -558,8 +538,6 @@ export class HyperliquidExchangeClient {
      * Initiates a withdrawal request.
      *
      * @requestWeight 1
-     * @param args - Parameters for the withdrawal request; {@link Withdraw3Parameters}.
-     * @returns - {@link SuccessResponse}.
      * @throws {HyperliquidAPIError} If the API returns an error.
      */
     async withdraw3(args: Withdraw3Parameters): Promise<SuccessResponse> {
@@ -589,8 +567,6 @@ export class HyperliquidExchangeClient {
      * Transfers funds between Spot and Perp accounts.
      *
      * @requestWeight 1
-     * @param args - Parameters for transferring from Spot to Perp; {@link SpotUserParameters}.
-     * @returns - {@link SuccessResponse}.
      * @throws {HyperliquidAPIError} If the API returns an error.
      */
     async spotUser(args: SpotUserParameters): Promise<SuccessResponse> {
@@ -607,11 +583,9 @@ export class HyperliquidExchangeClient {
     }
 
     /**
-     * Performs a deposit into a vault or a withdrawal from it.
+     * Deposits or withdraws from a vault.
      *
      * @requestWeight 1
-     * @param args - Parameters for the vault transfer; {@link VaultTransferParameters}.
-     * @returns - {@link SuccessResponse}.
      * @throws {HyperliquidAPIError} If the API returns an error.
      */
     async vaultTransfer(args: VaultTransferParameters): Promise<SuccessResponse> {
