@@ -24,10 +24,10 @@ export type OrderType =
  * Time-in-force options specify how long an order remains active:
  *
  * - `"Gtc"` (Good Til Cancelled): Remains active until filled or canceled.
- * - `"Alo"` (Add Liquidity Only): Only adds liquidity; does not take liquidity.
  * - `"Ioc"` (Immediate or Cancel): Fills immediately or cancels any unfilled portion.
+ * - `"Alo"` (Add Liquidity Only): Only adds liquidity; does not take liquidity.
  */
-export type TIF = "Gtc" | "Alo" | "Ioc";
+export type TIF = "Gtc" | "Ioc" | "Alo";
 
 /**
  * Represents a user's active open order.
@@ -68,7 +68,7 @@ export interface OpenOrder {
  */
 export interface FrontendOpenOrder extends OpenOrder {
     /** Trigger condition (if applicable). */
-    triggerCondition: "N/A";
+    triggerCondition: string;
 
     /** Indicates if the order is a trigger order. */
     isTrigger: boolean;
@@ -89,7 +89,7 @@ export interface FrontendOpenOrder extends OpenOrder {
     orderType: OrderType;
 
     /** Time-in-force option for the order. */
-    tif: TIF;
+    tif: TIF | null;
 }
 
 /**
@@ -187,7 +187,7 @@ export interface OrderStatus {
         timestamp: number;
 
         /** Trigger condition (if applicable). */
-        triggerCondition: "N/A";
+        triggerCondition: string;
 
         /** Indicates if the order is a trigger order. */
         isTrigger: boolean;
@@ -211,7 +211,7 @@ export interface OrderStatus {
         origSz: string;
 
         /** Time-in-force option for the order. */
-        tif: TIF;
+        tif: TIF | null;
 
         /** Client Order ID assigned by the user (if any). */
         cloid: Hex | null;
