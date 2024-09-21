@@ -1,6 +1,6 @@
 # @nktkas/hyperliquid
 
-A low-level SDK for interacting with Hyperliquid's APIs in TypeScript.
+A low-level SDK for interacting with [Hyperliquid's](https://hyperliquid.xyz/) APIs in TypeScript.
 
 ## Features
 
@@ -11,7 +11,7 @@ A low-level SDK for interacting with Hyperliquid's APIs in TypeScript.
 
 ## Installation
 
-Use [jsr](https://jsr.io/@nktkas/hyperliquid) to install. Compatible with Deno, Node.js, Bun, and works with npm, Yarn, or pnpm.
+Use [jsr](https://jsr.io/@nktkas/hyperliquid) to install. JSR makes it compatible with major JS runtimes and package managers.
 
 ## Usage
 
