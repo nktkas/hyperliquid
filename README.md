@@ -11,7 +11,7 @@ A low-level SDK for interacting with [Hyperliquid's](https://hyperliquid.xyz/) A
 
 ## Installation
 
-Use [jsr](https://jsr.io/@nktkas/hyperliquid) to install. Compatible with Deno, Node.js, Bun, and works with npm, Yarn, or pnpm.
+Use [jsr](https://jsr.io/@nktkas/hyperliquid) to install. JSR makes it compatible with major JS runtimes and package managers.
 
 ## Usage
 
