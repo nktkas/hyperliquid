@@ -349,7 +349,7 @@ export interface AssetPosition {
         /** Return on equity (unrealizedPnl / marginUsed). */
         returnOnEquity: string;
 
-        /** Liquidation price (`null` if not applicable). */
+        /** Liquidation price. */
         liquidationPx: string | null;
 
         /** Margin used for the position. */
@@ -388,7 +388,7 @@ export interface AssetCtx {
     /** Daily notional trading volume. */
     dayNtlVlm: string;
 
-    /** Premium (difference between mark and index price); `null` if not applicable. */
+    /** Premium (difference between mark and index price). */
     premium: string | null;
 
     /** Current oracle price. */
@@ -397,10 +397,10 @@ export interface AssetCtx {
     /** Current mark price (fair value). */
     markPx: string;
 
-    /** Current index price; `null` if not available. */
+    /** Current index price. */
     midPx: string | null;
 
-    /** Impact prices at different levels; `null` if not available. */
+    /** Impact prices at different levels. */
     impactPxs: string[] | null;
 }
 
@@ -435,7 +435,7 @@ export interface UserFunding {
         /** Funding rate applied. */
         fundingRate: string;
 
-        /** Number of samples used to calculate funding; `null` if not applicable. */
+        /** Number of samples used to calculate funding. */
         nSamples: number | null;
     };
 }
@@ -506,10 +506,10 @@ export interface SpotToken {
     /** Indicates if this token is the primary representation in the system. */
     isCanonical: boolean;
 
-    /** EVM contract address for the token (`null` if not applicable). */
+    /** EVM contract address for the token. */
     evmContract: Hex | null;
 
-    /** Full display name of the token (`null` if not applicable). */
+    /** Full display name of the token. */
     fullName: string | null;
 }
 
@@ -526,7 +526,7 @@ export interface SpotAssetCtx {
     /** Latest market price. */
     markPx: string;
 
-    /** Current index price; `null` if not available. */
+    /** Current index price. */
     midPx: string | null;
 
     /** Circulating supply. */
@@ -692,7 +692,8 @@ export interface L2BookRequest extends BaseInfoRequest {
     nSigFigs?: 2 | 3 | 4 | 5;
 
     /** Mantissa value for level aggregation (allowed only when `nSigFigs` is `5`, optional). */
-    mantissa?: 1 | 2 | 5;
+    // TODO: The documentation says that option 1 is possible, but in this case the request terminates with an error
+    mantissa?: 2 | 5;
 }
 
 /**
