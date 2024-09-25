@@ -96,6 +96,8 @@ Deno.test("l2Book", async (t) => {
     });
 
     await t.step("coin + nSigFigs + mantissa", async (t) => {
+        // TODO: "mantissa === 1" causes an error: Status 500 | Body: null
+
         await t.step("mantissa === 2", async () => {
             const data = await client.l2Book({ coin: "ETH", nSigFigs: 5, mantissa: 2 });
 
