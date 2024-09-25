@@ -11,7 +11,7 @@ const ajv = new Ajv({ strict: true });
  */
 export function assertJsonSchema(schema: Definition, data: unknown): void {
     const validate = ajv.compile(schema);
-    assert(validate(data), JSON.stringify(validate.errors));
+    assert(validate(data), JSON.stringify(validate.errors) + "\n" + JSON.stringify(data));
 }
 
 export function recursiveTraversal(
