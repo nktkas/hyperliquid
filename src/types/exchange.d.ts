@@ -422,8 +422,8 @@ export interface VaultTransferRequest extends BaseExchangeRequest {
         /** `true` for deposit; `false` for withdrawal. */
         isDeposit: boolean;
 
-        /** Amount of USD to transfer. */
-        usd: string;
+        /** Amount of raw USD to transfer (float amount * 1e6). */
+        usd: number;
     };
     vaultAddress?: never;
 }
