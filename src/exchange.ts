@@ -99,8 +99,8 @@ export interface CancelByCloidParameters {
  * Parameters for the {@link HyperliquidExchangeClient.scheduleCancel scheduleCancel} method.
  */
 export interface ScheduleCancelParameters {
-    /** Scheduled time for the cancel-all operation (set to `null` to remove scheduled cancel). */
-    time: number | null;
+    /** Scheduled time for the cancel-all operation. */
+    time: number;
 
     /** On-chain address of the vault (if trading on behalf of a vault). */
     vaultAddress?: Hex;

@@ -193,8 +193,8 @@ export interface ScheduleCancelRequest extends BaseExchangeRequest {
         /** Type of action. */
         type: "scheduleCancel";
 
-        /** Scheduled time for the cancel-all operation (set to `null` to remove scheduled cancel). */
-        time: number | null;
+        /** Scheduled time for the cancel-all operation. */
+        time: number;
     };
 }
 
