@@ -34,4 +34,4 @@ jobs:
         run: deno lint
 
       - name: Run tests
-        run: deno test -A -- ${{secrets.EXCHANGE_TEST_PRIVATE_KEY}} ETH
+        run: deno test -A -- ${{secrets.EXCHANGE_TEST_PRIVATE_KEY}} ETH 0xa15099a30bbf2e68942d6f4c43d70d04faeab0a0
