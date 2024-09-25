@@ -36,9 +36,26 @@ import type {
 } from "./types/info.d.ts";
 
 /**
- * Parameters for the {@link HyperliquidInfoClient.openOrders openOrders} method.
+ * Parameters for the {@link HyperliquidInfoClient.candleSnapshot candleSnapshot} method.
  */
-export interface OpenOrdersParameters {
+export interface CandleSnapshotParameters {
+    /** Symbol of the asset (e.g., `"ETH"`). */
+    coin: string;
+
+    /** Time interval for each candle (e.g., `"15m"`). */
+    interval: string;
+
+    /** Start time of the data (inclusive, in milliseconds since epoch). */
+    startTime: number;
+
+    /** End time of the data (inclusive, in milliseconds since epoch, optional). */
+    endTime?: number;
+}
+
+/**
+ * Parameters for the {@link HyperliquidInfoClient.clearinghouseState clearinghouseState} method.
+ */
+export interface ClearinghouseStateParameters {
     /** User's address. */
     user: Hex;
 }
@@ -47,6 +64,67 @@ export interface OpenOrdersParameters {
  * Parameters for the {@link HyperliquidInfoClient.frontendOpenOrders frontendOpenOrders} method.
  */
 export interface FrontendOpenOrdersParameters {
+    /** User's address. */
+    user: Hex;
+}
+
+/**
+ * Parameters for the {@link HyperliquidInfoClient.fundingHistory fundingHistory} method.
+ */
+export interface FundingHistoryParameters {
+    /** Symbol of the asset (e.g., `"ETH"`). */
+    coin: string;
+
+    /** Start time of the data (inclusive, in milliseconds since epoch). */
+    startTime: number;
+
+    /** End time of the data (inclusive, in milliseconds since epoch, optional). */
+    endTime?: number;
+}
+
+/**
+ * Parameters for the {@link HyperliquidInfoClient.l2Book l2Book} method.
+ */
+export interface L2BookParameters {
+    /** Symbol of the asset to retrieve the order book for (e.g., `"ETH"`). */
+    coin: string;
+
+    /** Number of significant figures to aggregate price levels (optional). */
+    nSigFigs?: 2 | 3 | 4 | 5;
+
+    /** Mantissa value for level aggregation (allowed only when `nSigFigs` is `5`, optional). */
+    // TODO: The documentation says that option 1 is possible, but in this case the request terminates with an error
+    mantissa?: 2 | 5;
+}
+
+/**
+ * Parameters for the {@link HyperliquidInfoClient.openOrders openOrders} method.
+ */
+export interface OpenOrdersParameters {
+    /** User's address. */
+    user: Hex;
+}
+
+/**
+ * Parameters for the {@link HyperliquidInfoClient.orderStatus orderStatus} method.
+ */
+export interface OrderStatusParameters {
+    /** User's address. */
+    user: Hex;
+
+    /**
+     * Order ID to query.
+     *
+     * - If a `number`, it's an Order ID (`oid`).
+     * - If a `Hex` string, it's a Client Order ID (`cloid`).
+     */
+    oid: number | Hex;
+}
+
+/**
+ * Parameters for the {@link HyperliquidInfoClient.spotClearinghouseState spotClearinghouseState} method.
+ */
+export interface SpotClearinghouseStateParameters {
     /** User's address. */
     user: Hex;
 }
@@ -74,69 +152,6 @@ export interface UserFillsByTimeParameters {
 }
 
 /**
- * Parameters for the {@link HyperliquidInfoClient.userRateLimit userRateLimit} method.
- */
-export interface UserRateLimitParameters {
-    /** User's address. */
-    user: Hex;
-}
-
-/**
- * Parameters for the {@link HyperliquidInfoClient.orderStatus orderStatus} method.
- */
-export interface OrderStatusParameters {
-    /** User's address. */
-    user: Hex;
-
-    /**
-     * Order ID to query.
-     *
-     * - If a `number`, it's an Order ID (`oid`).
-     * - If a `Hex` string, it's a Client Order ID (`cloid`).
-     */
-    oid: number | Hex;
-}
-
-/**
- * Parameters for the {@link HyperliquidInfoClient.l2Book l2Book} method.
- */
-export interface L2BookParameters {
-    /** Symbol of the asset to retrieve the order book for (e.g., `"ETH"`). */
-    coin: string;
-
-    /** Number of significant figures to aggregate price levels (optional). */
-    nSigFigs?: 2 | 3 | 4 | 5;
-
-    /** Mantissa value for level aggregation (allowed only when `nSigFigs` is `5`, optional). */
-    mantissa?: 1 | 2 | 5;
-}
-
-/**
- * Parameters for the {@link HyperliquidInfoClient.candleSnapshot candleSnapshot} method.
- */
-export interface CandleSnapshotParameters {
-    /** Symbol of the asset (e.g., `"ETH"`). */
-    coin: string;
-
-    /** Time interval for each candle (e.g., `"15m"`). */
-    interval: string;
-
-    /** Start time of the data (inclusive, in milliseconds since epoch). */
-    startTime: number;
-
-    /** End time of the data (inclusive, in milliseconds since epoch, optional). */
-    endTime?: number;
-}
-
-/**
- * Parameters for the {@link HyperliquidInfoClient.clearinghouseState clearinghouseState} method.
- */
-export interface ClearinghouseStateParameters {
-    /** User's address. */
-    user: Hex;
-}
-
-/**
  * Parameters for the {@link HyperliquidInfoClient.userFunding userFunding} method.
  */
 export interface UserFundingParameters {
@@ -151,23 +166,9 @@ export interface UserFundingParameters {
 }
 
 /**
- * Parameters for the {@link HyperliquidInfoClient.fundingHistory fundingHistory} method.
+ * Parameters for the {@link HyperliquidInfoClient.userRateLimit userRateLimit} method.
  */
-export interface FundingHistoryParameters {
-    /** Symbol of the asset (e.g., `"ETH"`). */
-    coin: string;
-
-    /** Start time of the data (inclusive, in milliseconds since epoch). */
-    startTime: number;
-
-    /** End time of the data (inclusive, in milliseconds since epoch, optional). */
-    endTime?: number;
-}
-
-/**
- * Parameters for the {@link HyperliquidInfoClient.spotClearinghouseState spotClearinghouseState} method.
- */
-export interface SpotClearinghouseStateParameters {
+export interface UserRateLimitParameters {
     /** User's address. */
     user: Hex;
 }
@@ -198,12 +199,21 @@ export class HyperliquidInfoClient {
     }
 
     /**
-     * Retrieves a user's active open orders.
+     * Retrieves a candlestick data point for charting.
      *
      * @requestWeight 20
      */
-    async openOrders(args: OpenOrdersParameters): Promise<OpenOrder[]> {
-        return await this.request({ type: "openOrders", ...args });
+    async candleSnapshot(args: CandleSnapshotParameters): Promise<CandleSnapshot[]> {
+        return await this.request({ type: "candleSnapshot", req: args });
+    }
+
+    /**
+     * Retrieves a user's account summary for perpetual trading.
+     *
+     * @requestWeight 2
+     */
+    async clearinghouseState(args: ClearinghouseStateParameters): Promise<ClearinghouseStateResponse> {
+        return await this.request({ type: "clearinghouseState", ...args });
     }
 
     /**
@@ -216,39 +226,12 @@ export class HyperliquidInfoClient {
     }
 
     /**
-     * Retrieves a user's trade fills.
+     * Retrieves historical funding rate data for an asset.
      *
      * @requestWeight 20
      */
-    async userFills(args: UserFillsParameters): Promise<UserFill[]> {
-        return await this.request({ type: "userFills", ...args });
-    }
-
-    /**
-     * Retrieves a user's trade fills within a specific time range.
-     *
-     * @requestWeight 20
-     */
-    async userFillsByTime(args: UserFillsByTimeParameters): Promise<UserFill[]> {
-        return await this.request({ type: "userFillsByTime", ...args });
-    }
-
-    /**
-     * Retrieves a user's rate limits.
-     *
-     * @requestWeight 20
-     */
-    async userRateLimit(args: UserRateLimitParameters): Promise<UserRateLimitResponse> {
-        return await this.request({ type: "userRateLimit", ...args });
-    }
-
-    /**
-     * Retrieves the status of a specific order.
-     *
-     * @requestWeight 2
-     */
-    async orderStatus(args: OrderStatusParameters): Promise<OrderStatusResponse> {
-        return await this.request({ type: "orderStatus", ...args });
+    async fundingHistory(args: FundingHistoryParameters): Promise<FundingHistory[]> {
+        return await this.request({ type: "fundingHistory", ...args });
     }
 
     /**
@@ -258,15 +241,6 @@ export class HyperliquidInfoClient {
      */
     async l2Book(args: L2BookParameters): Promise<L2BookResponse> {
         return await this.request({ type: "l2Book", ...args });
-    }
-
-    /**
-     * Retrieves a candlestick data point for charting.
-     *
-     * @requestWeight 20
-     */
-    async candleSnapshot(args: CandleSnapshotParameters): Promise<CandleSnapshot[]> {
-        return await this.request({ type: "candleSnapshot", req: args });
     }
 
     /**
@@ -288,30 +262,30 @@ export class HyperliquidInfoClient {
     }
 
     /**
-     * Retrieves a user's account summary for perpetual trading.
+     * Retrieves a user's active open orders.
+     *
+     * @requestWeight 20
+     */
+    async openOrders(args: OpenOrdersParameters): Promise<OpenOrder[]> {
+        return await this.request({ type: "openOrders", ...args });
+    }
+
+    /**
+     * Retrieves the status of a specific order.
      *
      * @requestWeight 2
      */
-    async clearinghouseState(args: ClearinghouseStateParameters): Promise<ClearinghouseStateResponse> {
-        return await this.request({ type: "clearinghouseState", ...args });
+    async orderStatus(args: OrderStatusParameters): Promise<OrderStatusResponse> {
+        return await this.request({ type: "orderStatus", ...args });
     }
 
     /**
-     * Retrieves a user's funding history or non-funding ledger updates.
+     * Retrieves a user's balances for spot tokens.
      *
-     * @requestWeight 20
+     * @requestWeight 2
      */
-    async userFunding(args: UserFundingParameters): Promise<UserFunding[]> {
-        return await this.request({ type: "userFunding", ...args });
-    }
-
-    /**
-     * Retrieves historical funding rate data for an asset.
-     *
-     * @requestWeight 20
-     */
-    async fundingHistory(args: FundingHistoryParameters): Promise<FundingHistory[]> {
-        return await this.request({ type: "fundingHistory", ...args });
+    async spotClearinghouseState(args: SpotClearinghouseStateParameters): Promise<SpotClearinghouseStateResponse> {
+        return await this.request({ type: "spotClearinghouseState", ...args });
     }
 
     /**
@@ -333,12 +307,39 @@ export class HyperliquidInfoClient {
     }
 
     /**
-     * Retrieves a user's balances for spot tokens.
+     * Retrieves a user's trade fills.
      *
-     * @requestWeight 2
+     * @requestWeight 20
      */
-    async spotClearinghouseState(args: SpotClearinghouseStateParameters): Promise<SpotClearinghouseStateResponse> {
-        return await this.request({ type: "spotClearinghouseState", ...args });
+    async userFills(args: UserFillsParameters): Promise<UserFill[]> {
+        return await this.request({ type: "userFills", ...args });
+    }
+
+    /**
+     * Retrieves a user's trade fills within a specific time range.
+     *
+     * @requestWeight 20
+     */
+    async userFillsByTime(args: UserFillsByTimeParameters): Promise<UserFill[]> {
+        return await this.request({ type: "userFillsByTime", ...args });
+    }
+
+    /**
+     * Retrieves a user's funding history or non-funding ledger updates.
+     *
+     * @requestWeight 20
+     */
+    async userFunding(args: UserFundingParameters): Promise<UserFunding[]> {
+        return await this.request({ type: "userFunding", ...args });
+    }
+
+    /**
+     * Retrieves a user's rate limits.
+     *
+     * @requestWeight 20
+     */
+    async userRateLimit(args: UserRateLimitParameters): Promise<UserRateLimitResponse> {
+        return await this.request({ type: "userRateLimit", ...args });
     }
 
     protected async request<T extends AllMidsRequest>(body: T): Promise<AllMidsResponse>;
