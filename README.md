@@ -69,6 +69,8 @@ information on each method and its parameters.
 
 - [ ] Add WebSocket support
 - [ ] Make tests more thorough
+    - [x] Info tests
+    - [ ] Exchange tests
 
 ## Contributing
 
