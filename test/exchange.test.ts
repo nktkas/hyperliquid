@@ -11,6 +11,7 @@ import type { OrderResponse } from "../src/types/exchange.d.ts";
 
 const TEST_PRIVATE_KEY = Deno.args[0];
 const TEST_ASSET = Deno.args[1];
+const TEST_VAULT_ADDRESS = Deno.args[2] as Hex;
 
 if (!isHex(TEST_PRIVATE_KEY)) {
     throw new Error(`Expected a hex string, but got ${TEST_PRIVATE_KEY}`);
@@ -150,9 +151,6 @@ Deno.test("HyperliquidExchangeClient", async (t) => {
         ignore: !orderTestResult,
     });
 
-    // Cannot set scheduled cancel time until enough volume traded (required: $1000000)
-    await t.step({ name: "scheduleCancel", fn: () => {}, ignore: true });
-
     await t.step({
         name: "modify",
         fn: async () => {
@@ -284,6 +282,14 @@ Deno.test("HyperliquidExchangeClient", async (t) => {
             });
         },
         ignore: !orderTestResult,
+    });
+
+    // TODO: "time === null" causes an error: L1 error: User or API Wallet 0x... does not exist.
+    await t.step("scheduleCancel", async () => {
+        const data = await exchangeClient.scheduleCancel({ time: Date.now() + 10000 });
+
+        const schema = tsjSchemaGenerator.createSchema("SuccessResponse");
+        assertJsonSchema(schema, data);
     });
 
     await t.step("updateLeverage", async (t) => {
@@ -430,8 +436,16 @@ Deno.test("HyperliquidExchangeClient", async (t) => {
         ignore: !spotUser_test,
     });
 
-    // It's not done yet
-    await t.step({ name: "vaultTransfer", fn: () => {}, ignore: true });
+    await t.step("vaultTransfer", async () => {
+        const data = await exchangeClient.vaultTransfer({
+            vaultAddress: TEST_VAULT_ADDRESS,
+            isDeposit: true,
+            usd: 5000000,
+        });
+
+        const schema = tsjSchemaGenerator.createSchema("SuccessResponse");
+        assertJsonSchema(schema, data);
+    });
 });
 
 function getPxDecimals(marketType: "perp" | "spot", szDecimals: number): number {
