@@ -260,6 +260,59 @@ export interface VaultTransferParameters {
 }
 
 /**
+ * Successful variant of {@link CancelResponse}.
+ */
+export interface CancelResponseSuccess extends CancelResponse {
+    status: "ok";
+    response: {
+        type: "cancel";
+        data: {
+            statuses: "success"[];
+        };
+    };
+}
+
+/**
+ * Successful variant of {@link OrderResponse}.
+ */
+export interface OrderResponseSuccess extends OrderResponse {
+    status: "ok";
+    response: {
+        type: "order";
+        data: {
+            statuses: (
+                | {
+                    /** Status for a resting order. */
+                    resting: {
+                        /** Order ID. */
+                        oid: number;
+
+                        /** Client Order ID. */
+                        cloid?: Hex;
+                    };
+                }
+                | {
+                    /** Status for a filled order. */
+                    filled: {
+                        /** Total size filled. */
+                        totalSz: string;
+
+                        /** Average price of fill. */
+                        avgPx: string;
+
+                        /** Order ID. */
+                        oid: number;
+
+                        /** Client Order ID. */
+                        cloid?: Hex;
+                    };
+                }
+            )[];
+        };
+    };
+}
+
+/**
  * A client to interact with the Hyperliquid exchange APIs.
  */
 export class HyperliquidExchangeClient {
@@ -295,7 +348,7 @@ export class HyperliquidExchangeClient {
      * @requestWeight 1
      * @throws {HyperliquidBatchAPIError} If the API returns an error.
      */
-    async order(args: OrderParameters): Promise<OrderResponse> {
+    async order(args: OrderParameters): Promise<OrderResponseSuccess> {
         const action: OrderRequest["action"] = {
             type: "order",
             orders: args.orders.map((order) => {
@@ -329,7 +382,7 @@ export class HyperliquidExchangeClient {
      * @requestWeight 1
      * @throws {HyperliquidBatchAPIError} If the API returns an error.
      */
-    async cancel(args: CancelParameters): Promise<CancelResponse> {
+    async cancel(args: CancelParameters): Promise<CancelResponseSuccess> {
         const action: CancelRequest["action"] = {
             type: "cancel",
             cancels: args.cancels.map((cancel) => ({ a: cancel.a, o: cancel.o })),
@@ -345,7 +398,7 @@ export class HyperliquidExchangeClient {
      * @requestWeight 1
      * @throws {HyperliquidBatchAPIError} If the API returns an error.
      */
-    async cancelByCloid(args: CancelByCloidParameters): Promise<CancelResponse> {
+    async cancelByCloid(args: CancelByCloidParameters): Promise<CancelResponseSuccess> {
         const action: CancelByCloidRequest["action"] = {
             type: "cancelByCloid",
             cancels: args.cancels.map((cancel) => ({ asset: cancel.asset, cloid: cancel.cloid })),
@@ -408,7 +461,7 @@ export class HyperliquidExchangeClient {
      * @requestWeight 1
      * @throws {HyperliquidBatchAPIError} If the API returns an error.
      */
-    async batchModify(args: BatchModifyParameters): Promise<OrderResponse> {
+    async batchModify(args: BatchModifyParameters): Promise<OrderResponseSuccess> {
         const action: BatchModifyRequest["action"] = {
             type: "batchModify",
             modifies: args.modifies.map((modify) => {
@@ -600,12 +653,12 @@ export class HyperliquidExchangeClient {
         return await this.request({ action, signature, nonce });
     }
 
-    protected async request<T extends OrderRequest>(body: T): Promise<OrderResponse>;
-    protected async request<T extends CancelRequest>(body: T): Promise<CancelResponse>;
-    protected async request<T extends CancelByCloidRequest>(body: T): Promise<CancelResponse>;
+    protected async request<T extends OrderRequest>(body: T): Promise<OrderResponseSuccess>;
+    protected async request<T extends CancelRequest>(body: T): Promise<CancelResponseSuccess>;
+    protected async request<T extends CancelByCloidRequest>(body: T): Promise<CancelResponseSuccess>;
     protected async request<T extends ScheduleCancelRequest>(body: T): Promise<SuccessResponse>;
     protected async request<T extends ModifyRequest>(body: T): Promise<SuccessResponse>;
-    protected async request<T extends BatchModifyRequest>(body: T): Promise<OrderResponse>;
+    protected async request<T extends BatchModifyRequest>(body: T): Promise<OrderResponseSuccess>;
     protected async request<T extends UpdateLeverageRequest>(body: T): Promise<SuccessResponse>;
     protected async request<T extends UpdateIsolatedMarginRequest>(body: T): Promise<SuccessResponse>;
     protected async request<T extends UsdSendRequest>(body: T): Promise<SuccessResponse>;
@@ -629,11 +682,10 @@ export class HyperliquidExchangeClient {
 
         const data = await res.json() as SuccessResponse | ErrorResponse | OrderResponse | CancelResponse;
 
-        if (data.status === "err") {
+        if (data.status !== "ok") {
             throw new HyperliquidAPIError(data.response);
         }
         if (
-            data.status === "ok" &&
             data.response.type !== "default" &&
             data.response.data.statuses.some((status) => typeof status === "object" && status !== null && "error" in status)
         ) {
@@ -643,7 +695,7 @@ export class HyperliquidExchangeClient {
             throw new HyperliquidBatchAPIError(messages);
         }
 
-        return data;
+        return data as SuccessResponse | OrderResponseSuccess | CancelResponseSuccess;
     }
 
     protected async signL1Action(
