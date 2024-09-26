@@ -503,7 +503,10 @@ export interface CancelResponse extends BaseExchangeResponse {
         data: {
             statuses: (
                 | "success"
-                | { error: string }
+                | {
+                    /** Error message. */
+                    error: string;
+                }
             )[];
         };
     };
