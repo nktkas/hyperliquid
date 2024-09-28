@@ -507,7 +507,14 @@ export interface SpotToken {
     isCanonical: boolean;
 
     /** EVM contract address for the token. */
-    evmContract: Hex | null;
+    evmContract:
+        | {
+            /** Address of the contract. */
+            address: Hex;
+            /** Number of decimals used in the token's smallest unit. */
+            evm_extra_wei_decimals: number;
+        }
+        | null;
 
     /** Full display name of the token. */
     fullName: string | null;
