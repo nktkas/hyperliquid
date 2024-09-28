@@ -201,14 +201,14 @@ export interface Withdraw3Parameters {
     /** Chain ID used when signing. */
     signatureChainId: Hex;
 
+    /** Recipient's address. */
+    destination: Hex;
+
     /** Amount of USD to withdraw. */
     amount: string;
 
     /** Current timestamp in milliseconds. */
     time: number;
-
-    /** Recipient's address. */
-    destination: Hex;
 }
 
 /**
@@ -341,6 +341,24 @@ export class HyperliquidExchangeClient {
      * @param walletClientOrSigner - The wallet client ([viem](https://viem.sh/)) or signer ([ethers](https://ethers.org/)) used for signing transactions.
      * @param endpoint - The endpoint of the Hyperliquid exchange APIs.
      * @param isMainnet - If the endpoint is testnet, change this value to `false`.
+     *
+     * @example Based on [viem](https://viem.sh/)
+     * ```ts
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const account = privateKeyToAccount("0x...");
+     *
+     * const client = new HyperliquidExchangeClient(account);
+     * ```
+     *
+     * @example Based on [ethers](https://ethers.org/)
+     * ```ts
+     * import { ethers } from "ethers";
+     *
+     * const wallet = new ethers.Wallet("0x...");
+     *
+     * const client = new HyperliquidExchangeClient(wallet);
+     * ```
      */
     constructor(
         walletClientOrSigner: AbstractWalletClient | AbstractSigner,
@@ -357,6 +375,26 @@ export class HyperliquidExchangeClient {
      *
      * @requestWeight 1
      * @throws {HyperliquidBatchAPIError} If the API returns an error.
+     *
+     * @example
+     * ```ts
+     * const result = await client.order({
+     *     orders: [{
+     *         a: 0, // Asset index
+     *         b: true, // Buy order
+     *         p: "30000", // Price
+     *         s: "0.1", // Size
+     *         r: false, // Not reduce-only
+     *         t: {
+     *             limit: {
+     *                 tif: "Gtc" // Good-til-cancelled
+     *             }
+     *         },
+     *         c: "0x1234567890abcdef1234567890abcdef" // Optional: Client Order ID
+     *     }],
+     *     grouping: "na" // No grouping
+     * });
+     * ```
      */
     async order(args: OrderParameters): Promise<OrderResponseSuccess> {
         const action: OrderRequest["action"] = {
@@ -391,6 +429,16 @@ export class HyperliquidExchangeClient {
      *
      * @requestWeight 1
      * @throws {HyperliquidBatchAPIError} If the API returns an error.
+     *
+     * @example
+     * ```ts
+     * const result = await client.cancel({
+     *     cancels: [{
+     *         a: 0, // Asset index
+     *         o: 123 // Order ID
+     *     }]
+     * });
+     * ```
      */
     async cancel(args: CancelParameters): Promise<CancelResponseSuccess> {
         const action: CancelRequest["action"] = {
@@ -407,6 +455,16 @@ export class HyperliquidExchangeClient {
      *
      * @requestWeight 1
      * @throws {HyperliquidBatchAPIError} If the API returns an error.
+     *
+     * @example
+     * ```ts
+     * const result = await client.cancelByCloid({
+     *     cancels: [{
+     *         asset: 0, // Asset index
+     *         cloid: "0x1234567890abcdef1234567890abcdef" // Client Order ID
+     *     }]
+     * });
+     * ```
      */
     async cancelByCloid(args: CancelByCloidParameters): Promise<CancelResponseSuccess> {
         const action: CancelByCloidRequest["action"] = {
@@ -423,6 +481,13 @@ export class HyperliquidExchangeClient {
      *
      * @requestWeight 1
      * @throws {HyperliquidAPIError} If the API returns an error.
+     *
+     * @example
+     * ```ts
+     * const result = await client.scheduleCancel({
+     *     time: Date.now() + 3600000 // Schedule cancellation 1 hour from now
+     * });
+     * ```
      */
     async scheduleCancel(args: ScheduleCancelParameters): Promise<SuccessResponse> {
         const action: ScheduleCancelRequest["action"] = {
@@ -439,6 +504,25 @@ export class HyperliquidExchangeClient {
      *
      * @requestWeight 1
      * @throws {HyperliquidAPIError} If the API returns an error.
+     *
+     * @example
+     * ```ts
+     * const result = await client.modify({
+     *     oid: 123, // Order ID
+     *     order: {
+     *         a: 0, // Asset index
+     *         b: true, // Buy order
+     *         p: "31000", // New price
+     *         s: "0.2", // New size
+     *         r: false, // Not reduce-only
+     *         t: {
+     *             limit: {
+     *                 tif: "Gtc" // Good-til-cancelled
+     *             }
+     *         }
+     *     }
+     * });
+     * ```
      */
     async modify(args: ModifyParameters): Promise<SuccessResponse> {
         const action: ModifyRequest["action"] = {
@@ -470,6 +554,27 @@ export class HyperliquidExchangeClient {
      *
      * @requestWeight 1
      * @throws {HyperliquidBatchAPIError} If the API returns an error.
+     *
+     * @example
+     * ```ts
+     * const result = await client.batchModify({
+     *     modifies: [{
+     *         oid: 123, // Order ID
+     *         order: {
+     *             a: 0, // Asset index
+     *             b: true, // Buy order
+     *             p: "31000", // New price
+     *             s: "0.2", // New size
+     *             r: false, // Not reduce-only
+     *             t: {
+     *                 limit: {
+     *                     tif: "Gtc" // Good-til-cancelled
+     *                 }
+     *             }
+     *         }
+     *     }]
+     * });
+     * ```
      */
     async batchModify(args: BatchModifyParameters): Promise<OrderResponseSuccess> {
         const action: BatchModifyRequest["action"] = {
@@ -506,6 +611,15 @@ export class HyperliquidExchangeClient {
      *
      * @requestWeight 1
      * @throws {HyperliquidAPIError} If the API returns an error.
+     *
+     * @example
+     * ```ts
+     * const result = await client.updateLeverage({
+     *     asset: 0, // Asset index
+     *     isCross: true, // Use cross leverage
+     *     leverage: 5 // Value of leverage
+     * });
+     * ```
      */
     async updateLeverage(args: UpdateLeverageParameters): Promise<SuccessResponse> {
         const action: UpdateLeverageRequest["action"] = {
@@ -524,6 +638,15 @@ export class HyperliquidExchangeClient {
      *
      * @requestWeight 1
      * @throws {HyperliquidAPIError} If the API returns an error.
+     *
+     * @example
+     * ```ts
+     * const result = await client.updateIsolatedMargin({
+     *     asset: 0, // Asset index
+     *     isBuy: true, // Long position
+     *     ntli: 1000 // Add 1000 USD margin
+     * });
+     * ```
      */
     async updateIsolatedMargin(args: UpdateIsolatedMarginParameters): Promise<SuccessResponse> {
         const action: UpdateIsolatedMarginRequest["action"] = {
@@ -542,6 +665,17 @@ export class HyperliquidExchangeClient {
      *
      * @requestWeight 1
      * @throws {HyperliquidAPIError} If the API returns an error.
+     *
+     * @example
+     * ```ts
+     * const result = await client.usdSend({
+     *     hyperliquidChain: "Mainnet", // Use mainnet
+     *     signatureChainId: "0x66eee", // Hyperliquid chain ID
+     *     destination: "0x...", // Recipient's address
+     *     amount: "1000", // Amount in USDC
+     *     time: Date.now() // Current timestamp
+     * });
+     * ```
      */
     async usdSend(args: UsdSendParameters): Promise<SuccessResponse> {
         const action: UsdSendRequest["action"] = {
@@ -571,6 +705,18 @@ export class HyperliquidExchangeClient {
      *
      * @requestWeight 1
      * @throws {HyperliquidAPIError} If the API returns an error.
+     *
+     * @example
+     * ```ts
+     * const result = await client.spotSend({
+     *     hyperliquidChain: "Mainnet", // Use mainnet
+     *     signatureChainId: "0x66eee", // Hyperliquid chain ID
+     *     destination: "0x...", // Recipient's address
+     *     token: "ETH:0x...", // Token to send
+     *     amount: "1", // Amount
+     *     time: Date.now() // Current timestamp
+     * });
+     * ```
      */
     async spotSend(args: SpotSendParameters): Promise<SuccessResponse> {
         const action: SpotSendRequest["action"] = {
@@ -602,6 +748,17 @@ export class HyperliquidExchangeClient {
      *
      * @requestWeight 1
      * @throws {HyperliquidAPIError} If the API returns an error.
+     *
+     * @example
+     * ```ts
+     * const result = await client.withdraw3({
+     *     hyperliquidChain: "Mainnet", // Use mainnet
+     *     signatureChainId: "0x66eee", // Hyperliquid chain ID
+     *     destination: "0x..." // Recipient's address
+     *     amount: "1000", // Amount in USD
+     *     time: Date.now(), // Current timestamp
+     * });
+     * ```
      */
     async withdraw3(args: Withdraw3Parameters): Promise<SuccessResponse> {
         const action: Withdraw3Request["action"] = {
@@ -631,6 +788,14 @@ export class HyperliquidExchangeClient {
      *
      * @requestWeight 1
      * @throws {HyperliquidAPIError} If the API returns an error.
+     *
+     * @example
+     * ```ts
+     * const result = await client.spotUser({
+     *     usdc: 1000000, // Amount in raw USDC units (float amount * 1e6)
+     *     toPerp: true // Transfer from Spot to Perp
+     * });
+     * ```
      */
     async spotUser(args: SpotUserParameters): Promise<SuccessResponse> {
         const action: SpotUserRequest["action"] = {
@@ -650,6 +815,15 @@ export class HyperliquidExchangeClient {
      *
      * @requestWeight 1
      * @throws {HyperliquidAPIError} If the API returns an error.
+     *
+     * @example
+     * ```ts
+     * const result = await client.vaultTransfer({
+     *     vaultAddress: "0x...", // Vault address
+     *     isDeposit: true, // Deposit to vault
+     *     usd: 1000000 // Amount in raw USD units (float amount * 1e6)
+     * });
+     * ```
      */
     async vaultTransfer(args: VaultTransferParameters): Promise<SuccessResponse> {
         const action: VaultTransferRequest["action"] = {
