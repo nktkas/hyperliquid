@@ -1,9 +1,8 @@
-import { HyperliquidInfoClient } from "../../index.ts";
+import { type Hex, HyperliquidInfoClient } from "../../index.ts";
 import { assertJsonSchema, recursiveTraversal } from "../utils.ts";
 import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
 import { resolve } from "jsr:@std/path@^1.0.2";
 import { assertGreater } from "jsr:@std/assert@^1.0.4";
-import type { Hex } from "viem";
 
 const USER_ADDRESS: Hex = "0x563C175E6f11582f65D6d9E360A618699DEe14a9";
 

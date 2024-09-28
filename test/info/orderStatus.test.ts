@@ -1,9 +1,8 @@
-import { HyperliquidInfoClient } from "../../index.ts";
+import { type Hex, HyperliquidInfoClient } from "../../index.ts";
 import { assertJsonSchema } from "../utils.ts";
 import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
 import { resolve } from "jsr:@std/path@^1.0.2";
 import { assert } from "jsr:@std/assert@^1.0.4";
-import type { Hex } from "viem";
 
 interface TestOrder {
     oid: number;

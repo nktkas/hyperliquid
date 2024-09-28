@@ -1,5 +1,4 @@
-import type { Hex } from "viem";
-import type { TIF } from "./info.d.ts";
+import type { Hex, TIF } from "./info.d.ts";
 
 type JSONValue =
     | string

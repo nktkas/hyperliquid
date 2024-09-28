@@ -1,4 +1,3 @@
-import type { Hex } from "viem";
 import type {
     AllMidsRequest,
     AllMidsResponse,
@@ -10,6 +9,7 @@ import type {
     FrontendOpenOrdersRequest,
     FundingHistory,
     FundingHistoryRequest,
+    Hex,
     L2BookRequest,
     L2BookResponse,
     MetaAndAssetCtxsRequest,

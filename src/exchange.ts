@@ -1,17 +1,6 @@
-import {
-    type Account,
-    type Chain,
-    type Hex,
-    hexToBytes,
-    hexToNumber,
-    keccak256,
-    parseSignature,
-    type RpcSchema,
-    type Transport,
-    type TypedDataParameter,
-    type WalletClient,
-} from "viem";
+import { keccak_256 } from "@noble/hashes/sha3";
 import { encode } from "@msgpack/msgpack";
+import type { Hex } from "./types/info.d.ts";
 import type {
     BatchModifyRequest,
     CancelByCloidRequest,
@@ -34,18 +23,6 @@ import type {
     Withdraw3Request,
 } from "./types/exchange.d.ts";
 import { HyperliquidAPIError, HyperliquidBatchAPIError } from "./error.ts";
-
-type JSONValue =
-    | string
-    | number
-    | boolean
-    | null
-    | JSONValue[]
-    | { [k: string | number]: JSONValue };
-
-interface JSONObject {
-    [k: string | number]: JSONValue;
-}
 
 /**
  * Parameters for the {@link HyperliquidExchangeClient.order order} method.
@@ -313,6 +290,39 @@ export interface OrderResponseSuccess extends OrderResponse {
 }
 
 /**
+ * Abstract interface for a wallet client (compatible with viem's WalletClient).
+ */
+export interface AbstractWalletClient {
+    signTypedData(params: {
+        domain: {
+            name: string;
+            version: string;
+            chainId: number;
+            verifyingContract: Hex;
+        };
+        types: Record<string, Array<{ name: string; type: string }>>;
+        primaryType: string;
+        message: Record<string, unknown>;
+    }): Promise<Hex>;
+}
+
+/**
+ * Abstract interface for a signer (compatible with ethers' Signer).
+ */
+export interface AbstractSigner {
+    signTypedData(
+        domain: {
+            name: string;
+            version: string;
+            chainId: number;
+            verifyingContract: string;
+        },
+        types: Record<string, Array<{ name: string; type: string }>>,
+        value: Record<string, unknown>,
+    ): Promise<string>;
+}
+
+/**
  * A client to interact with the Hyperliquid exchange APIs.
  */
 export class HyperliquidExchangeClient {
@@ -322,22 +332,22 @@ export class HyperliquidExchangeClient {
     /** If the endpoint is testnet, change this value to `false`. */
     public readonly isMainnet: boolean;
 
-    /** WalletClient from `viem` to sign transactions. */
-    public readonly walletClient: WalletClient<Transport, Chain | undefined, Account, RpcSchema | undefined>;
+    /** The wallet client ([viem](https://viem.sh/)) or signer ([ethers](https://ethers.org/)) used for signing transactions. */
+    public readonly walletClientOrSigner: AbstractWalletClient | AbstractSigner;
 
     /**
      * Initializes a new instance of the HyperliquidExchangeClient class.
      *
-     * @param walletClient - WalletClient from `viem` to sign transactions.
+     * @param walletClientOrSigner - The wallet client ([viem](https://viem.sh/)) or signer ([ethers](https://ethers.org/)) used for signing transactions.
      * @param endpoint - The endpoint of the Hyperliquid exchange APIs.
      * @param isMainnet - If the endpoint is testnet, change this value to `false`.
      */
     constructor(
-        walletClient: WalletClient<Transport, Chain | undefined, Account, RpcSchema | undefined>,
+        walletClientOrSigner: AbstractWalletClient | AbstractSigner,
         endpoint: string = "https://api.hyperliquid.xyz/exchange",
         isMainnet: boolean = true,
     ) {
-        this.walletClient = walletClient;
+        this.walletClientOrSigner = walletClientOrSigner;
         this.endpoint = endpoint;
         this.isMainnet = isMainnet;
     }
@@ -699,58 +709,111 @@ export class HyperliquidExchangeClient {
     }
 
     protected async signL1Action(
-        action: JSONObject,
+        action: Record<string, unknown>,
         vaultAddress: Hex | null,
         nonce: number,
     ): Promise<{ r: Hex; s: Hex; v: number }> {
         const actionHash = this.createActionHash(action, vaultAddress, nonce);
-        const signature = await this.walletClient.signTypedData({
-            domain: {
-                name: "Exchange",
-                version: "1",
-                chainId: 1337,
-                verifyingContract: "0x0000000000000000000000000000000000000000",
-            },
-            types: {
-                Agent: [
-                    { name: "source", type: "string" },
-                    { name: "connectionId", type: "bytes32" },
-                ],
-            },
-            primaryType: "Agent",
-            message: {
-                source: this.isMainnet ? "a" : "b",
-                connectionId: actionHash,
-            },
-        });
-        const { r, s, v } = parseSignature(signature);
-        return { r, s, v: Number(v!) };
+
+        if (isAbstractWalletClient(this.walletClientOrSigner)) {
+            const signature = await this.walletClientOrSigner.signTypedData({
+                domain: {
+                    name: "Exchange",
+                    version: "1",
+                    chainId: 1337,
+                    verifyingContract: "0x0000000000000000000000000000000000000000",
+                },
+                types: {
+                    Agent: [
+                        { name: "source", type: "string" },
+                        { name: "connectionId", type: "bytes32" },
+                    ],
+                },
+                primaryType: "Agent",
+                message: {
+                    source: this.isMainnet ? "a" : "b",
+                    connectionId: actionHash,
+                },
+            });
+
+            return parseSignature(signature);
+        } else if (isAbstractSigner(this.walletClientOrSigner)) {
+            const signature = await this.walletClientOrSigner.signTypedData(
+                {
+                    name: "Exchange",
+                    version: "1",
+                    chainId: 1337,
+                    verifyingContract: "0x0000000000000000000000000000000000000000",
+                },
+                {
+                    Agent: [
+                        { name: "source", type: "string" },
+                        { name: "connectionId", type: "bytes32" },
+                    ],
+                },
+                {
+                    source: this.isMainnet ? "a" : "b",
+                    connectionId: actionHash,
+                },
+            );
+
+            if (!isHex(signature)) {
+                throw new Error("Invalid signature format");
+            }
+
+            return parseSignature(signature);
+        } else {
+            throw new Error("Unsupported wallet client");
+        }
     }
 
     protected async signUserSignedAction(
-        action: JSONObject,
-        payloadTypes: TypedDataParameter[],
+        action: Record<string, unknown>,
+        payloadTypes: Array<{ name: string; type: string }>,
         primaryType: string,
         chainId: number,
     ): Promise<{ r: Hex; s: Hex; v: number }> {
-        const signature = await this.walletClient.signTypedData({
-            domain: {
-                name: "HyperliquidSignTransaction",
-                version: "1",
-                chainId,
-                verifyingContract: "0x0000000000000000000000000000000000000000",
-            },
-            types: {
-                [primaryType]: payloadTypes,
-            },
-            primaryType,
-            message: action,
-        });
-        const { r, s, v } = parseSignature(signature);
-        return { r, s, v: Number(v!) };
+        if (isAbstractWalletClient(this.walletClientOrSigner)) {
+            const signature = await this.walletClientOrSigner.signTypedData({
+                domain: {
+                    name: "HyperliquidSignTransaction",
+                    version: "1",
+                    chainId,
+                    verifyingContract: "0x0000000000000000000000000000000000000000",
+                },
+                types: {
+                    [primaryType]: payloadTypes,
+                },
+                primaryType,
+                message: action,
+            });
+
+            return parseSignature(signature);
+        } else if (isAbstractSigner(this.walletClientOrSigner)) {
+            const signature = await this.walletClientOrSigner.signTypedData(
+                {
+                    name: "HyperliquidSignTransaction",
+                    version: "1",
+                    chainId,
+                    verifyingContract: "0x0000000000000000000000000000000000000000",
+                },
+                {
+                    [primaryType]: payloadTypes,
+                },
+                action,
+            );
+
+            if (!isHex(signature)) {
+                throw new Error("Invalid signature format");
+            }
+
+            return parseSignature(signature);
+        } else {
+            throw new Error("Unsupported wallet client");
+        }
     }
 
-    protected createActionHash(action: JSONObject, vaultAddress: Hex | null, nonce: number): Hex {
+    protected createActionHash(action: Record<string, unknown>, vaultAddress: Hex | null, nonce: number): Hex {
         const msgPackBytes = encode(action);
         const additionalBytesLength = vaultAddress === null ? 9 : 29;
 
@@ -767,6 +830,74 @@ export class HyperliquidExchangeClient {
             data.set(hexToBytes(vaultAddress), msgPackBytes.length + 9);
         }
 
-        return keccak256(data);
+        return bytesToHex(keccak_256(data));
     }
+}
+
+function hexToBytes(hex: Hex): Uint8Array {
+    const len = hex.length;
+    if (len % 2 !== 0) throw new Error(`Invalid hex string length: ${len}. Length must be even.`);
+    const bytes = new Uint8Array(len / 2);
+    for (let i = 0; i < len; i += 2) {
+        const c1 = hex.charCodeAt(i);
+        const c2 = hex.charCodeAt(i + 1);
+
+        let high: number;
+        if (c1 >= 48 && c1 <= 57) { // '0' - '9'
+            high = c1 - 48;
+        } else if (c1 >= 65 && c1 <= 70) { // 'A' - 'F'
+            high = c1 - 55;
+        } else if (c1 >= 97 && c1 <= 102) { // 'a' - 'f'
+            high = c1 - 87;
+        } else {
+            throw new Error(`Invalid hex character at index ${i}: '${hex[i]}'`);
+        }
+
+        let low: number;
+        if (c2 >= 48 && c2 <= 57) { // '0' - '9'
+            low = c2 - 48;
+        } else if (c2 >= 65 && c2 <= 70) { // 'A' - 'F'
+            low = c2 - 55;
+        } else if (c2 >= 97 && c2 <= 102) { // 'a' - 'f'
+            low = c2 - 87;
+        } else {
+            throw new Error(`Invalid hex character at index ${i + 1}: '${hex[i + 1]}'`);
+        }
+
+        bytes[i / 2] = (high << 4) | low;
+    }
+    return bytes;
+}
+
+function hexToNumber(hex: Hex): number {
+    return parseInt(hex, 16);
+}
+
+function parseSignature(signature: Hex): { r: Hex; s: Hex; v: number } {
+    return {
+        r: `0x${signature.slice(2, 66)}`,
+        s: `0x${signature.slice(66, 130)}`,
+        v: parseInt(signature.slice(130, 132), 16),
+    };
+}
+
+function bytesToHex(bytes: Uint8Array): Hex {
+    const lookup = "0123456789abcdef";
+    let hex: Hex = "0x";
+    for (let i = 0; i < bytes.length; i++) {
+        hex += lookup[bytes[i] >> 4] + lookup[bytes[i] & 0xF];
+    }
+    return hex;
+}
+
+function isHex(data: unknown): data is Hex {
+    return typeof data === "string" && /^0x[0-9a-fA-F]+$/.test(data);
+}
+
+function isAbstractWalletClient(client: AbstractWalletClient | AbstractSigner): client is AbstractWalletClient {
+    return client.signTypedData.length === 1;
+}
+
+function isAbstractSigner(client: AbstractWalletClient | AbstractSigner): client is AbstractSigner {
+    return client.signTypedData.length === 3;
 }

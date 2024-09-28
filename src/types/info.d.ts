@@ -1,6 +1,6 @@
-import type { Hex } from "viem";
-
 // ———————————————Individual Types———————————————
+
+export type Hex = `0x${string}`;
 
 /**
  * Order types define the way orders are executed in the market:
