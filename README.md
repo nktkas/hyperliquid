@@ -7,7 +7,9 @@ A low-level SDK for interacting with [Hyperliquid's](https://hyperliquid.xyz/) A
 - Support for all Hyperliquid's exchange and info API's
 - Comprehensive documentation for all API methods and types
 - Test suite to ensure TypeScript types match real API data
-- Minimal dependencies (only [viem](https://viem.sh/) and [@msgpack/msgpack](https://github.com/msgpack/msgpack-javascript))
+- Minimal dependencies (only [@noble/hashes/sha3](https://github.com/paulmillr/noble-hashes) and
+  [@msgpack/msgpack](https://github.com/msgpack/msgpack-javascript))
+- Support for [viem](https://viem.sh/) and [ethers](https://ethers.org/)
 
 ## Installation
 
@@ -19,16 +21,16 @@ Here's a basic example of how to use the SDK:
 
 ```typescript
 import { HyperliquidExchangeClient, HyperliquidInfoClient } from "@nktkas/hyperliquid";
-import { createWalletClient, http } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+// import { ethers } from "ethers";
 
-// Create a wallet client (you need to provide your own account and transport)
-const walletClient = createWalletClient({
-    account,
-    transport: http(),
-});
+// A wallet that will sign transactions
+const account = privateKeyToAccount("0x...");
+// const wallet = new ethers.Wallet("0x...");
 
 // Initialize the exchange client
-const exchangeClient = new HyperliquidExchangeClient(walletClient);
+const exchangeClient = new HyperliquidExchangeClient(account);
+// const exchangeClient = new HyperliquidExchangeClient(wallet);
 
 // Initialize the info client
 const infoClient = new HyperliquidInfoClient();
@@ -69,8 +71,8 @@ information on each method and its parameters.
 
 - [ ] Add WebSocket support
 - [ ] Make tests more thorough
-    - [x] Info tests
-    - [ ] Exchange tests
+  - [x] Info tests
+  - [ ] Exchange tests
 
 ## Contributing
 
