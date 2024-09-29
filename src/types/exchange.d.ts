@@ -121,6 +121,7 @@ export type Order = {
  *
  * @requestWeight 1
  * @response {@link OrderResponse}
+ * @throws {HyperliquidBatchAPIError} If the API returns an error.
  */
 export interface OrderRequest extends BaseExchangeRequest {
     action: {
