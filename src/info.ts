@@ -31,6 +31,8 @@ import type {
     UserFillsRequest,
     UserFunding,
     UserFundingRequest,
+    UserNonFundingLedgerUpdates,
+    UserNonFundingLedgerUpdatesRequest,
     UserRateLimitRequest,
     UserRateLimitResponse,
 } from "./types/info.d.ts";
@@ -114,7 +116,6 @@ export interface OrderStatusParameters {
 
     /**
      * Order ID to query.
-     *
      * - If a `number`, it's an Order ID (`oid`).
      * - If a `Hex` string, it's a Client Order ID (`cloid`).
      */
@@ -155,6 +156,20 @@ export interface UserFillsByTimeParameters {
  * Parameters for the {@link HyperliquidInfoClient.userFunding userFunding} method.
  */
 export interface UserFundingParameters {
+    /** User's address. */
+    user: Hex;
+
+    /** Start time of the data (inclusive, in milliseconds since epoch). */
+    startTime: number;
+
+    /** End time of the data (inclusive, in milliseconds since epoch, optional). */
+    endTime?: number;
+}
+
+/**
+ * Parameters for the {@link HyperliquidInfoClient.userNonFundingLedgerUpdates userNonFundingLedgerUpdates} method.
+ */
+export interface UserNonFundingLedgerUpdatesParameters {
     /** User's address. */
     user: Hex;
 
@@ -462,6 +477,26 @@ export class HyperliquidInfoClient {
     }
 
     /**
+     * Retrieves a user's funding history or non-funding ledger updates.
+     *
+     * @requestWeight 20
+     *
+     * @example
+     * ```ts
+     * const funding = await client.userNonFundingLedgerUpdates({
+     *     user: "0x1234...",
+     *     startTime: Date.now() - 7 * 24 * 60 * 60 * 1000,
+     *     endTime: Date.now()
+     * });
+     * console.log(funding[0]);
+     * // Output: { time: 1234567890000, hash: "0x...", delta: { type: "deposit", usdc: "5" } }
+     * ```
+     */
+    async userNonFundingLedgerUpdates(args: UserNonFundingLedgerUpdatesParameters): Promise<UserNonFundingLedgerUpdates[]> {
+        return await this.request({ type: "userNonFundingLedgerUpdates", ...args });
+    }
+
+    /**
      * Retrieves a user's rate limits.
      *
      * @requestWeight 20
@@ -490,6 +525,7 @@ export class HyperliquidInfoClient {
     protected async request<T extends MetaAndAssetCtxsRequest>(body: T): Promise<MetaAndAssetCtxsResponse>;
     protected async request<T extends ClearinghouseStateRequest>(body: T): Promise<ClearinghouseStateResponse>;
     protected async request<T extends UserFundingRequest>(body: T): Promise<UserFunding[]>;
+    protected async request<T extends UserNonFundingLedgerUpdatesRequest>(body: T): Promise<UserNonFundingLedgerUpdates[]>;
     protected async request<T extends FundingHistoryRequest>(body: T): Promise<FundingHistory[]>;
     protected async request<T extends SpotMetaRequest>(body: T): Promise<SpotMetaResponse>;
     protected async request<T extends SpotMetaAndAssetCtxsRequest>(body: T): Promise<SpotMetaAndAssetCtxsResponse>;

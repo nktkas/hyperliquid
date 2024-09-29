@@ -1,10 +1,23 @@
+// ———————————————Base Types———————————————
+
+/**
+ * Base structure for all information requests.
+ */
+interface BaseInfoRequest {
+    /** Type of the request (e.g., `"openOrders"`). */
+    type: string;
+}
+
+interface BaseDelta {
+    type: string;
+}
+
 // ———————————————Individual Types———————————————
 
 export type Hex = `0x${string}`;
 
 /**
  * Order types define the way orders are executed in the market:
- *
  * - `"Market"`: Executes immediately at the current market price.
  * - `"Limit"`: Executes at the specified limit price or better.
  * - `"Stop Market"`: Becomes a market order once the stop price is reached.
@@ -22,7 +35,6 @@ export type OrderType =
 
 /**
  * Time-in-force options specify how long an order remains active:
- *
  * - `"Gtc"` (Good Til Cancelled): Remains active until filled or canceled.
  * - `"Ioc"` (Immediate or Cancel): Fills immediately or cancels any unfilled portion.
  * - `"Alo"` (Add Liquidity Only): Only adds liquidity; does not take liquidity.
@@ -33,33 +45,32 @@ export type TIF = "Gtc" | "Ioc" | "Alo";
  * Represents a user's active open order.
  */
 export interface OpenOrder {
-    /** Symbol for the order (e.g., `"ETH"`). */
+    /** Symbol (e.g., `"ETH"`). */
     coin: string;
 
     /**
      * Side of the order:
-     *
      * - `"B"`: Bid (Buy) order.
      * - `"A"`: Ask (Sell) order.
      */
     side: "B" | "A";
 
-    /** Limit price of the order. */
+    /** Limit price. */
     limitPx: string;
 
-    /** Remaining size of the order to be filled. */
+    /** Size */
     sz: string;
 
-    /** Unique identifier for the order. */
+    /** Order ID. */
     oid: number;
 
     /** Timestamp when the order was placed (in milliseconds since epoch). */
     timestamp: number;
 
-    /** Original size of the order when it was placed. */
+    /** Original size when it was placed. */
     origSz: string;
 
-    /** Client Order ID assigned by the user (optional). */
+    /** Client Order ID assigned by the user. */
     cloid?: Hex;
 }
 
@@ -77,6 +88,7 @@ export interface FrontendOpenOrder extends OpenOrder {
     triggerPx: string;
 
     /** Child orders associated with this order (if any). */
+    // TODO: Could not get a non-empty array
     children: unknown[];
 
     /** Indicates if the order is a position TP/SL order that adjusts with position size. */
@@ -88,7 +100,7 @@ export interface FrontendOpenOrder extends OpenOrder {
     /** Type of the order. */
     orderType: OrderType;
 
-    /** Time-in-force option for the order. */
+    /** Time-in-force. */
     tif: TIF | null;
 }
 
@@ -96,18 +108,17 @@ export interface FrontendOpenOrder extends OpenOrder {
  * Represents a user's trade fill.
  */
 export interface UserFill {
-    /** Symbol of the asset traded (e.g., `"ETH"`). */
+    /** Symbol (e.g., `"ETH"`). */
     coin: string;
 
-    /** Price at which the trade was executed. */
+    /** Price. */
     px: string;
 
-    /** Size of the trade executed. */
+    /** Size. */
     sz: string;
 
     /**
      * Side of the order:
-     *
      * - `"B"`: Bid (Buy) order.
      * - `"A"`: Ask (Sell) order.
      */
@@ -128,7 +139,7 @@ export interface UserFill {
     /** L1 transaction hash. */
     hash: Hex;
 
-    /** Unique identifier for the order associated with this fill. */
+    /** Order ID. */
     oid: number;
 
     /** Indicates if the fill was a taker order (crossed the spread). */
@@ -137,10 +148,10 @@ export interface UserFill {
     /** Fee charged or rebate received (negative value indicates rebate). */
     fee: string;
 
-    /** Unique identifier for the trade. */
+    /** Unique identifier of the transaction for the specified amount, which was a partial filling of one order (oid). */
     tid: number;
 
-    /** Client Order ID assigned by the user (if any). */
+    /** Client Order ID assigned by the user. */
     cloid?: Hex;
 
     /** Details of liquidation if the trade was part of one. */
@@ -150,10 +161,11 @@ export interface UserFill {
         /** Mark price at the time of liquidation. */
         markPx: string;
         /** Method of liquidation. */
+        // TODO: Couldn't find any other methods
         method: "market";
     };
 
-    /** Token in which the fee is denominated. */
+    /** Token in which the fee is denominated  (e.g., `"USDC"`). */
     feeToken: string;
 }
 
@@ -163,24 +175,23 @@ export interface UserFill {
 export interface OrderStatus {
     /** Order details. */
     order: {
-        /** Symbol for the order (e.g., `"ETH"`). */
+        /** Symbol (e.g., `"ETH"`). */
         coin: string;
 
         /**
          * Side of the order:
-         *
          * - `"B"`: Bid (Buy) order.
          * - `"A"`: Ask (Sell) order.
          */
         side: "B" | "A";
 
-        /** Limit price of the order. */
+        /** Limit price. */
         limitPx: string;
 
-        /** Remaining size of the order to be filled. */
+        /** Size. */
         sz: string;
 
-        /** Unique identifier for the order. */
+        /** Order ID. */
         oid: number;
 
         /** Timestamp when the order was placed (in milliseconds since epoch). */
@@ -196,6 +207,7 @@ export interface OrderStatus {
         triggerPx: string;
 
         /** Child orders associated with this order (if any). */
+        // TODO: Could not get a non-empty array
         children: unknown[];
 
         /** Indicates if the order is a position TP/SL order that adjusts with position size. */
@@ -207,10 +219,10 @@ export interface OrderStatus {
         /** Type of the order. */
         orderType: OrderType;
 
-        /** Original size of the order when it was placed. */
+        /** Original size when it was placed. */
         origSz: string;
 
-        /** Time-in-force option for the order. */
+        /** Time-in-force. */
         tif: TIF | null;
 
         /** Client Order ID assigned by the user (if any). */
@@ -218,8 +230,7 @@ export interface OrderStatus {
     };
 
     /**
-     * Current status of the order:
-     *
+     * Current status:
      * - `"filled"`: Fully executed.
      * - `"open"`: Active and waiting to be filled.
      * - `"canceled"`: Canceled by the user.
@@ -240,16 +251,16 @@ export interface OrderStatus {
 }
 
 /**
- * Represents a single entry in the Level 2 (L2) order book.
+ * Represents a single entry in the L2 order book.
  */
 export interface L2BookEntry {
-    /** Price level. */
+    /** Price. */
     px: string;
 
-    /** Total size (volume) available at this price level. */
+    /** Total size (volume). */
     sz: string;
 
-    /** Number of individual orders at this price level. */
+    /** Number of individual orders. */
     n: number;
 }
 
@@ -257,13 +268,13 @@ export interface L2BookEntry {
  * Represents a candlestick data point for charting.
  */
 export interface CandleSnapshot {
-    /** Opening timestamp of the candle period (in milliseconds since epoch). */
+    /** Opening timestamp (in milliseconds since epoch). */
     t: number;
 
-    /** Closing timestamp of the candle period (in milliseconds since epoch). */
+    /** Closing timestamp (in milliseconds since epoch). */
     T: number;
 
-    /** Symbol of the asset (e.g., `"ETH"`). */
+    /** Symbol (e.g., `"ETH"`). */
     s: string;
 
     /** Interval of the candle (e.g., `"1m"`, `"5m"`, `"1h"`). */
@@ -297,7 +308,6 @@ export interface Universe {
 
     /**
      * Name of the universe.
-     *
      * - Max length: 6 characters.
      * - No uniqueness constraints.
      */
@@ -314,12 +324,13 @@ export interface Universe {
  * Represents a user's position in a specific asset.
  */
 export interface AssetPosition {
-    /** Position type (currently only `"oneWay"` is supported). */
+    /** Position type. */
+    // TODO: currently only `"oneWay"` is supported
     type: "oneWay";
 
     /** Detailed position information. */
     position: {
-        /** Symbol of the asset (e.g., `"ETH"`). */
+        /** Symbol (e.g., `"ETH"`). */
         coin: string;
 
         /** Signed position size (positive for long, negative for short). */
@@ -349,7 +360,7 @@ export interface AssetPosition {
         /** Return on equity (unrealizedPnl / marginUsed). */
         returnOnEquity: string;
 
-        /** Liquidation price. */
+        /** Liquidation price (if any) */
         liquidationPx: string | null;
 
         /** Margin used for the position. */
@@ -405,7 +416,163 @@ export interface AssetCtx {
 }
 
 /**
- * Represents a user's funding or non-funding ledger update.
+ * Represents a funding update in the user's ledger.
+ */
+export interface FundingDelta extends BaseDelta {
+    /** Type of update. */
+    type: "funding";
+
+    /** Symbol (e.g., `"ETH"`). */
+    coin: string;
+
+    /** Amount credited or debited in USDC. */
+    usdc: string;
+
+    /** Signed position size at the time (positive for long, negative for short). */
+    szi: string;
+
+    /** Funding rate applied. */
+    fundingRate: string;
+
+    /** Number of samples used to calculate funding. */
+    nSamples: number | null;
+}
+
+/**
+ * Represents a deposit action in the user's ledger.
+ */
+export interface DepositDelta extends BaseDelta {
+    /** Type of update. */
+    type: "deposit";
+
+    /** Amount deposited in USDC. */
+    usdc: string;
+}
+
+/**
+ * Represents a transfer between different account classes in the user's ledger.
+ */
+export interface AccountClassTransferDelta extends BaseDelta {
+    /** Type of update. */
+    type: "accountClassTransfer";
+
+    /** Amount transferred in USDC. */
+    usdc: string;
+
+    /** Indicates if the transfer is to the perpetual account. */
+    toPerp: boolean;
+}
+
+/**
+ * Represents an internal transfer within the user's accounts.
+ */
+export interface InternalTransferDelta extends BaseDelta {
+    /** Type of update. */
+    type: "internalTransfer";
+
+    /** Amount transferred in USDC. */
+    usdc: string;
+
+    /** Address of the user initiating the transfer. */
+    user: Hex;
+
+    /** Destination address of the transfer. */
+    destination: Hex;
+
+    /** Fee associated with the transfer. */
+    fee: string;
+}
+
+/**
+ * Represents a transfer involving a spot token in the user's ledger.
+ */
+export interface SpotTransferDelta extends BaseDelta {
+    /** Type of update. */
+    type: "spotTransfer";
+
+    /** Token involved in the transfer. */
+    token: string;
+
+    /** Amount of the token transferred. */
+    amount: string;
+
+    /** Equivalent USDC value of the transferred amount. */
+    usdcValue: string;
+
+    /** Address of the user initiating the transfer. */
+    user: Hex;
+
+    /** Destination address of the transfer. */
+    destination: Hex;
+
+    /** Fee associated with the transfer. */
+    fee: string;
+}
+
+/**
+ * Represents a withdrawal action in the user's ledger.
+ */
+export interface WithdrawDelta extends BaseDelta {
+    /** Type of update. */
+    type: "withdraw";
+
+    /** Amount withdrawn in USDC. */
+    usdc: string;
+
+    /** Nonce to ensure uniqueness of the withdrawal. */
+    nonce: number;
+
+    /** Fee associated with the withdrawal. */
+    fee: string;
+}
+
+/**
+ * Represents the creation of a vault in the user's ledger.
+ */
+export interface VaultCreateDelta extends BaseDelta {
+    /** Type of update. */
+    type: "vaultCreate";
+
+    /** Address of the created vault. */
+    vault: Hex;
+
+    /** Initial amount allocated to the vault in USDC. */
+    usdc: string;
+}
+
+/**
+ * Represents a distribution event from a vault in the user's ledger.
+ */
+export interface VaultDistributionDelta extends BaseDelta {
+    /** Type of update. */
+    type: "vaultDistribution";
+
+    /** Address of the vault distributing funds. */
+    vault: Hex;
+
+    /** Amount distributed in USDC. */
+    usdc: string;
+}
+
+/**
+ * Represents a transfer between sub-accounts in the user's ledger.
+ */
+export interface SubAccountTransferDelta extends BaseDelta {
+    /** Type of update. */
+    type: "subAccountTransfer";
+
+    /** Amount transferred in USDC. */
+    usdc: string;
+
+    /** Address of the user initiating the transfer. */
+    user: Hex;
+
+    /** Destination address of the transfer. */
+    destination: Hex;
+}
+
+/**
+ * Represents a user's funding update.
  */
 export interface UserFunding {
     /** Timestamp of the update (in milliseconds since epoch). */
@@ -415,36 +582,36 @@ export interface UserFunding {
     hash: Hex;
 
     /** Details of the funding update. */
-    delta: {
-        /**
-         * Type of update.
-         *
-         * TODO: Check for the existence of other types
-         */
-        type: "funding";
+    delta: FundingDelta;
+}
 
-        /** Symbol of the asset affected (e.g., `"ETH"`). */
-        coin: string;
+/**
+ * Represents a user's non-funding ledger update.
+ */
+export interface UserNonFundingLedgerUpdates {
+    /** Timestamp of the update (in milliseconds since epoch). */
+    time: number;
 
-        /** Amount credited or debited (in USDC). */
-        usdc: string;
+    /** L1 transaction hash. */
+    hash: Hex;
 
-        /** Signed position size at the time (positive for long, negative for short). */
-        szi: string;
-
-        /** Funding rate applied. */
-        fundingRate: string;
-
-        /** Number of samples used to calculate funding. */
-        nSamples: number | null;
-    };
+    /** Details of the funding update. */
+    delta:
+        | DepositDelta
+        | AccountClassTransferDelta
+        | InternalTransferDelta
+        | SpotTransferDelta
+        | WithdrawDelta
+        | VaultCreateDelta
+        | VaultDistributionDelta
+        | SubAccountTransferDelta;
 }
 
 /**
  * Represents historical funding rate data for an asset.
  */
 export interface FundingHistory {
-    /** Symbol of the asset (e.g., `"ETH"`). */
+    /** Symbol (e.g., `"ETH"`). */
     coin: string;
 
     /** Funding rate at the time. */
@@ -466,13 +633,12 @@ export interface SpotUniverse {
 
     /**
      * Name of the universe.
-     *
      * - Max length: 6 characters.
      * - No uniqueness constraints.
      */
     name: string;
 
-    /** Unique identifier (index) for the universe. */
+    /** Unique identifier for the universe. */
     index: number;
 
     /** Indicates if this is the primary universe for spot trading. */
@@ -485,7 +651,6 @@ export interface SpotUniverse {
 export interface SpotToken {
     /**
      * Name of the token.
-     *
      * - Max length: 6 characters.
      * - No uniqueness constraints.
      */
@@ -497,16 +662,16 @@ export interface SpotToken {
     /** Number of decimals used in the token's smallest unit. */
     weiDecimals: number;
 
-    /** Unique identifier (index) for the token. */
+    /** Unique identifier for the token. */
     index: number;
 
-    /** Token ID in hexadecimal format. */
+    /** Token ID. */
     tokenId: Hex;
 
     /** Indicates if this token is the primary representation in the system. */
     isCanonical: boolean;
 
-    /** EVM contract address for the token. */
+    /** EVM contract address for the token (if any). */
     evmContract:
         | {
             /** Address of the contract. */
@@ -516,7 +681,7 @@ export interface SpotToken {
         }
         | null;
 
-    /** Full display name of the token. */
+    /** Full display name of the token (if any). */
     fullName: string | null;
 }
 
@@ -539,7 +704,7 @@ export interface SpotAssetCtx {
     /** Circulating supply. */
     circulatingSupply: string;
 
-    /** Symbol of the asset (e.g., `"ETH"`). */
+    /** Symbol (e.g., `"ETH"`). */
     coin: string;
 }
 
@@ -547,7 +712,7 @@ export interface SpotAssetCtx {
  * Represents a user's balance for a specific spot token.
  */
 export interface SpotBalance {
-    /** Symbol of the token (e.g., `"ETH"`). */
+    /** Symbol (e.g., `"ETH"`). */
     coin: string;
 
     /** Entry notional value (initial value when the position was opened). */
@@ -556,19 +721,11 @@ export interface SpotBalance {
     /** Amount of the token on hold (e.g., reserved in open orders). */
     hold: string;
 
-    /** Unique identifier (index) for the token. */
+    /** Unique identifier for the token. */
     token: number;
 
     /** Total balance of the token (available + on hold). */
     total: string;
-}
-
-/**
- * Base structure for all information requests.
- */
-export interface BaseInfoRequest {
-    /** Type of the request (e.g., `"openOrders"`). */
-    type: string;
 }
 
 // ———————————————API (Requests)———————————————
@@ -675,7 +832,6 @@ export interface OrderStatusRequest extends BaseInfoRequest {
 
     /**
      * Order ID to query.
-     *
      * - If a `number`, it's an Order ID (`oid`).
      * - If a `Hex` string, it's a Client Order ID (`cloid`).
      */
@@ -695,10 +851,10 @@ export interface L2BookRequest extends BaseInfoRequest {
     /** Symbol of the asset to retrieve the order book for (e.g., `"ETH"`). */
     coin: string;
 
-    /** Number of significant figures to aggregate price levels (optional). */
+    /** Number of significant figures to aggregate price levels. */
     nSigFigs?: 2 | 3 | 4 | 5;
 
-    /** Mantissa value for level aggregation (allowed only when `nSigFigs` is `5`, optional). */
+    /** Mantissa value for level aggregation (allowed only when `nSigFigs` is `5`). */
     // TODO: The documentation says that option 1 is possible, but in this case the request terminates with an error
     mantissa?: 2 | 5;
 }
@@ -715,7 +871,7 @@ export interface CandleSnapshotRequest extends BaseInfoRequest {
 
     /** Request parameters. */
     req: {
-        /** Symbol of the asset (e.g., `"ETH"`). */
+        /** Symbol (e.g., `"ETH"`). */
         coin: string;
 
         /** Time interval for each candle (e.g., `"15m"`). */
@@ -724,7 +880,7 @@ export interface CandleSnapshotRequest extends BaseInfoRequest {
         /** Start time of the data (inclusive, in milliseconds since epoch). */
         startTime: number;
 
-        /** End time of the data (inclusive, in milliseconds since epoch, optional). */
+        /** End time of the data (inclusive, in milliseconds since epoch). */
         endTime?: number;
     };
 }
@@ -772,13 +928,8 @@ export interface ClearinghouseStateRequest extends BaseInfoRequest {
  * @response Array of {@link UserFunding}
  */
 export interface UserFundingRequest extends BaseInfoRequest {
-    /**
-     * Type of the request:
-     *
-     * - `"userFunding"`: For funding updates.
-     * - `"userNonFundingLedgerUpdates"`: For other ledger updates.
-     */
-    type: "userFunding" | "userNonFundingLedgerUpdates";
+    /** Type of the request. */
+    type: "userFunding";
 
     /** User's address. */
     user: Hex;
@@ -786,7 +937,27 @@ export interface UserFundingRequest extends BaseInfoRequest {
     /** Start time of the data (inclusive, in milliseconds since epoch). */
     startTime: number;
 
-    /** End time of the data (inclusive, in milliseconds since epoch, optional). */
+    /** End time of the data (inclusive, in milliseconds since epoch). */
+    endTime?: number;
+}
+
+/**
+ * Request to retrieves a user's non-funding ledger updates.
+ *
+ * @requestWeight 20
+ * @response Array of {@link UserNonFundingLedgerUpdates}
+ */
+export interface UserNonFundingLedgerUpdatesRequest extends BaseInfoRequest {
+    /** Type of the request. */
+    type: "userNonFundingLedgerUpdates";
+
+    /** User's address. */
+    user: Hex;
+
+    /** Start time of the data (inclusive, in milliseconds since epoch). */
+    startTime: number;
+
+    /** End time of the data (inclusive, in milliseconds since epoch). */
     endTime?: number;
 }
 
@@ -800,13 +971,13 @@ export interface FundingHistoryRequest extends BaseInfoRequest {
     /** Type of the request. */
     type: "fundingHistory";
 
-    /** Symbol of the asset (e.g., `"ETH"`). */
+    /** Symbol (e.g., `"ETH"`). */
     coin: string;
 
     /** Start time of the data (inclusive, in milliseconds since epoch). */
     startTime: number;
 
-    /** End time of the data (inclusive, in milliseconds since epoch, optional). */
+    /** End time of the data (inclusive, in milliseconds since epoch). */
     endTime?: number;
 }
 
@@ -900,7 +1071,7 @@ export type OrderStatusResponse =
  * Request: {@link L2BookRequest}
  */
 export interface L2BookResponse {
-    /** Symbol of the asset (e.g., `"ETH"`). */
+    /** Symbol (e.g., `"ETH"`). */
     coin: string;
 
     /** Timestamp when the snapshot was taken (in milliseconds since epoch). */
@@ -908,7 +1079,6 @@ export interface L2BookResponse {
 
     /**
      * Array of bid and ask levels:
-     *
      * - Index 0: Bids (buy orders).
      * - Index 1: Asks (sell orders).
      */

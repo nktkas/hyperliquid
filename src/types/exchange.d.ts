@@ -12,11 +12,56 @@ interface JSONObject {
     [k: string | number]: JSONValue;
 }
 
+// ———————————————Base Types———————————————
+
+/**
+ * Base structure for all exchange requests.
+ */
+interface BaseExchangeRequest {
+    /** Action to be performed. */
+    action: JSONObject;
+
+    /** Unique identifier for the request (recommended: current timestamp in milliseconds). */
+    nonce: number;
+
+    /** Cryptographic signature. */
+    signature: { r: Hex; s: Hex; v: number };
+
+    /** On-chain address of the vault (if trading on behalf of a vault). */
+    vaultAddress?: Hex;
+}
+
+/**
+ * Base structure for all exchange responses.
+ */
+interface BaseExchangeResponse {
+    /** Status of the response. */
+    status: "ok" | "err";
+
+    /** Response body with operation-specific details or error message. */
+    response:
+        | {
+            /** Type of operation. */
+            type: "default" | "order" | "cancel";
+            data?: {
+                /** Array of statuses for the operation. */
+                statuses: (
+                    | JSONValue
+                    | {
+                        /** Error message. */
+                        error: string;
+                    }
+                )[];
+            };
+        }
+        /** Error message. */
+        | string;
+}
+
 // ———————————————Individual Types———————————————
 
 /**
  * Order grouping strategy:
- *
  * - `"na"`: Standard order without grouping.
  * - `"normalTpsl"`: Take Profit or Stop Loss order with fixed size that does not adjust with position changes. These TP/SL orders are linked to the initial order size and remain constant even if the position size changes. Useful when you want a TP/SL order to represent a specific amount independently of your current position.
  * - `"positionTpsl"`: Take Profit or Stop Loss order that automatically adjusts proportionally with the current position size. These TP/SL orders are linked to the position and will increase or decrease in size as your position size changes. Ideal for maintaining TP/SL orders that always cover your entire position.
@@ -33,10 +78,10 @@ export type Order = {
     /** Indicates whether this is a buy order. */
     b: boolean;
 
-    /** Price of the order. */
+    /** Price. */
     p: string;
 
-    /** Size of the order in units of the coin (base currency). */
+    /** Size in units of the coin (base currency). */
     s: string;
 
     /** Indicates whether this order reduces an existing position. */
@@ -68,50 +113,6 @@ export type Order = {
     /** Client Order ID. */
     c?: Hex;
 };
-
-/**
- * Base structure for all exchange requests.
- */
-export interface BaseExchangeRequest {
-    /** Action to be performed. */
-    action: JSONObject;
-
-    /** Unique identifier for the request (recommended: current timestamp in milliseconds). */
-    nonce: number;
-
-    /** Cryptographic signature. */
-    signature: { r: Hex; s: Hex; v: number };
-
-    /** On-chain address of the vault (if trading on behalf of a vault). */
-    vaultAddress?: Hex;
-}
-
-/**
- * Base structure for all exchange responses.
- */
-export interface BaseExchangeResponse {
-    /** Status of the response. */
-    status: "ok" | "err";
-
-    /** Response body with operation-specific details or error message. */
-    response:
-        | {
-            /** Type of operation. */
-            type: "default" | "order" | "cancel";
-            data?: {
-                /** Array of statuses for the operation. */
-                statuses: (
-                    | JSONValue
-                    | {
-                        /** Error message. */
-                        error: string;
-                    }
-                )[];
-            };
-        }
-        /** Error message. */
-        | string;
-}
 
 // ———————————————API (Requests)———————————————
 
