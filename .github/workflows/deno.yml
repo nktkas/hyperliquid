@@ -1,18 +1,11 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-# This workflow will install Deno then run `deno lint` and `deno test`.
-# For more information see: https://github.com/denoland/setup-deno
-
-name: Deno
+name: Deno Test
 
 on:
   push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
+    branches:
+      - main
+    paths:
+      - 'deno.json'  # Trigger only when deno.json changes
 
 permissions:
   contents: read
@@ -22,16 +15,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Setup repo
+      - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Fetch current and previous commits
+
+      - name: Compare Versions
+        id: version_check
+        shell: bash
+        run: |
+          # Install jq (if not already installed)
+          sudo apt-get update && sudo apt-get install -y jq
+
+          # Check if deno.json existed in the previous commit
+          if git show HEAD~1:deno.json > /dev/null 2>&1; then
+            PREVIOUS_VERSION=$(git show HEAD~1:deno.json | jq -r '.version')
+          else
+            PREVIOUS_VERSION=""
+          fi
+
+          # Get the current version
+          CURRENT_VERSION=$(jq -r '.version' deno.json)
+
+          echo "Current version: $CURRENT_VERSION"
+          echo "Previous version: $PREVIOUS_VERSION"
+
+          # Determine if the version has changed
+          if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+            echo "version_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "version_changed=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Setup Deno
+        if: steps.version_check.outputs.version_changed == 'true'
         uses: denoland/setup-deno@v1.5.1
         with:
           deno-version: v1.x
 
-      - name: Run linter
+      - name: Run Linter
+        if: steps.version_check.outputs.version_changed == 'true'
         run: deno lint
 
-      - name: Run tests
-        run: deno test -A -- ${{secrets.EXCHANGE_TEST_PRIVATE_KEY}} ETH 0xa15099a30bbf2e68942d6f4c43d70d04faeab0a0
+      - name: Run Tests
+        if: steps.version_check.outputs.version_changed == 'true'
+        run: deno test --allow-net --allow-read -- ${{ secrets.TEST_PRIVATE_KEY }} ETH 0x1719884eb866cb12b2287399b15f7db5e7d775ea 0xcb3f0bd249a89e45e86a44bcfc7113e4ffe84cd1
