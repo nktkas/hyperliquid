@@ -1,60 +1,47 @@
 import type { Hex, TIF } from "./info.d.ts";
 
-type JSONValue =
-    | string
-    | number
-    | boolean
-    | null
-    | JSONValue[]
-    | { [k: string | number]: JSONValue };
-
-interface JSONObject {
-    [k: string | number]: JSONValue;
-}
-
 // ———————————————Base Types———————————————
 
-/**
- * Base structure for all exchange requests.
- */
-interface BaseExchangeRequest {
-    /** Action to be performed. */
-    action: JSONObject;
+/** Base structure for exchange requests. */
+export interface BaseExchangeRequest {
+    /** Action to perform. */
+    action: Record<string, unknown>;
 
-    /** Unique identifier for the request (recommended: current timestamp in milliseconds). */
+    /** Unique request identifier (recommended: current timestamp in ms). */
     nonce: number;
 
     /** Cryptographic signature. */
     signature: { r: Hex; s: Hex; v: number };
 
-    /** On-chain address of the vault (if trading on behalf of a vault). */
+    /** Vault address (optional, for vault trading). */
     vaultAddress?: Hex;
 }
 
-/**
- * Base structure for all exchange responses.
- */
-interface BaseExchangeResponse {
+/** Base structure for exchange responses. */
+export interface BaseExchangeResponse {
     /** Status of the response. */
     status: "ok" | "err";
 
-    /** Response body with operation-specific details or error message. */
+    /** Response details or error message. */
     response:
         | {
             /** Type of operation. */
-            type: "default" | "order" | "cancel";
-            data?: {
-                /** Array of statuses for the operation. */
-                statuses: (
-                    | JSONValue
-                    | {
-                        /** Error message. */
-                        error: string;
-                    }
-                )[];
-            };
+            type: string;
+
+            /** Operation-specific data. */
+            data?:
+                | {
+                    /** Array of statuses or error messages. */
+                    statuses: (
+                        | unknown
+                        | {
+                            /** Error message. */
+                            error: string;
+                        }
+                    )[];
+                }
+                | string;
         }
-        /** Error message. */
         | string;
 }
 
@@ -63,49 +50,50 @@ interface BaseExchangeResponse {
 /**
  * Order grouping strategy:
  * - `"na"`: Standard order without grouping.
- * - `"normalTpsl"`: Take Profit or Stop Loss order with fixed size that does not adjust with position changes. These TP/SL orders are linked to the initial order size and remain constant even if the position size changes. Useful when you want a TP/SL order to represent a specific amount independently of your current position.
- * - `"positionTpsl"`: Take Profit or Stop Loss order that automatically adjusts proportionally with the current position size. These TP/SL orders are linked to the position and will increase or decrease in size as your position size changes. Ideal for maintaining TP/SL orders that always cover your entire position.
+ * - `"normalTpsl"`: TP/SL order with fixed size that doesn't adjust with position changes.
+ * - `"positionTpsl"`: TP/SL order that adjusts proportionally with the position size.
  */
-export type OrderGroupingStrategy = "na" | "normalTpsl" | "positionTpsl";
+export type OrderGroupingStrategy =
+    | "na"
+    | "normalTpsl"
+    | "positionTpsl";
 
-/**
- * Order parameters.
- */
+/** Order parameters. */
 export type Order = {
-    /** Index of the coin. */
+    /** Coin index. */
     a: number;
 
-    /** Indicates whether this is a buy order. */
+    /** Is the order to buy? */
     b: boolean;
 
     /** Price. */
     p: string;
 
-    /** Size in units of the coin (base currency). */
+    /** Size (in base currency units). */
     s: string;
 
-    /** Indicates whether this order reduces an existing position. */
+    /** Is reduce-only? */
     r: boolean;
 
-    /** Order type and specific parameters. */
+    /** Order type and parameters. */
     t:
         | {
-            /** Parameters for a limit order. */
+            /** Limit order parameters. */
             limit: {
-                /** Time-in-force; defines the behavior of the order upon entering the order book. */
+                /** Time-in-force. */
                 tif: TIF;
             };
         }
         | {
-            /** Parameters for a trigger order. */
+            /** Trigger order parameters. */
             trigger: {
-                /** Indicates whether this is a market order. */
+                /** Is the market order. */
                 isMarket: boolean;
 
-                /** Trigger price for conditional orders. */
+                /** Trigger price. */
                 triggerPx: string;
 
-                /** Indicates if the order is a take-profit (`"tp"`) or stop-loss (`"sl"`). */
+                /** Indicates if it's take-profit (tp) or stop-loss (sl). */
                 tpsl: "tp" | "sl";
             };
         };
@@ -114,43 +102,106 @@ export type Order = {
     c?: Hex;
 };
 
-// ———————————————API (Requests)———————————————
+// ———————————————Requests———————————————
 
 /**
- * Places an order.
+ * Approve an agent to sign on behalf of the master or sub-accounts.
  *
- * @requestWeight 1
- * @response {@link OrderResponse}
- * @throws {HyperliquidBatchAPIError} If the API returns an error.
+ * @response {@link SuccessResponse}
  */
-export interface OrderRequest extends BaseExchangeRequest {
+export interface ApproveAgentRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
     action: {
         /** Type of action. */
-        type: "order";
+        type: "approveAgent";
 
-        /** Array of open order parameters. */
-        orders: Order[];
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
 
-        /** Grouping strategy for orders. */
-        grouping: OrderGroupingStrategy;
+        /** Chain ID used for signing. */
+        signatureChainId: Hex;
+
+        /** Agent address. */
+        agentAddress: Hex;
+
+        /** Agent name. */
+        agentName: string;
+
+        /** Unique request identifier (recommended: current timestamp in ms). */
+        nonce: number;
+    };
+
+    /** Not applicable for this action. */
+    vaultAddress?: never;
+}
+
+/**
+ * Approve a max fee rate for a builder address.
+ *
+ * @response {@link SuccessResponse}
+ */
+export interface ApproveBuilderFeeRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "approveBuilderFee";
+
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
+
+        /** Chain ID used for signing. */
+        signatureChainId: Hex;
+
+        /** Max fee rate (e.g., "0.01%"). */
+        maxFeeRate: `${string}%`;
+
+        /** Builder address. */
+        builder: Hex;
+
+        /** Unique request identifier (recommended: current timestamp in ms). */
+        nonce: number;
+    };
+
+    /** Not applicable for this action. */
+    vaultAddress?: never;
+}
+
+/**
+ * Modify multiple orders.
+ *
+ * @response {@link OrderResponse}
+ */
+export interface BatchModifyRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "batchModify";
+
+        /** Order modifications. */
+        modifies: {
+            /** Order ID to modify. */
+            oid: number;
+
+            /** New order parameters. */
+            order: Order;
+        }[];
     };
 }
 
 /**
- * Cancels order(s).
+ * Cancel order(s).
  *
- * @requestWeight 1
  * @response {@link CancelResponse}
- * @throws {HyperliquidBatchAPIError} If the API returns an error.
  */
 export interface CancelRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
     action: {
         /** Type of action. */
         type: "cancel";
 
-        /** Array of orders to cancel. */
+        /** Orders to cancel. */
         cancels: {
-            /** Index of the coin. */
+            /** Coin index. */
             a: number;
 
             /** Order ID. */
@@ -160,20 +211,19 @@ export interface CancelRequest extends BaseExchangeRequest {
 }
 
 /**
- * Cancels order(s) by client order ID.
+ * Cancel order(s) by Client Order ID.
  *
- * @requestWeight 1
  * @response {@link CancelResponse}
- * @throws {HyperliquidBatchAPIError} If the API returns an error.
  */
 export interface CancelByCloidRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
     action: {
         /** Type of action. */
         type: "cancelByCloid";
 
-        /** Array of orders to cancel. */
+        /** Orders to cancel. */
         cancels: {
-            /** Index of the coin. */
+            /** Coin index. */
             asset: number;
 
             /** Client Order ID. */
@@ -183,30 +233,31 @@ export interface CancelByCloidRequest extends BaseExchangeRequest {
 }
 
 /**
- * Schedules a cancel-all operation (dead man's switch).
+ * Create a sub-account.
  *
- * @requestWeight 1
- * @response {@link SuccessResponse}
- * @throws {HyperliquidAPIError} If the API returns an error.
+ * @response {@link CreateSubAccountResponse}
  */
-export interface ScheduleCancelRequest extends BaseExchangeRequest {
+export interface CreateSubAccountRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
     action: {
         /** Type of action. */
-        type: "scheduleCancel";
+        type: "createSubAccount";
 
-        /** Scheduled time for the cancel-all operation. */
-        time: number;
+        /** Sub-account name. */
+        name: string;
     };
+
+    /** Not applicable for this action. */
+    vaultAddress?: never;
 }
 
 /**
- * Modifies an order.
+ * Modify an order.
  *
- * @requestWeight 1
  * @response {@link SuccessResponse}
- * @throws {HyperliquidAPIError} If the API returns an error.
  */
 export interface ModifyRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
     action: {
         /** Type of action. */
         type: "modify";
@@ -220,44 +271,155 @@ export interface ModifyRequest extends BaseExchangeRequest {
 }
 
 /**
- * Modifies multiple orders.
+ * Place an order(s).
  *
- * @requestWeight 1
  * @response {@link OrderResponse}
- * @throws {HyperliquidBatchAPIError} If the API returns an error.
  */
-export interface BatchModifyRequest extends BaseExchangeRequest {
+export interface OrderRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
     action: {
         /** Type of action. */
-        type: "batchModify";
+        type: "order";
 
-        /** Array of order modifications. */
-        modifies: {
-            /** Order ID to modify. */
-            oid: number;
+        /** Order parameters. */
+        orders: Order[];
 
-            /** New order parameters. */
-            order: Order;
-        }[];
+        /** Order grouping strategy. */
+        grouping: OrderGroupingStrategy;
     };
 }
 
 /**
- * Updates cross or isolated leverage for a coin.
+ * Schedule a time to cancel all open orders.
  *
- * @requestWeight 1
  * @response {@link SuccessResponse}
- * @throws {HyperliquidAPIError} If the API returns an error.
+ */
+export interface ScheduleCancelRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "scheduleCancel";
+
+        /** Scheduled time (in ms since epoch). Must be at least 5 seconds in the future. */
+        time: number;
+    };
+}
+
+/**
+ * Set a referral code.
+ *
+ * @response {@link SuccessResponse}
+ */
+export interface SetReferrerRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "setReferrer";
+
+        /** Referral code. */
+        code: string;
+    };
+
+    /** Not applicable for this action. */
+    vaultAddress?: never;
+}
+
+/**
+ * Transfer a spot asset on L1 to another address.
+ *
+ * @response {@link SuccessResponse}
+ */
+export interface SpotSendRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "spotSend";
+
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
+
+        /** Chain ID used for signing. */
+        signatureChainId: Hex;
+
+        /** Recipient address. */
+        destination: Hex;
+
+        /** Token identifier (e.g., tokenName:tokenId). */
+        token: `${string}:${Hex}`;
+
+        /** Amount to send. */
+        amount: string;
+
+        /** Current timestamp in ms. */
+        time: number;
+    };
+
+    /** Not applicable for this action. */
+    vaultAddress?: never;
+}
+
+/**
+ * Transfer between sub-accounts.
+ *
+ * @response {@link SuccessResponse}
+ */
+export interface SubAccountTransferRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "subAccountTransfer";
+
+        /** Sub-account address. */
+        subAccountUser: Hex;
+
+        /** `true` for deposit, `false` for withdrawal. */
+        isDeposit: boolean;
+
+        /** Amount to transfer (float * 1e6). */
+        usd: number;
+    };
+
+    /** Not applicable for this action. */
+    vaultAddress?: never;
+}
+
+/**
+ * Update isolated margin for a position.
+ *
+ * @response {@link SuccessResponse}
+ */
+export interface UpdateIsolatedMarginRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "updateIsolatedMargin";
+
+        /** Coin index. */
+        asset: number;
+
+        /** Position side (`true` for long, `false` for short). */
+        isBuy: boolean;
+
+        /** Amount to adjust (in USD). This should be an integer value. */
+        ntli: number;
+    };
+}
+
+/**
+ * Update leverage for cross or isolated margin.
+ *
+ * @response {@link SuccessResponse}
  */
 export interface UpdateLeverageRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
     action: {
         /** Type of action. */
         type: "updateLeverage";
 
-        /** Index of the coin. */
+        /** Coin index. */
         asset: number;
 
-        /** `true` for cross leverage; `false` for isolated leverage. */
+        /** `true` for cross leverage, `false` for isolated leverage. */
         isCross: boolean;
 
         /** New leverage value. */
@@ -266,201 +428,203 @@ export interface UpdateLeverageRequest extends BaseExchangeRequest {
 }
 
 /**
- * Adds or removes margin from an isolated position.
+ * Transfer funds between Spot and Perp accounts.
  *
- * @requestWeight 1
  * @response {@link SuccessResponse}
- * @throws {HyperliquidAPIError} If the API returns an error.
  */
-export interface UpdateIsolatedMarginRequest extends BaseExchangeRequest {
+export interface UsdClassTransferRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
     action: {
         /** Type of action. */
-        type: "updateIsolatedMargin";
+        type: "usdClassTransfer";
 
-        /** Index of the coin. */
-        asset: number;
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
 
-        /** Position side (`true` for long, `false` for short). Has no effect until hedge mode is implemented. */
-        isBuy: boolean;
+        /** Chain ID used for signing. */
+        signatureChainId: Hex;
 
-        /** Amount to add or remove (in USD). */
-        ntli: number;
+        /** USD amount to transfer. */
+        amount: string;
+
+        /** `true` for Spot to Perp, `false` for Perp to Spot. */
+        toPerp: boolean;
+
+        /** Unique request identifier (recommended: current timestamp in ms). */
+        nonce: number;
     };
+
+    /** Not applicable for this action. */
+    vaultAddress?: never;
 }
 
 /**
- * Transfers USDC on L1 to another address.
+ * Transfer USDC on L1 to another address.
  *
- * @requestWeight 1
  * @response {@link SuccessResponse}
- * @throws {HyperliquidAPIError} If the API returns an error.
  */
 export interface UsdSendRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
     action: {
         /** Type of action. */
         type: "usdSend";
 
-        /** HyperLiquid network to use. */
+        /** HyperLiquid network. */
         hyperliquidChain: "Mainnet" | "Testnet";
 
-        /** Chain ID used when signing. */
+        /** Chain ID used for signing. */
         signatureChainId: Hex;
 
-        /** Recipient's address. */
+        /** Recipient address. */
         destination: Hex;
 
-        /** Amount of USD to send. */
+        /** USD amount to send. */
         amount: string;
 
-        /** Current timestamp in milliseconds. */
+        /** Current timestamp in ms. */
         time: number;
     };
+
+    /** Not applicable for this action. */
     vaultAddress?: never;
 }
 
 /**
- * Transfers a spot asset on L1 to another address.
+ * Transfer funds to/from a vault.
  *
- * @requestWeight 1
  * @response {@link SuccessResponse}
- * @throws {HyperliquidAPIError} If the API returns an error.
- */
-export interface SpotSendRequest extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "spotSend";
-
-        /** HyperLiquid network to use. */
-        hyperliquidChain: "Mainnet" | "Testnet";
-
-        /** Chain ID used when signing. */
-        signatureChainId: Hex;
-
-        /** Recipient's address. */
-        destination: Hex;
-
-        /** Token identifier (format: `tokenName:tokenId`). */
-        token: `${string}:${Hex}`;
-
-        /** Amount of token to send. */
-        amount: string;
-
-        /** Current timestamp in milliseconds. */
-        time: number;
-    };
-    vaultAddress?: never;
-}
-
-/**
- * Initiates a withdrawal request.
- *
- * @requestWeight 1
- * @response {@link SuccessResponse}
- * @throws {HyperliquidAPIError} If the API returns an error.
- */
-export interface Withdraw3Request extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "withdraw3";
-
-        /** HyperLiquid network to use. */
-        hyperliquidChain: "Mainnet" | "Testnet";
-
-        /** Chain ID used when signing. */
-        signatureChainId: Hex;
-
-        /** Amount of USD to withdraw. */
-        amount: string;
-
-        /** Current timestamp in milliseconds. */
-        time: number;
-
-        /** Recipient's address. */
-        destination: Hex;
-    };
-    vaultAddress?: never;
-}
-
-/**
- * Transfers funds between Spot and Perp accounts.
- *
- * @requestWeight 1
- * @response {@link SuccessResponse}
- * @throws {HyperliquidAPIError} If the API returns an error.
- */
-export interface SpotUserRequest extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "spotUser";
-
-        /** Transfer parameters. */
-        classTransfer: {
-            /** Amount of raw USDC to send (float amount * 1e6). */
-            usdc: number;
-
-            /** `true` for Spot to Perp; `false` for Perp to Spot. */
-            toPerp: boolean;
-        };
-    };
-    vaultAddress?: never;
-}
-
-/**
- * Deposits or withdraws from a vault.
- *
- * @requestWeight 1
- * @response {@link SuccessResponse}
- * @throws {HyperliquidAPIError} If the API returns an error.
  */
 export interface VaultTransferRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
     action: {
         /** Type of action. */
         type: "vaultTransfer";
 
-        /** Address of the vault. */
+        /** Vault address. */
         vaultAddress: Hex;
 
-        /** `true` for deposit; `false` for withdrawal. */
+        /** `true` for deposit, `false` for withdrawal. */
         isDeposit: boolean;
 
-        /** Amount of raw USD to transfer (float amount * 1e6). */
+        /** Amount to transfer (float * 1e6). */
         usd: number;
     };
+
+    /** Not applicable for this action. */
     vaultAddress?: never;
 }
 
-// ———————————————API (Responses)———————————————
-
 /**
- * Successful response without specific data.
+ * Initiate a withdrawal request.
+ *
+ * @response {@link SuccessResponse}
  */
+export interface Withdraw3Request extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "withdraw3";
+
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
+
+        /** Chain ID used for signing. */
+        signatureChainId: Hex;
+
+        /** USD amount to withdraw. */
+        amount: string;
+
+        /** Current timestamp in ms. */
+        time: number;
+
+        /** Recipient address. */
+        destination: Hex;
+    };
+
+    /** Not applicable for this action. */
+    vaultAddress?: never;
+}
+
+// ———————————————Responses———————————————
+
+/** Successful response without specific data. */
 export interface SuccessResponse extends BaseExchangeResponse {
+    /** Successful status. */
     status: "ok";
+
+    /** Response details. */
     response: {
+        /** Type of operation. */
         type: "default";
+
         data?: never;
     };
 }
 
-/**
- * Error response for failed operations.
- */
+/** Error response for failed operations. */
 export interface ErrorResponse extends BaseExchangeResponse {
+    /** Error status. */
     status: "err";
+
+    /** Error message. */
     response: string;
 }
 
-/**
- * Response for order placement and batch modify operations.
- */
-export interface OrderResponse extends BaseExchangeResponse {
+/** Response for order cancellation. */
+export interface CancelResponse extends BaseExchangeResponse {
+    /** Successful status. */
     status: "ok";
+
+    /** Response details. */
     response: {
-        type: "order";
+        /** Type of operation. */
+        type: "cancel";
+
+        /** Specific data. */
         data: {
+            /** Array of statuses or error messages. */
+            statuses: (
+                | "success"
+                | {
+                    /** Error message. */
+                    error: string;
+                }
+            )[];
+        };
+    };
+}
+
+/** Response for creating a sub-account. */
+export interface CreateSubAccountResponse extends BaseExchangeResponse {
+    /** Successful status. */
+    status: "ok";
+
+    /** Response details. */
+    response: {
+        /** Type of operation. */
+        type: "createSubAccount";
+
+        /** Sub-account address. */
+        data: Hex;
+    };
+}
+
+/** Response for order placement and batch modifications. */
+export interface OrderResponse extends BaseExchangeResponse {
+    /** Successful status. */
+    status: "ok";
+
+    /** Response details. */
+    response: {
+        /** Type of operation. */
+        type: "order";
+
+        /** Specific data. */
+        data: {
+            /** Array of statuses or error messages. */
             statuses: (
                 | {
-                    /** Status for a resting order. */
+                    /** Resting order status. */
                     resting: {
                         /** Order ID. */
                         oid: number;
@@ -470,7 +634,7 @@ export interface OrderResponse extends BaseExchangeResponse {
                     };
                 }
                 | {
-                    /** Status for a filled order. */
+                    /** Filled order status. */
                     filled: {
                         /** Total size filled. */
                         totalSz: string;
@@ -485,25 +649,6 @@ export interface OrderResponse extends BaseExchangeResponse {
                         cloid?: Hex;
                     };
                 }
-                | {
-                    /** Error message. */
-                    error: string;
-                }
-            )[];
-        };
-    };
-}
-
-/**
- * Response for order cancellation.
- */
-export interface CancelResponse extends BaseExchangeResponse {
-    status: "ok";
-    response: {
-        type: "cancel";
-        data: {
-            statuses: (
-                | "success"
                 | {
                     /** Error message. */
                     error: string;

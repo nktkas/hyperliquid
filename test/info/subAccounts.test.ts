@@ -4,45 +4,28 @@ import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
 import { resolve } from "jsr:@std/path@^1.0.2";
 import { assert, assertGreater } from "jsr:@std/assert@^1.0.4";
 
-const USER_ADDRESS: Hex = "0x563C175E6f11582f65D6d9E360A618699DEe14a9";
+const USER_ADDRESS: Hex = "0x393296977708952244b02311d6e6ecaf785949a8";
 
 Deno.test(
-    "userFills",
+    "subAccounts",
     { permissions: { net: true, read: true } },
-    async (t) => {
+    async () => {
         // Create HyperliquidInfoClient
         const client = new InfoClient("https://api.hyperliquid-testnet.xyz/info");
 
         // Create TypeScript type schemas
         const tsjSchemaGenerator = tsj.createGenerator({ path: resolve("./src/types/info.d.ts"), skipTypeCheck: true });
-        const schema = tsjSchemaGenerator.createSchema("UserFill");
+        const schema = tsjSchemaGenerator.createSchema("SubAccount");
 
         // Test
-        const data = await client.userFills({ user: USER_ADDRESS });
+        const data = await client.subAccounts({ user: USER_ADDRESS });
 
         assert(Array.isArray(data), "WARNING: Unable to fully validate the type due to an empty array");
         data.forEach((item) => assertJsonSchema(schema, item));
 
-        await t.step("side", async (t) => {
-            await t.step("B", () => {
-                assert(data.find((item) => item.side === "B"), "Failed to verify type with 'side' === 'B'");
-            });
-
-            await t.step("A", () => {
-                assert(data.find((item) => item.side === "A"), "Failed to verify type with 'side' === 'A'");
-            });
-        });
-
-        await t.step(`cloid !== undefined`, () => {
-            assert(data.find((item) => item.cloid), "Failed to verify type with 'cloid'");
-        });
-
-        await t.step(`liquidation !== undefined`, () => {
-            assert(data.find((item) => item.liquidation), "Failed to verify type with 'liquidation'");
-        });
-
         recursiveTraversal(data, (key, value) => {
             if (Array.isArray(value)) {
+                if (key === "assetPositions" || key === "balances") return;
                 assertGreater(
                     value.length,
                     0,

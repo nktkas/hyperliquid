@@ -1,4 +1,4 @@
-import { type Hex, HyperliquidInfoClient } from "../../index.ts";
+import { type Hex, InfoClient } from "../../index.ts";
 import { assertJsonSchema } from "../utils.ts";
 import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
 import { resolve } from "jsr:@std/path@^1.0.2";
@@ -18,201 +18,205 @@ const STOP_LIMIT: TestOrder = { oid: 15030701730, cloid: "0xa81c445e1ece30c6bbf2
 const GTC: TestOrder = { oid: 15030023260, cloid: "0xcf4168b64a499def2901f4e12d50f877" };
 const ALO: TestOrder = { oid: 15030054922, cloid: "0xb7766a15f924a1c1f8fd635f255f36a3" };
 
-Deno.test("orderStatus", async (t) => {
-    // Create HyperliquidInfoClient
-    const client = new HyperliquidInfoClient("https://api.hyperliquid-testnet.xyz/info");
+Deno.test(
+    "orderStatus",
+    { permissions: { net: true, read: true } },
+    async (t) => {
+        // Create HyperliquidInfoClient
+        const client = new InfoClient("https://api.hyperliquid-testnet.xyz/info");
 
-    // Create TypeScript type schemas
-    const tsjSchemaGenerator = tsj.createGenerator({ path: resolve("./src/types/info.d.ts"), skipTypeCheck: true });
-    const schema = tsjSchemaGenerator.createSchema("OrderStatusResponse");
+        // Create TypeScript type schemas
+        const tsjSchemaGenerator = tsj.createGenerator({ path: resolve("./src/types/info.d.ts"), skipTypeCheck: true });
+        const schema = tsjSchemaGenerator.createSchema("OrderStatusResponse");
 
-    // Test
-    await t.step(`OrderStatusResponse.status === "order"`, async (t) => {
-        await t.step("oid", async (t) => {
-            await t.step("side", async (t) => {
-                await t.step("B", async () => {
+        // Test
+        await t.step(`OrderStatusResponse.status === "order"`, async (t) => {
+            await t.step("oid", async (t) => {
+                await t.step("side", async (t) => {
+                    await t.step("B", async () => {
+                        const data = await client.orderStatus({ user: USER_ADDRESS, oid: LONG.oid });
+
+                        assertJsonSchema(schema, data);
+                        assert(data.status === "order", "Expected status to be 'order'");
+                        assert(data.order.order.side === "B", "Failed to verify type with 'side' === 'B'");
+                    });
+
+                    await t.step("A", async () => {
+                        const data = await client.orderStatus({ user: USER_ADDRESS, oid: SHORT.oid });
+
+                        assertJsonSchema(schema, data);
+                        assert(data.status === "order", "Expected status to be 'order'");
+                        assert(data.order.order.side === "A", "Failed to verify type with 'side' === 'A'");
+                    });
+                });
+
+                await t.step(`cloid !== null`, async () => {
                     const data = await client.orderStatus({ user: USER_ADDRESS, oid: LONG.oid });
 
                     assertJsonSchema(schema, data);
                     assert(data.status === "order", "Expected status to be 'order'");
-                    assert(data.order.order.side === "B", "Failed to verify type with 'side' === 'B'");
+                    assert(data.order.order.cloid, "Failed to verify type with 'cloid' !== null");
                 });
 
-                await t.step("A", async () => {
-                    const data = await client.orderStatus({ user: USER_ADDRESS, oid: SHORT.oid });
+                await t.step("orderType", async (t) => {
+                    // TODO
+                    await t.step({ name: "Market", fn: () => {}, ignore: true });
 
-                    assertJsonSchema(schema, data);
-                    assert(data.status === "order", "Expected status to be 'order'");
-                    assert(data.order.order.side === "A", "Failed to verify type with 'side' === 'A'");
-                });
-            });
+                    await t.step("Limit", async () => {
+                        const data = await client.orderStatus({ user: USER_ADDRESS, oid: LIMIT.oid });
 
-            await t.step(`cloid !== null`, async () => {
-                const data = await client.orderStatus({ user: USER_ADDRESS, oid: LONG.oid });
+                        assertJsonSchema(schema, data);
+                        assert(data.status === "order", "Expected status to be 'order'");
+                        assert(data.order.order.orderType === "Limit", "Failed to verify type with 'orderType' === 'Limit'");
+                    });
 
-                assertJsonSchema(schema, data);
-                assert(data.status === "order", "Expected status to be 'order'");
-                assert(data.order.order.cloid, "Failed to verify type with 'cloid' !== null");
-            });
+                    await t.step("Stop Market", async () => {
+                        const data = await client.orderStatus({ user: USER_ADDRESS, oid: STOP_MARKET.oid });
 
-            await t.step("orderType", async (t) => {
-                // TODO
-                await t.step({ name: "Market", fn: () => {}, ignore: true });
+                        assertJsonSchema(schema, data);
+                        assert(data.status === "order", "Expected status to be 'order'");
+                        assert(
+                            data.order.order.orderType === "Stop Market",
+                            "Failed to verify type with 'orderType' === 'Stop Market'",
+                        );
+                    });
 
-                await t.step("Limit", async () => {
-                    const data = await client.orderStatus({ user: USER_ADDRESS, oid: LIMIT.oid });
+                    await t.step("Stop Limit", async () => {
+                        const data = await client.orderStatus({ user: USER_ADDRESS, oid: STOP_LIMIT.oid });
 
-                    assertJsonSchema(schema, data);
-                    assert(data.status === "order", "Expected status to be 'order'");
-                    assert(data.order.order.orderType === "Limit", "Failed to verify type with 'orderType' === 'Limit'");
-                });
+                        assertJsonSchema(schema, data);
+                        assert(data.status === "order", "Expected status to be 'order'");
+                        assert(
+                            data.order.order.orderType === "Stop Limit",
+                            "Failed to verify type with 'orderType' === 'Stop Limit'",
+                        );
+                    });
 
-                await t.step("Stop Market", async () => {
-                    const data = await client.orderStatus({ user: USER_ADDRESS, oid: STOP_MARKET.oid });
+                    // TODO
+                    await t.step({ name: "Scale", fn: () => {}, ignore: true });
 
-                    assertJsonSchema(schema, data);
-                    assert(data.status === "order", "Expected status to be 'order'");
-                    assert(
-                        data.order.order.orderType === "Stop Market",
-                        "Failed to verify type with 'orderType' === 'Stop Market'",
-                    );
-                });
-
-                await t.step("Stop Limit", async () => {
-                    const data = await client.orderStatus({ user: USER_ADDRESS, oid: STOP_LIMIT.oid });
-
-                    assertJsonSchema(schema, data);
-                    assert(data.status === "order", "Expected status to be 'order'");
-                    assert(
-                        data.order.order.orderType === "Stop Limit",
-                        "Failed to verify type with 'orderType' === 'Stop Limit'",
-                    );
+                    // TODO
+                    await t.step({ name: "TWAP", fn: () => {}, ignore: true });
                 });
 
-                // TODO
-                await t.step({ name: "Scale", fn: () => {}, ignore: true });
+                await t.step("tif", async (t) => {
+                    await t.step("Gtc", async () => {
+                        const data = await client.orderStatus({ user: USER_ADDRESS, oid: GTC.oid });
 
-                // TODO
-                await t.step({ name: "TWAP", fn: () => {}, ignore: true });
-            });
+                        assertJsonSchema(schema, data);
+                        assert(data.status === "order", "Expected status to be 'order'");
+                        assert(data.order.order.tif === "Gtc", "Failed to verify type with 'tif' === 'Gtc'");
+                    });
 
-            await t.step("tif", async (t) => {
-                await t.step("Gtc", async () => {
-                    const data = await client.orderStatus({ user: USER_ADDRESS, oid: GTC.oid });
+                    // TODO
+                    await t.step({ name: "Ioc", fn: async () => {}, ignore: true });
 
-                    assertJsonSchema(schema, data);
-                    assert(data.status === "order", "Expected status to be 'order'");
-                    assert(data.order.order.tif === "Gtc", "Failed to verify type with 'tif' === 'Gtc'");
-                });
+                    await t.step("Alo", async () => {
+                        const data = await client.orderStatus({ user: USER_ADDRESS, oid: ALO.oid });
 
-                // TODO
-                await t.step({ name: "Ioc", fn: async () => {}, ignore: true });
-
-                await t.step("Alo", async () => {
-                    const data = await client.orderStatus({ user: USER_ADDRESS, oid: ALO.oid });
-
-                    assertJsonSchema(schema, data);
-                    assert(data.status === "order", "Expected status to be 'order'");
-                    assert(data.order.order.tif === "Alo", "Failed to verify type with 'side' === 'Alo'");
+                        assertJsonSchema(schema, data);
+                        assert(data.status === "order", "Expected status to be 'order'");
+                        assert(data.order.order.tif === "Alo", "Failed to verify type with 'side' === 'Alo'");
+                    });
                 });
             });
-        });
 
-        await t.step("cloid", async (t) => {
-            await t.step("side", async (t) => {
-                await t.step("B", async () => {
+            await t.step("cloid", async (t) => {
+                await t.step("side", async (t) => {
+                    await t.step("B", async () => {
+                        const data = await client.orderStatus({ user: USER_ADDRESS, oid: LONG.cloid });
+
+                        assertJsonSchema(schema, data);
+                        assert(data.status === "order", "Expected status to be 'order'");
+                        assert(data.order.order.side === "B", "Failed to verify type with 'side' === 'B'");
+                    });
+
+                    await t.step("A", async () => {
+                        const data = await client.orderStatus({ user: USER_ADDRESS, oid: SHORT.cloid });
+
+                        assertJsonSchema(schema, data);
+                        assert(data.status === "order", "Expected status to be 'order'");
+                        assert(data.order.order.side === "A", "Failed to verify type with 'side' === 'A'");
+                    });
+                });
+
+                await t.step(`cloid !== null`, async () => {
                     const data = await client.orderStatus({ user: USER_ADDRESS, oid: LONG.cloid });
 
                     assertJsonSchema(schema, data);
                     assert(data.status === "order", "Expected status to be 'order'");
-                    assert(data.order.order.side === "B", "Failed to verify type with 'side' === 'B'");
+                    assert(data.order.order.cloid, "Failed to verify type with 'cloid' !== null");
                 });
 
-                await t.step("A", async () => {
-                    const data = await client.orderStatus({ user: USER_ADDRESS, oid: SHORT.cloid });
+                await t.step("orderType", async (t) => {
+                    // TODO
+                    await t.step({ name: "Market", fn: () => {}, ignore: true });
 
-                    assertJsonSchema(schema, data);
-                    assert(data.status === "order", "Expected status to be 'order'");
-                    assert(data.order.order.side === "A", "Failed to verify type with 'side' === 'A'");
-                });
-            });
+                    await t.step("Limit", async () => {
+                        const data = await client.orderStatus({ user: USER_ADDRESS, oid: LIMIT.cloid });
 
-            await t.step(`cloid !== null`, async () => {
-                const data = await client.orderStatus({ user: USER_ADDRESS, oid: LONG.cloid });
+                        assertJsonSchema(schema, data);
+                        assert(data.status === "order", "Expected status to be 'order'");
+                        assert(data.order.order.orderType === "Limit", "Failed to verify type with 'orderType' === 'Limit'");
+                    });
 
-                assertJsonSchema(schema, data);
-                assert(data.status === "order", "Expected status to be 'order'");
-                assert(data.order.order.cloid, "Failed to verify type with 'cloid' !== null");
-            });
+                    await t.step("Stop Market", async () => {
+                        const data = await client.orderStatus({ user: USER_ADDRESS, oid: STOP_MARKET.cloid });
 
-            await t.step("orderType", async (t) => {
-                // TODO
-                await t.step({ name: "Market", fn: () => {}, ignore: true });
+                        assertJsonSchema(schema, data);
+                        assert(data.status === "order", "Expected status to be 'order'");
+                        assert(
+                            data.order.order.orderType === "Stop Market",
+                            "Failed to verify type with 'orderType' === 'Stop Market'",
+                        );
+                    });
 
-                await t.step("Limit", async () => {
-                    const data = await client.orderStatus({ user: USER_ADDRESS, oid: LIMIT.cloid });
+                    await t.step("Stop Limit", async () => {
+                        const data = await client.orderStatus({ user: USER_ADDRESS, oid: STOP_LIMIT.cloid });
 
-                    assertJsonSchema(schema, data);
-                    assert(data.status === "order", "Expected status to be 'order'");
-                    assert(data.order.order.orderType === "Limit", "Failed to verify type with 'orderType' === 'Limit'");
-                });
+                        assertJsonSchema(schema, data);
+                        assert(data.status === "order", "Expected status to be 'order'");
+                        assert(
+                            data.order.order.orderType === "Stop Limit",
+                            "Failed to verify type with 'orderType' === 'Stop Limit'",
+                        );
+                    });
 
-                await t.step("Stop Market", async () => {
-                    const data = await client.orderStatus({ user: USER_ADDRESS, oid: STOP_MARKET.cloid });
+                    // TODO
+                    await t.step({ name: "Scale", fn: () => {}, ignore: true });
 
-                    assertJsonSchema(schema, data);
-                    assert(data.status === "order", "Expected status to be 'order'");
-                    assert(
-                        data.order.order.orderType === "Stop Market",
-                        "Failed to verify type with 'orderType' === 'Stop Market'",
-                    );
-                });
-
-                await t.step("Stop Limit", async () => {
-                    const data = await client.orderStatus({ user: USER_ADDRESS, oid: STOP_LIMIT.cloid });
-
-                    assertJsonSchema(schema, data);
-                    assert(data.status === "order", "Expected status to be 'order'");
-                    assert(
-                        data.order.order.orderType === "Stop Limit",
-                        "Failed to verify type with 'orderType' === 'Stop Limit'",
-                    );
+                    // TODO
+                    await t.step({ name: "TWAP", fn: () => {}, ignore: true });
                 });
 
-                // TODO
-                await t.step({ name: "Scale", fn: () => {}, ignore: true });
+                await t.step("tif", async (t) => {
+                    await t.step("Gtc", async () => {
+                        const data = await client.orderStatus({ user: USER_ADDRESS, oid: GTC.cloid });
 
-                // TODO
-                await t.step({ name: "TWAP", fn: () => {}, ignore: true });
-            });
+                        assertJsonSchema(schema, data);
+                        assert(data.status === "order", "Expected status to be 'order'");
+                        assert(data.order.order.tif === "Gtc", "Failed to verify type with 'tif' === 'Gtc'");
+                    });
 
-            await t.step("tif", async (t) => {
-                await t.step("Gtc", async () => {
-                    const data = await client.orderStatus({ user: USER_ADDRESS, oid: GTC.cloid });
+                    // TODO
+                    await t.step({ name: "Ioc", fn: async () => {}, ignore: true });
 
-                    assertJsonSchema(schema, data);
-                    assert(data.status === "order", "Expected status to be 'order'");
-                    assert(data.order.order.tif === "Gtc", "Failed to verify type with 'tif' === 'Gtc'");
-                });
+                    await t.step("Alo", async () => {
+                        const data = await client.orderStatus({ user: USER_ADDRESS, oid: ALO.cloid });
 
-                // TODO
-                await t.step({ name: "Ioc", fn: async () => {}, ignore: true });
-
-                await t.step("Alo", async () => {
-                    const data = await client.orderStatus({ user: USER_ADDRESS, oid: ALO.cloid });
-
-                    assertJsonSchema(schema, data);
-                    assert(data.status === "order", "Expected status to be 'order'");
-                    assert(data.order.order.tif === "Alo", "Failed to verify type with 'side' === 'Alo'");
+                        assertJsonSchema(schema, data);
+                        assert(data.status === "order", "Expected status to be 'order'");
+                        assert(data.order.order.tif === "Alo", "Failed to verify type with 'side' === 'Alo'");
+                    });
                 });
             });
         });
-    });
 
-    await t.step(`OrderStatusResponse.status == "unknownOid"`, async () => {
-        const data = await client.orderStatus({ user: USER_ADDRESS, oid: 0 });
+        await t.step(`OrderStatusResponse.status == "unknownOid"`, async () => {
+            const data = await client.orderStatus({ user: USER_ADDRESS, oid: 0 });
 
-        assertJsonSchema(schema, data);
-        assert(data.status === "unknownOid", "Expected status to be 'unknownOid'");
-    });
-});
+            assertJsonSchema(schema, data);
+            assert(data.status === "unknownOid", "Expected status to be 'unknownOid'");
+        });
+    },
+);

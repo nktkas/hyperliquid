@@ -4,9 +4,11 @@
 export class HyperliquidAPIError extends Error {
     /**
      * Constructs a new `HyperliquidAPIError` instance.
-     * @param message - The error message.
      */
-    constructor(message: string) {
+    constructor(
+        /** Error message. */
+        message: string,
+    ) {
         super(message);
         this.name = "HyperliquidAPIError";
     }
@@ -21,9 +23,11 @@ export class HyperliquidBatchAPIError extends Error {
 
     /**
      * Constructs a new `HyperliquidBatchAPIError` instance.
-     * @param messages - Array of error messages.
      */
-    constructor(messages: string[]) {
+    constructor(
+        /** Array of error messages. */
+        messages: string[],
+    ) {
         super(messages.join("\n"));
         this.name = "HyperliquidBatchAPIError";
         this.messages = messages;

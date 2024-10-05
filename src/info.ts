@@ -1,31 +1,37 @@
 import type {
+    AllMids,
     AllMidsRequest,
-    AllMidsResponse,
     CandleSnapshot,
     CandleSnapshotRequest,
+    ClearinghouseState,
     ClearinghouseStateRequest,
-    ClearinghouseStateResponse,
     FrontendOpenOrder,
     FrontendOpenOrdersRequest,
     FundingHistory,
     FundingHistoryRequest,
     Hex,
+    L2Book,
     L2BookRequest,
-    L2BookResponse,
+    Meta,
+    MetaAndAssetCtxs,
     MetaAndAssetCtxsRequest,
-    MetaAndAssetCtxsResponse,
     MetaRequest,
-    MetaResponse,
     OpenOrder,
     OpenOrdersRequest,
     OrderStatusRequest,
     OrderStatusResponse,
+    Referral,
+    ReferralRequest,
+    SpotClearinghouseState,
     SpotClearinghouseStateRequest,
-    SpotClearinghouseStateResponse,
+    SpotMeta,
+    SpotMetaAndAssetCtxs,
     SpotMetaAndAssetCtxsRequest,
-    SpotMetaAndAssetCtxsResponse,
     SpotMetaRequest,
-    SpotMetaResponse,
+    SubAccount,
+    SubAccountsRequest,
+    UserFees,
+    UserFeesRequest,
     UserFill,
     UserFillsByTimeRequest,
     UserFillsRequest,
@@ -33,503 +39,588 @@ import type {
     UserFundingRequest,
     UserNonFundingLedgerUpdates,
     UserNonFundingLedgerUpdatesRequest,
+    UserRateLimit,
     UserRateLimitRequest,
-    UserRateLimitResponse,
 } from "./types/info.d.ts";
-
-/**
- * Parameters for the {@link HyperliquidInfoClient.candleSnapshot candleSnapshot} method.
- */
-export interface CandleSnapshotParameters {
-    /** Symbol of the asset (e.g., `"ETH"`). */
-    coin: string;
-
-    /** Time interval for each candle (e.g., `"15m"`). */
-    interval: string;
-
-    /** Start time of the data (inclusive, in milliseconds since epoch). */
-    startTime: number;
-
-    /** End time of the data (inclusive, in milliseconds since epoch, optional). */
-    endTime?: number;
-}
-
-/**
- * Parameters for the {@link HyperliquidInfoClient.clearinghouseState clearinghouseState} method.
- */
-export interface ClearinghouseStateParameters {
-    /** User's address. */
-    user: Hex;
-}
-
-/**
- * Parameters for the {@link HyperliquidInfoClient.frontendOpenOrders frontendOpenOrders} method.
- */
-export interface FrontendOpenOrdersParameters {
-    /** User's address. */
-    user: Hex;
-}
-
-/**
- * Parameters for the {@link HyperliquidInfoClient.fundingHistory fundingHistory} method.
- */
-export interface FundingHistoryParameters {
-    /** Symbol of the asset (e.g., `"ETH"`). */
-    coin: string;
-
-    /** Start time of the data (inclusive, in milliseconds since epoch). */
-    startTime: number;
-
-    /** End time of the data (inclusive, in milliseconds since epoch, optional). */
-    endTime?: number;
-}
-
-/**
- * Parameters for the {@link HyperliquidInfoClient.l2Book l2Book} method.
- */
-export interface L2BookParameters {
-    /** Symbol of the asset to retrieve the order book for (e.g., `"ETH"`). */
-    coin: string;
-
-    /** Number of significant figures to aggregate price levels (optional). */
-    nSigFigs?: 2 | 3 | 4 | 5;
-
-    /** Mantissa value for level aggregation (allowed only when `nSigFigs` is `5`, optional). */
-    // TODO: The documentation says that option 1 is possible, but in this case the request terminates with an error
-    mantissa?: 2 | 5;
-}
-
-/**
- * Parameters for the {@link HyperliquidInfoClient.openOrders openOrders} method.
- */
-export interface OpenOrdersParameters {
-    /** User's address. */
-    user: Hex;
-}
-
-/**
- * Parameters for the {@link HyperliquidInfoClient.orderStatus orderStatus} method.
- */
-export interface OrderStatusParameters {
-    /** User's address. */
-    user: Hex;
-
-    /**
-     * Order ID to query.
-     * - If a `number`, it's an Order ID (`oid`).
-     * - If a `Hex` string, it's a Client Order ID (`cloid`).
-     */
-    oid: number | Hex;
-}
-
-/**
- * Parameters for the {@link HyperliquidInfoClient.spotClearinghouseState spotClearinghouseState} method.
- */
-export interface SpotClearinghouseStateParameters {
-    /** User's address. */
-    user: Hex;
-}
-
-/**
- * Parameters for the {@link HyperliquidInfoClient.userFills userFills} method.
- */
-export interface UserFillsParameters {
-    /** User's address. */
-    user: Hex;
-}
-
-/**
- * Parameters for the {@link HyperliquidInfoClient.userFillsByTime userFillsByTime} method.
- */
-export interface UserFillsByTimeParameters {
-    /** User's address. */
-    user: Hex;
-
-    /** Start time of the range (inclusive, in milliseconds since epoch). */
-    startTime: number;
-
-    /** End time of the range (inclusive, in milliseconds since epoch). */
-    endTime?: number;
-}
-
-/**
- * Parameters for the {@link HyperliquidInfoClient.userFunding userFunding} method.
- */
-export interface UserFundingParameters {
-    /** User's address. */
-    user: Hex;
-
-    /** Start time of the data (inclusive, in milliseconds since epoch). */
-    startTime: number;
-
-    /** End time of the data (inclusive, in milliseconds since epoch, optional). */
-    endTime?: number;
-}
-
-/**
- * Parameters for the {@link HyperliquidInfoClient.userNonFundingLedgerUpdates userNonFundingLedgerUpdates} method.
- */
-export interface UserNonFundingLedgerUpdatesParameters {
-    /** User's address. */
-    user: Hex;
-
-    /** Start time of the data (inclusive, in milliseconds since epoch). */
-    startTime: number;
-
-    /** End time of the data (inclusive, in milliseconds since epoch, optional). */
-    endTime?: number;
-}
-
-/**
- * Parameters for the {@link HyperliquidInfoClient.userRateLimit userRateLimit} method.
- */
-export interface UserRateLimitParameters {
-    /** User's address. */
-    user: Hex;
-}
+import { HyperliquidAPIError } from "./error.ts";
 
 /**
  * A client to interact with the Hyperliquid info APIs.
  */
-export class HyperliquidInfoClient {
+export class InfoClient {
     /** The endpoint of the Hyperliquid info APIs. */
     public readonly endpoint: string; // TESTNET: https://api.hyperliquid-testnet.xyz/info
 
     /**
-     * Initializes a new instance of the HyperliquidInfoClient class.
+     * Initialises a new instance.
      *
-     * @param endpoint - The endpoint of the Hyperliquid info APIs.
+     * @example
+     * ```ts
+     * import * as hyperliquid from "@nktkas/hyperliquid";
+     *
+     * const client = new hyperliquid.InfoClient();
+     * ```
      */
-    constructor(endpoint: string = "https://api.hyperliquid.xyz/info") {
+    constructor(
+        /** The endpoint of the Hyperliquid info APIs. */
+        endpoint: string = "https://api.hyperliquid.xyz/info",
+    ) {
         this.endpoint = endpoint;
     }
 
     /**
-     * Retrieves mid prices for all actively traded coins.
+     * Request mid coin prices.
      *
-     * @requestWeight 2
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
      *
      * @example
      * ```ts
      * const allMids = await client.allMids();
-     * console.log(allMids);
-     * // Output: { "ETH": "1800.5", "BTC": "30000.0", ... }
+     *
+     * // allMids: { "ETH": "1800.5", "BTC": "30000.0", ... }
      * ```
      */
-    async allMids(): Promise<AllMidsResponse> {
+    async allMids(): Promise<AllMids> {
         return await this.request({ type: "allMids" });
     }
 
     /**
-     * Retrieves a candlestick data point for charting.
+     * Request candlestick snapshots.
      *
-     * @requestWeight 20
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
      *
      * @example
      * ```ts
      * const candles = await client.candleSnapshot({
      *     coin: "ETH",
      *     interval: "1h",
-     *     startTime: Date.now() - 24 * 60 * 60 * 1000,
-     *     endTime: Date.now() // Optional
+     *     startTime: Date.now() - 1000 * 60 * 60 * 24
      * });
-     * console.log(candles[0]);
-     * // Output: { t: 1234567890000, T: 1234571490000, s: "ETH", i: "1h", o: "1800.0", c: "1805.0", h: "1810.0", l: "1795.0", v: "1000.5", n: 500 }
+     *
+     * // candles[0]: { t: 1234567890000, T: 1234571490000, s: "ETH", i: "1h", o: "1800.0", c: "1805.0", h: "1810.0", l: "1795.0", v: "1000.5", n: 500 }
      * ```
      */
-    async candleSnapshot(args: CandleSnapshotParameters): Promise<CandleSnapshot[]> {
+    async candleSnapshot(
+        /** The parameters for the request. */
+        args: {
+            /** Asset symbol (e.g., "ETH"). */
+            coin: string;
+
+            /** Time interval (e.g., "15m"). */
+            interval: string;
+
+            /** Start time (in ms since epoch). */
+            startTime: number;
+
+            /** End time (in ms since epoch). */
+            endTime?: number;
+        },
+    ): Promise<CandleSnapshot[]> {
         return await this.request({ type: "candleSnapshot", req: args });
     }
 
     /**
-     * Retrieves a user's account summary for perpetual trading.
+     * Request clearinghouse state.
      *
-     * @requestWeight 2
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
      *
      * @example
      * ```ts
      * const state = await client.clearinghouseState({ user: "0x..." });
-     * console.log(state.marginSummary);
-     * // Output: { accountValue: "10000.0", totalNtlPos: "5000.0", totalRawUsd: "5000.0", totalMarginUsed: "1000.0" }
+     *
+     * // state.marginSummary: { accountValue: "10000.0", totalNtlPos: "5000.0", totalRawUsd: "5000.0", totalMarginUsed: "1000.0" }
      * ```
      */
-    async clearinghouseState(args: ClearinghouseStateParameters): Promise<ClearinghouseStateResponse> {
+    async clearinghouseState(
+        /** The parameters for the request. */
+        args: {
+            /** User's address. */
+            user: Hex;
+        },
+    ): Promise<ClearinghouseState> {
         return await this.request({ type: "clearinghouseState", ...args });
     }
 
     /**
-     * Retrieves an open order with additional frontend information.
+     * Request frontend open orders.
      *
-     * @requestWeight 20
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
      *
      * @example
      * ```ts
      * const orders = await client.frontendOpenOrders({ user: "0x1234..." });
-     * console.log(orders[0]);
-     * // Output: { coin: "ETH", side: "B", limitPx: "1800.0", sz: "1.0", oid: 12345, timestamp: 1234567890000, ... }
+     *
+     * // orders[0]: { coin: "ETH", side: "B", limitPx: "1800.0", sz: "1.0", oid: 12345, timestamp: 1234567890000, ... }
      * ```
      */
-    async frontendOpenOrders(args: FrontendOpenOrdersParameters): Promise<FrontendOpenOrder[]> {
+    async frontendOpenOrders(
+        /** The parameters for the request. */
+        args: {
+            /** User's address. */
+            user: Hex;
+        },
+    ): Promise<FrontendOpenOrder[]> {
         return await this.request({ type: "frontendOpenOrders", ...args });
     }
 
     /**
-     * Retrieves historical funding rate data for an asset.
+     * Request funding history.
      *
-     * @requestWeight 20
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
      *
      * @example
      * ```ts
      * const funding = await client.fundingHistory({
      *     coin: "ETH",
-     *     startTime: Date.now() - 7 * 24 * 60 * 60 * 1000,
-     *     endTime: Date.now()
+     *     startTime: Date.now() - 1000 * 60 * 60 * 24
      * });
-     * console.log(funding[0]);
-     * // Output: { coin: "ETH", fundingRate: "0.0001", premium: "0.0002", time: 1234567890000 }
+     *
+     * // funding[0]: { coin: "ETH", fundingRate: "0.0001", premium: "0.0002", time: 1234567890000 }
      */
-    async fundingHistory(args: FundingHistoryParameters): Promise<FundingHistory[]> {
+    async fundingHistory(
+        /** The parameters for the request. */
+        args: {
+            /** Asset symbol (e.g., "ETH"). */
+            coin: string;
+
+            /** Start time (in ms since epoch). */
+            startTime: number;
+
+            /** End time (in ms since epoch). */
+            endTime?: number;
+        },
+    ): Promise<FundingHistory[]> {
         return await this.request({ type: "fundingHistory", ...args });
     }
 
     /**
-     * Retrieves a Level 2 (L2) order book snapshot.
+     * Request L2 order book.
      *
-     * @requestWeight 2
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
      *
      * @example
      * ```ts
      * const book = await client.l2Book({ coin: "ETH", nSigFigs: 2 });
-     * console.log(book.levels[0][0]);
-     * // Output: { px: "1800.00", sz: "10.5", n: 5 }
+     *
+     * // book.levels[0]: [{ px: "1800.00", sz: "10.5", n: 5 }, { px: "1799.00", sz: "5.0", n: 3 }, ...]
      * ```
      */
-    async l2Book(args: L2BookParameters): Promise<L2BookResponse> {
+    async l2Book(
+        /** The parameters for the request. */
+        args: {
+            /** Asset symbol (e.g., "ETH"). */
+            coin: string;
+
+            /** Number of significant figures for price levels. */
+            nSigFigs?: 2 | 3 | 4 | 5;
+
+            /** Mantissa for aggregation (if nSigFigs is 5). */
+            mantissa?: 2 | 5;
+        },
+    ): Promise<L2Book> {
         return await this.request({ type: "l2Book", ...args });
     }
 
     /**
-     * Retrieves metadata for perpetual assets.
+     * Request trading metadata.
      *
-     * @requestWeight 20
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
      *
      * @example
      * ```ts
      * const meta = await client.meta();
-     * console.log(meta.universe[0]);
-     * // Output: { szDecimals: 3, name: "PERP", maxLeverage: 50, onlyIsolated: false }
+     *
+     * // meta.universe[0]: { szDecimals: 3, name: "PERP", maxLeverage: 50, onlyIsolated: false }
      * ```
      */
-    async meta(): Promise<MetaResponse> {
+    async meta(): Promise<Meta> {
         return await this.request({ type: "meta" });
     }
 
     /**
-     * Retrieves both metadata and context information for perpetual assets.
+     * Request metadata and asset contexts.
      *
-     * @requestWeight 20
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
      *
      * @example
      * ```ts
      * const [meta, assetCtxs] = await client.metaAndAssetCtxs();
-     * console.log(assetCtxs[0]);
-     * // Output: { funding: "0.0001", openInterest: "1000000", prevDayPx: "1800.0", ... }
+     *
+     * // assetCtxs[0]: { funding: "0.0001", openInterest: "1000000", prevDayPx: "1800.0", ... }
      * ```
      */
-    async metaAndAssetCtxs(): Promise<MetaAndAssetCtxsResponse> {
+    async metaAndAssetCtxs(): Promise<MetaAndAssetCtxs> {
         return await this.request({ type: "metaAndAssetCtxs" });
     }
 
     /**
-     * Retrieves a user's active open orders.
+     * Request open orders.
      *
-     * @requestWeight 20
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
      *
      * @example
      * ```ts
      * const orders = await client.openOrders({ user: "0x1234..." });
-     * console.log(orders[0]);
-     * // Output: { coin: "ETH", side: "B", limitPx: "1800.0", sz: "1.0", oid: 12345, timestamp: 1234567890000, ... }
+     *
+     * // orders[0]: { coin: "ETH", side: "B", limitPx: "1800.0", sz: "1.0", oid: 12345, timestamp: 1234567890000, ... }
      * ```
      */
-    async openOrders(args: OpenOrdersParameters): Promise<OpenOrder[]> {
+    async openOrders(
+        /** The parameters for the request. */
+        args: {
+            /** User's address. */
+            user: Hex;
+        },
+    ): Promise<OpenOrder[]> {
         return await this.request({ type: "openOrders", ...args });
     }
 
     /**
-     * Retrieves the status of a specific order.
+     * Request order status.
      *
-     * @requestWeight 2
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
      *
      * @example
      * ```ts
      * const status = await client.orderStatus({ user: "0x1234...", oid: 12345 });
-     * console.log(status);
-     * // Output: { status: "order", order: { order: {...}, status: "open", statusTimestamp: 1234567890000 } }
+     *
+     * // status: { status: "order", order: { order: {...}, status: "open", statusTimestamp: 1234567890000 } }
      * ```
      */
-    async orderStatus(args: OrderStatusParameters): Promise<OrderStatusResponse> {
+    async orderStatus(
+        /** The parameters for the request. */
+        args: {
+            /** User's address. */
+            user: Hex;
+
+            /** Order ID or Client Order ID. */
+            oid: number | Hex;
+        },
+    ): Promise<OrderStatusResponse> {
         return await this.request({ type: "orderStatus", ...args });
     }
 
     /**
-     * Retrieves a user's balances for spot tokens.
+     * Request user referral.
      *
-     * @requestWeight 2
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
+     *
+     * @example
+     * ```ts
+     * const referral = await client.referral({ user: "0x1234..." });
+     *
+     * // referral: { referredBy: {...}, cumVlm: "100000.0", unclaimedRewards: "500.0", claimedRewards: "300.0", referrerState: {...}, rewardHistory: [...] }
+     * ```
+     */
+    async referral(
+        /** The parameters for the request. */
+        args: {
+            /** User's address. */
+            user: Hex;
+        },
+    ): Promise<Referral> {
+        return await this.request({ type: "referral", ...args });
+    }
+
+    /**
+     * Request spot clearinghouse state.
+     *
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
      *
      * @example
      * ```ts
      * const state = await client.spotClearinghouseState({ user: "0x1234..." });
-     * console.log(state.balances[0]);
-     * // Output: { coin: "ETH", entryNtl: "1800.0", hold: "0.5", token: 1, total: "10.0" }
+     *
+     * // state.balances[0]: { coin: "ETH", entryNtl: "1800.0", hold: "0.5", token: 1, total: "10.0" }
      * ```
      */
-    async spotClearinghouseState(args: SpotClearinghouseStateParameters): Promise<SpotClearinghouseStateResponse> {
+    async spotClearinghouseState(
+        /** The parameters for the request. */
+        args: {
+            /** User's address. */
+            user: Hex;
+        },
+    ): Promise<SpotClearinghouseState> {
         return await this.request({ type: "spotClearinghouseState", ...args });
     }
 
     /**
-     * Retrieves metadata for spot trading.
+     * Request spot trading metadata.
      *
-     * @requestWeight 20
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
      *
      * @example
      * ```ts
      * const meta = await client.spotMeta();
-     * console.log(meta.tokens[0]);
-     * // Output: { name: "ETH", szDecimals: 8, weiDecimals: 18, index: 1, tokenId: "0x...", ... }
+     *
+     * // meta.tokens[0]: { name: "ETH", szDecimals: 8, weiDecimals: 18, index: 1, tokenId: "0x...", ... }
      * ```
      */
-    async spotMeta(): Promise<SpotMetaResponse> {
+    async spotMeta(): Promise<SpotMeta> {
         return await this.request({ type: "spotMeta" });
     }
 
     /**
-     * Retrieves both metadata and context information for spot assets.
+     * Request user sub-accounts.
      *
-     * @requestWeight 20
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
+     *
+     * @example
+     * ```ts
+     * const subAccounts = await client.subAccounts({ user: "0x1234..." });
+     *
+     * // subAccounts[0]: { name: "Test", subAccountUser: "0x...", master: "0x...", clearinghouseState: {...}, spotState: {...} }
+     * ```
+     */
+    async subAccounts(
+        /** The parameters for the request. */
+        args: {
+            /** User's address. */
+            user: Hex;
+        },
+    ): Promise<SubAccount[]> {
+        return await this.request({ type: "subAccounts", ...args });
+    }
+
+    /**
+     * Request user fees.
+     *
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
+     *
+     * @example
+     * ```ts
+     * const userFees = await client.userFees({ user: "0x1234..." });
+     *
+     * // userFees: { dailyUserVlm: [...], feeSchedule: {...}, userCrossRate: "0.00035", userAddRate: "0.0001", ... }
+     * ```
+     */
+    async userFees(
+        /** The parameters for the request. */
+        args: {
+            /** User's address. */
+            user: Hex;
+        },
+    ): Promise<UserFees> {
+        return await this.request({ type: "userFees", ...args });
+    }
+
+    /**
+     * Request spot metadata and asset contexts.
+     *
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
      *
      * @example
      * ```ts
      * const [meta, assetCtxs] = await client.spotMetaAndAssetCtxs();
-     * console.log(assetCtxs[0]);
-     * // Output: { prevDayPx: "1800.0", dayNtlVlm: "10000000", markPx: "1805.0", ... }
+     *
+     * // assetCtxs[0]: { prevDayPx: "1800.0", dayNtlVlm: "10000000", markPx: "1805.0", ... }
      * ```
      */
-    async spotMetaAndAssetCtxs(): Promise<SpotMetaAndAssetCtxsResponse> {
+    async spotMetaAndAssetCtxs(): Promise<SpotMetaAndAssetCtxs> {
         return await this.request({ type: "spotMetaAndAssetCtxs" });
     }
 
     /**
-     * Retrieves a user's trade fills.
+     * Request user fills.
      *
-     * @requestWeight 20
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
      *
      * @example
      * ```ts
      * const fills = await client.userFills({ user: "0x1234..." });
-     * console.log(fills[0]);
-     * // Output: { coin: "ETH", px: "1800.0", sz: "1.0", side: "B", time: 1234567890000, ... }
+     *
+     * // fills[0]: { coin: "ETH", px: "1800.0", sz: "1.0", side: "B", time: 1234567890000, ... }
      * ```
      */
-    async userFills(args: UserFillsParameters): Promise<UserFill[]> {
+    async userFills(
+        /** The parameters for the request. */
+        args: {
+            /** User's address. */
+            user: Hex;
+        },
+    ): Promise<UserFill[]> {
         return await this.request({ type: "userFills", ...args });
     }
 
     /**
-     * Retrieves a user's trade fills within a specific time range.
+     * Request user fills by time.
      *
-     * @requestWeight 20
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
      *
      * @example
      * ```ts
      * const fills = await client.userFillsByTime({
      *     user: "0x1234...",
-     *     startTime: Date.now() - 24 * 60 * 60 * 1000,
-     *     endTime: Date.now() // Optional
+     *     startTime: Date.now() - 1000 * 60 * 60 * 24
      * });
-     * console.log(fills[0]);
-     * // Output: { coin: "ETH", px: "1800.0", sz: "1.0", side: "B", time: 1234567890000, ... }
+     *
+     * // fills[0]: { coin: "ETH", px: "1800.0", sz: "1.0", side: "B", time: 1234567890000, ... }
      * ```
      */
-    async userFillsByTime(args: UserFillsByTimeParameters): Promise<UserFill[]> {
+    async userFillsByTime(
+        /** The parameters for the request. */
+        args: {
+            /** User's address. */
+            user: Hex;
+
+            /** Start time (in ms since epoch). */
+            startTime: number;
+
+            /** End time (in ms since epoch). */
+            endTime?: number;
+        },
+    ): Promise<UserFill[]> {
         return await this.request({ type: "userFillsByTime", ...args });
     }
 
     /**
-     * Retrieves a user's funding history or non-funding ledger updates.
+     * Request user funding.
      *
-     * @requestWeight 20
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
      *
      * @example
      * ```ts
      * const funding = await client.userFunding({
      *     user: "0x1234...",
-     *     startTime: Date.now() - 7 * 24 * 60 * 60 * 1000,
-     *     endTime: Date.now()
+     *     startTime: Date.now() - 1000 * 60 * 60 * 24
      * });
-     * console.log(funding[0]);
-     * // Output: { time: 1234567890000, hash: "0x...", delta: { type: "funding", coin: "ETH", usdc: "1.5", ... } }
+     *
+     * // funding[0]: { time: 1234567890000, hash: "0x...", delta: { type: "funding", coin: "ETH", usdc: "1.5", ... } }
      * ```
      */
-    async userFunding(args: UserFundingParameters): Promise<UserFunding[]> {
+    async userFunding(
+        /** The parameters for the request. */
+        args: {
+            /** User's address. */
+            user: Hex;
+
+            /** Start time (in ms since epoch). */
+            startTime: number;
+
+            /** End time (in ms since epoch). */
+            endTime?: number;
+        },
+    ): Promise<UserFunding[]> {
         return await this.request({ type: "userFunding", ...args });
     }
 
     /**
-     * Retrieves a user's funding history or non-funding ledger updates.
+     * Request user non-funding ledger updates.
      *
-     * @requestWeight 20
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
      *
      * @example
      * ```ts
      * const funding = await client.userNonFundingLedgerUpdates({
      *     user: "0x1234...",
-     *     startTime: Date.now() - 7 * 24 * 60 * 60 * 1000,
-     *     endTime: Date.now()
+     *     startTime: Date.now() - 1000 * 60 * 60 * 24
      * });
-     * console.log(funding[0]);
-     * // Output: { time: 1234567890000, hash: "0x...", delta: { type: "deposit", usdc: "5" } }
+     *
+     * // funding[0]: { time: 1234567890000, hash: "0x...", delta: { type: "deposit", usdc: "5" } }
      * ```
      */
-    async userNonFundingLedgerUpdates(args: UserNonFundingLedgerUpdatesParameters): Promise<UserNonFundingLedgerUpdates[]> {
+    async userNonFundingLedgerUpdates(
+        /** The parameters for the request. */
+        args: {
+            /** User's address. */
+            user: Hex;
+
+            /** Start time (in ms since epoch). */
+            startTime: number;
+
+            /** End time (in ms since epoch). */
+            endTime?: number;
+        },
+    ): Promise<UserNonFundingLedgerUpdates[]> {
         return await this.request({ type: "userNonFundingLedgerUpdates", ...args });
     }
 
     /**
-     * Retrieves a user's rate limits.
+     * Request user rate limits.
      *
-     * @requestWeight 20
+     * @throws {HyperliquidAPIError} Thrown if the response is not successful.
      *
      * @example
      * ```ts
      * const rateLimit = await client.userRateLimit({ user: "0x1234..." });
-     * console.log(rateLimit);
-     * // Output: { cumVlm: "1000000", nRequestsUsed: 50, nRequestsCap: 100 }
+     *
+     * // rateLimit: { cumVlm: "1000000", nRequestsUsed: 50, nRequestsCap: 100 }
      * ```
      */
-    async userRateLimit(args: UserRateLimitParameters): Promise<UserRateLimitResponse> {
+    async userRateLimit(
+        /** The parameters for the request. */
+        args: {
+            /** User's address. */
+            user: Hex;
+        },
+    ): Promise<UserRateLimit> {
         return await this.request({ type: "userRateLimit", ...args });
     }
 
-    protected async request<T extends AllMidsRequest>(body: T): Promise<AllMidsResponse>;
+    /** Make `allMids` request */
+    protected async request<T extends AllMidsRequest>(body: T): Promise<AllMids>;
+
+    /** Make `candleSnapshot` request */
     protected async request<T extends OpenOrdersRequest>(body: T): Promise<OpenOrder[]>;
+
+    /** Make `clearinghouseState` request */
     protected async request<T extends FrontendOpenOrdersRequest>(body: T): Promise<FrontendOpenOrder[]>;
+
+    /** Make `userFills` request */
     protected async request<T extends UserFillsRequest>(body: T): Promise<UserFill[]>;
+
+    /** Make `userFillsByTime` request */
     protected async request<T extends UserFillsByTimeRequest>(body: T): Promise<UserFill[]>;
-    protected async request<T extends UserRateLimitRequest>(body: T): Promise<UserRateLimitResponse>;
+
+    /** Make `userRateLimit` request */
+    protected async request<T extends UserRateLimitRequest>(body: T): Promise<UserRateLimit>;
+
+    /** Make `orderStatus` request */
     protected async request<T extends OrderStatusRequest>(body: T): Promise<OrderStatusResponse>;
-    protected async request<T extends L2BookRequest>(body: T): Promise<L2BookResponse>;
+
+    /** Make `referral` request. */
+    protected async request<T extends ReferralRequest>(body: T): Promise<Referral>;
+
+    /** Make `l2Book` request */
+    protected async request<T extends L2BookRequest>(body: T): Promise<L2Book>;
+
+    /** Make `candleSnapshot` request */
     protected async request<T extends CandleSnapshotRequest>(body: T): Promise<CandleSnapshot[]>;
-    protected async request<T extends MetaRequest>(body: T): Promise<MetaResponse>;
-    protected async request<T extends MetaAndAssetCtxsRequest>(body: T): Promise<MetaAndAssetCtxsResponse>;
-    protected async request<T extends ClearinghouseStateRequest>(body: T): Promise<ClearinghouseStateResponse>;
+
+    /** Make `meta` request */
+    protected async request<T extends MetaRequest>(body: T): Promise<Meta>;
+
+    /** Make `metaAndAssetCtxs` request */
+    protected async request<T extends MetaAndAssetCtxsRequest>(body: T): Promise<MetaAndAssetCtxs>;
+
+    /** Make `clearinghouseState` request */
+    protected async request<T extends ClearinghouseStateRequest>(body: T): Promise<ClearinghouseState>;
+
+    /** Make `openOrders` request */
     protected async request<T extends UserFundingRequest>(body: T): Promise<UserFunding[]>;
+
+    /** Make `userNonFundingLedgerUpdates` request */
     protected async request<T extends UserNonFundingLedgerUpdatesRequest>(body: T): Promise<UserNonFundingLedgerUpdates[]>;
+
+    /** Make `fundingHistory` request */
     protected async request<T extends FundingHistoryRequest>(body: T): Promise<FundingHistory[]>;
-    protected async request<T extends SpotMetaRequest>(body: T): Promise<SpotMetaResponse>;
-    protected async request<T extends SpotMetaAndAssetCtxsRequest>(body: T): Promise<SpotMetaAndAssetCtxsResponse>;
-    protected async request<T extends SpotClearinghouseStateRequest>(body: T): Promise<SpotClearinghouseStateResponse>;
+
+    /** Make `spotMeta` request */
+    protected async request<T extends SpotMetaRequest>(body: T): Promise<SpotMeta>;
+
+    /** Make `subAccounts` request */
+    protected async request<T extends SubAccountsRequest>(body: T): Promise<SubAccount[]>;
+
+    /** Make `userFees` request */
+    protected async request<T extends UserFeesRequest>(body: T): Promise<UserFees>;
+
+    /** Make  `spotMetaAndAssetCtxs` request */
+    protected async request<T extends SpotMetaAndAssetCtxsRequest>(body: T): Promise<SpotMetaAndAssetCtxs>;
+
+    /** Make `spotClearinghouseState` request */
+    protected async request<T extends SpotClearinghouseStateRequest>(body: T): Promise<SpotClearinghouseState>;
+
+    /** Make a request */
     protected async request(body: unknown): Promise<unknown> {
         const res = await fetch(
             this.endpoint,
@@ -541,7 +632,7 @@ export class HyperliquidInfoClient {
         );
 
         if (!res.ok) {
-            throw new Error(`Request failed with status ${res.status}: ${await res.text()}`);
+            throw new HyperliquidAPIError(`Request failed with status ${res.status}: ${await res.text()}`);
         }
 
         return await res.json();
