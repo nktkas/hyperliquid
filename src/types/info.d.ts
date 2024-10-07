@@ -405,6 +405,9 @@ export interface Referral {
     /** Rewards claimed. */
     claimedRewards: string;
 
+    /** Rewards builder. */
+    builderRewards: string;
+
     /** Current state of the referrer. */
     referrerState:
         | {

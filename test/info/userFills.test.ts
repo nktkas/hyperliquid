@@ -10,7 +10,7 @@ Deno.test(
     "userFills",
     { permissions: { net: true, read: true } },
     async (t) => {
-        // Create HyperliquidInfoClient
+        // Create client
         const client = new InfoClient("https://api.hyperliquid-testnet.xyz/info");
 
         // Create TypeScript type schemas
@@ -24,21 +24,33 @@ Deno.test(
         data.forEach((item) => assertJsonSchema(schema, item));
 
         await t.step("side", async (t) => {
-            await t.step("B", () => {
-                assert(data.find((item) => item.side === "B"), "Failed to verify type with 'side' === 'B'");
+            await t.step("side === B", () => {
+                assert(data.find((item) => item.side === "B"));
             });
 
-            await t.step("A", () => {
-                assert(data.find((item) => item.side === "A"), "Failed to verify type with 'side' === 'A'");
+            await t.step("side === A", () => {
+                assert(data.find((item) => item.side === "A"));
             });
         });
 
-        await t.step(`cloid !== undefined`, () => {
-            assert(data.find((item) => item.cloid), "Failed to verify type with 'cloid'");
+        await t.step("cloid", async (t) => {
+            await t.step("typeof cloid === string", () => {
+                assert(data.find((item) => typeof item.cloid === "string"));
+            });
+
+            await t.step("cloid !== undefined", () => {
+                assert(data.find((item) => item.cloid));
+            });
         });
 
-        await t.step(`liquidation !== undefined`, () => {
-            assert(data.find((item) => item.liquidation), "Failed to verify type with 'liquidation'");
+        await t.step("liquidation", async (t) => {
+            await t.step("liquidation === undefined", () => {
+                assert(data.find((item) => item.liquidation === undefined));
+            });
+
+            await t.step("liquidation !== undefined", () => {
+                assert(data.find((item) => item.liquidation !== undefined));
+            });
         });
 
         recursiveTraversal(data, (key, value) => {

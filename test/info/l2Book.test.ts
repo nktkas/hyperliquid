@@ -8,7 +8,7 @@ Deno.test(
     "l2Book",
     { permissions: { net: true, read: true } },
     async (t) => {
-        // Create HyperliquidInfoClient
+        // Create client
         const client = new InfoClient("https://api.hyperliquid-testnet.xyz/info");
 
         // Create TypeScript type schemas
@@ -20,7 +20,6 @@ Deno.test(
             const data = await client.l2Book({ coin: "ETH" });
 
             assertJsonSchema(schema, data);
-
             recursiveTraversal(data, (key, value) => {
                 if (Array.isArray(value)) {
                     assertGreater(
@@ -37,7 +36,6 @@ Deno.test(
                 const data = await client.l2Book({ coin: "ETH", nSigFigs: 2 });
 
                 assertJsonSchema(schema, data);
-
                 recursiveTraversal(data, (key, value) => {
                     if (Array.isArray(value)) {
                         assertGreater(
@@ -53,7 +51,6 @@ Deno.test(
                 const data = await client.l2Book({ coin: "ETH", nSigFigs: 3 });
 
                 assertJsonSchema(schema, data);
-
                 recursiveTraversal(data, (key, value) => {
                     if (Array.isArray(value)) {
                         assertGreater(
@@ -69,7 +66,6 @@ Deno.test(
                 const data = await client.l2Book({ coin: "ETH", nSigFigs: 4 });
 
                 assertJsonSchema(schema, data);
-
                 recursiveTraversal(data, (key, value) => {
                     if (Array.isArray(value)) {
                         assertGreater(
@@ -85,7 +81,6 @@ Deno.test(
                 const data = await client.l2Book({ coin: "ETH", nSigFigs: 5 });
 
                 assertJsonSchema(schema, data);
-
                 recursiveTraversal(data, (key, value) => {
                     if (Array.isArray(value)) {
                         assertGreater(
@@ -100,12 +95,12 @@ Deno.test(
 
         await t.step("coin + nSigFigs + mantissa", async (t) => {
             // TODO: "mantissa === 1" causes an error: Status 500 | Body: null
+            await t.step({ name: "mantissa === 1", fn: () => {}, ignore: true });
 
             await t.step("mantissa === 2", async () => {
                 const data = await client.l2Book({ coin: "ETH", nSigFigs: 5, mantissa: 2 });
 
                 assertJsonSchema(schema, data);
-
                 recursiveTraversal(data, (key, value) => {
                     if (Array.isArray(value)) {
                         assertGreater(
@@ -121,7 +116,6 @@ Deno.test(
                 const data = await client.l2Book({ coin: "ETH", nSigFigs: 5, mantissa: 5 });
 
                 assertJsonSchema(schema, data);
-
                 recursiveTraversal(data, (key, value) => {
                     if (Array.isArray(value)) {
                         assertGreater(

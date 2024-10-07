@@ -9,7 +9,7 @@ Deno.test(
     "userRateLimit",
     { permissions: { net: true, read: true } },
     async () => {
-        // Create HyperliquidInfoClient
+        // Create client
         const client = new InfoClient("https://api.hyperliquid-testnet.xyz/info");
 
         // Create TypeScript type schemas

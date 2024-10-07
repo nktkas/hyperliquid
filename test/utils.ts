@@ -1,7 +1,8 @@
 import { Ajv } from "npm:ajv@^8.17.1";
 import type { Definition } from "npm:ts-json-schema-generator@^2.3.0";
 import { assert } from "jsr:@std/assert@^1.0.4";
-import type { AssetCtx, InfoClient, Universe } from "../index.ts";
+import type { AssetCtx, Hex, InfoClient, Universe } from "../index.ts";
+import { keccak_256 } from "@noble/hashes/sha3";
 
 export interface AssetData {
     id: number;
@@ -26,17 +27,13 @@ export function assertJsonSchema(schema: Definition, data: unknown): void {
  * @param func - Callback function
  */
 export function recursiveTraversal(
-    // deno-lint-ignore no-explicit-any
-    obj: Record<PropertyKey, any> | any[],
-    // deno-lint-ignore no-explicit-any
-    func: (key: string | number, value: any) => void,
+    obj: object,
+    func: (key: string | number, value: unknown) => void,
 ): void {
-    if (typeof obj === "object" && obj !== null) {
-        for (const [key, value] of Object.entries(obj)) {
-            func(key, value);
-            if (typeof value === "object" && value !== null) {
-                recursiveTraversal(value, func);
-            }
+    for (const [key, value] of Object.entries(obj)) {
+        func(key, value);
+        if (typeof value === "object" && value !== null) {
+            recursiveTraversal(value, func);
         }
     }
 }
@@ -65,4 +62,59 @@ export function getPxDecimals(marketType: "perp" | "spot", szDecimals: number): 
     const MAX_DECIMALS = marketType === "perp" ? 5 : 7;
     const maxPxDecimals = MAX_DECIMALS - szDecimals;
     return Math.max(0, maxPxDecimals);
+}
+
+/**
+ * Generate an Ethereum address
+ * @returns Ethereum address
+ */
+export function generateEthereumAddress(): Hex {
+    // Step 1: Generate a random 20-byte hex string
+
+    const randomBytes = new Uint8Array(20);
+    crypto.getRandomValues(randomBytes);
+
+    const address = Array.from(randomBytes)
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("");
+
+    // Step 2: Generate the checksum
+
+    const hashBytes = keccak_256(address.toLowerCase());
+
+    const hashHex = Array.from(hashBytes)
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("");
+
+    // Step 3: Apply the checksum
+
+    let checksumAddress = "";
+    for (let i = 0; i < address.length; i++) {
+        const char = address[i];
+        const hashChar = hashHex[i];
+        if (parseInt(hashChar, 16) >= 8) {
+            checksumAddress += char.toUpperCase();
+        } else {
+            checksumAddress += char.toLowerCase();
+        }
+    }
+
+    return `0x${checksumAddress}`;
+}
+
+/**
+ * Verify if the data is a hex string
+ * @param data - Data to verify
+ * @returns `true` if the data is a hex string
+ */
+export function isHex(data: unknown): data is Hex {
+    return typeof data === "string" && /^0x[0-9a-fA-F]+$/.test(data);
+}
+
+/**
+ * Generate a random Client Order ID
+ * @returns Client Order ID
+ */
+export function randomCloid(): Hex {
+    return `0x${Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
 }

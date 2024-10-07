@@ -10,7 +10,7 @@ Deno.test(
     "userNonFundingLedgerUpdates",
     { permissions: { net: true, read: true } },
     async (t) => {
-        // Create HyperliquidInfoClient
+        // Create client
         const client = new InfoClient("https://api.hyperliquid-testnet.xyz/info");
 
         // Create TypeScript type schemas
@@ -37,60 +37,36 @@ Deno.test(
                 }
             });
 
-            await t.step("deposit", () => {
-                assert(
-                    data.find((item) => item.delta.type === "deposit"),
-                    "Failed to verify type with 'delta.type' === 'deposit'",
-                );
+            await t.step("type === deposit", () => {
+                assert(data.find((item) => item.delta.type === "deposit"));
             });
 
-            await t.step("accountClassTransfer", () => {
-                assert(
-                    data.find((item) => item.delta.type === "accountClassTransfer"),
-                    "Failed to verify type with 'delta.type' === 'accountClassTransfer'",
-                );
+            await t.step("type === accountClassTransfer", () => {
+                assert(data.find((item) => item.delta.type === "accountClassTransfer"));
             });
 
-            await t.step("internalTransfer", () => {
-                assert(
-                    data.find((item) => item.delta.type === "internalTransfer"),
-                    "Failed to verify type with 'delta.type' === 'internalTransfer'",
-                );
+            await t.step("type === internalTransfer", () => {
+                assert(data.find((item) => item.delta.type === "internalTransfer"));
             });
 
-            await t.step("spotTransfer", () => {
-                assert(
-                    data.find((item) => item.delta.type === "spotTransfer"),
-                    "Failed to verify type with 'delta.type' === 'spotTransfer'",
-                );
+            await t.step("type === spotTransfer", () => {
+                assert(data.find((item) => item.delta.type === "spotTransfer"));
             });
 
-            await t.step("withdraw", () => {
-                assert(
-                    data.find((item) => item.delta.type === "withdraw"),
-                    "Failed to verify type with 'delta.type' === 'withdraw'",
-                );
+            await t.step("type === withdraw", () => {
+                assert(data.find((item) => item.delta.type === "withdraw"));
             });
 
-            await t.step("vaultCreate", () => {
-                assert(
-                    data.find((item) => item.delta.type === "vaultCreate"),
-                    "Failed to verify type with 'delta.type' === 'vaultCreate'",
-                );
+            await t.step("type === vaultCreate", () => {
+                assert(data.find((item) => item.delta.type === "vaultCreate"));
             });
 
-            await t.step("vaultDistribution", () => {
-                assert(
-                    data.find((item) => item.delta.type === "vaultDistribution"),
-                    "Failed to verify type with 'delta.type' === 'vaultDistribution'",
-                );
+            await t.step("type === vaultDistribution", () => {
+                assert(data.find((item) => item.delta.type === "vaultDistribution"));
             });
 
-            await t.step("subAccountTransfer", () => {
-                assert(
-                    data.find((item) => item.delta.type === "subAccountTransfer"),
-                    "Failed to verify type with 'delta.type' === 'subAccountTransfer'",
-                );
+            await t.step("type === subAccountTransfer", () => {
+                assert(data.find((item) => item.delta.type === "subAccountTransfer"));
             });
         });
 
@@ -114,60 +90,36 @@ Deno.test(
                 }
             });
 
-            await t.step("deposit", () => {
-                assert(
-                    data.find((item) => item.delta.type === "deposit"),
-                    "Failed to verify type with 'delta.type' === 'deposit'",
-                );
+            await t.step("type === deposit", () => {
+                assert(data.find((item) => item.delta.type === "deposit"));
             });
 
-            await t.step("accountClassTransfer", () => {
-                assert(
-                    data.find((item) => item.delta.type === "accountClassTransfer"),
-                    "Failed to verify type with 'delta.type' === 'accountClassTransfer'",
-                );
+            await t.step("type === accountClassTransfer", () => {
+                assert(data.find((item) => item.delta.type === "accountClassTransfer"));
             });
 
-            await t.step("internalTransfer", () => {
-                assert(
-                    data.find((item) => item.delta.type === "internalTransfer"),
-                    "Failed to verify type with 'delta.type' === 'internalTransfer'",
-                );
+            await t.step("type === internalTransfer", () => {
+                assert(data.find((item) => item.delta.type === "internalTransfer"));
             });
 
-            await t.step("spotTransfer", () => {
-                assert(
-                    data.find((item) => item.delta.type === "spotTransfer"),
-                    "Failed to verify type with 'delta.type' === 'spotTransfer'",
-                );
+            await t.step("type === spotTransfer", () => {
+                assert(data.find((item) => item.delta.type === "spotTransfer"));
             });
 
-            await t.step("withdraw", () => {
-                assert(
-                    data.find((item) => item.delta.type === "withdraw"),
-                    "Failed to verify type with 'delta.type' === 'withdraw'",
-                );
+            await t.step("type === withdraw", () => {
+                assert(data.find((item) => item.delta.type === "withdraw"));
             });
 
-            await t.step("vaultCreate", () => {
-                assert(
-                    data.find((item) => item.delta.type === "vaultCreate"),
-                    "Failed to verify type with 'delta.type' === 'vaultCreate'",
-                );
+            await t.step("type === vaultCreate", () => {
+                assert(data.find((item) => item.delta.type === "vaultCreate"));
             });
 
-            await t.step("vaultDistribution", () => {
-                assert(
-                    data.find((item) => item.delta.type === "vaultDistribution"),
-                    "Failed to verify type with 'delta.type' === 'vaultDistribution'",
-                );
+            await t.step("type === vaultDistribution", () => {
+                assert(data.find((item) => item.delta.type === "vaultDistribution"));
             });
 
-            await t.step("subAccountTransfer", () => {
-                assert(
-                    data.find((item) => item.delta.type === "subAccountTransfer"),
-                    "Failed to verify type with 'delta.type' === 'subAccountTransfer'",
-                );
+            await t.step("type === subAccountTransfer", () => {
+                assert(data.find((item) => item.delta.type === "subAccountTransfer"));
             });
         });
     },

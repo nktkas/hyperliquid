@@ -10,7 +10,7 @@ Deno.test(
     "userFees",
     { permissions: { net: true, read: true } },
     async () => {
-        // Create HyperliquidInfoClient
+        // Create client
         const client = new InfoClient("https://api.hyperliquid-testnet.xyz/info");
 
         // Create TypeScript type schemas
@@ -21,7 +21,6 @@ Deno.test(
         const data = await client.userFees({ user: USER_ADDRESS });
 
         assertJsonSchema(schema, data);
-
         recursiveTraversal(data, (key, value) => {
             if (Array.isArray(value)) {
                 assertGreater(

@@ -10,7 +10,7 @@ Deno.test(
     "userFunding",
     { permissions: { net: true, read: true } },
     async (t) => {
-        // Create HyperliquidInfoClient
+        // Create client
         const client = new InfoClient("https://api.hyperliquid-testnet.xyz/info");
 
         // Create TypeScript type schemas
@@ -18,7 +18,7 @@ Deno.test(
         const schema = tsjSchemaGenerator.createSchema("UserFunding");
 
         // Test
-        await t.step("user + startTime", async () => {
+        await t.step("user + startTime", async (t) => {
             const data = await client.userFunding({
                 user: USER_ADDRESS,
                 startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
@@ -26,7 +26,6 @@ Deno.test(
 
             assert(Array.isArray(data), "WARNING: Unable to fully validate the type due to an empty array");
             data.forEach((item) => assertJsonSchema(schema, item));
-
             recursiveTraversal(data, (key, value) => {
                 if (Array.isArray(value)) {
                     assertGreater(
@@ -36,9 +35,19 @@ Deno.test(
                     );
                 }
             });
+
+            await t.step("nSamples", async (t) => {
+                await t.step("typeof nSamples === number", () => {
+                    assert(data.find((item) => typeof item.delta.nSamples === "number"));
+                });
+
+                await t.step("nSamples === null", () => {
+                    assert(data.find((item) => item.delta.nSamples === null));
+                });
+            });
         });
 
-        await t.step("user + startTime + endTime", async () => {
+        await t.step("user + startTime + endTime", async (t) => {
             const data = await client.userFunding({
                 user: USER_ADDRESS,
                 startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
@@ -47,7 +56,6 @@ Deno.test(
 
             assert(Array.isArray(data), "WARNING: Unable to fully validate the type due to an empty array");
             data.forEach((item) => assertJsonSchema(schema, item));
-
             recursiveTraversal(data, (key, value) => {
                 if (Array.isArray(value)) {
                     assertGreater(
@@ -56,6 +64,16 @@ Deno.test(
                         `WARNING: Unable to fully validate the type due to an empty array. Key: ${key}`,
                     );
                 }
+            });
+
+            await t.step("nSamples", async (t) => {
+                await t.step("typeof nSamples === number", () => {
+                    assert(data.find((item) => typeof item.delta.nSamples === "number"));
+                });
+
+                await t.step("nSamples === null", () => {
+                    assert(data.find((item) => item.delta.nSamples === null));
+                });
             });
         });
     },

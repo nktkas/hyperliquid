@@ -8,7 +8,7 @@ Deno.test(
     "meta",
     { permissions: { net: true, read: true } },
     async () => {
-        // Create HyperliquidInfoClient
+        // Create client
         const client = new InfoClient("https://api.hyperliquid-testnet.xyz/info");
 
         // Create TypeScript type schemas
@@ -19,7 +19,6 @@ Deno.test(
         const data = await client.meta();
 
         assertJsonSchema(schema, data);
-
         recursiveTraversal(data, (key, value) => {
             if (Array.isArray(value)) {
                 assertGreater(value.length, 0, `WARNING: Unable to fully validate the type due to an empty array. Key: ${key}`);
