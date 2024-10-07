@@ -6,4 +6,4 @@ If you discover any security vulnerabilities or issues in this library, pplease 
 
 ## For Issues in Hyperliquid
 
-If you have discovered a vulnerability or security issue in Hyperliquid (e.g., buffer overflow, SQL injection, cross-site scripting, etc.), which this library interacts with, please refer to the [Hyperliquid Security Policy](https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/master/SECURITY.md).
+If you have discovered a vulnerability or security issue in Hyperliquid (e.g., buffer overflow, SQL injection, cross-site scripting, etc.), please refer to the [Hyperliquid Security Policy](https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/master/SECURITY.md).
