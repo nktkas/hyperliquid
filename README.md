@@ -8,9 +8,9 @@ Low-level SDK for interacting with [Hyperliquid's](https://hyperliquid.gitbook.i
 
 - Documented 📚 - Comprehensive documentation for all API methods and types
 - Tested 🧪 - Tests for all API methods and return types
-- Universal ⚙️ - Can use [viem](https://viem.sh/) or [ethers](https://ethers.org/) to access a wallet.
-- Lightweight 🪶 - Depends only on 2 libraries with no subdependencies ([29.7 kB](https://bundlephobia.com/scan-results?packages=@msgpack/msgpack@3.0.0-beta2,@noble/hashes@1.5.0)), relies on the Web Standard API for everything else.
-- Cross-runtime 🌍 - Works in Deno, Web, NodeJS, Bun. The same code runs on all platforms.
+- Universal ⚙️ - Can use [viem](https://viem.sh/) or [ethers](https://ethers.org/) to access a wallet
+- Lightweight 🪶 - Depends only on 2 libraries with no subdependencies ([29.7 kB](https://bundlephobia.com/scan-results?packages=@msgpack/msgpack@3.0.0-beta2,@noble/hashes@1.5.0))
+- Cross-runtime 🌍 - Works in Deno, Web, NodeJS, Bun. The same code runs on all platforms
 
 ## Installation
 
