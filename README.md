@@ -10,9 +10,20 @@ Low-level SDK for interacting with [Hyperliquid's](https://hyperliquid.gitbook.i
 - Tested 🧪 - Tests for all API methods and return types
 - Universal ⚙️ - Can use [viem](https://viem.sh/) or [ethers](https://ethers.org/) to access a wallet
 - Lightweight 🪶 - Depends only on 2 libraries with no subdependencies ([29.7 kB](https://bundlephobia.com/scan-results?packages=@msgpack/msgpack@3.0.0-beta2,@noble/hashes@1.5.0))
-- Cross-runtime 🌍 - Works in Deno, Web, NodeJS, Bun. The same code runs on all platforms
+- Cross-runtime 🌍 - Works in Node.js, Deno, Web, Bun. The same code runs on all platforms
 
 ## Installation
+
+### For Node.js
+
+```bash
+npx jsr add @nktkas/hyperliquid
+```
+
+Alternatively, you can use Yarn or pnpm:
+
+- Yarn: `yarn dlx jsr add @nktkas/hyperliquid`
+- pnpm: `pnpm dlx jsr add @nktkas/hyperliquid`
 
 ### For Deno
 
@@ -25,17 +36,6 @@ import * as hyperliquid from "jsr:@nktkas/hyperliquid";
 ```ts
 import * as hyperliquid from "https://esm.sh/jsr/@nktkas/hyperliquid";
 ```
-
-### For Node.js
-
-```bash
-npx jsr add @nktkas/hyperliquid
-```
-
-Alternatively, you can use Yarn or pnpm:
-
-- Yarn: `yarn dlx jsr add @nktkas/hyperliquid`
-- pnpm: `pnpm dlx jsr add @nktkas/hyperliquid`
 
 ### For Bun
 
