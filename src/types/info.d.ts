@@ -599,9 +599,6 @@ export interface UserFees {
 
     /** Active referral discount. */
     activeReferralDiscount: string;
-
-    /** Whether user pays fees with native token. */
-    useNativeToken: boolean;
 }
 
 /** Trading token for spot. */
