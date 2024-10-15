@@ -8,7 +8,7 @@ import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import { assertJsonSchema } from "../utils.ts";
 
 const TEST_PRIVATE_KEY = Deno.args[0];
-const TEST_ASSET = Deno.args[1];
+const TEST_ASSET = "ETH";
 
 if (!isHex(TEST_PRIVATE_KEY)) {
     throw new Error(`Expected a hex string, but got ${TEST_PRIVATE_KEY}`);
@@ -203,5 +203,8 @@ Deno.test(
                 grouping: "na",
             });
         });
+
+        // TODO: Cannot make a working example because of an error: "L1 error: User or API Wallet 0x... does not exist."
+        await t.step({ name: "builder", fn: () => {}, ignore: true });
     },
 );

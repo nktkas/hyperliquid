@@ -5,7 +5,7 @@ import { ExchangeClient } from "../../index.ts";
 import { assertJsonSchema, isHex } from "../utils.ts";
 
 const TEST_PRIVATE_KEY = Deno.args[0];
-const TEST_SUB_ACCOUNT_ADDRESS = Deno.args[3];
+const TEST_SUB_ACCOUNT_ADDRESS = "0xcb3f0bd249a89e45e86a44bcfc7113e4ffe84cd1";
 
 if (!isHex(TEST_PRIVATE_KEY)) {
     throw new Error(`Expected a hex string, but got ${TEST_PRIVATE_KEY}`);

@@ -19,12 +19,14 @@ export type Hex = `0x${string}`;
 
 /**
  * Order type for market execution:
- * - `"Market"`: Executes immediately at the market price.
- * - `"Limit"`: Executes at the specified limit price or better.
- * - `"Stop Market"`: Triggers a market order when the stop price is reached.
- * - `"Stop Limit"`: Triggers a limit order when the stop price is reached.
- * - `"Scale"`: Places multiple limit orders across a price range.
- * - `"TWAP"`: Executes over time to achieve the time-weighted average price.
+ * - `"Market"`: An order that executes immediately at the current market price.
+ * - `"Limit"`: An order that executes at the selected limit price or better.
+ * - `"Stop Market"`: A market order that is activated when the price reaches the selected stop price.
+ * - `"Stop Limit"`: A limit order that is activated when the price reaches the selected stop price.
+ * - `"Scale"`: Multiple limit orders in a set price range.
+ * - `"TWAP"`: A large order divided into smaller suborders and executed in 30 second intervals.
+ *
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/trading/order-types|Hyperliquid GitBook}
  */
 export type OrderType =
     | "Market"
@@ -538,7 +540,7 @@ export interface SubAccount {
     spotState: SpotClearinghouseState;
 }
 
-/** User fees */
+/** User fees. */
 export interface UserFees {
     /** User's daily volume. */
     dailyUserVlm: {
@@ -782,8 +784,6 @@ export interface UserRateLimit {
     nRequestsCap: number;
 }
 
-// ———————————————Interface: Delta———————————————
-
 /** Transfer between spot and perpetual accounts. */
 export interface AccountClassTransferDelta extends BaseDelta {
     /** Type of update. */
@@ -922,15 +922,25 @@ export interface WithdrawDelta extends BaseDelta {
     fee: string;
 }
 
-// ———————————————Interface: Request———————————————
+// ———————————————Requests———————————————
 
-/** Request mid coin prices ({@link AllMids}). */
+/**
+ * Request mid coin prices.
+ *
+ * @returns {AllMids}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-mids-for-all-actively-traded-coins|Hyperliquid GitBook}
+ */
 export interface AllMidsRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "allMids";
 }
 
-/** Request candlestick snapshots ({@link CandleSnapshot}[]). */
+/**
+ * Request candlestick snapshots.
+ *
+ * @returns {CandleSnapshot[]}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#candle-snapshot|Hyperliquid GitBook}
+ */
 export interface CandleSnapshotRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "candleSnapshot";
@@ -951,7 +961,12 @@ export interface CandleSnapshotRequest extends BaseInfoRequest {
     };
 }
 
-/** Request clearinghouse state ({@link ClearinghouseState}). */
+/**
+ * Request clearinghouse state.
+ *
+ * @returns {ClearinghouseState}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-perpetuals-account-summary|Hyperliquid GitBook}
+ */
 export interface ClearinghouseStateRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "clearinghouseState";
@@ -960,7 +975,12 @@ export interface ClearinghouseStateRequest extends BaseInfoRequest {
     user: Hex;
 }
 
-/** Request frontend open orders ({@link FrontendOpenOrder}[]). */
+/**
+ * Request frontend open orders.
+ *
+ * @returns {FrontendOpenOrder[]}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders-with-additional-frontend-info|Hyperliquid GitBook}
+ */
 export interface FrontendOpenOrdersRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "frontendOpenOrders";
@@ -969,7 +989,12 @@ export interface FrontendOpenOrdersRequest extends BaseInfoRequest {
     user: Hex;
 }
 
-/** Request funding history ({@link FundingHistory}[]). */
+/**
+ * Request funding history.
+ *
+ * @returns {FundingHistory[]}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-historical-funding-rates|Hyperliquid GitBook}
+ */
 export interface FundingHistoryRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "fundingHistory";
@@ -984,7 +1009,12 @@ export interface FundingHistoryRequest extends BaseInfoRequest {
     endTime?: number;
 }
 
-/** Request L2 order book ({@link L2Book}). */
+/**
+ * Request L2 order book ({@link L2Book}).
+ *
+ * @returns {L2Book}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#l2-book-snapshot|Hyperliquid GitBook}
+ */
 export interface L2BookRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "l2Book";
@@ -999,19 +1029,51 @@ export interface L2BookRequest extends BaseInfoRequest {
     mantissa?: 2 | 5;
 }
 
-/** Request trading metadata ({@link Meta}). */
+/**
+ * Request builder fee approval.
+ *
+ * @returns {number}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#check-builder-fee-approval|Hyperliquid GitBook}
+ */
+export interface MaxBuilderFeeRequest extends BaseInfoRequest {
+    /** Type of request. */
+    type: "maxBuilderFee";
+
+    /** User's address. */
+    user: Hex;
+
+    /** Builder address. */
+    builder: Hex;
+}
+
+/**
+ * Request trading metadata.
+ *
+ * @returns {Meta}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-metadata|Hyperliquid GitBook}
+ */
 export interface MetaRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "meta";
 }
 
-/** Request metadata and asset contexts ({@link MetaAndAssetCtxs}). */
+/**
+ * Request metadata and asset contexts.
+ *
+ * @returns {MetaAndAssetCtxs}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-asset-contexts-includes-mark-price-current-funding-open-interest-etc|Hyperliquid GitBook}
+ */
 export interface MetaAndAssetCtxsRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "metaAndAssetCtxs";
 }
 
-/** Request open orders ({@link OpenOrder}[]). */
+/**
+ * Request open orders.
+ *
+ * @returns {OpenOrder[]}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders|Hyperliquid GitBook}
+ */
 export interface OpenOrdersRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "openOrders";
@@ -1020,7 +1082,12 @@ export interface OpenOrdersRequest extends BaseInfoRequest {
     user: Hex;
 }
 
-/** Request order status ({@link OrderStatusResponse}). */
+/**
+ * Request order status.
+ *
+ * @returns {OrderStatusResponse}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-order-status-by-oid-or-cloid|Hyperliquid GitBook}
+ */
 export interface OrderStatusRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "orderStatus";
@@ -1032,7 +1099,12 @@ export interface OrderStatusRequest extends BaseInfoRequest {
     oid: number | Hex;
 }
 
-/** Request user referral ({@link Referral}). */
+/**
+ * Request user referral.
+ *
+ * @returns {Referral}
+ * @see null
+ */
 export interface ReferralRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "referral";
@@ -1041,7 +1113,12 @@ export interface ReferralRequest extends BaseInfoRequest {
     user: Hex;
 }
 
-/** Request spot clearinghouse state ({@link SpotClearinghouseState}). */
+/**
+ * Request spot clearinghouse state.
+ *
+ * @returns {SpotClearinghouseState}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-a-users-token-balances|Hyperliquid GitBook}
+ */
 export interface SpotClearinghouseStateRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "spotClearinghouseState";
@@ -1050,13 +1127,23 @@ export interface SpotClearinghouseStateRequest extends BaseInfoRequest {
     user: Hex;
 }
 
-/** Request spot trading metadata ({@link SpotMeta}). */
+/**
+ * Request spot trading metadata.
+ *
+ * @returns {SpotMeta}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-metadata|Hyperliquid GitBook}
+ */
 export interface SpotMetaRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "spotMeta";
 }
 
-/** Request user sub-accounts ({@link }). */
+/**
+ * Request user sub-accounts.
+ *
+ * @returns {SubAccount[]}
+ * @see null
+ */
 export interface SubAccountsRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "subAccounts";
@@ -1065,7 +1152,12 @@ export interface SubAccountsRequest extends BaseInfoRequest {
     user: Hex;
 }
 
-/** Request user fees ({@link }). */
+/**
+ * Request user fees.
+ *
+ * @returns {UserFees}
+ * @see null
+ */
 export interface UserFeesRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "userFees";
@@ -1074,13 +1166,23 @@ export interface UserFeesRequest extends BaseInfoRequest {
     user: Hex;
 }
 
-/** Request spot metadata and asset contexts ({@link SpotMetaAndAssetCtxs}). */
+/**
+ * Request spot metadata and asset contexts.
+ *
+ * @returns {SpotMetaAndAssetCtxs}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-asset-contexts|Hyperliquid GitBook}
+ */
 export interface SpotMetaAndAssetCtxsRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "spotMetaAndAssetCtxs";
 }
 
-/** Request user fills ({@link UserFill}[]). */
+/**
+ * Request user fills.
+ *
+ * @returns {UserFill[]}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills|Hyperliquid GitBook}
+ */
 export interface UserFillsRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "userFills";
@@ -1089,7 +1191,12 @@ export interface UserFillsRequest extends BaseInfoRequest {
     user: Hex;
 }
 
-/** Request user fills by time ({@link UserFill}[]). */
+/**
+ * Request user fills by time.
+ *
+ * @returns {UserFill[]}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills-by-time|Hyperliquid GitBook}
+ */
 export interface UserFillsByTimeRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "userFillsByTime";
@@ -1104,7 +1211,12 @@ export interface UserFillsByTimeRequest extends BaseInfoRequest {
     endTime?: number;
 }
 
-/** Request user funding ({@link UserFunding}[]). */
+/**
+ * Request user funding.
+ *
+ * @returns {UserFunding[]}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates|Hyperliquid GitBook}
+ */
 export interface UserFundingRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "userFunding";
@@ -1119,7 +1231,12 @@ export interface UserFundingRequest extends BaseInfoRequest {
     endTime?: number;
 }
 
-/** Request user non-funding ledger updates ({@link UserNonFundingLedgerUpdates}[]). */
+/**
+ * Request user non-funding ledger updates.
+ *
+ * @returns {UserNonFundingLedgerUpdates[]}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates|Hyperliquid GitBook}
+ */
 export interface UserNonFundingLedgerUpdatesRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "userNonFundingLedgerUpdates";
@@ -1134,7 +1251,12 @@ export interface UserNonFundingLedgerUpdatesRequest extends BaseInfoRequest {
     endTime?: number;
 }
 
-/** Request user rate limits ({@link UserRateLimit}). */
+/**
+ * Request user rate limits.
+ *
+ * @returns {UserRateLimit}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-rate-limits|Hyperliquid GitBook}
+ */
 export interface UserRateLimitRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "userRateLimit";

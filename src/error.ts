@@ -31,3 +31,22 @@ export class HyperliquidBatchAPIError extends Error {
         this.messages = messages;
     }
 }
+
+/**
+ * Represents an HTTP request error.
+ */
+export class HttpError extends Error {
+    /** Response object. */
+    public response: Response;
+
+    /**
+     * Constructs a new `HttpError` instance.
+     *
+     * @param response Response object.
+     */
+    constructor(response: Response) {
+        super(`HTTP Error: ${response.status} ${response.statusText}`);
+        this.name = "HttpError";
+        this.response = response;
+    }
+}
