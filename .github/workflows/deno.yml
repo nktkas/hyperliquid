@@ -59,4 +59,4 @@ jobs:
 
       - name: Run Tests
         if: steps.version_check.outputs.version_changed == 'true'
-        run: deno test --allow-net --allow-read -- ${{ secrets.TEST_PRIVATE_KEY }} ETH 0x1719884eb866cb12b2287399b15f7db5e7d775ea 0xcb3f0bd249a89e45e86a44bcfc7113e4ffe84cd1
+        run: deno test --allow-net --allow-read -- ${{ secrets.TEST_PRIVATE_KEY }}
