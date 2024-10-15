@@ -1,43 +1,33 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Report a bug
 title: 'Bug: '
 labels: bug
 assignees: nktkas
 ---
 
-**Describe the bug**
+**Bug Description**
 
-A clear and concise description of what the bug is.
-
-**To Reproduce**
-
-Steps to reproduce the behavior.
-
-**Expected behavior**
-
-A clear and concise description of what you expected to happen.
-
-**Screenshots**
-
-If applicable, add screenshots to help explain your problem.
+Briefly describe the bug.
 
 **Code to Reproduce**
 
-Provide a minimal, complete, and verifiable example.
+Provide a minimal code snippet that reproduces the bug.
 
-**Logs and Error Messages**
+**Expected vs. Actual Behavior**
 
-Include any error messages or logs.
+Explain what should happen vs. what actually happens.
+
+**Error Logs (if available)**
+
+Paste relevant error messages or logs here.
 
 **Environment**
 
-- Version of `@nktkas/hyperliquid`:
+- `@nktkas/hyperliquid` version:
 - Runtime environment (Node.js/Deno/Bun) and its version:
-- Operating system and version:
-- Package manager (npm/yarn/pnpm) and its version (if applicable):
-- TypeScript version (if applicable):
+- Operating System:
 
-**Additional context**
+**Additional Context (optional)**
 
-Add any other context about the problem here.
+Include any other relevant information.
