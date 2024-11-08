@@ -36,7 +36,7 @@ import * as hyperliquid from "@nktkas/hyperliquid";
 const httpTransport = new hyperliquid.HttpTransport({
   url: "https://api.hyperliquid.xyz",   // API base URL
   timeout: 10000,                       // Request timeout in ms
-  fetchOptions: { ... }                 // Additional fetch options
+  fetchOptions: { ... },                // Additional fetch options
   retry: {
     maxAttempts: 3,                   // Maximum retry attempts
     baseDelay: 150,                   // Base delay between retries in ms
