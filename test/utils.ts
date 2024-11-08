@@ -1,7 +1,7 @@
+import type { AssetCtx, Hex, InfoClient, Universe } from "../index.ts";
 import { Ajv } from "npm:ajv@^8.17.1";
 import type { Definition } from "npm:ts-json-schema-generator@^2.3.0";
 import { assert } from "jsr:@std/assert@^1.0.4";
-import type { AssetCtx, Hex, InfoClient, Universe } from "../index.ts";
 import { keccak_256 } from "@noble/hashes/sha3";
 
 export interface AssetData {
@@ -70,24 +70,19 @@ export function getPxDecimals(marketType: "perp" | "spot", szDecimals: number): 
  */
 export function generateEthereumAddress(): Hex {
     // Step 1: Generate a random 20-byte hex string
-
     const randomBytes = new Uint8Array(20);
     crypto.getRandomValues(randomBytes);
-
     const address = Array.from(randomBytes)
         .map((byte) => byte.toString(16).padStart(2, "0"))
         .join("");
 
     // Step 2: Generate the checksum
-
     const hashBytes = keccak_256(address.toLowerCase());
-
     const hashHex = Array.from(hashBytes)
         .map((byte) => byte.toString(16).padStart(2, "0"))
         .join("");
 
     // Step 3: Apply the checksum
-
     let checksumAddress = "";
     for (let i = 0; i < address.length; i++) {
         const char = address[i];

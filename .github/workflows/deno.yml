@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'deno.json'  # Trigger only when deno.json changes
+      - "deno.json" # Trigger only when deno.json changes
 
 permissions:
   contents: read
@@ -18,7 +18,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2  # Fetch current and previous commits
+          fetch-depth: 2 # Fetch current and previous commits
 
       - name: Compare Versions
         id: version_check
@@ -51,7 +51,7 @@ jobs:
         if: steps.version_check.outputs.version_changed == 'true'
         uses: denoland/setup-deno@v1.5.1
         with:
-          deno-version: v1.x
+          deno-version: v2.x
 
       - name: Run Linter
         if: steps.version_check.outputs.version_changed == 'true'

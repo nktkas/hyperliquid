@@ -1,21 +1,4 @@
-// ———————————————Base Interface———————————————
-
-/** Base structure for information requests. */
-export interface BaseInfoRequest {
-    /** Type of request. */
-    type: string;
-}
-
-/** Base structure for delta updates. */
-export interface BaseDelta {
-    /** Type of update. */
-    type: string;
-}
-
-// ———————————————Types———————————————
-
-/** Hexadecimal string starting with '0x'. */
-export type Hex = `0x${string}`;
+import type { Hex } from "../../utils/hex.ts";
 
 /**
  * Order type for market execution:
@@ -63,8 +46,6 @@ export type OrderProcessingStatus =
     | "triggered"
     | "rejected"
     | "marginCanceled";
-
-// ———————————————Interface———————————————
 
 /** Mid coin prices. */
 export interface AllMids {
@@ -785,7 +766,7 @@ export interface UserRateLimit {
 }
 
 /** Transfer between spot and perpetual accounts. */
-export interface AccountClassTransferDelta extends BaseDelta {
+export interface AccountClassTransferDelta {
     /** Type of update. */
     type: "accountClassTransfer";
 
@@ -797,7 +778,7 @@ export interface AccountClassTransferDelta extends BaseDelta {
 }
 
 /** Deposit to account. */
-export interface DepositDelta extends BaseDelta {
+export interface DepositDelta {
     /** Type of update. */
     type: "deposit";
 
@@ -806,7 +787,7 @@ export interface DepositDelta extends BaseDelta {
 }
 
 /** Funding update. */
-export interface FundingDelta extends BaseDelta {
+export interface FundingDelta {
     /** Type of update. */
     type: "funding";
 
@@ -827,7 +808,7 @@ export interface FundingDelta extends BaseDelta {
 }
 
 /** Internal transfer between accounts. */
-export interface InternalTransferDelta extends BaseDelta {
+export interface InternalTransferDelta {
     /** Type of update. */
     type: "internalTransfer";
 
@@ -845,7 +826,7 @@ export interface InternalTransferDelta extends BaseDelta {
 }
 
 /** Spot transfer between accounts. */
-export interface SpotTransferDelta extends BaseDelta {
+export interface SpotTransferDelta {
     /** Type of update. */
     type: "spotTransfer";
 
@@ -869,7 +850,7 @@ export interface SpotTransferDelta extends BaseDelta {
 }
 
 /** Transfer between sub-accounts. */
-export interface SubAccountTransferDelta extends BaseDelta {
+export interface SubAccountTransferDelta {
     /** Type of update. */
     type: "subAccountTransfer";
 
@@ -884,7 +865,7 @@ export interface SubAccountTransferDelta extends BaseDelta {
 }
 
 /** Creating a vault. */
-export interface VaultCreateDelta extends BaseDelta {
+export interface VaultCreateDelta {
     /** Type of update. */
     type: "vaultCreate";
 
@@ -896,7 +877,7 @@ export interface VaultCreateDelta extends BaseDelta {
 }
 
 /** Distribution event from a vault. */
-export interface VaultDistributionDelta extends BaseDelta {
+export interface VaultDistributionDelta {
     /** Type of update. */
     type: "vaultDistribution";
 
@@ -908,7 +889,7 @@ export interface VaultDistributionDelta extends BaseDelta {
 }
 
 /** Withdrawal from account. */
-export interface WithdrawDelta extends BaseDelta {
+export interface WithdrawDelta {
     /** Type of update. */
     type: "withdraw";
 
@@ -922,7 +903,13 @@ export interface WithdrawDelta extends BaseDelta {
     fee: string;
 }
 
-// ———————————————Requests———————————————
+// ———————————————Requests————————————————
+
+/** Base structure for info requests. */
+export interface BaseInfoRequest {
+    /** Type of request. */
+    type: string;
+}
 
 /**
  * Request mid coin prices.
@@ -1032,7 +1019,7 @@ export interface L2BookRequest extends BaseInfoRequest {
 /**
  * Request builder fee approval.
  *
- * @returns {number}
+ * @returns {number} 1 means 0.001%
  * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#check-builder-fee-approval|Hyperliquid GitBook}
  */
 export interface MaxBuilderFeeRequest extends BaseInfoRequest {

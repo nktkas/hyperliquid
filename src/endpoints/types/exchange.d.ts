@@ -1,51 +1,5 @@
-import type { Hex, TIF } from "./info.d.ts";
-
-// ———————————————Base Types———————————————
-
-/** Base structure for exchange requests. */
-export interface BaseExchangeRequest {
-    /** Action to perform. */
-    action: Record<string, unknown>;
-
-    /** Unique request identifier (recommended: current timestamp in ms). */
-    nonce: number;
-
-    /** Cryptographic signature. */
-    signature: { r: Hex; s: Hex; v: number };
-
-    /** Vault address (optional, for vault trading). */
-    vaultAddress?: Hex;
-}
-
-/** Base structure for exchange responses. */
-export interface BaseExchangeResponse {
-    /** Status of the response. */
-    status: "ok" | "err";
-
-    /** Response details or error message. */
-    response:
-        | {
-            /** Type of operation. */
-            type: string;
-
-            /** Operation-specific data. */
-            data?:
-                | {
-                    /** Array of statuses or error messages. */
-                    statuses: (
-                        | unknown
-                        | {
-                            /** Error message. */
-                            error: string;
-                        }
-                    )[];
-                }
-                | string;
-        }
-        | string;
-}
-
-// ———————————————Individual Types———————————————
+import type { TIF } from "./info.d.ts";
+import type { Hex } from "../../utils/hex.ts";
 
 /**
  * Order grouping strategy:
@@ -60,7 +14,7 @@ export type OrderGroupingStrategy =
 
 /** Order parameters. */
 export type Order = {
-    /** Coin index. */
+    /** An integer representing the asset being traded. */
     a: number;
 
     /** Is the order to buy? */
@@ -102,7 +56,219 @@ export type Order = {
     c?: Hex;
 };
 
-// ———————————————Requests———————————————
+// ———————————————Responses————————————————
+
+export interface BaseExchangeResponse {
+    /** Successful status. */
+    status: "ok" | "err";
+
+    /** Response details. */
+    response:
+        | {
+            /** Type of operation. */
+            type: string;
+
+            /** Specific data. */
+            data?:
+                | {
+                    statuses: (
+                        | Record<string, unknown>
+                        | string
+                    )[];
+                }
+                | string;
+        }
+        | string;
+}
+
+/** Successful response without specific data. */
+export interface SuccessResponse extends BaseExchangeResponse {
+    /** Successful status. */
+    status: "ok";
+
+    /** Response details. */
+    response: {
+        /** Type of operation. */
+        type: "default";
+    };
+}
+
+/** Error response for failed operations. */
+export interface ErrorResponse extends BaseExchangeResponse {
+    /** Error status. */
+    status: "err";
+
+    /** Error message. */
+    response: string;
+}
+
+/** Response for order cancellation. */
+export interface CancelResponse extends BaseExchangeResponse {
+    /** Successful status. */
+    status: "ok";
+
+    /** Response details. */
+    response: {
+        /** Type of operation. */
+        type: "cancel";
+
+        /** Specific data. */
+        data: {
+            /** Array of statuses or error messages. */
+            statuses: (
+                | "success"
+                | {
+                    /** Error message. */
+                    error: string;
+                }
+            )[];
+        };
+    };
+}
+
+/** Response for creating a sub-account. */
+export interface CreateSubAccountResponse extends BaseExchangeResponse {
+    /** Successful status. */
+    status: "ok";
+
+    /** Response details. */
+    response: {
+        /** Type of operation. */
+        type: "createSubAccount";
+
+        /** Sub-account address. */
+        data: Hex;
+    };
+}
+
+/** Response for order placement and batch modifications. */
+export interface OrderResponse extends BaseExchangeResponse {
+    /** Successful status. */
+    status: "ok";
+
+    /** Response details. */
+    response: {
+        /** Type of operation. */
+        type: "order";
+
+        /** Specific data. */
+        data: {
+            /** Array of statuses or error messages. */
+            statuses: (
+                | {
+                    /** Resting order status. */
+                    resting: {
+                        /** Order ID. */
+                        oid: number;
+
+                        /** Client Order ID. */
+                        cloid?: Hex;
+                    };
+                }
+                | {
+                    /** Filled order status. */
+                    filled: {
+                        /** Total size filled. */
+                        totalSz: string;
+
+                        /** Average price of fill. */
+                        avgPx: string;
+
+                        /** Order ID. */
+                        oid: number;
+
+                        /** Client Order ID. */
+                        cloid?: Hex;
+                    };
+                }
+                | {
+                    /** Error message. */
+                    error: string;
+                }
+            )[];
+        };
+    };
+}
+
+/** Successful variant of {@linkcode CancelResponse}. */
+export interface CancelResponseSuccess extends CancelResponse {
+    /** Successful status. */
+    status: "ok";
+
+    /** Response details. */
+    response: {
+        /** Type of operation. */
+        type: "cancel";
+
+        /** Specific data. */
+        data: {
+            /** Array of statuses. */
+            statuses: "success"[];
+        };
+    };
+}
+
+/** Successful variant of {@linkcode OrderResponse}. */
+export interface OrderResponseSuccess extends OrderResponse {
+    /** Successful status. */
+    status: "ok";
+
+    /** Response details. */
+    response: {
+        /** Type of operation. */
+        type: "order";
+
+        /** Specific data. */
+        data: {
+            /** Array of statuses. */
+            statuses: (
+                | {
+                    /** Resting order status. */
+                    resting: {
+                        /** Order ID. */
+                        oid: number;
+
+                        /** Client Order ID. */
+                        cloid?: Hex;
+                    };
+                }
+                | {
+                    /** Filled order status. */
+                    filled: {
+                        /** Total size filled. */
+                        totalSz: string;
+
+                        /** Average price of fill. */
+                        avgPx: string;
+
+                        /** Order ID. */
+                        oid: number;
+
+                        /** Client Order ID. */
+                        cloid?: Hex;
+                    };
+                }
+            )[];
+        };
+    };
+}
+
+// ———————————————Requests————————————————
+
+/** Base structure for exchange requests. */
+export interface BaseExchangeRequest {
+    /** Action to perform. */
+    action: Record<string, unknown>;
+
+    /** Unique request identifier (recommended: current timestamp in ms). */
+    nonce: number;
+
+    /** Cryptographic signature. */
+    signature: { r: Hex; s: Hex; v: number };
+
+    /** Vault address (optional, for vault trading). */
+    vaultAddress?: Hex;
+}
 
 /**
  * Approve an agent to sign on behalf of the master or sub-accounts.
@@ -205,7 +371,7 @@ export interface CancelRequest extends BaseExchangeRequest {
 
         /** Orders to cancel. */
         cancels: {
-            /** Coin index. */
+            /** An integer representing the asset being traded. */
             a: number;
 
             /** Order ID. */
@@ -228,7 +394,7 @@ export interface CancelByCloidRequest extends BaseExchangeRequest {
 
         /** Orders to cancel. */
         cancels: {
-            /** Coin index. */
+            /** An integer representing the asset being traded. */
             asset: number;
 
             /** Client Order ID. */
@@ -416,7 +582,7 @@ export interface UpdateIsolatedMarginRequest extends BaseExchangeRequest {
         /** Type of action. */
         type: "updateIsolatedMargin";
 
-        /** Coin index. */
+        /** An integer representing the asset being traded. */
         asset: number;
 
         /** Position side (`true` for long, `false` for short). */
@@ -439,7 +605,7 @@ export interface UpdateLeverageRequest extends BaseExchangeRequest {
         /** Type of action. */
         type: "updateLeverage";
 
-        /** Coin index. */
+        /** An integer representing the asset being traded. */
         asset: number;
 
         /** `true` for cross leverage, `false` for isolated leverage. */
@@ -570,117 +736,4 @@ export interface Withdraw3Request extends BaseExchangeRequest {
 
     /** Not applicable for this action. */
     vaultAddress?: never;
-}
-
-// ———————————————Responses———————————————
-
-/** Successful response without specific data. */
-export interface SuccessResponse extends BaseExchangeResponse {
-    /** Successful status. */
-    status: "ok";
-
-    /** Response details. */
-    response: {
-        /** Type of operation. */
-        type: "default";
-
-        data?: never;
-    };
-}
-
-/** Error response for failed operations. */
-export interface ErrorResponse extends BaseExchangeResponse {
-    /** Error status. */
-    status: "err";
-
-    /** Error message. */
-    response: string;
-}
-
-/** Response for order cancellation. */
-export interface CancelResponse extends BaseExchangeResponse {
-    /** Successful status. */
-    status: "ok";
-
-    /** Response details. */
-    response: {
-        /** Type of operation. */
-        type: "cancel";
-
-        /** Specific data. */
-        data: {
-            /** Array of statuses or error messages. */
-            statuses: (
-                | "success"
-                | {
-                    /** Error message. */
-                    error: string;
-                }
-            )[];
-        };
-    };
-}
-
-/** Response for creating a sub-account. */
-export interface CreateSubAccountResponse extends BaseExchangeResponse {
-    /** Successful status. */
-    status: "ok";
-
-    /** Response details. */
-    response: {
-        /** Type of operation. */
-        type: "createSubAccount";
-
-        /** Sub-account address. */
-        data: Hex;
-    };
-}
-
-/** Response for order placement and batch modifications. */
-export interface OrderResponse extends BaseExchangeResponse {
-    /** Successful status. */
-    status: "ok";
-
-    /** Response details. */
-    response: {
-        /** Type of operation. */
-        type: "order";
-
-        /** Specific data. */
-        data: {
-            /** Array of statuses or error messages. */
-            statuses: (
-                | {
-                    /** Resting order status. */
-                    resting: {
-                        /** Order ID. */
-                        oid: number;
-
-                        /** Client Order ID. */
-                        cloid?: Hex;
-                    };
-                }
-                | {
-                    /** Filled order status. */
-                    filled: {
-                        /** Total size filled. */
-                        totalSz: string;
-
-                        /** Average price of fill. */
-                        avgPx: string;
-
-                        /** Order ID. */
-                        oid: number;
-
-                        /** Client Order ID. */
-                        cloid?: Hex;
-                    };
-                }
-                | {
-                    /** Error message. */
-                    error: string;
-                }
-            )[];
-        };
-    };
 }

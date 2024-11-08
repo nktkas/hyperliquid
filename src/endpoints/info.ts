@@ -9,7 +9,6 @@ import type {
     FrontendOpenOrdersRequest,
     FundingHistory,
     FundingHistoryRequest,
-    Hex,
     L2Book,
     L2BookRequest,
     MaxBuilderFeeRequest,
@@ -43,180 +42,88 @@ import type {
     UserRateLimit,
     UserRateLimitRequest,
 } from "./types/info.d.ts";
-import { HttpError } from "./error.ts";
+import type { IRESTTransport } from "../transports/base.d.ts";
 
 /** @see {@linkcode InfoClient.candleSnapshot} */
-export interface CandleSnapshotParameters {
-    /** Asset symbol (e.g., "ETH"). */
-    coin: string;
-
-    /** Time interval (e.g., "15m"). */
-    interval: string;
-
-    /** Start time (in ms since epoch). */
-    startTime: number;
-
-    /** End time (in ms since epoch). */
-    endTime?: number;
-}
+export type CandleSnapshotParameters = CandleSnapshotRequest["req"];
 
 /** @see {@linkcode InfoClient.clearinghouseState} */
-export interface ClearinghouseStateParameters {
-    /** User's address. */
-    user: Hex;
-}
+export type ClearinghouseStateParameters = Omit<ClearinghouseStateRequest, "type">;
 
 /** @see {@linkcode InfoClient.frontendOpenOrders} */
-export interface FrontendOpenOrdersParameters {
-    /** User's address. */
-    user: Hex;
-}
+export type FrontendOpenOrdersParameters = Omit<FrontendOpenOrdersRequest, "type">;
 
 /** @see {@linkcode InfoClient.fundingHistory} */
-export interface FundingHistoryParameters {
-    /** Asset symbol (e.g., "ETH"). */
-    coin: string;
-
-    /** Start time (in ms since epoch). */
-    startTime: number;
-
-    /** End time (in ms since epoch). */
-    endTime?: number;
-}
+export type FundingHistoryParameters = Omit<FundingHistoryRequest, "type">;
 
 /** @see {@linkcode InfoClient.l2Book} */
-export interface L2BookParameters {
-    /** Asset symbol (e.g., "ETH"). */
-    coin: string;
-
-    /** Number of significant figures for price levels. */
-    nSigFigs?: 2 | 3 | 4 | 5;
-
-    /** Mantissa for aggregation (if nSigFigs is 5). */
-    mantissa?: 2 | 5;
-}
+export type L2BookParameters = Omit<L2BookRequest, "type">;
 
 /** @see {@linkcode InfoClient.maxBuilderFee} */
-export interface MaxBuilderFeeParameters {
-    /** User's address. */
-    user: Hex;
-
-    /** Builder address. */
-    builder: Hex;
-}
+export type MaxBuilderFeeParameters = Omit<MaxBuilderFeeRequest, "type">;
 
 /** @see {@linkcode InfoClient.openOrders} */
-export interface OpenOrdersParameters {
-    /** User's address. */
-    user: Hex;
-}
+export type OpenOrdersParameters = Omit<OpenOrdersRequest, "type">;
 
 /** @see {@linkcode InfoClient.orderStatus} */
-export interface OrderStatusParameters {
-    /** User's address. */
-    user: Hex;
-
-    /** Order ID or Client Order ID. */
-    oid: number | Hex;
-}
+export type OrderStatusParameters = Omit<OrderStatusRequest, "type">;
 
 /** @see {@linkcode InfoClient.referral} */
-export interface ReferralParameters {
-    /** User's address. */
-    user: Hex;
-}
+export type ReferralParameters = Omit<ReferralRequest, "type">;
 
 /** @see {@linkcode InfoClient.spotClearinghouseState} */
-export interface SpotClearinghouseStateParameters {
-    /** User's address. */
-    user: Hex;
-}
+export type SpotClearinghouseStateParameters = Omit<SpotClearinghouseStateRequest, "type">;
 
 /** @see {@linkcode InfoClient.subAccounts} */
-export interface SubAccountsParameters {
-    /** User's address. */
-    user: Hex;
-}
+export type SubAccountsParameters = Omit<SubAccountsRequest, "type">;
 
 /** @see {@linkcode InfoClient.userFees} */
-export interface UserFeesParameters {
-    /** User's address. */
-    user: Hex;
-}
-
-/** @see {@linkcode InfoClient.userFills} */
-export interface UserFillsParameters {
-    /** User's address. */
-    user: Hex;
-}
+export type UserFeesParameters = Omit<UserFeesRequest, "type">;
 
 /** @see {@linkcode InfoClient.userFillsByTime} */
-export interface UserFillsByTimeParameters {
-    /** User's address. */
-    user: Hex;
+export type UserFillsByTimeParameters = Omit<UserFillsByTimeRequest, "type">;
 
-    /** Start time (in ms since epoch). */
-    startTime: number;
-
-    /** End time (in ms since epoch). */
-    endTime?: number;
-}
+/** @see {@linkcode InfoClient.userFills} */
+export type UserFillsParameters = Omit<UserFillsRequest, "type">;
 
 /** @see {@linkcode InfoClient.userFunding} */
-export interface UserFundingParameters {
-    /** User's address. */
-    user: Hex;
-
-    /** Start time (in ms since epoch). */
-    startTime: number;
-
-    /** End time (in ms since epoch). */
-    endTime?: number;
-}
+export type UserFundingParameters = Omit<UserFundingRequest, "type">;
 
 /** @see {@linkcode InfoClient.userNonFundingLedgerUpdates} */
-export interface UserNonFundingLedgerUpdatesParameters {
-    /** User's address. */
-    user: Hex;
-
-    /** Start time (in ms since epoch). */
-    startTime: number;
-
-    /** End time (in ms since epoch). */
-    endTime?: number;
-}
+export type UserNonFundingLedgerUpdatesParameters = Omit<UserNonFundingLedgerUpdatesRequest, "type">;
 
 /** @see {@linkcode InfoClient.userRateLimit} */
-export interface UserRateLimitParameters {
-    /** User's address. */
-    user: Hex;
-}
+export type UserRateLimitParameters = Omit<UserRateLimitRequest, "type">;
 
-/** A client to interact with the Hyperliquid info APIs. */
+/**
+ * The client to interact with the Hyperliquid info APIs.
+ *
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint|Hyperliquid GitBook}
+ */
 export class InfoClient {
-    /** The endpoint of the Hyperliquid info APIs. */
-    public readonly endpoint: string; // TESTNET: https://api.hyperliquid-testnet.xyz/info
+    /** The transport used to connect to the Hyperliquid API. */
+    transport: IRESTTransport;
 
     /**
      * Initialises a new instance.
+     * @param transport - The transport used to connect to the Hyperliquid API.
      *
-     * @param endpoint - The endpoint of the Hyperliquid info APIs.
-     *
-     * @example
+     * @example Using the default URL.
      * ```ts
      * import * as hyperliquid from "@nktkas/hyperliquid";
      *
-     * const client = new hyperliquid.InfoClient();
+     * const transport = new hyperliquid.HttpTransport(); // or WebSocketTransport
+     * const client = new hyperliquid.InfoClient(transport);
      * ```
      */
-    constructor(endpoint: string = "https://api.hyperliquid.xyz/info") {
-        this.endpoint = endpoint;
+    constructor(transport: IRESTTransport) {
+        this.transport = transport;
     }
 
     /**
      * Request mid coin prices.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * @param args - The parameters for the request.
+     * @returns Mid coin prices.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-mids-for-all-actively-traded-coins|Hyperliquid GitBook}
      * @example
@@ -227,13 +134,16 @@ export class InfoClient {
      * ```
      */
     async allMids(): Promise<AllMids> {
-        return await this.request({ type: "allMids" });
+        return await this.transport.request(
+            "info",
+            { type: "allMids" } as AllMidsRequest,
+        );
     }
 
     /**
      * Request candlestick snapshots.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * @param args - The parameters for the request.
+     * @returns Array of candlestick data point.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#candle-snapshot|Hyperliquid GitBook}
      * @example
@@ -248,13 +158,16 @@ export class InfoClient {
      * ```
      */
     async candleSnapshot(args: CandleSnapshotParameters): Promise<CandleSnapshot[]> {
-        return await this.request({ type: "candleSnapshot", req: args });
+        return await this.transport.request(
+            "info",
+            { type: "candleSnapshot", req: args } as CandleSnapshotRequest,
+        );
     }
 
     /**
      * Request clearinghouse state.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * @param args - The parameters for the request.
+     * @returns Account summary for perpetual trading.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-perpetuals-account-summary|Hyperliquid GitBook}
      * @example
@@ -265,13 +178,16 @@ export class InfoClient {
      * ```
      */
     async clearinghouseState(args: ClearinghouseStateParameters): Promise<ClearinghouseState> {
-        return await this.request({ type: "clearinghouseState", ...args });
+        return await this.transport.request(
+            "info",
+            { type: "clearinghouseState", ...args } as ClearinghouseStateRequest,
+        );
     }
 
     /**
      * Request frontend open orders.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * @param args - The parameters for the request.
+     * @returns Array of open orders with additional frontend information.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders-with-additional-frontend-info|Hyperliquid GitBook}
      * @example
@@ -282,13 +198,16 @@ export class InfoClient {
      * ```
      */
     async frontendOpenOrders(args: FrontendOpenOrdersParameters): Promise<FrontendOpenOrder[]> {
-        return await this.request({ type: "frontendOpenOrders", ...args });
+        return await this.transport.request(
+            "info",
+            { type: "frontendOpenOrders", ...args } as FrontendOpenOrdersRequest,
+        );
     }
 
     /**
      * Request funding history.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * @param args - The parameters for the request.
+     * @returns Array of historical funding rate data for an asset.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-historical-funding-rates|Hyperliquid GitBook}
      * @example
@@ -301,13 +220,16 @@ export class InfoClient {
      * // funding[0]: { coin: "ETH", fundingRate: "0.0001", premium: "0.0002", time: 1234567890000 }
      */
     async fundingHistory(args: FundingHistoryParameters): Promise<FundingHistory[]> {
-        return await this.request({ type: "fundingHistory", ...args });
+        return await this.transport.request(
+            "info",
+            { type: "fundingHistory", ...args } as FundingHistoryRequest,
+        );
     }
 
     /**
      * Request L2 order book.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * @param args - The parameters for the request.
+     * @returns L2 order book snapshot.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#l2-book-snapshot|Hyperliquid GitBook}
      * @example
@@ -318,30 +240,36 @@ export class InfoClient {
      * ```
      */
     async l2Book(args: L2BookParameters): Promise<L2Book> {
-        return await this.request({ type: "l2Book", ...args });
+        return await this.transport.request(
+            "info",
+            { type: "l2Book", ...args } as L2BookRequest,
+        );
     }
 
     /**
-     * Request builder fee approval
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * Request builder fee approval.
+     * @param args - The parameters for the request.
+     * @returns Maximum builder fee approval.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#check-builder-fee-approval|Hyperliquid GitBook}
      * @example
      * ```ts
      * const maxBuilderFee = await client.maxBuilderFee({ user: "0x...", builder: "0x..." });
      *
-     * // maxBuilderFee: 1
+     * // maxBuilderFee: 1 (0.001%)
      * ```
      */
     async maxBuilderFee(args: MaxBuilderFeeParameters): Promise<number> {
-        return await this.request({ type: "maxBuilderFee", ...args });
+        return await this.transport.request(
+            "info",
+            { type: "maxBuilderFee", ...args } as MaxBuilderFeeRequest,
+        );
     }
 
     /**
      * Request metadata and asset contexts.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * @param args - The parameters for the request.
+     * @returns Metadata and context information for each perpetual asset.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-asset-contexts-includes-mark-price-current-funding-open-interest-etc|Hyperliquid GitBook}
      * @example
@@ -352,13 +280,16 @@ export class InfoClient {
      * ```
      */
     async metaAndAssetCtxs(): Promise<MetaAndAssetCtxs> {
-        return await this.request({ type: "metaAndAssetCtxs" });
+        return await this.transport.request(
+            "info",
+            { type: "metaAndAssetCtxs" } as MetaAndAssetCtxsRequest,
+        );
     }
 
     /**
      * Request trading metadata.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * @param args - The parameters for the request.
+     * @returns Metadata for perpetual assets.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-metadata|Hyperliquid GitBook}
      * @example
@@ -369,13 +300,16 @@ export class InfoClient {
      * ```
      */
     async meta(): Promise<Meta> {
-        return await this.request({ type: "meta" });
+        return await this.transport.request(
+            "info",
+            { type: "meta" } as MetaRequest,
+        );
     }
 
     /**
      * Request open orders.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * @param args - The parameters for the request.
+     * @returns Array of open order.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders|Hyperliquid GitBook}
      * @example
@@ -386,13 +320,16 @@ export class InfoClient {
      * ```
      */
     async openOrders(args: OpenOrdersParameters): Promise<OpenOrder[]> {
-        return await this.request({ type: "openOrders", ...args });
+        return await this.transport.request(
+            "info",
+            { type: "openOrders", ...args } as OpenOrdersRequest,
+        );
     }
 
     /**
      * Request order status.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * @param args - The parameters for the request.
+     * @returns Result of an order status lookup.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-order-status-by-oid-or-cloid|Hyperliquid GitBook}
      * @example
@@ -403,13 +340,16 @@ export class InfoClient {
      * ```
      */
     async orderStatus(args: OrderStatusParameters): Promise<OrderStatusResponse> {
-        return await this.request({ type: "orderStatus", ...args });
+        return await this.transport.request(
+            "info",
+            { type: "orderStatus", ...args } as OrderStatusRequest,
+        );
     }
 
     /**
      * Request user referral.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * @param args - The parameters for the request.
+     * @returns Referral information for a user.
      *
      * @see null
      * @example
@@ -420,13 +360,16 @@ export class InfoClient {
      * ```
      */
     async referral(args: ReferralParameters): Promise<Referral> {
-        return await this.request({ type: "referral", ...args });
+        return await this.transport.request(
+            "info",
+            { type: "referral", ...args } as ReferralRequest,
+        );
     }
 
     /**
      * Request spot clearinghouse state.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * @param args - The parameters for the request.
+     * @returns Balances for spot tokens.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-a-users-token-balances|Hyperliquid GitBook}
      * @example
@@ -437,13 +380,16 @@ export class InfoClient {
      * ```
      */
     async spotClearinghouseState(args: SpotClearinghouseStateParameters): Promise<SpotClearinghouseState> {
-        return await this.request({ type: "spotClearinghouseState", ...args });
+        return await this.transport.request(
+            "info",
+            { type: "spotClearinghouseState", ...args } as SpotClearinghouseStateRequest,
+        );
     }
 
     /**
      * Request spot metadata and asset contexts.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * @param args - The parameters for the request.
+     * @returns Metadata and context information for each spot asset.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-asset-contexts|Hyperliquid GitBook}
      * @example
@@ -454,13 +400,16 @@ export class InfoClient {
      * ```
      */
     async spotMetaAndAssetCtxs(): Promise<SpotMetaAndAssetCtxs> {
-        return await this.request({ type: "spotMetaAndAssetCtxs" });
+        return await this.transport.request(
+            "info",
+            { type: "spotMetaAndAssetCtxs" } as SpotMetaAndAssetCtxsRequest,
+        );
     }
 
     /**
      * Request spot trading metadata.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * @param args - The parameters for the request.
+     * @returns Metadata for spot assets.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-metadata|Hyperliquid GitBook}
      * @example
@@ -471,13 +420,16 @@ export class InfoClient {
      * ```
      */
     async spotMeta(): Promise<SpotMeta> {
-        return await this.request({ type: "spotMeta" });
+        return await this.transport.request(
+            "info",
+            { type: "spotMeta" } as SpotMetaRequest,
+        );
     }
 
     /**
      * Request user sub-accounts.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * @param args - The parameters for the request.
+     * @returns Array of user sub-account.
      *
      * @see null
      * @example
@@ -488,13 +440,16 @@ export class InfoClient {
      * ```
      */
     async subAccounts(args: SubAccountsParameters): Promise<SubAccount[]> {
-        return await this.request({ type: "subAccounts", ...args });
+        return await this.transport.request(
+            "info",
+            { type: "subAccounts", ...args } as SubAccountsRequest,
+        );
     }
 
     /**
      * Request user fees.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * @param args - The parameters for the request.
+     * @returns User fees.
      *
      * @see null
      * @example
@@ -505,30 +460,16 @@ export class InfoClient {
      * ```
      */
     async userFees(args: UserFeesParameters): Promise<UserFees> {
-        return await this.request({ type: "userFees", ...args });
-    }
-
-    /**
-     * Request user fills.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
-     *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills|Hyperliquid GitBook}
-     * @example
-     * ```ts
-     * const fills = await client.userFills({ user: "0x1234..." });
-     *
-     * // fills[0]: { coin: "ETH", px: "1800.0", sz: "1.0", side: "B", time: 1234567890000, ... }
-     * ```
-     */
-    async userFills(args: UserFillsParameters): Promise<UserFill[]> {
-        return await this.request({ type: "userFills", ...args });
+        return await this.transport.request(
+            "info",
+            { type: "userFees", ...args } as UserFeesRequest,
+        );
     }
 
     /**
      * Request user fills by time.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * @param args - The parameters for the request.
+     * @returns Array of user's trade fill.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills-by-time|Hyperliquid GitBook}
      * @example
@@ -542,13 +483,36 @@ export class InfoClient {
      * ```
      */
     async userFillsByTime(args: UserFillsByTimeParameters): Promise<UserFill[]> {
-        return await this.request({ type: "userFillsByTime", ...args });
+        return await this.transport.request(
+            "info",
+            { type: "userFillsByTime", ...args } as UserFillsByTimeRequest,
+        );
+    }
+
+    /**
+     * Request user fills.
+     * @param args - The parameters for the request.
+     * @returns Array of user's trade fill.
+     *
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills|Hyperliquid GitBook}
+     * @example
+     * ```ts
+     * const fills = await client.userFills({ user: "0x1234..." });
+     *
+     * // fills[0]: { coin: "ETH", px: "1800.0", sz: "1.0", side: "B", time: 1234567890000, ... }
+     * ```
+     */
+    async userFills(args: UserFillsParameters): Promise<UserFill[]> {
+        return await this.transport.request(
+            "info",
+            { type: "userFills", ...args } as UserFillsRequest,
+        );
     }
 
     /**
      * Request user funding.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * @param args - The parameters for the request.
+     * @returns Array of user's funding ledger update.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates|Hyperliquid GitBook}
      * @example
@@ -562,13 +526,16 @@ export class InfoClient {
      * ```
      */
     async userFunding(args: UserFundingParameters): Promise<UserFunding[]> {
-        return await this.request({ type: "userFunding", ...args });
+        return await this.transport.request(
+            "info",
+            { type: "userFunding", ...args } as UserFundingRequest,
+        );
     }
 
     /**
      * Request user non-funding ledger updates.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * @param args - The parameters for the request.
+     * @returns Array of user's non-funding ledger update.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates|Hyperliquid GitBook}
      * @example
@@ -582,13 +549,16 @@ export class InfoClient {
      * ```
      */
     async userNonFundingLedgerUpdates(args: UserNonFundingLedgerUpdatesParameters): Promise<UserNonFundingLedgerUpdates[]> {
-        return await this.request({ type: "userNonFundingLedgerUpdates", ...args });
+        return await this.transport.request(
+            "info",
+            { type: "userNonFundingLedgerUpdates", ...args } as UserNonFundingLedgerUpdatesRequest,
+        );
     }
 
     /**
      * Request user rate limits.
-     *
-     * @throws {HttpError} if HTTP response is not ok.
+     * @param args - The parameters for the request.
+     * @returns User's rate limits.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-rate-limits|Hyperliquid GitBook}
      * @example
@@ -599,45 +569,9 @@ export class InfoClient {
      * ```
      */
     async userRateLimit(args: UserRateLimitParameters): Promise<UserRateLimit> {
-        return await this.request({ type: "userRateLimit", ...args });
-    }
-
-    protected async request(body: AllMidsRequest): Promise<AllMids>;
-    protected async request(body: CandleSnapshotRequest): Promise<CandleSnapshot[]>;
-    protected async request(body: ClearinghouseStateRequest): Promise<ClearinghouseState>;
-    protected async request(body: FrontendOpenOrdersRequest): Promise<FrontendOpenOrder[]>;
-    protected async request(body: FundingHistoryRequest): Promise<FundingHistory[]>;
-    protected async request(body: L2BookRequest): Promise<L2Book>;
-    protected async request(body: MaxBuilderFeeRequest): Promise<number>;
-    protected async request(body: MetaAndAssetCtxsRequest): Promise<MetaAndAssetCtxs>;
-    protected async request(body: MetaRequest): Promise<Meta>;
-    protected async request(body: OpenOrdersRequest): Promise<OpenOrder[]>;
-    protected async request(body: OrderStatusRequest): Promise<OrderStatusResponse>;
-    protected async request(body: ReferralRequest): Promise<Referral>;
-    protected async request(body: SpotClearinghouseStateRequest): Promise<SpotClearinghouseState>;
-    protected async request(body: SpotMetaAndAssetCtxsRequest): Promise<SpotMetaAndAssetCtxs>;
-    protected async request(body: SpotMetaRequest): Promise<SpotMeta>;
-    protected async request(body: SubAccountsRequest): Promise<SubAccount[]>;
-    protected async request(body: UserFeesRequest): Promise<UserFees>;
-    protected async request(body: UserFillsByTimeRequest): Promise<UserFill[]>;
-    protected async request(body: UserFillsRequest): Promise<UserFill[]>;
-    protected async request(body: UserFundingRequest): Promise<UserFunding[]>;
-    protected async request(body: UserNonFundingLedgerUpdatesRequest): Promise<UserNonFundingLedgerUpdates[]>;
-    protected async request(body: UserRateLimitRequest): Promise<UserRateLimit>;
-    protected async request(body: unknown): Promise<unknown> {
-        const response = await fetch(
-            this.endpoint,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(body),
-            },
+        return await this.transport.request(
+            "info",
+            { type: "userRateLimit", ...args } as UserRateLimitRequest,
         );
-
-        if (!response.ok) {
-            throw new HttpError(response);
-        }
-
-        return await response.json();
     }
 }
