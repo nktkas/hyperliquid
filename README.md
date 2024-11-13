@@ -2,7 +2,7 @@
 
 [![JSR](https://jsr.io/badges/@nktkas/hyperliquid)](https://jsr.io/@nktkas/hyperliquid) [![JSR Score](https://jsr.io/badges/@nktkas/hyperliquid/score)](https://jsr.io/@nktkas/hyperliquid)
 
-Low-level SDK for interacting with [Hyperliquid's](https://hyperliquid.gitbook.io/hyperliquid-docs) API in TypeScript.
+SDK for Hyperliquid API trading with TypeScript.
 
 ## Installation
 
