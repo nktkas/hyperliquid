@@ -110,42 +110,6 @@ const transport = new hyperliquid.HttpTransport(); // or WebSocketTransport
 const client = new hyperliquid.InfoClient(transport);
 ```
 
-### Basic example
-
-```typescript
-import * as hyperliquid from "@nktkas/hyperliquid";
-
-// Initialize the transport
-const transport = new hyperliquid.HttpTransport(); // or WebSocketTransport
-
-// Initialize the exchange client
-const exchangeClient = new hyperliquid.ExchangeClient(..., transport);
-
-// Initialize the info client
-const infoClient = new hyperliquid.InfoClient(transport);
-
-// Example: Place an order
-const orderResult = await exchangeClient.order({
-  orders: [
-    {
-      a: 0, // Asset index
-      b: true, // Buy order
-      p: "1000", // Price
-      s: "1", // Size
-      r: false, // Not reduce-only
-      t: { limit: { tif: "Gtc" } }, // Good-til-cancelled limit order
-    },
-  ],
-  grouping: "na", // Just order(s) without grouping
-});
-
-console.log("Order placed:", orderResult);
-
-// Example: Get user's open orders
-const openOrders = await infoClient.openOrders({ user: "0x..." });
-console.log("Open orders:", openOrders);
-```
-
 ## API Reference
 
 The SDK provides several main classes:
@@ -174,7 +138,7 @@ interface HttpTransportConfig {
     maxAttempts?: number; // Maximum retry attempts (default: 3)
     baseDelay?: number; // Base delay between retries in ms (default: 150)
     maxDelay?: number; // Maximum delay between retries in ms (default: 5000)
-    shouldRetry?: (error: unknown) => boolean | Promise<boolean>; // Custom retry logic (Retries on network errors, timeouts, and 5xx status codes)
+    shouldRetry?: (error: unknown) => boolean | Promise<boolean>; // Custom retry logic (default: Retries on network errors, timeouts, and 5xx status codes)
   };
 }
 ```
@@ -203,7 +167,7 @@ interface WebSocketTransportConfig {
     maxAttempts?: number; // Maximum reconnection attempts (default: 3)
     baseDelay?: number; // Base delay between reconnections in ms (default: 150)
     maxDelay?: number; // Maximum delay between reconnections in ms (default: 5000)
-    shouldReconnect?: (event: CloseEvent) => boolean | Promise<boolean>; // Custom reconnection logic
+    shouldReconnect?: (event: CloseEvent) => boolean | Promise<boolean>; // Custom reconnection logic (default: Non-normal close code (event.code !== 1000))
   };
 }
 ```
