@@ -128,7 +128,7 @@ export interface WebSocketTransportConfig {
          * Custom logic to determine if reconnection should be attempted.
          * @param event - The close event that occurred during the connection.
          * @returns A boolean indicating if reconnection should be attempted.
-         * @default (event) => event.code !== 1000
+         * @default Non-normal close code (event.code !== 1000).
          */
         shouldReconnect?: (event: CloseEvent) => boolean | Promise<boolean>;
     };
