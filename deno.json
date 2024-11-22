@@ -14,7 +14,7 @@
     },
     "fmt": {
         "indentWidth": 4,
-        "lineWidth": 1300
+        "lineWidth": 130
     },
     "lock": false
 }
