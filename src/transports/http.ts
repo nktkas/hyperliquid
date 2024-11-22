@@ -7,7 +7,7 @@ type DeepRequired<T> = Required<
 >;
 
 /**
- * The error thrown when the HTTP response status is not ok.
+ * The error thrown when the HTTP request fails.
  */
 export class HttpRequestError extends Error {
     /** The HTTP response. */
@@ -33,7 +33,6 @@ export interface HttpTransportConfig {
 
     /**
      * The timeout for request. Set to `0` to disable.
-     * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal/timeout_static}
      * @default 10_000
      */
     timeout?: number;
@@ -44,36 +43,27 @@ export interface HttpTransportConfig {
      */
     fetchOptions?: Omit<RequestInit, "body" | "method">;
 
-    /**
-     * Retry policy configuration.
-     * @default { maxAttempts: 3, baseDelay: 150, maxDelay: 5000 }
-     */
+    /** Retry policy configuration for failed requests. */
     retry?: {
         /**
          * Maximum number of retry attempts. Set to `0` to disable.
-         * @default 3
+         * @default 0
          */
         maxAttempts?: number;
 
         /**
-         * Base delay between retries in milliseconds.
-         * @default 150
+         * Delay between retries in milliseconds.
+         * @default (attempt) => ~~(1 << attempt) * 150 // Exponential backoff
          */
-        baseDelay?: number;
-
-        /**
-         * Maximum delay between retries in milliseconds.
-         * @default 5000
-         */
-        maxDelay?: number;
+        delay: number | ((attempt: number) => number | Promise<number>);
 
         /**
          * Custom logic to determine if an error should trigger a retry.
          * @param error - The error that occurred during the request.
          * @returns A boolean indicating if retry should be attempted.
-         * @default Retries on network errors, timeouts, and 5xx status codes.
+         * @default (error) => error instanceof TypeError || (error instanceof HttpRequestError && error.response.status >= 500 && error.response.status < 600)
          */
-        shouldRetry?: (error: unknown) => boolean | Promise<boolean>;
+        shouldReattempt?: (error: unknown) => boolean | Promise<boolean>;
     };
 }
 
@@ -87,25 +77,25 @@ export class HttpTransport implements IRESTTransport {
     };
 
     /** API endpoint paths. */
-    protected readonly endpointPaths: Record<"info" | "action" | "explorer", string> = {
+    protected endpointPaths: Record<"info" | "action" | "explorer", string> = {
         info: "/info",
         action: "/exchange",
         explorer: "/explorer",
     };
 
-    /**
-     * Creates a new HTTP transport.
-     */
+    /** Creates a new HTTP transport. */
     constructor(config: HttpTransportConfig = {}) {
         this.config = {
             url: config.url ?? "https://api.hyperliquid.xyz",
             timeout: config.timeout ?? 10_000,
             fetchOptions: config.fetchOptions,
             retry: {
-                maxAttempts: config.retry?.maxAttempts ?? 3,
-                baseDelay: config.retry?.baseDelay ?? 150,
-                maxDelay: config.retry?.maxDelay ?? 5000,
-                shouldRetry: config.retry?.shouldRetry ?? defaultShouldRetry,
+                maxAttempts: config.retry?.maxAttempts ?? 0,
+                delay: config.retry?.delay ?? ((attempt) => ~~(1 << attempt) * 150),
+                shouldReattempt: config.retry?.shouldReattempt ??
+                    ((error) =>
+                        error instanceof TypeError ||
+                        (error instanceof HttpRequestError && error.response.status >= 500 && error.response.status < 600)),
             },
         };
     }
@@ -113,89 +103,119 @@ export class HttpTransport implements IRESTTransport {
     /**
      * Sends an API request.
      * @param endpoint - The endpoint to send the request to.
-     * @param body - The request body.
-     * @returns The response body.
-     *
-     * @throws {HttpRequestError} - On non-200 HTTP status.
-     * @throws {DOMException} - On `TimeoutError` from {@link HttpTransportConfig.timeout}.
-     * @throws {DOMException} - On `AbortError` from {@link HttpTransportConfig.fetchOptions.signal}.
-     * @throws {TypeError} - On network error.
+     * @param payload - The request payload.
+     * @param signal - An optional abort signal.
+     * @returns The response data.
+     * @throws {HttpRequestError} - On non-OK HTTP response status or invalid content type.
      */
-    async request<T>(endpoint: "info" | "action" | "explorer", body: unknown): Promise<T> {
-        const url: URL = new URL(this.endpointPaths[endpoint], this.config.url);
-        const init: RequestInit = {
-            method: "POST",
-            body: JSON.stringify(body),
-            keepalive: true,
-            ...this.config.fetchOptions,
-            headers: new Headers({
-                "Accept-Encoding": "gzip, deflate, br, zstd",
-                "Connection": "keep-alive",
-                "Content-Type": "application/json",
-                ...(Array.isArray(this.config.fetchOptions?.headers)
-                    ? Object.fromEntries(this.config.fetchOptions.headers)
-                    : this.config.fetchOptions?.headers),
-            }),
-        };
+    request<T>(endpoint: "info" | "action" | "explorer", payload: unknown, signal?: AbortSignal): Promise<T> {
+        return retry(async (signal) => {
+            const url = new URL(this.endpointPaths[endpoint], this.config.url);
+            const init = mergeRequestInit(
+                {
+                    body: JSON.stringify(payload),
+                    headers: {
+                        "Accept-Encoding": "gzip, deflate, br, zstd",
+                        "Connection": "keep-alive",
+                        "Content-Type": "application/json",
+                    },
+                    keepalive: true,
+                    method: "POST",
+                    signal: this.config.timeout > 0 ? AbortSignal.timeout(this.config.timeout) : undefined,
+                },
+                this.config.fetchOptions ?? {},
+                { signal },
+            );
 
-        if (this.config.timeout > 0) {
-            const timeoutSignal = AbortSignal.timeout(this.config.timeout);
-            init.signal = init.signal ? AbortSignal.any([timeoutSignal, init.signal]) : timeoutSignal;
-        }
-
-        return await retry(async () => {
             const response = await fetch(url, init);
             if (!response.ok || !response.headers.get("Content-Type")?.includes("application/json")) {
                 await response.body?.cancel();
                 throw new HttpRequestError(response);
             }
             return await response.json();
-        }, this.config.retry);
+        }, { ...this.config.retry, signal });
     }
 }
 
-/**
- * Retries an operation with the given configuration.
- */
+function sleep(ms: number, signal?: AbortSignal): Promise<void> {
+    return new Promise((resolve, reject) => {
+        if (signal?.aborted) {
+            reject(signal.reason);
+            return;
+        }
+
+        const timer = setTimeout(() => {
+            signal?.removeEventListener("abort", onAbort);
+            resolve();
+        }, ms);
+
+        const onAbort = () => {
+            clearTimeout(timer);
+            reject(signal!.reason);
+        };
+
+        signal?.addEventListener("abort", onAbort, { once: true });
+    });
+}
+
 async function retry<T>(
-    operation: () => T | Promise<T>,
-    config: DeepRequired<HttpTransportConfig>["retry"],
+    fn: (signal?: AbortSignal) => T | Promise<T>,
+    config: {
+        maxAttempts: number;
+        delay: number | ((attempt: number) => number | Promise<number>);
+        shouldReattempt?: (error: unknown) => boolean | Promise<boolean>;
+        signal?: AbortSignal;
+    },
 ): Promise<T> {
-    const { maxAttempts, baseDelay, maxDelay, shouldRetry } = config;
+    const {
+        maxAttempts,
+        delay,
+        shouldReattempt = () => true,
+        signal,
+    } = config;
+
+    if (signal?.aborted) {
+        throw signal.reason;
+    }
 
     let attempt = 0;
     while (true) {
         try {
-            return await operation();
+            return await fn(signal);
         } catch (error) {
-            if (++attempt < maxAttempts && await shouldRetry(error)) {
-                const delay = Math.min(
-                    Math.floor((1 << attempt) * baseDelay * (0.5 + Math.random())),
-                    maxDelay,
-                );
-                await new Promise((resolve) => setTimeout(resolve, delay));
-                continue;
+            if (signal?.aborted) {
+                throw signal.reason;
             }
-            throw error;
+
+            if (++attempt >= maxAttempts || !await shouldReattempt(error)) {
+                throw error;
+            }
+
+            const delayDuration = typeof delay === "number" ? delay : await delay(attempt);
+            await sleep(delayDuration, signal);
         }
     }
 }
 
-/**
- * The default retry policy.
- */
-function defaultShouldRetry(error: unknown): boolean {
-    if (error instanceof DOMException && error.name === "TimeoutError") {
-        return true;
+function mergeHeaders(...headersList: HeadersInit[]): Headers {
+    const merged = new Headers();
+    for (const headers of headersList) {
+        const entries = Symbol.iterator in headers ? headers : Object.entries(headers);
+        for (const [key, value] of entries) {
+            merged.set(key, value);
+        }
     }
+    return merged;
+}
 
-    if (error instanceof TypeError) {
-        return true;
-    }
+function mergeRequestInit(...inits: RequestInit[]): RequestInit {
+    const merged = inits.reduce((acc, init) => ({ ...acc, ...init }), {});
 
-    if (error instanceof HttpRequestError) {
-        return error.response.status >= 500 && error.response.status < 600;
-    }
+    const headersList = inits.map((init) => init.headers).filter((headers) => !!headers);
+    merged.headers = headersList.length > 1 ? mergeHeaders(...headersList) : headersList[0] as Headers | undefined;
 
-    return false;
+    const signals = inits.map((init) => init.signal).filter((signal) => !!signal);
+    merged.signal = signals.length > 1 ? AbortSignal.any(signals) : signals[0] as AbortSignal | undefined;
+
+    return merged;
 }

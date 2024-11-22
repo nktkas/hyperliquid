@@ -1,6 +1,6 @@
 {
     "name": "@nktkas/hyperliquid",
-    "version": "0.8.0",
+    "version": "0.9.0",
     "exports": "./index.ts",
     "imports": {
         "@msgpack/msgpack": "npm:@msgpack/msgpack@^3.0.0-beta2",
@@ -14,7 +14,7 @@
     },
     "fmt": {
         "indentWidth": 4,
-        "lineWidth": 130
+        "lineWidth": 1300
     },
     "lock": false
 }

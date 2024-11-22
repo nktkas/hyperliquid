@@ -147,19 +147,6 @@ export interface AbstractSigner {
  */
 export class ExchangeClient {
     /**
-     * The wallet used for signing transactions:
-     * - [WalletClient/Account](https://viem.sh/docs/clients/wallet) from `viem`
-     * - [Signer](https://docs.ethers.org/v6/api/providers/#Signer) from `ethers`
-     */
-    wallet: AbstractWalletClient | AbstractSigner;
-
-    /** The transport used to connect to the Hyperliquid API. */
-    transport: IRESTTransport;
-
-    /** Specifies whether the client uses testnet. */
-    isTestnet: boolean;
-
-    /**
      * Initialises a new instance.
      * @param wallet - The WalletClient/Account ([viem](https://viem.sh/docs/clients/wallet)) or signer ([ethers](https://docs.ethers.org/v6/api/providers/#Signer)) used for signing transactions.
      * @param transport - The transport used to connect to the Hyperliquid API.
@@ -201,19 +188,16 @@ export class ExchangeClient {
      * ```
      */
     constructor(
-        wallet: AbstractWalletClient | AbstractSigner,
-        transport: IRESTTransport,
-        isTestnet: boolean = false,
-    ) {
-        this.wallet = wallet;
-        this.transport = transport;
-        this.isTestnet = isTestnet;
-    }
+        public wallet: AbstractWalletClient | AbstractSigner,
+        public transport: IRESTTransport,
+        public isTestnet: boolean = false,
+    ) {}
 
     /**
      * Approve an agent to sign on behalf of the master or sub-accounts.
      * @param args - The parameters for the request.
-     *
+     * @param signal - An optional abort signal
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet|Hyperliquid GitBook: approveAgent}
@@ -227,7 +211,7 @@ export class ExchangeClient {
      *     nonce: Date.now() // Current time as nonce
      * });
      */
-    async approveAgent(args: ApproveAgentParameters): Promise<SuccessResponse> {
+    async approveAgent(args: ApproveAgentParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         const signature = await this.signUserSignedAction(
             { type: "approveAgent", ...args },
             [
@@ -247,6 +231,7 @@ export class ExchangeClient {
                 signature,
                 nonce: args.nonce,
             },
+            signal,
         );
 
         this.validateResponse(response);
@@ -256,7 +241,8 @@ export class ExchangeClient {
     /**
      * Approve a max fee rate for a builder address.
      * @param args - The parameters for the request.
-     *
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-a-builder-fee|Hyperliquid GitBook: approveBuilderFee}
@@ -270,7 +256,7 @@ export class ExchangeClient {
      *     nonce: Date.now() // Current time as nonce
      * });
      */
-    async approveBuilderFee(args: ApproveBuilderFeeParameters): Promise<SuccessResponse> {
+    async approveBuilderFee(args: ApproveBuilderFeeParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         const signature = await this.signUserSignedAction(
             { type: "approveBuilderFee", ...args },
             [
@@ -290,6 +276,7 @@ export class ExchangeClient {
                 signature,
                 nonce: args.nonce,
             },
+            signal,
         );
 
         this.validateResponse(response);
@@ -299,7 +286,8 @@ export class ExchangeClient {
     /**
      * Modify multiple orders.
      * @param args - The parameters for the request.
-     *
+     * @param signal - An optional abort signal.
+     * @returns Successful variant of {@linkcode OrderResponse}.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-multiple-orders|Hyperliquid GitBook: batchModify}
@@ -325,7 +313,7 @@ export class ExchangeClient {
      * });
      * ```
      */
-    async batchModify(args: BatchModifyParameters): Promise<OrderResponseSuccess> {
+    async batchModify(args: BatchModifyParameters, signal?: AbortSignal): Promise<OrderResponseSuccess> {
         const action: BatchModifyRequest["action"] = {
             type: "batchModify",
             modifies: args.modifies.map((modify) => {
@@ -361,6 +349,7 @@ export class ExchangeClient {
                 nonce,
                 vaultAddress: args.vaultAddress,
             },
+            signal,
         );
 
         this.validateResponse(response);
@@ -370,7 +359,8 @@ export class ExchangeClient {
     /**
      * Cancel order(s).
      * @param args - The parameters for the request.
-     *
+     * @param signal - An optional abort signal.
+     * @returns Successful variant of {@linkcode CancelResponse}.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s|Hyperliquid GitBook: cancel}
@@ -384,7 +374,7 @@ export class ExchangeClient {
      * });
      * ```
      */
-    async cancel(args: CancelParameters): Promise<CancelResponseSuccess> {
+    async cancel(args: CancelParameters, signal?: AbortSignal): Promise<CancelResponseSuccess> {
         const action: CancelRequest["action"] = {
             type: "cancel",
             cancels: args.cancels.map((cancel) => ({ a: cancel.a, o: cancel.o })),
@@ -400,6 +390,7 @@ export class ExchangeClient {
                 nonce,
                 vaultAddress: args.vaultAddress,
             },
+            signal,
         );
 
         this.validateResponse(response);
@@ -409,7 +400,8 @@ export class ExchangeClient {
     /**
      * Cancel order(s) by Client Order ID.
      * @param args - The parameters for the request.
-     *
+     * @param signal - An optional abort signal.
+     * @returns Successful variant of {@linkcode CancelResponse}.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid|Hyperliquid GitBook: cancelByCloid}
@@ -423,7 +415,7 @@ export class ExchangeClient {
      * });
      * ```
      */
-    async cancelByCloid(args: CancelByCloidParameters): Promise<CancelResponseSuccess> {
+    async cancelByCloid(args: CancelByCloidParameters, signal?: AbortSignal): Promise<CancelResponseSuccess> {
         const action: CancelByCloidRequest["action"] = {
             type: "cancelByCloid",
             cancels: args.cancels.map((cancel) => ({ asset: cancel.asset, cloid: cancel.cloid })),
@@ -439,6 +431,7 @@ export class ExchangeClient {
                 nonce,
                 vaultAddress: args.vaultAddress,
             },
+            signal,
         );
 
         this.validateResponse(response);
@@ -448,7 +441,8 @@ export class ExchangeClient {
     /**
      * Create a sub-account.
      * @param args - The parameters for the request.
-     *
+     * @param signal - An optional abort signal.
+     * @returns Response for creating a sub-account.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see null
@@ -459,7 +453,7 @@ export class ExchangeClient {
      * });
      * ```
      */
-    async createSubAccount(args: CreateSubAccountParameters): Promise<CreateSubAccountResponse> {
+    async createSubAccount(args: CreateSubAccountParameters, signal?: AbortSignal): Promise<CreateSubAccountResponse> {
         const action: CreateSubAccountRequest["action"] = {
             type: "createSubAccount",
             name: args.name,
@@ -474,6 +468,7 @@ export class ExchangeClient {
                 signature,
                 nonce,
             },
+            signal,
         );
 
         this.validateResponse(response);
@@ -483,7 +478,8 @@ export class ExchangeClient {
     /**
      * Modify an order.
      * @param args - The parameters for the request.
-     *
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order|Hyperliquid GitBook: modify}
@@ -507,7 +503,7 @@ export class ExchangeClient {
      * });
      * ```
      */
-    async modify(args: ModifyParameters): Promise<SuccessResponse> {
+    async modify(args: ModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         const action: ModifyRequest["action"] = {
             type: "modify",
             oid: args.oid,
@@ -538,6 +534,7 @@ export class ExchangeClient {
                 nonce,
                 vaultAddress: args.vaultAddress,
             },
+            signal,
         );
 
         this.validateResponse(response);
@@ -547,7 +544,8 @@ export class ExchangeClient {
     /**
      * Place an order(s).
      * @param args - The parameters for the request.
-     *
+     * @param signal - An optional abort signal.
+     * @returns Successful variant of {@linkcode OrderResponse}.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-an-order|Hyperliquid GitBook: order}
@@ -571,7 +569,7 @@ export class ExchangeClient {
      * });
      * ```
      */
-    async order(args: OrderParameters): Promise<OrderResponseSuccess> {
+    async order(args: OrderParameters, signal?: AbortSignal): Promise<OrderResponseSuccess> {
         const action: OrderRequest["action"] = {
             type: "order",
             orders: args.orders.map((order) => {
@@ -611,6 +609,7 @@ export class ExchangeClient {
                 nonce,
                 vaultAddress: args.vaultAddress,
             },
+            signal,
         );
 
         this.validateResponse(response);
@@ -620,7 +619,8 @@ export class ExchangeClient {
     /**
      * Schedule a time to cancel all open orders.
      * @param args - The parameters for the request.
-     *
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#schedule-cancel-dead-mans-switch|Hyperliquid GitBook: scheduleCancel}
@@ -631,7 +631,7 @@ export class ExchangeClient {
      * });
      * ```
      */
-    async scheduleCancel(args: ScheduleCancelParameters): Promise<SuccessResponse> {
+    async scheduleCancel(args: ScheduleCancelParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         const action: ScheduleCancelRequest["action"] = {
             type: "scheduleCancel",
             time: args.time,
@@ -647,6 +647,7 @@ export class ExchangeClient {
                 nonce,
                 vaultAddress: args.vaultAddress,
             },
+            signal,
         );
 
         this.validateResponse(response);
@@ -656,7 +657,8 @@ export class ExchangeClient {
     /**
      * Set a referral code.
      * @param args - The parameters for the request.
-     *
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see null
@@ -667,7 +669,7 @@ export class ExchangeClient {
      * });
      * ```
      */
-    async setReferrer(args: SetReferrerParameters): Promise<SuccessResponse> {
+    async setReferrer(args: SetReferrerParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         const action: SetReferrerRequest["action"] = {
             type: "setReferrer",
             code: args.code,
@@ -682,6 +684,7 @@ export class ExchangeClient {
                 signature,
                 nonce,
             },
+            signal,
         );
 
         this.validateResponse(response);
@@ -691,7 +694,8 @@ export class ExchangeClient {
     /**
      * Transfer a spot asset on L1 to another address.
      * @param args - The parameters for the request.
-     *
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-spot-transfer|Hyperliquid GitBook: spotSend}
@@ -707,7 +711,7 @@ export class ExchangeClient {
      * });
      * ```
      */
-    async spotSend(args: SpotSendParameters): Promise<SuccessResponse> {
+    async spotSend(args: SpotSendParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         const signature = await this.signUserSignedAction(
             { type: "spotSend", ...args },
             [
@@ -728,6 +732,7 @@ export class ExchangeClient {
                 signature,
                 nonce: args.time,
             },
+            signal,
         );
 
         this.validateResponse(response);
@@ -737,7 +742,8 @@ export class ExchangeClient {
     /**
      * Transfer between sub-accounts.
      * @param args - The parameters for the request.
-     *
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see null
@@ -750,7 +756,7 @@ export class ExchangeClient {
      * });
      * ```
      */
-    async subAccountTransfer(args: SubAccountTransferParameters): Promise<SuccessResponse> {
+    async subAccountTransfer(args: SubAccountTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         const action: SubAccountTransferRequest["action"] = {
             type: "subAccountTransfer",
             subAccountUser: args.subAccountUser,
@@ -767,6 +773,7 @@ export class ExchangeClient {
                 signature,
                 nonce,
             },
+            signal,
         );
 
         this.validateResponse(response);
@@ -776,7 +783,8 @@ export class ExchangeClient {
     /**
      * Update isolated margin for a position.
      * @param args - The parameters for the request.
-     *
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin|Hyperliquid GitBook: updateIsolatedMargin}
@@ -789,7 +797,7 @@ export class ExchangeClient {
      * });
      * ```
      */
-    async updateIsolatedMargin(args: UpdateIsolatedMarginParameters): Promise<SuccessResponse> {
+    async updateIsolatedMargin(args: UpdateIsolatedMarginParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         const action: UpdateIsolatedMarginRequest["action"] = {
             type: "updateIsolatedMargin",
             asset: args.asset,
@@ -807,6 +815,7 @@ export class ExchangeClient {
                 nonce,
                 vaultAddress: args.vaultAddress,
             },
+            signal,
         );
 
         this.validateResponse(response);
@@ -816,7 +825,8 @@ export class ExchangeClient {
     /**
      * Update leverage for cross or isolated margin.
      * @param args - The parameters for the request.
-     *
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-leverage|Hyperliquid GitBook: updateLeverage}
@@ -829,7 +839,7 @@ export class ExchangeClient {
      * });
      * ```
      */
-    async updateLeverage(args: UpdateLeverageParameters): Promise<SuccessResponse> {
+    async updateLeverage(args: UpdateLeverageParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         const action: UpdateLeverageRequest["action"] = {
             type: "updateLeverage",
             asset: args.asset,
@@ -847,6 +857,7 @@ export class ExchangeClient {
                 nonce,
                 vaultAddress: args.vaultAddress,
             },
+            signal,
         );
 
         this.validateResponse(response);
@@ -856,7 +867,8 @@ export class ExchangeClient {
     /**
      * Transfer funds between Spot and Perp accounts.
      * @param args - The parameters for the request.
-     *
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see null
@@ -871,7 +883,7 @@ export class ExchangeClient {
      * });
      * ```
      */
-    async usdClassTransfer(args: UsdClassTransferParameters): Promise<SuccessResponse> {
+    async usdClassTransfer(args: UsdClassTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         const signature = await this.signUserSignedAction(
             { type: "usdClassTransfer", ...args },
             [
@@ -891,6 +903,7 @@ export class ExchangeClient {
                 signature,
                 nonce: args.nonce,
             },
+            signal,
         );
 
         this.validateResponse(response);
@@ -900,7 +913,8 @@ export class ExchangeClient {
     /**
      * Transfer USDC on L1 to another address.
      * @param args - The parameters for the request.
-     *
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-usdc-transfer|Hyperliquid GitBook: usdSend}
@@ -915,7 +929,7 @@ export class ExchangeClient {
      * });
      * ```
      */
-    async usdSend(args: UsdSendParameters): Promise<SuccessResponse> {
+    async usdSend(args: UsdSendParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         const signature = await this.signUserSignedAction(
             { type: "usdSend", ...args },
             [
@@ -935,6 +949,7 @@ export class ExchangeClient {
                 signature,
                 nonce: args.time,
             },
+            signal,
         );
 
         this.validateResponse(response);
@@ -944,7 +959,8 @@ export class ExchangeClient {
     /**
      * Transfer funds to/from a vault.
      * @param args - The parameters for the request.
-     *
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-a-vault|Hyperliquid GitBook: vaultTransfer}
@@ -957,7 +973,7 @@ export class ExchangeClient {
      * });
      * ```
      */
-    async vaultTransfer(args: VaultTransferParameters): Promise<SuccessResponse> {
+    async vaultTransfer(args: VaultTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         const action: VaultTransferRequest["action"] = {
             type: "vaultTransfer",
             vaultAddress: args.vaultAddress,
@@ -974,6 +990,7 @@ export class ExchangeClient {
                 signature,
                 nonce,
             },
+            signal,
         );
 
         this.validateResponse(response);
@@ -983,7 +1000,8 @@ export class ExchangeClient {
     /**
      * Initiate a withdrawal request.
      * @param args - The parameters for the request.
-     *
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#initiate-a-withdrawal-request|Hyperliquid GitBook: withdraw3}
@@ -998,7 +1016,7 @@ export class ExchangeClient {
      * });
      * ```
      */
-    async withdraw3(args: Withdraw3Parameters): Promise<SuccessResponse> {
+    async withdraw3(args: Withdraw3Parameters, signal?: AbortSignal): Promise<SuccessResponse> {
         const signature = await this.signUserSignedAction(
             { type: "withdraw3", ...args },
             [
@@ -1018,6 +1036,7 @@ export class ExchangeClient {
                 signature,
                 nonce: args.time,
             },
+            signal,
         );
 
         this.validateResponse(response);
@@ -1050,15 +1069,12 @@ export class ExchangeClient {
 
         if (isAbstractWalletClient(this.wallet)) {
             const signature = await this.wallet.signTypedData({ domain, types, primaryType: "Agent", message });
-
             return parseSignature(signature);
         } else if (isAbstractSigner(this.wallet)) {
             const signature = await this.wallet.signTypedData(domain, types, message);
-
             if (!isHex(signature)) {
                 throw new Error("Invalid signature format");
             }
-
             return parseSignature(signature);
         } else {
             throw new Error("Unsupported wallet for signing typed data");

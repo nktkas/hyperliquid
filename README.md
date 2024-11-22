@@ -38,9 +38,9 @@ const httpTransport = new hyperliquid.HttpTransport({
   timeout: 10000,                       // Request timeout in ms
   fetchOptions: { ... },                // Additional fetch options
   retry: {
-    maxAttempts: 3,                   // Maximum retry attempts
-    baseDelay: 150,                   // Base delay between retries in ms
-    maxDelay: 5000,                   // Maximum delay between retries in ms
+    maxAttempts: 0,                               // Maximum retry attempts
+    delay: (attempt) => ~~(1 << attempt) * 150,   // Delay between retries in ms (default: Exponential backoff)
+    shouldReattempt: (error) => error instanceof TypeError || (error instanceof HttpRequestError && error.response.status >= 500 && error.response.status < 600) // Custom retry logic (default: Retries on network errors and 5xx status codes)
   }
 });
 
@@ -50,9 +50,9 @@ const wsTransport = new hyperliquid.WebSocketTransport({
   timeout: 10000,                        // Request timeout in ms
   keepAliveInterval: 20000,              // Ping interval in ms
   reconnect: {
-    maxAttempts: 3,                    // Maximum reconnection attempts
-    baseDelay: 150,                    // Base delay between reconnections in ms
-    maxDelay: 5000                     // Maximum delay between reconnections in ms
+    maxAttempts: 3,                                 // Maximum reconnection attempts
+    delay: (attempt) => ~~(1 << attempt) * 150,     // Delay between reconnections in ms (default: Exponential backoff)
+    shouldReattempt: (event) => event.code !== 1000 // Custom reconnection logic (default: Non-normal close code)
   }
 });
 ```
@@ -123,7 +123,7 @@ HTTP transport for API communication.
 ```typescript
 class HttpTransport implements IRESTTransport {
   constructor(config?: HttpTransportConfig);
-  request<T>(endpoint: "info" | "action" | "explorer", payload: unknown): Promise<T>;
+  request<T>(endpoint: "info" | "action" | "explorer", payload: unknown, signal?: AbortSignal): Promise<T>;
 }
 ```
 
@@ -135,10 +135,9 @@ interface HttpTransportConfig {
   timeout?: number; // Request timeout in ms (default: 10000)
   fetchOptions?: RequestInit; // Additional fetch options
   retry?: {
-    maxAttempts?: number; // Maximum retry attempts (default: 3)
-    baseDelay?: number; // Base delay between retries in ms (default: 150)
-    maxDelay?: number; // Maximum delay between retries in ms (default: 5000)
-    shouldRetry?: (error: unknown) => boolean | Promise<boolean>; // Custom retry logic (default: Retries on network errors, timeouts, and 5xx status codes)
+    maxAttempts?: number; // Maximum number of retry attempts (default: 0)
+    delay?: number | ((attempt: number) => number | Promise<number>); // Delay between reconnections (default: Exponential backoff)
+    shouldReattempt?: (error: unknown) => boolean | Promise<boolean>; // Custom retry logic (default: Retries on network errors and 5xx status codes)
   };
 }
 ```
@@ -150,7 +149,7 @@ WebSocket transport for API communication.
 ```typescript
 class WebSocketTransport implements IRESTTransport {
   constructor(config?: WebSocketTransportConfig);
-  request<T>(endpoint: "info" | "action" | "explorer", payload: unknown): Promise<T>;
+  request<T>(endpoint: "info" | "action" | "explorer", payload: unknown, signal?: AbortSignal): Promise<T>;
   ready(signal?: AbortSignal): Promise<void>; // Wait for connection
   close(signal?: AbortSignal): Promise<void>; // Close connection
 }
@@ -164,10 +163,12 @@ interface WebSocketTransportConfig {
   timeout?: number; // Request timeout in ms (default: 10000)
   keepAliveInterval?: number; // Ping interval in ms (default: 20000)
   reconnect?: {
-    maxAttempts?: number; // Maximum reconnection attempts (default: 3)
-    baseDelay?: number; // Base delay between reconnections in ms (default: 150)
-    maxDelay?: number; // Maximum delay between reconnections in ms (default: 5000)
-    shouldReconnect?: (event: CloseEvent) => boolean | Promise<boolean>; // Custom reconnection logic (default: Non-normal close code (event.code !== 1000))
+    maxAttempts?: number; // Maximum number of reconnection attempts (default: 3)
+    delay?: number | ((attempt: number) => number | Promise<number>); // Delay between reconnections (default: Exponential backoff)
+    shouldReattempt?: (event: CloseEvent) => boolean | Promise<boolean>; // Custom reconnection logic (default: Non-normal close code)
+  };
+  retry?: {
+    maxAttempts?: number; // Maximum number of retry attempts (default: 0)
   };
 }
 ```
@@ -189,30 +190,30 @@ class ExchangeClient {
   );
 
   // Order Management
-  order(args: OrderParameters): Promise<OrderResponseSuccess>;
-  modify(args: ModifyParameters): Promise<SuccessResponse>;
-  cancel(args: CancelParameters): Promise<CancelResponseSuccess>;
-  cancelByCloid(args: CancelByCloidParameters): Promise<CancelResponseSuccess>;
-  batchModify(args: BatchModifyParameters): Promise<OrderResponseSuccess>;
-  scheduleCancel(args: ScheduleCancelParameters): Promise<SuccessResponse>;
+  order(args: OrderParameters, signal?: AbortSignal): Promise<OrderResponseSuccess>;
+  modify(args: ModifyParameters, signal?: AbortSignal): Promise<SuccessResponse>;
+  cancel(args: CancelParameters, signal?: AbortSignal): Promise<CancelResponseSuccess>;
+  cancelByCloid(args: CancelByCloidParameters, signal?: AbortSignal): Promise<CancelResponseSuccess>;
+  batchModify(args: BatchModifyParameters, signal?: AbortSignal): Promise<OrderResponseSuccess>;
+  scheduleCancel(args: ScheduleCancelParameters, signal?: AbortSignal): Promise<SuccessResponse>;
 
   // Account Management
-  updateLeverage(args: UpdateLeverageParameters): Promise<SuccessResponse>;
-  updateIsolatedMargin(args: UpdateIsolatedMarginParameters): Promise<SuccessResponse>;
-  createSubAccount(args: CreateSubAccountParameters): Promise<CreateSubAccountResponse>;
-  subAccountTransfer(args: SubAccountTransferParameters): Promise<SuccessResponse>;
+  updateLeverage(args: UpdateLeverageParameters, signal?: AbortSignal): Promise<SuccessResponse>;
+  updateIsolatedMargin(args: UpdateIsolatedMarginParameters, signal?: AbortSignal): Promise<SuccessResponse>;
+  createSubAccount(args: CreateSubAccountParameters, signal?: AbortSignal): Promise<CreateSubAccountResponse>;
+  subAccountTransfer(args: SubAccountTransferParameters, signal?: AbortSignal): Promise<SuccessResponse>;
 
   // Transfers & Withdrawals
-  withdraw3(args: Withdraw3Parameters): Promise<SuccessResponse>;
-  usdSend(args: UsdSendParameters): Promise<SuccessResponse>;
-  spotSend(args: SpotSendParameters): Promise<SuccessResponse>;
-  usdClassTransfer(args: UsdClassTransferParameters): Promise<SuccessResponse>;
-  vaultTransfer(args: VaultTransferParameters): Promise<SuccessResponse>;
+  withdraw3(args: Withdraw3Parameters, signal?: AbortSignal): Promise<SuccessResponse>;
+  usdSend(args: UsdSendParameters, signal?: AbortSignal): Promise<SuccessResponse>;
+  spotSend(args: SpotSendParameters, signal?: AbortSignal): Promise<SuccessResponse>;
+  usdClassTransfer(args: UsdClassTransferParameters, signal?: AbortSignal): Promise<SuccessResponse>;
+  vaultTransfer(args: VaultTransferParameters, signal?: AbortSignal): Promise<SuccessResponse>;
 
   // Approvals & Settings
-  approveAgent(args: ApproveAgentParameters): Promise<SuccessResponse>;
-  approveBuilderFee(args: ApproveBuilderFeeParameters): Promise<SuccessResponse>;
-  setReferrer(args: SetReferrerParameters): Promise<SuccessResponse>;
+  approveAgent(args: ApproveAgentParameters, signal?: AbortSignal): Promise<SuccessResponse>;
+  approveBuilderFee(args: ApproveBuilderFeeParameters, signal?: AbortSignal): Promise<SuccessResponse>;
+  setReferrer(args: SetReferrerParameters, signal?: AbortSignal): Promise<SuccessResponse>;
 }
 ```
 
@@ -225,32 +226,32 @@ class InfoClient {
   constructor(transport: IRESTTransport);
 
   // Market Data
-  allMids(): Promise<AllMids>;
-  candleSnapshot(args: CandleSnapshotParameters): Promise<CandleSnapshot[]>;
-  fundingHistory(args: FundingHistoryParameters): Promise<FundingHistory[]>;
-  l2Book(args: L2BookParameters): Promise<L2Book>;
-  meta(): Promise<Meta>;
-  metaAndAssetCtxs(): Promise<MetaAndAssetCtxs>;
-  spotMeta(): Promise<SpotMeta>;
-  spotMetaAndAssetCtxs(): Promise<SpotMetaAndAssetCtxs>;
+  allMids(signal?: AbortSignal): Promise<AllMids>;
+  candleSnapshot(args: CandleSnapshotParameters, signal?: AbortSignal): Promise<CandleSnapshot[]>;
+  fundingHistory(args: FundingHistoryParameters, signal?: AbortSignal): Promise<FundingHistory[]>;
+  l2Book(args: L2BookParameters, signal?: AbortSignal): Promise<L2Book>;
+  meta(signal?: AbortSignal): Promise<Meta>;
+  metaAndAssetCtxs(signal?: AbortSignal): Promise<MetaAndAssetCtxs>;
+  spotMeta(signal?: AbortSignal): Promise<SpotMeta>;
+  spotMetaAndAssetCtxs(signal?: AbortSignal): Promise<SpotMetaAndAssetCtxs>;
 
   // Account Information
-  clearinghouseState(args: ClearinghouseStateParameters): Promise<ClearinghouseState>;
-  spotClearinghouseState(args: SpotClearinghouseStateParameters): Promise<SpotClearinghouseState>;
-  openOrders(args: OpenOrdersParameters): Promise<OpenOrder[]>;
-  frontendOpenOrders(args: FrontendOpenOrdersParameters): Promise<FrontendOpenOrder[]>;
-  maxBuilderFee(args: MaxBuilderFeeParameters): Promise<number>;
-  orderStatus(args: OrderStatusParameters): Promise<OrderStatusResponse>;
-  referral(args: ReferralParameters): Promise<Referral>;
-  subAccounts(args: SubAccountsParameters): Promise<SubAccount[]>;
+  clearinghouseState(args: ClearinghouseStateParameters, signal?: AbortSignal): Promise<ClearinghouseState>;
+  spotClearinghouseState(args: SpotClearinghouseStateParameters, signal?: AbortSignal): Promise<SpotClearinghouseState>;
+  openOrders(args: OpenOrdersParameters, signal?: AbortSignal): Promise<OpenOrder[]>;
+  frontendOpenOrders(args: FrontendOpenOrdersParameters, signal?: AbortSignal): Promise<FrontendOpenOrder[]>;
+  maxBuilderFee(args: MaxBuilderFeeParameters, signal?: AbortSignal): Promise<number>;
+  orderStatus(args: OrderStatusParameters, signal?: AbortSignal): Promise<OrderStatusResponse>;
+  referral(args: ReferralParameters, signal?: AbortSignal): Promise<Referral>;
+  subAccounts(args: SubAccountsParameters, signal?: AbortSignal): Promise<SubAccount[]>;
 
   // User Activity
-  userFills(args: UserFillsParameters): Promise<UserFill[]>;
-  userFillsByTime(args: UserFillsByTimeParameters): Promise<UserFill[]>;
-  userFunding(args: UserFundingParameters): Promise<UserFunding[]>;
-  userNonFundingLedgerUpdates(args: UserNonFundingLedgerUpdatesParameters): Promise<UserNonFundingLedgerUpdates[]>;
-  userFees(args: UserFeesParameters): Promise<UserFees>;
-  userRateLimit(args: UserRateLimitParameters): Promise<UserRateLimit>;
+  userFills(args: UserFillsParameters, signal?: AbortSignal): Promise<UserFill[]>;
+  userFillsByTime(args: UserFillsByTimeParameters, signal?: AbortSignal): Promise<UserFill[]>;
+  userFunding(args: UserFundingParameters, signal?: AbortSignal): Promise<UserFunding[]>;
+  userNonFundingLedgerUpdates(args: UserNonFundingLedgerUpdatesParameters, signal?: AbortSignal): Promise<UserNonFundingLedgerUpdates[]>;
+  userFees(args: UserFeesParameters, signal?: AbortSignal): Promise<UserFees>;
+  userRateLimit(args: UserRateLimitParameters, signal?: AbortSignal): Promise<UserRateLimit>;
 }
 ```
 

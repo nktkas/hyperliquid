@@ -102,7 +102,8 @@ export interface WebSocketTransportConfig {
     keepAliveInterval?: number;
 
     /**
-     * Reconnection policy configuration.
+     * Reconnection policy configuration for closed connections.
+     * @note Only re-establishes the connection, does not retry failed requests.
      * @default { maxAttempts: 3, baseDelay: 150, maxDelay: 5000 }
      */
     reconnect?: {
@@ -113,24 +114,30 @@ export interface WebSocketTransportConfig {
         maxAttempts?: number;
 
         /**
-         * Base delay between reconnection attempts in milliseconds.
-         * @default 150
+         * Deler between reconnection attempts in milliseconds.
+         * @default (attempt) => ~~(1 << attempt) * 150 // Exponential backoff
          */
-        baseDelay?: number;
-
-        /**
-         * Maximum delay between reconnection attempts in milliseconds.
-         * @default 5000
-         */
-        maxDelay?: number;
+        delay: number | ((attempt: number) => number | Promise<number>);
 
         /**
          * Custom logic to determine if reconnection should be attempted.
          * @param event - The close event that occurred during the connection.
          * @returns A boolean indicating if reconnection should be attempted.
-         * @default Non-normal close code (event.code !== 1000).
+         * @default (event) => event.code !== 1000
          */
-        shouldReconnect?: (event: CloseEvent) => boolean | Promise<boolean>;
+        shouldReattempt?: (event: CloseEvent) => boolean | Promise<boolean>;
+    };
+
+    /**
+     * Retry policy configuration for failed requests.
+     * @note Only works with async requests and when reconnect is enabled.
+     */
+    retry?: {
+        /**
+         * Maximum number of retry attempts. Set to `0` to disable.
+         * @default 0
+         */
+        maxAttempts?: number;
     };
 }
 
@@ -144,13 +151,13 @@ export class WebSocketTransport implements IRESTTransport {
     protected socket: WebSocket | null = null;
     protected keepAliveTimer: ReturnType<typeof setInterval> | null = null;
     protected reconnectCount: number = 0;
-    protected readyPromise: Promise<void> | null = null;
-    protected closePromise: Promise<void> | null = null;
     protected shouldReconnect: boolean = true;
     protected pendingRequests: Map<number, {
         // deno-lint-ignore no-explicit-any
         resolve: (value: any) => void;
         reject: (reason: unknown) => void;
+        retryCount: number;
+        payload: PostRequest<unknown>;
     }> = new Map();
     protected lastRequestId: number = 0;
 
@@ -164,9 +171,11 @@ export class WebSocketTransport implements IRESTTransport {
             keepAliveInterval: config.keepAliveInterval ?? 20_000,
             reconnect: {
                 maxAttempts: config.reconnect?.maxAttempts ?? 3,
-                baseDelay: config.reconnect?.baseDelay ?? 150,
-                maxDelay: config.reconnect?.maxDelay ?? 5000,
-                shouldReconnect: config.reconnect?.shouldReconnect ?? ((event) => event.code !== 1000),
+                delay: config.reconnect?.delay ?? ((attempt) => ~~(1 << attempt) * 150),
+                shouldReattempt: config.reconnect?.shouldReattempt ?? ((event) => event.code !== 1000),
+            },
+            retry: {
+                maxAttempts: config.retry?.maxAttempts ?? 0,
             },
         };
         this.connect();
@@ -176,15 +185,31 @@ export class WebSocketTransport implements IRESTTransport {
      * Establishes the WebSocket connection.
      */
     connect(): void {
+        this.shouldReconnect = true;
+
         if (this.socket?.readyState === WebSocket.CONNECTING || this.socket?.readyState === WebSocket.OPEN) {
             return;
         }
 
-        this.shouldReconnect = true;
         this.socket = new WebSocket(this.config.url);
 
         const handleOpen = () => {
             this.reconnectCount = 0;
+
+            // Retry pending requests after reconnection
+            if (this.config.reconnect.maxAttempts > 0 && this.config.retry.maxAttempts > 0) {
+                for (const [id, request] of this.pendingRequests.entries()) {
+                    if (request.retryCount < this.config.retry.maxAttempts) {
+                        request.retryCount++;
+                        if (this.socket?.readyState === WebSocket.OPEN) {
+                            this.socket.send(JSON.stringify(request.payload));
+                        }
+                    } else {
+                        request.reject(new WebSocketRequestError("Max retry attempts reached"));
+                        this.pendingRequests.delete(id);
+                    }
+                }
+            }
 
             // Send keep-alive messages
             if (this.config.keepAliveInterval > 0 && !this.keepAliveTimer) {
@@ -205,24 +230,34 @@ export class WebSocketTransport implements IRESTTransport {
                 this.keepAliveTimer = null;
             }
 
-            // Reject pending requests
-            for (const request of this.pendingRequests.values()) {
-                request.reject(new DOMException("The WebSocket is in an invalid state.", "InvalidStateError"));
+            // Handle pending requests based on retry configuration
+            if (this.config.reconnect.maxAttempts > 0 && this.config.retry.maxAttempts > 0) {
+                // Keep requests that haven't exceeded retry attempts
+                for (const [id, request] of this.pendingRequests.entries()) {
+                    if (request.retryCount >= this.config.retry.maxAttempts) {
+                        request.reject(new WebSocketRequestError("Max retry attempts reached"));
+                        this.pendingRequests.delete(id);
+                    }
+                }
+            } else {
+                // Reject all pending requests if retry is disabled
+                for (const request of this.pendingRequests.values()) {
+                    request.reject(new DOMException("The WebSocket is in an invalid state.", "InvalidStateError"));
+                }
+                this.pendingRequests.clear();
             }
-            this.pendingRequests.clear();
 
             // Reconnect
             if (
                 this.shouldReconnect &&
                 this.reconnectCount < this.config.reconnect.maxAttempts &&
-                await this.config.reconnect.shouldReconnect(event)
+                await this.config.reconnect.shouldReattempt(event)
             ) {
-                const delay = Math.min(
-                    Math.floor((1 << this.reconnectCount) * this.config.reconnect.baseDelay * (0.5 + Math.random())),
-                    this.config.reconnect.maxDelay,
-                );
                 this.reconnectCount++;
-                setTimeout(() => this.connect(), delay);
+                const delayDuration = typeof this.config.reconnect.delay === "number"
+                    ? this.config.reconnect.delay
+                    : await this.config.reconnect.delay(this.reconnectCount);
+                setTimeout(() => this.connect(), delayDuration);
             }
         };
 
@@ -230,12 +265,22 @@ export class WebSocketTransport implements IRESTTransport {
             try {
                 const msg = JSON.parse(event.data);
                 if (isPostResponse(msg)) {
-                    this.pendingRequests.get(msg.data.id)?.resolve(
-                        msg.data.response.type === "info" ? msg.data.response.payload.data : msg.data.response.payload,
-                    );
+                    const request = this.pendingRequests.get(msg.data.id);
+                    if (request) {
+                        request.resolve(
+                            msg.data.response.type === "info" ? msg.data.response.payload.data : msg.data.response.payload,
+                        );
+                        this.pendingRequests.delete(msg.data.id);
+                    }
                 } else if (isErrorResponse(msg)) {
-                    const responseId = Number(msg.data.match('"id":(.+?),')?.[1]);
-                    this.pendingRequests.get(responseId)?.reject(new WebSocketRequestError(msg.data));
+                    const responseId = msg.data.match('"id":(.+?),')?.[1]?.trim();
+                    if (responseId) {
+                        const request = this.pendingRequests.get(Number(responseId));
+                        if (request) {
+                            request.reject(new WebSocketRequestError(msg.data));
+                            this.pendingRequests.delete(Number(responseId));
+                        }
+                    }
                 }
             } catch {
                 // Ignore errors
@@ -249,20 +294,13 @@ export class WebSocketTransport implements IRESTTransport {
 
     /**
      * Waits for the WebSocket connection to be established.
-     * @param signal - Optional AbortSignal to cancel the operation.
+     * @param signal - An optional abort signal.
      * @returns A promise that resolves when the connection is established.
-     *
-     * @throws {DOMException} - `AbortError` from {@link signal}.
-     * @throws {DOMException} - `InvalidStateError` from invalid WebSocket state
      */
     ready(signal?: AbortSignal): Promise<void> {
-        if (!signal && this.readyPromise) {
-            return this.readyPromise;
-        }
-
-        const promise = new Promise<void>((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             if (signal?.aborted) {
-                return reject(new DOMException("The operation was aborted.", "AbortError"));
+                return reject(signal.reason);
             }
 
             if (!this.socket || this.socket.readyState === WebSocket.CLOSED || this.socket.readyState === WebSocket.CLOSING) {
@@ -274,7 +312,6 @@ export class WebSocketTransport implements IRESTTransport {
             }
 
             const handleOpen = () => {
-                this.socket?.removeEventListener("open", handleOpen);
                 this.socket?.removeEventListener("close", handleClose);
                 signal?.removeEventListener("abort", handleAbort);
                 resolve();
@@ -282,7 +319,6 @@ export class WebSocketTransport implements IRESTTransport {
 
             const handleClose = () => {
                 this.socket?.removeEventListener("open", handleOpen);
-                this.socket?.removeEventListener("close", handleClose);
                 signal?.removeEventListener("abort", handleAbort);
                 reject(new DOMException("The WebSocket is in an invalid state.", "InvalidStateError"));
             };
@@ -290,43 +326,26 @@ export class WebSocketTransport implements IRESTTransport {
             const handleAbort = () => {
                 this.socket?.removeEventListener("open", handleOpen);
                 this.socket?.removeEventListener("close", handleClose);
-                signal?.removeEventListener("abort", handleAbort);
-                reject(new DOMException("The operation was aborted.", "AbortError"));
+                reject(signal!.reason);
             };
 
             this.socket.addEventListener("open", handleOpen, { once: true });
             this.socket.addEventListener("close", handleClose, { once: true });
             signal?.addEventListener("abort", handleAbort, { once: true });
-        }).finally(() => {
-            if (!signal) {
-                this.readyPromise = null;
-            }
         });
-
-        if (!signal) {
-            this.readyPromise = promise;
-        }
-
-        return promise;
     }
 
     /**
      * Closes the WebSocket connection.
-     * @param signal - Optional AbortSignal to cancel the operation.
+     * @param signal - An optional abort signal.
      * @returns A promise that resolves when the connection is closed.
-     *
-     * @throws {DOMException} - `AbortError` from {@link signal}.
      */
     close(signal?: AbortSignal): Promise<void> {
-        this.shouldReconnect = false;
+        return new Promise<void>((resolve, reject) => {
+            this.shouldReconnect = false;
 
-        if (!signal && this.closePromise) {
-            return this.closePromise;
-        }
-
-        const promise = new Promise<void>((resolve, reject) => {
             if (signal?.aborted) {
-                return reject(new DOMException("The operation was aborted.", "AbortError"));
+                return reject(signal.reason);
             }
 
             if (!this.socket || this.socket.readyState === WebSocket.CLOSED) {
@@ -334,73 +353,63 @@ export class WebSocketTransport implements IRESTTransport {
             }
 
             const handleClose = () => {
-                this.socket?.removeEventListener("close", handleClose);
                 signal?.removeEventListener("abort", handleAbort);
                 resolve();
             };
 
             const handleAbort = () => {
                 this.socket?.removeEventListener("close", handleClose);
-                signal?.removeEventListener("abort", handleAbort);
-                reject(new DOMException("The operation was aborted.", "AbortError"));
+                reject(signal!.reason);
             };
 
             this.socket.addEventListener("close", handleClose, { once: true });
             signal?.addEventListener("abort", handleAbort, { once: true });
 
             this.socket.close();
-        }).finally(() => {
-            if (!signal) {
-                this.closePromise = null;
-            }
         });
-
-        if (!signal) {
-            this.closePromise = promise;
-        }
-
-        return promise;
     }
 
     /**
      * Sends an API request.
      * @param endpoint - The endpoint to send the request to.
      * @param payload - The request payload.
-     * @returns The response body.
-     *
-     * @throws {DOMException} - On `TimeoutError` from {@link WebSocketTransportConfig.timeout}.
-     * @throws {DOMException} - On `InvalidStateError` from invalid WebSocket state. Indicates that the WebSocket connection was terminated before a response was received.
+     * @param signal - An optional abort signal.
+     * @returns The response data.
      * @throws {WebSocketRequestError} - On WebSocket request failure.
      */
-    async request<T>(type: "info" | "action", payload: unknown): Promise<T> {
+    async request<T>(type: "info" | "action", payload: unknown, signal?: AbortSignal): Promise<T> {
+        const timeoutSignal = this.config.timeout > 0 ? AbortSignal.timeout(this.config.timeout) : undefined;
+        const combinedSignal = signal && timeoutSignal ? AbortSignal.any([signal, timeoutSignal]) : signal ?? timeoutSignal;
+
+        await this.ready(combinedSignal);
+
         const request: PostRequest<unknown> = {
             method: "post",
             id: ++this.lastRequestId,
-            request: {
-                type,
-                payload: payload,
-            },
+            request: { type, payload },
         };
 
-        const timeoutSignal = this.config.timeout > 0 ? AbortSignal.timeout(this.config.timeout) : undefined;
-        const handleTimeout = () => {
-            this.pendingRequests.get(request.id)?.reject(new DOMException("The operation timed out.", "TimeoutError"));
-        };
-
-        await this.ready(timeoutSignal);
-
-        return await new Promise<T>((resolve, reject) => {
-            if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
-                return reject(new DOMException("The WebSocket is in an invalid state.", "InvalidStateError"));
+        const handleAbort = () => {
+            const pendingRequest = this.pendingRequests.get(request.id);
+            if (pendingRequest) {
+                pendingRequest.reject(new DOMException("The operation timed out.", "TimeoutError"));
+                this.pendingRequests.delete(request.id);
             }
+        };
 
-            timeoutSignal?.addEventListener("abort", handleTimeout, { once: true });
+        return new Promise<T>((resolve, reject) => {
+            combinedSignal?.addEventListener("abort", handleAbort, { once: true });
 
-            this.pendingRequests.set(request.id, { resolve, reject });
-            this.socket.send(JSON.stringify(request));
+            this.socket!.send(JSON.stringify(request));
+
+            this.pendingRequests.set(request.id, {
+                resolve,
+                reject,
+                retryCount: 0,
+                payload: request,
+            });
         }).finally(() => {
-            timeoutSignal?.removeEventListener("abort", handleTimeout);
-            this.pendingRequests.delete(request.id);
+            combinedSignal?.removeEventListener("abort", handleAbort);
         });
     }
 }

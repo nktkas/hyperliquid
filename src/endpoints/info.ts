@@ -101,14 +101,11 @@ export type UserRateLimitParameters = Omit<UserRateLimitRequest, "type">;
  * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint|Hyperliquid GitBook}
  */
 export class InfoClient {
-    /** The transport used to connect to the Hyperliquid API. */
-    transport: IRESTTransport;
-
     /**
      * Initialises a new instance.
      * @param transport - The transport used to connect to the Hyperliquid API.
      *
-     * @example Using the default URL.
+     * @example
      * ```ts
      * import * as hyperliquid from "@nktkas/hyperliquid";
      *
@@ -116,13 +113,11 @@ export class InfoClient {
      * const client = new hyperliquid.InfoClient(transport);
      * ```
      */
-    constructor(transport: IRESTTransport) {
-        this.transport = transport;
-    }
+    constructor(public transport: IRESTTransport) {}
 
     /**
      * Request mid coin prices.
-     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns Mid coin prices.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-mids-for-all-actively-traded-coins|Hyperliquid GitBook}
@@ -133,16 +128,18 @@ export class InfoClient {
      * // allMids: { "ETH": "1800.5", "BTC": "30000.0", ... }
      * ```
      */
-    async allMids(): Promise<AllMids> {
+    async allMids(signal?: AbortSignal): Promise<AllMids> {
         return await this.transport.request(
             "info",
             { type: "allMids" } as AllMidsRequest,
+            signal,
         );
     }
 
     /**
      * Request candlestick snapshots.
      * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns Array of candlestick data point.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#candle-snapshot|Hyperliquid GitBook}
@@ -157,16 +154,18 @@ export class InfoClient {
      * // candles[0]: { t: 1234567890000, T: 1234571490000, s: "ETH", i: "1h", o: "1800.0", c: "1805.0", h: "1810.0", l: "1795.0", v: "1000.5", n: 500 }
      * ```
      */
-    async candleSnapshot(args: CandleSnapshotParameters): Promise<CandleSnapshot[]> {
+    async candleSnapshot(args: CandleSnapshotParameters, signal?: AbortSignal): Promise<CandleSnapshot[]> {
         return await this.transport.request(
             "info",
             { type: "candleSnapshot", req: args } as CandleSnapshotRequest,
+            signal,
         );
     }
 
     /**
      * Request clearinghouse state.
      * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns Account summary for perpetual trading.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-perpetuals-account-summary|Hyperliquid GitBook}
@@ -177,16 +176,18 @@ export class InfoClient {
      * // state.marginSummary: { accountValue: "10000.0", totalNtlPos: "5000.0", totalRawUsd: "5000.0", totalMarginUsed: "1000.0" }
      * ```
      */
-    async clearinghouseState(args: ClearinghouseStateParameters): Promise<ClearinghouseState> {
+    async clearinghouseState(args: ClearinghouseStateParameters, signal?: AbortSignal): Promise<ClearinghouseState> {
         return await this.transport.request(
             "info",
             { type: "clearinghouseState", ...args } as ClearinghouseStateRequest,
+            signal,
         );
     }
 
     /**
      * Request frontend open orders.
      * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns Array of open orders with additional frontend information.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders-with-additional-frontend-info|Hyperliquid GitBook}
@@ -197,16 +198,18 @@ export class InfoClient {
      * // orders[0]: { coin: "ETH", side: "B", limitPx: "1800.0", sz: "1.0", oid: 12345, timestamp: 1234567890000, ... }
      * ```
      */
-    async frontendOpenOrders(args: FrontendOpenOrdersParameters): Promise<FrontendOpenOrder[]> {
+    async frontendOpenOrders(args: FrontendOpenOrdersParameters, signal?: AbortSignal): Promise<FrontendOpenOrder[]> {
         return await this.transport.request(
             "info",
             { type: "frontendOpenOrders", ...args } as FrontendOpenOrdersRequest,
+            signal,
         );
     }
 
     /**
      * Request funding history.
      * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns Array of historical funding rate data for an asset.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-historical-funding-rates|Hyperliquid GitBook}
@@ -219,16 +222,18 @@ export class InfoClient {
      *
      * // funding[0]: { coin: "ETH", fundingRate: "0.0001", premium: "0.0002", time: 1234567890000 }
      */
-    async fundingHistory(args: FundingHistoryParameters): Promise<FundingHistory[]> {
+    async fundingHistory(args: FundingHistoryParameters, signal?: AbortSignal): Promise<FundingHistory[]> {
         return await this.transport.request(
             "info",
             { type: "fundingHistory", ...args } as FundingHistoryRequest,
+            signal,
         );
     }
 
     /**
      * Request L2 order book.
      * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns L2 order book snapshot.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#l2-book-snapshot|Hyperliquid GitBook}
@@ -239,16 +244,18 @@ export class InfoClient {
      * // book.levels[0]: [{ px: "1800.00", sz: "10.5", n: 5 }, { px: "1799.00", sz: "5.0", n: 3 }, ...]
      * ```
      */
-    async l2Book(args: L2BookParameters): Promise<L2Book> {
+    async l2Book(args: L2BookParameters, signal?: AbortSignal): Promise<L2Book> {
         return await this.transport.request(
             "info",
             { type: "l2Book", ...args } as L2BookRequest,
+            signal,
         );
     }
 
     /**
      * Request builder fee approval.
      * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns Maximum builder fee approval.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#check-builder-fee-approval|Hyperliquid GitBook}
@@ -259,16 +266,17 @@ export class InfoClient {
      * // maxBuilderFee: 1 (0.001%)
      * ```
      */
-    async maxBuilderFee(args: MaxBuilderFeeParameters): Promise<number> {
+    async maxBuilderFee(args: MaxBuilderFeeParameters, signal?: AbortSignal): Promise<number> {
         return await this.transport.request(
             "info",
             { type: "maxBuilderFee", ...args } as MaxBuilderFeeRequest,
+            signal,
         );
     }
 
     /**
      * Request metadata and asset contexts.
-     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns Metadata and context information for each perpetual asset.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-asset-contexts-includes-mark-price-current-funding-open-interest-etc|Hyperliquid GitBook}
@@ -279,16 +287,17 @@ export class InfoClient {
      * // assetCtxs[0]: { funding: "0.0001", openInterest: "1000000", prevDayPx: "1800.0", ... }
      * ```
      */
-    async metaAndAssetCtxs(): Promise<MetaAndAssetCtxs> {
+    async metaAndAssetCtxs(signal?: AbortSignal): Promise<MetaAndAssetCtxs> {
         return await this.transport.request(
             "info",
             { type: "metaAndAssetCtxs" } as MetaAndAssetCtxsRequest,
+            signal,
         );
     }
 
     /**
      * Request trading metadata.
-     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns Metadata for perpetual assets.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-metadata|Hyperliquid GitBook}
@@ -299,16 +308,18 @@ export class InfoClient {
      * // meta.universe[0]: { szDecimals: 3, name: "PERP", maxLeverage: 50, onlyIsolated: false }
      * ```
      */
-    async meta(): Promise<Meta> {
+    async meta(signal?: AbortSignal): Promise<Meta> {
         return await this.transport.request(
             "info",
             { type: "meta" } as MetaRequest,
+            signal,
         );
     }
 
     /**
      * Request open orders.
      * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns Array of open order.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders|Hyperliquid GitBook}
@@ -319,16 +330,18 @@ export class InfoClient {
      * // orders[0]: { coin: "ETH", side: "B", limitPx: "1800.0", sz: "1.0", oid: 12345, timestamp: 1234567890000, ... }
      * ```
      */
-    async openOrders(args: OpenOrdersParameters): Promise<OpenOrder[]> {
+    async openOrders(args: OpenOrdersParameters, signal?: AbortSignal): Promise<OpenOrder[]> {
         return await this.transport.request(
             "info",
             { type: "openOrders", ...args } as OpenOrdersRequest,
+            signal,
         );
     }
 
     /**
      * Request order status.
      * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns Result of an order status lookup.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-order-status-by-oid-or-cloid|Hyperliquid GitBook}
@@ -339,16 +352,18 @@ export class InfoClient {
      * // status: { status: "order", order: { order: {...}, status: "open", statusTimestamp: 1234567890000 } }
      * ```
      */
-    async orderStatus(args: OrderStatusParameters): Promise<OrderStatusResponse> {
+    async orderStatus(args: OrderStatusParameters, signal?: AbortSignal): Promise<OrderStatusResponse> {
         return await this.transport.request(
             "info",
             { type: "orderStatus", ...args } as OrderStatusRequest,
+            signal,
         );
     }
 
     /**
      * Request user referral.
      * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns Referral information for a user.
      *
      * @see null
@@ -359,16 +374,18 @@ export class InfoClient {
      * // referral: { referredBy: {...}, cumVlm: "100000.0", unclaimedRewards: "500.0", claimedRewards: "300.0", referrerState: {...}, rewardHistory: [...] }
      * ```
      */
-    async referral(args: ReferralParameters): Promise<Referral> {
+    async referral(args: ReferralParameters, signal?: AbortSignal): Promise<Referral> {
         return await this.transport.request(
             "info",
             { type: "referral", ...args } as ReferralRequest,
+            signal,
         );
     }
 
     /**
      * Request spot clearinghouse state.
      * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns Balances for spot tokens.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-a-users-token-balances|Hyperliquid GitBook}
@@ -379,16 +396,20 @@ export class InfoClient {
      * // state.balances[0]: { coin: "ETH", entryNtl: "1800.0", hold: "0.5", token: 1, total: "10.0" }
      * ```
      */
-    async spotClearinghouseState(args: SpotClearinghouseStateParameters): Promise<SpotClearinghouseState> {
+    async spotClearinghouseState(
+        args: SpotClearinghouseStateParameters,
+        signal?: AbortSignal,
+    ): Promise<SpotClearinghouseState> {
         return await this.transport.request(
             "info",
             { type: "spotClearinghouseState", ...args } as SpotClearinghouseStateRequest,
+            signal,
         );
     }
 
     /**
      * Request spot metadata and asset contexts.
-     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns Metadata and context information for each spot asset.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-asset-contexts|Hyperliquid GitBook}
@@ -399,16 +420,17 @@ export class InfoClient {
      * // assetCtxs[0]: { prevDayPx: "1800.0", dayNtlVlm: "10000000", markPx: "1805.0", ... }
      * ```
      */
-    async spotMetaAndAssetCtxs(): Promise<SpotMetaAndAssetCtxs> {
+    async spotMetaAndAssetCtxs(signal?: AbortSignal): Promise<SpotMetaAndAssetCtxs> {
         return await this.transport.request(
             "info",
             { type: "spotMetaAndAssetCtxs" } as SpotMetaAndAssetCtxsRequest,
+            signal,
         );
     }
 
     /**
      * Request spot trading metadata.
-     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns Metadata for spot assets.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-metadata|Hyperliquid GitBook}
@@ -419,16 +441,18 @@ export class InfoClient {
      * // meta.tokens[0]: { name: "ETH", szDecimals: 8, weiDecimals: 18, index: 1, tokenId: "0x...", ... }
      * ```
      */
-    async spotMeta(): Promise<SpotMeta> {
+    async spotMeta(signal?: AbortSignal): Promise<SpotMeta> {
         return await this.transport.request(
             "info",
             { type: "spotMeta" } as SpotMetaRequest,
+            signal,
         );
     }
 
     /**
      * Request user sub-accounts.
      * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns Array of user sub-account.
      *
      * @see null
@@ -439,16 +463,18 @@ export class InfoClient {
      * // subAccounts[0]: { name: "Test", subAccountUser: "0x...", master: "0x...", clearinghouseState: {...}, spotState: {...} }
      * ```
      */
-    async subAccounts(args: SubAccountsParameters): Promise<SubAccount[]> {
+    async subAccounts(args: SubAccountsParameters, signal?: AbortSignal): Promise<SubAccount[]> {
         return await this.transport.request(
             "info",
             { type: "subAccounts", ...args } as SubAccountsRequest,
+            signal,
         );
     }
 
     /**
      * Request user fees.
      * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns User fees.
      *
      * @see null
@@ -459,16 +485,18 @@ export class InfoClient {
      * // userFees: { dailyUserVlm: [...], feeSchedule: {...}, userCrossRate: "0.00035", userAddRate: "0.0001", ... }
      * ```
      */
-    async userFees(args: UserFeesParameters): Promise<UserFees> {
+    async userFees(args: UserFeesParameters, signal?: AbortSignal): Promise<UserFees> {
         return await this.transport.request(
             "info",
             { type: "userFees", ...args } as UserFeesRequest,
+            signal,
         );
     }
 
     /**
      * Request user fills by time.
      * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns Array of user's trade fill.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills-by-time|Hyperliquid GitBook}
@@ -482,16 +510,18 @@ export class InfoClient {
      * // fills[0]: { coin: "ETH", px: "1800.0", sz: "1.0", side: "B", time: 1234567890000, ... }
      * ```
      */
-    async userFillsByTime(args: UserFillsByTimeParameters): Promise<UserFill[]> {
+    async userFillsByTime(args: UserFillsByTimeParameters, signal?: AbortSignal): Promise<UserFill[]> {
         return await this.transport.request(
             "info",
             { type: "userFillsByTime", ...args } as UserFillsByTimeRequest,
+            signal,
         );
     }
 
     /**
      * Request user fills.
      * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns Array of user's trade fill.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills|Hyperliquid GitBook}
@@ -502,16 +532,18 @@ export class InfoClient {
      * // fills[0]: { coin: "ETH", px: "1800.0", sz: "1.0", side: "B", time: 1234567890000, ... }
      * ```
      */
-    async userFills(args: UserFillsParameters): Promise<UserFill[]> {
+    async userFills(args: UserFillsParameters, signal?: AbortSignal): Promise<UserFill[]> {
         return await this.transport.request(
             "info",
             { type: "userFills", ...args } as UserFillsRequest,
+            signal,
         );
     }
 
     /**
      * Request user funding.
      * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns Array of user's funding ledger update.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates|Hyperliquid GitBook}
@@ -525,16 +557,18 @@ export class InfoClient {
      * // funding[0]: { time: 1234567890000, hash: "0x...", delta: { type: "funding", coin: "ETH", usdc: "1.5", ... } }
      * ```
      */
-    async userFunding(args: UserFundingParameters): Promise<UserFunding[]> {
+    async userFunding(args: UserFundingParameters, signal?: AbortSignal): Promise<UserFunding[]> {
         return await this.transport.request(
             "info",
             { type: "userFunding", ...args } as UserFundingRequest,
+            signal,
         );
     }
 
     /**
      * Request user non-funding ledger updates.
      * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns Array of user's non-funding ledger update.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates|Hyperliquid GitBook}
@@ -548,16 +582,21 @@ export class InfoClient {
      * // funding[0]: { time: 1234567890000, hash: "0x...", delta: { type: "deposit", usdc: "5" } }
      * ```
      */
-    async userNonFundingLedgerUpdates(args: UserNonFundingLedgerUpdatesParameters): Promise<UserNonFundingLedgerUpdates[]> {
+    async userNonFundingLedgerUpdates(
+        args: UserNonFundingLedgerUpdatesParameters,
+        signal?: AbortSignal,
+    ): Promise<UserNonFundingLedgerUpdates[]> {
         return await this.transport.request(
             "info",
             { type: "userNonFundingLedgerUpdates", ...args } as UserNonFundingLedgerUpdatesRequest,
+            signal,
         );
     }
 
     /**
      * Request user rate limits.
      * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns User's rate limits.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-rate-limits|Hyperliquid GitBook}
@@ -568,10 +607,11 @@ export class InfoClient {
      * // rateLimit: { cumVlm: "1000000", nRequestsUsed: 50, nRequestsCap: 100 }
      * ```
      */
-    async userRateLimit(args: UserRateLimitParameters): Promise<UserRateLimit> {
+    async userRateLimit(args: UserRateLimitParameters, signal?: AbortSignal): Promise<UserRateLimit> {
         return await this.transport.request(
             "info",
             { type: "userRateLimit", ...args } as UserRateLimitRequest,
+            signal,
         );
     }
 }
