@@ -1,14 +1,19 @@
 /** Hexadecimal string starting with `0x`. */
 export type Hex = `0x${string}`;
 
-/** Converts a byte array to a hex string. */
-export function hexToBytes(hex: Hex): Uint8Array {
-    const len = hex.length;
-    if (len % 2 !== 0) throw new Error(`Invalid hex string length: ${len}. Length must be even.`);
-    const bytes = new Uint8Array(len / 2);
-    for (let i = 0; i < len; i += 2) {
-        const c1 = hex.charCodeAt(i);
-        const c2 = hex.charCodeAt(i + 1);
+/**
+ * Converts a hex string to a byte array.
+ * @param hex - The hex string (with or without '0x' prefix).
+ * @returns The byte array.
+ */
+export function hexToBytes(hex: string): Uint8Array {
+    const cleanHex = hex.startsWith("0x") ? hex.slice(2) : hex;
+    if (cleanHex.length % 2 !== 0) throw new Error(`Invalid hex string length: ${cleanHex.length}. Length must be even.`);
+
+    const bytes = new Uint8Array(cleanHex.length / 2);
+    for (let i = 0; i < cleanHex.length; i += 2) {
+        const c1 = cleanHex.charCodeAt(i);
+        const c2 = cleanHex.charCodeAt(i + 1);
 
         let high: number;
         if (c1 >= 48 && c1 <= 57) { // '0' - '9'
@@ -18,7 +23,7 @@ export function hexToBytes(hex: Hex): Uint8Array {
         } else if (c1 >= 97 && c1 <= 102) { // 'a' - 'f'
             high = c1 - 87;
         } else {
-            throw new Error(`Invalid hex character at index ${i}: '${hex[i]}'`);
+            throw new Error(`Invalid hex character at index ${i}: '${cleanHex[i]}'`);
         }
 
         let low: number;
@@ -29,7 +34,7 @@ export function hexToBytes(hex: Hex): Uint8Array {
         } else if (c2 >= 97 && c2 <= 102) { // 'a' - 'f'
             low = c2 - 87;
         } else {
-            throw new Error(`Invalid hex character at index ${i + 1}: '${hex[i + 1]}'`);
+            throw new Error(`Invalid hex character at index ${i + 1}: '${cleanHex[i + 1]}'`);
         }
 
         bytes[i / 2] = (high << 4) | low;
@@ -37,30 +42,41 @@ export function hexToBytes(hex: Hex): Uint8Array {
     return bytes;
 }
 
-/** Converts a hex string to a number. */
-export function hexToNumber(hex: Hex): number {
+/**
+ * Converts a hex string to a number.
+ * @param hex - The hex string (with or without '0x' prefix).
+ * @returns The number.
+ */
+export function hexToNumber(hex: string): number {
     return parseInt(hex, 16);
 }
 
-/** Parses a signature string into its components. */
-export function parseSignature(signature: Hex): { r: Hex; s: Hex; v: number } {
-    if (signature.length !== 132) {
-        throw new Error("Invalid signature length. Expected 132 characters.");
+/**
+ * Parses a signature string into its components.
+ * @param signature - The signature string (with or without '0x' prefix).
+ * @returns The signature components.
+ */
+export function parseSignature(signature: string): { r: Hex; s: Hex; v: number } {
+    const cleanSignature = signature.startsWith("0x") ? signature.slice(2) : signature;
+
+    if (cleanSignature.length !== 130) {
+        throw new Error("Invalid signature length. Expected 130 characters.");
     }
 
-    const r = "0x" + signature.slice(2, 66) as Hex;
-    const s = "0x" + signature.slice(66, 130) as Hex;
-    const v = parseInt(signature.slice(130, 132), 16);
+    const r = "0x" + cleanSignature.slice(0, 64) as Hex;
+    const s = "0x" + cleanSignature.slice(64, 128) as Hex;
+    const v = parseInt(cleanSignature.slice(128, 130), 16);
 
     return { r, s, v };
 }
 
-const BYTE_TO_HEX: string[] = Array.from(
-    { length: 256 },
-    (_, i) => i.toString(16).padStart(2, "0"),
-);
+const BYTE_TO_HEX: string[] = Array.from({ length: 256 }, (_, i) => i.toString(16).padStart(2, "0"));
 
-/** Converts a byte array to a hex string. */
+/**
+ * Converts a byte array to a hex string.
+ * @param bytes - The byte array.
+ * @returns The hex string.
+ */
 export function bytesToHex(bytes: Uint8Array): Hex {
     let hex: Hex = "0x";
     for (let i = 0; i < bytes.length; i++) {
@@ -69,7 +85,11 @@ export function bytesToHex(bytes: Uint8Array): Hex {
     return hex;
 }
 
-/** Checks if a value is a hex string. */
+/**
+ * Checks if the data is a hex string.
+ * @param data - The data to check.
+ * @returns `true` if the data is a hex string, `false` otherwise.
+ */
 export function isHex(data: unknown): data is Hex {
     return typeof data === "string" && /^0x[0-9a-fA-F]+$/.test(data);
 }
