@@ -22,7 +22,7 @@ bunx jsr add @nktkas/hyperliquid
 # deno (import directly)
 import * as hyperliquid from "jsr:@nktkas/hyperliquid"
 
-# CDN (import directly)
+# web (import directly)
 import * as hyperliquid from "https://esm.sh/jsr/@nktkas/hyperliquid"
 ```
 
