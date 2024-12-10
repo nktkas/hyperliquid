@@ -5,10 +5,14 @@ export type Hex = `0x${string}`;
  * Converts a hex string to a byte array.
  * @param hex - The hex string (with or without '0x' prefix).
  * @returns The byte array.
+ * @throws {Error} If the hex string is invalid.
  */
 export function hexToBytes(hex: string): Uint8Array {
     const cleanHex = hex.startsWith("0x") ? hex.slice(2) : hex;
-    if (cleanHex.length % 2 !== 0) throw new Error(`Invalid hex string length: ${cleanHex.length}. Length must be even.`);
+
+    if (cleanHex.length % 2 !== 0) {
+        throw new Error(`Invalid hex string length: ${cleanHex.length}. Length must be even.`);
+    }
 
     const bytes = new Uint8Array(cleanHex.length / 2);
     for (let i = 0; i < cleanHex.length; i += 2) {
@@ -42,34 +46,6 @@ export function hexToBytes(hex: string): Uint8Array {
     return bytes;
 }
 
-/**
- * Converts a hex string to a number.
- * @param hex - The hex string (with or without '0x' prefix).
- * @returns The number.
- */
-export function hexToNumber(hex: string): number {
-    return parseInt(hex, 16);
-}
-
-/**
- * Parses a signature string into its components.
- * @param signature - The signature string (with or without '0x' prefix).
- * @returns The signature components.
- */
-export function parseSignature(signature: string): { r: Hex; s: Hex; v: number } {
-    const cleanSignature = signature.startsWith("0x") ? signature.slice(2) : signature;
-
-    if (cleanSignature.length !== 130) {
-        throw new Error("Invalid signature length. Expected 130 characters.");
-    }
-
-    const r = "0x" + cleanSignature.slice(0, 64) as Hex;
-    const s = "0x" + cleanSignature.slice(64, 128) as Hex;
-    const v = parseInt(cleanSignature.slice(128, 130), 16);
-
-    return { r, s, v };
-}
-
 const BYTE_TO_HEX: string[] = Array.from({ length: 256 }, (_, i) => i.toString(16).padStart(2, "0"));
 
 /**
@@ -86,10 +62,21 @@ export function bytesToHex(bytes: Uint8Array): Hex {
 }
 
 /**
- * Checks if the data is a hex string.
- * @param data - The data to check.
- * @returns `true` if the data is a hex string, `false` otherwise.
+ * Parses a signature string into its components.
+ * @param signature - The signature string (with or without '0x' prefix).
+ * @returns The signature components.
+ * @throws {Error} If the signature string is invalid.
  */
-export function isHex(data: unknown): data is Hex {
-    return typeof data === "string" && /^0x[0-9a-fA-F]+$/.test(data);
+export function parseSignature(signature: string): { r: Hex; s: Hex; v: number } {
+    const cleanSignature = signature.startsWith("0x") ? signature.slice(2) : signature;
+
+    if (cleanSignature.length !== 130) {
+        throw new Error("Invalid signature length. Expected 130 characters.");
+    }
+
+    const r = "0x" + cleanSignature.slice(0, 64) as Hex;
+    const s = "0x" + cleanSignature.slice(64, 128) as Hex;
+    const v = parseInt(cleanSignature.slice(128, 130), 16);
+
+    return { r, s, v };
 }

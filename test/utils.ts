@@ -1,7 +1,7 @@
-import type { AssetCtx, Hex, InfoClient, Universe } from "../index.ts";
+import type { AssetCtx, Hex, PublicClient, Universe } from "../index.ts";
 import { Ajv } from "npm:ajv@^8.17.1";
 import type { Definition } from "npm:ts-json-schema-generator@^2.3.0";
-import { assert } from "jsr:@std/assert@^1.0.4";
+import { assert, assertGreater } from "jsr:@std/assert@^1.0.4";
 import { keccak_256 } from "@noble/hashes/sha3";
 
 export interface AssetData {
@@ -22,18 +22,34 @@ export function assertJsonSchema(schema: Definition, data: unknown): void {
 }
 
 /**
+ * Asserts that the data includes a non-empty array
+ * @param data - Data to validate
+ */
+export function assertIncludesNotEmptyArray(data: object): void {
+    recursiveTraversal(data, (key, value) => {
+        if (Array.isArray(value)) {
+            assertGreater(
+                value.length,
+                0,
+                `Unable to fully validate the type due to an empty array. Key: ${key}`,
+            );
+        }
+    });
+}
+
+/**
  * Recursively traverse an object
  * @param obj - Object to traverse
- * @param func - Callback function
+ * @param fn - Callback function
  */
-export function recursiveTraversal(
+function recursiveTraversal(
     obj: object,
-    func: (key: string | number, value: unknown) => void,
+    fn: (key: string | number, value: unknown) => void,
 ): void {
     for (const [key, value] of Object.entries(obj)) {
-        func(key, value);
+        fn(key, value);
         if (typeof value === "object" && value !== null) {
-            recursiveTraversal(value, func);
+            recursiveTraversal(value, fn);
         }
     }
 }
@@ -44,7 +60,7 @@ export function recursiveTraversal(
  * @param assetName - Asset name
  * @returns Asset data
  */
-export async function getAssetData(client: InfoClient, assetName: string): Promise<AssetData> {
+export async function getAssetData(client: PublicClient, assetName: string): Promise<AssetData> {
     const data = await client.metaAndAssetCtxs();
     const id = data[0].universe.findIndex((u) => u.name === assetName)!;
     const universe = data[0].universe[id];
@@ -65,39 +81,6 @@ export function getPxDecimals(marketType: "perp" | "spot", szDecimals: number): 
 }
 
 /**
- * Generate an Ethereum address
- * @returns Ethereum address
- */
-export function generateEthereumAddress(): Hex {
-    // Step 1: Generate a random 20-byte hex string
-    const randomBytes = new Uint8Array(20);
-    crypto.getRandomValues(randomBytes);
-    const address = Array.from(randomBytes)
-        .map((byte) => byte.toString(16).padStart(2, "0"))
-        .join("");
-
-    // Step 2: Generate the checksum
-    const hashBytes = keccak_256(address.toLowerCase());
-    const hashHex = Array.from(hashBytes)
-        .map((byte) => byte.toString(16).padStart(2, "0"))
-        .join("");
-
-    // Step 3: Apply the checksum
-    let checksumAddress = "";
-    for (let i = 0; i < address.length; i++) {
-        const char = address[i];
-        const hashChar = hashHex[i];
-        if (parseInt(hashChar, 16) >= 8) {
-            checksumAddress += char.toUpperCase();
-        } else {
-            checksumAddress += char.toLowerCase();
-        }
-    }
-
-    return `0x${checksumAddress}`;
-}
-
-/**
  * Verify if the data is a hex string
  * @param data - Data to verify
  * @returns `true` if the data is a hex string
@@ -112,4 +95,31 @@ export function isHex(data: unknown): data is Hex {
  */
 export function randomCloid(): Hex {
     return `0x${Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
+}
+
+/**
+ * Generate an Ethereum address
+ * @returns Ethereum address
+ */
+export function generateEthereumAddress(): Hex {
+    // Step 1: Generate a random 20-byte hex string
+    const address = Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
+
+    // Step 2: Generate the checksum
+    const hashBytes = keccak_256(address.toLowerCase());
+    const hashHex = Array.from(hashBytes).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+
+    // Step 3: Apply the checksum
+    let checksumAddress = "";
+    for (let i = 0; i < address.length; i++) {
+        const char = address[i];
+        const hashChar = hashHex[i];
+        if (parseInt(hashChar, 16) >= 8) {
+            checksumAddress += char.toUpperCase();
+        } else {
+            checksumAddress += char.toLowerCase();
+        }
+    }
+
+    return `0x${checksumAddress}`;
 }

@@ -1,8 +1,22 @@
-export type * from "./src/endpoints/types/exchange.d.ts";
-export type * from "./src/endpoints/types/info.d.ts";
-export * from "./src/endpoints/exchange.ts";
-export * from "./src/endpoints/info.ts";
+// Clients
+export * from "./src/clients/public.ts";
+export * from "./src/clients/wallet.ts";
+
+// Transports
 export type * from "./src/transports/base.d.ts";
 export * from "./src/transports/http.ts";
 export * from "./src/transports/websocket.ts";
-export type { Hex } from "./src/utils/hex.ts";
+export type { MessageBufferStrategy, ReconnectingWebSocketConfig } from "./src/utils/reconnecting-websocket.ts";
+
+// Types
+export type * from "./src/types/common.d.ts";
+export type * from "./src/types/exchange/common.d.ts";
+export type * from "./src/types/exchange/requests.d.ts";
+export type * from "./src/types/exchange/responses.d.ts";
+export type * from "./src/types/explorer/common.d.ts";
+export type * from "./src/types/explorer/requests.d.ts";
+export type * from "./src/types/explorer/responses.d.ts";
+export type * from "./src/types/info/account.d.ts";
+export type * from "./src/types/info/assets.d.ts";
+export type * from "./src/types/info/orders.d.ts";
+export type * from "./src/types/info/requests.d.ts";

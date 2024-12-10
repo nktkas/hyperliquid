@@ -1,23 +1,19 @@
 import type { IRESTTransport } from "./base.d.ts";
 
-type DeepRequired<T> = Required<
-    {
-        [K in keyof T]: T[K] extends Required<T[K]> ? T[K] : DeepRequired<T[K]>;
-    }
->;
+type MaybePromise<T> = T | Promise<T>;
 
 /**
  * The error thrown when the HTTP request fails.
  */
 export class HttpRequestError extends Error {
-    /** The HTTP response. */
-    response: Response;
-
-    /** Creates a new HTTP request error. */
-    constructor(response: Response) {
-        super(`HTTP request failed with status ${response.status} ${response.statusText}`);
+    /**
+     * Creates a new HTTP request error.
+     * @param response - The HTTP response.
+     * @param responseBody - The response body.
+     */
+    constructor(public response: Response, public responseBody?: string) {
+        super(`HTTP request failed with status "${response.status} ${response.statusText}" and body: ${responseBody}`);
         this.name = this.constructor.name;
-        this.response = response;
     }
 }
 
@@ -28,6 +24,8 @@ export interface HttpTransportConfig {
     /**
      * The API base URL.
      * @default "https://api.hyperliquid.xyz"
+     * @mainnet https://api.hyperliquid.xyz
+     * @testnet https://api.hyperliquid-testnet.xyz
      */
     url?: string | URL;
 
@@ -43,38 +41,50 @@ export interface HttpTransportConfig {
      */
     fetchOptions?: Omit<RequestInit, "body" | "method">;
 
-    /** Retry policy configuration for failed requests. */
-    retry?: {
-        /**
-         * Maximum number of retry attempts. Set to `0` to disable.
-         * @default 0
-         */
-        maxAttempts?: number;
+    /**
+     * A callback function that is called before the request is sent.
+     * @param request - The request to send.
+     * @returns The request to send.
+     */
+    onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>;
 
-        /**
-         * Delay between retries in milliseconds.
-         * @default (attempt) => ~~(1 << attempt) * 150 // Exponential backoff
-         */
-        delay: number | ((attempt: number) => number | Promise<number>);
-
-        /**
-         * Custom logic to determine if an error should trigger a retry.
-         * @param error - The error that occurred during the request.
-         * @returns A boolean indicating if retry should be attempted.
-         * @default (error) => error instanceof TypeError || (error instanceof HttpRequestError && error.response.status >= 500 && error.response.status < 600)
-         */
-        shouldReattempt?: (error: unknown) => boolean | Promise<boolean>;
-    };
+    /**
+     * A callback function that is called after the response is received.
+     * @param response - The response to process.
+     * @returns The response to process.
+     */
+    onResponse?: (response: Response) => MaybePromise<Response | void | null | undefined>;
 }
 
 /**
  * The transport connects to the Hyperliquid API via HTTP.
  */
 export class HttpTransport implements IRESTTransport {
-    /** Transport configuration. */
-    config: DeepRequired<Omit<HttpTransportConfig, "fetchOptions">> & {
-        fetchOptions?: HttpTransportConfig["fetchOptions"];
-    };
+    /** The API base URL. */
+    url: string | URL = "https://api.hyperliquid.xyz";
+
+    /** The timeout for request. Set to `0` to disable. */
+    timeout: number = 10_000;
+
+    /**
+     * Request configuration options.
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/RequestInit}
+     */
+    fetchOptions: Omit<RequestInit, "body" | "method"> = {};
+
+    /**
+     * A callback function that is called before the request is sent.
+     * @param request - The request to send.
+     * @returns The request to send.
+     */
+    onRequest: (request: Request) => MaybePromise<Request | void | null | undefined> = (request) => request;
+
+    /**
+     * A callback function that is called after the response is received.
+     * @param response - The response to process.
+     * @returns The response to process.
+     */
+    onResponse: (response: Response) => MaybePromise<Response | void | null | undefined> = (response) => response;
 
     /** API endpoint paths. */
     protected endpointPaths: Record<"info" | "action" | "explorer", string> = {
@@ -83,21 +93,16 @@ export class HttpTransport implements IRESTTransport {
         explorer: "/explorer",
     };
 
-    /** Creates a new HTTP transport. */
-    constructor(config: HttpTransportConfig = {}) {
-        this.config = {
-            url: config.url ?? "https://api.hyperliquid.xyz",
-            timeout: config.timeout ?? 10_000,
-            fetchOptions: config.fetchOptions,
-            retry: {
-                maxAttempts: config.retry?.maxAttempts ?? 0,
-                delay: config.retry?.delay ?? ((attempt) => ~~(1 << attempt) * 150),
-                shouldReattempt: config.retry?.shouldReattempt ??
-                    ((error) =>
-                        error instanceof TypeError ||
-                        (error instanceof HttpRequestError && error.response.status >= 500 && error.response.status < 600)),
-            },
-        };
+    /**
+     * Creates a new HTTP transport.
+     * @param config - The transport configuration.
+     */
+    constructor(config?: HttpTransportConfig) {
+        this.url = config?.url ?? "https://api.hyperliquid.xyz";
+        this.timeout = config?.timeout ?? 10_000;
+        this.fetchOptions = config?.fetchOptions ?? {};
+        this.onRequest = config?.onRequest ?? ((request) => request);
+        this.onResponse = config?.onResponse ?? ((response) => response);
     }
 
     /**
@@ -108,96 +113,48 @@ export class HttpTransport implements IRESTTransport {
      * @returns The response data.
      * @throws {HttpRequestError} - On non-OK HTTP response status or invalid content type.
      */
-    request<T>(endpoint: "info" | "action" | "explorer", payload: unknown, signal?: AbortSignal): Promise<T> {
-        return retry(async (signal) => {
-            const url = new URL(this.endpointPaths[endpoint], this.config.url);
-            const init = mergeRequestInit(
-                {
-                    body: JSON.stringify(payload),
-                    headers: {
-                        "Accept-Encoding": "gzip, deflate, br, zstd",
-                        "Connection": "keep-alive",
-                        "Content-Type": "application/json",
-                    },
-                    keepalive: true,
-                    method: "POST",
-                    signal: this.config.timeout > 0 ? AbortSignal.timeout(this.config.timeout) : undefined,
+    async request<T>(endpoint: "info" | "action" | "explorer", payload: unknown, signal?: AbortSignal): Promise<T> {
+        const url = new URL(this.endpointPaths[endpoint], this.url);
+        const init = mergeRequestInit(
+            {
+                body: JSON.stringify(payload),
+                headers: {
+                    "Accept-Encoding": "gzip, deflate, br, zstd",
+                    "Connection": "keep-alive",
+                    "Content-Type": "application/json",
                 },
-                this.config.fetchOptions ?? {},
-                { signal },
-            );
+                keepalive: true,
+                method: "POST",
+                signal: this.timeout > 0 ? AbortSignal.timeout(this.timeout) : undefined,
+            },
+            this.fetchOptions,
+            { signal },
+        );
+        let request = new Request(url, init);
 
-            const response = await fetch(url, init);
-            if (!response.ok || !response.headers.get("Content-Type")?.includes("application/json")) {
-                await response.body?.cancel();
-                throw new HttpRequestError(response);
-            }
-            return await response.json();
-        }, { ...this.config.retry, signal });
-    }
-}
+        request = await this.onRequest(request) ?? request;
+        let response = await fetch(request);
+        response = await this.onResponse(response) ?? response;
 
-function sleep(ms: number, signal?: AbortSignal): Promise<void> {
-    return new Promise((resolve, reject) => {
-        if (signal?.aborted) {
-            reject(signal.reason);
-            return;
+        if (!response.ok || !response.headers.get("Content-Type")?.includes("application/json")) {
+            const body = await response.text().catch(() => undefined);
+            throw new HttpRequestError(response, body);
         }
 
-        const timer = setTimeout(() => {
-            signal?.removeEventListener("abort", onAbort);
-            resolve();
-        }, ms);
-
-        const onAbort = () => {
-            clearTimeout(timer);
-            reject(signal!.reason);
-        };
-
-        signal?.addEventListener("abort", onAbort, { once: true });
-    });
-}
-
-async function retry<T>(
-    fn: (signal?: AbortSignal) => T | Promise<T>,
-    config: {
-        maxAttempts: number;
-        delay: number | ((attempt: number) => number | Promise<number>);
-        shouldReattempt?: (error: unknown) => boolean | Promise<boolean>;
-        signal?: AbortSignal;
-    },
-): Promise<T> {
-    const {
-        maxAttempts,
-        delay,
-        shouldReattempt = () => true,
-        signal,
-    } = config;
-
-    if (signal?.aborted) {
-        throw signal.reason;
-    }
-
-    let attempt = 0;
-    while (true) {
-        try {
-            return await fn(signal);
-        } catch (error) {
-            if (signal?.aborted) {
-                throw signal.reason;
-            }
-
-            if (++attempt >= maxAttempts || !await shouldReattempt(error)) {
-                throw error;
-            }
-
-            const delayDuration = typeof delay === "number" ? delay : await delay(attempt);
-            await sleep(delayDuration, signal);
-        }
+        return await response.json();
     }
 }
 
+/**
+ * Merges multiple headers objects into a single headers object.
+ * @param headersList - The headers objects to merge.
+ * @returns The merged headers object.
+ */
 function mergeHeaders(...headersList: HeadersInit[]): Headers {
+    if (headersList.length === 0 || headersList.length === 1) {
+        return new Headers(headersList[0]);
+    }
+
     const merged = new Headers();
     for (const headers of headersList) {
         const entries = Symbol.iterator in headers ? headers : Object.entries(headers);
@@ -208,14 +165,23 @@ function mergeHeaders(...headersList: HeadersInit[]): Headers {
     return merged;
 }
 
+/**
+ * Merges multiple request init objects into a single request init object.
+ * @param inits - The request init objects to merge.
+ * @returns The merged request init object.
+ */
 function mergeRequestInit(...inits: RequestInit[]): RequestInit {
     const merged = inits.reduce((acc, init) => ({ ...acc, ...init }), {});
 
-    const headersList = inits.map((init) => init.headers).filter((headers) => !!headers);
-    merged.headers = headersList.length > 1 ? mergeHeaders(...headersList) : headersList[0] as Headers | undefined;
+    const headersList = inits.map((init) => init.headers).filter((headers): headers is HeadersInit => Boolean(headers));
+    if (headersList.length > 0) {
+        merged.headers = mergeHeaders(...headersList);
+    }
 
-    const signals = inits.map((init) => init.signal).filter((signal) => !!signal);
-    merged.signal = signals.length > 1 ? AbortSignal.any(signals) : signals[0] as AbortSignal | undefined;
+    const signals = inits.map((init) => init.signal).filter((signal): signal is AbortSignal => Boolean(signal));
+    if (signals.length > 0) {
+        merged.signal = signals.length > 1 ? AbortSignal.any(signals) : signals[0];
+    }
 
     return merged;
 }

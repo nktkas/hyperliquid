@@ -6,7 +6,8 @@ First off, thanks for considering contributing to the Hyperliquid TypeScript SDK
 
 ### Report Issues
 
-If you find bugs or have suggestions for improvements, please open an issue on GitHub. Provide as much detail as possible to help us understand and address the problem.
+If you find bugs or have suggestions for improvements, please open an issue on GitHub. Provide as much detail as
+possible to help us understand and address the problem.
 
 ### Submit Pull Requests
 
@@ -36,7 +37,8 @@ git commit -am "Add new feature or fix"
 git push origin feature/your-feature-name
 ```
 
-- **Create a Pull Request**: Go to the original repository and click on "New Pull Request". Select your branch and submit the pull request.
+- **Create a Pull Request**: Go to the original repository and click on "New Pull Request". Select your branch and
+  submit the pull request.
 
 ### Coding Guidelines
 

@@ -1,62 +1,62 @@
 name: Deno Test
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "deno.json" # Trigger only when deno.json changes
+    push:
+        branches:
+            - main
+        paths:
+            - "deno.json" # Trigger only when deno.json changes
 
 permissions:
-  contents: read
+    contents: read
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+    test:
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2 # Fetch current and previous commits
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 2 # Fetch current and previous commits
 
-      - name: Compare Versions
-        id: version_check
-        shell: bash
-        run: |
-          # Install jq (if not already installed)
-          sudo apt-get update && sudo apt-get install -y jq
+            - name: Compare Versions
+              id: version_check
+              shell: bash
+              run: |
+                  # Install jq (if not already installed)
+                  sudo apt-get update && sudo apt-get install -y jq
 
-          # Check if deno.json existed in the previous commit
-          if git show HEAD~1:deno.json > /dev/null 2>&1; then
-            PREVIOUS_VERSION=$(git show HEAD~1:deno.json | jq -r '.version')
-          else
-            PREVIOUS_VERSION=""
-          fi
+                  # Check if deno.json existed in the previous commit
+                  if git show HEAD~1:deno.json > /dev/null 2>&1; then
+                    PREVIOUS_VERSION=$(git show HEAD~1:deno.json | jq -r '.version')
+                  else
+                    PREVIOUS_VERSION=""
+                  fi
 
-          # Get the current version
-          CURRENT_VERSION=$(jq -r '.version' deno.json)
+                  # Get the current version
+                  CURRENT_VERSION=$(jq -r '.version' deno.json)
 
-          echo "Current version: $CURRENT_VERSION"
-          echo "Previous version: $PREVIOUS_VERSION"
+                  echo "Current version: $CURRENT_VERSION"
+                  echo "Previous version: $PREVIOUS_VERSION"
 
-          # Determine if the version has changed
-          if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
-            echo "version_changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "version_changed=false" >> $GITHUB_OUTPUT
-          fi
+                  # Determine if the version has changed
+                  if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+                    echo "version_changed=true" >> $GITHUB_OUTPUT
+                  else
+                    echo "version_changed=false" >> $GITHUB_OUTPUT
+                  fi
 
-      - name: Setup Deno
-        if: steps.version_check.outputs.version_changed == 'true'
-        uses: denoland/setup-deno@v1.5.1
-        with:
-          deno-version: v2.x
+            - name: Setup Deno
+              if: steps.version_check.outputs.version_changed == 'true'
+              uses: denoland/setup-deno@v1.5.1
+              with:
+                  deno-version: v2.x
 
-      - name: Run Linter
-        if: steps.version_check.outputs.version_changed == 'true'
-        run: deno lint
+            - name: Run Linter
+              if: steps.version_check.outputs.version_changed == 'true'
+              run: deno lint
 
-      - name: Run Tests
-        if: steps.version_check.outputs.version_changed == 'true'
-        run: deno test --allow-net --allow-read -- ${{ secrets.TEST_PRIVATE_KEY }}
+            - name: Run Tests
+              if: steps.version_check.outputs.version_changed == 'true'
+              run: deno test --allow-net --allow-read -- ${{ secrets.TEST_PRIVATE_KEY }}
