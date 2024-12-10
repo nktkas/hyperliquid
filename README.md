@@ -110,8 +110,8 @@ interface HttpTransportConfig {
     url?: string | URL; // API base URL (default: "https://api.hyperliquid.xyz")
     timeout?: number; // Request timeout in ms (default: 10_000)
     fetchOptions?: RequestInit; // Additional fetch options
-    onRequest?: (request: Request) => Request | Promise<Request>; // Callback before request is sent
-    onResponse?: (response: Response) => Response | Promise<Response>; // Callback after response is received
+    onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>; // Callback before request is sent
+    onResponse?: (response: Response) => MaybePromise<Response | void | null | undefined>; // Callback after response is received
 }
 ```
 
