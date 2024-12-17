@@ -132,6 +132,7 @@ interface WebSocketTransportConfig {
     keepAliveInterval?: number; // Ping interval in ms (default: 20_000)
     reconnect?: { // Only re-establishes the connection, does not retry failed requests.
         maxAttempts?: number; // Maximum number of reconnection attempts (default: 3)
+        timeout?: number; // Connection timeout in ms (default: 10_000)
         delay?: number | ((attempt: number) => number | Promise<number>); // Delay between reconnections (default: Exponential backoff (max 10s))
         shouldReconnect?: (event: CloseEvent) => boolean | Promise<boolean>; // Custom reconnection logic (default: Always reattempt)
         messageBuffer?: MessageBufferStrategy; // Message buffering strategy between reconnection (default: FIFO buffer with a maximum size of 100 messages)
