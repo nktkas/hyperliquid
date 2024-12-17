@@ -11,6 +11,12 @@ export interface ReconnectingWebSocketConfig {
     maxAttempts?: number;
 
     /**
+     * Maximum time in milliseconds to wait for a connection to open.
+     * @default 10_000
+     */
+    timeout?: number;
+
+    /**
      * Delay between reconnection attempts in milliseconds.
      * @default (attempt) => Math.min(~~(1 << attempt) * 150, 10_000) // Exponential backoff (max 10s)
      */
@@ -20,30 +26,15 @@ export interface ReconnectingWebSocketConfig {
      * Custom logic to determine if reconnection should be attempted.
      * @param event - The close event that occurred during the connection.
      * @returns A boolean indicating if reconnection should be attempted.
-     * @default (event) => event.code !== 1008 && event.code !== 1011
+     * @default () => true // Always reattempt
      */
-    shouldReattempt?: (event: CloseEvent) => boolean | Promise<boolean>;
+    shouldReconnect?: (event: CloseEvent) => boolean | Promise<boolean>;
 
     /**
      * Message buffering strategy between reconnection
      * @default new FifoMessageBuffer(100) // FIFO buffer with a maximum size of 100 messages
      */
     messageBuffer?: MessageBufferStrategy;
-}
-
-/**
- * Custom events for reconnection monitoring
- */
-export interface ReconnectionEventMap {
-    /**
-     * Dispatched when the WebSocket is reconnecting.
-     */
-    reconnecting: CustomEvent<{ attempt: number }>;
-
-    /**
-     * Dispatched when the WebSocket is reconnected.
-     */
-    reconnected: CustomEvent<void>;
 }
 
 /**
@@ -74,12 +65,12 @@ export interface MessageBufferStrategy {
  * Simple FIFO buffer implementation
  */
 class FifoMessageBuffer implements MessageBufferStrategy {
-    private messages: Array<{
+    messages: Array<{
         data: string | ArrayBufferLike | Blob | ArrayBufferView;
         signal?: AbortSignal;
     }> = [];
 
-    constructor(private maxSize: number) {}
+    constructor(public maxSize: number) {}
 
     push(data: string | ArrayBufferLike | Blob | ArrayBufferView, signal?: AbortSignal): boolean {
         if (this.messages.length >= this.maxSize) {
@@ -109,7 +100,7 @@ class FifoMessageBuffer implements MessageBufferStrategy {
  */
 export class ReconnectingWebSocket implements WebSocket {
     /**
-     * Configuration for the ReconnectingWebSocket
+     * Configuration for the ReconnectingWebSocket.
      */
     config: Required<ReconnectingWebSocketConfig>;
 
@@ -126,69 +117,89 @@ export class ReconnectingWebSocket implements WebSocket {
         type: string;
         listener: EventListenerOrEventListenerObject;
         options?: boolean | AddEventListenerOptions;
-        wrappedListener: EventListenerOrEventListenerObject;
+        listenerProxy: EventListenerOrEventListenerObject;
     }[] = [];
 
     constructor(url: string | URL, protocols?: string | string[], config: ReconnectingWebSocketConfig = {}) {
         this.config = {
             maxAttempts: config.maxAttempts ?? 3,
+            timeout: config.timeout ?? 10_000,
             delay: config.delay ?? ((attempt) => Math.min(~~(1 << attempt) * 150, 10_000)),
-            shouldReattempt: config.shouldReattempt ?? ((event) => event.code !== 1008 && event.code !== 1011),
+            shouldReconnect: config.shouldReconnect ?? (() => true),
             messageBuffer: config.messageBuffer ?? new FifoMessageBuffer(100),
         };
         this.protocols = protocols;
 
-        // Initialize the socket
-        this.socket = new WebSocket(url, protocols);
-        this.addEventListener("open", () => {
-            // Send buffered messages
+        this.socket = this.connectWithTimeout(url, this.protocols, this.config.timeout);
+        this.setupEventListeners();
+    }
+
+    protected connectWithTimeout(
+        url: string | URL,
+        protocols: string | string[] | undefined,
+        timeout: number,
+    ): WebSocket {
+        const timeoutId = setTimeout(() => {
+            socket.removeEventListener("open", openHandler);
+            socket.removeEventListener("close", closeHandler);
+            socket.close(3008, "Timeout"); // https://www.iana.org/assignments/websocket/websocket.xml#close-code-number
+        }, timeout);
+
+        const socket = new WebSocket(url, protocols);
+
+        const openHandler = () => {
+            socket.removeEventListener("open", openHandler);
+            socket.removeEventListener("close", closeHandler);
+            clearTimeout(timeoutId);
+        };
+        const closeHandler = () => {
+            socket.removeEventListener("open", openHandler);
+            socket.removeEventListener("close", closeHandler);
+            clearTimeout(timeoutId);
+        };
+        socket.addEventListener("open", openHandler);
+        socket.addEventListener("close", closeHandler);
+
+        return socket;
+    }
+
+    protected setupEventListeners(): void {
+        this.socket.addEventListener("open", () => {
+            this.reconnectCount = 0;
+
             let message: (string | ArrayBufferLike | Blob | ArrayBufferView) | undefined;
             while ((message = this.config.messageBuffer.shift()) !== undefined) {
-                this.send(message);
+                this.socket.send(message);
             }
         });
-        this.addEventListener("close", async (event: CloseEvent) => {
+
+        this.socket.addEventListener("close", async (event) => {
             try {
-                // Ignore if the connection was terminated
                 if (this.terminationController.signal.aborted) return;
 
-                // Ignore if the maximum number of reconnection attempts has been reached
-                // or the connection should not be reattempted
-                if (
-                    ++this.reconnectCount > this.config.maxAttempts ||
-                    !await this.config.shouldReattempt(event)
-                ) {
-                    this.cleaner(new Error("Reconnection limit reached"));
+                const shouldReconnect = ++this.reconnectCount <= this.config.maxAttempts &&
+                    await this.config.shouldReconnect(event);
+                if (!shouldReconnect) {
+                    this.terminationController.abort(new Error("RECONNECTION_LIMIT_REACHED"));
+                    this.config.messageBuffer.clear();
+                    this.eventListeners = [];
                     return;
                 }
 
-                // Dispatch the reconnection event
-                this.dispatchEvent(new CustomEvent("reconnecting", { detail: { attempt: this.reconnectCount } }));
-
-                // Sleep for the delay
                 const delay = typeof this.config.delay === "number"
                     ? this.config.delay
                     : await this.config.delay(this.reconnectCount);
                 await sleep(delay, this.terminationController.signal);
 
-                // Reconnect
-                this.socket = new WebSocket(this.url, this.protocols);
-
-                // Reattach event listeners
-                this.eventListeners.forEach((entry) => {
-                    this.socket.addEventListener(entry.type, entry.wrappedListener, entry.options);
+                this.socket = this.connectWithTimeout(this.url, this.protocols, this.config.timeout);
+                this.setupEventListeners();
+                this.eventListeners.forEach(({ type, listenerProxy, options }) => {
+                    this.socket.addEventListener(type, listenerProxy, options);
                 });
-
-                // Attach the open event listener
-                this.socket.addEventListener("open", () => {
-                    // Reset the reconnection attempt count
-                    this.reconnectCount = 0;
-
-                    // Dispatch the reconnected event
-                    this.dispatchEvent(new CustomEvent("reconnected"));
-                }, { once: true });
             } catch (error) {
-                this.cleaner(new Error("Reconnection error", { cause: error }));
+                this.terminationController.abort(new Error("RECONNECTION_ERROR", { cause: error }));
+                this.config.messageBuffer.clear();
+                this.eventListeners = [];
             }
         });
     }
@@ -251,7 +262,9 @@ export class ReconnectingWebSocket implements WebSocket {
 
     // Methods
     close(code?: number, reason?: string): void {
-        this.cleaner("User-initiated close");
+        this.terminationController.abort(new Error("USER_INITIATED_CLOSE"));
+        this.config.messageBuffer.clear();
+        this.eventListeners = [];
         this.socket.close(code, reason);
     }
 
@@ -268,12 +281,7 @@ export class ReconnectingWebSocket implements WebSocket {
 
     addEventListener<K extends keyof WebSocketEventMap>(
         type: K,
-        listener: (this: WebSocket, ev: WebSocketEventMap[K]) => any,
-        options?: boolean | AddEventListenerOptions,
-    ): void;
-    addEventListener<K extends keyof ReconnectionEventMap>(
-        type: K,
-        listener: (this: WebSocket, ev: ReconnectionEventMap[K]) => any,
+        listener: (this: ReconnectingWebSocket, ev: WebSocketEventMap[K]) => any,
         options?: boolean | AddEventListenerOptions,
     ): void;
     addEventListener(
@@ -281,7 +289,7 @@ export class ReconnectingWebSocket implements WebSocket {
         listener: EventListenerOrEventListenerObject,
         options?: boolean | AddEventListenerOptions,
     ): void {
-        const wrappedListener = (event: Event) => {
+        const listenerProxy = (event: Event) => {
             try {
                 if (typeof listener === "function") {
                     listener.call(this, event);
@@ -289,24 +297,21 @@ export class ReconnectingWebSocket implements WebSocket {
                     listener.handleEvent(event);
                 }
             } finally {
-                const index = this.eventListeners.findIndex((e) => e.type === type && e.listener === listener);
-                if (index !== -1) {
-                    const { options } = this.eventListeners[index];
-                    if (typeof options === "object" && options.once) {
+                if (typeof options === "object" && options.once) {
+                    const index = this.eventListeners.findIndex((e) => e.type === type && e.listener === listener);
+                    if (index !== -1) {
                         this.eventListeners.splice(index, 1);
                     }
                 }
             }
         };
-
-        this.socket.addEventListener(type, wrappedListener, options);
-
-        this.eventListeners.push({ type, listener, wrappedListener, options });
+        this.eventListeners.push({ type, listener, listenerProxy, options });
+        this.socket.addEventListener(type, listenerProxy, options);
     }
 
     removeEventListener<K extends keyof WebSocketEventMap>(
         type: K,
-        listener: (this: WebSocket, ev: WebSocketEventMap[K]) => any,
+        listener: (this: ReconnectingWebSocket, ev: WebSocketEventMap[K]) => any,
         options?: boolean | EventListenerOptions,
     ): void;
     removeEventListener(
@@ -316,21 +321,16 @@ export class ReconnectingWebSocket implements WebSocket {
     ): void {
         const index = this.eventListeners.findIndex((e) => e.type === type && e.listener === listener);
         if (index !== -1) {
-            const { wrappedListener } = this.eventListeners[index];
-            this.socket.removeEventListener(type, wrappedListener, options);
+            const { listenerProxy } = this.eventListeners[index];
+            this.socket.removeEventListener(type, listenerProxy, options);
             this.eventListeners.splice(index, 1);
+        } else {
+            this.socket.removeEventListener(type, listener, options);
         }
     }
 
     dispatchEvent(event: Event): boolean {
         return this.socket.dispatchEvent(event);
-    }
-
-    // Custom methods
-    protected cleaner(reason?: unknown): void {
-        this.terminationController.abort(reason);
-        this.eventListeners = [];
-        this.config.messageBuffer.clear();
     }
 }
 

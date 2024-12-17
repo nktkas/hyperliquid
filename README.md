@@ -133,7 +133,7 @@ interface WebSocketTransportConfig {
     reconnect?: { // Only re-establishes the connection, does not retry failed requests.
         maxAttempts?: number; // Maximum number of reconnection attempts (default: 3)
         delay?: number | ((attempt: number) => number | Promise<number>); // Delay between reconnections (default: Exponential backoff (max 10s))
-        shouldReattempt?: (event: CloseEvent) => boolean | Promise<boolean>; // Custom reconnection logic (default: Always reattempt)
+        shouldReconnect?: (event: CloseEvent) => boolean | Promise<boolean>; // Custom reconnection logic (default: Always reattempt)
         messageBuffer?: MessageBufferStrategy; // Message buffering strategy between reconnection (default: FIFO buffer with a maximum size of 100 messages)
     };
 }

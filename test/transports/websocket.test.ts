@@ -10,7 +10,6 @@ Deno.test("WebSocket Transport Tests", async (t) => {
             reconnect: {
                 maxAttempts: 5,
                 delay: 1000,
-                shouldReattempt: () => true,
             },
         });
 
