@@ -278,3 +278,84 @@ export interface FundingHistory {
     /** Timestamp of the funding record (in ms since epoch). */
     time: number;
 }
+
+/** Predicted funding data for an asset. */
+export type PredictedFunding = [
+    /** Asset symbol. */
+    string,
+
+    /** Predicted funding data for each exchange. */
+    [
+        /** Exchange symbol. */
+        string,
+
+        /** Predicted funding data. */
+        {
+            /** Predicted funding rate. */
+            fundingRate: string;
+
+            /** Next funding time (in ms since epoch). */
+            nextFundingTime: number;
+        } | null,
+    ][],
+];
+
+/** The deploy state of a user. */
+export interface SpotDeployState {
+    /** The deploy state of a user. */
+    states: {
+        /** The token ID. */
+        token: number;
+
+        /** The spec of the token. */
+        spec: {
+            /** The name of the token. */
+            name: string;
+
+            /** The number of decimal places for minimum tradable unit (lot size) */
+            szDecimals: number;
+
+            /** The number of decimal places for minimum token unit (wei size) */
+            weiDecimals: number;
+        };
+
+        /** The full name of the token. */
+        fullName: string | null;
+
+        /** The spots of the token. */
+        spots: number[];
+
+        /** The max supply of the token. */
+        maxSupply: string | null;
+
+        /** The hyperliquidity genesis balance of the token. */
+        hyperliquidityGenesisBalance: string;
+
+        /** The total genesis balance of the token. */
+        totalGenesisBalanceWei: string;
+
+        /** The user genesis balances of the token. */
+        userGenesisBalances: [Hex, string][];
+
+        /** The existing token genesis balances of the token. */
+        existingTokenGenesisBalances: [number, string][];
+    }[];
+
+    /** The gas auction details. */
+    gasAuction: {
+        /** Current gas. */
+        currentGas: string | null;
+
+        /** Duration (in seconds). */
+        durationSeconds: number;
+
+        /** End gas. */
+        endGas: string | null;
+
+        /** Start gas. */
+        startGas: string;
+
+        /** Start time (in seconds since epoch). */
+        startTimeSeconds: number;
+    };
+}

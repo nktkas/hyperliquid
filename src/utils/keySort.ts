@@ -8,6 +8,8 @@ import type {
     ScheduleCancelRequest,
     SetReferrerRequest,
     SubAccountTransferRequest,
+    TwapCancelRequest,
+    TwapOrderRequest,
     UpdateIsolatedMarginRequest,
     UpdateLeverageRequest,
     VaultTransferRequest,
@@ -24,6 +26,8 @@ type ActionType =
     | ScheduleCancelRequest["action"]
     | SetReferrerRequest["action"]
     | SubAccountTransferRequest["action"]
+    | TwapCancelRequest["action"]
+    | TwapOrderRequest["action"]
     | UpdateIsolatedMarginRequest["action"]
     | UpdateLeverageRequest["action"]
     | VaultTransferRequest["action"];
@@ -125,6 +129,19 @@ const actionSortingSchemas: ActionSchema = {
 
     subAccountTransfer: {
         keys: ["type", "subAccountUser", "isDeposit", "usd"],
+    },
+
+    twapCancel: {
+        keys: ["type", "a", "t"],
+    },
+
+    twapOrder: {
+        keys: ["type", "twap"],
+        nested: {
+            twap: {
+                keys: ["a", "b", "s", "r", "m", "t"],
+            },
+        },
     },
 
     updateIsolatedMargin: {

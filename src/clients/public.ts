@@ -18,6 +18,8 @@ import type {
     FundingHistory,
     Meta,
     MetaAndAssetCtxs,
+    PredictedFunding,
+    SpotDeployState,
     SpotMeta,
     SpotMetaAndAssetCtxs,
     TokenDetails,
@@ -42,6 +44,7 @@ import type {
     OrderStatusRequest,
     ReferralRequest,
     SpotClearinghouseStateRequest,
+    SpotDeployStateRequest,
     SubAccountsRequest,
     TokenDetailsRequest,
     TwapHistoryRequest,
@@ -84,6 +87,9 @@ export type ReferralParameters = Omit<ReferralRequest, "type">;
 
 /** @see {@linkcode PublicClient.spotClearinghouseState} */
 export type SpotClearinghouseStateParameters = Omit<SpotClearinghouseStateRequest, "type">;
+
+/** @see {@linkcode PublicClient.spotDeployState} */
+export type SpotDeployStateParameters = Omit<SpotDeployStateRequest, "type">;
 
 /** @see {@linkcode PublicClient.subAccounts} */
 export type SubAccountsParameters = Omit<SubAccountsRequest, "type">;
@@ -474,6 +480,26 @@ export class PublicClient {
     }
 
     /**
+     * Request predicted funding rates.
+     * @param signal - An optional abort signal.
+     * @returns Array of predicted funding rates.
+     *
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-predicted-funding-rates-for-different-venues|Hyperliquid GitBook}
+     * @example
+     * ```ts
+     * const predictedFundings = await client.predictedFundings();
+     * // [
+     * //   ["ETH", [["BybitPerp", { fundingRate: "0.0001", nextFundingTime: 1234567890 }], ...],
+     * //   ["SOL", [["BybitPerp", { fundingRate: "0.0002", nextFundingTime: 1234567891 }], ...],
+     * //   ...
+     * // ]
+     * ```
+     */
+    predictedFundings(signal?: AbortSignal): Promise<PredictedFunding[]> {
+        return this.transport.request("info", { type: "predictedFundings" }, signal);
+    }
+
+    /**
      * Request user referral.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -525,6 +551,18 @@ export class PublicClient {
         signal?: AbortSignal,
     ): Promise<SpotClearinghouseState> {
         return this.transport.request("info", { type: "spotClearinghouseState", ...args }, signal);
+    }
+
+    /**
+     * Request spot deploy state.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns The deploy state of a user.
+     *
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-deploy-auction|Hyperliquid GitBook}
+     */
+    spotDeployState(args: SpotDeployStateParameters, signal?: AbortSignal): Promise<SpotDeployState> {
+        return this.transport.request("info", { type: "spotDeployState", ...args }, signal);
     }
 
     /**

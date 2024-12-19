@@ -159,6 +159,8 @@ class PublicClient {
     l2Book(args: L2BookParameters): Promise<L2Book>;
     meta(): Promise<Meta>;
     metaAndAssetCtxs(): Promise<MetaAndAssetCtxs>;
+    predictedFundings(): Promise<PredictedFunding[]>;
+    spotDeployState(args: SpotDeployStateParameters): Promise<SpotDeployState>;
     spotMeta(): Promise<SpotMeta>;
     spotMetaAndAssetCtxs(): Promise<SpotMetaAndAssetCtxs>;
     tokenDetails(args: TokenDetailsParameters): Promise<TokenDetails>;
@@ -206,6 +208,8 @@ class WalletClient {
     modify(args: ModifyParameters): Promise<SuccessResponse>;
     order(args: OrderParameters): Promise<OrderResponseSuccess>;
     scheduleCancel(args: ScheduleCancelParameters): Promise<SuccessResponse>;
+    twapCancel(args: TwapCancelParameters): Promise<TwapCancelResponseSuccess>;
+    twapOrder(args: TwapOrderParameters): Promise<TwapOrderResponseSuccess>;
     updateIsolatedMargin(args: UpdateIsolatedMarginParameters): Promise<SuccessResponse>;
     updateLeverage(args: UpdateLeverageParameters): Promise<SuccessResponse>;
 

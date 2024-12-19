@@ -234,8 +234,12 @@ export interface ScheduleCancelRequest extends BaseExchangeRequest {
         /** Type of action. */
         type: "scheduleCancel";
 
-        /** Scheduled time (in ms since epoch). Must be at least 5 seconds in the future. */
-        time: number;
+        /**
+         * Scheduled time (in ms since epoch).
+         * Must be at least 5 seconds in the future.
+         * If not specified, will cause all scheduled cancel operations to be deleted
+         */
+        time?: number;
     };
 
     /** Vault address (optional, for vault trading). */
@@ -307,6 +311,65 @@ export interface SubAccountTransferRequest extends BaseExchangeRequest {
         /** Amount to transfer (float * 1e6). */
         usd: number;
     };
+}
+
+/**
+ * Cancel a TWAP order.
+ * @returns {SuccessResponse}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order|Hyperliquid GitBook}
+ */
+export interface TwapCancelRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "twapCancel";
+
+        /** An integer representing the asset being traded. */
+        a: number;
+
+        /** Twap ID. */
+        t: number;
+    };
+
+    /** Vault address (optional, for vault trading). */
+    vaultAddress?: Hex;
+}
+
+/**
+ * Place a TWAP order.
+ * @returns {SuccessResponse}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-a-twap-order|Hyperliquid GitBook}
+ */
+export interface TwapOrderRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "twapOrder";
+
+        /** Twap parameters. */
+        twap: {
+            /** An integer representing the asset being traded. */
+            a: number;
+
+            /** Position side (`true` for long, `false` for short). */
+            b: boolean;
+
+            /** Size (in base currency units). */
+            s: string;
+
+            /** Is reduce-only? */
+            r: boolean;
+
+            /** TWAP duration in minutes. */
+            m: number;
+
+            /** Enable random order timing. */
+            t: boolean;
+        };
+    };
+
+    /** Vault address (optional, for vault trading). */
+    vaultAddress?: Hex;
 }
 
 /**

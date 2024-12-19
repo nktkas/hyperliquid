@@ -1,26 +1,18 @@
 import type { Hex } from "../common.d.ts";
 
+/** Base structure for exchange responses. */
 export interface BaseExchangeResponse {
-    /** Successful status. */
+    /** Response status */
     status: "ok" | "err";
 
-    /** Response details. */
-    response:
-        | {
-            /** Type of operation. */
-            type: string;
+    /** Error message or success data */
+    response: string | {
+        /** Type of operation. */
+        type: string;
 
-            /** Specific data. */
-            data?:
-                | {
-                    statuses: (
-                        | Record<string, unknown>
-                        | string
-                    )[];
-                }
-                | string;
-        }
-        | string;
+        /** Specific data for the operation. */
+        data?: unknown;
+    };
 }
 
 /** Successful response without specific data. */
@@ -128,6 +120,58 @@ export interface OrderResponse extends BaseExchangeResponse {
                     error: string;
                 }
             )[];
+        };
+    };
+}
+
+/** Response for creating a TWAP order. */
+export interface TwapOrderResponse extends BaseExchangeResponse {
+    /** Successful status. */
+    status: "ok";
+
+    /** Response details. */
+    response: {
+        /** Type of operation. */
+        type: "twapOrder";
+
+        /** Specific data. */
+        data: {
+            /** Status of the operation. */
+            status:
+                | {
+                    /** Running order status. */
+                    running: {
+                        /** TWAP ID. */
+                        twapId: number;
+                    };
+                }
+                | {
+                    /** Error message. */
+                    error: string;
+                };
+        };
+    };
+}
+
+/** Response for canceling a TWAP order. */
+export interface TwapCancelResponse extends BaseExchangeResponse {
+    /** Successful status. */
+    status: "ok";
+
+    /** Response details. */
+    response: {
+        /** Type of operation. */
+        type: "twapCancel";
+
+        /** Specific data. */
+        data: {
+            /** Status of the operation. */
+            status:
+                | string
+                | {
+                    /** Error message. */
+                    error: string;
+                };
         };
     };
 }

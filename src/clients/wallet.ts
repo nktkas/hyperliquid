@@ -13,6 +13,8 @@ import type {
     SetReferrerRequest,
     SpotSendRequest,
     SubAccountTransferRequest,
+    TwapCancelRequest,
+    TwapOrderRequest,
     UpdateIsolatedMarginRequest,
     UpdateLeverageRequest,
     UsdClassTransferRequest,
@@ -26,6 +28,8 @@ import type {
     ErrorResponse,
     OrderResponse,
     SuccessResponse,
+    TwapCancelResponse,
+    TwapOrderResponse,
 } from "../types/exchange/responses.d.ts";
 import type { IRESTTransport } from "../transports/base.d.ts";
 import { bytesToHex, type Hex, hexToBytes, parseSignature } from "../utils/hex.ts";
@@ -92,6 +96,16 @@ export type SpotSendParameters =
 export type SubAccountTransferParameters =
     & Omit<SubAccountTransferRequest["action"], "type">
     & Partial<Pick<SubAccountTransferRequest, "nonce">>;
+
+/** @see {@linkcode WalletClient.twapCancel} */
+export type TwapCancelParameters =
+    & Omit<TwapCancelRequest["action"], "type">
+    & Partial<Pick<TwapCancelRequest, "vaultAddress" | "nonce">>;
+
+/** @see {@linkcode WalletClient.twapOrder} */
+export type TwapOrderParameters =
+    & TwapOrderRequest["action"]["twap"]
+    & Partial<Pick<TwapOrderRequest, "vaultAddress" | "nonce">>;
 
 /** @see {@linkcode WalletClient.updateIsolatedMargin} */
 export type UpdateIsolatedMarginParameters =
@@ -188,23 +202,49 @@ export type OrderResponseSuccess = OrderResponse & {
     };
 };
 
+/** Successful variant of {@linkcode TwapOrderResponse} without error status. */
+export type TwapOrderResponseSuccess = TwapOrderResponse & {
+    response: {
+        data: {
+            status: Exclude<TwapOrderResponse["response"]["data"]["status"], { error: string }>;
+        };
+    };
+};
+
+/** Successful variant of {@linkcode TwapCancelResponse} without error status. */
+export type TwapCancelResponseSuccess = TwapCancelResponse & {
+    response: {
+        data: {
+            status: Exclude<TwapCancelResponse["response"]["data"]["status"], { error: string }>;
+        };
+    };
+};
+
 // ———————————————Errors———————————————
 
 /** The error thrown when the API request returns an error response. */
 export class ApiRequestError extends Error {
-    constructor(public response: ErrorResponse | OrderResponse | CancelResponse) {
-        let message: string;
+    constructor(
+        public response: ErrorResponse | OrderResponse | CancelResponse | TwapOrderResponse | TwapCancelResponse,
+    ) {
+        let message = "";
         if (response.status === "err") {
             message = response.response;
         } else {
-            message = response.response.data.statuses
-                .reduce<string[]>((acc, status, index) => {
-                    if (typeof status === "object" && "error" in status) {
-                        acc.push(`[${index}] ${status.error}`);
-                    }
-                    return acc;
-                }, [])
-                .join(", ");
+            if ("statuses" in response.response.data) {
+                message = response.response.data.statuses
+                    .reduce<string[]>((acc, status, index) => {
+                        if (typeof status === "object" && "error" in status) {
+                            acc.push(`[${index}] ${status.error}`);
+                        }
+                        return acc;
+                    }, [])
+                    .join(", ");
+            } else {
+                if (typeof response.response.data.status === "object" && "error" in response.response.data.status) {
+                    message = response.response.data.status.error;
+                }
+            }
         }
 
         super(message);
@@ -786,6 +826,86 @@ export class WalletClient {
     }
 
     /**
+     * Cancel a TWAP order.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
+     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order|Hyperliquid GitBook: twapCancel}
+     * @example
+     * ```ts
+     * const result = await client.twapCancel({
+     *     a: 0, // Asset index
+     *     t: 1 // TWAP ID
+     * });
+     * ```
+     */
+    async twapCancel(args: TwapCancelParameters, signal?: AbortSignal): Promise<TwapCancelResponseSuccess> {
+        const {
+            vaultAddress,
+            nonce = Date.now(),
+            ...actionArgs
+        } = args;
+
+        const sortedAction = sortActionKeys({ type: "twapCancel", ...actionArgs });
+        const signature = await this.signL1Action(sortedAction, nonce, vaultAddress);
+
+        const request: TwapCancelRequest = {
+            action: sortedAction,
+            signature,
+            nonce,
+            vaultAddress,
+        };
+        const response = await this.transport.request<TwapCancelResponse>("action", request, signal);
+
+        this.validateResponse(response);
+        return response;
+    }
+
+    /**
+     * Place a TWAP order.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
+     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-a-twap-order|Hyperliquid GitBook: twapOrder}
+     * @example
+     * ```ts
+     * const result = await client.twapOrder({
+     *     a: 0, // Asset index
+     *     b: true, // Buy order
+     *     s: "1", // Size
+     *     r: false, // Not reduce-only
+     *     m: 10, // Duration in minutes
+     *     t: true // Randomize order timing
+     * });
+     * ```
+     */
+    async twapOrder(args: TwapOrderParameters, signal?: AbortSignal): Promise<TwapOrderResponseSuccess> {
+        const {
+            vaultAddress,
+            nonce = Date.now(),
+            ...actionArgs
+        } = args;
+
+        const sortedAction = sortActionKeys({ type: "twapOrder", twap: actionArgs });
+        const signature = await this.signL1Action(sortedAction, nonce, vaultAddress);
+
+        const request: TwapOrderRequest = {
+            action: sortedAction,
+            signature,
+            nonce,
+            vaultAddress,
+        };
+        const response = await this.transport.request<TwapOrderResponse>("action", request, signal);
+
+        this.validateResponse(response);
+        return response;
+    }
+
+    /**
      * Update isolated margin for a position.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -1155,14 +1275,30 @@ export class WalletClient {
      * @param response - The response to validate.
      */
     protected validateResponse(
-        response: SuccessResponse | ErrorResponse | CancelResponse | CreateSubAccountResponse | OrderResponse,
-    ): asserts response is SuccessResponse | CancelResponseSuccess | CreateSubAccountResponse | OrderResponseSuccess {
+        response:
+            | SuccessResponse
+            | ErrorResponse
+            | CancelResponse
+            | CreateSubAccountResponse
+            | OrderResponse
+            | TwapOrderResponse
+            | TwapCancelResponse,
+    ): asserts response is
+        | SuccessResponse
+        | CancelResponseSuccess
+        | CreateSubAccountResponse
+        | OrderResponseSuccess
+        | TwapOrderResponseSuccess
+        | TwapCancelResponseSuccess {
         if (response.status === "err") {
             throw new ApiRequestError(response);
-        }
-        if (response.response.type === "order" || response.response.type === "cancel") {
+        } else if (response.response.type === "order" || response.response.type === "cancel") {
             if (response.response.data.statuses.some((status) => typeof status === "object" && "error" in status)) {
                 throw new ApiRequestError(response as OrderResponse | CancelResponse);
+            }
+        } else if (response.response.type === "twapOrder" || response.response.type === "twapCancel") {
+            if (typeof response.response.data.status === "object" && "error" in response.response.data.status) {
+                throw new ApiRequestError(response as TwapOrderResponse | TwapCancelResponse);
             }
         }
     }

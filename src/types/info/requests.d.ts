@@ -183,6 +183,16 @@ export interface OrderStatusRequest extends BaseInfoRequest {
 }
 
 /**
+ * Request predicted funding rates.
+ * @returns {PredictedFunding[]} Array of predicted funding rates.
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-predicted-funding-rates-for-different-venues|Hyperliquid GitBook}
+ */
+export interface PredictedFundingsRequest extends BaseInfoRequest {
+    /** Type of request. */
+    type: "predictedFundings";
+}
+
+/**
  * Request user referral.
  * @returns {Referral} Referral information for a user.
  */
@@ -202,6 +212,18 @@ export interface ReferralRequest extends BaseInfoRequest {
 export interface SpotClearinghouseStateRequest extends BaseInfoRequest {
     /** Type of request. */
     type: "spotClearinghouseState";
+
+    /** User's address. */
+    user: Hex;
+}
+
+/**
+ * Request spot deploy state.
+ * @returns {SpotDeployState} The deploy state of a user.
+ */
+export interface SpotDeployStateRequest extends BaseInfoRequest {
+    /** Type of request. */
+    type: "spotDeployState";
 
     /** User's address. */
     user: Hex;
@@ -292,6 +314,12 @@ export interface UserFillsByTimeRequest extends BaseInfoRequest {
 
     /** End time (in ms since epoch). */
     endTime?: number;
+
+    /**
+     * When true, partial fills are combined when a crossing order gets filled by multiple different resting orders.
+     * Resting orders filled by multiple crossing orders will not be aggregated.
+     */
+    aggregateByTime?: boolean;
 }
 
 /**
@@ -305,6 +333,12 @@ export interface UserFillsRequest extends BaseInfoRequest {
 
     /** User's address. */
     user: Hex;
+
+    /**
+     * When true, partial fills are combined when a crossing order gets filled by multiple different resting orders.
+     * Resting orders filled by multiple crossing orders will not be aggregated.
+     */
+    aggregateByTime?: boolean;
 }
 
 /**

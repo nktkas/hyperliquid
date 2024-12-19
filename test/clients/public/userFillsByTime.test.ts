@@ -65,4 +65,30 @@ Deno.test("userFillsByTime", async (t) => {
             await t.step("some should be defined", () => assert(data.some((item) => item.liquidation !== undefined)));
         });
     });
+
+    await t.step("required parameters + aggregateByTime", async (t) => {
+        const data = await client.userFillsByTime({
+            user: USER_ADDRESS,
+            startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
+            aggregateByTime: true,
+        });
+
+        assertGreater(data.length, 0, "Unable to fully validate the type due to an empty array");
+        data.forEach((item) => assertJsonSchema(schema, item));
+
+        await t.step("side", async (t) => {
+            await t.step("some should be B", () => assert(data.some((item) => item.side === "B")));
+            await t.step("some should be A", () => assert(data.some((item) => item.side === "A")));
+        });
+
+        await t.step("cloid", async (t) => {
+            await t.step("some should be string", () => assert(data.some((item) => typeof item.cloid === "string")));
+            await t.step("some should be defined", () => assert(data.some((item) => item.cloid)));
+        });
+
+        await t.step("liquidation", async (t) => {
+            await t.step("some should be undefined", () => assert(data.some((item) => item.liquidation === undefined)));
+            await t.step("some should be defined", () => assert(data.some((item) => item.liquidation !== undefined)));
+        });
+    });
 });

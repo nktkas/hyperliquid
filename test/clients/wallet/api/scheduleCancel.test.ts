@@ -9,7 +9,7 @@ if (!isHex(TEST_PRIVATE_KEY)) {
     throw new Error(`Expected a hex string, but got ${typeof TEST_PRIVATE_KEY}`);
 }
 
-Deno.test("scheduleCancel", async () => {
+Deno.test("scheduleCancel", async (t) => {
     // Create TypeScript type schemas
     const tsjSchemaGenerator = tsj.createGenerator({ path: resolve("./index.ts"), skipTypeCheck: true });
     const schema = tsjSchemaGenerator.createSchema("SuccessResponse");
@@ -20,6 +20,13 @@ Deno.test("scheduleCancel", async () => {
     const walletClient = new WalletClient(account, transport, true);
 
     //Test
-    const result = await walletClient.scheduleCancel({ time: Date.now() + 10000 });
-    assertJsonSchema(schema, result);
+    await t.step("time is number", async () => {
+        const result = await walletClient.scheduleCancel({ time: Date.now() + 10000 });
+        assertJsonSchema(schema, result);
+    });
+
+    await t.step("time is undefined", async () => {
+        const result = await walletClient.scheduleCancel({ time: undefined });
+        assertJsonSchema(schema, result);
+    });
 });
