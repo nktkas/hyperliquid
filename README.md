@@ -233,7 +233,8 @@ class WalletClient {
 
 This library follows **Semantic Versioning (semver)** for its releases.
 
-> **Note:** The Hyperliquid API types are updated independently and it is not possible to use a specific version of
+> [!NOTE]
+> The Hyperliquid API types are updated independently and it is not possible to use a specific version of
 > them, only the latest. As a result, updates to these types may change the patch version even if they include breaking
 > changes.
 
