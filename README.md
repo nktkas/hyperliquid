@@ -20,8 +20,8 @@ pnpm dlx jsr add @nktkas/hyperliquid
 # bun
 bunx jsr add @nktkas/hyperliquid
 
-# deno (import directly)
-import * as hl from "jsr:@nktkas/hyperliquid"
+# deno
+deno add jsr:@nktkas/hyperliquid
 
 # web (import directly)
 import * as hl from "https://esm.sh/jsr/@nktkas/hyperliquid"

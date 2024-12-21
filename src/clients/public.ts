@@ -64,6 +64,9 @@ export type CandleSnapshotParameters = CandleSnapshotRequest["req"];
 /** @see {@linkcode PublicClient.clearinghouseState} */
 export type ClearinghouseStateParameters = Omit<ClearinghouseStateRequest, "type">;
 
+/** @see {@linkcode PublicClient.extraAgents} */
+export type ExtraAgentsParameters = Omit<ExtraAgentsRequest, "type">;
+
 /** @see {@linkcode PublicClient.frontendOpenOrders} */
 export type FrontendOpenOrdersParameters = Omit<FrontendOpenOrdersRequest, "type">;
 
@@ -94,8 +97,8 @@ export type SpotDeployStateParameters = Omit<SpotDeployStateRequest, "type">;
 /** @see {@linkcode PublicClient.subAccounts} */
 export type SubAccountsParameters = Omit<SubAccountsRequest, "type">;
 
-/** @see {@linkcode PublicClient.extraAgents} */
-export type ExtraAgentsParameters = Omit<ExtraAgentsRequest, "type">;
+/** @see {@linkcode PublicClient.tokenDetails} */
+export type TokenDetailsParameters = Omit<TokenDetailsRequest, "type">;
 
 /** @see {@linkcode PublicClient.twapHistory} */
 export type TwapHistoryParameters = Omit<TwapHistoryRequest, "type">;
@@ -117,9 +120,6 @@ export type UserNonFundingLedgerUpdatesParameters = Omit<UserNonFundingLedgerUpd
 
 /** @see {@linkcode PublicClient.userRateLimit} */
 export type UserRateLimitParameters = Omit<UserRateLimitRequest, "type">;
-
-/** @see {@linkcode PublicClient.tokenDetails} */
-export type TokenDetailsParameters = Omit<TokenDetailsRequest, "type">;
 
 // ———————————————Explorer Parameters———————————————
 
@@ -505,7 +505,6 @@ export class PublicClient {
      * @param signal - An optional abort signal.
      * @returns Referral information for a user.
      *
-     * @see null
      * @example
      * ```ts
      * const referral = await client.referral({ user: "0x1234..." });
@@ -632,7 +631,6 @@ export class PublicClient {
      * @param signal - An optional abort signal.
      * @returns Array of user sub-account.
      *
-     * @see null
      * @example
      * ```ts
      * const subAccounts = await client.subAccounts({ user: "0x1234..." });
@@ -713,7 +711,6 @@ export class PublicClient {
      * @param signal - An optional abort signal.
      * @returns User fees.
      *
-     * @see null
      * @example
      * ```ts
      * const userFees = await client.userFees({ user: "0x1234..." });

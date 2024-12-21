@@ -152,7 +152,7 @@ export class HttpTransport implements IRESTTransport {
  */
 function mergeHeaders(...headersList: HeadersInit[]): Headers {
     if (headersList.length === 0 || headersList.length === 1) {
-        return new Headers(headersList[0]);
+        return new Headers(headersList[0] as HeadersInit | undefined);
     }
 
     const merged = new Headers();

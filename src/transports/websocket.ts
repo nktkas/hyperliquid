@@ -158,7 +158,7 @@ export class WebSocketTransport implements IRESTTransport {
             config?.reconnect,
         );
         this.url = this.socket.url;
-        this.reconnect = this.socket.config;
+        this.reconnect = this.socket.config; // Copying reference to object
         this.timeout = config?.timeout ?? 10_000;
         this.keepAliveInterval = config?.keepAliveInterval ?? 20_000;
 
@@ -181,6 +181,7 @@ export class WebSocketTransport implements IRESTTransport {
 
             // Reject all pending requests
             for (const request of this.pendingRequests.values()) {
+                // Based on error: https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/send#exceptions
                 request.reject(new DOMException("The WebSocket is in an invalid state.", "InvalidStateError"));
             }
             this.pendingRequests.clear();
@@ -266,6 +267,7 @@ export class WebSocketTransport implements IRESTTransport {
         // A closed WebSocket by default discards all send messages.
         // For HTTP-like request this logic is not suitable.
         if (this.socket.terminationController.signal.aborted) {
+            // Based on error: https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/send#exceptions
             return Promise.reject(new DOMException("The WebSocket is in an invalid state.", "InvalidStateError"));
         }
 

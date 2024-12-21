@@ -315,7 +315,7 @@ export interface SubAccountTransferRequest extends BaseExchangeRequest {
 
 /**
  * Cancel a TWAP order.
- * @returns {SuccessResponse}
+ * @returns {TwapCancelResponse}
  * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order|Hyperliquid GitBook}
  */
 export interface TwapCancelRequest extends BaseExchangeRequest {
@@ -337,7 +337,7 @@ export interface TwapCancelRequest extends BaseExchangeRequest {
 
 /**
  * Place a TWAP order.
- * @returns {SuccessResponse}
+ * @returns {TwapOrderResponse}
  * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-a-twap-order|Hyperliquid GitBook}
  */
 export interface TwapOrderRequest extends BaseExchangeRequest {
@@ -425,6 +425,7 @@ export interface UpdateLeverageRequest extends BaseExchangeRequest {
 /**
  * Transfer funds between Spot and Perp accounts.
  * @returns {SuccessResponse}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa|Hyperliquid GitBook}
  */
 export interface UsdClassTransferRequest extends BaseExchangeRequest {
     /** Action to be performed. */

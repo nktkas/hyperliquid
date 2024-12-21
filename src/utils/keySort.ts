@@ -32,20 +32,12 @@ type ActionType =
     | UpdateLeverageRequest["action"]
     | VaultTransferRequest["action"];
 
-// Type for action type discriminator
-type ActionTypeDiscriminator = ActionType["type"];
-
 // Type for nested schemas
 type NestedSchema = {
     readonly keys: readonly string[];
     readonly nested?: {
         readonly [key: string]: NestedSchema;
     };
-};
-
-// Type-safe schema definition
-type ActionSchema = {
-    [K in ActionTypeDiscriminator]: NestedSchema;
 };
 
 // Nested object schemas
@@ -67,7 +59,7 @@ const orderSchema: NestedSchema = {
 };
 
 // Sorting schema for action keys
-const actionSortingSchemas: ActionSchema = {
+const actionSortingSchemas: { [K in ActionType["type"]]: NestedSchema } = {
     batchModify: {
         keys: ["type", "modifies"],
         nested: {
@@ -164,39 +156,28 @@ const actionSortingSchemas: ActionSchema = {
  * @returns Sorted object
  */
 function sortBySchema<T extends Record<string, unknown>>(obj: T, schema: NestedSchema): T {
-    // Check if all keys in object exist in schema
-    Object.keys(obj).forEach((key) => {
+    function sortValue(value: unknown, subSchema?: NestedSchema): unknown {
+        if (!subSchema || typeof value !== "object" || value === null) {
+            return value;
+        }
+        if (Array.isArray(value)) {
+            return value.map((item) => sortBySchema(item as Record<string, unknown>, subSchema));
+        }
+        return sortBySchema(value as Record<string, unknown>, subSchema);
+    }
+
+    for (const key of Object.keys(obj)) {
         if (!schema.keys.includes(key)) {
             throw new Error(`Invalid key "${key}" found in object`);
         }
-    });
+    }
 
-    const sortedObj: Partial<T> = {};
-
-    // Add keys in schema order
-    schema.keys.forEach((key) => {
+    const sortedObj: Record<string, unknown> = {};
+    for (const key of schema.keys) {
         if (key in obj) {
-            const value = obj[key as keyof T];
-
-            if (schema.nested?.[key] && typeof value === "object" && value !== null) {
-                if (Array.isArray(value)) {
-                    // Handle array of objects
-                    sortedObj[key as keyof T] = value.map((item) =>
-                        sortBySchema(item as Record<string, unknown>, schema.nested![key])
-                    ) as T[keyof T];
-                } else {
-                    // Handle nested object
-                    sortedObj[key as keyof T] = sortBySchema(
-                        value as Record<string, unknown>,
-                        schema.nested[key],
-                    ) as T[keyof T];
-                }
-            } else {
-                sortedObj[key as keyof T] = value;
-            }
+            sortedObj[key] = sortValue(obj[key], schema.nested?.[key]);
         }
-    });
-
+    }
     return sortedObj as T;
 }
 

@@ -139,21 +139,6 @@ export type Withdraw3Parameters =
 
 // ———————————————Abstracts———————————————
 
-/** Abstract interface for a [viem](https://viem.sh/docs/clients/wallet) wallet client. */
-export interface AbstractViemWalletClient {
-    signTypedData(params: {
-        domain: {
-            name: string;
-            version: string;
-            chainId: number;
-            verifyingContract: Hex;
-        };
-        types: Record<string, Array<{ name: string; type: string }>>;
-        primaryType: string;
-        message: Record<string, unknown>;
-    }): Promise<Hex>;
-}
-
 /** Abstract interface for a [ethers.js](https://docs.ethers.org/v6/api/providers/#Signer) signer. */
 export interface AbstractEthersSigner {
     signTypedData(
@@ -182,6 +167,21 @@ export interface AbstractEthersV5Signer {
     ): Promise<string>;
 }
 
+/** Abstract interface for a [viem](https://viem.sh/docs/clients/wallet) wallet client. */
+export interface AbstractViemWalletClient {
+    signTypedData(params: {
+        domain: {
+            name: string;
+            version: string;
+            chainId: number;
+            verifyingContract: Hex;
+        };
+        types: Record<string, Array<{ name: string; type: string }>>;
+        primaryType: string;
+        message: Record<string, unknown>;
+    }): Promise<Hex>;
+}
+
 // ———————————————Responses———————————————
 
 /** Successful variant of {@linkcode CancelResponse} without error statuses. */
@@ -202,15 +202,6 @@ export type OrderResponseSuccess = OrderResponse & {
     };
 };
 
-/** Successful variant of {@linkcode TwapOrderResponse} without error status. */
-export type TwapOrderResponseSuccess = TwapOrderResponse & {
-    response: {
-        data: {
-            status: Exclude<TwapOrderResponse["response"]["data"]["status"], { error: string }>;
-        };
-    };
-};
-
 /** Successful variant of {@linkcode TwapCancelResponse} without error status. */
 export type TwapCancelResponseSuccess = TwapCancelResponse & {
     response: {
@@ -220,12 +211,26 @@ export type TwapCancelResponseSuccess = TwapCancelResponse & {
     };
 };
 
+/** Successful variant of {@linkcode TwapOrderResponse} without error status. */
+export type TwapOrderResponseSuccess = TwapOrderResponse & {
+    response: {
+        data: {
+            status: Exclude<TwapOrderResponse["response"]["data"]["status"], { error: string }>;
+        };
+    };
+};
+
 // ———————————————Errors———————————————
 
 /** The error thrown when the API request returns an error response. */
 export class ApiRequestError extends Error {
     constructor(
-        public response: ErrorResponse | OrderResponse | CancelResponse | TwapOrderResponse | TwapCancelResponse,
+        public response:
+            | ErrorResponse
+            | OrderResponse
+            | CancelResponse
+            | TwapOrderResponse
+            | TwapCancelResponse,
     ) {
         let message = "";
         if (response.status === "err") {
@@ -312,7 +317,7 @@ export class WalletClient {
      * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet|Hyperliquid GitBook: approveAgent}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet|Hyperliquid GitBook}
      * @example
      * ```ts
      * const result = await client.approveAgent({
@@ -325,7 +330,7 @@ export class WalletClient {
             ...args,
             type: "approveAgent",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: args.signatureChainId ?? "0x66eee",
+            signatureChainId: args.signatureChainId ?? this.isTestnet ? "0x66eee" : "0xa4b1",
             nonce: args.nonce ?? Date.now(),
         };
         const signature = await this.signUserSignedAction(
@@ -357,7 +362,7 @@ export class WalletClient {
      * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-a-builder-fee|Hyperliquid GitBook: approveBuilderFee}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-a-builder-fee|Hyperliquid GitBook}
      * @example
      * ```ts
      * const result = await client.approveBuilderFee({
@@ -370,7 +375,7 @@ export class WalletClient {
             ...args,
             type: "approveBuilderFee",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: args.signatureChainId ?? "0x66eee",
+            signatureChainId: args.signatureChainId ?? this.isTestnet ? "0x66eee" : "0xa4b1",
             nonce: args.nonce ?? Date.now(),
         };
         const signature = await this.signUserSignedAction(
@@ -402,7 +407,7 @@ export class WalletClient {
      * @returns Successful variant of {@linkcode OrderResponse}.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-multiple-orders|Hyperliquid GitBook: batchModify}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-multiple-orders|Hyperliquid GitBook}
      * @example
      * ```ts
      * const result = await client.batchModify({
@@ -454,7 +459,7 @@ export class WalletClient {
      * @returns Successful variant of {@linkcode CancelResponse}.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s|Hyperliquid GitBook: cancel}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s|Hyperliquid GitBook}
      * @example
      * ```ts
      * const result = await client.cancel({
@@ -494,7 +499,7 @@ export class WalletClient {
      * @returns Successful variant of {@linkcode CancelResponse}.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid|Hyperliquid GitBook: cancelByCloid}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid|Hyperliquid GitBook}
      * @example
      * ```ts
      * const result = await client.cancelByCloid({
@@ -534,7 +539,6 @@ export class WalletClient {
      * @returns Response for creating a sub-account.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see null
      * @example
      * ```ts
      * const result = await client.createSubAccount({
@@ -573,7 +577,7 @@ export class WalletClient {
      * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order|Hyperliquid GitBook: modify}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order|Hyperliquid GitBook}
      * @example
      * ```ts
      * const result = await client.modify({
@@ -623,7 +627,7 @@ export class WalletClient {
      * @returns Successful variant of {@linkcode OrderResponse}.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-an-order|Hyperliquid GitBook: order}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-an-order|Hyperliquid GitBook}
      * @example
      * ```ts
      * const result = await client.order({
@@ -645,11 +649,12 @@ export class WalletClient {
      * ```
      */
     async order(args: OrderParameters, signal?: AbortSignal): Promise<OrderResponseSuccess> {
+        const clonedArgs = structuredClone(args); // Clone to prevent mutation of original object
         const {
             vaultAddress,
             nonce = Date.now(),
             ...actionArgs
-        } = args;
+        } = clonedArgs;
 
         if (actionArgs.builder) actionArgs.builder.b = actionArgs.builder.b.toLowerCase() as Hex;
 
@@ -675,7 +680,7 @@ export class WalletClient {
      * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#schedule-cancel-dead-mans-switch|Hyperliquid GitBook: scheduleCancel}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#schedule-cancel-dead-mans-switch|Hyperliquid GitBook}
      * @example
      * ```ts
      * const result = await client.scheduleCancel({
@@ -712,7 +717,6 @@ export class WalletClient {
      * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see null
      * @example
      * ```ts
      * const result = await client.setReferrer({
@@ -747,7 +751,7 @@ export class WalletClient {
      * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-spot-transfer|Hyperliquid GitBook: spotSend}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-spot-transfer|Hyperliquid GitBook}
      * @example
      * ```ts
      * const result = await client.spotSend({
@@ -762,7 +766,7 @@ export class WalletClient {
             ...args,
             type: "spotSend",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: args.signatureChainId ?? "0x66eee",
+            signatureChainId: args.signatureChainId ?? this.isTestnet ? "0x66eee" : "0xa4b1",
             time: args.time ?? Date.now(),
         };
         const signature = await this.signUserSignedAction(
@@ -795,7 +799,6 @@ export class WalletClient {
      * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see null
      * @example
      * ```ts
      * const result = await client.subAccountTransfer({
@@ -832,7 +835,7 @@ export class WalletClient {
      * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order|Hyperliquid GitBook: twapCancel}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order|Hyperliquid GitBook}
      * @example
      * ```ts
      * const result = await client.twapCancel({
@@ -870,7 +873,7 @@ export class WalletClient {
      * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-a-twap-order|Hyperliquid GitBook: twapOrder}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-a-twap-order|Hyperliquid GitBook}
      * @example
      * ```ts
      * const result = await client.twapOrder({
@@ -912,7 +915,7 @@ export class WalletClient {
      * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin|Hyperliquid GitBook: updateIsolatedMargin}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin|Hyperliquid GitBook}
      * @example
      * ```ts
      * const result = await client.updateIsolatedMargin({
@@ -951,7 +954,7 @@ export class WalletClient {
      * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-leverage|Hyperliquid GitBook: updateLeverage}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-leverage|Hyperliquid GitBook}
      * @example
      * ```ts
      * const result = await client.updateLeverage({
@@ -990,7 +993,7 @@ export class WalletClient {
      * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see null
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa|Hyperliquid GitBook}
      * @example
      * ```ts
      * const result = await client.usdClassTransfer({
@@ -1004,7 +1007,7 @@ export class WalletClient {
             ...args,
             type: "usdClassTransfer",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: args.signatureChainId ?? "0x66eee",
+            signatureChainId: args.signatureChainId ?? this.isTestnet ? "0x66eee" : "0xa4b1",
             nonce: args.nonce ?? Date.now(),
         };
         const signature = await this.signUserSignedAction(
@@ -1036,7 +1039,7 @@ export class WalletClient {
      * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-usdc-transfer|Hyperliquid GitBook: usdSend}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-usdc-transfer|Hyperliquid GitBook}
      * @example
      * ```ts
      * const result = await client.usdSend({
@@ -1050,7 +1053,7 @@ export class WalletClient {
             ...args,
             type: "usdSend",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: args.signatureChainId ?? "0x66eee",
+            signatureChainId: args.signatureChainId ?? this.isTestnet ? "0x66eee" : "0xa4b1",
             time: args.time ?? Date.now(),
         };
         const signature = await this.signUserSignedAction(
@@ -1082,7 +1085,7 @@ export class WalletClient {
      * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-a-vault|Hyperliquid GitBook: vaultTransfer}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-a-vault|Hyperliquid GitBook}
      * @example
      * ```ts
      * const result = await client.vaultTransfer({
@@ -1119,7 +1122,7 @@ export class WalletClient {
      * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#initiate-a-withdrawal-request|Hyperliquid GitBook: withdraw3}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#initiate-a-withdrawal-request|Hyperliquid GitBook}
      * @example
      * ```ts
      * const result = await client.withdraw3({
@@ -1133,7 +1136,7 @@ export class WalletClient {
             ...args,
             type: "withdraw3",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: args.signatureChainId ?? "0x66eee",
+            signatureChainId: args.signatureChainId ?? this.isTestnet ? "0x66eee" : "0xa4b1",
             time: args.time ?? Date.now(),
         };
         const signature = await this.signUserSignedAction(
@@ -1159,6 +1162,33 @@ export class WalletClient {
     }
 
     // ———————————————Signatures———————————————
+
+    /**
+     * Create a hash of the action.
+     * @param action - The action to hash.
+     * @param nonce - The nonce.
+     * @param vaultAddress - The vault address.
+     * @returns The hash of the action.
+     */
+    protected createActionHash(action: unknown, nonce: number, vaultAddress?: Hex): Hex {
+        const msgPackBytes = encode(action, { ignoreUndefined: true });
+        const additionalBytesLength = vaultAddress ? 29 : 9;
+
+        const data = new Uint8Array(msgPackBytes.length + additionalBytesLength);
+        data.set(msgPackBytes);
+
+        const view = new DataView(data.buffer);
+        view.setBigUint64(msgPackBytes.length, BigInt(nonce));
+
+        if (vaultAddress) {
+            view.setUint8(msgPackBytes.length + 8, 1);
+            data.set(hexToBytes(vaultAddress), msgPackBytes.length + 9);
+        } else {
+            view.setUint8(msgPackBytes.length + 8, 0);
+        }
+
+        return bytesToHex(keccak_256(data));
+    }
 
     /**
      * Sign an L1 action.
@@ -1241,33 +1271,6 @@ export class WalletClient {
         return parseSignature(signature);
     }
 
-    /**
-     * Create a hash of the action.
-     * @param action - The action to hash.
-     * @param nonce - The nonce.
-     * @param vaultAddress - The vault address.
-     * @returns The hash of the action.
-     */
-    protected createActionHash(action: unknown, nonce: number, vaultAddress?: Hex): Hex {
-        const msgPackBytes = encode(action, { ignoreUndefined: true });
-        const additionalBytesLength = vaultAddress ? 29 : 9;
-
-        const data = new Uint8Array(msgPackBytes.length + additionalBytesLength);
-        data.set(msgPackBytes);
-
-        const view = new DataView(data.buffer);
-        view.setBigUint64(msgPackBytes.length, BigInt(nonce));
-
-        if (vaultAddress) {
-            view.setUint8(msgPackBytes.length + 8, 1);
-            data.set(hexToBytes(vaultAddress), msgPackBytes.length + 9);
-        } else {
-            view.setUint8(msgPackBytes.length + 8, 0);
-        }
-
-        return bytesToHex(keccak_256(data));
-    }
-
     // ———————————————Errors———————————————
 
     /**
@@ -1306,17 +1309,6 @@ export class WalletClient {
     // ———————————————Abstracts———————————————
 
     /**
-     * Checks if the given client is an abstract wallet client (viem).
-     * @param client - The client to check.
-     * @returns A boolean indicating if the client is an abstract wallet client.
-     */
-    protected isAbstractViemWalletClient(client: unknown): client is AbstractViemWalletClient {
-        return typeof client === "object" && client !== null &&
-            "signTypedData" in client && typeof client.signTypedData === "function" &&
-            client.signTypedData.length === 1;
-    }
-
-    /**
      * Checks if the given client is an abstract signer (ethers.js).
      * @param client - The client to check.
      * @returns A boolean indicating if the client is an abstract signer.
@@ -1336,5 +1328,16 @@ export class WalletClient {
         return typeof client === "object" && client !== null &&
             "_signTypedData" in client && typeof client._signTypedData === "function" &&
             client._signTypedData.length === 3;
+    }
+
+    /**
+     * Checks if the given client is an abstract wallet client (viem).
+     * @param client - The client to check.
+     * @returns A boolean indicating if the client is an abstract wallet client.
+     */
+    protected isAbstractViemWalletClient(client: unknown): client is AbstractViemWalletClient {
+        return typeof client === "object" && client !== null &&
+            "signTypedData" in client && typeof client.signTypedData === "function" &&
+            client.signTypedData.length === 1;
     }
 }
