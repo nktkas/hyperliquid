@@ -32,165 +32,174 @@ type ActionType =
     | UpdateLeverageRequest["action"]
     | VaultTransferRequest["action"];
 
-// Type for nested schemas
-type NestedSchema = {
-    readonly keys: readonly string[];
-    readonly nested?: {
-        readonly [key: string]: NestedSchema;
-    };
-};
-
-// Nested object schemas
-const orderSchema: NestedSchema = {
-    keys: ["a", "b", "p", "s", "r", "t", "c"],
-    nested: {
-        t: {
-            keys: ["limit", "trigger"],
-            nested: {
-                limit: {
-                    keys: ["tif"],
-                },
-                trigger: {
-                    keys: ["isMarket", "triggerPx", "tpsl"],
-                },
-            },
-        },
-    },
-};
-
-// Sorting schema for action keys
-const actionSortingSchemas: { [K in ActionType["type"]]: NestedSchema } = {
-    batchModify: {
-        keys: ["type", "modifies"],
-        nested: {
-            modifies: {
-                keys: ["oid", "order"],
-                nested: {
-                    order: orderSchema,
-                },
-            },
-        },
-    },
-
-    cancel: {
-        keys: ["type", "cancels"],
-        nested: {
-            cancels: {
-                keys: ["a", "o"],
-            },
-        },
-    },
-
-    cancelByCloid: {
-        keys: ["type", "cancels"],
-        nested: {
-            cancels: {
-                keys: ["asset", "cloid"],
-            },
-        },
-    },
-
-    createSubAccount: {
-        keys: ["type", "name"],
-    },
-
-    modify: {
-        keys: ["type", "oid", "order"],
-        nested: {
-            order: orderSchema,
-        },
-    },
-
-    order: {
-        keys: ["type", "orders", "grouping", "builder"],
-        nested: {
-            orders: orderSchema,
-            builder: {
-                keys: ["b", "f"],
-            },
-        },
-    },
-
-    scheduleCancel: {
-        keys: ["type", "time"],
-    },
-
-    setReferrer: {
-        keys: ["type", "code"],
-    },
-
-    subAccountTransfer: {
-        keys: ["type", "subAccountUser", "isDeposit", "usd"],
-    },
-
-    twapCancel: {
-        keys: ["type", "a", "t"],
-    },
-
-    twapOrder: {
-        keys: ["type", "twap"],
-        nested: {
-            twap: {
-                keys: ["a", "b", "s", "r", "m", "t"],
-            },
-        },
-    },
-
-    updateIsolatedMargin: {
-        keys: ["type", "asset", "isBuy", "ntli"],
-    },
-
-    updateLeverage: {
-        keys: ["type", "asset", "isCross", "leverage"],
-    },
-
-    vaultTransfer: {
-        keys: ["type", "vaultAddress", "isDeposit", "usd"],
-    },
-};
-
-/**
- * Sort an object according to schema
- * @param obj - Object to sort
- * @param schema - Schema to sort by
- * @returns Sorted object
- */
-function sortBySchema<T extends Record<string, unknown>>(obj: T, schema: NestedSchema): T {
-    function sortValue(value: unknown, subSchema?: NestedSchema): unknown {
-        if (!subSchema || typeof value !== "object" || value === null) {
-            return value;
-        }
-        if (Array.isArray(value)) {
-            return value.map((item) => sortBySchema(item as Record<string, unknown>, subSchema));
-        }
-        return sortBySchema(value as Record<string, unknown>, subSchema);
-    }
-
-    for (const key of Object.keys(obj)) {
-        if (!schema.keys.includes(key)) {
-            throw new Error(`Invalid key "${key}" found in object`);
-        }
-    }
-
-    const sortedObj: Record<string, unknown> = {};
-    for (const key of schema.keys) {
-        if (key in obj) {
-            sortedObj[key] = sortValue(obj[key], schema.nested?.[key]);
-        }
-    }
-    return sortedObj as T;
-}
-
 /**
  * Sort the keys of an action object according to the schema.
  * @param action - The action object to sort.
- * @returns The sorted action object.
+ * @returns A new sorted action object, which may include keys with undefined values.
  */
-export function sortActionKeys<T extends ActionType>(action: T): T {
-    const schema = actionSortingSchemas[action.type];
-    if (!schema) {
-        throw new Error(`No sorting schema found for action type: ${action.type}`);
+export function sortActionKeys(action: BatchModifyRequest["action"]): BatchModifyRequest["action"];
+export function sortActionKeys(action: CancelRequest["action"]): CancelRequest["action"];
+export function sortActionKeys(action: CancelByCloidRequest["action"]): CancelByCloidRequest["action"];
+export function sortActionKeys(action: CreateSubAccountRequest["action"]): CreateSubAccountRequest["action"];
+export function sortActionKeys(action: ModifyRequest["action"]): ModifyRequest["action"];
+export function sortActionKeys(action: OrderRequest["action"]): OrderRequest["action"];
+export function sortActionKeys(action: ScheduleCancelRequest["action"]): ScheduleCancelRequest["action"];
+export function sortActionKeys(action: SetReferrerRequest["action"]): SetReferrerRequest["action"];
+export function sortActionKeys(action: SubAccountTransferRequest["action"]): SubAccountTransferRequest["action"];
+export function sortActionKeys(action: TwapCancelRequest["action"]): TwapCancelRequest["action"];
+export function sortActionKeys(action: TwapOrderRequest["action"]): TwapOrderRequest["action"];
+export function sortActionKeys(action: UpdateIsolatedMarginRequest["action"]): UpdateIsolatedMarginRequest["action"];
+export function sortActionKeys(action: UpdateLeverageRequest["action"]): UpdateLeverageRequest["action"];
+export function sortActionKeys(action: VaultTransferRequest["action"]): VaultTransferRequest["action"];
+export function sortActionKeys(action: ActionType): ActionType {
+    if (action.type === "batchModify") {
+        return {
+            type: action.type,
+            modifies: action.modifies.map((modify) => ({
+                oid: modify.oid,
+                order: {
+                    a: modify.order.a,
+                    b: modify.order.b,
+                    p: modify.order.p,
+                    s: modify.order.s,
+                    r: modify.order.r,
+                    t: modify.order.t,
+                    c: modify.order.c,
+                },
+            })),
+        };
+    } else if (action.type === "cancel") {
+        return {
+            type: action.type,
+            cancels: action.cancels.map((cancel) => ({
+                a: cancel.a,
+                o: cancel.o,
+            })),
+        };
+    } else if (action.type === "cancelByCloid") {
+        return {
+            type: action.type,
+            cancels: action.cancels.map((cancel) => ({
+                asset: cancel.asset,
+                cloid: cancel.cloid,
+            })),
+        };
+    } else if (action.type === "createSubAccount") {
+        return {
+            type: action.type,
+            name: action.name,
+        };
+    } else if (action.type === "modify") {
+        return {
+            type: action.type,
+            oid: action.oid,
+            order: {
+                a: action.order.a,
+                b: action.order.b,
+                p: action.order.p,
+                s: action.order.s,
+                r: action.order.r,
+                t: "limit" in action.order.t
+                    ? {
+                        limit: { tif: action.order.t.limit.tif },
+                    }
+                    : {
+                        trigger: {
+                            isMarket: action.order.t.trigger.isMarket,
+                            triggerPx: action.order.t.trigger.triggerPx,
+                            tpsl: action.order.t.trigger.tpsl,
+                        },
+                    },
+                c: action.order.c,
+            },
+        };
+    } else if (action.type === "order") {
+        return {
+            type: action.type,
+            orders: action.orders.map((order) => ({
+                a: order.a,
+                b: order.b,
+                p: order.p,
+                s: order.s,
+                r: order.r,
+                t: "limit" in order.t
+                    ? {
+                        limit: { tif: order.t.limit.tif },
+                    }
+                    : {
+                        trigger: {
+                            isMarket: order.t.trigger.isMarket,
+                            triggerPx: order.t.trigger.triggerPx,
+                            tpsl: order.t.trigger.tpsl,
+                        },
+                    },
+                c: order.c,
+            })),
+            grouping: action.grouping,
+            builder: action.builder
+                ? {
+                    b: action.builder.b,
+                    f: action.builder.f,
+                }
+                : undefined,
+        };
+    } else if (action.type === "scheduleCancel") {
+        return {
+            type: action.type,
+            time: action.time,
+        };
+    } else if (action.type === "setReferrer") {
+        return {
+            type: action.type,
+            code: action.code,
+        };
+    } else if (action.type === "subAccountTransfer") {
+        return {
+            type: action.type,
+            subAccountUser: action.subAccountUser,
+            isDeposit: action.isDeposit,
+            usd: action.usd,
+        };
+    } else if (action.type === "twapCancel") {
+        return {
+            type: action.type,
+            a: action.a,
+            t: action.t,
+        };
+    } else if (action.type === "twapOrder") {
+        return {
+            type: action.type,
+            twap: {
+                a: action.twap.a,
+                b: action.twap.b,
+                s: action.twap.s,
+                r: action.twap.r,
+                m: action.twap.m,
+                t: action.twap.t,
+            },
+        };
+    } else if (action.type === "updateIsolatedMargin") {
+        return {
+            type: action.type,
+            asset: action.asset,
+            isBuy: action.isBuy,
+            ntli: action.ntli,
+        };
+    } else if (action.type === "updateLeverage") {
+        return {
+            type: action.type,
+            asset: action.asset,
+            isCross: action.isCross,
+            leverage: action.leverage,
+        };
+    } else if (action.type === "vaultTransfer") {
+        return {
+            type: action.type,
+            vaultAddress: action.vaultAddress,
+            isDeposit: action.isDeposit,
+            usd: action.usd,
+        };
+    } else {
+        throw new Error("No sorting schema found for action");
     }
-
-    return sortBySchema(action, schema);
 }

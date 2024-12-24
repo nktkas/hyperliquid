@@ -1,5 +1,3 @@
-import { keccak_256 } from "@noble/hashes/sha3";
-import { encode } from "@msgpack/msgpack";
 import type {
     ApproveAgentRequest,
     ApproveBuilderFeeRequest,
@@ -32,7 +30,14 @@ import type {
     TwapOrderResponse,
 } from "../types/exchange/responses.d.ts";
 import type { IRESTTransport } from "../transports/base.d.ts";
-import { bytesToHex, type Hex, hexToBytes, parseSignature } from "../utils/hex.ts";
+import {
+    type AbstractEthersSigner,
+    type AbstractEthersV5Signer,
+    type AbstractViemWalletClient,
+    signL1Action,
+    signUserSignedAction,
+} from "../utils/signing.ts";
+import type { Hex } from "../utils/hex.ts";
 import { sortActionKeys } from "../utils/keySort.ts";
 
 // ———————————————Parameters———————————————
@@ -136,51 +141,6 @@ export type VaultTransferParameters =
 export type Withdraw3Parameters =
     & Omit<Withdraw3Request["action"], "type" | "hyperliquidChain" | "signatureChainId" | "time">
     & Partial<Pick<Withdraw3Request["action"], "signatureChainId" | "time">>;
-
-// ———————————————Abstracts———————————————
-
-/** Abstract interface for a [ethers.js](https://docs.ethers.org/v6/api/providers/#Signer) signer. */
-export interface AbstractEthersSigner {
-    signTypedData(
-        domain: {
-            name: string;
-            version: string;
-            chainId: number;
-            verifyingContract: string;
-        },
-        types: Record<string, Array<{ name: string; type: string }>>,
-        value: Record<string, unknown>,
-    ): Promise<string>;
-}
-
-/** Abstract interface for a [ethers.js v5](https://docs.ethers.org/v5/api/providers/#Signer) signer. */
-export interface AbstractEthersV5Signer {
-    _signTypedData(
-        domain: {
-            name: string;
-            version: string;
-            chainId: number;
-            verifyingContract: string;
-        },
-        types: Record<string, Array<{ name: string; type: string }>>,
-        value: Record<string, unknown>,
-    ): Promise<string>;
-}
-
-/** Abstract interface for a [viem](https://viem.sh/docs/clients/wallet) wallet client. */
-export interface AbstractViemWalletClient {
-    signTypedData(params: {
-        domain: {
-            name: string;
-            version: string;
-            chainId: number;
-            verifyingContract: Hex;
-        };
-        types: Record<string, Array<{ name: string; type: string }>>;
-        primaryType: string;
-        message: Record<string, unknown>;
-    }): Promise<Hex>;
-}
 
 // ———————————————Responses———————————————
 
@@ -333,7 +293,8 @@ export class WalletClient {
             signatureChainId: args.signatureChainId ?? this.isTestnet ? "0x66eee" : "0xa4b1",
             nonce: args.nonce ?? Date.now(),
         };
-        const signature = await this.signUserSignedAction(
+        const signature = await signUserSignedAction(
+            this.wallet,
             action,
             [
                 { name: "hyperliquidChain", type: "string" },
@@ -345,11 +306,12 @@ export class WalletClient {
             parseInt(action.signatureChainId, 16),
         );
 
-        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", {
+        const request: ApproveAgentRequest = {
             action,
             signature,
             nonce: action.nonce,
-        }, signal);
+        };
+        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", request, signal);
 
         this.validateResponse(response);
         return response;
@@ -378,7 +340,8 @@ export class WalletClient {
             signatureChainId: args.signatureChainId ?? this.isTestnet ? "0x66eee" : "0xa4b1",
             nonce: args.nonce ?? Date.now(),
         };
-        const signature = await this.signUserSignedAction(
+        const signature = await signUserSignedAction(
+            this.wallet,
             action,
             [
                 { name: "hyperliquidChain", type: "string" },
@@ -390,11 +353,12 @@ export class WalletClient {
             parseInt(action.signatureChainId, 16),
         );
 
-        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", {
+        const request: ApproveBuilderFeeRequest = {
             action,
             signature,
             nonce: action.nonce,
-        }, signal);
+        };
+        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", request, signal);
 
         this.validateResponse(response);
         return response;
@@ -438,10 +402,11 @@ export class WalletClient {
         } = args;
 
         const sortedAction = sortActionKeys({ type: "batchModify", ...actionArgs });
-        const signature = await this.signL1Action(sortedAction, nonce, vaultAddress);
+        const cleanedAction = removeUndefinedValues(sortedAction);
+        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce, vaultAddress);
 
         const request: BatchModifyRequest = {
-            action: sortedAction,
+            action: cleanedAction,
             signature,
             nonce,
             vaultAddress,
@@ -478,10 +443,11 @@ export class WalletClient {
         } = args;
 
         const sortedAction = sortActionKeys({ type: "cancel", ...actionArgs });
-        const signature = await this.signL1Action(sortedAction, nonce, vaultAddress);
+        const cleanedAction = removeUndefinedValues(sortedAction);
+        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce, vaultAddress);
 
         const request: CancelRequest = {
-            action: sortedAction,
+            action: cleanedAction,
             signature,
             nonce,
             vaultAddress,
@@ -518,10 +484,11 @@ export class WalletClient {
         } = args;
 
         const sortedAction = sortActionKeys({ type: "cancelByCloid", ...actionArgs });
-        const signature = await this.signL1Action(sortedAction, nonce, vaultAddress);
+        const cleanedAction = removeUndefinedValues(sortedAction);
+        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce, vaultAddress);
 
         const request: CancelByCloidRequest = {
-            action: sortedAction,
+            action: cleanedAction,
             signature,
             nonce,
             vaultAddress,
@@ -553,10 +520,11 @@ export class WalletClient {
         } = args;
 
         const sortedAction = sortActionKeys({ type: "createSubAccount", ...actionArgs });
-        const signature = await this.signL1Action(sortedAction, nonce);
+        const cleanedAction = removeUndefinedValues(sortedAction);
+        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce);
 
         const request: CreateSubAccountRequest = {
-            action: sortedAction,
+            action: cleanedAction,
             signature,
             nonce,
         };
@@ -606,10 +574,11 @@ export class WalletClient {
         } = args;
 
         const sortedAction = sortActionKeys({ type: "modify", ...actionArgs });
-        const signature = await this.signL1Action(sortedAction, nonce, vaultAddress);
+        const cleanedAction = removeUndefinedValues(sortedAction);
+        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce, vaultAddress);
 
         const request: ModifyRequest = {
-            action: sortedAction,
+            action: cleanedAction,
             signature,
             nonce,
             vaultAddress,
@@ -659,10 +628,11 @@ export class WalletClient {
         if (actionArgs.builder) actionArgs.builder.b = actionArgs.builder.b.toLowerCase() as Hex;
 
         const sortedAction = sortActionKeys({ type: "order", ...actionArgs });
-        const signature = await this.signL1Action(sortedAction, nonce, vaultAddress);
+        const cleanedAction = removeUndefinedValues(sortedAction);
+        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce, vaultAddress);
 
         const request: OrderRequest = {
-            action: sortedAction,
+            action: cleanedAction,
             signature,
             nonce,
             vaultAddress,
@@ -696,10 +666,11 @@ export class WalletClient {
         } = args;
 
         const sortedAction = sortActionKeys({ type: "scheduleCancel", ...actionArgs });
-        const signature = await this.signL1Action(sortedAction, nonce, vaultAddress);
+        const cleanedAction = removeUndefinedValues(sortedAction);
+        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce, vaultAddress);
 
         const request: ScheduleCancelRequest = {
-            action: sortedAction,
+            action: cleanedAction,
             signature,
             nonce,
             vaultAddress,
@@ -731,10 +702,11 @@ export class WalletClient {
         } = args;
 
         const sortedAction = sortActionKeys({ type: "setReferrer", ...actionArgs });
-        const signature = await this.signL1Action(sortedAction, nonce);
+        const cleanedAction = removeUndefinedValues(sortedAction);
+        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce);
 
         const request: SetReferrerRequest = {
-            action: sortedAction,
+            action: cleanedAction,
             signature,
             nonce,
         };
@@ -769,7 +741,8 @@ export class WalletClient {
             signatureChainId: args.signatureChainId ?? this.isTestnet ? "0x66eee" : "0xa4b1",
             time: args.time ?? Date.now(),
         };
-        const signature = await this.signUserSignedAction(
+        const signature = await signUserSignedAction(
+            this.wallet,
             action,
             [
                 { name: "hyperliquidChain", type: "string" },
@@ -782,11 +755,12 @@ export class WalletClient {
             parseInt(action.signatureChainId, 16),
         );
 
-        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", {
+        const request: SpotSendRequest = {
             action,
             signature,
             nonce: action.time,
-        }, signal);
+        };
+        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", request, signal);
 
         this.validateResponse(response);
         return response;
@@ -815,10 +789,11 @@ export class WalletClient {
         } = args;
 
         const sortedAction = sortActionKeys({ type: "subAccountTransfer", ...actionArgs });
-        const signature = await this.signL1Action(sortedAction, nonce);
+        const cleanedAction = removeUndefinedValues(sortedAction);
+        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce);
 
         const request: SubAccountTransferRequest = {
-            action: sortedAction,
+            action: cleanedAction,
             signature,
             nonce,
         };
@@ -852,10 +827,11 @@ export class WalletClient {
         } = args;
 
         const sortedAction = sortActionKeys({ type: "twapCancel", ...actionArgs });
-        const signature = await this.signL1Action(sortedAction, nonce, vaultAddress);
+        const cleanedAction = removeUndefinedValues(sortedAction);
+        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce, vaultAddress);
 
         const request: TwapCancelRequest = {
-            action: sortedAction,
+            action: cleanedAction,
             signature,
             nonce,
             vaultAddress,
@@ -894,10 +870,11 @@ export class WalletClient {
         } = args;
 
         const sortedAction = sortActionKeys({ type: "twapOrder", twap: actionArgs });
-        const signature = await this.signL1Action(sortedAction, nonce, vaultAddress);
+        const cleanedAction = removeUndefinedValues(sortedAction);
+        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce, vaultAddress);
 
         const request: TwapOrderRequest = {
-            action: sortedAction,
+            action: cleanedAction,
             signature,
             nonce,
             vaultAddress,
@@ -933,10 +910,11 @@ export class WalletClient {
         } = args;
 
         const sortedAction = sortActionKeys({ type: "updateIsolatedMargin", ...actionArgs });
-        const signature = await this.signL1Action(sortedAction, nonce, vaultAddress);
+        const cleanedAction = removeUndefinedValues(sortedAction);
+        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce, vaultAddress);
 
         const request: UpdateIsolatedMarginRequest = {
-            action: sortedAction,
+            action: cleanedAction,
             signature,
             nonce,
             vaultAddress,
@@ -972,10 +950,11 @@ export class WalletClient {
         } = args;
 
         const sortedAction = sortActionKeys({ type: "updateLeverage", ...actionArgs });
-        const signature = await this.signL1Action(sortedAction, nonce, vaultAddress);
+        const cleanedAction = removeUndefinedValues(sortedAction);
+        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce, vaultAddress);
 
         const request: UpdateLeverageRequest = {
-            action: sortedAction,
+            action: cleanedAction,
             signature,
             nonce,
             vaultAddress,
@@ -1010,7 +989,8 @@ export class WalletClient {
             signatureChainId: args.signatureChainId ?? this.isTestnet ? "0x66eee" : "0xa4b1",
             nonce: args.nonce ?? Date.now(),
         };
-        const signature = await this.signUserSignedAction(
+        const signature = await signUserSignedAction(
+            this.wallet,
             action,
             [
                 { name: "hyperliquidChain", type: "string" },
@@ -1022,11 +1002,12 @@ export class WalletClient {
             parseInt(action.signatureChainId, 16),
         );
 
-        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", {
+        const request: UsdClassTransferRequest = {
             action,
             signature,
             nonce: action.nonce,
-        }, signal);
+        };
+        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", request, signal);
 
         this.validateResponse(response);
         return response;
@@ -1056,7 +1037,8 @@ export class WalletClient {
             signatureChainId: args.signatureChainId ?? this.isTestnet ? "0x66eee" : "0xa4b1",
             time: args.time ?? Date.now(),
         };
-        const signature = await this.signUserSignedAction(
+        const signature = await signUserSignedAction(
+            this.wallet,
             action,
             [
                 { name: "hyperliquidChain", type: "string" },
@@ -1068,11 +1050,12 @@ export class WalletClient {
             parseInt(action.signatureChainId, 16),
         );
 
-        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", {
+        const request: UsdSendRequest = {
             action,
             signature,
             nonce: action.time,
-        }, signal);
+        };
+        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", request, signal);
 
         this.validateResponse(response);
         return response;
@@ -1102,10 +1085,11 @@ export class WalletClient {
         } = args;
 
         const sortedAction = sortActionKeys({ type: "vaultTransfer", ...actionArgs });
-        const signature = await this.signL1Action(sortedAction, nonce);
+        const cleanedAction = removeUndefinedValues(sortedAction);
+        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce);
 
         const request: VaultTransferRequest = {
-            action: sortedAction,
+            action: cleanedAction,
             signature,
             nonce,
         };
@@ -1139,7 +1123,8 @@ export class WalletClient {
             signatureChainId: args.signatureChainId ?? this.isTestnet ? "0x66eee" : "0xa4b1",
             time: args.time ?? Date.now(),
         };
-        const signature = await this.signUserSignedAction(
+        const signature = await signUserSignedAction(
+            this.wallet,
             action,
             [
                 { name: "hyperliquidChain", type: "string" },
@@ -1151,127 +1136,16 @@ export class WalletClient {
             parseInt(action.signatureChainId, 16),
         );
 
-        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", {
+        const request: Withdraw3Request = {
             action,
             signature,
             nonce: action.time,
-        }, signal);
+        };
+        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", request, signal);
 
         this.validateResponse(response);
         return response;
     }
-
-    // ———————————————Signatures———————————————
-
-    /**
-     * Create a hash of the action.
-     * @param action - The action to hash.
-     * @param nonce - The nonce.
-     * @param vaultAddress - The vault address.
-     * @returns The hash of the action.
-     */
-    protected createActionHash(action: unknown, nonce: number, vaultAddress?: Hex): Hex {
-        const msgPackBytes = encode(action, { ignoreUndefined: true });
-        const additionalBytesLength = vaultAddress ? 29 : 9;
-
-        const data = new Uint8Array(msgPackBytes.length + additionalBytesLength);
-        data.set(msgPackBytes);
-
-        const view = new DataView(data.buffer);
-        view.setBigUint64(msgPackBytes.length, BigInt(nonce));
-
-        if (vaultAddress) {
-            view.setUint8(msgPackBytes.length + 8, 1);
-            data.set(hexToBytes(vaultAddress), msgPackBytes.length + 9);
-        } else {
-            view.setUint8(msgPackBytes.length + 8, 0);
-        }
-
-        return bytesToHex(keccak_256(data));
-    }
-
-    /**
-     * Sign an L1 action.
-     * @param action - The action to sign.
-     * @param nonce - The nonce.
-     * @param vaultAddress - The vault address.
-     * @returns The signature.
-     */
-    protected async signL1Action(
-        action: Record<string, unknown>,
-        nonce: number,
-        vaultAddress?: Hex,
-    ): Promise<{ r: Hex; s: Hex; v: number }> {
-        const domain = {
-            name: "Exchange",
-            version: "1",
-            chainId: 1337,
-            verifyingContract: "0x0000000000000000000000000000000000000000",
-        } as const;
-        const types = {
-            Agent: [
-                { name: "source", type: "string" },
-                { name: "connectionId", type: "bytes32" },
-            ],
-        };
-
-        const actionHash = this.createActionHash(action, nonce, vaultAddress);
-        const message = {
-            source: this.isTestnet ? "b" : "a",
-            connectionId: actionHash,
-        };
-
-        let signature: string;
-        if (this.isAbstractViemWalletClient(this.wallet)) {
-            signature = await this.wallet.signTypedData({ domain, types, primaryType: "Agent", message });
-        } else if (this.isAbstractEthersSigner(this.wallet)) {
-            signature = await this.wallet.signTypedData(domain, types, message);
-        } else if (this.isAbstractEthersV5Signer(this.wallet)) {
-            signature = await this.wallet._signTypedData(domain, types, message);
-        } else {
-            throw new Error("Unsupported wallet for signing typed data", { cause: this.wallet });
-        }
-        return parseSignature(signature);
-    }
-
-    /**
-     * Sign a user-signed action.
-     * @param action - The action to sign.
-     * @param payloadTypes - The payload types.
-     * @param primaryType - The primary type.
-     * @param chainId - The chain ID.
-     * @returns The signature.
-     */
-    protected async signUserSignedAction(
-        action: Record<string, unknown>,
-        payloadTypes: Array<{ name: string; type: string }>,
-        primaryType: string,
-        chainId: number,
-    ): Promise<{ r: Hex; s: Hex; v: number }> {
-        const domain = {
-            name: "HyperliquidSignTransaction",
-            version: "1",
-            chainId,
-            verifyingContract: "0x0000000000000000000000000000000000000000",
-        } as const;
-        const types = {
-            [primaryType]: payloadTypes,
-        };
-
-        let signature: string;
-        if (this.isAbstractViemWalletClient(this.wallet)) {
-            signature = await this.wallet.signTypedData({ domain, types, primaryType, message: action });
-        } else if (this.isAbstractEthersSigner(this.wallet)) {
-            signature = await this.wallet.signTypedData(domain, types, action);
-        } else if (this.isAbstractEthersV5Signer(this.wallet)) {
-            signature = await this.wallet._signTypedData(domain, types, action);
-        } else {
-            throw new Error("Unsupported wallet for signing typed data", { cause: this.wallet });
-        }
-        return parseSignature(signature);
-    }
-
-    // ———————————————Errors———————————————
 
     /**
      * Validate the response.
@@ -1305,39 +1179,27 @@ export class WalletClient {
             }
         }
     }
+}
 
-    // ———————————————Abstracts———————————————
-
-    /**
-     * Checks if the given client is an abstract signer (ethers.js).
-     * @param client - The client to check.
-     * @returns A boolean indicating if the client is an abstract signer.
-     */
-    protected isAbstractEthersSigner(client: unknown): client is AbstractEthersSigner {
-        return typeof client === "object" && client !== null &&
-            "signTypedData" in client && typeof client.signTypedData === "function" &&
-            client.signTypedData.length === 3;
-    }
-
-    /**
-     * Checks if the given client is an abstract signer (ethers.js v5).
-     * @param client - The client to check.
-     * @returns A boolean indicating if the client is an abstract signer.
-     */
-    protected isAbstractEthersV5Signer(client: unknown): client is AbstractEthersV5Signer {
-        return typeof client === "object" && client !== null &&
-            "_signTypedData" in client && typeof client._signTypedData === "function" &&
-            client._signTypedData.length === 3;
-    }
-
-    /**
-     * Checks if the given client is an abstract wallet client (viem).
-     * @param client - The client to check.
-     * @returns A boolean indicating if the client is an abstract wallet client.
-     */
-    protected isAbstractViemWalletClient(client: unknown): client is AbstractViemWalletClient {
-        return typeof client === "object" && client !== null &&
-            "signTypedData" in client && typeof client.signTypedData === "function" &&
-            client.signTypedData.length === 1;
+/**
+ * Remove undefined values from an object.
+ * @param obj - The object to remove undefined values from.
+ * @returns A new object with undefined values removed.
+ */
+function removeUndefinedValues<T>(obj: T): T {
+    if (Array.isArray(obj)) {
+        return obj.map(removeUndefinedValues) as T;
+    } else if (obj && typeof obj === "object") {
+        return Object.entries(obj).reduce((acc, [key, val]) => {
+            if (val === undefined) {
+                return acc;
+            }
+            return {
+                ...acc,
+                [key]: removeUndefinedValues(val),
+            };
+        }, {} as T);
+    } else {
+        return obj;
     }
 }

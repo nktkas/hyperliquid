@@ -10,8 +10,8 @@ import {
     getPxDecimals,
     isHex,
     randomCloid,
-} from "../../../utils.ts";
-import { HttpTransport, PublicClient, WalletClient } from "../../../../index.ts";
+} from "../../utils.ts";
+import { HttpTransport, PublicClient, WalletClient } from "../../../index.ts";
 
 const TEST_PRIVATE_KEY = Deno.args[0];
 const TEST_ASSET = "ETH";

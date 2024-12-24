@@ -1,6 +1,7 @@
 // Clients
 export * from "./src/clients/public.ts";
 export * from "./src/clients/wallet.ts";
+export type { AbstractEthersSigner, AbstractEthersV5Signer, AbstractViemWalletClient } from "./src/utils/signing.ts";
 
 // Transports
 export type * from "./src/transports/base.d.ts";

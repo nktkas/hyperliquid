@@ -3,8 +3,8 @@ import { resolve } from "jsr:@std/path@^1.0.2";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import { BigNumber } from "npm:bignumber.js@^9.1.2";
 import { assertRejects } from "jsr:@std/assert@^1.0.9";
-import { assertIncludesNotEmptyArray, assertJsonSchema, getAssetData, isHex } from "../../../utils.ts";
-import { ApiRequestError, HttpTransport, PublicClient, WalletClient } from "../../../../index.ts";
+import { assertIncludesNotEmptyArray, assertJsonSchema, getAssetData, isHex } from "../../utils.ts";
+import { ApiRequestError, HttpTransport, PublicClient, WalletClient } from "../../../index.ts";
 
 const TEST_PRIVATE_KEY = Deno.args[0];
 const TEST_ASSET = "ETH";
