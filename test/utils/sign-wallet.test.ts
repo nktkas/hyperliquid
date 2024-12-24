@@ -487,22 +487,19 @@ Deno.test("Signature Generation Tests", async (t) => {
         const viemSignature = await signUserSignedAction(
             viemWallet,
             userSignedActionSignature.data.action,
-            [...userSignedActionSignature.data.payloadTypes],
-            userSignedActionSignature.data.primaryType,
+            { [userSignedActionSignature.data.primaryType]: [...userSignedActionSignature.data.payloadTypes] },
             userSignedActionSignature.data.chainId,
         );
         const ethersSignature = await signUserSignedAction(
             ethersWallet,
             userSignedActionSignature.data.action,
-            [...userSignedActionSignature.data.payloadTypes],
-            userSignedActionSignature.data.primaryType,
+            { [userSignedActionSignature.data.primaryType]: [...userSignedActionSignature.data.payloadTypes] },
             userSignedActionSignature.data.chainId,
         );
         const ethersV5Signature = await signUserSignedAction(
             ethersV5Wallet,
             userSignedActionSignature.data.action,
-            [...userSignedActionSignature.data.payloadTypes],
-            userSignedActionSignature.data.primaryType,
+            { [userSignedActionSignature.data.primaryType]: [...userSignedActionSignature.data.payloadTypes] },
             userSignedActionSignature.data.chainId,
         );
 

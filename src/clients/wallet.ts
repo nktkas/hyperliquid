@@ -296,13 +296,14 @@ export class WalletClient {
         const signature = await signUserSignedAction(
             this.wallet,
             action,
-            [
-                { name: "hyperliquidChain", type: "string" },
-                { name: "agentAddress", type: "address" },
-                { name: "agentName", type: "string" },
-                { name: "nonce", type: "uint64" },
-            ],
-            "HyperliquidTransaction:ApproveAgent",
+            {
+                "HyperliquidTransaction:ApproveAgent": [
+                    { name: "hyperliquidChain", type: "string" },
+                    { name: "agentAddress", type: "address" },
+                    { name: "agentName", type: "string" },
+                    { name: "nonce", type: "uint64" },
+                ],
+            },
             parseInt(action.signatureChainId, 16),
         );
 
@@ -343,13 +344,14 @@ export class WalletClient {
         const signature = await signUserSignedAction(
             this.wallet,
             action,
-            [
-                { name: "hyperliquidChain", type: "string" },
-                { name: "maxFeeRate", type: "string" },
-                { name: "builder", type: "address" },
-                { name: "nonce", type: "uint64" },
-            ],
-            "HyperliquidTransaction:ApproveBuilderFee",
+            {
+                "HyperliquidTransaction:ApproveBuilderFee": [
+                    { name: "hyperliquidChain", type: "string" },
+                    { name: "maxFeeRate", type: "string" },
+                    { name: "builder", type: "address" },
+                    { name: "nonce", type: "uint64" },
+                ],
+            },
             parseInt(action.signatureChainId, 16),
         );
 
@@ -744,14 +746,15 @@ export class WalletClient {
         const signature = await signUserSignedAction(
             this.wallet,
             action,
-            [
-                { name: "hyperliquidChain", type: "string" },
-                { name: "destination", type: "string" },
-                { name: "token", type: "string" },
-                { name: "amount", type: "string" },
-                { name: "time", type: "uint64" },
-            ],
-            "HyperliquidTransaction:SpotSend",
+            {
+                "HyperliquidTransaction:SpotSend": [
+                    { name: "hyperliquidChain", type: "string" },
+                    { name: "destination", type: "string" },
+                    { name: "token", type: "string" },
+                    { name: "amount", type: "string" },
+                    { name: "time", type: "uint64" },
+                ],
+            },
             parseInt(action.signatureChainId, 16),
         );
 
@@ -992,13 +995,14 @@ export class WalletClient {
         const signature = await signUserSignedAction(
             this.wallet,
             action,
-            [
-                { name: "hyperliquidChain", type: "string" },
-                { name: "amount", type: "string" },
-                { name: "toPerp", type: "bool" },
-                { name: "nonce", type: "uint64" },
-            ],
-            "HyperliquidTransaction:UsdClassTransfer",
+            {
+                "HyperliquidTransaction:UsdClassTransfer": [
+                    { name: "hyperliquidChain", type: "string" },
+                    { name: "amount", type: "string" },
+                    { name: "toPerp", type: "bool" },
+                    { name: "nonce", type: "uint64" },
+                ],
+            },
             parseInt(action.signatureChainId, 16),
         );
 
@@ -1040,13 +1044,14 @@ export class WalletClient {
         const signature = await signUserSignedAction(
             this.wallet,
             action,
-            [
-                { name: "hyperliquidChain", type: "string" },
-                { name: "destination", type: "string" },
-                { name: "amount", type: "string" },
-                { name: "time", type: "uint64" },
-            ],
-            "HyperliquidTransaction:UsdSend",
+            {
+                "HyperliquidTransaction:UsdSend": [
+                    { name: "hyperliquidChain", type: "string" },
+                    { name: "destination", type: "string" },
+                    { name: "amount", type: "string" },
+                    { name: "time", type: "uint64" },
+                ],
+            },
             parseInt(action.signatureChainId, 16),
         );
 
@@ -1126,13 +1131,14 @@ export class WalletClient {
         const signature = await signUserSignedAction(
             this.wallet,
             action,
-            [
-                { name: "hyperliquidChain", type: "string" },
-                { name: "destination", type: "string" },
-                { name: "amount", type: "string" },
-                { name: "time", type: "uint64" },
-            ],
-            "HyperliquidTransaction:Withdraw",
+            {
+                "HyperliquidTransaction:Withdraw": [
+                    { name: "hyperliquidChain", type: "string" },
+                    { name: "destination", type: "string" },
+                    { name: "amount", type: "string" },
+                    { name: "time", type: "uint64" },
+                ],
+            },
             parseInt(action.signatureChainId, 16),
         );
 

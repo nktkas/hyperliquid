@@ -11,7 +11,12 @@ export interface AbstractEthersSigner {
             chainId: number;
             verifyingContract: string;
         },
-        types: Record<string, Array<{ name: string; type: string }>>,
+        types: {
+            [key: string]: {
+                name: string;
+                type: string;
+            }[];
+        },
         value: Record<string, unknown>,
     ): Promise<string>;
 }
@@ -25,7 +30,12 @@ export interface AbstractEthersV5Signer {
             chainId: number;
             verifyingContract: string;
         },
-        types: Record<string, Array<{ name: string; type: string }>>,
+        types: {
+            [key: string]: {
+                name: string;
+                type: string;
+            }[];
+        },
         value: Record<string, unknown>,
     ): Promise<string>;
 }
@@ -39,7 +49,12 @@ export interface AbstractViemWalletClient {
             chainId: number;
             verifyingContract: Hex;
         };
-        types: Record<string, Array<{ name: string; type: string }>>;
+        types: {
+            [key: string]: {
+                name: string;
+                type: string;
+            }[];
+        };
         primaryType: string;
         message: Record<string, unknown>;
     }): Promise<Hex>;
@@ -74,6 +89,8 @@ export function createActionHash(action: unknown, nonce: number, vaultAddress?: 
 
 /**
  * Sign an L1 action.
+ * @param wallet - The wallet to sign with.
+ * @param isTestnet - A boolean indicating if the action is for the testnet.
  * @param action - The action to sign.
  * @param nonce - The nonce of the action.
  * @param vaultAddress - Optional vault address.
@@ -120,17 +137,16 @@ export async function signL1Action(
 
 /**
  * Sign a user-signed action.
+ * @param wallet - The wallet to sign with.
  * @param action - The action to sign.
- * @param payloadTypes - The payload types.
- * @param primaryType - The primary type.
- * @param chainId - The chain ID.
+ * @param types - The types of the action.
+ * @param chainId - The chain ID of the action.
  * @returns The signature.
  */
 export async function signUserSignedAction(
     wallet: AbstractEthersSigner | AbstractEthersV5Signer | AbstractViemWalletClient,
     action: Record<string, unknown>,
-    payloadTypes: Array<{ name: string; type: string }>,
-    primaryType: string,
+    types: { [key: string]: { name: string; type: string }[] },
     chainId: number,
 ): Promise<{ r: Hex; s: Hex; v: number }> {
     const domain = {
@@ -139,12 +155,10 @@ export async function signUserSignedAction(
         chainId,
         verifyingContract: "0x0000000000000000000000000000000000000000",
     } as const;
-    const types = {
-        [primaryType]: payloadTypes,
-    };
 
     let signature: string;
     if (isAbstractViemWalletClient(wallet)) {
+        const primaryType = Object.keys(types)[0];
         signature = await wallet.signTypedData({ domain, types, primaryType, message: action });
     } else if (isAbstractEthersSigner(wallet)) {
         signature = await wallet.signTypedData(domain, types, action);
