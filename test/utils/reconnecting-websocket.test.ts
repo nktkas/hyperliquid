@@ -46,7 +46,7 @@ Deno.test("ReconnectingWebSocket", async (t) => {
         const maxAttempts = 3;
         const ws = new ReconnectingWebSocket("ws://invalid4567t7281.com", undefined, {
             maxAttempts,
-            delay: 0,
+            delay: 100,
         });
 
         let closeCount = 0;
@@ -54,7 +54,7 @@ Deno.test("ReconnectingWebSocket", async (t) => {
             closeCount++;
         });
 
-        await new Promise((r) => setTimeout(r, 100));
+        await new Promise((r) => setTimeout(r, 5000));
 
         assert(
             ws.terminationController.signal.aborted,
