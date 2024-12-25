@@ -24,34 +24,31 @@ jobs:
               id: version_check
               shell: bash
               run: |
-                  # Install jq (if not already installed)
-                  sudo apt-get update && sudo apt-get install -y jq
+                  # Fetch the previous version if deno.json existed in the last commit
+                  PREVIOUS_VERSION=$(git show HEAD~1:deno.json 2>/dev/null | jq -r '.version' || echo "")
 
-                  # Check if deno.json existed in the previous commit
-                  if git show HEAD~1:deno.json > /dev/null 2>&1; then
-                    PREVIOUS_VERSION=$(git show HEAD~1:deno.json | jq -r '.version')
-                  else
-                    PREVIOUS_VERSION=""
-                  fi
-
-                  # Get the current version
+                  # Extract the current version from the deno.json file
                   CURRENT_VERSION=$(jq -r '.version' deno.json)
 
                   echo "Current version: $CURRENT_VERSION"
                   echo "Previous version: $PREVIOUS_VERSION"
 
-                  # Determine if the version has changed
+                  # Compare the versions and set output accordingly
                   if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
-                    echo "version_changed=true" >> $GITHUB_OUTPUT
+                      echo "version_changed=true" >> $GITHUB_OUTPUT
                   else
-                    echo "version_changed=false" >> $GITHUB_OUTPUT
+                      echo "version_changed=false" >> $GITHUB_OUTPUT
                   fi
 
             - name: Setup Deno
               if: steps.version_check.outputs.version_changed == 'true'
-              uses: denoland/setup-deno@v1.5.1
+              uses: denoland/setup-deno@v2
               with:
                   deno-version: v2.x
+
+            - name: Run Formatter
+              if: steps.version_check.outputs.version_changed == 'true'
+              run: deno fmt --check
 
             - name: Run Linter
               if: steps.version_check.outputs.version_changed == 'true'

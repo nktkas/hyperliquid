@@ -1,11 +1,12 @@
 name: Publish Package to JSR
 on:
-    push:
-        branches:
-            - main
+    workflow_run:
+        workflows: ["Deno Test"]
+        types: [completed]
 
 jobs:
     publish:
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
         runs-on: ubuntu-latest
 
         permissions:
