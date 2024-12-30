@@ -12,7 +12,8 @@ Deno.test("subAccounts", async (t) => {
     const schema = tsjSchemaGenerator.createSchema("SubAccount");
 
     // Create client
-    const client = new PublicClient(new HttpTransport({ url: "https://api.hyperliquid-testnet.xyz" }));
+    const transport = new HttpTransport({ url: "https://api.hyperliquid-testnet.xyz" });
+    const client = new PublicClient({ transport });
 
     //Test
     const data = await client.subAccounts({ user: USER_ADDRESS });

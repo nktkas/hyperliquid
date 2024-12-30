@@ -5,7 +5,8 @@ const BUILDER_ADDRESS = "0xe019d6167E7e324aEd003d94098496b6d986aB05";
 
 Deno.test("maxBuilderFee", async () => {
     // Create client
-    const client = new PublicClient(new HttpTransport({ url: "https://api.hyperliquid-testnet.xyz" }));
+    const transport = new HttpTransport({ url: "https://api.hyperliquid-testnet.xyz" });
+    const client = new PublicClient({ transport });
 
     //Test
     const data = await client.maxBuilderFee({ user: BUILDER_ADDRESS, builder: BUILDER_ADDRESS });

@@ -132,20 +132,28 @@ export type TxDetailsParameters = Omit<TxDetailsRequest, "type">;
 // ———————————————Client———————————————`
 
 /** Public client for interacting with the Hyperliquid API. */
-export class PublicClient {
+export class PublicClient<T extends IRESTTransport = IRESTTransport> {
+    /** The transport used to connect to the Hyperliquid API. */
+    transport: T;
+
     /**
      * Initialises a new instance.
-     * @param transport - The transport used to connect to the Hyperliquid API.
+     * @param args - The arguments for initialisation.
      *
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient(transport);
+     * const client = new hl.PublicClient({ transport });
      * ```
      */
-    constructor(public transport: IRESTTransport) {}
+    constructor(args: {
+        /** The transport used to connect to the Hyperliquid API. */
+        transport: T;
+    }) {
+        this.transport = args.transport;
+    }
 
     // ———————————————Info API———————————————
 

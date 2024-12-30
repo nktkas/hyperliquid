@@ -26,8 +26,8 @@ Deno.test("cancelByCloid", async () => {
     // Create client
     const account = privateKeyToAccount(TEST_PRIVATE_KEY);
     const transport = new HttpTransport({ url: "https://api.hyperliquid-testnet.xyz" });
-    const walletClient = new WalletClient(account, transport, true);
-    const publicClient = new PublicClient(transport);
+    const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
+    const publicClient = new PublicClient({ transport });
 
     // Preparation
 

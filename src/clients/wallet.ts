@@ -220,22 +220,38 @@ export class ApiRequestError extends Error {
 // ———————————————Client———————————————
 
 /** Wallet client for interacting with the Hyperliquid API. */
-export class WalletClient {
+export class WalletClient<
+    T extends IRESTTransport = IRESTTransport,
+    W extends AbstractViemWalletClient | AbstractEthersSigner | AbstractEthersV5Signer =
+        | AbstractViemWalletClient
+        | AbstractEthersSigner
+        | AbstractEthersV5Signer,
+> {
+    /** The transport used to connect to the Hyperliquid API. */
+    transport: T;
+
+    /** The WalletClient/Account ([viem](https://viem.sh/docs/clients/wallet)) or Signer ([ethers.js](https://docs.ethers.org/v6/api/providers/#Signer)) used for signing transactions. */
+    wallet: W;
+
+    /** Specifies whether the client uses testnet. */
+    isTestnet: boolean;
+
+    /** Sets a default vaultAddress to be used if no vaultAddress is explicitly passed to a method. */
+    defaultVaultAddress?: Hex;
+
     /**
      * Initialises a new instance.
-     * @param wallet - The WalletClient/Account ([viem](https://viem.sh/docs/clients/wallet)) or Signer ([ethers.js](https://docs.ethers.org/v6/api/providers/#Signer)) used for signing transactions.
-     * @param transport - The transport used to connect to the Hyperliquid API.
-     * @param isTestnet - Specifies whether the client uses testnet. Defaults to `false`.
+     * @param args - The parameters for the client.
      *
      * @example Private key via [viem](https://viem.sh/docs/clients/wallet#local-accounts-private-key-mnemonic-etc)
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      * import { privateKeyToAccount } from "viem/accounts";
      *
-     * const account = privateKeyToAccount("0x...");
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const wallet = privateKeyToAccount("0x...");
      *
-     * const client = new hl.ExchangeClient(account, transport);
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
      * ```
      *
      * @example Private key via [ethers.js](https://docs.ethers.org/v6/api/wallet/#Wallet)
@@ -244,9 +260,9 @@ export class WalletClient {
      * import { ethers } from "ethers";
      *
      * const wallet = new ethers.Wallet("0x...");
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
      *
-     * const client = new hl.ExchangeClient(wallet, transport);
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
      * ```
      *
      * @example External wallet (e.g. MetaMask) via [viem](https://viem.sh/docs/clients/wallet#optional-hoist-the-account)
@@ -257,16 +273,29 @@ export class WalletClient {
      *
      * const [account] = await window.ethereum.request({ method: "eth_requestAccounts" });
      * const wallet = createWalletClient({ account, chain: arbitrum, transport: custom(window.ethereum) });
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
      *
-     * const client = new hl.ExchangeClient(wallet, transport);
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
      * ```
      */
-    constructor(
-        public wallet: AbstractViemWalletClient | AbstractEthersSigner | AbstractEthersV5Signer,
-        public transport: IRESTTransport,
-        public isTestnet: boolean = false,
-    ) {}
+    constructor(args: {
+        /** The transport used to connect to the Hyperliquid API. */
+        transport: T;
+
+        /** The WalletClient/Account ([viem](https://viem.sh/docs/clients/wallet)) or Signer ([ethers.js](https://docs.ethers.org/v6/api/providers/#Signer)) used for signing transactions. */
+        wallet: W;
+
+        /** Specifies whether the client uses testnet. Defaults to `false`. */
+        isTestnet?: boolean;
+
+        /** Sets a default vaultAddress to be used if no vaultAddress is explicitly passed to a method. */
+        defaultVaultAddress?: Hex;
+    }) {
+        this.transport = args.transport;
+        this.wallet = args.wallet;
+        this.isTestnet = args.isTestnet ?? false;
+        this.defaultVaultAddress = args.defaultVaultAddress;
+    }
 
     // ———————————————Actions———————————————
 
@@ -398,7 +427,7 @@ export class WalletClient {
      */
     async batchModify(args: BatchModifyParameters, signal?: AbortSignal): Promise<OrderResponseSuccess> {
         const {
-            vaultAddress,
+            vaultAddress = this.defaultVaultAddress,
             nonce = Date.now(),
             ...actionArgs
         } = args;
@@ -439,7 +468,7 @@ export class WalletClient {
      */
     async cancel(args: CancelParameters, signal?: AbortSignal): Promise<CancelResponseSuccess> {
         const {
-            vaultAddress,
+            vaultAddress = this.defaultVaultAddress,
             nonce = Date.now(),
             ...actionArgs
         } = args;
@@ -480,7 +509,7 @@ export class WalletClient {
      */
     async cancelByCloid(args: CancelByCloidParameters, signal?: AbortSignal): Promise<CancelResponseSuccess> {
         const {
-            vaultAddress,
+            vaultAddress = this.defaultVaultAddress,
             nonce = Date.now(),
             ...actionArgs
         } = args;
@@ -570,7 +599,7 @@ export class WalletClient {
      */
     async modify(args: ModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         const {
-            vaultAddress,
+            vaultAddress = this.defaultVaultAddress,
             nonce = Date.now(),
             ...actionArgs
         } = args;
@@ -622,7 +651,7 @@ export class WalletClient {
     async order(args: OrderParameters, signal?: AbortSignal): Promise<OrderResponseSuccess> {
         const clonedArgs = structuredClone(args); // Clone to prevent mutation of original object
         const {
-            vaultAddress,
+            vaultAddress = this.defaultVaultAddress,
             nonce = Date.now(),
             ...actionArgs
         } = clonedArgs;
@@ -662,7 +691,7 @@ export class WalletClient {
      */
     async scheduleCancel(args: ScheduleCancelParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         const {
-            vaultAddress,
+            vaultAddress = this.defaultVaultAddress,
             nonce = Date.now(),
             ...actionArgs
         } = args;
@@ -824,7 +853,7 @@ export class WalletClient {
      */
     async twapCancel(args: TwapCancelParameters, signal?: AbortSignal): Promise<TwapCancelResponseSuccess> {
         const {
-            vaultAddress,
+            vaultAddress = this.defaultVaultAddress,
             nonce = Date.now(),
             ...actionArgs
         } = args;
@@ -867,7 +896,7 @@ export class WalletClient {
      */
     async twapOrder(args: TwapOrderParameters, signal?: AbortSignal): Promise<TwapOrderResponseSuccess> {
         const {
-            vaultAddress,
+            vaultAddress = this.defaultVaultAddress,
             nonce = Date.now(),
             ...actionArgs
         } = args;
@@ -907,7 +936,7 @@ export class WalletClient {
      */
     async updateIsolatedMargin(args: UpdateIsolatedMarginParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         const {
-            vaultAddress,
+            vaultAddress = this.defaultVaultAddress,
             nonce = Date.now(),
             ...actionArgs
         } = args;
@@ -947,7 +976,7 @@ export class WalletClient {
      */
     async updateLeverage(args: UpdateLeverageParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         const {
-            vaultAddress,
+            vaultAddress = this.defaultVaultAddress,
             nonce = Date.now(),
             ...actionArgs
         } = args;

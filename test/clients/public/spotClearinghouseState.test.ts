@@ -11,7 +11,8 @@ Deno.test("spotClearinghouseState", async () => {
     const schema = tsjSchemaGenerator.createSchema("SpotClearinghouseState");
 
     // Create client
-    const client = new PublicClient(new HttpTransport({ url: "https://api.hyperliquid-testnet.xyz" }));
+    const transport = new HttpTransport({ url: "https://api.hyperliquid-testnet.xyz" });
+    const client = new PublicClient({ transport });
 
     //Test
     const data = await client.spotClearinghouseState({ user: USER_ADDRESS });

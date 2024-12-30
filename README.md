@@ -59,7 +59,7 @@ Next, initialize the client with the transport layer (more details in the [API R
 import * as hl from "@nktkas/hyperliquid";
 
 const transport = new hl.HttpTransport(); // or WebSocketTransport
-const client = new hl.PublicClient(transport);
+const client = new hl.PublicClient({ transport });
 ```
 
 #### Create WalletClient
@@ -74,11 +74,11 @@ const transport = new hl.HttpTransport(); // or WebSocketTransport
 
 // 1. Using Viem with private key
 const viemAccount = privateKeyToAccount("0x...");
-const viemClient = new hl.WalletClient(viemAccount, transport);
+const viemClient = new hl.WalletClient({ wallet: viemAccount, transport });
 
 // 2. Using Ethers (or Ethers V5) with private key
 const ethersWallet = new ethers.Wallet("0x...");
-const ethersClient = new hl.WalletClient(ethersWallet, transport);
+const ethersClient = new hl.WalletClient({ wallet: ethersWallet, transport });
 
 // 3. Using external wallet (e.g. MetaMask) via Viem
 const [account] = await window.ethereum.request({ method: "eth_requestAccounts" });
@@ -87,7 +87,7 @@ const walletClient = createWalletClient({
     chain: arbitrum,
     transport: custom(window.ethereum),
 });
-const metamaskClient = new hl.WalletClient(walletClient, transport);
+const metamaskClient = new hl.WalletClient({ wallet: walletClient, transport });
 ```
 
 ## API Reference
@@ -149,8 +149,10 @@ The SDK provides two client classes for interacting with the Hyperliquid API:
 Client for retrieving information (order book, user positions, etc.).
 
 ```typescript
-class PublicClient {
-    constructor(transport: IRESTTransport); // HttpTransport or WebSocketTransport
+class PublicClient<T extends IRESTTransport> {
+    constructor(args: {
+        transport: T; // HttpTransport or WebSocketTransport
+    });
 
     // Market
     allMids(): Promise<AllMids>;
@@ -194,12 +196,16 @@ class PublicClient {
 Client for interacting with the exchange API (placing orders, cancelling orders, etc.).
 
 ```typescript
-class WalletClient {
-    constructor(
-        wallet: AbstractViemWalletClient | AbstractEthersSigner | AbstractEthersV5Signer, // viem, ethers, or ethers v5
-        transport: IRESTTransport, // HttpTransport or WebSocketTransport
-        isTestnet?: boolean, // Whether to use the testnet API (default: false)
-    );
+class WalletClient<
+    T extends IRESTTransport,
+    W extends AbstractViemWalletClient | AbstractEthersSigner | AbstractEthersV5Signer,
+> {
+    constructor(args: {
+        transport: T; // HttpTransport or WebSocketTransport
+        wallet: W; // viem, ethers, or ethers v5
+        isTestnet?: boolean; // Whether to use the testnet API (default: false)
+        defaultVaultAddress?: Hex; // Vault address used by default if not provided in method call
+    });
 
     // Order Management
     batchModify(args: BatchModifyParameters): Promise<OrderResponseSuccess>;

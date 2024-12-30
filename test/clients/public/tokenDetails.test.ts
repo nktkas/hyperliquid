@@ -11,7 +11,8 @@ Deno.test("tokenDetails", async () => {
     const schema = tsjSchemaGenerator.createSchema("TokenDetails");
 
     // Create client
-    const client = new PublicClient(new HttpTransport({ url: "https://api.hyperliquid-testnet.xyz" }));
+    const transport = new HttpTransport({ url: "https://api.hyperliquid-testnet.xyz" });
+    const client = new PublicClient({ transport });
 
     //Test
     const data = await client.tokenDetails({ tokenId: TOKEN_ID });
