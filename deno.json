@@ -3,8 +3,8 @@
     "version": "0.11.1",
     "exports": "./index.ts",
     "imports": {
-        "@msgpack/msgpack": "npm:@msgpack/msgpack@^3.0.0-beta2",
-        "@noble/hashes/sha3": "npm:@noble/hashes@^1.6.1/sha3"
+        "@std/msgpack/encode": "jsr:@std/msgpack@^1.0.2/encode",
+        "@noble/hashes/sha3": "jsr:@noble/hashes@^1.7.0/sha3"
     },
     "fmt": {
         "indentWidth": 4,

@@ -1,5 +1,5 @@
 import { keccak_256 } from "@noble/hashes/sha3";
-import { encode } from "@msgpack/msgpack";
+import { encode, type ValueType } from "@std/msgpack/encode";
 import { bytesToHex, type Hex, hexToBytes, parseSignature } from "./hex.ts";
 
 /** Abstract interface for a [ethers.js](https://docs.ethers.org/v6/api/providers/#Signer) signer. */
@@ -67,8 +67,25 @@ export interface AbstractViemWalletClient {
  * @param vaultAddress - Optional vault address.
  * @returns The hash of the action.
  */
-export function createActionHash(action: unknown, nonce: number, vaultAddress?: Hex): Hex {
-    const msgPackBytes = encode(action);
+export function createActionHash(action: ValueType, nonce: number, vaultAddress?: Hex): Hex {
+    // Layer for compatibility of @std/msgpack with @msgpack/msgpack
+    // In the future should be replaced by the msgpack extension: https://github.com/denoland/std/issues/3534
+    const float64IntegersToUint64 = (obj: ValueType): ValueType => {
+        const THIRTY_ONE_BITS = 2147483648;
+        const THIRTY_TWO_BITS = 4294967296;
+        if (typeof obj === "number" && Number.isInteger(obj) && (obj >= THIRTY_TWO_BITS || obj < -THIRTY_ONE_BITS)) {
+            return BigInt(obj); // Now @std/msgpack will handle integer 64 bit as int64/uint64 instead of float64
+        } else if (Array.isArray(obj)) {
+            return obj.map(float64IntegersToUint64);
+        } else if (obj && typeof obj === "object") {
+            return Object.fromEntries(
+                Object.entries(obj).map(([key, value]) => [key, float64IntegersToUint64(value)]),
+            );
+        }
+        return obj;
+    };
+
+    const msgPackBytes = encode(float64IntegersToUint64(action));
     const additionalBytesLength = vaultAddress ? 29 : 9;
 
     const data = new Uint8Array(msgPackBytes.length + additionalBytesLength);
@@ -99,7 +116,7 @@ export function createActionHash(action: unknown, nonce: number, vaultAddress?: 
 export async function signL1Action(
     wallet: AbstractEthersSigner | AbstractEthersV5Signer | AbstractViemWalletClient,
     isTestnet: boolean,
-    action: Record<string, unknown>,
+    action: ValueType,
     nonce: number,
     vaultAddress?: Hex,
 ): Promise<{ r: Hex; s: Hex; v: number }> {
