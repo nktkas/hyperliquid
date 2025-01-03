@@ -1,4 +1,4 @@
-import type { IRESTTransport } from "../transports/base.d.ts";
+import type { IRESTTransport } from "../transports/base.ts";
 import type { BlockDetailsRequest, TxDetailsRequest } from "../types/explorer/requests.d.ts";
 import type { BlockDetailsResponse, TxDetailsResponse } from "../types/explorer/responses.d.ts";
 import type {
@@ -11,7 +11,7 @@ import type {
     UserFunding,
     UserNonFundingLedgerUpdates,
     UserRateLimit,
-} from "../types/info/account.d.ts";
+} from "../types/info/accounts.d.ts";
 import type {
     AllMids,
     CandleSnapshot,
@@ -29,8 +29,10 @@ import type {
     L2Book,
     OpenOrder,
     OrderStatus,
+    OrderStatusResult,
     TwapHistory,
     UserFill,
+    UserTwapSliceFill,
 } from "../types/info/orders.d.ts";
 import type {
     CandleSnapshotRequest,
@@ -38,6 +40,7 @@ import type {
     ExtraAgentsRequest,
     FrontendOpenOrdersRequest,
     FundingHistoryRequest,
+    HistoricalOrdersRequest,
     L2BookRequest,
     MaxBuilderFeeRequest,
     OpenOrdersRequest,
@@ -54,7 +57,11 @@ import type {
     UserFundingRequest,
     UserNonFundingLedgerUpdatesRequest,
     UserRateLimitRequest,
+    UserTwapSliceFillsRequest,
+    UserVaultEquitiesRequest,
+    VaultDetailsRequest,
 } from "../types/info/requests.d.ts";
+import type { UserVaultEquity, VaultDetails, VaultSummary } from "../types/info/vaults.d.ts";
 
 // ———————————————Info Parameters———————————————
 
@@ -72,6 +79,9 @@ export type FrontendOpenOrdersParameters = Omit<FrontendOpenOrdersRequest, "type
 
 /** @see {@linkcode PublicClient.fundingHistory} */
 export type FundingHistoryParameters = Omit<FundingHistoryRequest, "type">;
+
+/** @see {@linkcode PublicClient.historicalOrders} */
+export type HistoricalOrdersParameters = Omit<HistoricalOrdersRequest, "type">;
 
 /** @see {@linkcode PublicClient.l2Book} */
 export type L2BookParameters = Omit<L2BookRequest, "type">;
@@ -120,6 +130,15 @@ export type UserNonFundingLedgerUpdatesParameters = Omit<UserNonFundingLedgerUpd
 
 /** @see {@linkcode PublicClient.userRateLimit} */
 export type UserRateLimitParameters = Omit<UserRateLimitRequest, "type">;
+
+/** @see {@linkcode PublicClient.userTwapSliceFills} */
+export type UserTwapSliceFillsParameters = Omit<UserTwapSliceFillsRequest, "type">;
+
+/** @see {@linkcode PublicClient.userVaultEquities} */
+export type UserVaultEquitiesParameters = Omit<UserVaultEquitiesRequest, "type">;
+
+/** @see {@linkcode PublicClient.vaultDetails} */
+export type VaultDetailsParameters = Omit<VaultDetailsRequest, "type">;
 
 // ———————————————Explorer Parameters———————————————
 
@@ -332,6 +351,38 @@ export class PublicClient<T extends IRESTTransport = IRESTTransport> {
     }
 
     /**
+     * Request user's historical orders.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Array of user's historical orders.
+     *
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-historical-orders|Hyperliquid GitBook}
+     * @example
+     * ```ts
+     * const orders = await client.historicalOrders({ user: "0x..." });
+     * // [
+     * //   {
+     * //     "order": {
+     * //       "coin": "ETH",
+     * //       "side": "A",
+     * //       "limitPx": "2412.7",
+     * //       "sz": "0.0",
+     * //       "oid": 1,
+     * //       "timestamp": 1724361546645,
+     * //       ...
+     * //     },
+     * //     "status": "filled",
+     * //     "statusTimestamp": 1724361546645
+     * //   },
+     * //   ...
+     * // ]
+     * ```
+     */
+    historicalOrders(args: HistoricalOrdersParameters, signal?: AbortSignal): Promise<OrderStatus[]> {
+        return this.transport.request("info", { type: "historicalOrders", ...args }, signal);
+    }
+
+    /**
      * Request L2 order book.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -483,7 +534,7 @@ export class PublicClient<T extends IRESTTransport = IRESTTransport> {
      * // }
      * ```
      */
-    orderStatus(args: OrderStatusParameters, signal?: AbortSignal): Promise<OrderStatus> {
+    orderStatus(args: OrderStatusParameters, signal?: AbortSignal): Promise<OrderStatusResult> {
         return this.transport.request("info", { type: "orderStatus", ...args }, signal);
     }
 
@@ -639,6 +690,7 @@ export class PublicClient<T extends IRESTTransport = IRESTTransport> {
      * @param signal - An optional abort signal.
      * @returns Array of user sub-account.
      *
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-subaccounts|Hyperliquid GitBook}
      * @example
      * ```ts
      * const subAccounts = await client.subAccounts({ user: "0x1234..." });
@@ -649,7 +701,7 @@ export class PublicClient<T extends IRESTTransport = IRESTTransport> {
      * // ]
      * ```
      */
-    subAccounts(args: SubAccountsParameters, signal?: AbortSignal): Promise<SubAccount[]> {
+    subAccounts(args: SubAccountsParameters, signal?: AbortSignal): Promise<SubAccount[] | null> {
         return this.transport.request("info", { type: "subAccounts", ...args }, signal);
     }
 
@@ -659,6 +711,7 @@ export class PublicClient<T extends IRESTTransport = IRESTTransport> {
      * @param signal - An optional abort signal.
      * @returns The details of a token.
      *
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-a-token|Hyperliquid GitBook}
      * @example
      * ```ts
      * const details = await client.tokenDetails({ tokenId: "0x..." });
@@ -868,6 +921,106 @@ export class PublicClient<T extends IRESTTransport = IRESTTransport> {
      */
     userRateLimit(args: UserRateLimitParameters, signal?: AbortSignal): Promise<UserRateLimit> {
         return this.transport.request("info", { type: "userRateLimit", ...args }, signal);
+    }
+
+    /**
+     * Request user twap slice fills.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Array of user's twap slice fill.
+     *
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills|Hyperliquid GitBook}
+     * @example
+     * ```ts
+     * const fills = await client.userTwapSliceFills({ user: "0x..." });
+     * // [
+     * //   {
+     * //     "fill": {
+     * //       "closedPnl": "0.0",
+     * //       "coin": "AVAX",
+     * //       "crossed": true,
+     * //       "dir": "Open Long",
+     * //       "oid": 90542681,
+     * //       "px": "18.435",
+     * //       "side": "B",
+     * //       ...
+     * //     },
+     * //     "twapId": 3156
+     * //   },
+     * //   ...
+     * // ]
+     * ```
+     */
+    userTwapSliceFills(args: UserTwapSliceFillsParameters, signal?: AbortSignal): Promise<UserTwapSliceFill[]> {
+        return this.transport.request("info", { type: "userTwapSliceFills", ...args }, signal);
+    }
+
+    /**
+     * Request user vault deposits.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Array of user's vault deposits.
+     *
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-vault-deposits|Hyperliquid GitBook}
+     * @example
+     * ```ts
+     * const deposits = await client.userVaultDeposits({ user: "0x..." });
+     * // [
+     * //   {
+     * //     "vaultAddress": "0xdfc24b077bc1425ad1dea75bcb6f8158e10df303",
+     * //     "equity": "742500.082809"
+     * //   },
+     * //   ...
+     * // ]
+     * ```
+     */
+    userVaultEquities(args: UserVaultEquitiesParameters, signal?: AbortSignal): Promise<UserVaultEquity[]> {
+        return this.transport.request("info", { type: "userVaultEquities", ...args }, signal);
+    }
+
+    /**
+     * Request details of a vault.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Details of a vault.
+     *
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-details-for-a-vault|Hyperliquid GitBook}
+     * @example
+     * ```ts
+     * const vault = await client.vaultDetails({ vaultAddress: "0x..." });
+     * ```
+     */
+    vaultDetails(args: VaultDetailsParameters, signal?: AbortSignal): Promise<VaultDetails | null> {
+        return this.transport.request("info", { type: "vaultDetails", ...args }, signal);
+    }
+
+    /**
+     * Request a list of vaults less than 2 hours old.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Array of vault summaries.
+     *
+     * @example
+     * ```ts
+     * const vaults = await client.vaultSummaries();
+     * // [
+     * //   {
+     * //     "name": "Test Vault",
+     * //     "vaultAddress": "0xd7290b064ad5b7246f7396a5e64acec99345e4f3",
+     * //     "leader": "0x4dc1cf5a7e6f3dd273b287ba7d93980daedc9ee6",
+     * //     "tvl": "500.0",
+     * //     "isClosed": false,
+     * //     "relationship": {
+     * //       "type": "normal"
+     * //     },
+     * //     "createTimeMillis": 1735582150881
+     * //   },
+     * //   ...
+     * // ]
+     * ```
+     */
+    vaultSummaries(signal?: AbortSignal): Promise<VaultSummary[]> {
+        return this.transport.request("info", { type: "vaultSummaries" }, signal);
     }
 
     // ———————————————Explorer API———————————————

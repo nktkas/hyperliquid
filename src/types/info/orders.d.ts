@@ -28,7 +28,9 @@ export type OrderType =
 export type TIF =
     | "Gtc"
     | "Ioc"
-    | "Alo";
+    | "Alo"
+    | "FrontendMarket"
+    | "LiquidationMarket";
 
 /**
  * Order processing status:
@@ -56,7 +58,7 @@ export interface FrontendOpenOrder extends Omit<OpenOrder, "cloid"> {
     isTrigger: boolean;
 
     /** Trigger price (if {@link isTrigger} is true). */
-    triggerPx: string | null;
+    triggerPx: string;
 
     /** Child orders associated with this order. */
     children: FrontendOpenOrder[];
@@ -104,23 +106,26 @@ export interface OpenOrder {
     cloid?: Hex;
 }
 
+/** Order status with additional frontend information and current status. */
+export interface OrderStatus {
+    /** Order details. */
+    order: FrontendOpenOrder;
+
+    /** Order processing status. */
+    status: OrderProcessingStatus;
+
+    /** Timestamp when the status was last updated (in ms since epoch). */
+    statusTimestamp: number;
+}
+
 /** Result of an order status lookup. */
-export type OrderStatus =
+export type OrderStatusResult =
     | {
         /** Indicates that the order was found. */
         status: "order";
 
-        /** Open order with additional frontend information and current status. */
-        order: {
-            /** Order details. */
-            order: FrontendOpenOrder;
-
-            /** Order processing status. */
-            status: OrderProcessingStatus;
-
-            /** Timestamp when the status was last updated (in ms since epoch). */
-            statusTimestamp: number;
-        };
+        /** Order details. */
+        order: OrderStatus;
     }
     | {
         /** Indicates that the order was not found. */
@@ -196,7 +201,7 @@ export interface L2Book {
     time: number;
 
     /** Bid and ask levels (index 0 = bids, index 1 = asks). */
-    levels: L2BookEntry[][];
+    levels: [L2BookEntry[], L2BookEntry[]];
 }
 
 /** Single entry in {@link L2Book.levels}. */
@@ -250,8 +255,25 @@ export interface TwapHistory {
     };
 
     /** The status of the twap. */
-    status: {
-        /** The status of the twap. */
-        status: "finished" | "activated" | "terminated";
-    };
+    status:
+        | {
+            /** The status of the twap. */
+            status: "finished" | "activated" | "terminated";
+        }
+        | {
+            /** The status of the twap. */
+            status: "error";
+
+            /** The error message. */
+            description: string;
+        };
+}
+
+/** The twap slice fill of a user. */
+export interface UserTwapSliceFill {
+    /** The fill of the twap slice. */
+    fill: Omit<UserFill, "cloid" | "liquidation">;
+
+    /** The id of the twap. */
+    twapId: number;
 }

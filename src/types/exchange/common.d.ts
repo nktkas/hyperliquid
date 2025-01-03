@@ -2,7 +2,7 @@ import type { Hex } from "../common.d.ts";
 import type { TIF } from "../info/orders.d.ts";
 
 /** Order parameters. */
-export interface Order {
+export type Order = {
     /** An integer representing the asset being traded. */
     a: number;
 
@@ -43,4 +43,4 @@ export interface Order {
 
     /** Client Order ID. */
     c?: Hex;
-}
+};

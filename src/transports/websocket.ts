@@ -1,4 +1,4 @@
-import type { IRESTTransport } from "./base.d.ts";
+import { TransportError, type IRESTTransport } from "./base.ts";
 import { ReconnectingWebSocket, type ReconnectingWebSocketConfig } from "../utils/reconnecting-websocket.ts";
 
 /**
@@ -72,7 +72,7 @@ interface ErrorResponse {
 /**
  * The error thrown when the WebSocket request fails.
  */
-export class WebSocketRequestError extends Error {
+export class WebSocketRequestError extends TransportError {
     /**
      * Creates a new WebSocket request error.
      * @param message - The error message.

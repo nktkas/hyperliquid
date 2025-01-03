@@ -99,6 +99,19 @@ export interface FundingHistoryRequest extends BaseInfoRequest {
 }
 
 /**
+ * Request user historical orders.
+ * @returns {OrderStatus[]} Array of user's historical orders.
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-historical-orders|Hyperliquid GitBook}
+ */
+export interface HistoricalOrdersRequest extends BaseInfoRequest {
+    /** Type of request. */
+    type: "historicalOrders";
+
+    /** User's address. */
+    user: Hex;
+}
+
+/**
  * Request L2 order book ({@link L2Book}).
  * @returns {L2Book} L2 order book snapshot.
  * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#l2-book-snapshot|Hyperliquid GitBook}
@@ -220,6 +233,7 @@ export interface SpotClearinghouseStateRequest extends BaseInfoRequest {
 /**
  * Request spot deploy state.
  * @returns {SpotDeployState} The deploy state of a user.
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-deploy-auction|Hyperliquid GitBook}
  */
 export interface SpotDeployStateRequest extends BaseInfoRequest {
     /** Type of request. */
@@ -252,6 +266,7 @@ export interface SpotMetaRequest extends BaseInfoRequest {
 /**
  * Request user sub-accounts.
  * @returns {SubAccount[]} Array of user sub-account.
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-subaccounts|Hyperliquid GitBook}
  */
 export interface SubAccountsRequest extends BaseInfoRequest {
     /** Type of request. */
@@ -264,6 +279,7 @@ export interface SubAccountsRequest extends BaseInfoRequest {
 /**
  * The request to get the details of a token.
  * @returns {TokenDetails} The details of a token.
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-a-token|Hyperliquid GitBook}
  */
 export interface TokenDetailsRequest extends BaseInfoRequest {
     /** Type of request. */
@@ -390,4 +406,55 @@ export interface UserRateLimitRequest extends BaseInfoRequest {
 
     /** User's address. */
     user: Hex;
+}
+
+/**
+ * Request user twap slice fills.
+ * @returns {UserTwapSliceFill[]} Array of user's twap slice fills.
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills|Hyperliquid GitBook}
+ */
+export interface UserTwapSliceFillsRequest extends BaseInfoRequest {
+    /** Type of request. */
+    type: "userTwapSliceFills";
+
+    /** User's address. */
+    user: Hex;
+}
+
+/**
+ * Request user vault deposits.
+ * @returns {VaultEquity[]} Array of user's vault deposits.
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-vault-deposits|Hyperliquid GitBook}
+ */
+export interface UserVaultEquitiesRequest extends BaseInfoRequest {
+    /** Type of request. */
+    type: "userVaultEquities";
+
+    /** User's address. */
+    user: Hex;
+}
+
+/**
+ * Request details of a vault.
+ * @returns {VaultDetails} Details of a vault.
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-details-for-a-vault|Hyperliquid GitBook}
+ */
+export interface VaultDetailsRequest extends BaseInfoRequest {
+    /** Type of request. */
+    type: "vaultDetails";
+
+    /** Vault address. */
+    vaultAddress: Hex;
+
+    /** User's address. */
+    user?: Hex;
+}
+
+/**
+ * Request a list of vaults less than 2 hours old.
+ * @returns {VaultSummary[]} Array of vault summaries.
+ */
+export interface VaultSummariesRequest extends BaseInfoRequest {
+    /** Type of request. */
+    type: "vaultSummaries";
 }

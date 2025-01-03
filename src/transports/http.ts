@@ -1,11 +1,11 @@
-import type { IRESTTransport } from "./base.d.ts";
+import { TransportError, type IRESTTransport } from "./base.ts";
 
 type MaybePromise<T> = T | Promise<T>;
 
 /**
  * The error thrown when the HTTP request fails.
  */
-export class HttpRequestError extends Error {
+export class HttpRequestError extends TransportError {
     /**
      * Creates a new HTTP request error.
      * @param response - The HTTP response.

@@ -29,7 +29,7 @@ import type {
     TwapCancelResponse,
     TwapOrderResponse,
 } from "../types/exchange/responses.d.ts";
-import type { IRESTTransport } from "../transports/base.d.ts";
+import type { IRESTTransport } from "../transports/base.ts";
 import {
     type AbstractEthersSigner,
     type AbstractEthersV5Signer,
@@ -689,7 +689,7 @@ export class WalletClient<
      * });
      * ```
      */
-    async scheduleCancel(args: ScheduleCancelParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+    async scheduleCancel(args: ScheduleCancelParameters = {}, signal?: AbortSignal): Promise<SuccessResponse> {
         const {
             vaultAddress = this.defaultVaultAddress,
             nonce = Date.now(),
