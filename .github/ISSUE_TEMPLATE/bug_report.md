@@ -8,19 +8,19 @@ assignees: nktkas
 
 **Bug Description**
 
-Briefly describe the bug.
+<!-- Briefly describe the bug. -->
 
 **Code to Reproduce**
 
-Provide a minimal code snippet that reproduces the bug.
+<!-- Provide a minimal code snippet that reproduces the bug. -->
 
 **Expected vs. Actual Behavior**
 
-Explain what should happen vs. what actually happens.
+<!-- Explain what should happen vs. what actually happens. -->
 
 **Error Logs (if available)**
 
-Paste relevant error messages or logs here.
+<!-- Paste relevant error messages or logs here. -->
 
 **Environment**
 
@@ -30,4 +30,4 @@ Paste relevant error messages or logs here.
 
 **Additional Context (optional)**
 
-Include any other relevant information.
+<!-- Include any other relevant information. -->
