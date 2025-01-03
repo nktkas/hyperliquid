@@ -1,9 +1,23 @@
-# @nktkas/hyperliquid
+# Hyperliquid API TypeScript SDK
 
 [![JSR](https://jsr.io/badges/@nktkas/hyperliquid)](https://jsr.io/@nktkas/hyperliquid)
 [![JSR Score](https://jsr.io/badges/@nktkas/hyperliquid/score)](https://jsr.io/@nktkas/hyperliquid)
 
-SDK for Hyperliquid API trading with TypeScript.
+Community-supported [Hyperliquid API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api) SDK for all
+major JS runtimes, written in TypeScript and provided with tests.
+
+## Features
+
+- 🖋️ **Typed**: Source code is 100% TypeScript.
+- 🧪 **Tested**: Code coverage is 100% and has type validation.
+- 📦 **Minimal dependencies**: Only [@std/msgpack](https://jsr.io/@std/msgpack) and
+  [@noble/hashes](https://github.com/paulmillr/noble-hashes), everything else is standard JS.
+- 🌐 **Cross-Environment Support**: Compatible with all major JS runtimes, including Node.js, Deno, Bun, and browser
+  environments.
+- 🔧 **Extensible**: Easily integrates with [viem](https://github.com/wevm/viem) and
+  [ethers](https://github.com/ethers-io/ethers.js).
+- 📚 **Documented**: Comprehensive documentation and usage examples, provided directly in JSDoc annotations within the
+  source code.
 
 ## Installation
 
@@ -66,8 +80,9 @@ const client = new hl.PublicClient({ transport });
 
 ```typescript
 import * as hl from "@nktkas/hyperliquid";
-import { createWalletClient, custom, privateKeyToAccount } from "viem";
+import { createWalletClient, custom } from "viem";
 import { arbitrum } from "viem/chains";
+import { privateKeyToAccount } from "viem/accounts";
 import { ethers } from "ethers";
 
 const transport = new hl.HttpTransport(); // or WebSocketTransport
@@ -82,12 +97,12 @@ const ethersClient = new hl.WalletClient({ wallet: ethersWallet, transport });
 
 // 3. Using external wallet (e.g. MetaMask) via Viem
 const [account] = await window.ethereum.request({ method: "eth_requestAccounts" });
-const walletClient = createWalletClient({
+const externalWallet = createWalletClient({
     account,
     chain: arbitrum,
     transport: custom(window.ethereum),
 });
-const metamaskClient = new hl.WalletClient({ wallet: walletClient, transport });
+const metamaskClient = new hl.WalletClient({ wallet: externalWallet, transport });
 ```
 
 ## API Reference
@@ -146,7 +161,8 @@ The SDK provides two client classes for interacting with the Hyperliquid API:
 
 #### PublicClient
 
-Client for retrieving information (order book, user positions, etc.).
+Client for interaction with [Info API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint)
+(order book, user positions, etc.).
 
 ```typescript
 class PublicClient<T extends IRESTTransport> {
@@ -170,20 +186,29 @@ class PublicClient<T extends IRESTTransport> {
     // Account
     clearinghouseState(args: ClearinghouseStateParameters): Promise<ClearinghouseState>;
     extraAgents(args: ExtraAgentsParameters): Promise<ExtraAgent[]>;
-    frontendOpenOrders(args: FrontendOpenOrdersParameters): Promise<FrontendOpenOrder[]>;
     maxBuilderFee(args: MaxBuilderFeeParameters): Promise<number>;
-    openOrders(args: OpenOrdersParameters): Promise<OpenOrder[]>;
-    orderStatus(args: OrderStatusParameters): Promise<OrderStatusResponse>;
     referral(args: ReferralParameters): Promise<Referral>;
     spotClearinghouseState(args: SpotClearinghouseStateParameters): Promise<SpotClearinghouseState>;
     subAccounts(args: SubAccountsParameters): Promise<SubAccount[]>;
-    twapHistory(args: TwapHistoryParameters): Promise<TwapHistory>;
     userFees(args: UserFeesParameters): Promise<UserFees>;
-    userFills(args: UserFillsParameters): Promise<UserFill[]>;
-    userFillsByTime(args: UserFillsByTimeParameters): Promise<UserFill[]>;
     userFunding(args: UserFundingParameters): Promise<UserFunding[]>;
     userNonFundingLedgerUpdates(args: UserNonFundingLedgerUpdatesParameters): Promise<UserNonFundingLedgerUpdates[]>;
     userRateLimit(args: UserRateLimitParameters): Promise<UserRateLimit>;
+
+    // Order
+    frontendOpenOrders(args: FrontendOpenOrdersParameters): Promise<FrontendOpenOrder[]>;
+    historicalOrders(args: HistoricalOrdersParameters): Promise<OrderStatus[]>;
+    openOrders(args: OpenOrdersParameters): Promise<OpenOrder[]>;
+    orderStatus(args: OrderStatusParameters): Promise<OrderStatusResponse>;
+    twapHistory(args: TwapHistoryParameters): Promise<TwapHistory>;
+    userFills(args: UserFillsParameters): Promise<UserFill[]>;
+    userFillsByTime(args: UserFillsByTimeParameters): Promise<UserFill[]>;
+    userTwapSliceFills(args: UserTwapSliceFillsParameters): Promise<UserTwapSliceFill[]>;
+
+    // Vault
+    userVaultEquities(args: UserVaultEquitiesParameters): Promise<UserVaultEquity[]>;
+    vaultDetails(args: VaultDetailsParameters): Promise<VaultDetails | null>;
+    vaultSummaries(): Promise<VaultSummary[]>;
 
     // Blockchain
     blockDetails(args: BlockDetailsParameters): Promise<BlockDetailsResponse>;
@@ -193,7 +218,9 @@ class PublicClient<T extends IRESTTransport> {
 
 #### WalletClient
 
-Client for interacting with the exchange API (placing orders, cancelling orders, etc.).
+Client for interaction with
+[Exchange API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint) (placing orders,
+transferring funds, etc.).
 
 ```typescript
 class WalletClient<
@@ -203,7 +230,7 @@ class WalletClient<
     constructor(args: {
         transport: T; // HttpTransport or WebSocketTransport
         wallet: W; // viem, ethers, or ethers v5
-        isTestnet?: boolean; // Whether to use the testnet API (default: false)
+        isTestnet?: boolean; // Whether to use testnet API (default: false)
         defaultVaultAddress?: Hex; // Vault address used by default if not provided in method call
     });
 
@@ -237,16 +264,17 @@ class WalletClient<
 
 ## Semantic Versioning
 
-This library follows **Semantic Versioning (semver)** for its releases.
+This library follows [Semantic Versioning (semver)](https://semver.org/) for its releases.
 
-> [!NOTE]
+> [!IMPORTANT]
 > The Hyperliquid API types are updated independently and it is not possible to use a specific version of them, only the
 > latest. As a result, updates to these types may change the patch version even if they include breaking changes.
 
 ## CI/CD and Release
 
-Before publishing a new version of the SDK on GitHub, we make sure to run tests in CI. Only if all tests are successful,
-the process of publishing the package on JSR takes place.
+Before publishing a new version of the SDK, tests are always run in
+[Github Actions](https://github.com/nktkas/hyperliquid/actions). Only if all tests pass successfully, the process of
+publishing the package takes place.
 
 For more details, see our [CI/CD configuration files](./.github/workflows/).
 
