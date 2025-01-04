@@ -33,9 +33,9 @@ type ActionType =
     | VaultTransferRequest["action"];
 
 /**
- * Sort the keys of an action object according to the schema.
+ * Sort the keys of the action object to then create the correct action hash.
  * @param action - The action object to sort.
- * @returns A new sorted action object, which may include keys with undefined values.
+ * @returns A new sorted action object.
  */
 export function sortActionKeys(action: BatchModifyRequest["action"]): BatchModifyRequest["action"];
 export function sortActionKeys(action: CancelRequest["action"]): CancelRequest["action"];
@@ -52,8 +52,9 @@ export function sortActionKeys(action: UpdateIsolatedMarginRequest["action"]): U
 export function sortActionKeys(action: UpdateLeverageRequest["action"]): UpdateLeverageRequest["action"];
 export function sortActionKeys(action: VaultTransferRequest["action"]): VaultTransferRequest["action"];
 export function sortActionKeys(action: ActionType): ActionType {
+    let sortedAction: ActionType;
     if (action.type === "batchModify") {
-        return {
+        sortedAction = {
             type: action.type,
             modifies: action.modifies.map((modify) => ({
                 oid: modify.oid,
@@ -69,7 +70,7 @@ export function sortActionKeys(action: ActionType): ActionType {
             })),
         };
     } else if (action.type === "cancel") {
-        return {
+        sortedAction = {
             type: action.type,
             cancels: action.cancels.map((cancel) => ({
                 a: cancel.a,
@@ -77,7 +78,7 @@ export function sortActionKeys(action: ActionType): ActionType {
             })),
         };
     } else if (action.type === "cancelByCloid") {
-        return {
+        sortedAction = {
             type: action.type,
             cancels: action.cancels.map((cancel) => ({
                 asset: cancel.asset,
@@ -85,12 +86,12 @@ export function sortActionKeys(action: ActionType): ActionType {
             })),
         };
     } else if (action.type === "createSubAccount") {
-        return {
+        sortedAction = {
             type: action.type,
             name: action.name,
         };
     } else if (action.type === "modify") {
-        return {
+        sortedAction = {
             type: action.type,
             oid: action.oid,
             order: {
@@ -101,7 +102,9 @@ export function sortActionKeys(action: ActionType): ActionType {
                 r: action.order.r,
                 t: "limit" in action.order.t
                     ? {
-                        limit: { tif: action.order.t.limit.tif },
+                        limit: {
+                            tif: action.order.t.limit.tif,
+                        },
                     }
                     : {
                         trigger: {
@@ -114,7 +117,7 @@ export function sortActionKeys(action: ActionType): ActionType {
             },
         };
     } else if (action.type === "order") {
-        return {
+        sortedAction = {
             type: action.type,
             orders: action.orders.map((order) => ({
                 a: order.a,
@@ -124,7 +127,9 @@ export function sortActionKeys(action: ActionType): ActionType {
                 r: order.r,
                 t: "limit" in order.t
                     ? {
-                        limit: { tif: order.t.limit.tif },
+                        limit: {
+                            tif: order.t.limit.tif,
+                        },
                     }
                     : {
                         trigger: {
@@ -141,33 +146,33 @@ export function sortActionKeys(action: ActionType): ActionType {
                     b: action.builder.b,
                     f: action.builder.f,
                 }
-                : undefined,
+                : action.builder,
         };
     } else if (action.type === "scheduleCancel") {
-        return {
+        sortedAction = {
             type: action.type,
             time: action.time,
         };
     } else if (action.type === "setReferrer") {
-        return {
+        sortedAction = {
             type: action.type,
             code: action.code,
         };
     } else if (action.type === "subAccountTransfer") {
-        return {
+        sortedAction = {
             type: action.type,
             subAccountUser: action.subAccountUser,
             isDeposit: action.isDeposit,
             usd: action.usd,
         };
     } else if (action.type === "twapCancel") {
-        return {
+        sortedAction = {
             type: action.type,
             a: action.a,
             t: action.t,
         };
     } else if (action.type === "twapOrder") {
-        return {
+        sortedAction = {
             type: action.type,
             twap: {
                 a: action.twap.a,
@@ -179,27 +184,49 @@ export function sortActionKeys(action: ActionType): ActionType {
             },
         };
     } else if (action.type === "updateIsolatedMargin") {
-        return {
+        sortedAction = {
             type: action.type,
             asset: action.asset,
             isBuy: action.isBuy,
             ntli: action.ntli,
         };
     } else if (action.type === "updateLeverage") {
-        return {
+        sortedAction = {
             type: action.type,
             asset: action.asset,
             isCross: action.isCross,
             leverage: action.leverage,
         };
-    } else if (action.type === "vaultTransfer") {
-        return {
+    } else {
+        sortedAction = {
             type: action.type,
             vaultAddress: action.vaultAddress,
             isDeposit: action.isDeposit,
             usd: action.usd,
         };
+    }
+    return removeUndefinedValues(sortedAction);
+}
+
+/**
+ * Remove undefined values from an object.
+ * @param obj - The object to remove undefined values from.
+ * @returns A new object with undefined values removed.
+ */
+function removeUndefinedValues<T>(obj: T): T {
+    if (Array.isArray(obj)) {
+        return obj.map(removeUndefinedValues) as T;
+    } else if (obj && typeof obj === "object") {
+        return Object.entries(obj).reduce((acc, [key, val]) => {
+            if (val === undefined) {
+                return acc;
+            }
+            return {
+                ...acc,
+                [key]: removeUndefinedValues(val),
+            };
+        }, {} as T);
     } else {
-        throw new Error("No sorting schema found for action");
+        return obj;
     }
 }

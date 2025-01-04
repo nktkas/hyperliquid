@@ -68,13 +68,18 @@ export interface AbstractViemWalletClient {
  * @returns The hash of the action.
  */
 export function createActionHash(action: ValueType, nonce: number, vaultAddress?: Hex): Hex {
-    // Layer for compatibility of @std/msgpack with @msgpack/msgpack
-    // In the future should be replaced by the msgpack extension: https://github.com/denoland/std/issues/3534
+    // Layer to make @std/msgpack compatible with @msgpack/msgpack which uses hyperliquid.
+    // Reason for creating this function: https://github.com/denoland/std/issues/6328#issuecomment-2571092439
+    // Reasons to use @std/msgpack instead of @msgpack/msgpack: the size is smaller and lends itself better to manual analysis
     const float64IntegersToUint64 = (obj: ValueType): ValueType => {
         const THIRTY_ONE_BITS = 2147483648;
         const THIRTY_TWO_BITS = 4294967296;
-        if (typeof obj === "number" && Number.isInteger(obj) && (obj >= THIRTY_TWO_BITS || obj < -THIRTY_ONE_BITS)) {
-            return BigInt(obj); // Now @std/msgpack will handle integer 64 bit as int64/uint64 instead of float64
+        if (
+            typeof obj === "number" && Number.isInteger(obj) &&
+            obj <= Number.MAX_SAFE_INTEGER && obj >= Number.MIN_SAFE_INTEGER &&
+            (obj >= THIRTY_TWO_BITS || obj < -THIRTY_ONE_BITS)
+        ) {
+            return BigInt(obj);
         } else if (Array.isArray(obj)) {
             return obj.map(float64IntegersToUint64);
         } else if (obj && typeof obj === "object") {

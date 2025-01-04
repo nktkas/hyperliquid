@@ -433,11 +433,10 @@ export class WalletClient<
         } = args;
 
         const sortedAction = sortActionKeys({ type: "batchModify", ...actionArgs });
-        const cleanedAction = removeUndefinedValues(sortedAction);
-        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce, vaultAddress);
+        const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce, vaultAddress);
 
         const request: BatchModifyRequest = {
-            action: cleanedAction,
+            action: sortedAction,
             signature,
             nonce,
             vaultAddress,
@@ -474,11 +473,10 @@ export class WalletClient<
         } = args;
 
         const sortedAction = sortActionKeys({ type: "cancel", ...actionArgs });
-        const cleanedAction = removeUndefinedValues(sortedAction);
-        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce, vaultAddress);
+        const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce, vaultAddress);
 
         const request: CancelRequest = {
-            action: cleanedAction,
+            action: sortedAction,
             signature,
             nonce,
             vaultAddress,
@@ -515,11 +513,10 @@ export class WalletClient<
         } = args;
 
         const sortedAction = sortActionKeys({ type: "cancelByCloid", ...actionArgs });
-        const cleanedAction = removeUndefinedValues(sortedAction);
-        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce, vaultAddress);
+        const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce, vaultAddress);
 
         const request: CancelByCloidRequest = {
-            action: cleanedAction,
+            action: sortedAction,
             signature,
             nonce,
             vaultAddress,
@@ -551,11 +548,10 @@ export class WalletClient<
         } = args;
 
         const sortedAction = sortActionKeys({ type: "createSubAccount", ...actionArgs });
-        const cleanedAction = removeUndefinedValues(sortedAction);
-        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce);
+        const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce);
 
         const request: CreateSubAccountRequest = {
-            action: cleanedAction,
+            action: sortedAction,
             signature,
             nonce,
         };
@@ -605,11 +601,10 @@ export class WalletClient<
         } = args;
 
         const sortedAction = sortActionKeys({ type: "modify", ...actionArgs });
-        const cleanedAction = removeUndefinedValues(sortedAction);
-        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce, vaultAddress);
+        const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce, vaultAddress);
 
         const request: ModifyRequest = {
-            action: cleanedAction,
+            action: sortedAction,
             signature,
             nonce,
             vaultAddress,
@@ -659,11 +654,10 @@ export class WalletClient<
         if (actionArgs.builder) actionArgs.builder.b = actionArgs.builder.b.toLowerCase() as Hex;
 
         const sortedAction = sortActionKeys({ type: "order", ...actionArgs });
-        const cleanedAction = removeUndefinedValues(sortedAction);
-        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce, vaultAddress);
+        const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce, vaultAddress);
 
         const request: OrderRequest = {
-            action: cleanedAction,
+            action: sortedAction,
             signature,
             nonce,
             vaultAddress,
@@ -697,11 +691,10 @@ export class WalletClient<
         } = args;
 
         const sortedAction = sortActionKeys({ type: "scheduleCancel", ...actionArgs });
-        const cleanedAction = removeUndefinedValues(sortedAction);
-        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce, vaultAddress);
+        const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce, vaultAddress);
 
         const request: ScheduleCancelRequest = {
-            action: cleanedAction,
+            action: sortedAction,
             signature,
             nonce,
             vaultAddress,
@@ -733,11 +726,10 @@ export class WalletClient<
         } = args;
 
         const sortedAction = sortActionKeys({ type: "setReferrer", ...actionArgs });
-        const cleanedAction = removeUndefinedValues(sortedAction);
-        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce);
+        const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce);
 
         const request: SetReferrerRequest = {
-            action: cleanedAction,
+            action: sortedAction,
             signature,
             nonce,
         };
@@ -821,11 +813,10 @@ export class WalletClient<
         } = args;
 
         const sortedAction = sortActionKeys({ type: "subAccountTransfer", ...actionArgs });
-        const cleanedAction = removeUndefinedValues(sortedAction);
-        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce);
+        const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce);
 
         const request: SubAccountTransferRequest = {
-            action: cleanedAction,
+            action: sortedAction,
             signature,
             nonce,
         };
@@ -859,11 +850,10 @@ export class WalletClient<
         } = args;
 
         const sortedAction = sortActionKeys({ type: "twapCancel", ...actionArgs });
-        const cleanedAction = removeUndefinedValues(sortedAction);
-        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce, vaultAddress);
+        const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce, vaultAddress);
 
         const request: TwapCancelRequest = {
-            action: cleanedAction,
+            action: sortedAction,
             signature,
             nonce,
             vaultAddress,
@@ -902,11 +892,10 @@ export class WalletClient<
         } = args;
 
         const sortedAction = sortActionKeys({ type: "twapOrder", twap: actionArgs });
-        const cleanedAction = removeUndefinedValues(sortedAction);
-        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce, vaultAddress);
+        const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce, vaultAddress);
 
         const request: TwapOrderRequest = {
-            action: cleanedAction,
+            action: sortedAction,
             signature,
             nonce,
             vaultAddress,
@@ -942,11 +931,10 @@ export class WalletClient<
         } = args;
 
         const sortedAction = sortActionKeys({ type: "updateIsolatedMargin", ...actionArgs });
-        const cleanedAction = removeUndefinedValues(sortedAction);
-        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce, vaultAddress);
+        const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce, vaultAddress);
 
         const request: UpdateIsolatedMarginRequest = {
-            action: cleanedAction,
+            action: sortedAction,
             signature,
             nonce,
             vaultAddress,
@@ -982,11 +970,10 @@ export class WalletClient<
         } = args;
 
         const sortedAction = sortActionKeys({ type: "updateLeverage", ...actionArgs });
-        const cleanedAction = removeUndefinedValues(sortedAction);
-        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce, vaultAddress);
+        const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce, vaultAddress);
 
         const request: UpdateLeverageRequest = {
-            action: cleanedAction,
+            action: sortedAction,
             signature,
             nonce,
             vaultAddress,
@@ -1119,11 +1106,10 @@ export class WalletClient<
         } = args;
 
         const sortedAction = sortActionKeys({ type: "vaultTransfer", ...actionArgs });
-        const cleanedAction = removeUndefinedValues(sortedAction);
-        const signature = await signL1Action(this.wallet, this.isTestnet, cleanedAction, nonce);
+        const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce);
 
         const request: VaultTransferRequest = {
-            action: cleanedAction,
+            action: sortedAction,
             signature,
             nonce,
         };
@@ -1213,28 +1199,5 @@ export class WalletClient<
                 throw new ApiRequestError(response as TwapOrderResponse | TwapCancelResponse);
             }
         }
-    }
-}
-
-/**
- * Remove undefined values from an object.
- * @param obj - The object to remove undefined values from.
- * @returns A new object with undefined values removed.
- */
-function removeUndefinedValues<T>(obj: T): T {
-    if (Array.isArray(obj)) {
-        return obj.map(removeUndefinedValues) as T;
-    } else if (obj && typeof obj === "object") {
-        return Object.entries(obj).reduce((acc, [key, val]) => {
-            if (val === undefined) {
-                return acc;
-            }
-            return {
-                ...acc,
-                [key]: removeUndefinedValues(val),
-            };
-        }, {} as T);
-    } else {
-        return obj;
     }
 }
