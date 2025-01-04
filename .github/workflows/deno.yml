@@ -6,6 +6,7 @@ on:
             - main
         paths:
             - "deno.json" # Trigger only when deno.json changes
+    workflow_dispatch: # Allow manual triggering of the workflow. Necessary if the test failed due to unstable Testnet
 
 permissions:
     contents: read
@@ -18,7 +19,7 @@ jobs:
             - name: Checkout Repository
               uses: actions/checkout@v4
               with:
-                  fetch-depth: 2 # Fetch current and previous commits
+                  fetch-depth: 2 # Fetch current and previous commits for version comparison
 
             - name: Compare Versions
               id: version_check
@@ -40,20 +41,20 @@ jobs:
                       echo "version_changed=false" >> $GITHUB_OUTPUT
                   fi
 
+            - name: Skip if version not changed
+              if: steps.version_check.outputs.version_changed == 'false'
+              run: exit 1
+
             - name: Setup Deno
-              if: steps.version_check.outputs.version_changed == 'true'
               uses: denoland/setup-deno@v2
               with:
                   deno-version: v2.x
 
             - name: Run Formatter
-              if: steps.version_check.outputs.version_changed == 'true'
               run: deno fmt --check
 
             - name: Run Linter
-              if: steps.version_check.outputs.version_changed == 'true'
               run: deno lint
 
             - name: Run Tests
-              if: steps.version_check.outputs.version_changed == 'true'
               run: deno test --allow-net --allow-read -- ${{ secrets.TEST_PRIVATE_KEY }}
