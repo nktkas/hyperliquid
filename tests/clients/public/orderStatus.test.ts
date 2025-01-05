@@ -78,7 +78,7 @@ Deno.test("orderStatus", async (t) => {
                         });
                     });
 
-                    // Failed to find an order with `children.length > 0`
+                    // Failed to re-find an order with `children.length > 0`
                     await t.step({ name: "Check key 'children'", fn: () => {}, ignore: true });
 
                     await t.step("Check key 'orderType'", async (t) => {
@@ -112,12 +112,6 @@ Deno.test("orderStatus", async (t) => {
                                 "Expected 'orderType' to be 'Stop Limit', got: " + data.order.order.orderType,
                             );
                         });
-
-                        // Failed to find an order with `orderType === Scale`
-                        await t.step({ name: "some must be 'Scale'", fn: () => {}, ignore: true });
-
-                        // Failed to find an order with `orderType === TWAP`
-                        await t.step({ name: "some must be 'TWAP'", fn: () => {}, ignore: true });
                     });
 
                     await t.step("Check key 'tif'", async (t) => {
@@ -152,6 +146,12 @@ Deno.test("orderStatus", async (t) => {
                                 "Expected 'tif' to be 'Alo', got: " + data.order.order.tif,
                             );
                         });
+
+                        // Failed to find an order with `tif === FrontendMarket`
+                        await t.step({ name: "some must be 'FrontendMarket'", fn: () => {}, ignore: true });
+
+                        // Failed to find an order with `tif === LiquidationMarket`
+                        await t.step({ name: "some must be 'LiquidationMarket'", fn: () => {}, ignore: true });
                     });
 
                     await t.step("Check key 'cloid'", async (t) => {

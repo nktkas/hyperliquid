@@ -36,7 +36,7 @@ Deno.test("frontendOpenOrders", async (t) => {
             //     await t.step("some must be null", () => assert(data.some((item) => item.side === null)));
             // });
 
-            // Failed to find an order with `children.length > 0`
+            // Failed to re-find an order with `children.length > 0`
             await t.step({ name: "Check key 'children'", fn: () => {}, ignore: true });
 
             await t.step("Check key 'orderType'", async (t) => {
@@ -55,12 +55,6 @@ Deno.test("frontendOpenOrders", async (t) => {
                     "some must be 'Stop Limit'",
                     () => assert(data.some((item) => item.orderType === "Stop Limit")),
                 );
-
-                // Failed to find an order with `orderType === Scale`
-                await t.step({ name: "some must be 'Scale'", fn: () => {}, ignore: true });
-
-                // Failed to find an order with `orderType === TWAP`
-                await t.step({ name: "some must be 'TWAP'", fn: () => {}, ignore: true });
             });
 
             await t.step("Check key 'tif'", async (t) => {
@@ -71,6 +65,12 @@ Deno.test("frontendOpenOrders", async (t) => {
                 await t.step({ name: "some must be 'Ioc'", fn: () => {}, ignore: true });
 
                 await t.step("some must be 'Alo'", () => assert(data.some((item) => item.tif === "Alo")));
+
+                // Failed to find an order with `tif === FrontendMarket`
+                await t.step({ name: "some must be 'FrontendMarket'", fn: () => {}, ignore: true });
+
+                // Failed to find an order with `tif === LiquidationMarket`
+                await t.step({ name: "some must be 'LiquidationMarket'", fn: () => {}, ignore: true });
             });
 
             await t.step("Check key 'cloid'", async (t) => {

@@ -6,8 +6,6 @@ import type { Hex } from "../common.d.ts";
  * - `"Limit"`: An order that executes at the selected limit price or better.
  * - `"Stop Market"`: A market order that is activated when the price reaches the selected stop price.
  * - `"Stop Limit"`: A limit order that is activated when the price reaches the selected stop price.
- * - `"Scale"`: Multiple limit orders in a set price range.
- * - `"TWAP"`: A large order divided into smaller suborders and executed in 30 second intervals.
  *
  * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/trading/order-types|Hyperliquid GitBook}
  */
@@ -15,15 +13,15 @@ export type OrderType =
     | "Market"
     | "Limit"
     | "Stop Market"
-    | "Stop Limit"
-    | "Scale"
-    | "TWAP";
+    | "Stop Limit";
 
 /**
  * Time-in-force options:
  * - `"Gtc"` (Good Til Cancelled): Remains active until filled or canceled.
  * - `"Ioc"` (Immediate or Cancel): Fills immediately or cancels any unfilled portion.
  * - `"Alo"` (Add Liquidity Only): Only adds liquidity; does not take liquidity.
+ * - `"FrontendMarket"`: Equivalent `Ioc`. Used in Hyperliquid UI.
+ * - `"LiquidationMarket"`: Equivalent `Ioc`. Used in Hyperliquid UI.
  */
 export type TIF =
     | "Gtc"
