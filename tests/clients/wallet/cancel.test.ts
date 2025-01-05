@@ -1,7 +1,7 @@
 import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import { BigNumber } from "npm:bignumber.js@^9.1.2";
-import { assertIncludesNotEmptyArray, assertJsonSchema, getAssetData, getPxDecimals, isHex } from "../../utils.ts";
+import { assertIncludesNotEmptyArray, assertJsonSchema, getAssetData, isHex } from "../../utils.ts";
 import { HttpTransport, PublicClient, WalletClient } from "../../../index.ts";
 
 const TEST_PRIVATE_KEY = Deno.args[0] as string | undefined;
@@ -32,10 +32,9 @@ Deno.test("cancel", async () => {
     const { id, universe, ctx } = await getAssetData(publicClient, TEST_PERPS_ASSET);
 
     // Calculations
-    const pxDecimals = getPxDecimals("perp", universe.szDecimals);
     const pxDown = new BigNumber(ctx.markPx)
         .times(0.99)
-        .dp(pxDecimals, BigNumber.ROUND_DOWN)
+        .dp(universe.szDecimals, BigNumber.ROUND_DOWN)
         .toString();
     const sz = new BigNumber(11) // USD
         .div(ctx.markPx)
@@ -46,7 +45,7 @@ Deno.test("cancel", async () => {
     await walletClient.updateLeverage({
         asset: id,
         isCross: true,
-        leverage: 10,
+        leverage: 3,
     });
 
     // Preparation of orders

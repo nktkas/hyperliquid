@@ -75,18 +75,6 @@ export async function getAssetData(client: PublicClient, assetName: string): Pro
 }
 
 /**
- * Get the number of decimals for the price
- * @param marketType - Market type
- * @param szDecimals - Number of decimals for the size
- * @returns Number of decimals for the price
- */
-export function getPxDecimals(marketType: "perp" | "spot", szDecimals: number): number {
-    const MAX_DECIMALS = marketType === "perp" ? 5 : 7;
-    const maxPxDecimals = MAX_DECIMALS - szDecimals;
-    return Math.max(0, maxPxDecimals);
-}
-
-/**
  * Verify if the data is a hex string
  * @param data - Data to verify
  * @returns `true` if the data is a hex string
