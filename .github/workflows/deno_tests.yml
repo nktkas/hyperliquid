@@ -1,0 +1,28 @@
+name: Run Deno Tests
+on:
+    workflow_dispatch:
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+        permissions:
+            contents: read
+
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+
+            - name: Setup Deno
+              uses: denoland/setup-deno@v2
+              with:
+                  deno-version: v2.x
+
+            - name: Run Formatter
+              run: deno fmt --check
+
+            - name: Run Linter
+              run: deno lint
+
+            - name: Run Tests
+              run: deno test --allow-net --allow-read -- ${{ secrets.TEST_PRIVATE_KEY }} ${{ vars.TEST_PERP_ASSET }} ${{ vars.TEST_SUB_ACCOUNT_ADDRESS }} ${{ vars.TEST_VAULT_ADDRESS }}

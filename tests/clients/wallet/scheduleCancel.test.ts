@@ -3,7 +3,8 @@ import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import { assertJsonSchema, isHex } from "../../utils.ts";
 import { HttpTransport, WalletClient } from "../../../index.ts";
 
-const TEST_PRIVATE_KEY = Deno.args[0];
+const TEST_PRIVATE_KEY = Deno.args[0] as string | undefined;
+
 if (!isHex(TEST_PRIVATE_KEY)) {
     throw new Error(`Expected a hex string, but got ${typeof TEST_PRIVATE_KEY}`);
 }

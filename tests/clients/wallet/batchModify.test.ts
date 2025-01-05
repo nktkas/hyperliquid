@@ -12,10 +12,14 @@ import {
 } from "../../utils.ts";
 import { HttpTransport, PublicClient, WalletClient } from "../../../index.ts";
 
-const TEST_PRIVATE_KEY = Deno.args[0];
-const TEST_ASSET = "ETH";
+const TEST_PRIVATE_KEY = Deno.args[0] as string | undefined;
+const TEST_PERPS_ASSET = Deno.args[1] as string | undefined;
+
 if (!isHex(TEST_PRIVATE_KEY)) {
     throw new Error(`Expected a hex string, but got ${typeof TEST_PRIVATE_KEY}`);
+}
+if (typeof TEST_PERPS_ASSET !== "string") {
+    throw new Error(`Expected a string, but got ${typeof TEST_PERPS_ASSET}`);
 }
 
 Deno.test("batchModify", async (t) => {
@@ -33,7 +37,7 @@ Deno.test("batchModify", async (t) => {
     // Preparation
 
     // Get asset data
-    const { id, universe, ctx } = await getAssetData(publicClient, TEST_ASSET);
+    const { id, universe, ctx } = await getAssetData(publicClient, TEST_PERPS_ASSET);
 
     // Calculations
     const pxDecimals = getPxDecimals("perp", universe.szDecimals);

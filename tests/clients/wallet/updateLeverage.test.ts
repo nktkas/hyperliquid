@@ -3,10 +3,14 @@ import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import { assertJsonSchema, getAssetData, isHex } from "../../utils.ts";
 import { HttpTransport, PublicClient, WalletClient } from "../../../index.ts";
 
-const TEST_PRIVATE_KEY = Deno.args[0];
-const TEST_ASSET = "ETH";
+const TEST_PRIVATE_KEY = Deno.args[0] as string | undefined;
+const TEST_PERPS_ASSET = Deno.args[1] as string | undefined;
+
 if (!isHex(TEST_PRIVATE_KEY)) {
     throw new Error(`Expected a hex string, but got ${typeof TEST_PRIVATE_KEY}`);
+}
+if (typeof TEST_PERPS_ASSET !== "string") {
+    throw new Error(`Expected a string, but got ${typeof TEST_PERPS_ASSET}`);
 }
 
 Deno.test("updateLeverage", async (t) => {
@@ -24,7 +28,7 @@ Deno.test("updateLeverage", async (t) => {
     // Preparation
 
     // Get asset data
-    const { id } = await getAssetData(publicClient, TEST_ASSET);
+    const { id } = await getAssetData(publicClient, TEST_PERPS_ASSET);
 
     // Test
     await t.step("change to cross leverage", async () => {

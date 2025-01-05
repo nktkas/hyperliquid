@@ -1,8 +1,10 @@
 name: Publish Package to JSR
 on:
     workflow_run:
-        workflows: ["Deno Test"]
-        types: [completed]
+        workflows:
+            - Run Deno Tests
+        types:
+            - completed
 
 jobs:
     publish:

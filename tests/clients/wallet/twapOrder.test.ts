@@ -5,10 +5,14 @@ import { assertRejects } from "jsr:@std/assert@^1.0.10";
 import { assertIncludesNotEmptyArray, assertJsonSchema, getAssetData, isHex } from "../../utils.ts";
 import { ApiRequestError, HttpTransport, PublicClient, WalletClient } from "../../../index.ts";
 
-const TEST_PRIVATE_KEY = Deno.args[0];
-const TEST_ASSET = "ETH";
+const TEST_PRIVATE_KEY = Deno.args[0] as string | undefined;
+const TEST_PERPS_ASSET = Deno.args[1] as string | undefined;
+
 if (!isHex(TEST_PRIVATE_KEY)) {
     throw new Error(`Expected a hex string, but got ${typeof TEST_PRIVATE_KEY}`);
+}
+if (typeof TEST_PERPS_ASSET !== "string") {
+    throw new Error(`Expected a string, but got ${typeof TEST_PERPS_ASSET}`);
 }
 
 Deno.test("twapOrder", async (t) => {
@@ -24,7 +28,7 @@ Deno.test("twapOrder", async (t) => {
     const publicClient = new PublicClient({ transport });
 
     // Preparation
-    const { id, universe, ctx } = await getAssetData(publicClient, TEST_ASSET);
+    const { id, universe, ctx } = await getAssetData(publicClient, TEST_PERPS_ASSET);
 
     // Test
     await t.step("should place twap order", async () => {

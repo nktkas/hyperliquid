@@ -13,7 +13,7 @@
     "publish": {
         "exclude": [
             ".github",
-            "test"
+            "tests"
         ]
     },
     "license": "MIT",
