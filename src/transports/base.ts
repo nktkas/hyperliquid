@@ -1,5 +1,8 @@
 /**
  * Interface representing a REST transport.
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint|Info endpoint}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint|Exchange endpoint}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/post-requests|Websocket post requests}
  */
 export interface IRESTTransport {
     /**

@@ -26,8 +26,8 @@ Deno.test("WebSocket Transport Tests", async (t) => {
             "Keep alive interval should be 30000, but got: " + transport.keepAliveInterval,
         );
         assert(
-            transport.reconnect.maxAttempts === 5,
-            "Max reconnect attempts should be 5, but got: " + transport.reconnect.maxAttempts,
+            transport.socket.config.maxAttempts === 5,
+            "Max reconnect attempts should be 5, but got: " + transport.socket.config.maxAttempts,
         );
 
         await transport.close();
@@ -115,5 +115,13 @@ Deno.test("WebSocket Transport Tests", async (t) => {
                 "Error should be InvalidStateError, but got: " + error.name,
             );
         }
+    });
+
+    await t.step("should await a successful connection", async () => {
+        const transport = new WebSocketTransport();
+        await transport.ready();
+        assert(transport.socket.readyState === WebSocket.OPEN, "Socket should be open");
+
+        await transport.close();
     });
 });

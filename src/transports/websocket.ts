@@ -89,9 +89,9 @@ export class WebSocketRequestError extends TransportError {
 export interface WebSocketTransportConfig {
     /**
      * The WebSocket URL.
-     * @default "wss://api.hyperliquid.xyz/ws"
      * @mainnet wss://api.hyperliquid.xyz/ws
      * @testnet wss://api.hyperliquid-testnet.xyz/ws
+     * @default "wss://api.hyperliquid.xyz/ws"
      */
     url?: string | URL;
 
@@ -110,6 +110,7 @@ export interface WebSocketTransportConfig {
     /**
      * Reconnection policy configuration for closed connections.
      * @note Only re-establishes the connection, does not retry failed requests.
+     * @default // Enabled with default configuration.
      */
     reconnect?: ReconnectingWebSocketConfig;
 }
@@ -124,14 +125,11 @@ export class WebSocketTransport implements IRESTTransport {
     /** The timeout for async WebSocket requests. */
     timeout: number;
 
-    /** Reconnection policy configuration for closed connections. */
-    reconnect: Required<ReconnectingWebSocketConfig>;
-
     /** The interval (in ms) to send keep-alive messages. */
     readonly keepAliveInterval: number;
 
     /** The WebSocket connection. */
-    protected socket: ReconnectingWebSocket;
+    readonly socket: ReconnectingWebSocket;
 
     /** The keep-alive timer. */
     protected keepAliveTimer: ReturnType<typeof setInterval> | null = null;
@@ -158,7 +156,6 @@ export class WebSocketTransport implements IRESTTransport {
             config?.reconnect,
         );
         this.url = this.socket.url;
-        this.reconnect = this.socket.config; // Copying reference to object
         this.timeout = config?.timeout ?? 10_000;
         this.keepAliveInterval = config?.keepAliveInterval ?? 20_000;
 
@@ -213,9 +210,49 @@ export class WebSocketTransport implements IRESTTransport {
     }
 
     /**
-     * Closes the WebSocket connection.
+     * Waits until the WebSocket connection is ready.
      * @param signal - An optional abort signal.
-     * @returns A promise that resolves when the connection is closed.
+     * @returns A promise that resolves when the connection is ready.
+     * @throws {AbortError} - On abort signal.
+     */
+    ready(signal?: AbortSignal): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            if (signal?.aborted) {
+                return reject(signal.reason);
+            }
+
+            if (this.socket.readyState === WebSocket.OPEN) {
+                return resolve();
+            }
+
+            const handleOpen = () => {
+                this.socket.terminationController.signal.removeEventListener("abort", handleTerminate);
+                signal?.removeEventListener("abort", handleAbort);
+                resolve();
+            };
+
+            const handleTerminate = () => {
+                this.socket.removeEventListener("open", handleOpen);
+                signal?.removeEventListener("abort", handleAbort);
+                reject(this.socket.terminationController.signal.reason);
+            };
+
+            const handleAbort = () => {
+                this.socket.removeEventListener("open", handleOpen);
+                this.socket.terminationController.signal.removeEventListener("abort", handleTerminate);
+                reject(signal?.reason);
+            };
+
+            this.socket.addEventListener("open", handleOpen, { once: true });
+            this.socket.terminationController.signal.addEventListener("abort", handleTerminate, { once: true });
+            signal?.addEventListener("abort", handleAbort, { once: true });
+        });
+    }
+
+    /**
+     * Closes the WebSocket connection and waits until it is fully closed.
+     * @param signal - An optional abort signal.
+     * @returns A promise that resolves when the connection is fully closed.
      */
     close(signal?: AbortSignal): Promise<void> {
         return new Promise<void>((resolve, reject) => {

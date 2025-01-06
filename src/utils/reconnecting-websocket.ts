@@ -45,7 +45,7 @@ export interface MessageBufferStrategy {
      * Add a message to the buffer
      * @param data - The message to buffer
      * @param signal - An AbortSignal for buffered message to cancel sending on reconnection
-     * @returns true if message was buffered, false if rejected
+     * @returns `true` if message was buffered, `false` if rejected
      */
     push(data: string | ArrayBufferLike | Blob | ArrayBufferView, signal?: AbortSignal): boolean;
 
@@ -96,12 +96,11 @@ class FifoMessageBuffer implements MessageBufferStrategy {
 }
 
 /**
- * A WebSocket that automatically reconnects when disconnected
+ * A WebSocket that automatically reconnects when disconnected.
+ * Reconnect all previously added listeners after reconnecting.
  */
 export class ReconnectingWebSocket implements WebSocket {
-    /**
-     * Configuration for the ReconnectingWebSocket.
-     */
+    /** Configuration for the ReconnectingWebSocket. */
     config: Required<ReconnectingWebSocketConfig>;
 
     /**
@@ -120,13 +119,13 @@ export class ReconnectingWebSocket implements WebSocket {
         listenerProxy: EventListenerOrEventListenerObject;
     }[] = [];
 
-    constructor(url: string | URL, protocols?: string | string[], config: ReconnectingWebSocketConfig = {}) {
+    constructor(url: string | URL, protocols?: string | string[], config?: ReconnectingWebSocketConfig) {
         this.config = {
-            maxAttempts: config.maxAttempts ?? 3,
-            timeout: config.timeout ?? 10_000,
-            delay: config.delay ?? ((attempt) => Math.min(~~(1 << attempt) * 150, 10_000)),
-            shouldReconnect: config.shouldReconnect ?? (() => true),
-            messageBuffer: config.messageBuffer ?? new FifoMessageBuffer(100),
+            maxAttempts: config?.maxAttempts ?? 3,
+            timeout: config?.timeout ?? 10_000,
+            delay: config?.delay ?? ((attempt) => Math.min(~~(1 << attempt) * 150, 10_000)),
+            shouldReconnect: config?.shouldReconnect ?? (() => true),
+            messageBuffer: config?.messageBuffer ?? new FifoMessageBuffer(100),
         };
         this.protocols = protocols;
 
@@ -180,7 +179,7 @@ export class ReconnectingWebSocket implements WebSocket {
                 const shouldReconnect = ++this.reconnectCount <= this.config.maxAttempts &&
                     await this.config.shouldReconnect(event);
                 if (!shouldReconnect) {
-                    this.terminationController.abort(new Error("RECONNECTION_LIMIT_REACHED"));
+                    this.terminationController.abort(new Error("RECONNECTION_LIMIT_REACHED", { cause: event }));
                     this.config.messageBuffer.clear();
                     this.eventListeners = [];
                     return;
@@ -272,7 +271,7 @@ export class ReconnectingWebSocket implements WebSocket {
      * @param signal - An optional abort signal for message buffering
      */
     send(data: string | ArrayBufferLike | Blob | ArrayBufferView, signal?: AbortSignal): void {
-        if (this.socket.readyState !== WebSocket.OPEN) {
+        if (this.socket.readyState !== WebSocket.OPEN && !this.terminationController.signal.aborted) {
             this.config.messageBuffer.push(data, signal);
         } else {
             this.socket.send(data);

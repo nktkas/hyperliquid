@@ -23,9 +23,9 @@ export class HttpRequestError extends TransportError {
 export interface HttpTransportConfig {
     /**
      * The API base URL.
-     * @default "https://api.hyperliquid.xyz"
      * @mainnet https://api.hyperliquid.xyz
      * @testnet https://api.hyperliquid-testnet.xyz
+     * @default "https://api.hyperliquid.xyz"
      */
     url?: string | URL;
 
@@ -61,30 +61,30 @@ export interface HttpTransportConfig {
  */
 export class HttpTransport implements IRESTTransport {
     /** The API base URL. */
-    url: string | URL = "https://api.hyperliquid.xyz";
+    url: string | URL;
 
     /** The timeout for request. Set to `0` to disable. */
-    timeout: number = 10_000;
+    timeout: number;
 
     /**
      * Request configuration options.
      * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/RequestInit}
      */
-    fetchOptions: Omit<RequestInit, "body" | "method"> = {};
+    fetchOptions: Omit<RequestInit, "body" | "method">;
 
     /**
      * A callback function that is called before the request is sent.
      * @param request - The request to send.
      * @returns The request to send.
      */
-    onRequest: (request: Request) => MaybePromise<Request | void | null | undefined> = (request) => request;
+    onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>;
 
     /**
      * A callback function that is called after the response is received.
      * @param response - The response to process.
      * @returns The response to process.
      */
-    onResponse: (response: Response) => MaybePromise<Response | void | null | undefined> = (response) => response;
+    onResponse?: (response: Response) => MaybePromise<Response | void | null | undefined>;
 
     /** API endpoint paths. */
     protected endpointPaths: Record<"info" | "action" | "explorer", string> = {
@@ -101,8 +101,8 @@ export class HttpTransport implements IRESTTransport {
         this.url = config?.url ?? "https://api.hyperliquid.xyz";
         this.timeout = config?.timeout ?? 10_000;
         this.fetchOptions = config?.fetchOptions ?? {};
-        this.onRequest = config?.onRequest ?? ((request) => request);
-        this.onResponse = config?.onResponse ?? ((response) => response);
+        this.onRequest = config?.onRequest;
+        this.onResponse = config?.onResponse;
     }
 
     /**
@@ -132,9 +132,9 @@ export class HttpTransport implements IRESTTransport {
         );
         let request = new Request(url, init);
 
-        request = await this.onRequest(request) ?? request;
+        request = await this.onRequest?.(request) ?? request;
         let response = await fetch(request);
-        response = await this.onResponse(response) ?? response;
+        response = await this.onResponse?.(response) ?? response;
 
         if (!response.ok || !response.headers.get("Content-Type")?.includes("application/json")) {
             const body = await response.text().catch(() => undefined);
@@ -173,12 +173,12 @@ function mergeHeaders(...headersList: HeadersInit[]): Headers {
 function mergeRequestInit(...inits: RequestInit[]): RequestInit {
     const merged = inits.reduce((acc, init) => ({ ...acc, ...init }), {});
 
-    const headersList = inits.map((init) => init.headers).filter((headers): headers is HeadersInit => Boolean(headers));
+    const headersList = inits.map((init) => init.headers).filter((headers) => typeof headers === "object");
     if (headersList.length > 0) {
         merged.headers = mergeHeaders(...headersList);
     }
 
-    const signals = inits.map((init) => init.signal).filter((signal): signal is AbortSignal => Boolean(signal));
+    const signals = inits.map((init) => init.signal).filter((signal) => signal instanceof AbortSignal);
     if (signals.length > 0) {
         merged.signal = signals.length > 1 ? AbortSignal.any(signals) : signals[0];
     }
