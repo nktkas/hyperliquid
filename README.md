@@ -6,6 +6,10 @@
 Community-supported [Hyperliquid API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api) SDK for all
 major JS runtimes, written in TypeScript and provided with tests.
 
+> [!NOTE]
+> This library is under active development. While no major compatibility-breaking changes are planned, minor tweaks may
+> sometimes affect compatibility in a few places.
+
 ## Features
 
 - 🖋️ **Typed**: Source code is 100% TypeScript.
