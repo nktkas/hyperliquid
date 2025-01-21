@@ -2,7 +2,7 @@ import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import { BigNumber } from "npm:bignumber.js@^9.1.2";
 import { assertRejects } from "jsr:@std/assert@^1.0.10";
-import { assertJsonSchema, getAssetData, isHex } from "../../utils.ts";
+import { assertJsonSchema, formatSize, getAssetData, isHex } from "../../utils.ts";
 import { ApiRequestError, HttpTransport, PublicClient, WalletClient } from "../../../index.ts";
 
 const TEST_PRIVATE_KEY = Deno.args[0] as string | undefined;
@@ -32,10 +32,8 @@ Deno.test("twapCancel", async (t) => {
 
     // Test
     await t.step("cancel twap order", async () => {
-        const sz = new BigNumber(55) // USD (1 min = 10$, 5 min min)
-            .div(ctx.markPx)
-            .decimalPlaces(universe.szDecimals, BigNumber.ROUND_DOWN)
-            .toString();
+        // USD (1 min = 10$, 5 min min)
+        const sz = formatSize(new BigNumber(55).div(ctx.markPx), universe.szDecimals);
 
         const twapOrderResult = await walletClient.twapOrder({
             a: id,

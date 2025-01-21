@@ -2,7 +2,15 @@ import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import { BigNumber } from "npm:bignumber.js@^9.1.2";
 import { assert } from "jsr:@std/assert@^1.0.10";
-import { assertIncludesNotEmptyArray, assertJsonSchema, getAssetData, isHex, randomCloid } from "../../utils.ts";
+import {
+    assertIncludesNotEmptyArray,
+    assertJsonSchema,
+    formatPrice,
+    formatSize,
+    getAssetData,
+    isHex,
+    randomCloid,
+} from "../../utils.ts";
 import { HttpTransport, PublicClient, WalletClient } from "../../../index.ts";
 
 const TEST_PRIVATE_KEY = Deno.args[0] as string | undefined;
@@ -33,18 +41,9 @@ Deno.test("order", async (t) => {
     const { id, universe, ctx } = await getAssetData(publicClient, TEST_PERPS_ASSET);
 
     // Calculations
-    const pxUp = new BigNumber(ctx.markPx)
-        .times(1.01)
-        .decimalPlaces(universe.szDecimals, BigNumber.ROUND_DOWN)
-        .toString();
-    const pxDown = new BigNumber(ctx.markPx)
-        .times(0.99)
-        .decimalPlaces(universe.szDecimals, BigNumber.ROUND_DOWN)
-        .toString();
-    const sz = new BigNumber(15) // USD
-        .div(ctx.markPx)
-        .decimalPlaces(universe.szDecimals, BigNumber.ROUND_DOWN)
-        .toString();
+    const pxUp = formatPrice(new BigNumber(ctx.markPx).times(1.01), universe.szDecimals);
+    const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
+    const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);
 
     // Test
     await t.step("unfilled + without cloid", async () => {

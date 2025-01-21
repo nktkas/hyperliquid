@@ -2,6 +2,7 @@ import type { AssetCtx, Hex, PublicClient, Universe } from "../index.ts";
 import { Ajv } from "npm:ajv@^8.17.1";
 import type { Definition } from "npm:ts-json-schema-generator@^2.3.0";
 import { assert, assertGreater } from "jsr:@std/assert@^1.0.4";
+import { BigNumber } from "npm:bignumber.js@^9.1.2";
 import { keccak_256 } from "@noble/hashes/sha3";
 
 export interface AssetData {
@@ -116,4 +117,45 @@ export function generateEthereumAddress(): Hex {
     }
 
     return `0x${checksumAddress}`;
+}
+
+/**
+ * Format the price for Hyperliquid
+ * @param priceStr - Price string
+ * @param szDecimals - Size decimals from `universe`
+ * @param isPerp - Is perpetual market
+ * @param roundingMode - BigNumber rounding mode
+ * @returns Formatted price
+ */
+export function formatPrice(
+    priceStr: BigNumber.Value,
+    szDecimals: number,
+    isPerp: boolean = true,
+    roundingMode: BigNumber.RoundingMode = BigNumber.ROUND_HALF_UP,
+): string {
+    const price = new BigNumber(priceStr);
+    if (price.isInteger()) return price.toString();
+
+    const maxDecimals = isPerp ? 6 : 8;
+    const maxAllowedDecimals = Math.max(maxDecimals - szDecimals, 0);
+
+    const priceSignificant = price.precision(5, roundingMode);
+    return priceSignificant
+        .toFixed(maxAllowedDecimals, roundingMode)
+        .replace(/\.?0+$/, "");
+}
+
+/**
+ * Format the size for Hyperliquid
+ * @param sizeStr - Size string
+ * @param szDecimals - Size decimals from `universe`
+ * @param roundingMode - BigNumber rounding mode
+ * @returns Formatted size
+ */
+export function formatSize(
+    sizeStr: BigNumber.Value,
+    szDecimals: number,
+    roundingMode: BigNumber.RoundingMode = BigNumber.ROUND_HALF_UP,
+): string {
+    return new BigNumber(sizeStr).toFixed(szDecimals, roundingMode);
 }
