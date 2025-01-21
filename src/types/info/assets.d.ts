@@ -98,6 +98,9 @@ export interface Universe {
 
     /** Whether only isolated margin trading is allowed. */
     onlyIsolated?: true;
+
+    /** Whether the universe is delisted. */
+    isDelisted?: true;
 }
 
 /** Trading universe with specific parameters for spot. */
@@ -154,6 +157,9 @@ export interface SpotToken {
 
     /** Full display name of the token. */
     fullName: string | null;
+
+    /** Fee share for the deployer of the token. */
+    deployerTradingFeeShare: string;
 }
 
 /** The details of a token. */

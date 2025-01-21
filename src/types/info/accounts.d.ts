@@ -511,6 +511,9 @@ export interface VaultCreateDelta {
 
     /** Initial amount allocated. */
     usdc: string;
+
+    /** Fee for creating the vault. */
+    fee: string;
 }
 
 /** Distribution event from a vault. */
