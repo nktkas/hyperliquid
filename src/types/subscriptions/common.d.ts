@@ -237,4 +237,6 @@ export interface WsWebData2 {
     spotState: SpotClearinghouseState;
     /** Context information for spot assets. */
     spotAssetCtxs: SpotAssetCtx[];
+    /** Assets currently at their open interest cap. */
+    perpsAtOpenInterestCap?: string[];
 }
