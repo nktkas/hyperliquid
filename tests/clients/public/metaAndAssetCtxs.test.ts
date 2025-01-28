@@ -14,6 +14,8 @@ const MethodReturnType = tsj
 // —————————— Test ——————————
 
 Deno.test("metaAndAssetCtxs", async (t) => {
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
     // —————————— Prepare ——————————
 
     const transport = new HttpTransport({ url: "https://api.hyperliquid-testnet.xyz" });

@@ -190,7 +190,7 @@ export class ReconnectingWebSocket implements WebSocket {
             while ((message = this.reconnectOptions.messageBuffer.shift()) !== undefined) {
                 this.socket.send(message);
             }
-        });
+        }, { once: true });
 
         this.socket.addEventListener("close", async (event) => {
             try {
@@ -230,7 +230,7 @@ export class ReconnectingWebSocket implements WebSocket {
             } catch (error) {
                 this.cleanup(new Error("RECONNECTION_ERROR", { cause: { error, event } }));
             }
-        });
+        }, { once: true });
     }
 
     /**

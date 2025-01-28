@@ -22,6 +22,8 @@ const MethodReturnType = tsj
 // —————————— Test ——————————
 
 Deno.test("usdClassTransfer", async (t) => {
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
     // —————————— Prepare ——————————
 
     const account = privateKeyToAccount(TEST_PRIVATE_KEY);

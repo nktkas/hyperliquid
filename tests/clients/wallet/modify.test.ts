@@ -27,6 +27,8 @@ const MethodReturnType = tsj
 // —————————— Test ——————————
 
 Deno.test("modify", async () => {
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
     // —————————— Prepare ——————————
 
     const account = privateKeyToAccount(TEST_PRIVATE_KEY);
