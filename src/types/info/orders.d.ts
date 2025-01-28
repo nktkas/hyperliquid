@@ -7,7 +7,7 @@ import type { Hex } from "../common.d.ts";
  * - `"Stop Market"`: A market order that is activated when the price reaches the selected stop price.
  * - `"Stop Limit"`: A limit order that is activated when the price reaches the selected stop price.
  *
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/trading/order-types|Hyperliquid GitBook}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/trading/order-types | Hyperliquid GitBook}
  */
 export type OrderType =
     | "Market"
@@ -31,6 +31,24 @@ export type TIF =
     | "LiquidationMarket";
 
 /**
+ * TWAP status:
+ * - `"finished"`: The TWAP order has been fully executed.
+ * - `"activated"`: The TWAP order has been activated and is currently executing
+ * - `"terminated"`: The TWAP order has been terminated.
+ * - `"error"`: An error occurred while processing the TWAP order.
+ */
+export type TwapStatus = {
+    /** The status of the twap. */
+    status: "finished" | "activated" | "terminated";
+} | {
+    /** The status of the twap. */
+    status: "error";
+
+    /** The error message. */
+    description: string;
+};
+
+/**
  * Order processing status:
  * - `"filled"`: Order fully executed.
  * - `"open"`: Order is active and waiting to be filled.
@@ -47,91 +65,32 @@ export type OrderProcessingStatus =
     | "rejected"
     | "marginCanceled";
 
-/** Open order with additional frontend information. */
-export interface FrontendOpenOrder extends Omit<OpenOrder, "cloid"> {
-    /** Condition for triggering. */
-    triggerCondition: string;
-
-    /** Is the order a trigger order? */
-    isTrigger: boolean;
-
-    /** Trigger price (if {@link isTrigger} is true). */
-    triggerPx: string;
-
-    /** Child orders associated with this order. */
-    children: FrontendOpenOrder[];
-
-    /** Is the order a position TP/SL order (which changes depending on the position size)? */
-    isPositionTpsl: boolean;
-
-    /** Is reduce-only? */
-    reduceOnly: boolean;
-
-    /** Type of the order. */
-    orderType: OrderType;
-
-    /** Time-in-force. */
-    tif: TIF | null;
-
-    /** Client Order ID. */
-    cloid: Hex | null;
-}
-
-/** Open order. */
-export interface OpenOrder {
+/** L2 order book snapshot. */
+export interface Book {
     /** Asset symbol. */
     coin: string;
 
-    /** Side of the order ("B" = Bid = Buy, "A" = Ask = Sell). */
-    side: "B" | "A";
+    /** Timestamp when the snapshot was taken (in ms since epoch). */
+    time: number;
 
-    /** Limit price. */
-    limitPx: string;
+    /** Bid and ask levels (index 0 = bids, index 1 = asks). */
+    levels: [BookLevel[], BookLevel[]];
+}
 
-    /** Size. */
+/** Level of the order book. */
+export interface BookLevel {
+    /** Price. */
+    px: string;
+
+    /** Total size. */
     sz: string;
 
-    /** Order ID. */
-    oid: number;
-
-    /** Timestamp when the order was placed (in ms since epoch). */
-    timestamp: number;
-
-    /** Original size when placed. */
-    origSz: string;
-
-    /** Client Order ID. */
-    cloid?: Hex;
+    /** Number of individual orders. */
+    n: number;
 }
 
-/** Order status with additional frontend information and current status. */
-export interface OrderStatus {
-    /** Order details. */
-    order: FrontendOpenOrder;
-
-    /** Order processing status. */
-    status: OrderProcessingStatus;
-
-    /** Timestamp when the status was last updated (in ms since epoch). */
-    statusTimestamp: number;
-}
-
-/** Result of an order status lookup. */
-export type OrderStatusResult =
-    | {
-        /** Indicates that the order was found. */
-        status: "order";
-
-        /** Order details. */
-        order: OrderStatus;
-    }
-    | {
-        /** Indicates that the order was not found. */
-        status: "unknownOid";
-    };
-
-/** User's trade fill. */
-export interface UserFill {
+/** Trade fill. */
+export interface Fill {
     /** Asset symbol. */
     coin: string;
 
@@ -175,44 +134,109 @@ export interface UserFill {
     cloid?: Hex;
 
     /** Liquidation details. */
-    liquidation?: {
-        /** Address of the user who was liquidated. */
-        liquidatedUser: Hex;
-
-        /** Mark price at the time of liquidation. */
-        markPx: string;
-
-        /** Method of liquidation. */
-        method: "market" | "backstop";
-    };
+    liquidation?: FillLiquidation;
 
     /** Token in which the fee is denominated (e.g., "USDC"). */
     feeToken: string;
 }
 
-/** L2 order book snapshot. */
-export interface L2Book {
+/** Liquidation details for a fill. */
+export interface FillLiquidation {
+    /** Address of the user who was liquidated. */
+    liquidatedUser: Hex;
+
+    /** Mark price at the time of liquidation. */
+    markPx: string;
+
+    /** Method of liquidation. */
+    method: "market" | "backstop";
+}
+
+/** Open order with additional frontend information. */
+export interface FrontendOrder extends Omit<Order, "reduceOnly" | "cloid"> {
+    /** Condition for triggering. */
+    triggerCondition: string;
+
+    /** Is the order a trigger order? */
+    isTrigger: boolean;
+
+    /** Trigger price. */
+    triggerPx: string;
+
+    /** Child orders associated with this order. */
+    children: FrontendOrder[];
+
+    /** Is the order a position TP/SL order (which changes depending on the position size)? */
+    isPositionTpsl: boolean;
+
+    /** Is reduce-only? */
+    reduceOnly: boolean;
+
+    /** Type of the order. */
+    orderType: OrderType;
+
+    /** Time-in-force. */
+    tif: TIF | null;
+
+    /** Client Order ID. */
+    cloid: Hex | null;
+}
+
+/** Open order. */
+export interface Order {
     /** Asset symbol. */
     coin: string;
 
-    /** Timestamp when the snapshot was taken (in ms since epoch). */
-    time: number;
+    /** Side of the order ("B" = Bid = Buy, "A" = Ask = Sell). */
+    side: "B" | "A";
 
-    /** Bid and ask levels (index 0 = bids, index 1 = asks). */
-    levels: [L2BookEntry[], L2BookEntry[]];
-}
+    /** Limit price. */
+    limitPx: string;
 
-/** Single entry in {@link L2Book.levels}. */
-export interface L2BookEntry {
-    /** Price. */
-    px: string;
-
-    /** Total size. */
+    /** Size. */
     sz: string;
 
-    /** Number of individual orders. */
-    n: number;
+    /** Order ID. */
+    oid: number;
+
+    /** Timestamp when the order was placed (in ms since epoch). */
+    timestamp: number;
+
+    /** Original size when placed. */
+    origSz: string;
+
+    /** Client Order ID. */
+    cloid?: Hex;
+
+    /** Is reduce-only? */
+    reduceOnly?: true;
 }
+
+/** Order status with additional frontend information and current status. */
+export interface OrderStatus<O extends Order | FrontendOrder> {
+    /** Order details. */
+    order: O;
+
+    /** Order processing status. */
+    status: OrderProcessingStatus;
+
+    /** Timestamp when the status was last updated (in ms since epoch). */
+    statusTimestamp: number;
+}
+
+/** Result of an order status lookup. */
+export type OrderLookup =
+    | {
+        /** Indicates that the order was found. */
+        status: "order";
+
+        /** Order details. */
+        order: OrderStatus<FrontendOrder>;
+    }
+    | {
+        /** Indicates that the order was not found. */
+        status: "unknownOid";
+    };
 
 /** The twap history of a user. */
 export interface TwapHistory {
@@ -220,58 +244,50 @@ export interface TwapHistory {
     time: number;
 
     /** The state of the twap. */
-    state: {
-        /** The asset symbol. */
-        coin: string;
-
-        /** The executed notional. */
-        executedNtl: string;
-
-        /** The executed size. */
-        executedSz: string;
-
-        /** The number of minutes. */
-        minutes: number;
-
-        /** Whether to randomize the twap. */
-        randomize: boolean;
-
-        /** Whether to reduce only. */
-        reduceOnly: boolean;
-
-        /** The side of the order ("B" = Bid = Buy, "A" = Ask = Sell). */
-        side: "B" | "A";
-
-        /** The size of the order. */
-        sz: string;
-
-        /** The start time of the TWAP order (in milliseconds since epoch). */
-        timestamp: number;
-
-        /** The user's address. */
-        user: Hex;
-    };
+    state: TwapState;
 
     /** The status of the twap. */
-    status:
-        | {
-            /** The status of the twap. */
-            status: "finished" | "activated" | "terminated";
-        }
-        | {
-            /** The status of the twap. */
-            status: "error";
-
-            /** The error message. */
-            description: string;
-        };
+    status: TwapStatus;
 }
 
 /** The twap slice fill of a user. */
-export interface UserTwapSliceFill {
+export interface TwapSliceFill {
     /** The fill of the twap slice. */
-    fill: Omit<UserFill, "cloid" | "liquidation">;
+    fill: Omit<Fill, "cloid" | "liquidation">;
 
     /** The id of the twap. */
     twapId: number;
+}
+
+/** The twap state of a user. */
+export interface TwapState {
+    /** The asset symbol. */
+    coin: string;
+
+    /** The executed notional. */
+    executedNtl: string;
+
+    /** The executed size. */
+    executedSz: string;
+
+    /** The number of minutes. */
+    minutes: number;
+
+    /** Whether to randomize the twap. */
+    randomize: boolean;
+
+    /** Whether to reduce only. */
+    reduceOnly: boolean;
+
+    /** The side of the order ("B" = Bid = Buy, "A" = Ask = Sell). */
+    side: "B" | "A";
+
+    /** The size of the order. */
+    sz: string;
+
+    /** The start time of the TWAP order (in milliseconds since epoch). */
+    timestamp: number;
+
+    /** The user's address. */
+    user: Hex;
 }

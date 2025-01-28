@@ -69,7 +69,7 @@ export interface AssetPosition {
 }
 
 /** Account summary for perpetual trading. */
-export interface ClearinghouseState {
+export interface PerpsClearinghouseState {
     /** Margin details. */
     marginSummary: {
         /** Total account value. */
@@ -118,17 +118,17 @@ export interface SpotBalance {
     /** Asset symbol. */
     coin: string;
 
-    /** Entry notional value. */
-    entryNtl: string;
-
-    /** Amount on hold. */
-    hold: string;
-
     /** Unique identifier for the token. */
     token: number;
 
     /** Total balance. */
     total: string;
+
+    /** Amount on hold. */
+    hold: string;
+
+    /** Entry notional value. */
+    entryNtl: string;
 }
 
 /** Balances for spot tokens. */
@@ -149,7 +149,7 @@ export interface SubAccount {
     master: Hex;
 
     /** Account summary for perpetual trading. */
-    clearinghouseState: ClearinghouseState;
+    clearinghouseState: PerpsClearinghouseState;
 
     /** Balances for spot tokens. */
     spotState: SpotClearinghouseState;
@@ -336,7 +336,7 @@ export interface Referral {
 }
 
 /** User's funding ledger update. */
-export interface UserFunding {
+export interface UserFundingUpdate {
     /** Timestamp of the update (in ms since epoch). */
     time: number;
 
@@ -344,11 +344,11 @@ export interface UserFunding {
     hash: Hex;
 
     /** Details of the update. */
-    delta: FundingDelta;
+    delta: FundingUpdate;
 }
 
 /** User's non-funding ledger update. */
-export interface UserNonFundingLedgerUpdates {
+export interface UserNonFundingLedgerUpdate {
     /** Timestamp of the update (in ms since epoch). */
     time: number;
 
@@ -357,20 +357,22 @@ export interface UserNonFundingLedgerUpdates {
 
     /** Details of the update. */
     delta:
-        | AccountClassTransferDelta
-        | DepositDelta
-        | InternalTransferDelta
-        | LiquidationDelta
-        | RewardsClaimDelta
-        | SpotTransferDelta
-        | SubAccountTransferDelta
-        | VaultCreateDelta
-        | VaultDistributionDelta
-        | WithdrawDelta;
+        | AccountClassTransferUpdate
+        | DepositUpdate
+        | InternalTransferUpdate
+        | LiquidationUpdate
+        | RewardsClaimUpdate
+        | SpotTransferUpdate
+        | SubAccountTransferUpdate
+        | VaultCreateUpdate
+        | VaultDepositUpdate
+        | VaultDistributionUpdate
+        | VaultWithdrawUpdate
+        | WithdrawUpdate;
 }
 
 /** Transfer between spot and perpetual accounts. */
-export interface AccountClassTransferDelta {
+export interface AccountClassTransferUpdate {
     /** Type of update. */
     type: "accountClassTransfer";
 
@@ -382,7 +384,7 @@ export interface AccountClassTransferDelta {
 }
 
 /** Deposit to account. */
-export interface DepositDelta {
+export interface DepositUpdate {
     /** Type of update. */
     type: "deposit";
 
@@ -391,7 +393,7 @@ export interface DepositDelta {
 }
 
 /** Internal transfer between accounts. */
-export interface InternalTransferDelta {
+export interface InternalTransferUpdate {
     /** Type of update. */
     type: "internalTransfer";
 
@@ -409,7 +411,7 @@ export interface InternalTransferDelta {
 }
 
 /** Update representing a liquidation event. */
-export interface LiquidationDelta {
+export interface LiquidationUpdate {
     /** Type of update. */
     type: "liquidation";
 
@@ -420,7 +422,7 @@ export interface LiquidationDelta {
     accountValue: string;
 
     /** Type of leverage used for the liquidated positions. */
-    leverageType: "Isolated";
+    leverageType: "Cross" | "Isolated";
 
     /** Details of individual positions that were liquidated. */
     liquidatedPositions: {
@@ -433,7 +435,7 @@ export interface LiquidationDelta {
 }
 
 /** Funding update. */
-export interface FundingDelta {
+export interface FundingUpdate {
     /** Type of update. */
     type: "funding";
 
@@ -454,7 +456,7 @@ export interface FundingDelta {
 }
 
 /** Rewards claim update. */
-export interface RewardsClaimDelta {
+export interface RewardsClaimUpdate {
     /** Type of update. */
     type: "rewardsClaim";
 
@@ -463,7 +465,7 @@ export interface RewardsClaimDelta {
 }
 
 /** Spot transfer between accounts. */
-export interface SpotTransferDelta {
+export interface SpotTransferUpdate {
     /** Type of update. */
     type: "spotTransfer";
 
@@ -487,7 +489,7 @@ export interface SpotTransferDelta {
 }
 
 /** Transfer between sub-accounts. */
-export interface SubAccountTransferDelta {
+export interface SubAccountTransferUpdate {
     /** Type of update. */
     type: "subAccountTransfer";
 
@@ -502,7 +504,7 @@ export interface SubAccountTransferDelta {
 }
 
 /** Creating a vault. */
-export interface VaultCreateDelta {
+export interface VaultCreateUpdate {
     /** Type of update. */
     type: "vaultCreate";
 
@@ -516,8 +518,20 @@ export interface VaultCreateDelta {
     fee: string;
 }
 
+/** Deposit to a vault. */
+export interface VaultDepositUpdate {
+    /** Type of update. */
+    type: "vaultDeposit";
+
+    /** Address of the vault receiving funds. */
+    vault: Hex;
+
+    /** Amount deposited. */
+    usdc: string;
+}
+
 /** Distribution event from a vault. */
-export interface VaultDistributionDelta {
+export interface VaultDistributionUpdate {
     /** Type of update. */
     type: "vaultDistribution";
 
@@ -528,8 +542,35 @@ export interface VaultDistributionDelta {
     usdc: string;
 }
 
+/** Withdrawal from a vault. */
+export interface VaultWithdrawUpdate {
+    /** Type of update. */
+    type: "vaultWithdraw";
+
+    /** Address of the vault. */
+    vault: Hex;
+
+    /** Address of the user withdrawing funds. */
+    user: Hex;
+
+    /** Amount requested for withdrawal in USD. */
+    requestedUsd: string;
+
+    /** Commission charged for the withdrawal. */
+    commission: string;
+
+    /** Cost associated with closing positions. */
+    closingCost: string;
+
+    /** Basis value for the withdrawal calculation. */
+    basis: string;
+
+    /** Final amount withdrawn after deducting fees and costs. */
+    netWithdrawnUsd: string;
+}
+
 /** Withdrawal from account. */
-export interface WithdrawDelta {
+export interface WithdrawUpdate {
     /** Type of update. */
     type: "withdraw";
 

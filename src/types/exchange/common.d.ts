@@ -2,7 +2,7 @@ import type { Hex } from "../common.d.ts";
 import type { TIF } from "../info/orders.d.ts";
 
 /** Order parameters. */
-export type Order = {
+export type OrderParms = {
     /** An integer representing the asset being traded. */
     a: number;
 

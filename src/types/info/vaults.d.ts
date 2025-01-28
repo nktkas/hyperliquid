@@ -1,31 +1,5 @@
 import type { Hex } from "../common.d.ts";
 
-/** The equity of a user in a vault. */
-export interface UserVaultEquity {
-    /** The address of the vault. */
-    vaultAddress: Hex;
-
-    /** The user's deposited equity in the vault. */
-    equity: string;
-}
-
-/** The type of relationship between vaults. */
-export type VaultRelationship =
-    | {
-        /** The type of relationship. */
-        type: "normal";
-    }
-    | {
-        /** The type of relationship. */
-        type: "parent";
-
-        /** Data about child vault addresses. */
-        data: {
-            /** List of child vault addresses. */
-            childAddresses: Hex[];
-        };
-    };
-
 /** Details about a vault. */
 export interface VaultDetails {
     /** The name of the vault. */
@@ -42,21 +16,15 @@ export interface VaultDetails {
 
     /** The portfolio of the vault. */
     portfolio: [
-        /** The time period of the data. */
-        "day" | "week" | "month" | "allTime" | "perpDay" | "perpWeek" | "perpMonth" | "perpAllTime",
-
-        /** The data of the time period. */
-        {
-            /** The account value history as [timestamp, value]. */
-            accountValueHistory: [number, string][];
-
-            /** The profit and loss (PnL) history as [timestamp, value]. */
-            pnlHistory: [number, string][];
-
-            /** The volume or related metric of the portfolio. */
-            vlm: string;
-        },
-    ][];
+        ["day", VaultMetrics],
+        ["week", VaultMetrics],
+        ["month", VaultMetrics],
+        ["allTime", VaultMetrics],
+        ["perpDay", VaultMetrics],
+        ["perpWeek", VaultMetrics],
+        ["perpMonth", VaultMetrics],
+        ["perpAllTime", VaultMetrics],
+    ];
 
     /** The annual percentage rate (APR) of the vault. */
     apr: number;
@@ -111,6 +79,46 @@ export interface VaultDetails {
     /** Indicates whether to always close positions on withdrawal. */
     alwaysCloseOnWithdraw: boolean;
 }
+
+/** The equity of a user in a vault. */
+export interface VaultEquity {
+    /** The address of the vault. */
+    vaultAddress: Hex;
+
+    /** The user's deposited equity in the vault. */
+    equity: string;
+}
+
+/** Metrics data for a vault */
+export interface VaultMetrics {
+    /** The account value history as [timestamp, value]. */
+    accountValueHistory: [number, string][];
+    /** The profit and loss (PnL) history as [timestamp, value]. */
+    pnlHistory: [number, string][];
+    /** The volume or related metric of the portfolio. */
+    vlm: string;
+}
+
+/** The type of relationship between vaults. */
+export type VaultRelationship =
+    | {
+        /** The type of relationship. */
+        type: "normal";
+    }
+    | {
+        /** The type of relationship. */
+        type: "parent";
+
+        /** Data about child vault addresses. */
+        data: {
+            /** List of child vault addresses. */
+            childAddresses: Hex[];
+        };
+    }
+    | {
+        /** The type of relationship. */
+        type: "child";
+    };
 
 /** Summary of a vault. */
 export interface VaultSummary {

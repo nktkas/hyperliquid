@@ -1,3 +1,4 @@
+import type { Hex } from "../types/common.d.ts";
 import type {
     ApproveAgentRequest,
     ApproveBuilderFeeRequest,
@@ -29,7 +30,8 @@ import type {
     TwapCancelResponse,
     TwapOrderResponse,
 } from "../types/exchange/responses.d.ts";
-import type { IRESTTransport } from "../transports/base.ts";
+import type { IRequestTransport } from "../transports/base.ts";
+import { sorters } from "../utils/keySort.ts";
 import {
     type AbstractEthersSigner,
     type AbstractEthersV5Signer,
@@ -37,107 +39,123 @@ import {
     signL1Action,
     signUserSignedAction,
 } from "../utils/signing.ts";
-import type { Hex } from "../utils/hex.ts";
-import { sortActionKeys } from "../utils/keySort.ts";
 
 // ———————————————Parameters———————————————
 
-/** @see {@linkcode WalletClient.approveAgent} */
+/** Parameters for the {@linkcode WalletClient} constructor. */
+export type WalletClientParameters<
+    T extends IRequestTransport = IRequestTransport,
+    W extends AbstractViemWalletClient | AbstractEthersSigner | AbstractEthersV5Signer =
+        | AbstractViemWalletClient
+        | AbstractEthersSigner
+        | AbstractEthersV5Signer,
+> = {
+    /** The transport used to connect to the Hyperliquid API. */
+    transport: T;
+    /** The WalletClient/Account ([viem](https://viem.sh/docs/clients/wallet)) or Signer ([ethers.js](https://docs.ethers.org/v6/api/providers/#Signer)) used for signing transactions. */
+    wallet: W;
+    /** Specifies whether the client uses testnet. Defaults to `false`. */
+    isTestnet?: boolean;
+    /** Sets a default vaultAddress to be used if no vaultAddress is explicitly passed to a method. */
+    defaultVaultAddress?: Hex;
+};
+
+/** Parameters for the {@linkcode WalletClient.approveAgent} method. */
 export type ApproveAgentParameters =
     & Omit<ApproveAgentRequest["action"], "type" | "hyperliquidChain" | "signatureChainId" | "nonce">
     & Partial<Pick<ApproveAgentRequest["action"], "signatureChainId" | "nonce">>;
 
-/** @see {@linkcode WalletClient.approveBuilderFee} */
+/** Parameters for the {@linkcode WalletClient.approveBuilderFee} method. */
 export type ApproveBuilderFeeParameters =
     & Omit<ApproveBuilderFeeRequest["action"], "type" | "hyperliquidChain" | "signatureChainId" | "nonce">
     & Partial<Pick<ApproveBuilderFeeRequest["action"], "signatureChainId" | "nonce">>;
 
-/** @see {@linkcode WalletClient.batchModify} */
+/** Parameters for the {@linkcode WalletClient.batchModify} method. */
 export type BatchModifyParameters =
     & Omit<BatchModifyRequest["action"], "type">
     & Partial<Pick<BatchModifyRequest, "vaultAddress" | "nonce">>;
 
-/** @see {@linkcode WalletClient.cancel} */
+/** Parameters for the {@linkcode WalletClient.cancel} method. */
 export type CancelParameters =
     & Omit<CancelRequest["action"], "type">
     & Partial<Pick<CancelRequest, "vaultAddress" | "nonce">>;
 
-/** @see {@linkcode WalletClient.cancelByCloid} */
+/** Parameters for the {@linkcode WalletClient.cancelByCloid} method. */
 export type CancelByCloidParameters =
     & Omit<CancelByCloidRequest["action"], "type">
     & Partial<Pick<CancelByCloidRequest, "vaultAddress" | "nonce">>;
 
-/** @see {@linkcode WalletClient.createSubAccount} */
+/** Parameters for the {@linkcode WalletClient.createSubAccount} method. */
 export type CreateSubAccountParameters =
     & Omit<CreateSubAccountRequest["action"], "type">
     & Partial<Pick<CreateSubAccountRequest, "nonce">>;
 
-/** @see {@linkcode WalletClient.modify} */
+/** Parameters for the {@linkcode WalletClient.modify} method. */
 export type ModifyParameters =
     & Omit<ModifyRequest["action"], "type">
     & Partial<Pick<ModifyRequest, "vaultAddress" | "nonce">>;
 
-/** @see {@linkcode WalletClient.order} */
+/** Parameters for the {@linkcode WalletClient.order} method. */
 export type OrderParameters =
     & Omit<OrderRequest["action"], "type">
     & Partial<Pick<OrderRequest, "vaultAddress" | "nonce">>;
 
-/** @see {@linkcode WalletClient.scheduleCancel} */
+/** Parameters for the {@linkcode WalletClient.scheduleCancel} method. */
 export type ScheduleCancelParameters =
     & Omit<ScheduleCancelRequest["action"], "type">
     & Partial<Pick<ScheduleCancelRequest, "vaultAddress" | "nonce">>;
 
-/** @see {@linkcode WalletClient.setReferrer} */
+/** Parameters for the {@linkcode WalletClient.setReferrer} method. */
 export type SetReferrerParameters =
     & Omit<SetReferrerRequest["action"], "type">
     & Partial<Pick<SetReferrerRequest, "nonce">>;
 
-/** @see {@linkcode WalletClient.spotSend} */
+/** Parameters for the {@linkcode WalletClient.spotSend} method. */
 export type SpotSendParameters =
     & Omit<SpotSendRequest["action"], "type" | "hyperliquidChain" | "signatureChainId" | "time">
     & Partial<Pick<SpotSendRequest["action"], "signatureChainId" | "time">>;
 
-/** @see {@linkcode WalletClient.subAccountTransfer} */
+/** Parameters for the {@linkcode WalletClient.subAccountTransfer} method. */
 export type SubAccountTransferParameters =
     & Omit<SubAccountTransferRequest["action"], "type">
     & Partial<Pick<SubAccountTransferRequest, "nonce">>;
 
-/** @see {@linkcode WalletClient.twapCancel} */
+/** Parameters for the {@linkcode WalletClient.twapCancel} method. */
 export type TwapCancelParameters =
     & Omit<TwapCancelRequest["action"], "type">
     & Partial<Pick<TwapCancelRequest, "vaultAddress" | "nonce">>;
 
-/** @see {@linkcode WalletClient.twapOrder} */
+/** Parameters for the {@linkcode WalletClient.twapOrder} method. */
 export type TwapOrderParameters =
     & TwapOrderRequest["action"]["twap"]
     & Partial<Pick<TwapOrderRequest, "vaultAddress" | "nonce">>;
 
-/** @see {@linkcode WalletClient.updateIsolatedMargin} */
+/** Parameters for the {@linkcode WalletClient.updateIsolatedMargin} method. */
 export type UpdateIsolatedMarginParameters =
     & Omit<UpdateIsolatedMarginRequest["action"], "type">
     & Partial<Pick<UpdateIsolatedMarginRequest, "vaultAddress" | "nonce">>;
 
-/** @see {@linkcode WalletClient.updateLeverage} */
+/** Parameters for the {@linkcode WalletClient.updateLeverage} method. */
 export type UpdateLeverageParameters =
     & Omit<UpdateLeverageRequest["action"], "type">
     & Partial<Pick<UpdateLeverageRequest, "vaultAddress" | "nonce">>;
 
-/** @see {@linkcode WalletClient.usdClassTransfer} */
+/** Parameters for the {@linkcode WalletClient.usdClassTransfer} method. */
 export type UsdClassTransferParameters =
     & Omit<UsdClassTransferRequest["action"], "type" | "hyperliquidChain" | "signatureChainId" | "nonce">
     & Partial<Pick<UsdClassTransferRequest["action"], "signatureChainId" | "nonce">>;
 
-/** @see {@linkcode WalletClient.usdSend} */
+/** Parameters for the {@linkcode WalletClient.usdSend} method. */
 export type UsdSendParameters =
     & Omit<UsdSendRequest["action"], "type" | "hyperliquidChain" | "signatureChainId" | "time">
     & Partial<Pick<UsdSendRequest["action"], "signatureChainId" | "time">>;
 
-/** @see {@linkcode WalletClient.vaultTransfer} */
+/** Parameters for the {@linkcode WalletClient.vaultTransfer} method. */
 export type VaultTransferParameters =
     & Omit<VaultTransferRequest["action"], "type">
     & Partial<Pick<VaultTransferRequest, "nonce">>;
 
-/** @see {@linkcode WalletClient.withdraw3} */
+/** Parameters for the {@linkcode WalletClient.withdraw3} method. */
 export type Withdraw3Parameters =
     & Omit<Withdraw3Request["action"], "type" | "hyperliquidChain" | "signatureChainId" | "time">
     & Partial<Pick<Withdraw3Request["action"], "signatureChainId" | "time">>;
@@ -182,7 +200,7 @@ export type TwapOrderResponseSuccess = TwapOrderResponse & {
 
 // ———————————————Errors———————————————
 
-/** The error thrown when the API request returns an error response. */
+/** Error thrown when the API returns an error response. */
 export class ApiRequestError extends Error {
     constructor(
         public response:
@@ -213,15 +231,19 @@ export class ApiRequestError extends Error {
         }
 
         super(message);
-        this.name = this.constructor.name;
+        this.name = "ApiRequestError";
     }
 }
 
 // ———————————————Client———————————————
 
-/** Wallet client for interacting with the Hyperliquid API. */
+/**
+ * Wallet client for interacting with the Hyperliquid API.
+ * @typeParam T - The transport used to connect to the Hyperliquid API.
+ * @typeParam W - The WalletClient/Account ([viem](https://viem.sh/docs/clients/wallet)) or Signer ([ethers.js](https://docs.ethers.io/v6/api/providers/#Signer)) used for signing transactions.
+ */
 export class WalletClient<
-    T extends IRESTTransport = IRESTTransport,
+    T extends IRequestTransport = IRequestTransport,
     W extends AbstractViemWalletClient | AbstractEthersSigner | AbstractEthersV5Signer =
         | AbstractViemWalletClient
         | AbstractEthersSigner
@@ -278,19 +300,7 @@ export class WalletClient<
      * const client = new hl.WalletClient({ wallet, transport });
      * ```
      */
-    constructor(args: {
-        /** The transport used to connect to the Hyperliquid API. */
-        transport: T;
-
-        /** The WalletClient/Account ([viem](https://viem.sh/docs/clients/wallet)) or Signer ([ethers.js](https://docs.ethers.org/v6/api/providers/#Signer)) used for signing transactions. */
-        wallet: W;
-
-        /** Specifies whether the client uses testnet. Defaults to `false`. */
-        isTestnet?: boolean;
-
-        /** Sets a default vaultAddress to be used if no vaultAddress is explicitly passed to a method. */
-        defaultVaultAddress?: Hex;
-    }) {
+    constructor(args: WalletClientParameters<T, W>) {
         this.transport = args.transport;
         this.wallet = args.wallet;
         this.isTestnet = args.isTestnet ?? false;
@@ -303,15 +313,22 @@ export class WalletClient<
      * Approve an agent to sign on behalf of the master or sub-accounts.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal
-     * @returns Successful response without specific data.
+     * @returns {SuccessResponse} Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet|Hyperliquid GitBook}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet | Hyperliquid GitBook}
      * @example
      * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
      * const result = await client.approveAgent({
-     *     agentAddress: "0x...",
-     *     agentName: "agentName"
+     *   agentAddress: "0x...",
+     *   agentName: "agentName",
      * });
      */
     async approveAgent(args: ApproveAgentParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -341,9 +358,9 @@ export class WalletClient<
             signature,
             nonce: action.nonce,
         };
-        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", request, signal);
+        const response = await this.transport.request("action", request, signal) as SuccessResponse | ErrorResponse;
 
-        this.validateResponse(response);
+        this._validateResponse(response);
         return response;
     }
 
@@ -351,15 +368,22 @@ export class WalletClient<
      * Approve a max fee rate for a builder address.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Successful response without specific data.
+     * @returns {SuccessResponse} Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-a-builder-fee|Hyperliquid GitBook}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-a-builder-fee | Hyperliquid GitBook}
      * @example
      * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
      * const result = await client.approveBuilderFee({
-     *     maxFeeRate: "0.01%",
-     *     builder: "0x..."
+     *   maxFeeRate: "0.01%",
+     *   builder: "0x...",
      * });
      */
     async approveBuilderFee(args: ApproveBuilderFeeParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -389,9 +413,9 @@ export class WalletClient<
             signature,
             nonce: action.nonce,
         };
-        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", request, signal);
+        const response = await this.transport.request("action", request, signal) as SuccessResponse | ErrorResponse;
 
-        this.validateResponse(response);
+        this._validateResponse(response);
         return response;
     }
 
@@ -399,29 +423,36 @@ export class WalletClient<
      * Modify multiple orders.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Successful variant of {@linkcode OrderResponse}.
+     * @returns {OrderResponseSuccess} Successful variant of {@link OrderResponse} without error statuses.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-multiple-orders|Hyperliquid GitBook}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-multiple-orders | Hyperliquid GitBook}
      * @example
      * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
      * const result = await client.batchModify({
-     *     modifies: [{
-     *         oid: 123, // Order ID
-     *         order: {
-     *             a: 0, // Asset index
-     *             b: true, // Buy order
-     *             p: "31000", // New price
-     *             s: "0.2", // New size
-     *             r: false, // Not reduce-only
-     *             t: {
-     *                 limit: {
-     *                     tif: "Gtc" // Good-til-cancelled
-     *                 }
-     *             },
-     *             c: "0x..." // Optional: Client Order ID
-     *         }
-     *     }]
+     *   modifies: [{
+     *     oid: 123, // Order ID
+     *     order: {
+     *       a: 0, // Asset index
+     *       b: true, // Buy order
+     *       p: "31000", // New price
+     *       s: "0.2", // New size
+     *       r: false, // Not reduce-only
+     *       t: {
+     *         limit: {
+     *           tif: "Gtc", // Good-til-cancelled
+     *         },
+     *       },
+     *       c: "0x...", // Optional: Client Order ID
+     *     },
+     *   }],
      * });
      * ```
      */
@@ -432,7 +463,7 @@ export class WalletClient<
             ...actionArgs
         } = args;
 
-        const sortedAction = sortActionKeys({ type: "batchModify", ...actionArgs });
+        const sortedAction = sorters.batchModify({ type: "batchModify", ...actionArgs });
         const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce, vaultAddress);
 
         const request: BatchModifyRequest = {
@@ -441,9 +472,9 @@ export class WalletClient<
             nonce,
             vaultAddress,
         };
-        const response = await this.transport.request<OrderResponse>("action", request, signal);
+        const response = await this.transport.request("action", request, signal) as OrderResponse;
 
-        this.validateResponse(response);
+        this._validateResponse(response);
         return response;
     }
 
@@ -451,17 +482,24 @@ export class WalletClient<
      * Cancel order(s).
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Successful variant of {@linkcode CancelResponse}.
+     * @returns {CancelResponseSuccess} Successful variant of {@link CancelResponse} without error statuses.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s|Hyperliquid GitBook}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s | Hyperliquid GitBook}
      * @example
      * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
      * const result = await client.cancel({
-     *     cancels: [{
-     *         a: 0,  // Asset index
-     *         o: 123 // Order ID
-     *     }]
+     *   cancels: [{
+     *     a: 0, // Asset index
+     *     o: 123, // Order ID
+     *   }],
      * });
      * ```
      */
@@ -472,7 +510,7 @@ export class WalletClient<
             ...actionArgs
         } = args;
 
-        const sortedAction = sortActionKeys({ type: "cancel", ...actionArgs });
+        const sortedAction = sorters.cancel({ type: "cancel", ...actionArgs });
         const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce, vaultAddress);
 
         const request: CancelRequest = {
@@ -481,9 +519,9 @@ export class WalletClient<
             nonce,
             vaultAddress,
         };
-        const response = await this.transport.request<CancelResponse>("action", request, signal);
+        const response = await this.transport.request("action", request, signal) as CancelResponse;
 
-        this.validateResponse(response);
+        this._validateResponse(response);
         return response;
     }
 
@@ -491,17 +529,24 @@ export class WalletClient<
      * Cancel order(s) by Client Order ID.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Successful variant of {@linkcode CancelResponse}.
+     * @returns {CancelResponseSuccess} Successful variant of {@link CancelResponse} without error statuses.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid|Hyperliquid GitBook}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid | Hyperliquid GitBook}
      * @example
      * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
      * const result = await client.cancelByCloid({
-     *     cancels: [{
-     *         asset: 0,
-     *         cloid: "0x..." // Client Order ID
-     *     }]
+     *   cancels: [{
+     *     asset: 0,
+     *     cloid: "0x...", // Client Order ID
+     *   }],
      * });
      * ```
      */
@@ -512,7 +557,7 @@ export class WalletClient<
             ...actionArgs
         } = args;
 
-        const sortedAction = sortActionKeys({ type: "cancelByCloid", ...actionArgs });
+        const sortedAction = sorters.cancelByCloid({ type: "cancelByCloid", ...actionArgs });
         const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce, vaultAddress);
 
         const request: CancelByCloidRequest = {
@@ -521,9 +566,9 @@ export class WalletClient<
             nonce,
             vaultAddress,
         };
-        const response = await this.transport.request<CancelResponse>("action", request, signal);
+        const response = await this.transport.request("action", request, signal) as CancelResponse;
 
-        this.validateResponse(response);
+        this._validateResponse(response);
         return response;
     }
 
@@ -531,13 +576,20 @@ export class WalletClient<
      * Create a sub-account.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Response for creating a sub-account.
+     * @returns {CreateSubAccountResponse} Response for creating a sub-account.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @example
      * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
      * const result = await client.createSubAccount({
-     *     name: "subAccountName"
+     *   name: "subAccountName",
      * });
      * ```
      */
@@ -547,7 +599,7 @@ export class WalletClient<
             ...actionArgs
         } = args;
 
-        const sortedAction = sortActionKeys({ type: "createSubAccount", ...actionArgs });
+        const sortedAction = sorters.createSubAccount({ type: "createSubAccount", ...actionArgs });
         const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce);
 
         const request: CreateSubAccountRequest = {
@@ -555,13 +607,11 @@ export class WalletClient<
             signature,
             nonce,
         };
-        const response = await this.transport.request<CreateSubAccountResponse | ErrorResponse>(
-            "action",
-            request,
-            signal,
-        );
+        const response = await this.transport.request("action", request, signal) as
+            | CreateSubAccountResponse
+            | ErrorResponse;
 
-        this.validateResponse(response);
+        this._validateResponse(response);
         return response;
     }
 
@@ -569,27 +619,34 @@ export class WalletClient<
      * Modify an order.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Successful response without specific data.
+     * @returns {SuccessResponse} Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order|Hyperliquid GitBook}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order | Hyperliquid GitBook}
      * @example
      * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
      * const result = await client.modify({
-     *     oid: 123, // Order ID
-     *     order: {
-     *         a: 0, // Asset index
-     *         b: true, // Buy order
-     *         p: "31000", // New price
-     *         s: "0.2", // New size
-     *         r: false, // Not reduce-only
-     *         t: {
-     *             limit: {
-     *                 tif: "Gtc" // Good-til-cancelled
-     *             }
-     *         },
-     *         c: "0x..." // Optional: Client Order ID
-     *     }
+     *   oid: 123, // Order ID
+     *   order: {
+     *     a: 0, // Asset index
+     *     b: true, // Buy order
+     *     p: "31000", // New price
+     *     s: "0.2", // New size
+     *     r: false, // Not reduce-only
+     *     t: {
+     *       limit: {
+     *         tif: "Gtc", // Good-til-cancelled
+     *       },
+     *     },
+     *     c: "0x...", // Optional: Client Order ID
+     *   },
      * });
      * ```
      */
@@ -600,7 +657,7 @@ export class WalletClient<
             ...actionArgs
         } = args;
 
-        const sortedAction = sortActionKeys({ type: "modify", ...actionArgs });
+        const sortedAction = sorters.modify({ type: "modify", ...actionArgs });
         const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce, vaultAddress);
 
         const request: ModifyRequest = {
@@ -609,9 +666,9 @@ export class WalletClient<
             nonce,
             vaultAddress,
         };
-        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", request, signal);
+        const response = await this.transport.request("action", request, signal) as SuccessResponse | ErrorResponse;
 
-        this.validateResponse(response);
+        this._validateResponse(response);
         return response;
     }
 
@@ -619,27 +676,34 @@ export class WalletClient<
      * Place an order(s).
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Successful variant of {@linkcode OrderResponse}.
+     * @returns {OrderResponseSuccess} Successful variant of {@link OrderResponse} without error statuses.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-an-order|Hyperliquid GitBook}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-an-order | Hyperliquid GitBook}
      * @example
      * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
      * const result = await client.order({
-     *     orders: [{
-     *         a: 0, // Asset index
-     *         b: true, // Buy order
-     *         p: "30000", // Price
-     *         s: "0.1", // Size
-     *         r: false, // Not reduce-only
-     *         t: {
-     *             limit: {
-     *                 tif: "Gtc" // Good-til-cancelled
-     *             }
-     *         },
-     *         c: "0x..." // Optional: Client Order ID
-     *     }],
-     *     grouping: "na" // No grouping
+     *   orders: [{
+     *     a: 0, // Asset index
+     *     b: true, // Buy order
+     *     p: "30000", // Price
+     *     s: "0.1", // Size
+     *     r: false, // Not reduce-only
+     *     t: {
+     *       limit: {
+     *         tif: "Gtc", // Good-til-cancelled
+     *       },
+     *     },
+     *     c: "0x...", // Optional: Client Order ID
+     *   }],
+     *   grouping: "na", // No grouping
      * });
      * ```
      */
@@ -653,7 +717,7 @@ export class WalletClient<
 
         if (actionArgs.builder) actionArgs.builder.b = actionArgs.builder.b.toLowerCase() as Hex;
 
-        const sortedAction = sortActionKeys({ type: "order", ...actionArgs });
+        const sortedAction = sorters.order({ type: "order", ...actionArgs });
         const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce, vaultAddress);
 
         const request: OrderRequest = {
@@ -662,9 +726,9 @@ export class WalletClient<
             nonce,
             vaultAddress,
         };
-        const response = await this.transport.request<OrderResponse>("action", request, signal);
+        const response = await this.transport.request("action", request, signal) as OrderResponse;
 
-        this.validateResponse(response);
+        this._validateResponse(response);
         return response;
     }
 
@@ -672,14 +736,21 @@ export class WalletClient<
      * Schedule a time to cancel all open orders.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Successful response without specific data.
+     * @returns {SuccessResponse} Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#schedule-cancel-dead-mans-switch|Hyperliquid GitBook}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#schedule-cancel-dead-mans-switch | Hyperliquid GitBook}
      * @example
      * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
      * const result = await client.scheduleCancel({
-     *     time: Date.now() + 3600000 // Schedule cancellation 1 hour from now
+     *   time: Date.now() + 3600000, // Schedule cancellation 1 hour from now
      * });
      * ```
      */
@@ -690,7 +761,7 @@ export class WalletClient<
             ...actionArgs
         } = args;
 
-        const sortedAction = sortActionKeys({ type: "scheduleCancel", ...actionArgs });
+        const sortedAction = sorters.scheduleCancel({ type: "scheduleCancel", ...actionArgs });
         const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce, vaultAddress);
 
         const request: ScheduleCancelRequest = {
@@ -699,9 +770,9 @@ export class WalletClient<
             nonce,
             vaultAddress,
         };
-        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", request, signal);
+        const response = await this.transport.request("action", request, signal) as SuccessResponse | ErrorResponse;
 
-        this.validateResponse(response);
+        this._validateResponse(response);
         return response;
     }
 
@@ -709,13 +780,20 @@ export class WalletClient<
      * Set a referral code.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Successful response without specific data.
+     * @returns {SuccessResponse} Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @example
      * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
      * const result = await client.setReferrer({
-     *     code: "TEST"
+     *   code: "TEST",
      * });
      * ```
      */
@@ -725,7 +803,7 @@ export class WalletClient<
             ...actionArgs
         } = args;
 
-        const sortedAction = sortActionKeys({ type: "setReferrer", ...actionArgs });
+        const sortedAction = sorters.setReferrer({ type: "setReferrer", ...actionArgs });
         const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce);
 
         const request: SetReferrerRequest = {
@@ -733,9 +811,9 @@ export class WalletClient<
             signature,
             nonce,
         };
-        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", request, signal);
+        const response = await this.transport.request("action", request, signal) as SuccessResponse | ErrorResponse;
 
-        this.validateResponse(response);
+        this._validateResponse(response);
         return response;
     }
 
@@ -743,16 +821,23 @@ export class WalletClient<
      * Transfer a spot asset on L1 to another address.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Successful response without specific data.
+     * @returns {SuccessResponse} Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-spot-transfer|Hyperliquid GitBook}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-spot-transfer | Hyperliquid GitBook}
      * @example
      * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
      * const result = await client.spotSend({
-     *     destination: "0x...",
-     *     token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
-     *     amount: "1"
+     *   destination: "0x...",
+     *   token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
+     *   amount: "1",
      * });
      * ```
      */
@@ -784,9 +869,9 @@ export class WalletClient<
             signature,
             nonce: action.time,
         };
-        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", request, signal);
+        const response = await this.transport.request("action", request, signal) as SuccessResponse | ErrorResponse;
 
-        this.validateResponse(response);
+        this._validateResponse(response);
         return response;
     }
 
@@ -794,15 +879,22 @@ export class WalletClient<
      * Transfer between sub-accounts.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Successful response without specific data.
+     * @returns {SuccessResponse} Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @example
      * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
      * const result = await client.subAccountTransfer({
-     *     subAccountUser: "0x...",
-     *     isDeposit: true,
-     *     usd: 1000000 // 1 USD in raw units (float amount * 1e6)
+     *   subAccountUser: "0x...",
+     *   isDeposit: true,
+     *   usd: 1000000, // 1 USD in raw units (float amount * 1e6)
      * });
      * ```
      */
@@ -812,7 +904,7 @@ export class WalletClient<
             ...actionArgs
         } = args;
 
-        const sortedAction = sortActionKeys({ type: "subAccountTransfer", ...actionArgs });
+        const sortedAction = sorters.subAccountTransfer({ type: "subAccountTransfer", ...actionArgs });
         const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce);
 
         const request: SubAccountTransferRequest = {
@@ -820,9 +912,9 @@ export class WalletClient<
             signature,
             nonce,
         };
-        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", request, signal);
+        const response = await this.transport.request("action", request, signal) as SuccessResponse | ErrorResponse;
 
-        this.validateResponse(response);
+        this._validateResponse(response);
         return response;
     }
 
@@ -830,15 +922,22 @@ export class WalletClient<
      * Cancel a TWAP order.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Successful response without specific data.
+     * @returns {TwapCancelResponseSuccess} Successful variant of {@link TwapCancelResponse} without error status.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order|Hyperliquid GitBook}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order | Hyperliquid GitBook}
      * @example
      * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
      * const result = await client.twapCancel({
-     *     a: 0, // Asset index
-     *     t: 1 // TWAP ID
+     *   a: 0, // Asset index
+     *   t: 1, // TWAP ID
      * });
      * ```
      */
@@ -849,7 +948,7 @@ export class WalletClient<
             ...actionArgs
         } = args;
 
-        const sortedAction = sortActionKeys({ type: "twapCancel", ...actionArgs });
+        const sortedAction = sorters.twapCancel({ type: "twapCancel", ...actionArgs });
         const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce, vaultAddress);
 
         const request: TwapCancelRequest = {
@@ -858,9 +957,9 @@ export class WalletClient<
             nonce,
             vaultAddress,
         };
-        const response = await this.transport.request<TwapCancelResponse>("action", request, signal);
+        const response = await this.transport.request("action", request, signal) as TwapCancelResponse;
 
-        this.validateResponse(response);
+        this._validateResponse(response);
         return response;
     }
 
@@ -868,19 +967,26 @@ export class WalletClient<
      * Place a TWAP order.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Successful response without specific data.
+     * @returns {TwapOrderResponseSuccess} Successful variant of {@link TwapOrderResponse} without error status.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-a-twap-order|Hyperliquid GitBook}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-a-twap-order | Hyperliquid GitBook}
      * @example
      * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
      * const result = await client.twapOrder({
-     *     a: 0, // Asset index
-     *     b: true, // Buy order
-     *     s: "1", // Size
-     *     r: false, // Not reduce-only
-     *     m: 10, // Duration in minutes
-     *     t: true // Randomize order timing
+     *   a: 0, // Asset index
+     *   b: true, // Buy order
+     *   s: "1", // Size
+     *   r: false, // Not reduce-only
+     *   m: 10, // Duration in minutes
+     *   t: true, // Randomize order timing
      * });
      * ```
      */
@@ -891,7 +997,7 @@ export class WalletClient<
             ...actionArgs
         } = args;
 
-        const sortedAction = sortActionKeys({ type: "twapOrder", twap: actionArgs });
+        const sortedAction = sorters.twapOrder({ type: "twapOrder", twap: actionArgs });
         const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce, vaultAddress);
 
         const request: TwapOrderRequest = {
@@ -900,9 +1006,9 @@ export class WalletClient<
             nonce,
             vaultAddress,
         };
-        const response = await this.transport.request<TwapOrderResponse>("action", request, signal);
+        const response = await this.transport.request("action", request, signal) as TwapOrderResponse;
 
-        this.validateResponse(response);
+        this._validateResponse(response);
         return response;
     }
 
@@ -910,16 +1016,23 @@ export class WalletClient<
      * Update isolated margin for a position.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Successful response without specific data.
+     * @returns {SuccessResponse} Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin|Hyperliquid GitBook}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin | Hyperliquid GitBook}
      * @example
      * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
      * const result = await client.updateIsolatedMargin({
-     *     asset: 0,
-     *     isBuy: true, // Add to long position
-     *     ntli: 1000 // Add 1000 USD margin (integer only)
+     *   asset: 0,
+     *   isBuy: true, // Add to long position
+     *   ntli: 1000, // Add 1000 USD margin (integer only)
      * });
      * ```
      */
@@ -930,7 +1043,7 @@ export class WalletClient<
             ...actionArgs
         } = args;
 
-        const sortedAction = sortActionKeys({ type: "updateIsolatedMargin", ...actionArgs });
+        const sortedAction = sorters.updateIsolatedMargin({ type: "updateIsolatedMargin", ...actionArgs });
         const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce, vaultAddress);
 
         const request: UpdateIsolatedMarginRequest = {
@@ -939,9 +1052,9 @@ export class WalletClient<
             nonce,
             vaultAddress,
         };
-        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", request, signal);
+        const response = await this.transport.request("action", request, signal) as SuccessResponse | ErrorResponse;
 
-        this.validateResponse(response);
+        this._validateResponse(response);
         return response;
     }
 
@@ -949,16 +1062,23 @@ export class WalletClient<
      * Update leverage for cross or isolated margin.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Successful response without specific data.
+     * @returns {SuccessResponse} Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-leverage|Hyperliquid GitBook}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-leverage | Hyperliquid GitBook}
      * @example
      * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
      * const result = await client.updateLeverage({
-     *     asset: 0,
-     *     isCross: true,
-     *     leverage: 5
+     *   asset: 0,
+     *   isCross: true,
+     *   leverage: 5,
      * });
      * ```
      */
@@ -969,7 +1089,7 @@ export class WalletClient<
             ...actionArgs
         } = args;
 
-        const sortedAction = sortActionKeys({ type: "updateLeverage", ...actionArgs });
+        const sortedAction = sorters.updateLeverage({ type: "updateLeverage", ...actionArgs });
         const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce, vaultAddress);
 
         const request: UpdateLeverageRequest = {
@@ -978,9 +1098,9 @@ export class WalletClient<
             nonce,
             vaultAddress,
         };
-        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", request, signal);
+        const response = await this.transport.request("action", request, signal) as SuccessResponse | ErrorResponse;
 
-        this.validateResponse(response);
+        this._validateResponse(response);
         return response;
     }
 
@@ -988,15 +1108,22 @@ export class WalletClient<
      * Transfer funds between Spot and Perp accounts.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Successful response without specific data.
+     * @returns {SuccessResponse} Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa|Hyperliquid GitBook}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa | Hyperliquid GitBook}
      * @example
      * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
      * const result = await client.usdClassTransfer({
-     *     amount: "1000",
-     *     toPerp: true // Transfer from Spot to Perp
+     *   amount: "1000",
+     *   toPerp: true, // Transfer from Spot to Perp
      * });
      * ```
      */
@@ -1027,9 +1154,9 @@ export class WalletClient<
             signature,
             nonce: action.nonce,
         };
-        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", request, signal);
+        const response = await this.transport.request("action", request, signal) as SuccessResponse | ErrorResponse;
 
-        this.validateResponse(response);
+        this._validateResponse(response);
         return response;
     }
 
@@ -1037,15 +1164,22 @@ export class WalletClient<
      * Transfer USDC on L1 to another address.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Successful response without specific data.
+     * @returns {SuccessResponse} Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-usdc-transfer|Hyperliquid GitBook}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-usdc-transfer | Hyperliquid GitBook}
      * @example
      * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
      * const result = await client.usdSend({
-     *     destination: "0x...",
-     *     amount: "1000"
+     *   destination: "0x...",
+     *   amount: "1000",
      * });
      * ```
      */
@@ -1076,9 +1210,9 @@ export class WalletClient<
             signature,
             nonce: action.time,
         };
-        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", request, signal);
+        const response = await this.transport.request("action", request, signal) as SuccessResponse | ErrorResponse;
 
-        this.validateResponse(response);
+        this._validateResponse(response);
         return response;
     }
 
@@ -1086,16 +1220,23 @@ export class WalletClient<
      * Transfer funds to/from a vault.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Successful response without specific data.
+     * @returns {SuccessResponse} Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-a-vault|Hyperliquid GitBook}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-a-vault | Hyperliquid GitBook}
      * @example
      * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
      * const result = await client.vaultTransfer({
-     *     vaultAddress: "0x...",
-     *     isDeposit: true,
-     *     usd: 1000000 // 1 USD in raw units (float amount * 1e6)
+     *   vaultAddress: "0x...",
+     *   isDeposit: true,
+     *   usd: 1000000, // 1 USD in raw units (float amount * 1e6)
      * });
      * ```
      */
@@ -1105,7 +1246,7 @@ export class WalletClient<
             ...actionArgs
         } = args;
 
-        const sortedAction = sortActionKeys({ type: "vaultTransfer", ...actionArgs });
+        const sortedAction = sorters.vaultTransfer({ type: "vaultTransfer", ...actionArgs });
         const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce);
 
         const request: VaultTransferRequest = {
@@ -1113,9 +1254,9 @@ export class WalletClient<
             signature,
             nonce,
         };
-        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", request, signal);
+        const response = await this.transport.request("action", request, signal) as SuccessResponse | ErrorResponse;
 
-        this.validateResponse(response);
+        this._validateResponse(response);
         return response;
     }
 
@@ -1123,15 +1264,22 @@ export class WalletClient<
      * Initiate a withdrawal request.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Successful response without specific data.
+     * @returns {SuccessResponse} Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#initiate-a-withdrawal-request|Hyperliquid GitBook}
+     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#initiate-a-withdrawal-request | Hyperliquid GitBook}
      * @example
      * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
      * const result = await client.withdraw3({
-     *     destination: "0x...",
-     *     amount: "1000"
+     *   destination: "0x...",
+     *   amount: "1000",
      * });
      * ```
      */
@@ -1162,17 +1310,14 @@ export class WalletClient<
             signature,
             nonce: action.time,
         };
-        const response = await this.transport.request<SuccessResponse | ErrorResponse>("action", request, signal);
+        const response = await this.transport.request("action", request, signal) as SuccessResponse | ErrorResponse;
 
-        this.validateResponse(response);
+        this._validateResponse(response);
         return response;
     }
 
-    /**
-     * Validate the response.
-     * @param response - The response to validate.
-     */
-    protected validateResponse(
+    /** Validate a response from the API. */
+    protected _validateResponse(
         response:
             | SuccessResponse
             | ErrorResponse

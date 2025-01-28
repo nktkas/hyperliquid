@@ -7,30 +7,18 @@ export interface AllMids {
 }
 
 /** Context information for a perpetual asset. */
-export interface AssetCtx {
+export interface PerpsAssetCtx extends SharedAssetCtx {
     /** Funding rate. */
     funding: string;
 
     /** Total open interest. */
     openInterest: string;
 
-    /** Previous day's closing price. */
-    prevDayPx: string;
-
-    /** Daily volume. */
-    dayNtlVlm: string;
-
     /** Premium price. */
     premium: string | null;
 
     /** Oracle price. */
     oraclePx: string;
-
-    /** Mark price. */
-    markPx: string;
-
-    /** Index price. */
-    midPx: string | null;
 
     /** Impact prices. */
     impactPxs: string[] | null;
@@ -39,8 +27,8 @@ export interface AssetCtx {
     dayBaseVlm: string;
 }
 
-/** Context information for a spot asset. */
-export interface SpotAssetCtx {
+/** Base asset context information. */
+export interface SharedAssetCtx {
     /** Previous day's closing price. */
     prevDayPx: string;
 
@@ -52,7 +40,10 @@ export interface SpotAssetCtx {
 
     /** Index price. */
     midPx: string | null;
+}
 
+/** Context information for a spot asset. */
+export interface SpotAssetCtx extends SharedAssetCtx {
     /** Circulating supply. */
     circulatingSupply: string;
 
@@ -67,9 +58,9 @@ export interface SpotAssetCtx {
 }
 
 /** Metadata for perpetual assets. */
-export interface Meta {
+export interface PerpsMeta {
     /** Universes available for trading. */
-    universe: Universe[];
+    universe: PerpsUniverse[];
 }
 
 /** Metadata for spot assets. */
@@ -82,7 +73,7 @@ export interface SpotMeta {
 }
 
 /** Trading universe with specific parameters for perpetual. */
-export interface Universe {
+export interface PerpsUniverse {
     /** Minimum decimal places for order sizes. */
     szDecimals: number;
 
@@ -193,11 +184,14 @@ export interface TokenDetails {
 
     /** The genesis data of the token. */
     genesis: {
+        /** The user balances. */
+        userBalances: [Hex, string][];
+
         /** The existing token balances. */
         existingTokenBalances: [number, string][];
 
-        /** The user balances. */
-        userBalances: [Hex, string][];
+        /** The blacklisted users. */
+        blacklistUsers: Hex[];
     } | null;
 
     /** The deployer of the token. */
@@ -220,12 +214,12 @@ export interface TokenDetails {
 }
 
 /** Metadata and context information for each perpetual asset. */
-export type MetaAndAssetCtxs = [
+export type PerpsMetaAndAssetCtxs = [
     /** Metadata for assets. */
-    Meta,
+    PerpsMeta,
 
     /** Context information for each asset. */
-    AssetCtx[],
+    PerpsAssetCtx[],
 ];
 
 /** Metadata and context information for each spot asset. */
@@ -238,7 +232,7 @@ export type SpotMetaAndAssetCtxs = [
 ];
 
 /** Candlestick data point. */
-export interface CandleSnapshot {
+export interface Candle {
     /** Opening timestamp (in ms since epoch). */
     t: number;
 
@@ -327,6 +321,9 @@ export interface SpotDeployState {
 
         /** The full name of the token. */
         fullName: string | null;
+
+        /** The deployer trading fee share of the token. */
+        deployerTradingFeeShare: string;
 
         /** The spots of the token. */
         spots: number[];
