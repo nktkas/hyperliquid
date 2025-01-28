@@ -15,6 +15,7 @@
     "publish": {
         "exclude": [
             ".github",
+            "build",
             "tests"
         ]
     },
