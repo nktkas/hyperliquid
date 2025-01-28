@@ -4,7 +4,8 @@ import { assert, assertEquals } from "jsr:@std/assert@^1.0.11";
 Deno.test("ReconnectingWebSocket Tests", async (t) => {
     const server = Deno.serve(
         { port: 8080, onListen: () => {} },
-        (request) => {
+        async (request) => {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
             if (request.headers.get("upgrade") === "websocket") {
                 const protocolsHeader = request.headers.get("sec-websocket-protocol") ?? "";
                 const requestedProtocols = protocolsHeader.split(",").map((p) => p.trim())[0] ?? "";
