@@ -1,4 +1,5 @@
 import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
+import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import { BigNumber } from "npm:bignumber.js@^9.1.2";
 import { assertJsonSchema, formatSize, getAssetData, isHex } from "../../utils.ts";
@@ -20,7 +21,7 @@ if (typeof TEST_PERPS_ASSET !== "string") {
 
 export type MethodReturnType = ReturnType<WalletClient["twapOrder"]>;
 const MethodReturnType = tsj
-    .createGenerator({ path: import.meta.url, skipTypeCheck: true })
+    .createGenerator({ path: fromFileUrl(import.meta.url), skipTypeCheck: true })
     .createSchema("MethodReturnType");
 
 // —————————— Test ——————————

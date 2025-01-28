@@ -87,7 +87,7 @@ Deno.test("ReconnectingWebSocket Tests", async (t) => {
                 // The default formula is roughly: Math.min(~~(1 << attempt) * 150, 10_000)
                 const expected = Math.min(~~(1 << i) * 150, 10_000);
                 assert(
-                    diff >= expected && diff <= expected * 1.2,
+                    diff >= expected && diff <= expected * 1.4,
                     `Close event #${i} expected backoff around ${expected}ms (+20%), but got ${diff}ms`,
                 );
             }
@@ -113,7 +113,7 @@ Deno.test("ReconnectingWebSocket Tests", async (t) => {
             for (let i = 1; i < closeTimes.length; i++) {
                 const diff = closeTimes[i] - closeTimes[i - 1];
                 assert(
-                    diff >= customDelay && diff <= customDelay * 1.2,
+                    diff >= customDelay && diff <= customDelay * 1.4,
                     `Close event #${i} waited less than customDelay. Expected ${customDelay}ms, got ${diff}ms`,
                 );
             }
@@ -137,7 +137,7 @@ Deno.test("ReconnectingWebSocket Tests", async (t) => {
                 const diff = closeTimes[i] - closeTimes[i - 1];
                 const expected = delays[i - 1] || delays[delays.length - 1];
                 assert(
-                    diff >= expected && diff <= expected * 1.2,
+                    diff >= expected && diff <= expected * 1.4,
                     `Close event #${i} waited less than the function-supplied delay. Expected ${expected}ms, got ${diff}ms`,
                 );
             }

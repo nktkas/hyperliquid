@@ -1,4 +1,5 @@
 import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
+import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import { assertJsonSchema, generateEthereumAddress, isHex } from "../../utils.ts";
 import { HttpTransport, WalletClient } from "../../../mod.ts";
@@ -15,7 +16,7 @@ if (!isHex(TEST_PRIVATE_KEY)) {
 
 export type MethodReturnType = ReturnType<WalletClient["usdSend"]>;
 const MethodReturnType = tsj
-    .createGenerator({ path: import.meta.url, skipTypeCheck: true })
+    .createGenerator({ path: fromFileUrl(import.meta.url), skipTypeCheck: true })
     .createSchema("MethodReturnType");
 
 // —————————— Test ——————————

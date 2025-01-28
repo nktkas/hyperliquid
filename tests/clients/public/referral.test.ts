@@ -1,4 +1,5 @@
 import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
+import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
 import { assert } from "jsr:@std/assert@^1.0.10";
 import { HttpTransport, PublicClient } from "../../../mod.ts";
 import { assertJsonSchema } from "../../utils.ts";
@@ -16,7 +17,7 @@ const REWARD_HISTORY = "0x745d208c08be6743481cdaf5984956be87ec5a3f"; // Mainnet
 
 export type MethodReturnType = ReturnType<PublicClient["referral"]>;
 const MethodReturnType = tsj
-    .createGenerator({ path: import.meta.url, skipTypeCheck: true })
+    .createGenerator({ path: fromFileUrl(import.meta.url), skipTypeCheck: true })
     .createSchema("MethodReturnType");
 
 // —————————— Test ——————————

@@ -1,4 +1,5 @@
 import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
+import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
 import { assert } from "jsr:@std/assert@^1.0.10";
 import { HttpTransport, PublicClient } from "../../../mod.ts";
 import { assertJsonSchema } from "../../utils.ts";
@@ -11,7 +12,7 @@ const USER_ADDRESS = "0xe973105a27e17350500926ae664dfcfe6006d924";
 
 export type MethodReturnType = ReturnType<PublicClient["userFees"]>;
 const MethodReturnType = tsj
-    .createGenerator({ path: import.meta.url, skipTypeCheck: true })
+    .createGenerator({ path: fromFileUrl(import.meta.url), skipTypeCheck: true })
     .createSchema("MethodReturnType");
 
 // —————————— Test ——————————

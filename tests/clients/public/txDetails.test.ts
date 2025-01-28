@@ -1,4 +1,5 @@
 import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
+import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
 import { assert } from "jsr:@std/assert@^1.0.10";
 import { HttpTransport, PublicClient } from "../../../mod.ts";
 import { assertJsonSchema } from "../../utils.ts";
@@ -12,7 +13,7 @@ const TX_HASH_WITHOUT_ERROR = "0x4de9f1f5d912c23d8fbb0411f01bfe0000eb9f3ccb3fec7
 
 export type MethodReturnType = ReturnType<PublicClient["txDetails"]>;
 const MethodReturnType = tsj
-    .createGenerator({ path: import.meta.url, skipTypeCheck: true })
+    .createGenerator({ path: fromFileUrl(import.meta.url), skipTypeCheck: true })
     .createSchema("MethodReturnType");
 
 // —————————— Test ——————————
