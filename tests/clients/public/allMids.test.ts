@@ -1,22 +1,26 @@
 import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
-import { assert } from "jsr:@std/assert@^1.0.10";
-import { HttpTransport, PublicClient } from "../../../index.ts";
+import { HttpTransport, PublicClient } from "../../../mod.ts";
 import { assertJsonSchema } from "../../utils.ts";
 
-Deno.test("allMids", async (t) => {
-    // Create a scheme of type
-    const typeSchema = tsj
-        .createGenerator({ path: "./index.ts", skipTypeCheck: true })
-        .createSchema("AllMids");
+// —————————— Type schema ——————————
 
-    // Create client
+export type MethodReturnType = ReturnType<PublicClient["allMids"]>;
+const MethodReturnType = tsj
+    .createGenerator({ path: import.meta.url, skipTypeCheck: true })
+    .createSchema("MethodReturnType");
+
+// —————————— Test ——————————
+
+Deno.test("allMids", async (t) => {
+    // —————————— Prepare ——————————
+
     const transport = new HttpTransport({ url: "https://api.hyperliquid-testnet.xyz" });
     const client = new PublicClient({ transport });
 
-    //Test
+    // —————————— Test ——————————
+
     await t.step("Matching data to type schema", async () => {
         const data = await client.allMids();
-        assertJsonSchema(typeSchema, data);
-        assert(Object.keys(data).length > 0, "Expected data to have at least one element");
+        assertJsonSchema(MethodReturnType, data);
     });
 });

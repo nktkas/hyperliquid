@@ -2,16 +2,10 @@ import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import { BigNumber } from "npm:bignumber.js@^9.1.2";
 import { assert } from "jsr:@std/assert@^1.0.10";
-import {
-    assertIncludesNotEmptyArray,
-    assertJsonSchema,
-    formatPrice,
-    formatSize,
-    getAssetData,
-    isHex,
-    randomCloid,
-} from "../../utils.ts";
-import { HttpTransport, PublicClient, WalletClient } from "../../../index.ts";
+import { assertJsonSchema, formatPrice, formatSize, getAssetData, isHex, randomCloid } from "../../utils.ts";
+import { HttpTransport, PublicClient, WalletClient } from "../../../mod.ts";
+
+// —————————— Constants ——————————
 
 const TEST_PRIVATE_KEY = Deno.args[0] as string | undefined;
 const TEST_PERPS_ASSET = Deno.args[1] as string | undefined;
@@ -23,29 +17,30 @@ if (typeof TEST_PERPS_ASSET !== "string") {
     throw new Error(`Expected a string, but got ${typeof TEST_PERPS_ASSET}`);
 }
 
-Deno.test("order", async (t) => {
-    // Create a scheme of type
-    const typeSchema = tsj
-        .createGenerator({ path: "./index.ts", skipTypeCheck: true })
-        .createSchema("OrderResponseSuccess");
+// —————————— Type schema ——————————
 
-    // Create client
+export type MethodReturnType = ReturnType<WalletClient["order"]>;
+const MethodReturnType = tsj
+    .createGenerator({ path: import.meta.url, skipTypeCheck: true })
+    .createSchema("MethodReturnType");
+
+// —————————— Test ——————————
+
+Deno.test("order", async (t) => {
+    // —————————— Prepare ——————————
+
     const account = privateKeyToAccount(TEST_PRIVATE_KEY);
     const transport = new HttpTransport({ url: "https://api.hyperliquid-testnet.xyz" });
     const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
     const publicClient = new PublicClient({ transport });
 
-    // Preparation
-
-    // Get asset data
     const { id, universe, ctx } = await getAssetData(publicClient, TEST_PERPS_ASSET);
-
-    // Calculations
     const pxUp = formatPrice(new BigNumber(ctx.markPx).times(1.01), universe.szDecimals);
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);
 
-    // Test
+    // —————————— Test ——————————
+
     await t.step("unfilled + without cloid", async () => {
         const result = await walletClient.order({
             orders: [
@@ -62,12 +57,12 @@ Deno.test("order", async (t) => {
         });
         const [order] = result.response.data.statuses;
 
-        assertJsonSchema(typeSchema, result);
-        assertIncludesNotEmptyArray(result);
+        assertJsonSchema(MethodReturnType, result);
         assert("resting" in result.response.data.statuses[0], "resting is not defined");
         assert(result.response.data.statuses[0].resting.cloid === undefined, "cloid is defined");
 
-        // Closing orders after the test
+        // —————————— Cleanup ——————————
+
         await walletClient.cancel({
             cancels: [{ a: id, o: "resting" in order ? order.resting.oid : order.filled.oid }],
         });
@@ -90,12 +85,12 @@ Deno.test("order", async (t) => {
         });
         const [order] = result.response.data.statuses;
 
-        assertJsonSchema(typeSchema, result);
-        assertIncludesNotEmptyArray(result);
+        assertJsonSchema(MethodReturnType, result);
         assert("resting" in result.response.data.statuses[0], "resting is not defined");
         assert(result.response.data.statuses[0].resting.cloid !== undefined, "cloid is not defined");
 
-        // Closing orders after the test
+        // —————————— Cleanup ——————————
+
         await walletClient.cancel({
             cancels: [{ a: id, o: "resting" in order ? order.resting.oid : order.filled.oid }],
         });
@@ -116,12 +111,12 @@ Deno.test("order", async (t) => {
             grouping: "na",
         });
 
-        assertJsonSchema(typeSchema, result);
-        assertIncludesNotEmptyArray(result);
+        assertJsonSchema(MethodReturnType, result);
         assert("filled" in result.response.data.statuses[0], "filled is not defined");
         assert(result.response.data.statuses[0].filled.cloid === undefined, "cloid is defined");
 
-        // Closing orders after the test
+        // —————————— Cleanup ——————————
+
         await walletClient.order({
             orders: [{
                 a: id,
@@ -151,12 +146,12 @@ Deno.test("order", async (t) => {
             grouping: "na",
         });
 
-        assertJsonSchema(typeSchema, result);
-        assertIncludesNotEmptyArray(result);
+        assertJsonSchema(MethodReturnType, result);
         assert("filled" in result.response.data.statuses[0], "filled is not defined");
         assert(result.response.data.statuses[0].filled.cloid !== undefined, "cloid is not defined");
 
-        // Closing orders after the test
+        // —————————— Cleanup ——————————
+
         await walletClient.order({
             orders: [{
                 a: id,
@@ -187,10 +182,10 @@ Deno.test("order", async (t) => {
         });
         const [order] = result.response.data.statuses;
 
-        assertJsonSchema(typeSchema, result);
-        assertIncludesNotEmptyArray(result);
+        assertJsonSchema(MethodReturnType, result);
 
-        // Closing orders after the test
+        // —————————— Cleanup ——————————
+
         await walletClient.cancel({
             cancels: [{ a: id, o: "resting" in order ? order.resting.oid : order.filled.oid }],
         });

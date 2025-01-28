@@ -1,56 +1,65 @@
 import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
-import { assert, assertGreater } from "jsr:@std/assert@^1.0.10";
-import { HttpTransport, PublicClient } from "../../../index.ts";
+import { assert } from "jsr:@std/assert@^1.0.10";
+import { HttpTransport, PublicClient } from "../../../mod.ts";
 import { assertJsonSchema } from "../../utils.ts";
+
+// —————————— Constants ——————————
 
 const USER_ADDRESS = "0x563C175E6f11582f65D6d9E360A618699DEe14a9";
 const USER_ADDRESS_WITHOUT_SUBACCOUNTS = "0x0000000000000000000000000000000000000000";
 
-Deno.test("subAccounts", async (t) => {
-    // Create a scheme of type
-    const typeSchema = tsj
-        .createGenerator({ path: "./index.ts", skipTypeCheck: true })
-        .createSchema("SubAccount");
+// —————————— Type schema ——————————
 
-    // Create client
+export type MethodReturnType = ReturnType<PublicClient["subAccounts"]>;
+const MethodReturnType = tsj
+    .createGenerator({ path: import.meta.url, skipTypeCheck: true })
+    .createSchema("MethodReturnType");
+
+// —————————— Test ——————————
+
+Deno.test("subAccounts", async (t) => {
+    // —————————— Prepare ——————————
+
     const transport = new HttpTransport({ url: "https://api.hyperliquid-testnet.xyz" });
     const client = new PublicClient({ transport });
 
-    //Test
-    const data = await client.subAccounts({ user: USER_ADDRESS });
+    // —————————— Test ——————————
 
     const isMatchToScheme = await t.step("Matching data to type schema", async (t) => {
-        await t.step("response must be an array", () => {
-            assert(Array.isArray(data), "Expected data to be an array, but got: " + typeof data);
-            assertGreater(data.length, 0, "Expected data to have at least one element");
-            data.forEach((item) => assertJsonSchema(typeSchema, item));
+        await t.step("response should be an 'array'", async () => {
+            const data = await client.subAccounts({ user: USER_ADDRESS });
+            assertJsonSchema(MethodReturnType, data);
+            assert(Array.isArray(data), `Expected data to be an 'array', got '${typeof data}'`);
         });
-        await t.step("response must be null", async () => {
+        await t.step("response should be 'null'", async () => {
             const data = await client.subAccounts({ user: USER_ADDRESS_WITHOUT_SUBACCOUNTS });
-            assert(data === null, "Expected data to be null, but got: " + typeof data);
+            // NOTE: tsj does not return a null schema
+            // assertJsonSchema(MethodReturnType, data);
+            assert(data === null, `Expected data to be 'null', got '${typeof data}'`);
         });
     });
 
     await t.step({
         name: "Additional checks",
         fn: async (t) => {
-            assert(Array.isArray(data), "Expected data to be an array, but got: " + typeof data);
+            const data = await client.subAccounts({ user: USER_ADDRESS });
+            assertJsonSchema(MethodReturnType, data);
 
             await t.step("Check key 'clearinghouseState.assetPositions'", async (t) => {
                 assert(
                     data.some((item) => item.clearinghouseState.assetPositions.length > 0),
-                    "some 'assetPositions' must be a non-empty array",
+                    "some 'assetPositions' should be a non-empty array",
                 );
 
                 await t.step("Check key 'leverage'", async (t) => {
-                    await t.step("some must be 'isolated'", () => {
+                    await t.step("some should be 'isolated'", () => {
                         assert(
                             data.some((x) =>
                                 x.clearinghouseState.assetPositions.some((y) => y.position.leverage.type === "isolated")
                             ),
                         );
                     });
-                    await t.step("some must be 'cross'", () => {
+                    await t.step("some should be 'cross'", () => {
                         assert(
                             data.some((x) =>
                                 x.clearinghouseState.assetPositions.some((y) => y.position.leverage.type === "cross")
@@ -60,7 +69,7 @@ Deno.test("subAccounts", async (t) => {
                 });
 
                 await t.step("Check key 'liquidationPx'", async (t) => {
-                    await t.step("some must be a string", () => {
+                    await t.step("some should be a 'string'", () => {
                         assert(
                             data.some((item) =>
                                 item.clearinghouseState.assetPositions.some((item) =>
@@ -69,7 +78,7 @@ Deno.test("subAccounts", async (t) => {
                             ),
                         );
                     });
-                    await t.step("some must be null", () => {
+                    await t.step("some should be 'null'", () => {
                         assert(
                             data.some((item) =>
                                 item.clearinghouseState.assetPositions.some((item) =>
@@ -78,12 +87,6 @@ Deno.test("subAccounts", async (t) => {
                             ),
                         );
                     });
-                });
-            });
-
-            await t.step("Check key 'spotState.balances'", async (t) => {
-                await t.step("some must be a non-empty array", () => {
-                    assert(data.some((x) => x.spotState.balances.length > 0));
                 });
             });
         },

@@ -1,40 +1,40 @@
 import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
 import { assert } from "jsr:@std/assert@^1.0.10";
-import { HttpTransport, PublicClient } from "../../../index.ts";
+import { HttpTransport, PublicClient } from "../../../mod.ts";
 import { assertJsonSchema } from "../../utils.ts";
 
-Deno.test("meta", async (t) => {
-    // Create a scheme of type
-    const typeSchema = tsj
-        .createGenerator({ path: "./index.ts", skipTypeCheck: true })
-        .createSchema("Meta");
+// —————————— Type schema ——————————
 
-    // Create client
+export type MethodReturnType = ReturnType<PublicClient["meta"]>;
+const MethodReturnType = tsj
+    .createGenerator({ path: import.meta.url, skipTypeCheck: true })
+    .createSchema("MethodReturnType");
+
+// —————————— Test ——————————
+
+Deno.test("meta", async (t) => {
+    // —————————— Prepare ——————————
+
     const transport = new HttpTransport({ url: "https://api.hyperliquid-testnet.xyz" });
     const client = new PublicClient({ transport });
 
-    //Test
+    // —————————— Test ——————————
+
     const data = await client.meta();
 
     const isMatchToScheme = await t.step("Matching data to type schema", () => {
-        assertJsonSchema(typeSchema, data);
+        assertJsonSchema(MethodReturnType, data);
     });
 
     await t.step({
         name: "Additional checks",
         fn: async (t) => {
-            await t.step("Check key 'universe'", async (t) => {
-                assert(data.universe.length > 0, "'universe' must be a non-empty array");
-
-                await t.step("Check key 'onlyIsolated'", async (t) => {
-                    await t.step(
-                        "some must be true",
-                        () => assert(data.universe.some((item) => item.onlyIsolated === true)),
-                    );
-                    await t.step(
-                        "some must be undefined",
-                        () => assert(data.universe.some((item) => item.onlyIsolated === undefined)),
-                    );
+            await t.step("Check key 'universe.onlyIsolated'", async (t) => {
+                await t.step("some should be 'true'", () => {
+                    assert(data.universe.some((item) => item.onlyIsolated === true));
+                });
+                await t.step("some should be 'undefined'", () => {
+                    assert(data.universe.some((item) => item.onlyIsolated === undefined));
                 });
             });
         },

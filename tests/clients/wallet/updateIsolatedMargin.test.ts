@@ -2,7 +2,9 @@ import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import { BigNumber } from "npm:bignumber.js@^9.1.2";
 import { assertJsonSchema, formatPrice, formatSize, getAssetData, isHex } from "../../utils.ts";
-import { HttpTransport, PublicClient, WalletClient } from "../../../index.ts";
+import { HttpTransport, PublicClient, WalletClient } from "../../../mod.ts";
+
+// —————————— Constants ——————————
 
 const TEST_PRIVATE_KEY = Deno.args[0] as string | undefined;
 const TEST_PERPS_ASSET = Deno.args[1] as string | undefined;
@@ -14,24 +16,24 @@ if (typeof TEST_PERPS_ASSET !== "string") {
     throw new Error(`Expected a string, but got ${typeof TEST_PERPS_ASSET}`);
 }
 
-Deno.test("updateIsolatedMargin", async (t) => {
-    // Create a scheme of type
-    const typeSchema = tsj
-        .createGenerator({ path: "./index.ts", skipTypeCheck: true })
-        .createSchema("SuccessResponse");
+// —————————— Type schema ——————————
 
-    // Create client
+export type MethodReturnType = ReturnType<WalletClient["updateIsolatedMargin"]>;
+const MethodReturnType = tsj
+    .createGenerator({ path: import.meta.url, skipTypeCheck: true })
+    .createSchema("MethodReturnType");
+
+// —————————— Test ——————————
+
+Deno.test("updateIsolatedMargin", async (t) => {
+    // —————————— Prepare ——————————
+
     const account = privateKeyToAccount(TEST_PRIVATE_KEY);
     const transport = new HttpTransport({ url: "https://api.hyperliquid-testnet.xyz" });
     const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
     const publicClient = new PublicClient({ transport });
 
-    // Preparation
-
-    // Get asset data
     const { id, universe, ctx } = await getAssetData(publicClient, TEST_PERPS_ASSET);
-
-    // Calculations
     const pxUp = formatPrice(new BigNumber(ctx.markPx).times(1.01), universe.szDecimals);
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);
@@ -56,14 +58,15 @@ Deno.test("updateIsolatedMargin", async (t) => {
         grouping: "na",
     });
 
-    // Test
+    // —————————— Test ——————————
+
     await t.step("for long position", async () => {
         const result = await walletClient.updateIsolatedMargin({
             asset: id,
             isBuy: true,
             ntli: 1,
         });
-        assertJsonSchema(typeSchema, result);
+        assertJsonSchema(MethodReturnType, result);
     });
 
     await t.step("for short position", async () => {
@@ -72,10 +75,11 @@ Deno.test("updateIsolatedMargin", async (t) => {
             isBuy: false,
             ntli: 1,
         });
-        assertJsonSchema(typeSchema, result);
+        assertJsonSchema(MethodReturnType, result);
     });
 
-    // Post test cleaning
+    // —————————— Cleanup ——————————
+
     await walletClient.order({
         orders: [{
             a: id,

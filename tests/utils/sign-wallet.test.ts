@@ -156,65 +156,24 @@ Deno.test("Signature Generation Tests", async (t) => {
         await t.step("Action Hash", async (t) => {
             await t.step("should generate matching action hashes", async (t) => {
                 await t.step("with VaultAddress", () => {
-                    const viemHash = createActionHash(
+                    const actionHash = createActionHash(
                         l1ActionSignature.data.action,
                         l1ActionSignature.data.nonce,
                         l1ActionSignature.data.vaultAddress,
                     );
-
-                    const ethersHash = createActionHash(
-                        l1ActionSignature.data.action,
-                        l1ActionSignature.data.nonce,
-                        l1ActionSignature.data.vaultAddress,
-                    );
-
-                    const ethersV5Hash = createActionHash(
-                        l1ActionSignature.data.action,
-                        l1ActionSignature.data.nonce,
-                        l1ActionSignature.data.vaultAddress,
-                    );
-
                     assert(
-                        viemHash === l1ActionSignature.actionHash.withVaultAddress,
-                        `Viem Hash does not match, expected: ${l1ActionSignature.actionHash.withVaultAddress}, got: ${viemHash}`,
-                    );
-                    assert(
-                        ethersHash === l1ActionSignature.actionHash.withVaultAddress,
-                        `Ethers Hash does not match, expected: ${l1ActionSignature.actionHash.withVaultAddress}, got: ${ethersHash}`,
-                    );
-                    assert(
-                        ethersV5Hash === l1ActionSignature.actionHash.withVaultAddress,
-                        `Ethers v5 Hash does not match, expected: ${l1ActionSignature.actionHash.withVaultAddress}, got: ${ethersV5Hash}`,
+                        actionHash === l1ActionSignature.actionHash.withVaultAddress,
+                        `Hash does not match, expected: ${l1ActionSignature.actionHash.withVaultAddress}, got: ${actionHash}`,
                     );
                 });
-
                 await t.step("without VaultAddress", () => {
-                    const viemHash = createActionHash(
+                    const actionHash = createActionHash(
                         l1ActionSignature.data.action,
                         l1ActionSignature.data.nonce,
                     );
-
-                    const ethersHash = createActionHash(
-                        l1ActionSignature.data.action,
-                        l1ActionSignature.data.nonce,
-                    );
-
-                    const ethersV5Hash = createActionHash(
-                        l1ActionSignature.data.action,
-                        l1ActionSignature.data.nonce,
-                    );
-
                     assert(
-                        viemHash === l1ActionSignature.actionHash.withoutVaultAddress,
-                        `Viem Hash does not match, expected: ${l1ActionSignature.actionHash.withoutVaultAddress}, got: ${viemHash}`,
-                    );
-                    assert(
-                        ethersHash === l1ActionSignature.actionHash.withoutVaultAddress,
-                        `Ethers Hash does not match, expected: ${l1ActionSignature.actionHash.withoutVaultAddress}, got: ${ethersHash}`,
-                    );
-                    assert(
-                        ethersV5Hash === l1ActionSignature.actionHash.withoutVaultAddress,
-                        `Ethers v5 Hash does not match, expected: ${l1ActionSignature.actionHash.withoutVaultAddress}, got: ${ethersV5Hash}`,
+                        actionHash === l1ActionSignature.actionHash.withoutVaultAddress,
+                        `Hash does not match, expected: ${l1ActionSignature.actionHash.withoutVaultAddress}, got: ${actionHash}`,
                     );
                 });
             });

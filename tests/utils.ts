@@ -1,64 +1,29 @@
-import type { AssetCtx, Hex, PublicClient, Universe } from "../index.ts";
+import type { Hex, PerpsAssetCtx, PerpsUniverse, PublicClient } from "../mod.ts";
 import { Ajv } from "npm:ajv@^8.17.1";
-import type { Definition } from "npm:ts-json-schema-generator@^2.3.0";
-import { assert, assertGreater } from "jsr:@std/assert@^1.0.4";
+import { assert } from "jsr:@std/assert@^1.0.4";
 import { BigNumber } from "npm:bignumber.js@^9.1.2";
+import type { JSONSchema7, JSONSchema7Definition } from "npm:json-schema@0.4.0";
 import { keccak_256 } from "@noble/hashes/sha3";
-
-export interface AssetData {
-    id: number;
-    universe: Universe;
-    ctx: AssetCtx;
-}
 
 /**
  * Asserts that the data matches the JSON schema
  * @param schema - A JSON schema definition
- * @param data - Data to validate
+ * @param data - A data to validate
+ * @param options - Additional options
  */
-export function assertJsonSchema<T>(schema: Definition, data: unknown): asserts data is T {
+export function assertJsonSchema(
+    schema: JSONSchema7,
+    data: unknown,
+    options?: {
+        skipMinItemsCheck?: string[] | boolean;
+    },
+): asserts data {
+    const strictSchema = addMinItemsToArrays(schema, 1, options?.skipMinItemsCheck);
     const ajv = new Ajv({ strict: true });
-    const validate = ajv.compile(schema);
-    assert(validate(data), JSON.stringify(validate.errors) + "\n" + JSON.stringify(data));
-}
-
-/**
- * Asserts that the data includes a non-empty array
- * @param data - Data to validate
- */
-export function assertIncludesNotEmptyArray(data: object): void {
-    recursiveTraversal(data, "", (fullPath, value) => {
-        if (Array.isArray(value)) {
-            assertGreater(
-                value.length,
-                0,
-                `Unable to fully validate the type due to an empty array. Path: ${fullPath}, Data: ${
-                    JSON.stringify(data, null, 2)
-                }`,
-            );
-        }
-    });
-}
-
-/**
- * Recursively traverse an object
- * @param obj - Object to traverse
- * @param parentPath - Accumulated path
- * @param fn - Callback function
- */
-function recursiveTraversal(
-    obj: object,
-    parentPath: string,
-    fn: (fullPath: string, value: unknown) => void,
-): void {
-    for (const [key, value] of Object.entries(obj)) {
-        const currentPath = parentPath ? `${parentPath}.${key}` : key;
-        fn(currentPath, value);
-
-        if (typeof value === "object" && value !== null) {
-            recursiveTraversal(value, currentPath, fn);
-        }
-    }
+    assert(
+        ajv.validate(strictSchema, data),
+        `\nSchema error: ${JSON.stringify(ajv.errors)}\nData: ${JSON.stringify(data)}`,
+    );
 }
 
 /**
@@ -67,7 +32,11 @@ function recursiveTraversal(
  * @param assetName - Asset name
  * @returns Asset data
  */
-export async function getAssetData(client: PublicClient, assetName: string): Promise<AssetData> {
+export async function getAssetData(client: PublicClient, assetName: string): Promise<{
+    id: number;
+    universe: PerpsUniverse;
+    ctx: PerpsAssetCtx;
+}> {
     const data = await client.metaAndAssetCtxs();
     const id = data[0].universe.findIndex((u) => u.name === assetName)!;
     const universe = data[0].universe[id];
@@ -75,27 +44,17 @@ export async function getAssetData(client: PublicClient, assetName: string): Pro
     return { id, universe, ctx };
 }
 
-/**
- * Verify if the data is a hex string
- * @param data - Data to verify
- * @returns `true` if the data is a hex string
- */
+/** Check if the data is a hex string. */
 export function isHex(data: unknown): data is Hex {
     return typeof data === "string" && /^0x[0-9a-fA-F]+$/.test(data);
 }
 
-/**
- * Generate a random Client Order ID
- * @returns Client Order ID
- */
+/** Generate a random Client Order ID. */
 export function randomCloid(): Hex {
     return `0x${Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
 }
 
-/**
- * Generate an Ethereum address
- * @returns Ethereum address
- */
+/** Generate an Ethereum address. */
 export function generateEthereumAddress(): Hex {
     // Step 1: Generate a random 20-byte hex string
     const address = Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
@@ -121,41 +80,107 @@ export function generateEthereumAddress(): Hex {
 
 /**
  * Format the price for Hyperliquid
- * @param priceStr - Price string
+ * @param price - Price value
  * @param szDecimals - Size decimals from `universe`
- * @param isPerp - Is perpetual market
- * @param roundingMode - BigNumber rounding mode
+ * @param isPerp - Is perpetual market? Default: `true`
+ * @param roundingMode - BigNumber rounding mode. Default: `ROUND_HALF_UP`
  * @returns Formatted price
  */
 export function formatPrice(
-    priceStr: BigNumber.Value,
+    price: BigNumber.Value,
     szDecimals: number,
     isPerp: boolean = true,
     roundingMode: BigNumber.RoundingMode = BigNumber.ROUND_HALF_UP,
 ): string {
-    const price = new BigNumber(priceStr);
-    if (price.isInteger()) return price.toString();
+    const priceBN = new BigNumber(price);
+    if (priceBN.isInteger()) return priceBN.toString();
 
     const maxDecimals = isPerp ? 6 : 8;
     const maxAllowedDecimals = Math.max(maxDecimals - szDecimals, 0);
 
-    const priceSignificant = price.precision(5, roundingMode);
-    return priceSignificant
+    return priceBN
+        .precision(5, roundingMode)
         .toFixed(maxAllowedDecimals, roundingMode)
         .replace(/\.?0+$/, "");
 }
 
 /**
  * Format the size for Hyperliquid
- * @param sizeStr - Size string
+ * @param size - Size value
  * @param szDecimals - Size decimals from `universe`
- * @param roundingMode - BigNumber rounding mode
+ * @param roundingMode - BigNumber rounding mode. Default: `ROUND_HALF_UP`
  * @returns Formatted size
  */
 export function formatSize(
-    sizeStr: BigNumber.Value,
+    size: BigNumber.Value,
     szDecimals: number,
     roundingMode: BigNumber.RoundingMode = BigNumber.ROUND_HALF_UP,
 ): string {
-    return new BigNumber(sizeStr).toFixed(szDecimals, roundingMode);
+    return new BigNumber(size)
+        .toFixed(szDecimals, roundingMode)
+        .replace(/\.?0+$/, "");
+}
+
+/** Add `minItems` to all arrays in the json schema. */
+export function addMinItemsToArrays<T extends JSONSchema7 | JSONSchema7Definition>(
+    schema: T,
+    minItemsValue: number = 1,
+    skipKeys: string[] | boolean = [],
+): T {
+    if (!schema || typeof schema !== "object") {
+        return schema;
+    }
+
+    const copy = structuredClone(schema);
+
+    if (copy.definitions) {
+        const newDefinitions: Record<string, JSONSchema7> = {};
+        for (const [key, defSchema] of Object.entries(copy.definitions)) {
+            newDefinitions[key] = typeof skipKeys === "boolean"
+                ? skipKeys
+                : skipKeys.includes(key)
+                ? defSchema
+                : addMinItemsToArrays(defSchema, minItemsValue, skipKeys);
+        }
+        copy.definitions = newDefinitions;
+    }
+
+    if (copy.type === "array") {
+        if (copy.minItems === undefined) {
+            copy.minItems = minItemsValue;
+        }
+        if (copy.items) {
+            copy.items = addMinItemsToArrays(copy.items, minItemsValue, skipKeys);
+        }
+    }
+
+    if (copy.anyOf) {
+        copy.anyOf = copy.anyOf.map((subSchema: JSONSchema7) =>
+            addMinItemsToArrays(subSchema, minItemsValue, skipKeys)
+        );
+    }
+    if (copy.allOf) {
+        copy.allOf = copy.allOf.map((subSchema: JSONSchema7) =>
+            addMinItemsToArrays(subSchema, minItemsValue, skipKeys)
+        );
+    }
+    if (copy.oneOf) {
+        copy.oneOf = copy.oneOf.map((subSchema: JSONSchema7) =>
+            addMinItemsToArrays(subSchema, minItemsValue, skipKeys)
+        );
+    }
+
+    if (copy.type === "object" && copy.properties) {
+        const newProperties: Record<string, JSONSchema7> = {};
+        for (const [key, propSchema] of Object.entries(copy.properties)) {
+            newProperties[key] = typeof skipKeys === "boolean"
+                ? skipKeys
+                : skipKeys.includes(key)
+                ? propSchema
+                : addMinItemsToArrays(propSchema, minItemsValue, skipKeys);
+        }
+        copy.properties = newProperties;
+    }
+
+    return copy as T;
 }
