@@ -18,6 +18,11 @@ jobs:
               with:
                   deno-version: v2.x
 
+            - name: Ensure LF line endings for Windows
+              run: |
+                  git config --global core.autocrlf false
+                  git config --global core.eol lf
+
             - name: Run Formatter
               run: deno fmt --check
 
