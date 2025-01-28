@@ -1,7 +1,7 @@
 // deno-lint-ignore-file require-await
 
 import { assert, assertEquals, assertRejects } from "jsr:@std/assert@^1.0.10";
-import { HttpRequestError, HttpTransport } from "../../../src/transports/http/http-transport.ts";
+import { HttpRequestError, HttpTransport } from "../../../src/transports/http/http_transport.ts";
 
 Deno.test("HttpTransport Tests", async (t) => {
     const originalFetch = globalThis.fetch;

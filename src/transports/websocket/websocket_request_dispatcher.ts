@@ -1,5 +1,5 @@
 import { TransportError } from "../base.ts";
-import type { HyperliquidEventTarget } from "./hyperliquid-event-target.ts";
+import type { HyperliquidEventTarget } from "./hyperliquid_event_target.ts";
 
 /**
  * Error thrown when a WebSocket request fails:

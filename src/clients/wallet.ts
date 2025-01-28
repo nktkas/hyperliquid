@@ -31,7 +31,7 @@ import type {
     TwapOrderResponse,
 } from "../types/exchange/responses.d.ts";
 import type { IRequestTransport } from "../transports/base.ts";
-import { sorters } from "../utils/keySort.ts";
+import { sorters } from "../utils/key_sort.ts";
 import {
     type AbstractEthersSigner,
     type AbstractEthersV5Signer,

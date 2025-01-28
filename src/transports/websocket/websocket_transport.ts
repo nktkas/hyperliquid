@@ -1,6 +1,6 @@
-import { ReconnectingWebSocket, type ReconnectingWebSocketOptions } from "./reconnecting-websocket.ts";
-import { HyperliquidEventTarget } from "./hyperliquid-event-target.ts";
-import { WebSocketRequestDispatcher } from "./websocket-request-dispatcher.ts";
+import { ReconnectingWebSocket, type ReconnectingWebSocketOptions } from "./reconnecting_websocket.ts";
+import { HyperliquidEventTarget } from "./hyperliquid_event_target.ts";
+import { WebSocketRequestDispatcher } from "./websocket_request_dispatcher.ts";
 import type { IRequestTransport, ISubscriptionTransport, Subscription } from "../base.ts";
 
 /**

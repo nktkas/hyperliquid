@@ -6,14 +6,14 @@ export * from "./src/clients/wallet.ts";
 // Transports
 export * from "./src/transports/base.ts";
 
-export * from "./src/transports/http/http-transport.ts";
+export * from "./src/transports/http/http_transport.ts";
 
-export * from "./src/transports/websocket/websocket-transport.ts";
+export * from "./src/transports/websocket/websocket_transport.ts";
 export type {
     MessageBufferStrategy,
     ReconnectingWebSocketOptions,
-} from "./src/transports/websocket/reconnecting-websocket.ts";
-export { WebSocketRequestError } from "./src/transports/websocket/websocket-request-dispatcher.ts";
+} from "./src/transports/websocket/reconnecting_websocket.ts";
+export { WebSocketRequestError } from "./src/transports/websocket/websocket_request_dispatcher.ts";
 
 // Types
 export type * from "./src/types/common.d.ts";

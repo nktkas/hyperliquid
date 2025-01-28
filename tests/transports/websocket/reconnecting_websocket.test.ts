@@ -1,4 +1,4 @@
-import { ReconnectingWebSocket } from "../../../src/transports/websocket/reconnecting-websocket.ts";
+import { ReconnectingWebSocket } from "../../../src/transports/websocket/reconnecting_websocket.ts";
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.11";
 
 Deno.test("ReconnectingWebSocket Tests", async (t) => {
