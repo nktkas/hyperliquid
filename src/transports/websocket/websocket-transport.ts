@@ -59,7 +59,14 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
      * - Key: Unique subscription identifier (stringified payload)
      * - Value: Subscription info containing payload and listener mappings
      */
-    protected _subscriptions = new Map<
+    protected _subscriptions: Map<
+        string,
+        {
+            channel: string;
+            listeners: Map<(data: CustomEvent) => void, () => Promise<void>>;
+            requestPromise: Promise<unknown>;
+        }
+    > = new Map<
         string,
         {
             /** The event channel that being listened to. */
