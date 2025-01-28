@@ -43,13 +43,13 @@ import {
 // ———————————————Parameters———————————————
 
 /** Parameters for the {@linkcode WalletClient} constructor. */
-export type WalletClientParameters<
+export interface WalletClientParameters<
     T extends IRequestTransport = IRequestTransport,
     W extends AbstractViemWalletClient | AbstractEthersSigner | AbstractEthersV5Signer =
         | AbstractViemWalletClient
         | AbstractEthersSigner
         | AbstractEthersV5Signer,
-> = {
+> {
     /** The transport used to connect to the Hyperliquid API. */
     transport: T;
     /** The WalletClient/Account ([viem](https://viem.sh/docs/clients/wallet)) or Signer ([ethers.js](https://docs.ethers.org/v6/api/providers/#Signer)) used for signing transactions. */
@@ -58,7 +58,7 @@ export type WalletClientParameters<
     isTestnet?: boolean;
     /** Sets a default vaultAddress to be used if no vaultAddress is explicitly passed to a method. */
     defaultVaultAddress?: Hex;
-};
+}
 
 /** Parameters for the {@linkcode WalletClient.approveAgent} method. */
 export type ApproveAgentParameters =

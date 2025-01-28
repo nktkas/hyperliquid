@@ -37,10 +37,10 @@ import type { Book, Order, OrderStatus } from "../types/info/orders.d.ts";
 // ———————————————Parameters———————————————
 
 /** Parameters for the {@linkcode EventClient} constructor. */
-export type EventClientParameters<T extends ISubscriptionTransport = ISubscriptionTransport> = {
+export interface EventClientParameters<T extends ISubscriptionTransport = ISubscriptionTransport> {
     /** The transport used to connect to the Hyperliquid API. */
     transport: T;
-};
+}
 
 /** Parameters for the {@linkcode EventClient.activeAssetCtx} method. */
 export type EventActiveAssetCtxParameters = Omit<WsActiveAssetCtxRequest, "type">;

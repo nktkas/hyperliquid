@@ -66,10 +66,10 @@ import type { VaultDetails, VaultEquity, VaultSummary } from "../types/info/vaul
 // ———————————————Info Parameters———————————————
 
 /** Parameters for the {@linkcode PublicClient} constructor. */
-export type PublicClientParameters<T extends IRequestTransport = IRequestTransport> = {
+export interface PublicClientParameters<T extends IRequestTransport = IRequestTransport> {
     /** The transport used to connect to the Hyperliquid API. */
     transport: T;
-};
+}
 
 /** Parameters for the {@linkcode PublicClient.candleSnapshot} method. */
 export type CandleSnapshotParameters = CandleSnapshotRequest["req"];
