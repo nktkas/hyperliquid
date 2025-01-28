@@ -3,19 +3,14 @@
 [![JSR](https://jsr.io/badges/@nktkas/hyperliquid)](https://jsr.io/@nktkas/hyperliquid)
 [![JSR Score](https://jsr.io/badges/@nktkas/hyperliquid/score)](https://jsr.io/@nktkas/hyperliquid)
 
-Community-supported [Hyperliquid API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api) SDK for all
-major JS runtimes, written in TypeScript and provided with tests.
-
-> [!NOTE]
-> This library is under active development. While no major compatibility-breaking changes are planned, minor tweaks may
-> sometimes affect compatibility in a few places.
+Unofficial [Hyperliquid API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api) SDK for all major JS
+runtimes, written in TypeScript and provided with tests.
 
 ## Features
 
 - 🖋️ **Typed**: Source code is 100% TypeScript.
-- 🧪 **Tested**: Code coverage is 100% and has type validation.
-- 📦 **Minimal dependencies**: Only [@std/msgpack](https://jsr.io/@std/msgpack) and
-  [@noble/hashes](https://github.com/paulmillr/noble-hashes), everything else is standard JS.
+- 🧪 **Tested**: Good code coverage and type validation.
+- 📦 **Minimal dependencies**: Few small dependencies, standard JS is favored.
 - 🌐 **Cross-Environment Support**: Compatible with all major JS runtimes, including Node.js, Deno, Bun, and browser
   environments.
 - 🔧 **Extensible**: Easily integrates with [viem](https://github.com/wevm/viem) and
@@ -49,7 +44,7 @@ import * as hl from "https://esm.sh/jsr/@nktkas/hyperliquid"
 
 ### Initialize Transport
 
-First, choose and configure your transport layer (more details in the [API Reference](#transport-layer)):
+First, choose and configure your transport layer (more details in the [API Reference](#transports)):
 
 ```typescript
 import * as hl from "@nktkas/hyperliquid";
@@ -69,7 +64,7 @@ const wsTransport = new hl.WebSocketTransport({ // All options are optional
 
 ### Initialize Client
 
-Next, initialize the client with the transport layer (more details in the [API Reference](#client-classes)):
+Next, initialize the client with the transport layer (more details in the [API Reference](#clients)):
 
 #### Create PublicClient
 
@@ -111,68 +106,27 @@ const metamaskClient = new hl.WalletClient({ wallet: externalWallet, transport }
 
 ## API Reference
 
-### Transport Layer
+### Clients
 
-The SDK supports both HTTP and WebSocket transports for API communication:
+A **Client** provides access to the Hyperliquid API endpoints.
 
-#### HttpTransport
+There are three types of **Clients** in the sdk:
+
+#### Public Client
+
+A Public Client which provides access to
+[Info API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint) and Explorer API, such as
+`l2Book` and `clearinghouseState`.
+
+The Public Client class sets up with a given [Transport](#transports).
 
 ```typescript
-class HttpTransport implements IRESTTransport {
-    constructor(config?: HttpTransportConfig);
-    request<T>(endpoint: "info" | "action" | "explorer", payload: unknown, signal?: AbortSignal): Promise<T>;
+interface PublicClientParameters<T extends IRequestTransport = IRequestTransport> {
+    transport: T; // HttpTransport or WebSocketTransport
 }
-```
 
-```typescript
-interface HttpTransportConfig {
-    url?: string | URL; // API base URL (default: "https://api.hyperliquid.xyz")
-    timeout?: number; // Request timeout in ms (default: 10_000)
-    fetchOptions?: RequestInit; // Additional fetch options
-    onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>; // Callback before request is sent
-    onResponse?: (response: Response) => MaybePromise<Response | void | null | undefined>; // Callback after response is received
-}
-```
-
-#### WebSocketTransport
-
-```typescript
-class WebSocketTransport implements IRESTTransport {
-    constructor(config?: WebSocketTransportConfig);
-    request<T>(endpoint: "info" | "action" | "explorer", payload: unknown, signal?: AbortSignal): Promise<T>;
-    close(signal?: AbortSignal): Promise<void>;
-}
-```
-
-```typescript
-interface WebSocketTransportConfig {
-    url?: string | URL; // WebSocket URL (default: "wss://api.hyperliquid.xyz/ws")
-    timeout?: number; // Request timeout in ms (default: 10_000)
-    keepAliveInterval?: number; // Ping interval in ms (default: 20_000)
-    reconnect?: { // Only re-establishes the connection, does not retry failed requests.
-        maxAttempts?: number; // Maximum number of reconnection attempts (default: 3)
-        timeout?: number; // Connection timeout in ms (default: 10_000)
-        delay?: number | ((attempt: number) => number | Promise<number>); // Delay between reconnections (default: Exponential backoff (max 10s))
-        shouldReconnect?: (event: CloseEvent) => boolean | Promise<boolean>; // Custom reconnection logic (default: Always reattempt)
-        messageBuffer?: MessageBufferStrategy; // Message buffering strategy between reconnection (default: FIFO buffer with a maximum size of 100 messages)
-    };
-}
-```
-
-### Client Classes
-
-The SDK provides two client classes for interacting with the Hyperliquid API:
-
-#### PublicClient
-
-Client for interaction with [Info API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint)
-(order book, user positions, etc.).
-
-```typescript
 class PublicClient<T extends IRESTTransport> {
-    constructor(args: {
-        transport: T; // HttpTransport or WebSocketTransport
-    });
+    constructor(args: PublicClientParameters<T>);
 
     // Market
     allMids(): Promise<AllMids>;
@@ -220,23 +174,32 @@ class PublicClient<T extends IRESTTransport> {
 }
 ```
 
-#### WalletClient
+#### Wallet Client
 
-Client for interaction with
-[Exchange API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint) (placing orders,
-transferring funds, etc.).
+A Wallet Client which provides access to
+[Exchange API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint), such as `order`
+and `withdraw3`.
+
+The Wallet Client class sets up with a given [Transport](#transports) and a wallet instance, which can be a
+[Viem Wallet](https://viem.sh/docs/clients/wallet) or an
+[Ethers Wallet](https://docs.ethers.org/v6/api/providers/#Signer).
 
 ```typescript
+interface WalletClientParameters<
+    T extends ISubscriptionTransport,
+    W extends AbstractViemWalletClient | AbstractEthersSigner | AbstractEthersV5Signer,
+> {
+    transport: T; // HttpTransport or WebSocketTransport
+    wallet: W; // viem, ethers, or ethers v5
+    isTestnet?: boolean; // Whether to use testnet API (default: false)
+    defaultVaultAddress?: Hex; // Vault address used by default if not provided in method call
+}
+
 class WalletClient<
     T extends IRESTTransport,
     W extends AbstractViemWalletClient | AbstractEthersSigner | AbstractEthersV5Signer,
 > {
-    constructor(args: {
-        transport: T; // HttpTransport or WebSocketTransport
-        wallet: W; // viem, ethers, or ethers v5
-        isTestnet?: boolean; // Whether to use testnet API (default: false)
-        defaultVaultAddress?: Hex; // Vault address used by default if not provided in method call
-    });
+    constructor(args: WalletClientParameters<T, W>);
 
     // Order Management
     batchModify(args: BatchModifyParameters): Promise<OrderResponseSuccess>;
@@ -266,13 +229,121 @@ class WalletClient<
 }
 ```
 
+#### Event Client
+
+A Event Client which provides access to
+[Subscriptions API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions), such as
+real-time updates for `l2Book` and `userFills`.
+
+The Event Client class sets up with a given [WebSocket Transport](#websocket-transport).
+
+<!-- deno-fmt-ignore-start -->
+```typescript
+interface EventClientParameters<T extends ISubscriptionTransport> {
+    transport: T; // WebSocketTransport
+}
+
+class EventClient<T extends ISubscriptionTransport> {
+    constructor(args: EventClientParameters<T>);
+
+    // Market Data
+    activeAssetCtx(args: EventActiveAssetCtxParameters, listener: (data: WsActiveAssetCtx | WsActiveSpotAssetCtx) => void): Promise<Subscription>;
+    activeAssetData(args: EventActiveAssetDataParameters, listener: (data: WsActiveAssetData) => void): Promise<Subscription>;
+    allMids(listener: (data: WsAllMids) => void): Promise<Subscription>;
+    candle(args: EventCandleParameters, listener: (data: Candle) => void): Promise<Subscription>;
+    l2Book(args: EventL2BookParameters, listener: (data: Book) => void): Promise<Subscription>;
+    trades(args: EventTradesParameters, listener: (data: WsTrade[]) => void): Promise<Subscription>;
+
+    // Account/User Data
+    notification(args: EventNotificationParameters, listener: (data: WsNotification) => void): Promise<Subscription>;
+    userEvents(args: EventUserEventsParameters, listener: (data: WsUserEvent) => void): Promise<Subscription>;
+    userFundings(args: EventUserFundingsParameters, listener: (data: WsUserFundings) => void): Promise<Subscription>;
+    userNonFundingLedgerUpdates(args: EventUserNonFundingLedgerUpdatesParameters, listener: (data: WsUserNonFundingLedgerUpdates) => void): Promise<Subscription>;
+    webData2(args: EventWebData2Parameters, listener: (data: WsWebData2) => void): Promise<Subscription>;
+
+    // Order Management
+    orderUpdates(args: EventOrderUpdatesParameters, listener: (data: OrderStatus) => void): Promise<Subscription>;
+    userFills(args: EventUserFillsParameters, listener: (data: WsUserFills) => void): Promise<Subscription>;
+    userTwapHistory(args: EventUserTwapHistory, listener: (data: WsUserTwapHistory) => void): Promise<Subscription>;
+    userTwapSliceFills(args: EventUserTwapSliceFills, listener: (data: WsUserTwapSliceFills) => void): Promise<Subscription>;
+}
+```
+<!-- deno-fmt-ignore-end -->
+
+### Transports
+
+A [Client](#clients) is instantiated with a **Transport**, which is the intermediary layer that is responsible for
+executing outgoing requests (ie. API calls and event listeners).
+
+There are two types of **Transports** in the sdk:
+
+#### HTTP Transport
+
+A HTTP Transport that executes requests via a [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch)
+API.
+
+```typescript
+class HttpTransport implements IRequestTransport, HttpTransportOptions {
+    constructor(options?: HttpTransportOptions);
+
+    request(endpoint: "info" | "action" | "explorer", payload: unknown, signal?: AbortSignal): Promise<unknown>;
+}
+
+interface HttpTransportOptions {
+    url?: string | URL; // Base URL for API endpoints (default: "https://api.hyperliquid.xyz")
+    timeout?: number; // Request timeout in ms (default: 10_000)
+    fetchOptions?: RequestInit; // A custom fetch options
+    onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>; // A callback before request is sent
+    onResponse?: (response: Response) => MaybePromise<Response | void | null | undefined>; // A callback after response is received
+}
+```
+
+#### WebSocket Transport
+
+A WebSocket Transport that executes requests and subscribes to events via a
+[WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) connection.
+
+```typescript
+class WebSocketTransport implements IRESTTransport, ISubscriptionTransport {
+    constructor(options?: WebSocketTransportOptions);
+
+    request(endpoint: "info" | "action" | "explorer", payload: unknown, signal?: AbortSignal): Promise<unknown>;
+    subscribe(
+        channel: string,
+        payload: unknown,
+        listener: (data: CustomEvent) => void,
+        signal?: AbortSignal,
+    ): Promise<Subscription>;
+
+    ready(signal?: AbortSignal): Promise<void>;
+    close(signal?: AbortSignal): Promise<void>;
+}
+
+interface WebSocketTransportOptions {
+    url?: string | URL; // WebSocket URL (default: "wss://api.hyperliquid.xyz/ws")
+    timeout?: number; // Request timeout in ms (default: 10_000)
+    keepAlive?: { // Keep-alive configuration
+        interval?: number; // Ping interval in ms (default: 20_000)
+    };
+    reconnect?: { // Reconnection policy configuration for closed connections
+        maxRetries?: number; // Maximum number of reconnection attempts (default: 3)
+        connectionTimeout?: number; // Connection timeout in ms (default: 10_000)
+        connectionDelay?: number | ((attempt: number) => number | Promise<number>); // Delay between reconnection (default: Exponential backoff (max 10s))
+        shouldReconnect?: (event: CloseEvent) => boolean | Promise<boolean>; // Custom reconnection logic (default: Always reconnect)
+        messageBuffer?: MessageBufferStrategy; // Message buffering strategy between reconnection (default: FIFO buffer)
+        WebSocketConstructor?: typeof WebSocket; // Custom WebSocket constructor (default: globalThis.WebSocket)
+    };
+}
+```
+
 ## Semantic Versioning
 
-This library follows [Semantic Versioning (semver)](https://semver.org/) for its releases.
+This library follows [Semantic Versioning](https://semver.org/) (or rather
+[this proposal](https://github.com/semver/semver/pull/923)) for its releases.
 
 > [!IMPORTANT]
-> The Hyperliquid API types are updated independently and it is not possible to use a specific version of them, only the
-> latest. As a result, updates to these types may change the patch version even if they include breaking changes.
+> To avoid rapid increase in the main version of the SDK due to changes in Hyperliquid API types, such changes are
+> reflected in updates to the patch version of this SDK.
 
 ## CI/CD and Release
 
