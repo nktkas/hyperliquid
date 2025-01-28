@@ -35,5 +35,3 @@ Deno.test("approveAgent", async () => {
     });
     assertJsonSchema(MethodReturnType, result);
 });
-
-// —————————— Cleanup ——————————
