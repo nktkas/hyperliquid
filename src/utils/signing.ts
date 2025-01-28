@@ -1,6 +1,8 @@
 import { keccak_256 } from "@noble/hashes/sha3";
 import { encode, type ValueType } from "@std/msgpack/encode";
-import { bytesToHex, type Hex, hexToBytes, parseSignature } from "./hex.ts";
+import { decodeHex, encodeHex } from "@std/encoding/hex";
+
+type Hex = `0x${string}`;
 
 /** Abstract interface for a [ethers.js](https://docs.ethers.org/v6/api/providers/#Signer) signer. */
 export interface AbstractEthersSigner {
@@ -68,31 +70,10 @@ export interface AbstractViemWalletClient {
  * @returns The hash of the action.
  */
 export function createActionHash(action: ValueType, nonce: number, vaultAddress?: Hex): Hex {
-    // Layer to make @std/msgpack compatible with @msgpack/msgpack which uses hyperliquid.
-    // Reason for creating this function: https://github.com/denoland/std/issues/6328#issuecomment-2571092439
-    // Reasons to use @std/msgpack instead of @msgpack/msgpack: the size is smaller and lends itself better to manual analysis
-    const float64IntegersToUint64 = (obj: ValueType): ValueType => {
-        const THIRTY_ONE_BITS = 2147483648;
-        const THIRTY_TWO_BITS = 4294967296;
-        if (
-            typeof obj === "number" && Number.isInteger(obj) &&
-            obj <= Number.MAX_SAFE_INTEGER && obj >= Number.MIN_SAFE_INTEGER &&
-            (obj >= THIRTY_TWO_BITS || obj < -THIRTY_ONE_BITS)
-        ) {
-            return BigInt(obj);
-        } else if (Array.isArray(obj)) {
-            return obj.map(float64IntegersToUint64);
-        } else if (obj && typeof obj === "object") {
-            return Object.fromEntries(
-                Object.entries(obj).map(([key, value]) => [key, float64IntegersToUint64(value)]),
-            );
-        }
-        return obj;
-    };
+    const normalizedAction = normalizeIntegersForMsgPack(action);
+    const msgPackBytes = encode(normalizedAction);
 
-    const msgPackBytes = encode(float64IntegersToUint64(action));
     const additionalBytesLength = vaultAddress ? 29 : 9;
-
     const data = new Uint8Array(msgPackBytes.length + additionalBytesLength);
     data.set(msgPackBytes);
 
@@ -101,12 +82,42 @@ export function createActionHash(action: ValueType, nonce: number, vaultAddress?
 
     if (vaultAddress) {
         view.setUint8(msgPackBytes.length + 8, 1);
-        data.set(hexToBytes(vaultAddress), msgPackBytes.length + 9);
+        const normalizedVaultAddress = vaultAddress.startsWith("0x") ? vaultAddress.slice(2) : vaultAddress;
+        data.set(decodeHex(normalizedVaultAddress), msgPackBytes.length + 9);
     } else {
         view.setUint8(msgPackBytes.length + 8, 0);
     }
 
-    return bytesToHex(keccak_256(data));
+    return `0x${encodeHex(keccak_256(data))}`;
+}
+
+/**
+ * Layer to make {@link https://jsr.io/@std/msgpack | @std/msgpack} compatible with {@link https://github.com/msgpack/msgpack-javascript | @msgpack/msgpack}.
+ * @returns A new object with integers normalized.
+ */
+function normalizeIntegersForMsgPack(obj: ValueType): ValueType {
+    const THIRTY_ONE_BITS = 2147483648;
+    const THIRTY_TWO_BITS = 4294967296;
+
+    if (
+        typeof obj === "number" && Number.isInteger(obj) &&
+        obj <= Number.MAX_SAFE_INTEGER && obj >= Number.MIN_SAFE_INTEGER &&
+        (obj >= THIRTY_TWO_BITS || obj < -THIRTY_ONE_BITS)
+    ) {
+        return BigInt(obj);
+    }
+
+    if (Array.isArray(obj)) {
+        return obj.map(normalizeIntegersForMsgPack);
+    }
+
+    if (obj && typeof obj === "object" && obj !== null) {
+        return Object.fromEntries(
+            Object.entries(obj).map(([key, value]) => [key, normalizeIntegersForMsgPack(value)]),
+        );
+    }
+
+    return obj;
 }
 
 /**
@@ -190,6 +201,23 @@ export async function signUserSignedAction(
         throw new Error("Unsupported wallet for signing typed data", { cause: wallet });
     }
     return parseSignature(signature);
+}
+
+/**
+ * Parses a signature hexadecimal string into its components.
+ */
+function parseSignature(signature: string): { r: Hex; s: Hex; v: number } {
+    const normalizedSignature = signature.startsWith("0x") ? signature.slice(2) : signature;
+
+    if (normalizedSignature.length !== 130) {
+        throw new Error(`Invalid signature length. Expected 130 characters. Received ${normalizedSignature.length}.`);
+    }
+
+    const r = `0x${normalizedSignature.slice(0, 64)}` as const;
+    const s = `0x${normalizedSignature.slice(64, 128)}` as const;
+    const v = parseInt(normalizedSignature.slice(128, 130), 16);
+
+    return { r, s, v };
 }
 
 /**
