@@ -1,0 +1,47 @@
+name: Publish Package to npm
+on:
+    workflow_run:
+        workflows:
+            - Run Deno Tests
+        types:
+            - completed
+    workflow_dispatch:
+
+jobs:
+    publish:
+        if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Get version
+              id: get_version
+              run: |
+                  VERSION=$(jq -r '.version' deno.json)
+                  echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+            - name: Check tag
+              if: ${{ github.event_name == 'workflow_dispatch' }}
+              id: check-tag
+              run: |
+                  if [[ "${{ steps.get_version.outputs.version }}" == *-* ]]; then
+                    echo "tag_exists=true" >> $GITHUB_OUTPUT
+                    echo "Tag found, manual publishing allowed"
+                  else
+                    echo "Error: Manual publishing without a tag is not allowed" >&2
+                    exit 1
+                  fi
+
+            - name: Setup Deno
+              uses: denoland/setup-deno@v2
+              with:
+                  deno-version: v2.x
+
+            - name: npm build
+              run: deno run -A ./build/npm.ts ${{ steps.get_version.outputs.version }}
+
+            - name: npm publish
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+              run: cd ./build/npm && npm publish --access public
