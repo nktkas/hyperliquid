@@ -1,10 +1,10 @@
 {
     "name": "@nktkas/hyperliquid",
-    "version": "0.13.0",
+    "version": "0.13.1",
     "exports": "./mod.ts",
     "imports": {
         "@derzade/typescript-event-target": "jsr:@derzade/typescript-event-target@1.1.1",
-        "@noble/hashes/sha3": "jsr:@noble/hashes@^1.7.0/sha3",
+        "@noble/hashes/sha3": "jsr:@noble/hashes@^1.7.1/sha3",
         "@std/encoding/hex": "jsr:@std/encoding@^1.0.6/hex",
         "@std/msgpack/encode": "jsr:@std/msgpack@^1.0.2/encode"
     },
