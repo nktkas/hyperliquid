@@ -23,16 +23,16 @@ runtimes, written in TypeScript and provided with tests.
 
 ```bash
 # npm
-npx jsr add @nktkas/hyperliquid
+npm i @nktkas/hyperliquid
 
 # yarn 
-yarn dlx jsr add @nktkas/hyperliquid
+yarn add @nktkas/hyperliquid
 
 # pnpm
-pnpm dlx jsr add @nktkas/hyperliquid
+pnpm add @nktkas/hyperliquid
 
 # bun
-bunx jsr add @nktkas/hyperliquid
+bun i @nktkas/hyperliquid
 
 # deno
 deno add jsr:@nktkas/hyperliquid
