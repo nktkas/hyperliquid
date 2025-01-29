@@ -13,7 +13,14 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v4 # Checkout the repository
+            - uses: denoland/setup-deno@v2 # Set up Deno
+              with:
+                  deno-version: v2.x # Run with latest stable Deno
+            - uses: actions/setup-node@v4 # Set up Node.js
+              with:
+                  node-version: "22.x" # Run with latest stable Node.js
+                  registry-url: "https://registry.npmjs.org" # Use npm registry
 
             - name: Get version
               id: get_version
@@ -32,17 +39,6 @@ jobs:
                     echo "Error: Manual publishing without a tag is not allowed" >&2
                     exit 1
                   fi
-
-            - name: Setup Deno
-              uses: denoland/setup-deno@v2
-              with:
-                  deno-version: v2.x
-
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "22.x"
-                  registry-url: "https://registry.npmjs.org"
 
             - name: npm build
               run: deno run -A ./build/npm.ts ${{ steps.get_version.outputs.version }}

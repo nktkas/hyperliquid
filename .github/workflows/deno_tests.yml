@@ -6,27 +6,21 @@ jobs:
     test:
         runs-on: ubuntu-latest
 
-        permissions:
-            contents: read
-
         steps:
-            - name: Checkout Repository
-              uses: actions/checkout@v4
-
-            - name: Setup Deno
-              uses: denoland/setup-deno@v2
+            - uses: actions/checkout@v4 # Checkout the repository
+            - uses: denoland/setup-deno@v2 # Set up Deno
               with:
-                  deno-version: v2.x
+                  deno-version: v2.x # Run with latest stable Deno
 
-            - name: Ensure LF line endings for Windows
+            - name: Ensure LF line endings
               run: |
                   git config --global core.autocrlf false
                   git config --global core.eol lf
 
-            - name: Run Formatter
+            - name: Run Formatter Check
               run: deno fmt --check
 
-            - name: Run Linter
+            - name: Run Linter Check
               run: deno lint
 
             - name: Run Tests
