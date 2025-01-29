@@ -1,4 +1,4 @@
-import type { BlockDetails, TxDetails } from "./common.d.ts";
+import type { BlockDetails, TxDetails } from "./common.ts";
 
 /** The response to get the details of a transaction. */
 export interface TxDetailsResponse {

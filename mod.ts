@@ -16,24 +16,24 @@ export type {
 export { WebSocketRequestError } from "./src/transports/websocket/websocket_request_dispatcher.ts";
 
 // Types
-export type * from "./src/types/common.d.ts";
+export type * from "./src/types/common.ts";
 
-export type * from "./src/types/exchange/common.d.ts";
-export type * from "./src/types/exchange/requests.d.ts";
-export type * from "./src/types/exchange/responses.d.ts";
+export type * from "./src/types/exchange/common.ts";
+export type * from "./src/types/exchange/requests.ts";
+export type * from "./src/types/exchange/responses.ts";
 
-export type * from "./src/types/explorer/common.d.ts";
-export type * from "./src/types/explorer/requests.d.ts";
-export type * from "./src/types/explorer/responses.d.ts";
+export type * from "./src/types/explorer/common.ts";
+export type * from "./src/types/explorer/requests.ts";
+export type * from "./src/types/explorer/responses.ts";
 
-export type * from "./src/types/info/accounts.d.ts";
-export type * from "./src/types/info/assets.d.ts";
-export type * from "./src/types/info/orders.d.ts";
-export type * from "./src/types/info/requests.d.ts";
-export type * from "./src/types/info/vaults.d.ts";
+export type * from "./src/types/info/accounts.ts";
+export type * from "./src/types/info/assets.ts";
+export type * from "./src/types/info/orders.ts";
+export type * from "./src/types/info/requests.ts";
+export type * from "./src/types/info/vaults.ts";
 
-export type * from "./src/types/subscriptions/common.d.ts";
-export type * from "./src/types/subscriptions/requests.d.ts";
+export type * from "./src/types/subscriptions/common.ts";
+export type * from "./src/types/subscriptions/requests.ts";
 
 // Utils
 export type { AbstractEthersSigner, AbstractEthersV5Signer, AbstractViemWalletClient } from "./src/utils/signing.ts";

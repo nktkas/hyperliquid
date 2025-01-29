@@ -1,6 +1,6 @@
 import type { IRequestTransport } from "../transports/base.ts";
-import type { BlockDetailsRequest, TxDetailsRequest } from "../types/explorer/requests.d.ts";
-import type { BlockDetailsResponse, TxDetailsResponse } from "../types/explorer/responses.d.ts";
+import type { BlockDetailsRequest, TxDetailsRequest } from "../types/explorer/requests.ts";
+import type { BlockDetailsResponse, TxDetailsResponse } from "../types/explorer/responses.ts";
 import type {
     ExtraAgent,
     PerpsClearinghouseState,
@@ -11,7 +11,7 @@ import type {
     UserFundingUpdate,
     UserNonFundingLedgerUpdate,
     UserRateLimit,
-} from "../types/info/accounts.d.ts";
+} from "../types/info/accounts.ts";
 import type {
     AllMids,
     Candle,
@@ -23,7 +23,7 @@ import type {
     SpotMeta,
     SpotMetaAndAssetCtxs,
     TokenDetails,
-} from "../types/info/assets.d.ts";
+} from "../types/info/assets.ts";
 import type {
     Book,
     Fill,
@@ -33,7 +33,7 @@ import type {
     OrderStatus,
     TwapHistory,
     TwapSliceFill,
-} from "../types/info/orders.d.ts";
+} from "../types/info/orders.ts";
 import type {
     CandleSnapshotRequest,
     ClearinghouseStateRequest,
@@ -60,8 +60,8 @@ import type {
     UserTwapSliceFillsRequest,
     UserVaultEquitiesRequest,
     VaultDetailsRequest,
-} from "../types/info/requests.d.ts";
-import type { VaultDetails, VaultEquity, VaultSummary } from "../types/info/vaults.d.ts";
+} from "../types/info/requests.ts";
+import type { VaultDetails, VaultEquity, VaultSummary } from "../types/info/vaults.ts";
 
 // ———————————————Info Parameters———————————————
 

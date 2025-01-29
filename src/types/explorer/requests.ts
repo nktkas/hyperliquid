@@ -1,4 +1,4 @@
-import type { Hex } from "../common.d.ts";
+import type { Hex } from "../common.ts";
 
 /**
  * The request to get the details of a transaction.

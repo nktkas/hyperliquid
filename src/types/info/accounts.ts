@@ -1,4 +1,4 @@
-import type { Hex } from "../common.d.ts";
+import type { Hex } from "../common.ts";
 
 /** Position in a specific asset. */
 export interface AssetPosition {

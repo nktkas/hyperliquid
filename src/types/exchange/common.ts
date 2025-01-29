@@ -1,5 +1,5 @@
-import type { Hex } from "../common.d.ts";
-import type { TIF } from "../info/orders.d.ts";
+import type { Hex } from "../common.ts";
+import type { TIF } from "../info/orders.ts";
 
 /** Order parameters. */
 export type OrderParms = {

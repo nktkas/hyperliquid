@@ -1,5 +1,5 @@
-import type { Hex } from "../common.d.ts";
-import type { OrderParms } from "./common.d.ts";
+import type { Hex } from "../common.ts";
+import type { OrderParms } from "./common.ts";
 
 /** Base structure for exchange requests. */
 export interface BaseExchangeRequest {

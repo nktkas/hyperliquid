@@ -1,12 +1,12 @@
-import type { Hex } from "../common.d.ts";
+import type { Hex } from "../common.ts";
 import type {
     FundingUpdate,
     PerpsClearinghouseState,
     SpotClearinghouseState,
     UserFundingUpdate,
     UserNonFundingLedgerUpdate,
-} from "../info/accounts.d.ts";
-import type { AllMids, PerpsAssetCtx, PerpsMeta, SpotAssetCtx } from "../info/assets.d.ts";
+} from "../info/accounts.ts";
+import type { AllMids, PerpsAssetCtx, PerpsMeta, SpotAssetCtx } from "../info/assets.ts";
 import type {
     Fill,
     FrontendOrder,
@@ -15,7 +15,7 @@ import type {
     TwapHistory,
     TwapSliceFill,
     TwapState,
-} from "../info/orders.d.ts";
+} from "../info/orders.ts";
 
 /** WebSocket message containing active perpetual asset context. */
 export interface WsActiveAssetCtx {

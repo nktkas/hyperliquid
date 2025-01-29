@@ -15,7 +15,7 @@ import type {
     WsUserTwapHistoryRequest,
     WsUserTwapSliceFillsRequest,
     WsWebData2Request,
-} from "../types/subscriptions/requests.d.ts";
+} from "../types/subscriptions/requests.ts";
 import type {
     WsActiveAssetCtx,
     WsActiveAssetData,
@@ -30,9 +30,9 @@ import type {
     WsUserTwapHistory,
     WsUserTwapSliceFills,
     WsWebData2,
-} from "../types/subscriptions/common.d.ts";
-import type { Candle } from "../types/info/assets.d.ts";
-import type { Book, Order, OrderStatus } from "../types/info/orders.d.ts";
+} from "../types/subscriptions/common.ts";
+import type { Candle } from "../types/info/assets.ts";
+import type { Book, Order, OrderStatus } from "../types/info/orders.ts";
 
 // ———————————————Parameters———————————————
 

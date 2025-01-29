@@ -1,4 +1,4 @@
-import type { Hex } from "../common.d.ts";
+import type { Hex } from "../common.ts";
 
 /**
  * Request mid coin prices.

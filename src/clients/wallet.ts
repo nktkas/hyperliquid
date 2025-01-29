@@ -1,4 +1,4 @@
-import type { Hex } from "../types/common.d.ts";
+import type { Hex } from "../types/common.ts";
 import type {
     ApproveAgentRequest,
     ApproveBuilderFeeRequest,
@@ -20,7 +20,7 @@ import type {
     UsdSendRequest,
     VaultTransferRequest,
     Withdraw3Request,
-} from "../types/exchange/requests.d.ts";
+} from "../types/exchange/requests.ts";
 import type {
     CancelResponse,
     CreateSubAccountResponse,
@@ -29,7 +29,7 @@ import type {
     SuccessResponse,
     TwapCancelResponse,
     TwapOrderResponse,
-} from "../types/exchange/responses.d.ts";
+} from "../types/exchange/responses.ts";
 import type { IRequestTransport } from "../transports/base.ts";
 import { sorters } from "../utils/key_sort.ts";
 import {

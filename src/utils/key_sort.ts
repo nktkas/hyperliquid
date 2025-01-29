@@ -13,8 +13,8 @@ import type {
     UpdateIsolatedMarginRequest,
     UpdateLeverageRequest,
     VaultTransferRequest,
-} from "../types/exchange/requests.d.ts";
-import type { OrderParms } from "../types/exchange/common.d.ts";
+} from "../types/exchange/requests.ts";
+import type { OrderParms } from "../types/exchange/common.ts";
 
 /** Record of action types and their corresponding sorters. */
 // NOTE: An object after sorting must not contain undefined values.
