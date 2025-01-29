@@ -52,7 +52,7 @@ export interface WsL2BookRequest {
     mantissa?: 2 | 5 | null;
 }
 
-/** Subscribe to user notification. */
+/** Subscribe to notification updates for a specific user. */
 export interface WsNotificationRequest {
     /** Type of subscription. */
     type: "notification";
@@ -76,7 +76,7 @@ export interface WsTradesRequest {
     coin: string;
 }
 
-/** Subscribe to all events for a specific user. */
+/** Subscribe to non-order events for a specific user. */
 export interface WsUserEventsRequest {
     /** Type of subscription. */
     type: "userEvents";

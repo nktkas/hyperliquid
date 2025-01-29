@@ -104,6 +104,15 @@ const externalWallet = createWalletClient({
 const metamaskClient = new hl.WalletClient({ wallet: externalWallet, transport });
 ```
 
+#### Create EventClient
+
+```typescript
+import * as hl from "@nktkas/hyperliquid";
+
+const transport = new hl.WebSocketTransport();
+const client = new hl.EventClient({ transport });
+```
+
 ## API Reference
 
 ### Clients

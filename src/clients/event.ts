@@ -316,7 +316,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
     }
 
     /**
-     * Subscribe to user notification.
+     * Subscribe to notification updates for a specific user.
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
      * @param signal - An optional abort signal for canceling the subscription request.
@@ -435,11 +435,13 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
     }
 
     /**
-     * Subscribe to all events for a specific user.
+     * Subscribe to non-order events for a specific user.
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     *
+     * @note Different subscriptions cannot be distinguished from each other.
      *
      * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | Hyperliquid GitBook}
      * @example
