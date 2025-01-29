@@ -210,22 +210,25 @@ export class ApiRequestError extends Error {
             | TwapOrderResponse
             | TwapCancelResponse,
     ) {
-        let message = "";
+        let message = "Cannot process API request";
+
         if (response.status === "err") {
-            message = response.response;
+            message += `: ${response.response}`;
         } else {
             if ("statuses" in response.response.data) {
-                message = response.response.data.statuses
+                const errors = response.response.data.statuses
                     .reduce<string[]>((acc, status, index) => {
                         if (typeof status === "object" && "error" in status) {
-                            acc.push(`[${index}] ${status.error}`);
+                            acc.push(`Order ${index} failed: ${status.error}`);
                         }
                         return acc;
-                    }, [])
-                    .join(", ");
+                    }, []);
+                if (errors.length > 0) {
+                    message += `: ${errors.join(", ")}`;
+                }
             } else {
                 if (typeof response.response.data.status === "object" && "error" in response.response.data.status) {
-                    message = response.response.data.status.error;
+                    message += `: ${response.response.data.status.error}`;
                 }
             }
         }

@@ -14,7 +14,10 @@ export class HttpRequestError extends TransportError {
      * @param responseBody - The raw response body content, if available.
      */
     constructor(public response: Response, public responseBody?: string) {
-        super(`HTTP request failed. Status: ${response.status}. Body: ${responseBody}`);
+        let message = `HTTP request failed: status ${response.status}`;
+        if (responseBody) message += `, body "${responseBody}"`;
+
+        super(message);
         this.name = "HttpRequestError";
     }
 }

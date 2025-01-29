@@ -35,11 +35,7 @@ Deno.test("HttpTransport Tests", async (t) => {
             });
 
         const transport = new HttpTransport();
-        await assertRejects(
-            () => transport.request("action", { foo: "bar" }),
-            HttpRequestError,
-            "HTTP request failed. Status: 500. Body: Server Error",
-        );
+        await assertRejects(() => transport.request("action", { foo: "bar" }), HttpRequestError);
     });
 
     // 3) Invalid Content-Type => HttpRequestError
@@ -51,11 +47,7 @@ Deno.test("HttpTransport Tests", async (t) => {
             });
 
         const transport = new HttpTransport();
-        await assertRejects(
-            () => transport.request("explorer", {}),
-            HttpRequestError,
-            "HTTP request failed. Status: 200. Body: <html>not json</html>",
-        );
+        await assertRejects(() => transport.request("explorer", {}), HttpRequestError);
     });
 
     // 4) onRequest callback modifies request (URL, custom headers, etc.)

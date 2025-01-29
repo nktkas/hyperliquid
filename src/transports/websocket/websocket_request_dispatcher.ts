@@ -57,7 +57,10 @@ export class WebSocketRequestDispatcher {
                     const parsedRequest = JSON.parse(request) as Record<string, unknown>;
                     if ("id" in parsedRequest && typeof parsedRequest.id === "number") {
                         // If a post request was sent, it is possible to get the id from the request
-                        this.reject(parsedRequest.id, new WebSocketRequestError(event.detail));
+                        this.reject(
+                            parsedRequest.id,
+                            new WebSocketRequestError(`Cannot process WebSocket request: ${event.detail}`),
+                        );
                     } else if (
                         "subscription" in parsedRequest &&
                         typeof parsedRequest.subscription === "object" &&
@@ -65,11 +68,17 @@ export class WebSocketRequestDispatcher {
                     ) {
                         // If a subscription/unsubscribe request was sent, use the request as an id
                         const id = WebSocketRequestDispatcher.requestToId(parsedRequest.subscription);
-                        this.reject(id, new WebSocketRequestError(event.detail));
+                        this.reject(
+                            id,
+                            new WebSocketRequestError(`Cannot process subscription request: ${event.detail}`),
+                        );
                     } else {
                         // If the request is not recognized, use the parsed request as an id
                         const id = WebSocketRequestDispatcher.requestToId(parsedRequest);
-                        this.reject(id, new WebSocketRequestError(event.detail));
+                        this.reject(
+                            id,
+                            new WebSocketRequestError(`Cannot process unrecognized request: ${event.detail}`),
+                        );
                     }
                 }
             } catch {
@@ -80,7 +89,7 @@ export class WebSocketRequestDispatcher {
         // Throws all pending requests if the connection is dropped
         socket.addEventListener("close", () => {
             this.pending.forEach(({ reject }) => {
-                reject(new WebSocketRequestError("The WebSocket connection has been closed."));
+                reject(new WebSocketRequestError("Cannot complete WebSocket request: connection is closed"));
             });
             this.pending.clear();
         });
