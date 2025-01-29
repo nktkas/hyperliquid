@@ -38,6 +38,12 @@ jobs:
               with:
                   deno-version: v2.x
 
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "22.x"
+                  registry-url: "https://registry.npmjs.org"
+
             - name: npm build
               run: deno run -A ./build/npm.ts ${{ steps.get_version.outputs.version }}
 
