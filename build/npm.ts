@@ -11,7 +11,7 @@ await build({
     package: {
         name: "@nktkas/hyperliquid",
         version: Deno.args[0],
-        description: "Unofficial Hyperliquid API SDK for all major JS runtimes",
+        description: "Unofficial Hyperliquid API SDK for all major JS runtimes, written in TypeScript and provided with tests",
         keywords: ["api", "typescript", "sdk", "hyperliquid"],
         author: {
             name: "nktkas",
