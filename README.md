@@ -2,7 +2,7 @@
 
 [![JSR](https://jsr.io/badges/@nktkas/hyperliquid)](https://jsr.io/@nktkas/hyperliquid)
 [![JSR Score](https://jsr.io/badges/@nktkas/hyperliquid/score)](https://jsr.io/@nktkas/hyperliquid)
-![bundlephobia](https://badgen.net/bundlephobia/minzip/@nktkas/hyperliquid)
+[![bundlephobia](https://badgen.net/bundlephobia/minzip/@nktkas/hyperliquid)](https://bundlephobia.com/package/@nktkas/hyperliquid)
 
 Unofficial [Hyperliquid API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api) SDK for all major JS
 runtimes, written in TypeScript and provided with tests.
