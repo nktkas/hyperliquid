@@ -8,6 +8,7 @@ await build({
     shims: {},
     typeCheck: "both",
     test: false,
+    scriptModule: "umd",
     package: {
         name: "@nktkas/hyperliquid",
         version: Deno.args[0],
