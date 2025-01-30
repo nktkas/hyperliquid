@@ -14,10 +14,10 @@ assignees: nktkas
 
 <!-- Explain why this feature is important for you or others. How does it improve the library or make tasks easier? -->
 
-**Proposed Solution**
+**Proposed Solution (optional)**
 
 <!-- If you have an idea of how to implement this feature, please share it. -->
 
-**Additional Information**
+**Additional Information (optional)**
 
-<!-- Any additional details, links, screenshots, or diagrams that can help understand your request. -->
+<!-- Any additional details, links or screenshots that can help understand your request. -->

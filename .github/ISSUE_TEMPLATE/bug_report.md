@@ -14,20 +14,11 @@ assignees: nktkas
 
 <!-- Provide a minimal code snippet that reproduces the bug. -->
 
-**Expected vs. Actual Behavior**
-
-<!-- Explain what should happen vs. what actually happens. -->
-
-**Error Logs (if available)**
-
-<!-- Paste relevant error messages or logs here. -->
-
 **Environment**
 
 - `@nktkas/hyperliquid` version:
-- Runtime environment (Node.js/Deno/Bun) and its version:
-- Operating System:
+- Runtime environment and its version: <!-- Node.js / Deno / Bun / Web -->
 
 **Additional Context (optional)**
 
-<!-- Include any other relevant information. -->
+<!-- Include any other relevant information (e.g. error stack traces, related issues, suggestions on how to fix, etc.). -->
