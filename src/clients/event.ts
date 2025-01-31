@@ -4,6 +4,8 @@ import type {
     WsActiveAssetDataRequest,
     WsAllMidsRequest,
     WsCandleRequest,
+    WsExplorerBlockRequest,
+    WsExplorerTxsRequest,
     WsL2BookRequest,
     WsNotificationRequest,
     WsOrderUpdatesRequest,
@@ -33,6 +35,7 @@ import type {
 } from "../types/subscriptions/common.ts";
 import type { Candle } from "../types/info/assets.ts";
 import type { Book, Order, OrderStatus } from "../types/info/orders.ts";
+import type { BlockDetails, TxDetails } from "../types/explorer/common.ts";
 
 // ———————————————Parameters———————————————
 
@@ -267,6 +270,76 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
                 if (event.detail.s === args.coin && event.detail.i === args.interval) {
                     listener(event.detail);
                 }
+            },
+            signal,
+        );
+    }
+
+    /**
+     * Subscribe to explorer block updates.
+     * @param listener - The callback function to be called when the event is received.
+     * @param signal - An optional abort signal for canceling the subscription request.
+     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     *
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.WebSocketTransport();
+     * const client = new hl.EventClient({ transport });
+     *
+     * const sub = await client.explorerBlock((data) => {
+     *   console.log(data);
+     * });
+     * ```
+     */
+    explorerBlock(
+        listener: (data: Omit<BlockDetails, "txs">[]) => void,
+        signal?: AbortSignal,
+    ): Promise<Subscription> {
+        const payload: WsExplorerBlockRequest = {
+            type: "explorerBlock",
+        };
+        return this.transport.subscribe(
+            "_explorerBlock", // Internal channel as it does not have its own channel
+            payload,
+            (event: CustomEvent<Omit<BlockDetails, "txs">[]>) => {
+                listener(event.detail);
+            },
+            signal,
+        );
+    }
+
+    /**
+     * Subscribe to explorer transaction updates.
+     * @param listener - The callback function to be called when the event is received.
+     * @param signal - An optional abort signal for canceling the subscription request.
+     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     *
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.WebSocketTransport();
+     * const client = new hl.EventClient({ transport });
+     *
+     * const sub = await client.explorerTxs((data) => {
+     *   console.log(data);
+     * });
+     * ```
+     */
+    explorerTxs(
+        listener: (data: TxDetails[]) => void,
+        signal?: AbortSignal,
+    ): Promise<Subscription> {
+        const payload: WsExplorerTxsRequest = {
+            type: "explorerTxs",
+        };
+        return this.transport.subscribe(
+            "_explorerTxs", // Internal channel as it does not have its own channel
+            payload,
+            (event: CustomEvent<TxDetails[]>) => {
+                listener(event.detail);
             },
             signal,
         );

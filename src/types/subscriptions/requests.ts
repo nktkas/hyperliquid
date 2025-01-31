@@ -34,6 +34,18 @@ export interface WsCandleRequest {
     interval: string;
 }
 
+/** Subscribe to explorer block updates. */
+export interface WsExplorerBlockRequest {
+    /** Type of subscription. */
+    type: "explorerBlock";
+}
+
+/** Subscribe to explorer transaction updates. */
+export interface WsExplorerTxsRequest {
+    /** Type of subscription. */
+    type: "explorerTxs";
+}
+
 /** Subscribe to L2 order book updates for a specific asset. */
 export interface WsL2BookRequest {
     /** Type of subscription. */
