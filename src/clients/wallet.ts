@@ -339,7 +339,7 @@ export class WalletClient<
             ...args,
             type: "approveAgent",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: args.signatureChainId ?? this.isTestnet ? "0x66eee" : "0xa4b1",
+            signatureChainId: args.signatureChainId ?? (this.isTestnet ? "0x66eee" : "0xa4b1"),
             nonce: args.nonce ?? Date.now(),
         };
         const signature = await signUserSignedAction(
@@ -394,7 +394,7 @@ export class WalletClient<
             ...args,
             type: "approveBuilderFee",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: args.signatureChainId ?? this.isTestnet ? "0x66eee" : "0xa4b1",
+            signatureChainId: args.signatureChainId ?? (this.isTestnet ? "0x66eee" : "0xa4b1"),
             nonce: args.nonce ?? Date.now(),
         };
         const signature = await signUserSignedAction(
@@ -849,7 +849,7 @@ export class WalletClient<
             ...args,
             type: "spotSend",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: args.signatureChainId ?? this.isTestnet ? "0x66eee" : "0xa4b1",
+            signatureChainId: args.signatureChainId ?? (this.isTestnet ? "0x66eee" : "0xa4b1"),
             time: args.time ?? Date.now(),
         };
         const signature = await signUserSignedAction(
@@ -1135,7 +1135,7 @@ export class WalletClient<
             ...args,
             type: "usdClassTransfer",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: args.signatureChainId ?? this.isTestnet ? "0x66eee" : "0xa4b1",
+            signatureChainId: args.signatureChainId ?? (this.isTestnet ? "0x66eee" : "0xa4b1"),
             nonce: args.nonce ?? Date.now(),
         };
         const signature = await signUserSignedAction(
@@ -1191,7 +1191,7 @@ export class WalletClient<
             ...args,
             type: "usdSend",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: args.signatureChainId ?? this.isTestnet ? "0x66eee" : "0xa4b1",
+            signatureChainId: args.signatureChainId ?? (this.isTestnet ? "0x66eee" : "0xa4b1"),
             time: args.time ?? Date.now(),
         };
         const signature = await signUserSignedAction(
@@ -1291,7 +1291,7 @@ export class WalletClient<
             ...args,
             type: "withdraw3",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: args.signatureChainId ?? this.isTestnet ? "0x66eee" : "0xa4b1",
+            signatureChainId: args.signatureChainId ?? (this.isTestnet ? "0x66eee" : "0xa4b1"),
             time: args.time ?? Date.now(),
         };
         const signature = await signUserSignedAction(
