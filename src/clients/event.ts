@@ -23,6 +23,7 @@ import type {
     WsActiveAssetData,
     WsActiveSpotAssetCtx,
     WsAllMids,
+    WsBlockDetails,
     WsNotification,
     WsTrade,
     WsUserEvent,
@@ -35,7 +36,7 @@ import type {
 } from "../types/subscriptions/common.ts";
 import type { Candle } from "../types/info/assets.ts";
 import type { Book, Order, OrderStatus } from "../types/info/orders.ts";
-import type { BlockDetails, TxDetails } from "../types/explorer/common.ts";
+import type { TxDetails } from "../types/explorer/common.ts";
 
 // ———————————————Parameters———————————————
 
@@ -294,7 +295,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      * ```
      */
     explorerBlock(
-        listener: (data: Omit<BlockDetails, "txs">[]) => void,
+        listener: (data: WsBlockDetails[]) => void,
         signal?: AbortSignal,
     ): Promise<Subscription> {
         const payload: WsExplorerBlockRequest = {
@@ -303,7 +304,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
         return this.transport.subscribe(
             "_explorerBlock", // Internal channel as it does not have its own channel
             payload,
-            (event: CustomEvent<Omit<BlockDetails, "txs">[]>) => {
+            (event: CustomEvent<WsBlockDetails[]>) => {
                 listener(event.detail);
             },
             signal,

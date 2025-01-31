@@ -1,4 +1,5 @@
 import type { Hex } from "../common.ts";
+import type { BlockDetails } from "../explorer/common.ts";
 import type {
     FundingUpdate,
     PerpsClearinghouseState,
@@ -66,6 +67,9 @@ export interface WsAllMids {
     /** Mid prices for all assets. */
     mids: AllMids;
 }
+
+/** WebSocket message containing block details. */
+export type WsBlockDetails = Omit<BlockDetails, "txs">;
 
 /** WebSocket message containing user notifications. */
 export interface WsNotification {

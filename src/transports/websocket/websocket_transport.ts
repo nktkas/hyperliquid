@@ -56,27 +56,23 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
 
     /**
      * Map of active subscriptions.
-     * - Key: Unique subscription identifier (stringified payload)
-     * - Value: Subscription info containing payload and listener mappings
+     * - Key: Unique subscription identifier based on payload
+     * - Value: Subscription info containing the subscription request promise
+     *   and a map of listeners to their metadata (channel + unsubscribe function).
      */
     protected _subscriptions: Map<
         string,
         {
-            channel: string;
-            listeners: Map<(data: CustomEvent) => void, () => Promise<void>>;
+            listeners: Map<
+                (data: CustomEvent) => void,
+                {
+                    channel: string;
+                    unsubscribe: (signal?: AbortSignal) => Promise<void>;
+                }
+            >;
             requestPromise: Promise<unknown>;
         }
-    > = new Map<
-        string,
-        {
-            /** The event channel that being listened to. */
-            channel: string;
-            /** Map of listeners and their corresponding unsubscribe functions. */
-            listeners: Map<(data: CustomEvent) => void, () => Promise<void>>;
-            /** The initial subscription request promise. */
-            requestPromise: Promise<unknown>;
-        }
-    >();
+    > = new Map();
 
     /**
      * Request timeout in ms.
@@ -131,8 +127,8 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
             }
 
             // Clear all subscriptions
-            for (const [_, { channel, listeners }] of this._subscriptions.entries()) {
-                for (const [listener] of listeners) {
+            for (const subscriptionInfo of this._subscriptions.values()) {
+                for (const [listener, { channel }] of subscriptionInfo.listeners) {
                     this._hlEvents.removeEventListener(channel, listener);
                 }
             }
@@ -156,7 +152,12 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
         }
 
         // Send the request and wait for a response
-        return this._wsRequester.request("post", { type, payload }, this.combineSignals(signal));
+        const timeoutSignal = this.timeout ? AbortSignal.timeout(this.timeout) : undefined;
+        const combinedSignal = timeoutSignal && signal
+            ? AbortSignal.any([timeoutSignal, signal])
+            : timeoutSignal ?? signal;
+
+        return this._wsRequester.request("post", { type, payload }, combinedSignal);
     }
 
     /**
@@ -174,28 +175,29 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
         signal?: AbortSignal,
     ): Promise<Subscription> {
         // Create a unique identifier for the subscription
-        const id = `${channel}::${WebSocketRequestDispatcher.requestToId(payload)}`;
+        const id = WebSocketRequestDispatcher.requestToId(payload);
 
         // Initialize new subscription, if it doesn't exist
         let subscriptionInfo = this._subscriptions.get(id);
         if (!subscriptionInfo) {
             // Send subscription request
-            const requestPromise = this._wsRequester.request("subscribe", payload, this.combineSignals(signal))
-                .catch((error) => {
-                    this._subscriptions.delete(id);
-                    throw error;
-                });
+            const timeoutSignal = this.timeout ? AbortSignal.timeout(this.timeout) : undefined;
+            const combinedSignal = timeoutSignal && signal
+                ? AbortSignal.any([timeoutSignal, signal])
+                : timeoutSignal ?? signal;
+
+            const requestPromise = this._wsRequester.request("subscribe", payload, combinedSignal);
 
             // Cache subscription info
-            subscriptionInfo = { channel, listeners: new Map(), requestPromise };
+            subscriptionInfo = { listeners: new Map(), requestPromise };
             this._subscriptions.set(id, subscriptionInfo);
         }
 
-        // Check if we already have an unsubscribe function for this listener
-        let unsubscribe = subscriptionInfo.listeners.get(listener);
-        if (!unsubscribe) {
-            // Create new unsubscribe function if none exists
-            unsubscribe = async (signal?: AbortSignal) => {
+        // Initialize new listener, if it doesn't exist
+        let listenerInfo = subscriptionInfo.listeners.get(listener);
+        if (!listenerInfo) {
+            // Create new unsubscribe function
+            const unsubscribe = async (signal?: AbortSignal) => {
                 // Remove listener and cleanup
                 this._hlEvents.removeEventListener(channel, listener);
                 const isDeleted = subscriptionInfo.listeners.delete(listener);
@@ -203,26 +205,44 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
                 // If no listeners remain, remove subscription entirely
                 // `isDeleted` means that the map had a listener before and became 0 after that
                 if (subscriptionInfo.listeners.size === 0 && isDeleted) {
+                    // Cleanup subscription
                     this._subscriptions.delete(id);
-                    await this._wsRequester.request("unsubscribe", payload, this.combineSignals(signal));
+
+                    // Send unsubscription request
+                    const timeoutSignal = this.timeout ? AbortSignal.timeout(this.timeout) : undefined;
+                    const combinedSignal = timeoutSignal && signal
+                        ? AbortSignal.any([timeoutSignal, signal])
+                        : timeoutSignal ?? signal;
+
+                    await this._wsRequester.request("unsubscribe", payload, combinedSignal);
                 }
             };
 
-            // Add event listener & Cache unsubscribe function
+            // Cache listener info
+            listenerInfo = { channel, unsubscribe };
+            subscriptionInfo.listeners.set(listener, listenerInfo);
+
+            // Add event listener
             this._hlEvents.addEventListener(channel, listener);
-            subscriptionInfo.listeners.set(listener, unsubscribe);
         }
 
         // Wait for the initial subscription request to complete
         await subscriptionInfo.requestPromise.catch((error) => {
-            // Cleanup the subscription and rethrow the error
+            // Remove listener and cleanup
             this._hlEvents.removeEventListener(channel, listener);
             subscriptionInfo.listeners.delete(listener);
+
+            // If no listeners remain, remove subscription entirely
+            if (subscriptionInfo.listeners.size === 0) this._subscriptions.delete(id);
+
+            // Rethrow the error
             throw error;
         });
 
         // Return subscription control object
-        return { unsubscribe };
+        return {
+            unsubscribe: listenerInfo.unsubscribe,
+        };
     }
 
     /**
@@ -277,17 +297,5 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
 
             this.socket.close();
         });
-    }
-
-    /**
-     * Combines timeout and user-provided signal.
-     * @param signal - A user-provided signal.
-     * @returns An AbortSignal that triggers when either the timeout or user-provided signal aborts.
-     */
-    protected combineSignals(signal?: AbortSignal): AbortSignal {
-        const signals: AbortSignal[] = [];
-        if (this.timeout) signals.push(AbortSignal.timeout(this.timeout));
-        if (signal) signals.push(signal);
-        return signals.length > 1 ? AbortSignal.any(signals) : signals[0];
     }
 }

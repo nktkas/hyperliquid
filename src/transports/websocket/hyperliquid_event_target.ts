@@ -1,5 +1,6 @@
 import { TypedEventTarget } from "@derzade/typescript-event-target";
-import type { BlockDetails, TxDetails } from "../../types/explorer/common.ts";
+import type { TxDetails } from "../../types/explorer/common.ts";
+import type { WsBlockDetails } from "../../types/subscriptions/common.ts";
 
 /**
  * Represents a message from the Hyperliquid WebSocket API.
@@ -69,7 +70,7 @@ export interface HyperliquidEventMap {
     pong: CustomEvent<undefined>;
 
     /** Block explorer update event. */
-    _explorerBlock: CustomEvent<Omit<BlockDetails, "txs">[]>;
+    _explorerBlock: CustomEvent<WsBlockDetails[]>;
 
     /** Transaction explorer update event. */
     _explorerTxs: CustomEvent<TxDetails[]>;
@@ -120,7 +121,7 @@ function isHyperliquidMsg(value: unknown): value is HyperliquidMsg {
  * @param value - The value to check.
  * @returns True if the value is an array of block details.
  */
-function isExplorerBlockMsg(value: unknown): value is Omit<BlockDetails, "txs">[] {
+function isExplorerBlockMsg(value: unknown): value is WsBlockDetails[] {
     return Array.isArray(value) && value.length > 0 &&
         value.every((block) =>
             typeof block === "object" && block !== null && !Array.isArray(block) &&

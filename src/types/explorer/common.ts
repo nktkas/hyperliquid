@@ -1,49 +1,38 @@
 import type { Hex } from "../common.ts";
 
-/** The transaction details. */
+/** Transaction details. */
 export interface TxDetails {
-    /** The action of the transaction. */
+    /** Action performed in transaction. */
     action: {
-        /** Type of action. */
+        /** Action type. */
         type: string;
-
         /** Additional action parameters. */
         [key: string]: unknown;
     };
-
-    /** The block number in which the transaction was included. */
+    /** Block number where transaction was included. */
     block: number;
-
-    /** The error message if the transaction failed. */
+    /** Error message if transaction failed. */
     error: string | null;
-
-    /** The hash of the transaction. */
+    /** Transaction hash. */
     hash: Hex;
-
-    /** The time at which the transaction was created. */
+    /** Transaction creation timestamp. */
     time: number;
-
-    /** The user that created the transaction. */
+    /** Creator's address. */
     user: Hex;
 }
 
-/** The block details. */
+/** Block details. */
 export interface BlockDetails {
-    /** The time at which the block was created. */
+    /** Block creation timestamp. */
     blockTime: number;
-
-    /** The hash of the block. */
+    /** Block hash. */
     hash: Hex;
-
-    /** The height of the block. */
+    /** Block height in chain. */
     height: number;
-
-    /** The number of transactions in the block. */
+    /** Total transactions in block. */
     numTxs: number;
-
-    /** The proposer of the block. */
+    /** Block proposer address. */
     proposer: Hex;
-
-    /** The transactions in the block. */
+    /** List of transactions. */
     txs: TxDetails[];
 }

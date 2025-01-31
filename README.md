@@ -81,7 +81,6 @@ const client = new hl.PublicClient({ transport });
 ```typescript
 import * as hl from "@nktkas/hyperliquid";
 import { createWalletClient, custom } from "viem";
-import { arbitrum } from "viem/chains";
 import { privateKeyToAccount } from "viem/accounts";
 import { ethers } from "ethers";
 
@@ -97,11 +96,7 @@ const ethersClient = new hl.WalletClient({ wallet: ethersWallet, transport });
 
 // 3. Using external wallet (e.g. MetaMask) via Viem
 const [account] = await window.ethereum.request({ method: "eth_requestAccounts" });
-const externalWallet = createWalletClient({
-    account,
-    chain: arbitrum,
-    transport: custom(window.ethereum),
-});
+const externalWallet = createWalletClient({ account, transport: custom(window.ethereum) });
 const metamaskClient = new hl.WalletClient({ wallet: externalWallet, transport });
 ```
 
@@ -178,7 +173,7 @@ class PublicClient<T extends IRESTTransport> {
     vaultDetails(args: VaultDetailsParameters): Promise<VaultDetails | null>;
     vaultSummaries(): Promise<VaultSummary[]>;
 
-    // Blockchain
+    // Explorer
     blockDetails(args: BlockDetailsParameters): Promise<BlockDetailsResponse>;
     txDetails(args: TxDetailsParameters): Promise<TxDetailsResponse>;
 }
@@ -272,10 +267,14 @@ class EventClient<T extends ISubscriptionTransport> {
     webData2(args: EventWebData2Parameters, listener: (data: WsWebData2) => void): Promise<Subscription>;
 
     // Order Management
-    orderUpdates(args: EventOrderUpdatesParameters, listener: (data: OrderStatus) => void): Promise<Subscription>;
+    orderUpdates(args: EventOrderUpdatesParameters, listener: (data: OrderStatus<Order>[]) => void): Promise<Subscription>;
     userFills(args: EventUserFillsParameters, listener: (data: WsUserFills) => void): Promise<Subscription>;
     userTwapHistory(args: EventUserTwapHistory, listener: (data: WsUserTwapHistory) => void): Promise<Subscription>;
     userTwapSliceFills(args: EventUserTwapSliceFills, listener: (data: WsUserTwapSliceFills) => void): Promise<Subscription>;
+
+    // Explorer
+    explorerBlock(listener: (data: WsBlockDetails[]) => void): Promise<Subscription>;
+    explorerTx(listener: (data: TxDetails[]) => void): Promise<Subscription>;
 }
 ```
 <!-- deno-fmt-ignore-end -->

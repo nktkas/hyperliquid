@@ -14,7 +14,7 @@ import type {
     UpdateLeverageRequest,
     VaultTransferRequest,
 } from "../types/exchange/requests.ts";
-import type { OrderParms } from "../types/exchange/common.ts";
+import type { OrderParams } from "../types/exchange/common.ts";
 
 /** Record of action types and their corresponding sorters. */
 // NOTE: An object after sorting must not contain undefined values.
@@ -112,7 +112,7 @@ export const sorters = {
         usd: action.usd,
     }),
 
-    _order: (order: OrderParms): OrderParms => {
+    _order: (order: OrderParams): OrderParams => {
         const sortedOrder = {
             a: order.a,
             b: order.b,

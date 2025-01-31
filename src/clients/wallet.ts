@@ -294,10 +294,9 @@ export class WalletClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      * import { createWalletClient, custom } from "viem";
-     * import { arbitrum } from "viem/chains";
      *
      * const [account] = await window.ethereum.request({ method: "eth_requestAccounts" });
-     * const wallet = createWalletClient({ account, chain: arbitrum, transport: custom(window.ethereum) });
+     * const wallet = createWalletClient({ account, transport: custom(window.ethereum) });
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.WalletClient({ wallet, transport });
@@ -529,7 +528,7 @@ export class WalletClient<
     }
 
     /**
-     * Cancel order(s) by Client Order ID.
+     * Cancel order(s) by cloid.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns {CancelResponseSuccess} Successful variant of {@link CancelResponse} without error statuses.
@@ -1220,7 +1219,7 @@ export class WalletClient<
     }
 
     /**
-     * Transfer funds to/from a vault.
+     * Add or remove funds from a vault.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns {SuccessResponse} Successful response without specific data.

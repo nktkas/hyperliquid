@@ -4,25 +4,24 @@ import type { Hex } from "../common.ts";
 export interface BaseExchangeResponse {
     /** Response status */
     status: "ok" | "err";
-
     /** Error message or success data */
-    response: string | {
-        /** Type of operation. */
-        type: string;
-
-        /** Specific data for the operation. */
-        data?: unknown;
-    };
+    response:
+        | string
+        | {
+            /** Type of response. */
+            type: string;
+            /** Specific data for the operation. */
+            data?: unknown;
+        };
 }
 
 /** Successful response without specific data. */
 export interface SuccessResponse extends BaseExchangeResponse {
     /** Successful status. */
     status: "ok";
-
     /** Response details. */
     response: {
-        /** Type of operation. */
+        /** Type of response. */
         type: "default";
     };
 }
@@ -31,7 +30,6 @@ export interface SuccessResponse extends BaseExchangeResponse {
 export interface ErrorResponse extends BaseExchangeResponse {
     /** Error status. */
     status: "err";
-
     /** Error message. */
     response: string;
 }
@@ -40,12 +38,10 @@ export interface ErrorResponse extends BaseExchangeResponse {
 export interface CancelResponse extends BaseExchangeResponse {
     /** Successful status. */
     status: "ok";
-
     /** Response details. */
     response: {
-        /** Type of operation. */
+        /** Type of response. */
         type: "cancel";
-
         /** Specific data. */
         data: {
             /** Array of statuses or error messages. */
@@ -64,12 +60,10 @@ export interface CancelResponse extends BaseExchangeResponse {
 export interface CreateSubAccountResponse extends BaseExchangeResponse {
     /** Successful status. */
     status: "ok";
-
     /** Response details. */
     response: {
-        /** Type of operation. */
+        /** Type of response. */
         type: "createSubAccount";
-
         /** Sub-account address. */
         data: Hex;
     };
@@ -79,12 +73,10 @@ export interface CreateSubAccountResponse extends BaseExchangeResponse {
 export interface OrderResponse extends BaseExchangeResponse {
     /** Successful status. */
     status: "ok";
-
     /** Response details. */
     response: {
-        /** Type of operation. */
+        /** Type of response. */
         type: "order";
-
         /** Specific data. */
         data: {
             /** Array of statuses or error messages. */
@@ -94,7 +86,6 @@ export interface OrderResponse extends BaseExchangeResponse {
                     resting: {
                         /** Order ID. */
                         oid: number;
-
                         /** Client Order ID. */
                         cloid?: Hex;
                     };
@@ -104,13 +95,10 @@ export interface OrderResponse extends BaseExchangeResponse {
                     filled: {
                         /** Total size filled. */
                         totalSz: string;
-
                         /** Average price of fill. */
                         avgPx: string;
-
                         /** Order ID. */
                         oid: number;
-
                         /** Client Order ID. */
                         cloid?: Hex;
                     };
@@ -128,12 +116,10 @@ export interface OrderResponse extends BaseExchangeResponse {
 export interface TwapOrderResponse extends BaseExchangeResponse {
     /** Successful status. */
     status: "ok";
-
     /** Response details. */
     response: {
-        /** Type of operation. */
+        /** Type of response. */
         type: "twapOrder";
-
         /** Specific data. */
         data: {
             /** Status of the operation. */
@@ -157,12 +143,10 @@ export interface TwapOrderResponse extends BaseExchangeResponse {
 export interface TwapCancelResponse extends BaseExchangeResponse {
     /** Successful status. */
     status: "ok";
-
     /** Response details. */
     response: {
-        /** Type of operation. */
+        /** Type of response. */
         type: "twapCancel";
-
         /** Specific data. */
         data: {
             /** Status of the operation. */

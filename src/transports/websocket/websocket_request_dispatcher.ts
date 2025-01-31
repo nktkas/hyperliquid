@@ -59,7 +59,7 @@ export class WebSocketRequestDispatcher {
                         // If a post request was sent, it is possible to get the id from the request
                         this.reject(
                             parsedRequest.id,
-                            new WebSocketRequestError(`Cannot process WebSocket request: ${event.detail}`),
+                            new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
                         );
                     } else if (
                         "subscription" in parsedRequest &&
@@ -70,14 +70,14 @@ export class WebSocketRequestDispatcher {
                         const id = WebSocketRequestDispatcher.requestToId(parsedRequest.subscription);
                         this.reject(
                             id,
-                            new WebSocketRequestError(`Cannot process subscription request: ${event.detail}`),
+                            new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
                         );
                     } else {
                         // If the request is not recognized, use the parsed request as an id
                         const id = WebSocketRequestDispatcher.requestToId(parsedRequest);
                         this.reject(
                             id,
-                            new WebSocketRequestError(`Cannot process unrecognized request: ${event.detail}`),
+                            new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
                         );
                     }
                 }
