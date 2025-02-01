@@ -3,6 +3,7 @@ import type {
     CancelByCloidRequest,
     CancelRequest,
     CreateSubAccountRequest,
+    EvmUserModifyRequest,
     ModifyRequest,
     OrderRequest,
     ScheduleCancelRequest,
@@ -39,6 +40,10 @@ export const sorters = {
             asset: cancel.asset,
             cloid: cancel.cloid,
         })),
+    }),
+    evmUserModify: (action: EvmUserModifyRequest["action"]): EvmUserModifyRequest["action"] => ({
+        type: action.type,
+        usingBigBlocks: action.usingBigBlocks,
     }),
     createSubAccount: (action: CreateSubAccountRequest["action"]): CreateSubAccountRequest["action"] => ({
         type: action.type,

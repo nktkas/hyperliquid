@@ -8,6 +8,7 @@ import type {
     CDepositRequest,
     CreateSubAccountRequest,
     CWithdrawRequest,
+    EvmUserModifyRequest,
     ModifyRequest,
     OrderRequest,
     ScheduleCancelRequest,
@@ -97,6 +98,11 @@ export type CancelByCloidParameters =
 export type CWithdrawParameters =
     & Omit<CWithdrawRequest["action"], "type" | "hyperliquidChain" | "signatureChainId" | "nonce">
     & Partial<Pick<CWithdrawRequest["action"], "signatureChainId" | "nonce">>;
+
+/** Parameters for the {@linkcode WalletClient.evmUserModify} method. */
+export type EvmUserModifyParameters =
+    & Omit<EvmUserModifyRequest["action"], "type">
+    & Partial<Pick<EvmUserModifyRequest, "nonce">>;
 
 /** Parameters for the {@linkcode WalletClient.createSubAccount} method. */
 export type CreateSubAccountParameters =
@@ -693,6 +699,46 @@ export class WalletClient<
             action,
             signature,
             nonce: action.nonce,
+        };
+        const response = await this.transport.request("action", request, signal) as SuccessResponse | ErrorResponse;
+
+        this._validateResponse(response);
+        return response;
+    }
+
+    /**
+     * Configure block type for EVM transactions.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Response for creating a sub-account.
+     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/evm/dual-block-architecture
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
+     * const result = await client.evmUserModify({ usingBigBlocks: true });
+     * ```
+     */
+    async evmUserModify(args: EvmUserModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        const {
+            nonce = Date.now(),
+            ...actionArgs
+        } = args;
+
+        const sortedAction = sorters.evmUserModify({ type: "evmUserModify", ...actionArgs });
+        const signature = await signL1Action(this.wallet, this.isTestnet, sortedAction, nonce);
+
+        const request: EvmUserModifyRequest = {
+            action: sortedAction,
+            signature,
+            nonce,
         };
         const response = await this.transport.request("action", request, signal) as SuccessResponse | ErrorResponse;
 

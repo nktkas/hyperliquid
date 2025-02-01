@@ -247,6 +247,9 @@ class WalletClient<
     cDeposit(args: CDepositParameters): Promise<SuccessResponse>;
     cWithdraw(args: CWithdrawParameters): Promise<SuccessResponse>;
     tokenDelegate(args: TokenDelegateParameters): Promise<SuccessResponse>;
+
+    // Other
+    evmUserModify(args: EvmUserModifyParameters): Promise<SuccessResponse>;
 }
 ```
 

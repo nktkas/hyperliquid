@@ -186,6 +186,21 @@ export interface CWithdrawRequest extends BaseExchangeRequest {
 }
 
 /**
+ * Configure block type for EVM transactions.
+ * @returns {SuccessResponse}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/evm/dual-block-architecture
+ */
+export interface EvmUserModifyRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "evmUserModify";
+        /** `true` for large blocks, `false` for small blocks. */
+        usingBigBlocks: boolean;
+    };
+}
+
+/**
  * Modify an order.
  * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order
