@@ -135,11 +135,11 @@ class PublicClient<T extends IRESTTransport> {
 
     // Market
     allMids(): Promise<AllMids>;
-    candleSnapshot(args: CandleSnapshotParameters): Promise<CandleSnapshot[]>;
+    candleSnapshot(args: CandleSnapshotParameters): Promise<Candle[]>;
     fundingHistory(args: FundingHistoryParameters): Promise<FundingHistory[]>;
-    l2Book(args: L2BookParameters): Promise<L2Book>;
-    meta(): Promise<Meta>;
-    metaAndAssetCtxs(): Promise<MetaAndAssetCtxs>;
+    l2Book(args: L2BookParameters): Promise<Book>;
+    meta(): Promise<PerpsMeta>;
+    metaAndAssetCtxs(): Promise<PerpsMetaAndAssetCtxs>;
     perpsAtOpenInterestCap(): Promise<string[]>;
     predictedFundings(): Promise<PredictedFunding[]>;
     spotDeployState(args: SpotDeployStateParameters): Promise<SpotDeployState>;
@@ -148,28 +148,28 @@ class PublicClient<T extends IRESTTransport> {
     tokenDetails(args: TokenDetailsParameters): Promise<TokenDetails>;
 
     // Account
-    clearinghouseState(args: ClearinghouseStateParameters): Promise<ClearinghouseState>;
+    clearinghouseState(args: ClearinghouseStateParameters): Promise<PerpsClearinghouseState>;
     extraAgents(args: ExtraAgentsParameters): Promise<ExtraAgent[]>;
     maxBuilderFee(args: MaxBuilderFeeParameters): Promise<number>;
     portfolio(args: PortfolioParameters): Promise<PortfolioPeriods>;
     referral(args: ReferralParameters): Promise<Referral>;
     spotClearinghouseState(args: SpotClearinghouseStateParameters): Promise<SpotClearinghouseState>;
-    subAccounts(args: SubAccountsParameters): Promise<SubAccount[]>;
+    subAccounts(args: SubAccountsParameters): Promise<SubAccount[] | null>;
     userFees(args: UserFeesParameters): Promise<UserFees>;
-    userFunding(args: UserFundingParameters): Promise<UserFunding[]>;
-    userNonFundingLedgerUpdates(args: UserNonFundingLedgerUpdatesParameters): Promise<UserNonFundingLedgerUpdates[]>;
+    userFunding(args: UserFundingParameters): Promise<UserFundingUpdate[]>;
+    userNonFundingLedgerUpdates(args: UserNonFundingLedgerUpdatesParameters): Promise<UserNonFundingLedgerUpdate[]>;
     userRateLimit(args: UserRateLimitParameters): Promise<UserRateLimit>;
     userRole(args: UserRoleParameters): Promise<UserRole>;
 
     // Order
-    frontendOpenOrders(args: FrontendOpenOrdersParameters): Promise<FrontendOpenOrder[]>;
-    historicalOrders(args: HistoricalOrdersParameters): Promise<OrderStatus[]>;
-    openOrders(args: OpenOrdersParameters): Promise<OpenOrder[]>;
-    orderStatus(args: OrderStatusParameters): Promise<OrderStatusResponse>;
-    twapHistory(args: TwapHistoryParameters): Promise<TwapHistory>;
-    userFills(args: UserFillsParameters): Promise<UserFill[]>;
-    userFillsByTime(args: UserFillsByTimeParameters): Promise<UserFill[]>;
-    userTwapSliceFills(args: UserTwapSliceFillsParameters): Promise<UserTwapSliceFill[]>;
+    frontendOpenOrders(args: FrontendOpenOrdersParameters): Promise<FrontendOrder[]>;
+    historicalOrders(args: HistoricalOrdersParameters): Promise<OrderStatus<FrontendOrder>[]>;
+    openOrders(args: OpenOrdersParameters): Promise<Order[]>;
+    orderStatus(args: OrderStatusParameters): Promise<OrderLookup>;
+    twapHistory(args: TwapHistoryParameters): Promise<TwapHistory[]>;
+    userFills(args: UserFillsParameters): Promise<Fill[]>;
+    userFillsByTime(args: UserFillsByTimeParameters): Promise<Fill[]>;
+    userTwapSliceFills(args: UserTwapSliceFillsParameters): Promise<TwapSliceFill[]>;
 
     // Staking
     delegations(args: DelegationsParameters): Promise<Delegation[]>;
@@ -179,7 +179,7 @@ class PublicClient<T extends IRESTTransport> {
     validatorSummaries(): Promise<ValidatorSummary[]>;
 
     // Vault
-    userVaultEquities(args: UserVaultEquitiesParameters): Promise<UserVaultEquity[]>;
+    userVaultEquities(args: UserVaultEquitiesParameters): Promise<VaultEquity[]>;
     vaultDetails(args: VaultDetailsParameters): Promise<VaultDetails | null>;
     vaultSummaries(): Promise<VaultSummary[]>;
 
