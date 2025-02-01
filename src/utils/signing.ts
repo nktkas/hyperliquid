@@ -165,7 +165,7 @@ export async function signL1Action(
     } else {
         throw new Error("Unsupported wallet for signing typed data", { cause: wallet });
     }
-    return parseSignature(signature);
+    return splitSignature(signature);
 }
 
 /**
@@ -200,13 +200,11 @@ export async function signUserSignedAction(
     } else {
         throw new Error("Unsupported wallet for signing typed data", { cause: wallet });
     }
-    return parseSignature(signature);
+    return splitSignature(signature);
 }
 
-/**
- * Parses a signature hexadecimal string into its components.
- */
-function parseSignature(signature: string): { r: Hex; s: Hex; v: number } {
+/** Splits a signature hexadecimal string into its components. */
+function splitSignature(signature: string): { r: Hex; s: Hex; v: number } {
     const normalizedSignature = signature.startsWith("0x") ? signature.slice(2) : signature;
 
     if (normalizedSignature.length !== 130) {
