@@ -242,6 +242,11 @@ class WalletClient<
     usdSend(args: UsdSendParameters): Promise<SuccessResponse>;
     vaultTransfer(args: VaultTransferParameters): Promise<SuccessResponse>;
     withdraw3(args: Withdraw3Parameters): Promise<SuccessResponse>;
+
+    // Staking
+    cDeposit(args: CDepositParameters): Promise<SuccessResponse>;
+    cWithdraw(args: CWithdrawParameters): Promise<SuccessResponse>;
+    tokenDelegate(args: TokenDelegateParameters): Promise<SuccessResponse>;
 }
 ```
 

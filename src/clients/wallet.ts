@@ -5,13 +5,16 @@ import type {
     BatchModifyRequest,
     CancelByCloidRequest,
     CancelRequest,
+    CDepositRequest,
     CreateSubAccountRequest,
+    CWithdrawRequest,
     ModifyRequest,
     OrderRequest,
     ScheduleCancelRequest,
     SetReferrerRequest,
     SpotSendRequest,
     SubAccountTransferRequest,
+    TokenDelegateRequest,
     TwapCancelRequest,
     TwapOrderRequest,
     UpdateIsolatedMarginRequest,
@@ -80,10 +83,20 @@ export type CancelParameters =
     & Omit<CancelRequest["action"], "type">
     & Partial<Pick<CancelRequest, "vaultAddress" | "nonce">>;
 
+/** Parameters for the {@linkcode WalletClient.cDeposit} method. */
+export type CDepositParameters =
+    & Omit<CDepositRequest["action"], "type" | "hyperliquidChain" | "signatureChainId" | "nonce">
+    & Partial<Pick<CDepositRequest["action"], "signatureChainId" | "nonce">>;
+
 /** Parameters for the {@linkcode WalletClient.cancelByCloid} method. */
 export type CancelByCloidParameters =
     & Omit<CancelByCloidRequest["action"], "type">
     & Partial<Pick<CancelByCloidRequest, "vaultAddress" | "nonce">>;
+
+/** Parameters for the {@linkcode WalletClient.cWithdraw} method. */
+export type CWithdrawParameters =
+    & Omit<CWithdrawRequest["action"], "type" | "hyperliquidChain" | "signatureChainId" | "nonce">
+    & Partial<Pick<CWithdrawRequest["action"], "signatureChainId" | "nonce">>;
 
 /** Parameters for the {@linkcode WalletClient.createSubAccount} method. */
 export type CreateSubAccountParameters =
@@ -119,6 +132,11 @@ export type SpotSendParameters =
 export type SubAccountTransferParameters =
     & Omit<SubAccountTransferRequest["action"], "type">
     & Partial<Pick<SubAccountTransferRequest, "nonce">>;
+
+/** Parameters for the {@linkcode WalletClient.tokenDelegate} method. */
+export type TokenDelegateParameters =
+    & Omit<TokenDelegateRequest["action"], "type" | "hyperliquidChain" | "signatureChainId" | "nonce">
+    & Partial<Pick<TokenDelegateRequest["action"], "signatureChainId" | "nonce">>;
 
 /** Parameters for the {@linkcode WalletClient.twapCancel} method. */
 export type TwapCancelParameters =
@@ -341,6 +359,7 @@ export class WalletClient<
             signatureChainId: args.signatureChainId ?? (this.isTestnet ? "0x66eee" : "0xa4b1"),
             nonce: args.nonce ?? Date.now(),
         };
+
         const signature = await signUserSignedAction(
             this.wallet,
             action,
@@ -396,6 +415,7 @@ export class WalletClient<
             signatureChainId: args.signatureChainId ?? (this.isTestnet ? "0x66eee" : "0xa4b1"),
             nonce: args.nonce ?? Date.now(),
         };
+
         const signature = await signUserSignedAction(
             this.wallet,
             action,
@@ -528,6 +548,59 @@ export class WalletClient<
     }
 
     /**
+     * Deposit into staking balance.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
+     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-into-staking
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
+     * const result = await client.cDeposit({ wei: 100000000 });
+     * ```
+     */
+    async cDeposit(args: CDepositParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        const action: CDepositRequest["action"] = {
+            ...args,
+            type: "cDeposit",
+            hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
+            signatureChainId: args.signatureChainId ?? (this.isTestnet ? "0x66eee" : "0xa4b1"),
+            nonce: args.nonce ?? Date.now(),
+        };
+
+        const signature = await signUserSignedAction(
+            this.wallet,
+            action,
+            {
+                "HyperliquidTransaction:CDeposit": [
+                    { name: "hyperliquidChain", type: "string" },
+                    { name: "wei", type: "uint64" },
+                    { name: "nonce", type: "uint64" },
+                ],
+            },
+            parseInt(action.signatureChainId, 16),
+        );
+
+        const request: CDepositRequest = {
+            action,
+            signature,
+            nonce: action.nonce,
+        };
+        const response = await this.transport.request("action", request, signal) as SuccessResponse | ErrorResponse;
+
+        this._validateResponse(response);
+        return response;
+    }
+
+    /**
      * Cancel order(s) by cloid.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -575,6 +648,59 @@ export class WalletClient<
     }
 
     /**
+     * Withdraw from staking balance.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
+     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#withdraw-from-staking
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
+     * const result = await client.cWithdraw({ wei: 100000000 });
+     * ```
+     */
+    async cWithdraw(args: CWithdrawParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        const action: CWithdrawRequest["action"] = {
+            ...args,
+            type: "cWithdraw",
+            hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
+            signatureChainId: args.signatureChainId ?? (this.isTestnet ? "0x66eee" : "0xa4b1"),
+            nonce: args.nonce ?? Date.now(),
+        };
+
+        const signature = await signUserSignedAction(
+            this.wallet,
+            action,
+            {
+                "HyperliquidTransaction:CWithdraw": [
+                    { name: "hyperliquidChain", type: "string" },
+                    { name: "wei", type: "uint64" },
+                    { name: "nonce", type: "uint64" },
+                ],
+            },
+            parseInt(action.signatureChainId, 16),
+        );
+
+        const request: CWithdrawRequest = {
+            action,
+            signature,
+            nonce: action.nonce,
+        };
+        const response = await this.transport.request("action", request, signal) as SuccessResponse | ErrorResponse;
+
+        this._validateResponse(response);
+        return response;
+    }
+
+    /**
      * Create a sub-account.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -591,9 +717,7 @@ export class WalletClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.WalletClient({ wallet, transport });
      *
-     * const result = await client.createSubAccount({
-     *   name: "subAccountName",
-     * });
+     * const result = await client.createSubAccount({ name: "subAccountName" });
      * ```
      */
     async createSubAccount(args: CreateSubAccountParameters, signal?: AbortSignal): Promise<CreateSubAccountResponse> {
@@ -752,9 +876,7 @@ export class WalletClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.WalletClient({ wallet, transport });
      *
-     * const result = await client.scheduleCancel({
-     *   time: Date.now() + 3600000, // Schedule cancellation 1 hour from now
-     * });
+     * const result = await client.scheduleCancel({ time: Date.now() + 3600000 });
      * ```
      */
     async scheduleCancel(args: ScheduleCancelParameters = {}, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -796,9 +918,7 @@ export class WalletClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.WalletClient({ wallet, transport });
      *
-     * const result = await client.setReferrer({
-     *   code: "TEST",
-     * });
+     * const result = await client.setReferrer({ code: "TEST" });
      * ```
      */
     async setReferrer(args: SetReferrerParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -853,6 +973,7 @@ export class WalletClient<
             signatureChainId: args.signatureChainId ?? (this.isTestnet ? "0x66eee" : "0xa4b1"),
             time: args.time ?? Date.now(),
         };
+
         const signature = await signUserSignedAction(
             this.wallet,
             action,
@@ -916,6 +1037,65 @@ export class WalletClient<
             action: sortedAction,
             signature,
             nonce,
+        };
+        const response = await this.transport.request("action", request, signal) as SuccessResponse | ErrorResponse;
+
+        this._validateResponse(response);
+        return response;
+    }
+
+    /**
+     * Delegate or undelegate stake from a validator.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
+     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#delegate-or-undelegate-stake-from-validator
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
+     * const result = await client.tokenDelegate({
+     *   validator: "0x...",
+     *   isUndelegate: true,
+     *   wei: 100000000,
+     * });
+     * ```
+     */
+    async tokenDelegate(args: TokenDelegateParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        const action: TokenDelegateRequest["action"] = {
+            ...args,
+            type: "tokenDelegate",
+            hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
+            signatureChainId: args.signatureChainId ?? (this.isTestnet ? "0x66eee" : "0xa4b1"),
+            nonce: args.nonce ?? Date.now(),
+        };
+
+        const signature = await signUserSignedAction(
+            this.wallet,
+            action,
+            {
+                "HyperliquidTransaction:TokenDelegate": [
+                    { name: "hyperliquidChain", type: "string" },
+                    { name: "validator", type: "address" },
+                    { name: "wei", type: "uint64" },
+                    { name: "isUndelegate", type: "bool" },
+                    { name: "nonce", type: "uint64" },
+                ],
+            },
+            parseInt(action.signatureChainId, 16),
+        );
+
+        const request: TokenDelegateRequest = {
+            action,
+            signature,
+            nonce: action.nonce,
         };
         const response = await this.transport.request("action", request, signal) as SuccessResponse | ErrorResponse;
 
@@ -1140,6 +1320,7 @@ export class WalletClient<
             signatureChainId: args.signatureChainId ?? (this.isTestnet ? "0x66eee" : "0xa4b1"),
             nonce: args.nonce ?? Date.now(),
         };
+
         const signature = await signUserSignedAction(
             this.wallet,
             action,
@@ -1196,6 +1377,7 @@ export class WalletClient<
             signatureChainId: args.signatureChainId ?? (this.isTestnet ? "0x66eee" : "0xa4b1"),
             time: args.time ?? Date.now(),
         };
+
         const signature = await signUserSignedAction(
             this.wallet,
             action,
@@ -1296,6 +1478,7 @@ export class WalletClient<
             signatureChainId: args.signatureChainId ?? (this.isTestnet ? "0x66eee" : "0xa4b1"),
             time: args.time ?? Date.now(),
         };
+
         const signature = await signUserSignedAction(
             this.wallet,
             action,

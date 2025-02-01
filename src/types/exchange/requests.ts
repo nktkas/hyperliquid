@@ -129,6 +129,27 @@ export interface CancelByCloidRequest extends BaseExchangeRequest {
 }
 
 /**
+ * Deposit into staking balance.
+ * @returns {SuccessResponse}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-into-staking
+ */
+export interface CDepositRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "cDeposit";
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
+        /** Chain ID used for signing. */
+        signatureChainId: Hex;
+        /** Unique request identifier (recommended current timestamp in ms). */
+        nonce: number;
+        /** Amount of wei to deposit into staking balance. */
+        wei: number;
+    };
+}
+
+/**
  * Create a sub-account.
  * @returns {CreateSubAccountResponse}
  * @see null - no documentation
@@ -140,6 +161,27 @@ export interface CreateSubAccountRequest extends BaseExchangeRequest {
         type: "createSubAccount";
         /** Sub-account name. */
         name: string;
+    };
+}
+
+/**
+ * Withdraw from staking balance.
+ * @returns {SuccessResponse}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#withdraw-from-staking
+ */
+export interface CWithdrawRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "cWithdraw";
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
+        /** Chain ID used for signing. */
+        signatureChainId: Hex;
+        /** Unique request identifier (recommended current timestamp in ms). */
+        nonce: number;
+        /** Amount of wei to withdraw from staking balance. */
+        wei: number;
     };
 }
 
@@ -271,6 +313,31 @@ export interface SubAccountTransferRequest extends BaseExchangeRequest {
         isDeposit: boolean;
         /** Raw amount to transfer (float * 1e6). */
         usd: number;
+    };
+}
+
+/**
+ * Delegate or undelegate stake from a validator.
+ * @returns {SuccessResponse}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#delegate-or-undelegate-stake-from-validator
+ */
+export interface TokenDelegateRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "tokenDelegate";
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
+        /** Chain ID used for signing. */
+        signatureChainId: Hex;
+        /** Unique request identifier (recommended current timestamp in ms). */
+        nonce: number;
+        /** Validator address. */
+        validator: Hex;
+        /** `true` for undelegate, `false` for delegate. */
+        isUndelegate: boolean;
+        /** Amount of wei to delegate. */
+        wei: number;
     };
 }
 
