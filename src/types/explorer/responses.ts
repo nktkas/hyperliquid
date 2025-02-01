@@ -15,3 +15,11 @@ export interface BlockDetailsResponse {
     /** The details of a block. */
     blockDetails: BlockDetails;
 }
+
+/** Response containing user details. */
+export interface UserDetailsResponse {
+    /** Type of response. */
+    type: "userDetails";
+    /** The transactions of a user. */
+    txs: TxDetails[];
+}

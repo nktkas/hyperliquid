@@ -1,361 +1,335 @@
 import type { Hex } from "../common.ts";
 
-/** Position in a specific asset. */
+/** Position for a specific asset. */
 export interface AssetPosition {
     /** Position type. */
     type: "oneWay";
-
     /** Position details. */
     position: {
         /** Asset symbol. */
         coin: string;
-
         /** Signed position size. */
         szi: string;
-
         /** Leverage details. */
         leverage:
             | {
                 /** Leverage type. */
                 type: "isolated";
-
                 /** Leverage value used. */
                 value: number;
-
                 /** Amount of raw USD used. */
                 rawUsd: string;
             }
             | {
                 /** Leverage type. */
                 type: "cross";
-
                 /** Leverage value used. */
                 value: number;
             };
 
         /** Average entry price. */
         entryPx: string;
-
         /** Position value. */
         positionValue: string;
-
-        /** Unrealized PnL. */
+        /** Unrealized profit and loss. */
         unrealizedPnl: string;
-
         /** Return on equity. */
         returnOnEquity: string;
-
         /** Liquidation price. */
         liquidationPx: string | null;
-
         /** Margin used. */
         marginUsed: string;
-
         /** Maximum allowed leverage. */
         maxLeverage: number;
-
         /** Cumulative funding details. */
         cumFunding: {
             /** Total funding paid or received since account opening. */
             allTime: string;
-
-            /** Funding since the position was opened. */
+            /** Funding accumulated since the position was opened. */
             sinceOpen: string;
-
-            /** Funding since the last position size change. */
+            /** Funding accumulated since the last change in position size. */
             sinceChange: string;
         };
     };
 }
 
-/** Account summary for perpetual trading. */
+/** Perpetual trading clearinghouse state summary. */
 export interface PerpsClearinghouseState {
-    /** Margin details. */
+    /** Margin summary details. */
     marginSummary: {
         /** Total account value. */
         accountValue: string;
-
-        /** Total notional value. */
+        /** Total notional position value. */
         totalNtlPos: string;
-
         /** Total raw USD value. */
         totalRawUsd: string;
-
         /** Total margin used. */
         totalMarginUsed: string;
     };
-
-    /** Cross-margin details. */
+    /** Cross-margin summary details. */
     crossMarginSummary: {
         /** Total account value. */
         accountValue: string;
-
-        /** Total notional value. */
+        /** Total notional position value. */
         totalNtlPos: string;
-
         /** Total raw USD value. */
         totalRawUsd: string;
-
         /** Total margin used. */
         totalMarginUsed: string;
     };
-
     /** Maintenance margin used for cross-margin positions. */
     crossMaintenanceMarginUsed: string;
-
     /** Amount available for withdrawal. */
     withdrawable: string;
-
-    /** Positions in various assets. */
+    /** List of asset positions. */
     assetPositions: AssetPosition[];
-
-    /** Timestamp when the data was retrieved (in ms since epoch). */
+    /** Timestamp when data was retrieved (in ms since epoch). */
     time: number;
+}
+
+/** Portfolio metrics grouped by time periods. */
+export type PortfolioPeriods = [
+    ["day", Portfolio],
+    ["week", Portfolio],
+    ["month", Portfolio],
+    ["allTime", Portfolio],
+    ["perpDay", Portfolio],
+    ["perpWeek", Portfolio],
+    ["perpMonth", Portfolio],
+    ["perpAllTime", Portfolio],
+];
+
+/** Portfolio metrics snapshot. */
+export interface Portfolio {
+    /** History entries for account value as [timestamp, value]. */
+    accountValueHistory: [number, string][];
+    /** History entries for profit and loss as [timestamp, value]. */
+    pnlHistory: [number, string][];
+    /** Volume metric for the portfolio. */
+    vlm: string;
 }
 
 /** Balance for a specific spot token. */
 export interface SpotBalance {
     /** Asset symbol. */
     coin: string;
-
     /** Unique identifier for the token. */
     token: number;
-
     /** Total balance. */
     total: string;
-
     /** Amount on hold. */
     hold: string;
-
     /** Entry notional value. */
     entryNtl: string;
 }
 
-/** Balances for spot tokens. */
+/** Clearinghouse state for spot tokens. */
 export interface SpotClearinghouseState {
     /** Balance for each token. */
     balances: SpotBalance[];
 }
 
-/** User sub-accounts. */
+/** Sub-account details for a user. */
 export interface SubAccount {
-    /** Name of the sub-account. */
+    /** Sub-account name. */
     name: string;
-
-    /** Address of the sub-account. */
+    /** Sub-account address. */
     subAccountUser: Hex;
-
-    /** Address of the master account. */
+    /** Master account address. */
     master: Hex;
-
-    /** Account summary for perpetual trading. */
+    /** Perpetual trading clearinghouse state summary. */
     clearinghouseState: PerpsClearinghouseState;
-
-    /** Balances for spot tokens. */
+    /** Spot tokens clearinghouse state. */
     spotState: SpotClearinghouseState;
 }
 
-/** User fees. */
+/** User fee details. */
 export interface UserFees {
-    /** User's daily volume. */
+    /** Daily user volume metrics. */
     dailyUserVlm: {
-        /** Date. */
+        /** Date in YYYY-M-D format. */
         date: `${number}-${number}-${number}`;
-
-        /** User's cross-trade volume. */
+        /** User cross-trade volume. */
         userCross: string;
-
-        /** User's add liquidity volume. */
+        /** User add-liquidity volume. */
         userAdd: string;
-
-        /** Total exchange volume. */
+        /** Exchange total volume. */
         exchange: string;
     }[];
 
-    /** Fee schedule. */
+    /** Fee schedule information. */
     feeSchedule: {
         /** Cross-trade fee rate. */
         cross: string;
-
-        /** Add liquidity fee rate. */
+        /** Add-liquidity fee rate. */
         add: string;
-
-        /** Fee tiers. */
+        /** Fee tiers details. */
         tiers: {
-            /** VIP fee tiers. */
+            /** VIP fee tier information. */
             vip: {
                 /** Notional volume cutoff. */
                 ntlCutoff: string;
-
                 /** Cross-trade fee rate. */
                 cross: string;
-
-                /** Add liquidity fee rate. */
+                /** Add-liquidity fee rate. */
                 add: string;
             }[];
-
-            /** MM fee tiers. */
+            /** Market maker fee tier information. */
             mm: {
                 /** Maker fraction cutoff. */
                 makerFractionCutoff: string;
-
-                /** Add liquidity fee rate. */
+                /** Add-liquidity fee rate. */
                 add: string;
             }[];
         };
-
-        /** Referral discount. */
+        /** Referral discount rate. */
         referralDiscount: string;
     };
-
-    /** User's cross-trade rate. */
+    /** User cross-trade rate. */
     userCrossRate: string;
-
-    /** User's add liquidity rate. */
+    /** User add-liquidity rate. */
     userAddRate: string;
-
-    /** Active referral discount. */
+    /** Active referral discount rate. */
     activeReferralDiscount: string;
-
     /** Trial details. */
     trial: unknown | null;
-
-    /** Fee trial reward. */
+    /** Fee trial reward amount. */
     feeTrialReward: string;
-
-    /** Next trial available timestamp. */
+    /** Timestamp when next trial becomes available. */
     nextTrialAvailableTimestamp: unknown | null;
 }
 
-/** User's rate limits. */
+/** Rate limits for a user. */
 export interface UserRateLimit {
     /** Cumulative trading volume. */
     cumVlm: string;
-
     /** Number of API requests used. */
     nRequestsUsed: number;
-
     /** Maximum allowed API requests. */
     nRequestsCap: number;
 }
 
-/** User's extra agent. */
+/** User role details. */
+export type UserRole =
+    | {
+        /** Role identifier. */
+        role: "missing" | "user" | "vault";
+    }
+    | {
+        /** Role identifier. */
+        role: "agent";
+        /** Details for agent role. */
+        data: {
+            /** Master account address associated with the agent. */
+            user: Hex;
+        };
+    }
+    | {
+        /** Role identifier. */
+        role: "subAccount";
+        /** Details for sub-account role. */
+        data: {
+            /** Master account address associated with the sub-account. */
+            master: Hex;
+        };
+    };
+
+/** Extra agent details for a user. */
 export interface ExtraAgent {
-    /** The address of the extra agent. */
+    /** Extra agent address. */
     address: Hex;
-
-    /** The name of the extra agent. */
+    /** Extra agent name. */
     name: string;
-
-    /** The validity period of the extra agent. */
+    /** Validity period as a timestamp (in ms since epoch). */
     validUntil: number;
 }
 
-/** Referral information for a user. */
+/** Referral details for a user. */
 export interface Referral {
-    /** Details about who referred this user, or `null` if no referrer exists. */
+    /** Referrer details. */
     referredBy: {
-        /** Referrer's address. */
+        /** Referrer address. */
         referrer: Hex;
-
         /** Referral code used. */
         code: string;
     } | null;
 
-    /** Cumulative volume traded. */
+    /** Cumulative traded volume. */
     cumVlm: string;
-
     /** Rewards earned but not yet claimed. */
     unclaimedRewards: string;
-
-    /** Rewards claimed. */
+    /** Rewards that have been claimed. */
     claimedRewards: string;
-
-    /** Rewards builder. */
+    /** Builder reward amount. */
     builderRewards: string;
-
     /** Current state of the referrer. */
     referrerState:
         | {
             /** Referrer is ready to receive rewards. */
             stage: "ready";
-
-            /** Data related to the referrer's referral program. */
+            /** Referral program details. */
             data: {
-                /** Referral code assigned. */
+                /** Assigned referral code. */
                 code: string;
-
-                /** Summary of each user's activity. */
+                /** Summary of each referral state. */
                 referralStates: {
-                    /** Cumulative volume traded. */
+                    /** Cumulative traded volume. */
                     cumVlm: string;
-
-                    /** Total fees rewarded to the referred user since being referred. */
+                    /** Total fees rewarded to the referred user since referral. */
                     cumRewardedFeesSinceReferred: string;
-
-                    /** Total fees rewarded to the referrer from the referred user's trades. */
+                    /** Total fees rewarded to the referrer from referred trades. */
                     cumFeesRewardedToReferrer: string;
-
                     /** Timestamp when the referred user joined (in ms since epoch). */
                     timeJoined: number;
-
                     /** Address of the referred user. */
                     user: string;
                 }[];
             };
         }
         | {
-            /** Referrer needs to create a referral code to start receiving rewards. */
+            /** Referrer needs to create a referral code. */
             stage: "needToCreateCode";
         }
         | {
-            /** Referrer must complete a trade before receiving rewards. */
+            /** Referrer must complete a trade before earning rewards. */
             stage: "needToTrade";
-
-            /** Additional information about the required volume to start earning rewards. */
+            /** Required trading volume details for activation. */
             data: {
-                /** Required trading volume to activate rewards. */
+                /** Required trading volume. */
                 required: string;
             };
         };
 
-    /** History of rewards. */
+    /** History of referral rewards. */
     rewardHistory: {
-        /** Amount of rewards earned. */
+        /** Amount of earned rewards. */
         earned: string;
-
-        /** Volume traded. */
+        /** Traded volume at the time of reward. */
         vlm: string;
-
-        /** Volume traded through referrals. */
+        /** Traded volume via referrals. */
         referralVlm: string;
-
-        /** Timestamp when the rewards were earned (in ms since epoch). */
+        /** Timestamp when the reward was earned (in ms since epoch). */
         time: number;
     }[];
 }
 
-/** User's funding ledger update. */
+/** Funding ledger update for a user. */
 export interface UserFundingUpdate {
     /** Timestamp of the update (in ms since epoch). */
     time: number;
-
     /** L1 transaction hash. */
     hash: Hex;
-
-    /** Details of the update. */
+    /** Update details. */
     delta: FundingUpdate;
 }
 
-/** User's non-funding ledger update. */
+/** Non-funding ledger update for a user. */
 export interface UserNonFundingLedgerUpdate {
     /** Timestamp of the update (in ms since epoch). */
     time: number;
-
     /** L1 transaction hash. */
     hash: Hex;
-
-    /** Details of the update. */
+    /** Update details. */
     delta:
         | AccountClassTransferUpdate
         | DepositUpdate
@@ -373,213 +347,169 @@ export interface UserNonFundingLedgerUpdate {
 
 /** Transfer between spot and perpetual accounts. */
 export interface AccountClassTransferUpdate {
-    /** Type of update. */
+    /** Update type. */
     type: "accountClassTransfer";
-
-    /** Amount. */
+    /** Amount transferred in USDC. */
     usdc: string;
-
-    /** Whether the transfer is to the perpetual account. */
+    /** Indicates if the transfer is to the perpetual account. */
     toPerp: boolean;
 }
 
-/** Deposit to account. */
+/** Deposit update to an account. */
 export interface DepositUpdate {
-    /** Type of update. */
+    /** Update type. */
     type: "deposit";
-
-    /** Amount. */
+    /** Amount deposited in USDC. */
     usdc: string;
 }
 
 /** Internal transfer between accounts. */
 export interface InternalTransferUpdate {
-    /** Type of update. */
+    /** Update type. */
     type: "internalTransfer";
-
-    /** Amount. */
+    /** Amount transferred in USDC. */
     usdc: string;
-
-    /** Address of the user initiating the transfer. */
+    /** Initiator's address. */
     user: Hex;
-
     /** Destination address. */
     destination: Hex;
-
-    /** Fee. */
+    /** Transfer fee. */
     fee: string;
 }
 
-/** Update representing a liquidation event. */
+/** Liquidation event update. */
 export interface LiquidationUpdate {
-    /** Type of update. */
+    /** Update type. */
     type: "liquidation";
-
     /** Total notional value of liquidated positions. */
     liquidatedNtlPos: string;
-
-    /** Account value at the time of liquidation. */
+    /** Account value at liquidation time. */
     accountValue: string;
-
-    /** Type of leverage used for the liquidated positions. */
+    /** Leverage type for liquidated positions. */
     leverageType: "Cross" | "Isolated";
-
-    /** Details of individual positions that were liquidated. */
+    /** Details of each liquidated position. */
     liquidatedPositions: {
         /** Asset symbol of the liquidated position. */
         coin: string;
-
-        /** Signed position size that was liquidated. */
+        /** Signed position size liquidated. */
         szi: string;
     }[];
 }
 
-/** Funding update. */
+/** Funding update details. */
 export interface FundingUpdate {
-    /** Type of update. */
+    /** Update type. */
     type: "funding";
-
     /** Asset symbol. */
     coin: string;
-
-    /** Amount. */
+    /** Amount transferred in USDC. */
     usdc: string;
-
     /** Signed position size. */
     szi: string;
-
-    /** Funding rate. */
+    /** Applied funding rate. */
     fundingRate: string;
-
     /** Number of samples. */
     nSamples: number | null;
 }
 
-/** Rewards claim update. */
+/** Rewards claim event update. */
 export interface RewardsClaimUpdate {
-    /** Type of update. */
+    /** Update type. */
     type: "rewardsClaim";
-
     /** Amount of rewards claimed. */
     amount: string;
 }
 
-/** Spot transfer between accounts. */
+/** Spot transfer update between accounts. */
 export interface SpotTransferUpdate {
-    /** Type of update. */
+    /** Update type. */
     type: "spotTransfer";
-
-    /** Token. */
+    /** Token symbol. */
     token: string;
-
-    /** Amount. */
+    /** Amount transferred. */
     amount: string;
-
-    /** Equivalent USDC value of the amount. */
+    /** Equivalent USDC value. */
     usdcValue: string;
-
-    /** Address of the user initiating the transfer. */
+    /** Initiator's address. */
     user: Hex;
-
     /** Destination address. */
     destination: Hex;
-
-    /** Fee. */
+    /** Transfer fee. */
     fee: string;
 }
 
-/** Transfer between sub-accounts. */
+/** Transfer update between sub-accounts. */
 export interface SubAccountTransferUpdate {
-    /** Type of update. */
+    /** Update type. */
     type: "subAccountTransfer";
-
-    /** Amount. */
+    /** Amount transferred in USDC. */
     usdc: string;
-
-    /** Address of the user initiating the transfer. */
+    /** Initiator's address. */
     user: Hex;
-
     /** Destination address. */
     destination: Hex;
 }
 
-/** Creating a vault. */
+/** Vault creation update. */
 export interface VaultCreateUpdate {
-    /** Type of update. */
+    /** Update type. */
     type: "vaultCreate";
-
     /** Address of the created vault. */
     vault: Hex;
-
-    /** Initial amount allocated. */
+    /** Initial allocated amount in USDC. */
     usdc: string;
-
-    /** Fee for creating the vault. */
+    /** Vault creation fee. */
     fee: string;
 }
 
-/** Deposit to a vault. */
+/** Vault deposit update. */
 export interface VaultDepositUpdate {
-    /** Type of update. */
+    /** Update type. */
     type: "vaultDeposit";
-
-    /** Address of the vault receiving funds. */
+    /** Address of the target vault. */
     vault: Hex;
-
-    /** Amount deposited. */
+    /** Amount deposited in USDC. */
     usdc: string;
 }
 
-/** Distribution event from a vault. */
+/** Vault distribution update. */
 export interface VaultDistributionUpdate {
-    /** Type of update. */
+    /** Update type. */
     type: "vaultDistribution";
-
     /** Address of the vault distributing funds. */
     vault: Hex;
-
-    /** Amount. */
+    /** Amount distributed in USDC. */
     usdc: string;
 }
 
-/** Withdrawal from a vault. */
+/** Vault withdrawal event update. */
 export interface VaultWithdrawUpdate {
-    /** Type of update. */
+    /** Update type. */
     type: "vaultWithdraw";
-
-    /** Address of the vault. */
+    /** Vault address. */
     vault: Hex;
-
     /** Address of the user withdrawing funds. */
     user: Hex;
-
-    /** Amount requested for withdrawal in USD. */
+    /** Withdrawal request amount in USD. */
     requestedUsd: string;
-
-    /** Commission charged for the withdrawal. */
+    /** Withdrawal commission fee. */
     commission: string;
-
-    /** Cost associated with closing positions. */
+    /** Closing cost associated with positions. */
     closingCost: string;
-
-    /** Basis value for the withdrawal calculation. */
+    /** Basis value for withdrawal calculation. */
     basis: string;
-
-    /** Final amount withdrawn after deducting fees and costs. */
+    /** Net withdrawn amount in USD after fees and costs. */
     netWithdrawnUsd: string;
 }
 
-/** Withdrawal from account. */
+/** Withdrawal update from an account. */
 export interface WithdrawUpdate {
-    /** Type of update. */
+    /** Update type. */
     type: "withdraw";
-
-    /** Amount. */
+    /** Amount withdrawn in USDC. */
     usdc: string;
-
-    /** Unique request identifier. */
+    /** Unique nonce for the withdrawal request. */
     nonce: number;
-
-    /** Fee. */
+    /** Withdrawal fee. */
     fee: string;
 }

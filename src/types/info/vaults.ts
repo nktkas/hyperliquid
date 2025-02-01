@@ -1,145 +1,96 @@
 import type { Hex } from "../common.ts";
+import type { PortfolioPeriods } from "./accounts.ts";
 
 /** Details about a vault. */
 export interface VaultDetails {
-    /** The name of the vault. */
+    /** Vault name. */
     name: string;
-
-    /** The address of the vault. */
+    /** Vault address. */
     vaultAddress: Hex;
-
-    /** The address of the leader. */
+    /** Leader address. */
     leader: Hex;
-
-    /** The description of the vault. */
+    /** Vault description. */
     description: string;
-
-    /** The portfolio of the vault. */
-    portfolio: [
-        ["day", VaultMetrics],
-        ["week", VaultMetrics],
-        ["month", VaultMetrics],
-        ["allTime", VaultMetrics],
-        ["perpDay", VaultMetrics],
-        ["perpWeek", VaultMetrics],
-        ["perpMonth", VaultMetrics],
-        ["perpAllTime", VaultMetrics],
-    ];
-
-    /** The annual percentage rate (APR) of the vault. */
+    /** Vault portfolio metrics grouped by time periods. */
+    portfolio: PortfolioPeriods;
+    /** Annual percentage rate. */
     apr: number;
-
+    /** unknown */
+    // FIXME: add type
     followerState: unknown | null;
-
-    /** The fraction of the vault owned by the leader. */
+    /** Ownership percentage held by leader. */
     leaderFraction: number;
-
-    /** The commission percentage taken by the leader. */
+    /** Leader's commission percentage. */
     leaderCommission: number;
-
-    /** The followers of the vault. */
+    /** Vault followers list. */
     followers: {
-        /** The address of the follower or "Leader" for the leader. */
+        /** Follower address or "Leader". */
         user: Hex | "Leader";
-
-        /** The equity of the follower in the vault. */
+        /** Follower's vault equity. */
         vaultEquity: string;
-
-        /** The current profit and loss (PnL) of the follower. */
+        /** Current profit and loss. */
         pnl: string;
-
-        /** The all-time profit and loss (PnL) of the follower. */
+        /** All-time profit and loss. */
         allTimePnl: string;
-
-        /** The number of days the follower has been subscribed. */
+        /** Subscription duration in days. */
         daysFollowing: number;
-
-        /** The timestamp when the follower joined the vault. */
+        /** Vault entry timestamp. */
         vaultEntryTime: number;
-
-        /** The timestamp until which the funds are locked. */
+        /** Timestamp when funds become unlocked. */
         lockupUntil: number;
     }[];
-
-    /** The maximum amount that can be distributed from the vault. */
+    /** Maximum distributable amount. */
     maxDistributable: number;
-
-    /** The maximum amount that can be withdrawn from the vault. */
+    /** Maximum withdrawable amount. */
     maxWithdrawable: number;
-
-    /** Indicates if the vault is closed. */
+    /** Vault closure status. */
     isClosed: boolean;
-
-    /** The type of relationship between vaults. */
+    /** Vault relationship type. */
     relationship: VaultRelationship;
-
-    /** Indicates whether deposits are allowed. */
+    /** Deposit permission status. */
     allowDeposits: boolean;
-
-    /** Indicates whether to always close positions on withdrawal. */
+    /** Position closure policy on withdrawal. */
     alwaysCloseOnWithdraw: boolean;
 }
 
-/** The equity of a user in a vault. */
+/** User's vault equity details. */
 export interface VaultEquity {
-    /** The address of the vault. */
+    /** Vault address. */
     vaultAddress: Hex;
-
-    /** The user's deposited equity in the vault. */
+    /** User's deposited equity. */
     equity: string;
 }
 
-/** Metrics data for a vault */
-export interface VaultMetrics {
-    /** The account value history as [timestamp, value]. */
-    accountValueHistory: [number, string][];
-    /** The profit and loss (PnL) history as [timestamp, value]. */
-    pnlHistory: [number, string][];
-    /** The volume or related metric of the portfolio. */
-    vlm: string;
-}
-
-/** The type of relationship between vaults. */
+/** Vault relationship configuration. */
 export type VaultRelationship =
     | {
-        /** The type of relationship. */
-        type: "normal";
+        /** Relationship type. */
+        type: "normal" | "child";
     }
     | {
-        /** The type of relationship. */
+        /** Relationship type. */
         type: "parent";
-
-        /** Data about child vault addresses. */
+        /** Child vault information. */
         data: {
-            /** List of child vault addresses. */
+            /** Child vault addresses. */
             childAddresses: Hex[];
         };
-    }
-    | {
-        /** The type of relationship. */
-        type: "child";
     };
 
 /** Summary of a vault. */
 export interface VaultSummary {
-    /** The name of the vault. */
+    /** Vault name. */
     name: string;
-
-    /** The address of the vault. */
+    /** Vault address. */
     vaultAddress: Hex;
-
-    /** The address of the leader. */
+    /** Leader address. */
     leader: Hex;
-
-    /** The total value locked (TVL) in the vault. */
+    /** Total value locked. */
     tvl: string;
-
-    /** Indicates if the vault is closed. */
+    /** Vault closure status. */
     isClosed: boolean;
-
-    /** The type of relationship between vaults. */
+    /** Vault relationship type. */
     relationship: VaultRelationship;
-
-    /** The timestamp when the vault was created. */
+    /** Creation timestamp. */
     createTimeMillis: number;
 }

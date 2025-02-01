@@ -3,7 +3,7 @@ import type { Hex } from "../common.ts";
 /**
  * Request mid coin prices.
  * @returns {AllMids} Mid coin prices.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-mids-for-all-coins | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-mids-for-all-coins
  */
 export interface AllMidsRequest {
     /** Type of request. */
@@ -13,7 +13,7 @@ export interface AllMidsRequest {
 /**
  * Request candlestick snapshots.
  * @returns {Candle[]} Array of candlestick data points.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#candle-snapshot | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#candle-snapshot
  */
 export interface CandleSnapshotRequest {
     /** Type of request. */
@@ -34,7 +34,7 @@ export interface CandleSnapshotRequest {
 /**
  * Request clearinghouse state.
  * @returns {PerpsClearinghouseState} Account summary for perpetual trading.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-perpetuals-account-summary | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-perpetuals-account-summary
  */
 export interface ClearinghouseStateRequest {
     /** Type of request. */
@@ -44,8 +44,57 @@ export interface ClearinghouseStateRequest {
 }
 
 /**
+ * Request user staking delegations.
+ * @returns {Delegation[]} Array of user's staking delegations.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-staking-delegations
+ */
+export interface DelegationsRequest {
+    /** Type of request. */
+    type: "delegations";
+    /** User's address. */
+    user: Hex;
+}
+
+/**
+ * Request user staking history.
+ * @returns {DelegatorUpdate[]} Array of user's staking history.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-staking-history
+ */
+export interface DelegatorHistoryRequest {
+    /** Type of request. */
+    type: "delegatorHistory";
+    /** User's address. */
+    user: Hex;
+}
+
+/**
+ * Request user staking rewards.
+ * @returns {DelegatorReward[]} Array of user's staking rewards.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-staking-rewards
+ */
+export interface DelegatorRewardsRequest {
+    /** Type of request. */
+    type: "delegatorRewards";
+    /** User's address. */
+    user: Hex;
+}
+
+/**
+ * Request user staking summary.
+ * @returns {DelegatorSummary} Summary of a user's staking.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-staking-summary
+ */
+export interface DelegatorSummaryRequest {
+    /** Type of request. */
+    type: "delegatorSummary";
+    /** User's address. */
+    user: Hex;
+}
+
+/**
  * Request user's extra agents.
  * @returns {ExtraAgent[]} The extra agents of a user.
+ * @see null - no documentation
  */
 export interface ExtraAgentsRequest {
     /** Type of request. */
@@ -57,7 +106,7 @@ export interface ExtraAgentsRequest {
 /**
  * Request frontend open orders.
  * @returns {FrontendOrder[]} Array of open orders with additional frontend information.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders-with-additional-frontend-info | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders-with-additional-frontend-info
  */
 export interface FrontendOpenOrdersRequest {
     /** Type of request. */
@@ -69,7 +118,7 @@ export interface FrontendOpenOrdersRequest {
 /**
  * Request funding history.
  * @returns {FundingHistory[]} Array of historical funding rate data for an asset.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-historical-funding-rates | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-historical-funding-rates
  */
 export interface FundingHistoryRequest {
     /** Type of request. */
@@ -85,7 +134,7 @@ export interface FundingHistoryRequest {
 /**
  * Request user historical orders.
  * @returns {OrderStatus[]} Array of user's historical orders.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-historical-orders | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-historical-orders
  */
 export interface HistoricalOrdersRequest {
     /** Type of request. */
@@ -97,7 +146,7 @@ export interface HistoricalOrdersRequest {
 /**
  * Request L2 order book ({@link L2Book}).
  * @returns {Book} L2 order book snapshot.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#l2-book-snapshot | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#l2-book-snapshot
  */
 export interface L2BookRequest {
     /** Type of request. */
@@ -113,7 +162,7 @@ export interface L2BookRequest {
 /**
  * Request builder fee approval.
  * @returns {number} 1 (means 0.001%)
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#check-builder-fee-approval | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#check-builder-fee-approval
  */
 export interface MaxBuilderFeeRequest {
     /** Type of request. */
@@ -125,29 +174,9 @@ export interface MaxBuilderFeeRequest {
 }
 
 /**
- * Request metadata and asset contexts.
- * @returns {PerpsMetaAndAssetCtxs} Metadata and context information for each perpetual asset.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-asset-contexts-includes-mark-price-current-funding-open-interest-etc | Hyperliquid GitBook}
- */
-export interface MetaAndAssetCtxsRequest {
-    /** Type of request. */
-    type: "metaAndAssetCtxs";
-}
-
-/**
- * Request trading metadata.
- * @returns {PerpsMeta} Metadata for perpetual assets.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-metadata | Hyperliquid GitBook}
- */
-export interface MetaRequest {
-    /** Type of request. */
-    type: "meta";
-}
-
-/**
  * Request open orders.
- * @returns {Order[]} Array of open order.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders | Hyperliquid GitBook}
+ * @returns {Order[]} Array of open orders.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders
  */
 export interface OpenOrdersRequest {
     /** Type of request. */
@@ -159,21 +188,43 @@ export interface OpenOrdersRequest {
 /**
  * Request order status.
  * @returns {OrderLookup} Result of an order status lookup.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-order-status-by-oid-or-cloid | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-order-status-by-oid-or-cloid
  */
 export interface OrderStatusRequest {
     /** Type of request. */
     type: "orderStatus";
     /** User's address. */
     user: Hex;
-    /** oid (order id) or cloid (client order id). */
+    /** Order ID or client order ID. */
     oid: number | Hex;
+}
+
+/**
+ * Request user portfolio.
+ * @returns {Portfolio} User's portfolio.
+ * @see null - no documentation
+ */
+export interface PortfolioRequest {
+    /** Type of request. */
+    type: "portfolio";
+    /** User's address. */
+    user: Hex;
+}
+
+/**
+ * Request perpetuals at open interest cap.
+ * @returns {string[]} Array of perpetuals at open interest caps.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#query-perps-at-open-interest-caps
+ */
+export interface PerpsAtOpenInterestCapRequest {
+    /** Type of request. */
+    type: "perpsAtOpenInterestCap";
 }
 
 /**
  * Request predicted funding rates.
  * @returns {PredictedFunding[]} Array of predicted funding rates.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-predicted-funding-rates-for-different-venues | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-predicted-funding-rates-for-different-venues
  */
 export interface PredictedFundingsRequest {
     /** Type of request. */
@@ -183,6 +234,7 @@ export interface PredictedFundingsRequest {
 /**
  * Request user referral.
  * @returns {Referral} Referral information for a user.
+ * @see null - no documentation
  */
 export interface ReferralRequest {
     /** Type of request. */
@@ -194,7 +246,7 @@ export interface ReferralRequest {
 /**
  * Request spot clearinghouse state.
  * @returns {SpotClearinghouseState} Balances for spot tokens.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-a-users-token-balances | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-a-users-token-balances
  */
 export interface SpotClearinghouseStateRequest {
     /** Type of request. */
@@ -206,7 +258,7 @@ export interface SpotClearinghouseStateRequest {
 /**
  * Request spot deploy state.
  * @returns {SpotDeployState} The deploy state of a user.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-deploy-auction | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-deploy-auction
  */
 export interface SpotDeployStateRequest {
     /** Type of request. */
@@ -218,7 +270,7 @@ export interface SpotDeployStateRequest {
 /**
  * Request spot metadata and asset contexts.
  * @returns {SpotMetaAndAssetCtxs} Metadata and context information for each spot asset.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-asset-contexts | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-asset-contexts
  */
 export interface SpotMetaAndAssetCtxsRequest {
     /** Type of request. */
@@ -228,7 +280,7 @@ export interface SpotMetaAndAssetCtxsRequest {
 /**
  * Request spot trading metadata.
  * @returns {SpotMeta} Metadata for spot assets.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-metadata | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-metadata
  */
 export interface SpotMetaRequest {
     /** Type of request. */
@@ -237,8 +289,8 @@ export interface SpotMetaRequest {
 
 /**
  * Request user sub-accounts.
- * @returns {SubAccount[]} Array of user sub-account.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-subaccounts | Hyperliquid GitBook}
+ * @returns {SubAccount[]} Array of user sub-accounts.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-subaccounts
  */
 export interface SubAccountsRequest {
     /** Type of request. */
@@ -248,9 +300,9 @@ export interface SubAccountsRequest {
 }
 
 /**
- * The request to get the details of a token.
+ * Request token details.
  * @returns {TokenDetails} The details of a token.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-a-token | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-a-token
  */
 export interface TokenDetailsRequest {
     /** Type of request. */
@@ -260,8 +312,9 @@ export interface TokenDetailsRequest {
 }
 
 /**
- * Request twap history.
- * @returns {TwapHistory[]} The twap history of a user.
+ * Request TWAP history.
+ * @returns {TwapHistory[]} The TWAP history of a user.
+ * @see null - no documentation
  */
 export interface TwapHistoryRequest {
     /** Type of request. */
@@ -273,6 +326,7 @@ export interface TwapHistoryRequest {
 /**
  * Request user fees.
  * @returns {UserFees} User fees.
+ * @see null - no documentation
  */
 export interface UserFeesRequest {
     /** Type of request. */
@@ -283,8 +337,8 @@ export interface UserFeesRequest {
 
 /**
  * Request user fills by time.
- * @returns {Fill[]} Array of user's trade fill.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills-by-time | Hyperliquid GitBook}
+ * @returns {Fill[]} Array of user's trade fills.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills-by-time
  */
 export interface UserFillsByTimeRequest {
     /** Type of request. */
@@ -295,34 +349,28 @@ export interface UserFillsByTimeRequest {
     startTime: number;
     /** End time (in ms since epoch). */
     endTime?: number | null;
-    /**
-     * When `true`, partial fills are combined when a crossing order gets filled by multiple different resting orders.
-     * Resting orders filled by multiple crossing orders will not be aggregated.
-     */
+    /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
     aggregateByTime?: boolean;
 }
 
 /**
  * Request user fills.
- * @returns {Fill[]} Array of user's trade fill.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills | Hyperliquid GitBook}
+ * @returns {Fill[]} Array of user's trade fills.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills
  */
 export interface UserFillsRequest {
     /** Type of request. */
     type: "userFills";
     /** User's address. */
     user: Hex;
-    /**
-     * When `true`, partial fills are combined when a crossing order gets filled by multiple different resting orders.
-     * Resting orders filled by multiple crossing orders will not be aggregated.
-     */
+    /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
     aggregateByTime?: boolean;
 }
 
 /**
  * Request user funding.
- * @returns {UserFundingUpdate[]} Array of user's funding ledger update.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates | Hyperliquid GitBook}
+ * @returns {UserFundingUpdate[]} Array of user's funding ledger updates.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates
  */
 export interface UserFundingRequest {
     /** Type of request. */
@@ -337,8 +385,8 @@ export interface UserFundingRequest {
 
 /**
  * Request user non-funding ledger updates.
- * @returns {UserNonFundingLedgerUpdates[]} Array of user's non-funding ledger update.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates | Hyperliquid GitBook}
+ * @returns {UserNonFundingLedgerUpdate[]} Array of user's non-funding ledger updates.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates
  */
 export interface UserNonFundingLedgerUpdatesRequest {
     /** Type of request. */
@@ -354,7 +402,7 @@ export interface UserNonFundingLedgerUpdatesRequest {
 /**
  * Request user rate limits.
  * @returns {UserRateLimit} User's rate limits.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-rate-limits | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-rate-limits
  */
 export interface UserRateLimitRequest {
     /** Type of request. */
@@ -364,9 +412,21 @@ export interface UserRateLimitRequest {
 }
 
 /**
- * Request user twap slice fills.
- * @returns {TwapSliceFill[]} Array of user's twap slice fills.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills | Hyperliquid GitBook}
+ * Request user role.
+ * @returns {UserRole} User role.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-role
+ */
+export interface UserRoleRequest {
+    /** Type of request. */
+    type: "userRole";
+    /** User's address. */
+    user: Hex;
+}
+
+/**
+ * Request user TWAP slice fills.
+ * @returns {TwapSliceFill[]} Array of user's TWAP slice fills.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills
  */
 export interface UserTwapSliceFillsRequest {
     /** Type of request. */
@@ -378,7 +438,7 @@ export interface UserTwapSliceFillsRequest {
 /**
  * Request user vault deposits.
  * @returns {VaultEquity[]} Array of user's vault deposits.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-vault-deposits | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-vault-deposits
  */
 export interface UserVaultEquitiesRequest {
     /** Type of request. */
@@ -388,9 +448,19 @@ export interface UserVaultEquitiesRequest {
 }
 
 /**
+ * Request validator summaries.
+ * @returns {ValidatorSummary[]} Array of validator summaries.
+ * @see null - no documentation
+ */
+export interface ValidatorSummariesRequest {
+    /** Type of request. */
+    type: "validatorSummaries";
+}
+
+/**
  * Request details of a vault.
  * @returns {VaultDetails} Details of a vault.
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-details-for-a-vault | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-details-for-a-vault
  */
 export interface VaultDetailsRequest {
     /** Type of request. */
@@ -404,6 +474,7 @@ export interface VaultDetailsRequest {
 /**
  * Request a list of vaults less than 2 hours old.
  * @returns {VaultSummary[]} Array of vault summaries.
+ * @see null - no documentation
  */
 export interface VaultSummariesRequest {
     /** Type of request. */

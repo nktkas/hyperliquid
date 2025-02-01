@@ -38,7 +38,7 @@ import type { Candle } from "../types/info/assets.ts";
 import type { Book, Order, OrderStatus } from "../types/info/orders.ts";
 import type { TxDetails } from "../types/explorer/common.ts";
 
-// ———————————————Parameters———————————————
+// ——————————————— Parameters ———————————————
 
 /** Parameters for the {@linkcode EventClient} constructor. */
 export interface EventClientParameters<T extends ISubscriptionTransport = ISubscriptionTransport> {
@@ -88,7 +88,7 @@ export type EventUserTwapSliceFills = Omit<WsUserTwapSliceFillsRequest, "type">;
 /** Parameters for the {@linkcode EventClient.webData2} method. */
 export type EventWebData2Parameters = Omit<WsWebData2Request, "type">;
 
-// ———————————————Client———————————————
+// ——————————————— Client ———————————————
 
 /**
  * Event client for subscribing to various Hyperliquid events.
@@ -121,7 +121,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -163,7 +163,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -204,7 +204,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -241,7 +241,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -282,6 +282,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
+     * @see null - no documentation
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -317,6 +318,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
+     * @see null - no documentation
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -353,7 +355,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -396,7 +398,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -435,7 +437,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -474,7 +476,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -517,7 +519,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      *
      * @note Different subscriptions cannot be distinguished from each other.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -556,7 +558,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -598,7 +600,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -639,7 +641,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -680,7 +682,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -721,7 +723,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -762,7 +764,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";

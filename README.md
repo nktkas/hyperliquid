@@ -140,6 +140,7 @@ class PublicClient<T extends IRESTTransport> {
     l2Book(args: L2BookParameters): Promise<L2Book>;
     meta(): Promise<Meta>;
     metaAndAssetCtxs(): Promise<MetaAndAssetCtxs>;
+    perpsAtOpenInterestCap(): Promise<string[]>;
     predictedFundings(): Promise<PredictedFunding[]>;
     spotDeployState(args: SpotDeployStateParameters): Promise<SpotDeployState>;
     spotMeta(): Promise<SpotMeta>;
@@ -150,6 +151,7 @@ class PublicClient<T extends IRESTTransport> {
     clearinghouseState(args: ClearinghouseStateParameters): Promise<ClearinghouseState>;
     extraAgents(args: ExtraAgentsParameters): Promise<ExtraAgent[]>;
     maxBuilderFee(args: MaxBuilderFeeParameters): Promise<number>;
+    portfolio(args: PortfolioParameters): Promise<PortfolioPeriods>;
     referral(args: ReferralParameters): Promise<Referral>;
     spotClearinghouseState(args: SpotClearinghouseStateParameters): Promise<SpotClearinghouseState>;
     subAccounts(args: SubAccountsParameters): Promise<SubAccount[]>;
@@ -157,6 +159,7 @@ class PublicClient<T extends IRESTTransport> {
     userFunding(args: UserFundingParameters): Promise<UserFunding[]>;
     userNonFundingLedgerUpdates(args: UserNonFundingLedgerUpdatesParameters): Promise<UserNonFundingLedgerUpdates[]>;
     userRateLimit(args: UserRateLimitParameters): Promise<UserRateLimit>;
+    userRole(args: UserRoleParameters): Promise<UserRole>;
 
     // Order
     frontendOpenOrders(args: FrontendOpenOrdersParameters): Promise<FrontendOpenOrder[]>;
@@ -168,6 +171,13 @@ class PublicClient<T extends IRESTTransport> {
     userFillsByTime(args: UserFillsByTimeParameters): Promise<UserFill[]>;
     userTwapSliceFills(args: UserTwapSliceFillsParameters): Promise<UserTwapSliceFill[]>;
 
+    // Staking
+    delegations(args: DelegationsParameters): Promise<Delegation[]>;
+    delegatorHistory(args: DelegatorHistoryParameters): Promise<DelegatorUpdate[]>;
+    delegatorRewards(args: DelegatorRewardsParameters): Promise<DelegatorReward[]>;
+    delegatorSummary(args: DelegatorSummaryParameters): Promise<DelegatorSummary>;
+    validatorSummaries(): Promise<ValidatorSummary[]>;
+
     // Vault
     userVaultEquities(args: UserVaultEquitiesParameters): Promise<UserVaultEquity[]>;
     vaultDetails(args: VaultDetailsParameters): Promise<VaultDetails | null>;
@@ -176,6 +186,7 @@ class PublicClient<T extends IRESTTransport> {
     // Explorer
     blockDetails(args: BlockDetailsParameters): Promise<BlockDetailsResponse>;
     txDetails(args: TxDetailsParameters): Promise<TxDetailsResponse>;
+    userDetails(args: UserDetailsParameters): Promise<UserDetailsResponse>;
 }
 ```
 
@@ -206,7 +217,7 @@ class WalletClient<
 > {
     constructor(args: WalletClientParameters<T, W>);
 
-    // Order Management
+    // Order
     batchModify(args: BatchModifyParameters): Promise<OrderResponseSuccess>;
     cancel(args: CancelParameters): Promise<CancelResponseSuccess>;
     cancelByCloid(args: CancelByCloidParameters): Promise<CancelResponseSuccess>;
@@ -218,7 +229,7 @@ class WalletClient<
     updateIsolatedMargin(args: UpdateIsolatedMarginParameters): Promise<SuccessResponse>;
     updateLeverage(args: UpdateLeverageParameters): Promise<SuccessResponse>;
 
-    // Account Management
+    // Account
     approveAgent(args: ApproveAgentParameters): Promise<SuccessResponse>;
     approveBuilderFee(args: ApproveBuilderFeeParameters): Promise<SuccessResponse>;
     createSubAccount(args: CreateSubAccountParameters): Promise<CreateSubAccountResponse>;
@@ -251,7 +262,7 @@ interface EventClientParameters<T extends ISubscriptionTransport> {
 class EventClient<T extends ISubscriptionTransport> {
     constructor(args: EventClientParameters<T>);
 
-    // Market Data
+    // Market
     activeAssetCtx(args: EventActiveAssetCtxParameters, listener: (data: WsActiveAssetCtx | WsActiveSpotAssetCtx) => void): Promise<Subscription>;
     activeAssetData(args: EventActiveAssetDataParameters, listener: (data: WsActiveAssetData) => void): Promise<Subscription>;
     allMids(listener: (data: WsAllMids) => void): Promise<Subscription>;
@@ -259,14 +270,14 @@ class EventClient<T extends ISubscriptionTransport> {
     l2Book(args: EventL2BookParameters, listener: (data: Book) => void): Promise<Subscription>;
     trades(args: EventTradesParameters, listener: (data: WsTrade[]) => void): Promise<Subscription>;
 
-    // Account/User Data
+    // Account
     notification(args: EventNotificationParameters, listener: (data: WsNotification) => void): Promise<Subscription>;
     userEvents(args: EventUserEventsParameters, listener: (data: WsUserEvent) => void): Promise<Subscription>;
     userFundings(args: EventUserFundingsParameters, listener: (data: WsUserFundings) => void): Promise<Subscription>;
     userNonFundingLedgerUpdates(args: EventUserNonFundingLedgerUpdatesParameters, listener: (data: WsUserNonFundingLedgerUpdates) => void): Promise<Subscription>;
     webData2(args: EventWebData2Parameters, listener: (data: WsWebData2) => void): Promise<Subscription>;
 
-    // Order Management
+    // Order
     orderUpdates(args: EventOrderUpdatesParameters, listener: (data: OrderStatus<Order>[]) => void): Promise<Subscription>;
     userFills(args: EventUserFillsParameters, listener: (data: WsUserFills) => void): Promise<Subscription>;
     userTwapHistory(args: EventUserTwapHistory, listener: (data: WsUserTwapHistory) => void): Promise<Subscription>;

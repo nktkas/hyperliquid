@@ -19,7 +19,7 @@ export interface BaseExchangeRequest {
 /**
  * Approve an agent to sign on behalf of the master or sub-accounts.
  * @returns {SuccessResponse}
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet
  */
 export interface ApproveAgentRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -42,7 +42,7 @@ export interface ApproveAgentRequest extends BaseExchangeRequest {
 /**
  * Approve a max fee rate for a builder address.
  * @returns {SuccessResponse}
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-a-builder-fee | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-a-builder-fee
  */
 export interface ApproveBuilderFeeRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -65,7 +65,7 @@ export interface ApproveBuilderFeeRequest extends BaseExchangeRequest {
 /**
  * Modify multiple orders.
  * @returns {OrderResponse}
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-multiple-orders | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-multiple-orders
  */
 export interface BatchModifyRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -87,7 +87,7 @@ export interface BatchModifyRequest extends BaseExchangeRequest {
 /**
  * Cancel order(s).
  * @returns {CancelResponse}
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s
  */
 export interface CancelRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -109,7 +109,7 @@ export interface CancelRequest extends BaseExchangeRequest {
 /**
  * Cancel order(s) by cloid.
  * @returns {CancelResponse}
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid
  */
 export interface CancelByCloidRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -131,6 +131,7 @@ export interface CancelByCloidRequest extends BaseExchangeRequest {
 /**
  * Create a sub-account.
  * @returns {CreateSubAccountResponse}
+ * @see null - no documentation
  */
 export interface CreateSubAccountRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -145,7 +146,7 @@ export interface CreateSubAccountRequest extends BaseExchangeRequest {
 /**
  * Modify an order.
  * @returns {SuccessResponse}
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order
  */
 export interface ModifyRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -164,7 +165,7 @@ export interface ModifyRequest extends BaseExchangeRequest {
 /**
  * Place an order(s).
  * @returns {OrderResponse}
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-an-order | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-an-order
  */
 export interface OrderRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -195,7 +196,7 @@ export interface OrderRequest extends BaseExchangeRequest {
 /**
  * Schedule a time to cancel all open orders.
  * @returns {SuccessResponse}
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#schedule-cancel-dead-mans-switch | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#schedule-cancel-dead-mans-switch
  */
 export interface ScheduleCancelRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -217,6 +218,7 @@ export interface ScheduleCancelRequest extends BaseExchangeRequest {
 /**
  * Set a referral code.
  * @returns {SuccessResponse}
+ * @see null - no documentation
  */
 export interface SetReferrerRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -231,7 +233,7 @@ export interface SetReferrerRequest extends BaseExchangeRequest {
 /**
  * Transfer a spot asset on L1 to another address.
  * @returns {SuccessResponse}
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-spot-transfer | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-spot-transfer
  */
 export interface SpotSendRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -256,6 +258,7 @@ export interface SpotSendRequest extends BaseExchangeRequest {
 /**
  * Transfer between sub-accounts.
  * @returns {SuccessResponse}
+ * @see null - no documentation
  */
 export interface SubAccountTransferRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -274,7 +277,7 @@ export interface SubAccountTransferRequest extends BaseExchangeRequest {
 /**
  * Cancel a TWAP order.
  * @returns {TwapCancelResponse}
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order
  */
 export interface TwapCancelRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -293,7 +296,7 @@ export interface TwapCancelRequest extends BaseExchangeRequest {
 /**
  * Place a TWAP order.
  * @returns {TwapOrderResponse}
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-a-twap-order | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-a-twap-order
  */
 export interface TwapOrderRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -323,7 +326,7 @@ export interface TwapOrderRequest extends BaseExchangeRequest {
 /**
  * Update isolated margin for a position.
  * @returns {SuccessResponse}
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin
  */
 export interface UpdateIsolatedMarginRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -344,7 +347,7 @@ export interface UpdateIsolatedMarginRequest extends BaseExchangeRequest {
 /**
  * Update leverage for cross or isolated margin.
  * @returns {SuccessResponse}
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-leverage | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-leverage
  */
 export interface UpdateLeverageRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -365,7 +368,7 @@ export interface UpdateLeverageRequest extends BaseExchangeRequest {
 /**
  * Transfer funds between Spot and Perp accounts.
  * @returns {SuccessResponse}
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa
  */
 export interface UsdClassTransferRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -388,7 +391,7 @@ export interface UsdClassTransferRequest extends BaseExchangeRequest {
 /**
  * Transfer USDC on L1 to another address.
  * @returns {SuccessResponse}
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-usdc-transfer | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-usdc-transfer
  */
 export interface UsdSendRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -411,7 +414,7 @@ export interface UsdSendRequest extends BaseExchangeRequest {
 /**
  * Add or remove funds from a vault.
  * @returns {SuccessResponse}
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-a-vault | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-a-vault
  */
 export interface VaultTransferRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -430,7 +433,7 @@ export interface VaultTransferRequest extends BaseExchangeRequest {
 /**
  * Initiate a withdrawal request.
  * @returns {SuccessResponse}
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#initiate-a-withdrawal-request | Hyperliquid GitBook}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#initiate-a-withdrawal-request
  */
 export interface Withdraw3Request extends BaseExchangeRequest {
     /** Action to be performed. */

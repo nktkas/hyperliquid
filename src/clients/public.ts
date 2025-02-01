@@ -1,9 +1,10 @@
 import type { IRequestTransport } from "../transports/base.ts";
-import type { BlockDetailsRequest, TxDetailsRequest } from "../types/explorer/requests.ts";
-import type { BlockDetailsResponse, TxDetailsResponse } from "../types/explorer/responses.ts";
+import type { BlockDetailsRequest, TxDetailsRequest, UserDetailsRequest } from "../types/explorer/requests.ts";
+import type { BlockDetailsResponse, TxDetailsResponse, UserDetailsResponse } from "../types/explorer/responses.ts";
 import type {
     ExtraAgent,
     PerpsClearinghouseState,
+    PortfolioPeriods,
     Referral,
     SpotClearinghouseState,
     SubAccount,
@@ -11,6 +12,7 @@ import type {
     UserFundingUpdate,
     UserNonFundingLedgerUpdate,
     UserRateLimit,
+    UserRole,
 } from "../types/info/accounts.ts";
 import type {
     AllMids,
@@ -25,6 +27,13 @@ import type {
     TokenDetails,
 } from "../types/info/assets.ts";
 import type {
+    Delegation,
+    DelegatorReward,
+    DelegatorSummary,
+    DelegatorUpdate,
+    ValidatorSummary,
+} from "../types/info/delegations.ts";
+import type {
     Book,
     Fill,
     FrontendOrder,
@@ -37,6 +46,10 @@ import type {
 import type {
     CandleSnapshotRequest,
     ClearinghouseStateRequest,
+    DelegationsRequest,
+    DelegatorHistoryRequest,
+    DelegatorRewardsRequest,
+    DelegatorSummaryRequest,
     ExtraAgentsRequest,
     FrontendOpenOrdersRequest,
     FundingHistoryRequest,
@@ -45,6 +58,7 @@ import type {
     MaxBuilderFeeRequest,
     OpenOrdersRequest,
     OrderStatusRequest,
+    PortfolioRequest,
     ReferralRequest,
     SpotClearinghouseStateRequest,
     SpotDeployStateRequest,
@@ -57,13 +71,14 @@ import type {
     UserFundingRequest,
     UserNonFundingLedgerUpdatesRequest,
     UserRateLimitRequest,
+    UserRoleRequest,
     UserTwapSliceFillsRequest,
     UserVaultEquitiesRequest,
     VaultDetailsRequest,
 } from "../types/info/requests.ts";
 import type { VaultDetails, VaultEquity, VaultSummary } from "../types/info/vaults.ts";
 
-// ———————————————Info Parameters———————————————
+// ——————————————— Info Parameters ———————————————
 
 /** Parameters for the {@linkcode PublicClient} constructor. */
 export interface PublicClientParameters<T extends IRequestTransport = IRequestTransport> {
@@ -76,6 +91,18 @@ export type CandleSnapshotParameters = CandleSnapshotRequest["req"];
 
 /** Parameters for the {@linkcode PublicClient.clearinghouseState} method. */
 export type ClearinghouseStateParameters = Omit<ClearinghouseStateRequest, "type">;
+
+/** Parameters for the {@linkcode PublicClient.delegations} method. */
+export type DelegationsParameters = Omit<DelegationsRequest, "type">;
+
+/** Parameters for the {@linkcode PublicClient.delegatorHistory} method. */
+export type DelegatorHistoryParameters = Omit<DelegatorHistoryRequest, "type">;
+
+/** Parameters for the {@linkcode PublicClient.delegatorRewards} method. */
+export type DelegatorRewardsParameters = Omit<DelegatorRewardsRequest, "type">;
+
+/** Parameters for the {@linkcode PublicClient.delegatorSummary} method. */
+export type DelegatorSummaryParameters = Omit<DelegatorSummaryRequest, "type">;
 
 /** Parameters for the {@linkcode PublicClient.extraAgents} method. */
 export type ExtraAgentsParameters = Omit<ExtraAgentsRequest, "type">;
@@ -100,6 +127,9 @@ export type OpenOrdersParameters = Omit<OpenOrdersRequest, "type">;
 
 /** Parameters for the {@linkcode PublicClient.orderStatus} method. */
 export type OrderStatusParameters = Omit<OrderStatusRequest, "type">;
+
+/** Parameters for the {@linkcode PublicClient.portfolio} method. */
+export type PortfolioParameters = Omit<PortfolioRequest, "type">;
 
 /** Parameters for the {@linkcode PublicClient.referral} method. */
 export type ReferralParameters = Omit<ReferralRequest, "type">;
@@ -137,6 +167,9 @@ export type UserNonFundingLedgerUpdatesParameters = Omit<UserNonFundingLedgerUpd
 /** Parameters for the {@linkcode PublicClient.userRateLimit} method. */
 export type UserRateLimitParameters = Omit<UserRateLimitRequest, "type">;
 
+/** Parameters for the {@linkcode PublicClient.userRole} method. */
+export type UserRoleParameters = Omit<UserRoleRequest, "type">;
+
 /** Parameters for the {@linkcode PublicClient.userTwapSliceFills} method. */
 export type UserTwapSliceFillsParameters = Omit<UserTwapSliceFillsRequest, "type">;
 
@@ -146,13 +179,18 @@ export type UserVaultEquitiesParameters = Omit<UserVaultEquitiesRequest, "type">
 /** Parameters for the {@linkcode PublicClient.vaultDetails} method. */
 export type VaultDetailsParameters = Omit<VaultDetailsRequest, "type">;
 
-// ———————————————Explorer Parameters———————————————
+// ——————————————— Explorer Parameters ———————————————
 
 /** Parameters for the {@linkcode PublicClient.blockDetails} method. */
 export type BlockDetailsParameters = Omit<BlockDetailsRequest, "type">;
 
 /** Parameters for the {@linkcode PublicClient.txDetails} method. */
 export type TxDetailsParameters = Omit<TxDetailsRequest, "type">;
+
+/** Parameters for the {@linkcode PublicClient.userDetails} method. */
+export type UserDetailsParameters = Omit<UserDetailsRequest, "type">;
+
+// ——————————————— Client ———————————————
 
 /**
  * Public client for interacting with the Hyperliquid API.
@@ -178,14 +216,14 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
         this.transport = args.transport;
     }
 
-    // ———————————————Info API———————————————
+    // ——————————————— Info API ———————————————
 
     /**
      * Request mid coin prices.
      * @param signal - An optional abort signal.
      * @returns Mid coin prices.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-mids-for-all-coins | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-mids-for-all-coins
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -210,7 +248,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Array of candlestick data points.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#candle-snapshot | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#candle-snapshot
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -218,7 +256,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.PublicClient({ transport });
      *
-     * const candles = await client.candleSnapshot({
+     * const candleSnapshot = await client.candleSnapshot({
      *   coin: "ETH",
      *   interval: "1h",
      *   startTime: Date.now() - 1000 * 60 * 60 * 24
@@ -239,7 +277,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Account summary for perpetual trading.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-perpetuals-account-summary | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-perpetuals-account-summary
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -247,7 +285,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.PublicClient({ transport });
      *
-     * const state = await client.clearinghouseState({ user: "0x..." });
+     * const clearinghouseState = await client.clearinghouseState({ user: "0x..." });
      * ```
      */
     clearinghouseState(args: ClearinghouseStateParameters, signal?: AbortSignal): Promise<PerpsClearinghouseState> {
@@ -259,11 +297,112 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
     }
 
     /**
+     * Request user staking delegations.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Array of user's delegations to validators.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-staking-delegations
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const delegations = await client.delegations({ user: "0x..." });
+     * ```
+     */
+    delegations(args: DelegationsParameters, signal?: AbortSignal): Promise<Delegation[]> {
+        return this.transport.request(
+            "info",
+            { type: "delegations", ...args },
+            signal,
+        ) as Promise<Delegation[]>;
+    }
+
+    /**
+     * Request user staking history.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Array of user's staking updates.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-staking-history
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const delegatorHistory = await client.delegatorHistory({ user: "0x..." });
+     * ```
+     */
+    delegatorHistory(args: DelegatorHistoryParameters, signal?: AbortSignal): Promise<DelegatorUpdate[]> {
+        return this.transport.request(
+            "info",
+            { type: "delegatorHistory", ...args },
+            signal,
+        ) as Promise<DelegatorUpdate[]>;
+    }
+
+    /**
+     * Request user staking rewards.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Array of user's staking rewards.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-staking-rewards
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const delegatorRewards = await client.delegatorRewards({ user: "0x..." });
+     * ```
+     */
+    delegatorRewards(args: DelegatorRewardsParameters, signal?: AbortSignal): Promise<DelegatorReward[]> {
+        return this.transport.request(
+            "info",
+            { type: "delegatorRewards", ...args },
+            signal,
+        ) as Promise<DelegatorReward[]>;
+    }
+
+    /**
+     * Request user staking summary.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Summary of a user's staking delegations.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-staking-summary
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const delegatorSummary = await client.delegatorSummary({ user: "0x..." });
+     * ```
+     */
+    delegatorSummary(args: DelegatorSummaryParameters, signal?: AbortSignal): Promise<DelegatorSummary> {
+        return this.transport.request(
+            "info",
+            { type: "delegatorSummary", ...args },
+            signal,
+        ) as Promise<DelegatorSummary>;
+    }
+
+    /**
      * Request user's extra agents.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns User's extra agents.
      *
+     * @see null - no documentation
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -288,7 +427,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Array of open orders with additional frontend information.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders-with-additional-frontend-info | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders-with-additional-frontend-info
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -296,7 +435,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.PublicClient({ transport });
      *
-     * const orders = await client.frontendOpenOrders({ user: "0x..." });
+     * const frontendOpenOrders = await client.frontendOpenOrders({ user: "0x..." });
      * ```
      */
     frontendOpenOrders(args: FrontendOpenOrdersParameters, signal?: AbortSignal): Promise<FrontendOrder[]> {
@@ -313,7 +452,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Array of historical funding rate data for an asset.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-historical-funding-rates | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-historical-funding-rates
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -321,7 +460,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.PublicClient({ transport });
      *
-     * const funding = await client.fundingHistory({
+     * const fundingHistory = await client.fundingHistory({
      *   coin: "ETH",
      *   startTime: Date.now() - 1000 * 60 * 60 * 24
      * });
@@ -341,7 +480,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Array of user's historical orders.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-historical-orders | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-historical-orders
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -349,7 +488,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.PublicClient({ transport });
      *
-     * const orders = await client.historicalOrders({ user: "0x..." });
+     * const historicalOrders = await client.historicalOrders({ user: "0x..." });
      * ```
      */
     historicalOrders(args: HistoricalOrdersParameters, signal?: AbortSignal): Promise<OrderStatus<FrontendOrder>[]> {
@@ -366,7 +505,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns L2 order book snapshot.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#l2-book-snapshot | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#l2-book-snapshot
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -374,7 +513,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.PublicClient({ transport });
      *
-     * const book = await client.l2Book({ coin: "ETH", nSigFigs: 2 });
+     * const l2Book = await client.l2Book({ coin: "ETH", nSigFigs: 2 });
      * ```
      */
     l2Book(args: L2BookParameters, signal?: AbortSignal): Promise<Book> {
@@ -391,7 +530,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Maximum builder fee approval.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#check-builder-fee-approval | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#check-builder-fee-approval
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -415,7 +554,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Metadata for perpetual assets.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-metadata | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-metadata
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -439,7 +578,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Metadata and context information for each perpetual asset.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-asset-contexts-includes-mark-price-current-funding-open-interest-etc | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-asset-contexts-includes-mark-price-current-funding-open-interest-etc
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -464,7 +603,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Array of open order.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -472,7 +611,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.PublicClient({ transport });
      *
-     * const orders = await client.openOrders({ user: "0x..." });
+     * const openOrders = await client.openOrders({ user: "0x..." });
      * ```
      */
     openOrders(args: OpenOrdersParameters, signal?: AbortSignal): Promise<Order[]> {
@@ -489,7 +628,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Result of an order status lookup.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-order-status-by-oid-or-cloid | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-order-status-by-oid-or-cloid
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -497,7 +636,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.PublicClient({ transport });
      *
-     * const status = await client.orderStatus({ user: "0x...", oid: 12345 });
+     * const orderStatus = await client.orderStatus({ user: "0x...", oid: 12345 });
      * ```
      */
     orderStatus(args: OrderStatusParameters, signal?: AbortSignal): Promise<OrderLookup> {
@@ -509,11 +648,61 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
     }
 
     /**
+     * Request portfolio.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Portfolio of a user.
+     *
+     * @see null - no documentation
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const portfolio = await client.portfolio({ user: "0x..." });
+     * ```
+     */
+    portfolio(args: PortfolioParameters, signal?: AbortSignal): Promise<PortfolioPeriods> {
+        return this.transport.request(
+            "info",
+            { type: "portfolio", ...args },
+            signal,
+        ) as Promise<PortfolioPeriods>;
+    }
+
+    /**
+     * Request perpetuals at open interest cap.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Array of perpetuals at open interest caps.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#query-perps-at-open-interest-caps
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const perpsAtOpenInterestCap = await client.perpsAtOpenInterestCap();
+     * ```
+     */
+    perpsAtOpenInterestCap(signal?: AbortSignal): Promise<string[]> {
+        return this.transport.request(
+            "info",
+            { type: "perpsAtOpenInterestCap" },
+            signal,
+        ) as Promise<string[]>;
+    }
+
+    /**
      * Request predicted funding rates.
      * @param signal - An optional abort signal.
      * @returns Array of predicted funding rates.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-predicted-funding-rates-for-different-venues | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-predicted-funding-rates-for-different-venues
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -538,6 +727,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Referral information for a user.
      *
+     * @see null - no documentation
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -562,7 +752,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Balances for spot tokens.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-a-users-token-balances | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-a-users-token-balances
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -570,7 +760,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.PublicClient({ transport });
      *
-     * const state = await client.spotClearinghouseState({ user: "0x..." });
+     * const spotClearinghouseState = await client.spotClearinghouseState({ user: "0x..." });
      * ```
      */
     spotClearinghouseState(
@@ -590,7 +780,16 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns The deploy state of a user.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-deploy-auction | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-deploy-auction
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const spotDeployState = await client.spotDeployState({ user: "0x..." });
+     * ```
      */
     spotDeployState(args: SpotDeployStateParameters, signal?: AbortSignal): Promise<SpotDeployState> {
         return this.transport.request(
@@ -605,7 +804,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Metadata for spot assets.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-metadata | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-metadata
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -613,7 +812,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.PublicClient({ transport });
      *
-     * const meta = await client.spotMeta();
+     * const spotMeta = await client.spotMeta();
      * ```
      */
     spotMeta(signal?: AbortSignal): Promise<SpotMeta> {
@@ -629,7 +828,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Metadata and context information for each spot asset.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-asset-contexts | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-asset-contexts
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -637,7 +836,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.PublicClient({ transport });
      *
-     * const [meta, assetCtxs] = await client.spotMetaAndAssetCtxs();
+     * const [spotMeta, spotAssetCtxs] = await client.spotMetaAndAssetCtxs();
      * ```
      */
     spotMetaAndAssetCtxs(signal?: AbortSignal): Promise<SpotMetaAndAssetCtxs> {
@@ -654,7 +853,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Array of user sub-account.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-subaccounts | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-subaccounts
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -679,7 +878,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns The details of a token.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-a-token | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-a-token
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -687,7 +886,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.PublicClient({ transport });
      *
-     * const details = await client.tokenDetails({ tokenId: "0x..." });
+     * const tokenDetails = await client.tokenDetails({ tokenId: "0x..." });
      * ```
      */
     tokenDetails(args: TokenDetailsParameters, signal?: AbortSignal): Promise<TokenDetails> {
@@ -704,6 +903,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns The twap history of a user.
      *
+     * @see null - no documentation
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -728,6 +928,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns User fees.
      *
+     * @see null - no documentation
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -735,7 +936,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.PublicClient({ transport });
      *
-     * const userFees = await client.userFees({ user: "0x..." });
+     * const fees = await client.userFees({ user: "0x..." });
      * ```
      */
     userFees(args: UserFeesParameters, signal?: AbortSignal): Promise<UserFees> {
@@ -752,7 +953,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Array of user's trade fill.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -777,7 +978,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Array of user's trade fill.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills-by-time | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills-by-time
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -805,7 +1006,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Array of user's funding ledger update.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -833,7 +1034,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Array of user's non-funding ledger update.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -841,7 +1042,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.PublicClient({ transport });
      *
-     * const funding = await client.userNonFundingLedgerUpdates({
+     * const nonFundingLedgerUpdates = await client.userNonFundingLedgerUpdates({
      *   user: "0x...",
      *   startTime: Date.now() - 1000 * 60 * 60 * 24
      * });
@@ -864,7 +1065,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns User's rate limits.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-rate-limits | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-rate-limits
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -884,12 +1085,12 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
     }
 
     /**
-     * Request user twap slice fills.
+     * Request user role.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Array of user's twap slice fill.
+     * @returns User's role.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-role
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -897,7 +1098,32 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.PublicClient({ transport });
      *
-     * const fills = await client.userTwapSliceFills({ user: "0x..." });
+     * const userRole = await client.userRole({ user: "0x..." });
+     * ```
+     */
+    userRole(args: UserRoleParameters, signal?: AbortSignal): Promise<UserRole> {
+        return this.transport.request(
+            "info",
+            { type: "userRole", ...args },
+            signal,
+        ) as Promise<UserRole>;
+    }
+
+    /**
+     * Request user twap slice fills.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Array of user's twap slice fill.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const twapSliceFills = await client.userTwapSliceFills({ user: "0x..." });
      * ```
      */
     userTwapSliceFills(args: UserTwapSliceFillsParameters, signal?: AbortSignal): Promise<TwapSliceFill[]> {
@@ -914,7 +1140,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Array of user's vault deposits.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-vault-deposits | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-vault-deposits
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -922,7 +1148,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.PublicClient({ transport });
      *
-     * const deposits = await client.userVaultDeposits({ user: "0x..." });
+     * const userVaultEquities = await client.userVaultDeposits({ user: "0x..." });
      * ```
      */
     userVaultEquities(args: UserVaultEquitiesParameters, signal?: AbortSignal): Promise<VaultEquity[]> {
@@ -934,12 +1160,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
     }
 
     /**
-     * Request details of a vault.
+     * Request validator summaries.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
-     * @returns Details of a vault.
+     * @returns Array of validator summaries.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-details-for-a-vault | Hyperliquid GitBook}
+     * @see null - no documentation
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -947,7 +1172,32 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.PublicClient({ transport });
      *
-     * const vault = await client.vaultDetails({ vaultAddress: "0x..." });
+     * const validatorSummaries = await client.validatorSummaries();
+     * ```
+     */
+    validatorSummaries(signal?: AbortSignal): Promise<ValidatorSummary[]> {
+        return this.transport.request(
+            "info",
+            { type: "validatorSummaries" },
+            signal,
+        ) as Promise<ValidatorSummary[]>;
+    }
+
+    /**
+     * Request details of a vault.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Details of a vault.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-details-for-a-vault
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const vaultDetails = await client.vaultDetails({ vaultAddress: "0x..." });
      * ```
      */
     vaultDetails(args: VaultDetailsParameters, signal?: AbortSignal): Promise<VaultDetails | null> {
@@ -964,6 +1214,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Array of vault summaries.
      *
+     * @see null - no documentation
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -971,7 +1222,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.PublicClient({ transport });
      *
-     * const vaults = await client.vaultSummaries();
+     * const vaultSummaries = await client.vaultSummaries();
      * ```
      */
     vaultSummaries(signal?: AbortSignal): Promise<VaultSummary[]> {
@@ -982,7 +1233,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
         ) as Promise<VaultSummary[]>;
     }
 
-    // ———————————————Explorer API———————————————
+    // ——————————————— Explorer API ———————————————
 
     /**
      * Gets the details of a block.
@@ -990,6 +1241,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns A promise that resolves with the details of the block.
      *
+     * @see null - no documentation
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -1014,6 +1266,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns A promise that resolves with the details of the transaction.
      *
+     * @see null - no documentation
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -1030,5 +1283,30 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
             { type: "txDetails", ...args },
             signal,
         ) as Promise<TxDetailsResponse>;
+    }
+
+    /**
+     * Request user details.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns User details.
+     *
+     * @see null - no documentation
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const { txs } = await client.userDetails({ user: "0x..." });
+     * ```
+     */
+    userDetails(args: UserDetailsParameters, signal?: AbortSignal): Promise<UserDetailsResponse> {
+        return this.transport.request(
+            "explorer",
+            { type: "userDetails", ...args },
+            signal,
+        ) as Promise<UserDetailsResponse>;
     }
 }

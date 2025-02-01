@@ -40,7 +40,7 @@ import {
     signUserSignedAction,
 } from "../utils/signing.ts";
 
-// ———————————————Parameters———————————————
+// ——————————————— Parameters ———————————————
 
 /** Parameters for the {@linkcode WalletClient} constructor. */
 export interface WalletClientParameters<
@@ -160,7 +160,7 @@ export type Withdraw3Parameters =
     & Omit<Withdraw3Request["action"], "type" | "hyperliquidChain" | "signatureChainId" | "time">
     & Partial<Pick<Withdraw3Request["action"], "signatureChainId" | "time">>;
 
-// ———————————————Responses———————————————
+// ——————————————— Responses ———————————————
 
 /** Successful variant of {@linkcode CancelResponse} without error statuses. */
 export type CancelResponseSuccess = CancelResponse & {
@@ -198,7 +198,7 @@ export type TwapOrderResponseSuccess = TwapOrderResponse & {
     };
 };
 
-// ———————————————Errors———————————————
+// ——————————————— Errors ———————————————
 
 /** Error thrown when the API returns an error response. */
 export class ApiRequestError extends Error {
@@ -238,7 +238,7 @@ export class ApiRequestError extends Error {
     }
 }
 
-// ———————————————Client———————————————
+// ——————————————— Client ———————————————
 
 /**
  * Wallet client for interacting with the Hyperliquid API.
@@ -315,10 +315,10 @@ export class WalletClient<
      * Approve an agent to sign on behalf of the master or sub-accounts.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal
-     * @returns {SuccessResponse} Successful response without specific data.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -370,10 +370,10 @@ export class WalletClient<
      * Approve a max fee rate for a builder address.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns {SuccessResponse} Successful response without specific data.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-a-builder-fee | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-a-builder-fee
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -425,10 +425,10 @@ export class WalletClient<
      * Modify multiple orders.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns {OrderResponseSuccess} Successful variant of {@link OrderResponse} without error statuses.
+     * @returns Successful variant of {@link OrderResponse} without error statuses.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-multiple-orders | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-multiple-orders
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -484,10 +484,10 @@ export class WalletClient<
      * Cancel order(s).
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns {CancelResponseSuccess} Successful variant of {@link CancelResponse} without error statuses.
+     * @returns Successful variant of {@link CancelResponse} without error statuses.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -531,10 +531,10 @@ export class WalletClient<
      * Cancel order(s) by cloid.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns {CancelResponseSuccess} Successful variant of {@link CancelResponse} without error statuses.
+     * @returns Successful variant of {@link CancelResponse} without error statuses.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -578,9 +578,10 @@ export class WalletClient<
      * Create a sub-account.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns {CreateSubAccountResponse} Response for creating a sub-account.
+     * @returns Response for creating a sub-account.
      * @throws {ApiRequestError} When the API returns an error response.
      *
+     * @see null - no documentation
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -621,10 +622,10 @@ export class WalletClient<
      * Modify an order.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns {SuccessResponse} Successful response without specific data.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -678,10 +679,10 @@ export class WalletClient<
      * Place an order(s).
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns {OrderResponseSuccess} Successful variant of {@link OrderResponse} without error statuses.
+     * @returns Successful variant of {@link OrderResponse} without error statuses.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-an-order | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-an-order
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -738,10 +739,10 @@ export class WalletClient<
      * Schedule a time to cancel all open orders.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns {SuccessResponse} Successful response without specific data.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#schedule-cancel-dead-mans-switch | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#schedule-cancel-dead-mans-switch
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -782,9 +783,10 @@ export class WalletClient<
      * Set a referral code.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns {SuccessResponse} Successful response without specific data.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
+     * @see null - no documentation
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -823,10 +825,10 @@ export class WalletClient<
      * Transfer a spot asset on L1 to another address.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns {SuccessResponse} Successful response without specific data.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-spot-transfer | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-spot-transfer
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -881,9 +883,10 @@ export class WalletClient<
      * Transfer between sub-accounts.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns {SuccessResponse} Successful response without specific data.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
+     * @see null - no documentation
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -924,10 +927,10 @@ export class WalletClient<
      * Cancel a TWAP order.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns {TwapCancelResponseSuccess} Successful variant of {@link TwapCancelResponse} without error status.
+     * @returns Successful variant of {@link TwapCancelResponse} without error status.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -969,10 +972,10 @@ export class WalletClient<
      * Place a TWAP order.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns {TwapOrderResponseSuccess} Successful variant of {@link TwapOrderResponse} without error status.
+     * @returns Successful variant of {@link TwapOrderResponse} without error status.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-a-twap-order | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-a-twap-order
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -1018,10 +1021,10 @@ export class WalletClient<
      * Update isolated margin for a position.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns {SuccessResponse} Successful response without specific data.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -1064,10 +1067,10 @@ export class WalletClient<
      * Update leverage for cross or isolated margin.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns {SuccessResponse} Successful response without specific data.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-leverage | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-leverage
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -1110,10 +1113,10 @@ export class WalletClient<
      * Transfer funds between Spot and Perp accounts.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns {SuccessResponse} Successful response without specific data.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -1166,10 +1169,10 @@ export class WalletClient<
      * Transfer USDC on L1 to another address.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns {SuccessResponse} Successful response without specific data.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-usdc-transfer | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-usdc-transfer
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -1222,10 +1225,10 @@ export class WalletClient<
      * Add or remove funds from a vault.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns {SuccessResponse} Successful response without specific data.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-a-vault | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-a-vault
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -1266,10 +1269,10 @@ export class WalletClient<
      * Initiate a withdrawal request.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns {SuccessResponse} Successful response without specific data.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#initiate-a-withdrawal-request | Hyperliquid GitBook}
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#initiate-a-withdrawal-request
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
