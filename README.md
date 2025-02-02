@@ -233,6 +233,7 @@ class WalletClient<
     approveAgent(args: ApproveAgentParameters): Promise<SuccessResponse>;
     approveBuilderFee(args: ApproveBuilderFeeParameters): Promise<SuccessResponse>;
     createSubAccount(args: CreateSubAccountParameters): Promise<CreateSubAccountResponse>;
+    evmUserModify(args: EvmUserModifyParameters): Promise<SuccessResponse>;
     setReferrer(args: SetReferrerParameters): Promise<SuccessResponse>;
 
     // Transfers & Withdrawals
@@ -247,9 +248,6 @@ class WalletClient<
     cDeposit(args: CDepositParameters): Promise<SuccessResponse>;
     cWithdraw(args: CWithdrawParameters): Promise<SuccessResponse>;
     tokenDelegate(args: TokenDelegateParameters): Promise<SuccessResponse>;
-
-    // Other
-    evmUserModify(args: EvmUserModifyParameters): Promise<SuccessResponse>;
 }
 ```
 
