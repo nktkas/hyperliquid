@@ -3,8 +3,10 @@ import type { BlockDetailsRequest, TxDetailsRequest, UserDetailsRequest } from "
 import type { BlockDetailsResponse, TxDetailsResponse, UserDetailsResponse } from "../types/explorer/responses.ts";
 import type {
     ExtraAgent,
+    MultiSigSigners,
     PerpsClearinghouseState,
     PortfolioPeriods,
+    PreTransferCheck,
     Referral,
     SpotClearinghouseState,
     SubAccount,
@@ -59,6 +61,7 @@ import type {
     OpenOrdersRequest,
     OrderStatusRequest,
     PortfolioRequest,
+    PreTransferCheckRequest,
     ReferralRequest,
     SpotClearinghouseStateRequest,
     SpotDeployStateRequest,
@@ -72,6 +75,8 @@ import type {
     UserNonFundingLedgerUpdatesRequest,
     UserRateLimitRequest,
     UserRoleRequest,
+    UserToMultiSigSignersRequest,
+    UserTwapSliceFillsByTimeRequest,
     UserTwapSliceFillsRequest,
     UserVaultEquitiesRequest,
     VaultDetailsRequest,
@@ -131,6 +136,9 @@ export type OrderStatusParameters = Omit<OrderStatusRequest, "type">;
 /** Parameters for the {@linkcode PublicClient.portfolio} method. */
 export type PortfolioParameters = Omit<PortfolioRequest, "type">;
 
+/** Parameters for the {@linkcode PublicClient.preTransferCheck} method. */
+export type PreTransferCheckParameters = Omit<PreTransferCheckRequest, "type">;
+
 /** Parameters for the {@linkcode PublicClient.referral} method. */
 export type ReferralParameters = Omit<ReferralRequest, "type">;
 
@@ -170,8 +178,14 @@ export type UserRateLimitParameters = Omit<UserRateLimitRequest, "type">;
 /** Parameters for the {@linkcode PublicClient.userRole} method. */
 export type UserRoleParameters = Omit<UserRoleRequest, "type">;
 
+/** Parameters for the {@linkcode PublicClient.userToMultiSigSigners} method. */
+export type UserToMultiSigSignersParameters = Omit<UserToMultiSigSignersRequest, "type">;
+
 /** Parameters for the {@linkcode PublicClient.userTwapSliceFills} method. */
 export type UserTwapSliceFillsParameters = Omit<UserTwapSliceFillsRequest, "type">;
+
+/** Parameters for the {@linkcode PublicClient.userTwapSliceFillsByTime} method. */
+export type UserTwapSliceFillsByTimeParameters = Omit<UserTwapSliceFillsByTimeRequest, "type">;
 
 /** Parameters for the {@linkcode PublicClient.userVaultEquities} method. */
 export type UserVaultEquitiesParameters = Omit<UserVaultEquitiesRequest, "type">;
@@ -673,6 +687,31 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
     }
 
     /**
+     * Request user's existence check before transfer.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Pre-transfer user existence check result.
+     *
+     * @see null - no documentation
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const preTransferCheck = await client.preTransferCheck({ user: "0x...", source: "0x..." });
+     * ```
+     */
+    preTransferCheck(args: PreTransferCheckParameters, signal?: AbortSignal): Promise<PreTransferCheck> {
+        return this.transport.request(
+            "info",
+            { type: "preTransferCheck", ...args },
+            signal,
+        ) as Promise<PreTransferCheck>;
+    }
+
+    /**
      * Request perpetuals at open interest cap.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -851,7 +890,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * Request user sub-accounts.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Array of user sub-account.
+     * @returns Array of user sub-account or null if the user does not have any sub-accounts.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-subaccounts
      * @example
@@ -1110,6 +1149,34 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
     }
 
     /**
+     * Request multi-sig signers for a user.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Multi-sig signers for a user or null if the user does not have any multi-sig signers.
+     *
+     * @see null - no documentation
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const multiSigSigners = await client.userToMultiSigSigners({ user: "0x..." });
+     * ```
+     */
+    userToMultiSigSigners(
+        args: UserToMultiSigSignersParameters,
+        signal?: AbortSignal,
+    ): Promise<MultiSigSigners | null> {
+        return this.transport.request(
+            "info",
+            { type: "userToMultiSigSigners", ...args },
+            signal,
+        ) as Promise<MultiSigSigners | null>;
+    }
+
+    /**
      * Request user twap slice fills.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -1130,6 +1197,34 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
         return this.transport.request(
             "info",
             { type: "userTwapSliceFills", ...args },
+            signal,
+        ) as Promise<TwapSliceFill[]>;
+    }
+
+    /**
+     * Request user twap slice fills by time.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Array of user's twap slice fill.
+     *
+     * @see null - no documentation
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const twapSliceFillsByTime = await client.userTwapSliceFillsByTime({
+     *   user: "0x...",
+     *   startTime: Date.now() - 1000 * 60 * 60 * 24
+     * });
+     * ```
+     */
+    userTwapSliceFillsByTime(args: UserTwapSliceFillsByTimeParameters, signal?: AbortSignal): Promise<TwapSliceFill[]> {
+        return this.transport.request(
+            "info",
+            { type: "userTwapSliceFillsByTime", ...args },
             signal,
         ) as Promise<TwapSliceFill[]>;
     }
@@ -1187,7 +1282,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * Request details of a vault.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Details of a vault.
+     * @returns Details of a vault or null if the vault does not exist.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-details-for-a-vault
      * @example

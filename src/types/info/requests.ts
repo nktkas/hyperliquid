@@ -212,6 +212,20 @@ export interface PortfolioRequest {
 }
 
 /**
+ * Request user's existence check before transfer.
+ * @returns {PreTransferCheck} Pre-transfer user existence check result.
+ * @see null - no documentation
+ */
+export interface PreTransferCheckRequest {
+    /** Type of request. */
+    type: "preTransferCheck";
+    /** Destination address. */
+    user: Hex;
+    /** Source address. */
+    source: Hex;
+}
+
+/**
  * Request perpetuals at open interest cap.
  * @returns {string[]} Array of perpetuals at open interest caps.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#query-perps-at-open-interest-caps
@@ -424,6 +438,18 @@ export interface UserRoleRequest {
 }
 
 /**
+ * Request user to multi-sig signers.
+ * @returns {MultiSigSigner[]} Array of user's multi-sig signers.
+ * @see null - no documentation
+ */
+export interface UserToMultiSigSignersRequest {
+    /** Type of request. */
+    type: "userToMultiSigSigners";
+    /** User's address. */
+    user: Hex;
+}
+
+/**
  * Request user TWAP slice fills.
  * @returns {TwapSliceFill[]} Array of user's TWAP slice fills.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills
@@ -433,6 +459,24 @@ export interface UserTwapSliceFillsRequest {
     type: "userTwapSliceFills";
     /** User's address. */
     user: Hex;
+}
+
+/**
+ * Request user TWAP slice fills by time.
+ * @returns {TwapSliceFill[]} Array of user's TWAP slice fills.
+ * @see null - no documentation
+ */
+export interface UserTwapSliceFillsByTimeRequest {
+    /** Type of request. */
+    type: "userTwapSliceFillsByTime";
+    /** User's address. */
+    user: Hex;
+    /** Start time (in ms since epoch). */
+    startTime: number;
+    /** End time (in ms since epoch). */
+    endTime?: number | null;
+    /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
+    aggregateByTime?: boolean;
 }
 
 /**

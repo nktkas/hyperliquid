@@ -109,6 +109,16 @@ export interface Portfolio {
     vlm: string;
 }
 
+/** Pre-transfer user existence check result. */
+export interface PreTransferCheck {
+    /** Activation fee. */
+    fee: string;
+    /** Whether the user is sanctioned. */
+    isSanctioned: boolean;
+    /** Whether the user exists. */
+    userExists: boolean;
+}
+
 /** Balance for a specific spot token. */
 export interface SpotBalance {
     /** Asset symbol. */
@@ -242,6 +252,14 @@ export interface ExtraAgent {
     name: string;
     /** Validity period as a timestamp (in ms since epoch). */
     validUntil: number;
+}
+
+/** Multi-sig signers for a user. */
+export interface MultiSigSigners {
+    /** Authorized users addresses. */
+    authorizedUsers: Hex[];
+    /** Threshold number of signatures required. */
+    threshold: number;
 }
 
 /** Referral details for a user. */

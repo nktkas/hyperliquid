@@ -303,7 +303,7 @@ export interface SpotSendRequest extends BaseExchangeRequest {
         signatureChainId: Hex;
         /** Unique request identifier (recommended current timestamp in ms). */
         time: number;
-        /** Recipient address. */
+        /** Destination address. */
         destination: Hex;
         /** Token identifier. */
         token: `${string}:${Hex}`;
@@ -486,7 +486,7 @@ export interface UsdSendRequest extends BaseExchangeRequest {
         signatureChainId: Hex;
         /** Unique request identifier (recommended current timestamp in ms). */
         time: number;
-        /** Recipient address. */
+        /** Destination address. */
         destination: Hex;
         /** Amount to send. */
         amount: string;
@@ -530,7 +530,7 @@ export interface Withdraw3Request extends BaseExchangeRequest {
         time: number;
         /** Amount to withdraw. */
         amount: string;
-        /** Recipient address. */
+        /** Destination address. */
         destination: Hex;
     };
 }
