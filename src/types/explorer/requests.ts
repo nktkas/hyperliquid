@@ -1,16 +1,4 @@
-import type { Hex } from "../common.ts";
-
-/**
- * Request for transaction details by transaction hash.
- * @returns {TxDetailsResponse} Transaction details response.
- * @see null - no documentation
- */
-export interface TxDetailsRequest {
-    /** Type of request. */
-    type: "txDetails";
-    /** Transaction hash. */
-    hash: Hex;
-}
+import type { Hex } from "../../base.ts";
 
 /**
  * Request for block details by block height.
@@ -22,6 +10,18 @@ export interface BlockDetailsRequest {
     type: "blockDetails";
     /** Block height. */
     height: number;
+}
+
+/**
+ * Request for transaction details by transaction hash.
+ * @returns {TxDetailsResponse} Transaction details response.
+ * @see null - no documentation
+ */
+export interface TxDetailsRequest {
+    /** Type of request. */
+    type: "txDetails";
+    /** Transaction hash. */
+    hash: Hex;
 }
 
 /**

@@ -1,4 +1,4 @@
-import { type IRequestTransport, TransportError } from "../base.ts";
+import { type IRequestTransport, TransportError } from "../../base.ts";
 
 type MaybePromise<T> = T | Promise<T>;
 

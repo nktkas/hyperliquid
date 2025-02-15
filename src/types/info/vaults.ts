@@ -1,4 +1,4 @@
-import type { Hex } from "../common.ts";
+import type { Hex } from "../../base.ts";
 import type { PortfolioPeriods } from "./accounts.ts";
 
 /** Details about a vault. */

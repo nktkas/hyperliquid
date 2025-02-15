@@ -1,4 +1,4 @@
-import type { Hex } from "../common.ts";
+import type { Hex } from "../../base.ts";
 
 /** Subscribe to context updates for a specific perpetual asset. */
 export interface WsActiveAssetCtxRequest {

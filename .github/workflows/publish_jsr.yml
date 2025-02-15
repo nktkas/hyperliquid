@@ -1,15 +1,9 @@
 name: Publish Package to JSR
 on:
-    workflow_run:
-        workflows:
-            - Run Deno Tests
-        types:
-            - completed
     workflow_dispatch:
 
 jobs:
     publish:
-        if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
         runs-on: ubuntu-latest
 
         permissions:
@@ -17,20 +11,7 @@ jobs:
             id-token: write
 
         steps:
-            - uses: actions/checkout@v4 # Checkout the repository
-
-            - name: Check tag
-              if: ${{ github.event_name == 'workflow_dispatch' }}
-              id: version
-              run: |
-                  VERSION=$(jq -r '.version' deno.json)
-                  echo "Version: $VERSION"
-                  if [[ "$VERSION" == *-* ]]; then
-                    echo "Tag found, manual publishing allowed"
-                  else
-                    echo "Error: Manual publishing without a tag is not allowed" >&2
-                    exit 1
-                  fi
+            - uses: actions/checkout@v4
 
             - name: Publish package
               run: npx jsr publish

@@ -1,8 +1,9 @@
-import type { IRequestTransport } from "../transports/base.ts";
+import type { IRequestTransport } from "../base.ts";
 import type { BlockDetailsRequest, TxDetailsRequest, UserDetailsRequest } from "../types/explorer/requests.ts";
 import type { BlockDetailsResponse, TxDetailsResponse, UserDetailsResponse } from "../types/explorer/responses.ts";
 import type {
     ExtraAgent,
+    LegalCheck,
     MultiSigSigners,
     PerpsClearinghouseState,
     PortfolioPeriods,
@@ -56,7 +57,9 @@ import type {
     FrontendOpenOrdersRequest,
     FundingHistoryRequest,
     HistoricalOrdersRequest,
+    IsVipRequest,
     L2BookRequest,
+    LegalCheckRequest,
     MaxBuilderFeeRequest,
     OpenOrdersRequest,
     OrderStatusRequest,
@@ -121,8 +124,14 @@ export type FundingHistoryParameters = Omit<FundingHistoryRequest, "type">;
 /** Parameters for the {@linkcode PublicClient.historicalOrders} method. */
 export type HistoricalOrdersParameters = Omit<HistoricalOrdersRequest, "type">;
 
+/** Parameters for the {@linkcode PublicClient.isVip} method. */
+export type IsVipParameters = Omit<IsVipRequest, "type">;
+
 /** Parameters for the {@linkcode PublicClient.l2Book} method. */
 export type L2BookParameters = Omit<L2BookRequest, "type">;
+
+/** Parameters for the {@linkcode PublicClient.legalCheck} method. */
+export type LegalCheckParameters = Omit<LegalCheckRequest, "type">;
 
 /** Parameters for the {@linkcode PublicClient.maxBuilderFee} method. */
 export type MaxBuilderFeeParameters = Omit<MaxBuilderFeeRequest, "type">;
@@ -208,7 +217,7 @@ export type UserDetailsParameters = Omit<UserDetailsRequest, "type">;
 
 /**
  * Public client for interacting with the Hyperliquid API.
- * @typeParam T - The type of transport used to connect to the Hyperliquid API.
+ * @typeParam T The type of transport used to connect to the Hyperliquid API.
  */
 export class PublicClient<T extends IRequestTransport = IRequestTransport> {
     /** The transport used to connect to the Hyperliquid API. */
@@ -489,6 +498,31 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
     }
 
     /**
+     * Request to check if a user is a VIP.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Boolean indicating user's VIP status.
+     *
+     * @see null - no documentation
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const isVip = await client.isVip({ user: "0x..." });
+     * ```
+     */
+    isVip(args: IsVipParameters, signal?: AbortSignal): Promise<boolean> {
+        return this.transport.request(
+            "info",
+            { type: "isVip", ...args },
+            signal,
+        ) as Promise<boolean>;
+    }
+
+    /**
      * Request user's historical orders.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -536,6 +570,31 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
             { type: "l2Book", ...args },
             signal,
         ) as Promise<Book>;
+    }
+
+    /**
+     * Request legal verification status of a user.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Legal verification status for a user.
+     *
+     * @see null - no documentation
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const legalCheck = await client.legalCheck({ user: "0x..." });
+     * ```
+     */
+    legalCheck(args: LegalCheckParameters, signal?: AbortSignal): Promise<LegalCheck> {
+        return this.transport.request(
+            "info",
+            { type: "legalCheck", ...args },
+            signal,
+        ) as Promise<LegalCheck>;
     }
 
     /**

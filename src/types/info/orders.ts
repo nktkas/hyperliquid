@@ -1,61 +1,4 @@
-import type { Hex } from "../common.ts";
-
-/**
- * Order types for market execution.
- * - Market: Executes immediately at the market price.
- * - Limit: Executes at the specified limit price or better.
- * - Stop Market: Activates as a market order when a stop price is reached.
- * - Stop Limit: Activates as a limit order when a stop price is reached.
- *
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/trading/order-types
- */
-export type OrderType = "Market" | "Limit" | "Stop Market" | "Stop Limit";
-
-/**
- * Time-in-force options.
- * - Gtc: Remains active until filled or canceled.
- * - Ioc: Fills immediately or cancels any unfilled portion.
- * - Alo: Adds liquidity only.
- * - FrontendMarket: Similar to Ioc, used in Hyperliquid UI.
- * - LiquidationMarket: Similar to Ioc, used in Hyperliquid UI.
- */
-export type TIF = "Gtc" | "Ioc" | "Alo" | "FrontendMarket" | "LiquidationMarket";
-
-/**
- * TWAP order status.
- * - finished: Fully executed.
- * - activated: Active and executing.
- * - terminated: Terminated.
- * - error: An error occurred.
- */
-export type TwapStatus =
-    | {
-        /** Status of the TWAP order. */
-        status: "finished" | "activated" | "terminated";
-    }
-    | {
-        /** Status of the TWAP order. */
-        status: "error";
-        /** Error message. */
-        description: string;
-    };
-
-/**
- * Order processing status.
- * - filled: Order fully executed.
- * - open: Order active and waiting to be filled.
- * - canceled: Order canceled by the user.
- * - triggered: Order triggered and awaiting execution.
- * - rejected: Order rejected by the system.
- * - marginCanceled: Order canceled due to insufficient margin.
- */
-export type OrderProcessingStatus =
-    | "filled"
-    | "open"
-    | "canceled"
-    | "triggered"
-    | "rejected"
-    | "marginCanceled";
+import type { Hex } from "../../base.ts";
 
 /** L2 order book snapshot. */
 export interface Book {
@@ -167,16 +110,6 @@ export interface Order {
     reduceOnly?: true;
 }
 
-/** Order status with additional frontend information and current state. */
-export interface OrderStatus<O extends Order | FrontendOrder> {
-    /** Order details. */
-    order: O;
-    /** Order processing status. */
-    status: OrderProcessingStatus;
-    /** Timestamp when the status was last updated (in ms since epoch). */
-    statusTimestamp: number;
-}
-
 /** Result of an order status lookup. */
 export type OrderLookup =
     | {
@@ -189,6 +122,54 @@ export type OrderLookup =
         /** Indicates that the order was not found. */
         status: "unknownOid";
     };
+
+/**
+ * Order processing status.
+ * - filled: Order fully executed.
+ * - open: Order active and waiting to be filled.
+ * - canceled: Order canceled by the user.
+ * - triggered: Order triggered and awaiting execution.
+ * - rejected: Order rejected by the system.
+ * - marginCanceled: Order canceled due to insufficient margin.
+ */
+export type OrderProcessingStatus =
+    | "filled"
+    | "open"
+    | "canceled"
+    | "triggered"
+    | "rejected"
+    | "marginCanceled";
+
+/** Order with current processing status. */
+export interface OrderStatus<O extends Order | FrontendOrder> {
+    /** Order details. */
+    order: O;
+    /** Order processing status. */
+    status: OrderProcessingStatus;
+    /** Timestamp when the status was last updated (in ms since epoch). */
+    statusTimestamp: number;
+}
+
+/**
+ * Order types for market execution.
+ * - Market: Executes immediately at the market price.
+ * - Limit: Executes at the specified limit price or better.
+ * - Stop Market: Activates as a market order when a stop price is reached.
+ * - Stop Limit: Activates as a limit order when a stop price is reached.
+ *
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/trading/order-types
+ */
+export type OrderType = "Market" | "Limit" | "Stop Market" | "Stop Limit";
+
+/**
+ * Time-in-force options.
+ * - Gtc: Remains active until filled or canceled.
+ * - Ioc: Fills immediately or cancels any unfilled portion.
+ * - Alo: Adds liquidity only.
+ * - FrontendMarket: Similar to Ioc, used in Hyperliquid UI.
+ * - LiquidationMarket: Similar to Ioc, used in Hyperliquid UI.
+ */
+export type TIF = "Gtc" | "Ioc" | "Alo" | "FrontendMarket" | "LiquidationMarket";
 
 /** TWAP history record for a user. */
 export interface TwapHistory {
@@ -231,3 +212,22 @@ export interface TwapState {
     /** User address. */
     user: Hex;
 }
+
+/**
+ * TWAP order status.
+ * - finished: Fully executed.
+ * - activated: Active and executing.
+ * - terminated: Terminated.
+ * - error: An error occurred.
+ */
+export type TwapStatus =
+    | {
+        /** Status of the TWAP order. */
+        status: "finished" | "activated" | "terminated";
+    }
+    | {
+        /** Status of the TWAP order. */
+        status: "error";
+        /** Error message. */
+        description: string;
+    };

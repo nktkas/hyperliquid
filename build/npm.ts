@@ -3,7 +3,11 @@ import { build, emptyDir } from "jsr:@deno/dnt@0.41.3";
 await emptyDir("./build/npm");
 
 await build({
-    entryPoints: ["./mod.ts"],
+    entryPoints: [
+        { name: ".", path: "./mod.ts" },
+        { name: "./types", path: "./src/types/mod.ts" },
+        { name: "./signing", path: "./src/signing/signing.ts" },
+    ],
     outDir: "./build/npm",
     shims: {},
     typeCheck: "both",
@@ -14,25 +18,38 @@ await build({
         version: Deno.args[0],
         description:
             "Unofficial Hyperliquid API SDK for all major JS runtimes, written in TypeScript and provided with tests",
-        keywords: ["api", "typescript", "sdk", "hyperliquid"],
+        keywords: [
+            "api",
+            "blockchain",
+            "crypto",
+            "cryptocurrency",
+            "dex",
+            "exchange",
+            "hyperliquid",
+            "library",
+            "sdk",
+            "trading",
+            "typescript",
+            "web3",
+        ],
         author: {
             name: "nktkas",
             email: "github.turk9@passmail.net",
             url: "https://github.com/nktkas",
         },
-        homepage: "https://github.com/nktkas/hyperliquid#readme",
+        homepage: "https://github.com/nktkas/hyperliquid",
         repository: {
             type: "git",
             url: "git+https://github.com/nktkas/hyperliquid.git",
         },
-        license: "MIT",
         bugs: {
             url: "https://github.com/nktkas/hyperliquid/issues",
         },
+        license: "MIT",
     },
     importMap: "deno.json",
     compilerOptions: {
-        lib: ["ESNext", "DOM"],
+        lib: ["ES2022", "DOM"],
     },
     postBuild() {
         Deno.copyFileSync("CONTRIBUTING.md", "build/npm/CONTRIBUTING.md");

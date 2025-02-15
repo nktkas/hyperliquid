@@ -1,4 +1,4 @@
-import type { ISubscriptionTransport, Subscription } from "../transports/base.ts";
+import type { ISubscriptionTransport, Subscription } from "../base.ts";
 import type {
     WsActiveAssetCtxRequest,
     WsActiveAssetDataRequest,
@@ -33,10 +33,10 @@ import type {
     WsUserTwapHistory,
     WsUserTwapSliceFills,
     WsWebData2,
-} from "../types/subscriptions/common.ts";
+} from "../types/subscriptions/responses.ts";
 import type { Candle } from "../types/info/assets.ts";
 import type { Book, Order, OrderStatus } from "../types/info/orders.ts";
-import type { TxDetails } from "../types/explorer/common.ts";
+import type { TxDetails } from "../types/explorer/responses.ts";
 
 // ——————————————— Parameters ———————————————
 
@@ -92,7 +92,7 @@ export type EventWebData2Parameters = Omit<WsWebData2Request, "type">;
 
 /**
  * Event client for subscribing to various Hyperliquid events.
- * @typeParam T - The type of transport used to connect to the Hyperliquid Websocket API.
+ * @typeParam T The type of transport used to connect to the Hyperliquid Websocket API.
  */
 export class EventClient<T extends ISubscriptionTransport = ISubscriptionTransport> {
     /** The transport used to connect to the Hyperliquid API. */
@@ -542,7 +542,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
             user: args.user,
         };
         return this.transport.subscribe(
-            payload.type,
+            "user",
             payload,
             (event: CustomEvent<WsUserEvent>) => {
                 listener(event.detail);

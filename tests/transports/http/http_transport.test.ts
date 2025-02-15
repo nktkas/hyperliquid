@@ -38,7 +38,32 @@ Deno.test("HttpTransport Tests", async (t) => {
         await assertRejects(() => transport.request("action", { foo: "bar" }), HttpRequestError);
     });
 
-    // 3) Invalid Content-Type => HttpRequestError
+    // 3) Response body unloading on failed request
+    await t.step("Response body unloading on failed request", async () => {
+        // @ts-ignore - Mock fetch API
+        globalThis.fetch = async () => {
+            const response = new Response("body", {
+                status: 500,
+                headers: { "Content-Type": "text/plain" },
+            });
+            // Read the body to cause an error the next time `.text()` is called
+            await response.text();
+            return response;
+        };
+
+        const transport = new HttpTransport();
+
+        try {
+            await transport.request("info", { test: "body-unload" });
+            throw new Error("Expected HttpRequestError");
+        } catch (error) {
+            assert(error instanceof HttpRequestError, "Expected `HttpRequestError`");
+            assertEquals(error.responseBody, undefined, "Expected `responseBody` to be `undefined`");
+            assert(error.response.bodyUsed, "Expected `response.bodyUsed` to be `true`");
+        }
+    });
+
+    // 4) Invalid Content-Type => HttpRequestError
     await t.step("Invalid Content-Type (text/html)", async () => {
         globalThis.fetch = async () =>
             new Response("<html>not json</html>", {
@@ -50,7 +75,7 @@ Deno.test("HttpTransport Tests", async (t) => {
         await assertRejects(() => transport.request("explorer", {}), HttpRequestError);
     });
 
-    // 4) onRequest callback modifies request (URL, custom headers, etc.)
+    // 5) onRequest callback modifies request (URL, custom headers, etc.)
     await t.step("onRequest callback modifies request", async () => {
         // @ts-ignore - Mock fetch API
         globalThis.fetch = async (request: Request) => {
@@ -77,7 +102,7 @@ Deno.test("HttpTransport Tests", async (t) => {
         assertEquals(result, { changed: true });
     });
 
-    // 5) onResponse callback replaces the original response
+    // 6) onResponse callback replaces the original response
     await t.step("onResponse callback replaces response", async () => {
         globalThis.fetch = async () =>
             new Response(JSON.stringify({ original: true }), {
@@ -99,7 +124,7 @@ Deno.test("HttpTransport Tests", async (t) => {
         assertEquals(result, { replaced: true });
     });
 
-    // 6) Custom base URL usage
+    // 7) Custom base URL usage
     await t.step("Custom base URL usage", async () => {
         // @ts-ignore - Mock fetch API
         globalThis.fetch = async (request: Request) => {
@@ -115,19 +140,17 @@ Deno.test("HttpTransport Tests", async (t) => {
         assertEquals(result, { baseUrlUsed: true });
     });
 
-    // 7) fetchOptions merging (headers, keepalive, credentials, etc.)
-    // Temporarily out of service: https://github.com/denoland/deno/issues/27763
-    await t.step({
-        name: "fetchOptions merging",
-        ignore: true,
-        fn: async () => {
+    // 8) fetchOptions merging
+    // FIXME: Not all RequestInit options can be checked, see https://github.com/denoland/deno/issues/27763
+    await t.step("fetchOptions merging", async (t) => {
+        await t.step("headers are an object", async () => {
             // @ts-ignore - Mock fetch API
             globalThis.fetch = async (request: Request) => {
                 // Default code sets keepalive = true, but we override to false
-                assertEquals(request.keepalive, false, "Expected keepalive=false from fetchOptions");
                 assertEquals(request.headers.get("Content-Type"), "application/json");
                 assertEquals(request.headers.get("X-FetchOption"), "Custom");
-                assertEquals(request.credentials, "include");
+                assertEquals(request.headers.get("X-FetchOption2"), "Custom2");
+                assertEquals(request.headers.get("X-FetchOption3"), "Custom3");
                 return new Response(JSON.stringify({ merged: true }), {
                     status: 200,
                     headers: { "Content-Type": "application/json" },
@@ -136,22 +159,49 @@ Deno.test("HttpTransport Tests", async (t) => {
 
             const transport = new HttpTransport({
                 fetchOptions: {
-                    keepalive: false,
-                    credentials: "include",
                     headers: {
                         "X-FetchOption": "Custom",
+                        "X-FetchOption2": "Custom2",
+                        "X-FetchOption3": "Custom3",
                     },
                 },
             });
 
             const result = await transport.request("info", { fetchOption: true });
             assertEquals(result, { merged: true });
-        },
+        });
+        await t.step("headers are iterable", async () => {
+            // @ts-ignore - Mock fetch API
+            globalThis.fetch = async (request: Request) => {
+                // Default code sets keepalive = true, but we override to false
+                assertEquals(request.headers.get("Content-Type"), "application/json");
+                assertEquals(request.headers.get("X-FetchOption"), "Custom");
+                assertEquals(request.headers.get("X-FetchOption2"), "Custom2");
+                assertEquals(request.headers.get("X-FetchOption3"), "Custom3");
+                return new Response(JSON.stringify({ merged: true }), {
+                    status: 200,
+                    headers: { "Content-Type": "application/json" },
+                });
+            };
+
+            const transport = new HttpTransport({
+                fetchOptions: {
+                    headers: new Headers({
+                        "X-FetchOption": "Custom",
+                        "X-FetchOption2": "Custom2",
+                        "X-FetchOption3": "Custom3",
+                    }),
+                },
+            });
+
+            const result = await transport.request("info", { fetchOption: true });
+            assertEquals(result, { merged: true });
+        });
     });
 
-    // 8) AbortSignal tests:
+    // 9) AbortSignal tests:
 
-    // 8a) Internal timeout => triggers TimeoutError if fetch doesn't resolve in time
+    // 9a) Internal timeout => triggers TimeoutError if fetch doesn't resolve in time
     await t.step("Internal timeout triggers TimeoutError", async () => {
         globalThis.fetch = originalFetch;
 
@@ -166,7 +216,7 @@ Deno.test("HttpTransport Tests", async (t) => {
         }
     });
 
-    // 8b) User-supplied signal triggers CustomError
+    // 9b) User-supplied signal triggers CustomError
     await t.step("User-supplied signal triggers CustomError", async () => {
         globalThis.fetch = originalFetch;
         class CustomError extends Error {}
@@ -176,6 +226,37 @@ Deno.test("HttpTransport Tests", async (t) => {
         const promise = transport.request("info", { type: "meta" }, userSignal);
 
         await assertRejects(() => promise, CustomError, "user-supplied abort");
+    });
+
+    // 9c) timeout: null disables internal timeout
+    await t.step("timeout: null disables internal timeout", async () => {
+        // We save the original function so that we can restore it later.
+        const originalTimeout = AbortSignal.timeout;
+        let timeoutCalled = false;
+        // Override AbortSignal.timeout to mark the call
+        AbortSignal.timeout = (ms: number) => {
+            timeoutCalled = true;
+            return originalTimeout(ms);
+        };
+
+        // @ts-ignore - Mock fetch API
+        globalThis.fetch = async () => {
+            return new Response(JSON.stringify({ noTimeout: true }), {
+                status: 200,
+                headers: { "Content-Type": "application/json" },
+            });
+        };
+
+        // Create a transport with timeout disabled
+        const transport = new HttpTransport({ timeout: null });
+        const result = await transport.request("info", { test: "null timeout" });
+
+        // Check that AbortSignal.timeout has not been called
+        assertEquals(timeoutCalled, false, "AbortSignal.timeout should not be called when timeout: null");
+        assertEquals(result, { noTimeout: true });
+
+        // Restore the original function
+        AbortSignal.timeout = originalTimeout;
     });
 
     globalThis.fetch = originalFetch;

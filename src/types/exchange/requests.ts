@@ -1,5 +1,41 @@
-import type { Hex } from "../common.ts";
-import type { OrderParams } from "./common.ts";
+import type { Hex } from "../../base.ts";
+import type { TIF } from "../info/orders.ts";
+
+/** Order parameters. */
+export type OrderParams = {
+    /** Asset ID. */
+    a: number;
+    /** Position side (`true` for long, `false` for short). */
+    b: boolean;
+    /** Price. */
+    p: string;
+    /** Size (in base currency units). */
+    s: string;
+    /** Is reduce-only? */
+    r: boolean;
+    /** Order type. */
+    t:
+        | {
+            /** Limit order parameters. */
+            limit: {
+                /** Time-in-force. */
+                tif: TIF;
+            };
+        }
+        | {
+            /** Trigger order parameters. */
+            trigger: {
+                /** Is market order? */
+                isMarket: boolean;
+                /** Trigger price. */
+                triggerPx: string;
+                /** Indicates whether it is take profit or stop loss. */
+                tpsl: "tp" | "sl";
+            };
+        };
+    /** Client Order ID. */
+    c?: Hex | null;
+};
 
 /** Base structure for exchange requests. */
 export interface BaseExchangeRequest {
@@ -85,28 +121,6 @@ export interface BatchModifyRequest extends BaseExchangeRequest {
 }
 
 /**
- * Cancel order(s).
- * @returns {CancelResponse}
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s
- */
-export interface CancelRequest extends BaseExchangeRequest {
-    /** Action to be performed. */
-    action: {
-        /** Type of action. */
-        type: "cancel";
-        /** Orders to cancel. */
-        cancels: {
-            /** Asset ID. */
-            a: number;
-            /** Order ID. */
-            o: number;
-        }[];
-    };
-    /** Vault address (for vault trading). */
-    vaultAddress?: Hex;
-}
-
-/**
  * Cancel order(s) by cloid.
  * @returns {CancelResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid
@@ -122,6 +136,28 @@ export interface CancelByCloidRequest extends BaseExchangeRequest {
             asset: number;
             /** Client Order ID. */
             cloid: Hex;
+        }[];
+    };
+    /** Vault address (for vault trading). */
+    vaultAddress?: Hex;
+}
+
+/**
+ * Cancel order(s).
+ * @returns {CancelResponse}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s
+ */
+export interface CancelRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "cancel";
+        /** Orders to cancel. */
+        cancels: {
+            /** Asset ID. */
+            a: number;
+            /** Order ID. */
+            o: number;
         }[];
     };
     /** Vault address (for vault trading). */
@@ -146,6 +182,19 @@ export interface CDepositRequest extends BaseExchangeRequest {
         nonce: number;
         /** Amount of wei to deposit into staking balance. */
         wei: number;
+    };
+}
+
+/**
+ * Claim rewards from referral program.
+ * @returns {SuccessResponse}
+ * @see null - no documentation
+ */
+export interface ClaimRewardsRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "claimRewards";
     };
 }
 
@@ -273,6 +322,25 @@ export interface ScheduleCancelRequest extends BaseExchangeRequest {
 }
 
 /**
+ * Set the display name in the leaderboard.
+ * @returns {SuccessResponse}
+ * @see null - no documentation
+ */
+export interface SetDisplayNameRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "setDisplayName";
+        /**
+         * Display name.
+         *
+         * Set to an empty string to remove the display name.
+         */
+        displayName: string;
+    };
+}
+
+/**
  * Set a referral code.
  * @returns {SuccessResponse}
  * @see null - no documentation
@@ -313,7 +381,46 @@ export interface SpotSendRequest extends BaseExchangeRequest {
 }
 
 /**
- * Transfer between sub-accounts.
+ * Opt Out of Spot Dusting.
+ * @returns {SuccessResponse}
+ * @see null - no documentation
+ */
+export interface SpotUserRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "spotUser";
+        /** Spot dusting options. */
+        toggleSpotDusting: {
+            /** Opt out of spot dusting. */
+            optOut: boolean;
+        };
+    };
+}
+
+/**
+ * Transfer between sub-accounts (spot).
+ * @returns {SuccessResponse}
+ * @see null - no documentation
+ */
+export interface SubAccountSpotTransferRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "subAccountSpotTransfer";
+        /** Sub-account address. */
+        subAccountUser: Hex;
+        /** `true` for deposit, `false` for withdrawal. */
+        isDeposit: boolean;
+        /** Token identifier. */
+        token: `${string}:${Hex}`;
+        /** Amount to send. */
+        amount: string;
+    };
+}
+
+/**
+ * Transfer between sub-accounts (perpetual).
  * @returns {SuccessResponse}
  * @see null - no documentation
  */
@@ -490,6 +597,46 @@ export interface UsdSendRequest extends BaseExchangeRequest {
         destination: Hex;
         /** Amount to send. */
         amount: string;
+    };
+}
+
+/**
+ * Distribute funds from a vault between followers.
+ * @returns {SuccessResponse}
+ * @see null - no documentation
+ */
+export interface VaultDistributeRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "vaultDistribute";
+        /** Vault address. */
+        vaultAddress: Hex;
+        /**
+         * Raw amount to distribute (float * 1e6).
+         *
+         * Set to 0 to close the vault.
+         */
+        usd: number;
+    };
+}
+
+/**
+ * Modify a vault's configuration.
+ * @returns {SuccessResponse}
+ * @see null - no documentation
+ */
+export interface VaultModifyRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "vaultModify";
+        /** Vault address. */
+        vaultAddress: Hex;
+        /** Allow deposits from followers. */
+        allowDeposits: boolean | null;
+        /** Always close positions on withdrawal. */
+        alwaysCloseOnWithdraw: boolean | null;
     };
 }
 

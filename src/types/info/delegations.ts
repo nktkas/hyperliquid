@@ -1,4 +1,4 @@
-import type { Hex } from "../common.ts";
+import type { Hex } from "../../base.ts";
 
 /** User delegation to a validator. */
 export interface Delegation {
@@ -18,6 +18,18 @@ export interface DelegatorReward {
     source: "delegation" | "commission";
     /** Total reward amount. */
     totalAmount: string;
+}
+
+/** Summary of a user's staking. */
+export interface DelegatorSummary {
+    /** Total amount of delegated tokens. */
+    delegated: string;
+    /** Total amount of undelegated tokens. */
+    undelegated: string;
+    /** Total amount of tokens pending withdrawal. */
+    totalPendingWithdrawal: string;
+    /** Number of pending withdrawals. */
+    nPendingWithdrawals: number;
 }
 
 /** Record of a staking event by a delegator. */
@@ -63,16 +75,14 @@ export interface DelegatorUpdateWithdrawal {
     };
 }
 
-/** Summary of a user's staking. */
-export interface DelegatorSummary {
-    /** Total amount of delegated tokens. */
-    delegated: string;
-    /** Total amount of undelegated tokens. */
-    undelegated: string;
-    /** Total amount of tokens pending withdrawal. */
-    totalPendingWithdrawal: string;
-    /** Number of pending withdrawals. */
-    nPendingWithdrawals: number;
+/** Statistics for validator performance over a time period. */
+export interface ValidatorStats {
+    /** Fraction of time the validator was online. */
+    uptimeFraction: string;
+    /** Predicted annual percentage rate of returns. */
+    predictedApr: string;
+    /** Number of samples used for statistics calculation. */
+    nSamples: number;
 }
 
 /** Summary of a validator's status and performance. */
@@ -103,14 +113,4 @@ export interface ValidatorSummary {
         ["week", ValidatorStats],
         ["month", ValidatorStats],
     ];
-}
-
-/** Statistics for validator performance over a time period. */
-export interface ValidatorStats {
-    /** Fraction of time the validator was online. */
-    uptimeFraction: string;
-    /** Predicted annual percentage rate of returns. */
-    predictedApr: string;
-    /** Number of samples used for statistics calculation. */
-    nSamples: number;
 }

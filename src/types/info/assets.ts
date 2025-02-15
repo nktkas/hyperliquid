@@ -1,9 +1,45 @@
-import type { Hex } from "../common.ts";
+import type { Hex } from "../../base.ts";
 
 /** Mapping of coin symbols to mid prices. */
 export interface AllMids {
     /** Mid prices mapped by coin symbol. */
     [coin: string]: string;
+}
+
+/** Candlestick data point. */
+export interface Candle {
+    /** Opening timestamp (ms since epoch). */
+    t: number;
+    /** Closing timestamp (ms since epoch). */
+    T: number;
+    /** Asset symbol. */
+    s: string;
+    /** Candle interval (e.g., "1m", "5m", "1h", etc.). */
+    i: string;
+    /** Opening price. */
+    o: string;
+    /** Closing price. */
+    c: string;
+    /** Highest price. */
+    h: string;
+    /** Lowest price. */
+    l: string;
+    /** Total volume traded in base currency. */
+    v: string;
+    /** Number of trades executed. */
+    n: number;
+}
+
+/** Historical funding rate record for an asset. */
+export interface FundingHistory {
+    /** Asset symbol. */
+    coin: string;
+    /** Funding rate. */
+    fundingRate: string;
+    /** Premium price. */
+    premium: string;
+    /** Funding record timestamp (ms since epoch). */
+    time: number;
 }
 
 /** Context for a perpetual asset. */
@@ -21,6 +57,60 @@ export interface PerpsAssetCtx extends SharedAssetCtx {
     /** Daily volume in base currency. */
     dayBaseVlm: string;
 }
+
+/** Metadata for perpetual assets. */
+export interface PerpsMeta {
+    /** Trading universes available for perpetual trading. */
+    universe: PerpsUniverse[];
+}
+
+/** Metadata and context for perpetual assets. */
+export type PerpsMetaAndAssetCtxs = [
+    /** Metadata for assets. */
+    PerpsMeta,
+    /** Context for each perpetual asset. */
+    PerpsAssetCtx[],
+];
+
+/** Trading universe parameters for perpetual assets. */
+export interface PerpsUniverse {
+    /** Minimum decimal places for order sizes. */
+    szDecimals: number;
+    /**
+     * Name of the universe.
+     *
+     * Note: Maximum length 6 characters. No uniqueness constraints.
+     */
+    name: string;
+    /** Maximum allowed leverage. */
+    maxLeverage: number;
+    /** Indicates if only isolated margin trading is allowed. */
+    onlyIsolated?: true;
+    /** Indicates if the universe is delisted. */
+    isDelisted?: true;
+}
+
+/**
+ * Predicted funding data.
+ *
+ * The first element is the asset symbol and the second element is an array of predicted funding data for each exchange.
+ */
+export type PredictedFunding = [
+    /** Asset symbol. */
+    string,
+    /** Array of predicted funding data for each exchange. */
+    [
+        /** Exchange symbol. */
+        string,
+        /** Predicted funding data. */
+        {
+            /** Predicted funding rate. */
+            fundingRate: string;
+            /** Next funding time (ms since epoch). */
+            nextFundingTime: number;
+        } | null,
+    ][],
+];
 
 /** Shared context for assets. */
 export interface SharedAssetCtx {
@@ -46,10 +136,53 @@ export interface SpotAssetCtx extends SharedAssetCtx {
     dayBaseVlm: string;
 }
 
-/** Metadata for perpetual assets. */
-export interface PerpsMeta {
-    /** Trading universes available for perpetual trading. */
-    universe: PerpsUniverse[];
+/** Deploy state for spot tokens. */
+export interface SpotDeployState {
+    /** Array of deploy states for tokens. */
+    states: {
+        /** Token ID. */
+        token: number;
+        /** Token specification. */
+        spec: {
+            /** Name of the token. */
+            name: string;
+            /** Minimum decimal places for order sizes. */
+            szDecimals: number;
+            /** Number of decimals for the token's smallest unit. */
+            weiDecimals: number;
+        };
+        /** Full name of the token. */
+        fullName: string | null;
+        /** Deployer trading fee share for the token. */
+        deployerTradingFeeShare: string;
+        /** Spot indices for the token. */
+        spots: number[];
+        /** Maximum supply of the token. */
+        maxSupply: string | null;
+        /** Hyperliquidity genesis balance of the token. */
+        hyperliquidityGenesisBalance: string;
+        /** Total genesis balance (in Wei) for the token. */
+        totalGenesisBalanceWei: string;
+        /** User genesis balances for the token. */
+        userGenesisBalances: [Hex, string][];
+        /** Existing token genesis balances for the token. */
+        existingTokenGenesisBalances: [number, string][];
+        /** Blacklisted users for the token. */
+        blacklistUsers: Hex[];
+    }[];
+    /** Gas auction details. */
+    gasAuction: {
+        /** Current gas. */
+        currentGas: string | null;
+        /** Duration in seconds. */
+        durationSeconds: number;
+        /** Ending gas. */
+        endGas: string | null;
+        /** Starting gas. */
+        startGas: string;
+        /** Auction start time (seconds since epoch). */
+        startTimeSeconds: number;
+    };
 }
 
 /** Metadata for spot assets. */
@@ -60,39 +193,13 @@ export interface SpotMeta {
     tokens: SpotToken[];
 }
 
-/** Trading universe parameters for perpetual assets. */
-export interface PerpsUniverse {
-    /** Minimum decimal places for order sizes. */
-    szDecimals: number;
-    /**
-     * Name of the universe.
-     *
-     * Note: Maximum length 6 characters. No uniqueness constraints.
-     */
-    name: string;
-    /** Maximum allowed leverage. */
-    maxLeverage: number;
-    /** Indicates if only isolated margin trading is allowed. */
-    onlyIsolated?: true;
-    /** Indicates if the universe is delisted. */
-    isDelisted?: true;
-}
-
-/** Trading universe parameters for spot assets. */
-export interface SpotUniverse {
-    /** Token indices included in this universe. */
-    tokens: number[];
-    /**
-     * Name of the universe.
-     *
-     * Note: Maximum length 6 characters. No uniqueness constraints.
-     */
-    name: string;
-    /** Unique identifier of the universe. */
-    index: number;
-    /** Indicates if the token is the primary representation in the system. */
-    isCanonical: boolean;
-}
+/** Metadata and context for spot assets. */
+export type SpotMetaAndAssetCtxs = [
+    /** Metadata for assets. */
+    SpotMeta,
+    /** Context for each spot asset. */
+    SpotAssetCtx[],
+];
 
 /** Details for a trading token in spot markets. */
 export interface SpotToken {
@@ -123,6 +230,22 @@ export interface SpotToken {
     fullName: string | null;
     /** Deployer trading fee share for the token. */
     deployerTradingFeeShare: string;
+}
+
+/** Trading universe parameters for spot assets. */
+export interface SpotUniverse {
+    /** Token indices included in this universe. */
+    tokens: number[];
+    /**
+     * Name of the universe.
+     *
+     * Note: Maximum length 6 characters. No uniqueness constraints.
+     */
+    name: string;
+    /** Unique identifier of the universe. */
+    index: number;
+    /** Indicates if the token is the primary representation in the system. */
+    isCanonical: boolean;
 }
 
 /** Details of a token. */
@@ -166,125 +289,4 @@ export interface TokenDetails {
     nonCirculatingUserBalances: [Hex, string][];
     /** Future emissions amount. */
     futureEmissions: string;
-}
-
-/** Metadata and context for perpetual assets. */
-export type PerpsMetaAndAssetCtxs = [
-    /** Metadata for assets. */
-    PerpsMeta,
-    /** Context for each perpetual asset. */
-    PerpsAssetCtx[],
-];
-
-/** Metadata and context for spot assets. */
-export type SpotMetaAndAssetCtxs = [
-    /** Metadata for assets. */
-    SpotMeta,
-    /** Context for each spot asset. */
-    SpotAssetCtx[],
-];
-
-/** Candlestick data point. */
-export interface Candle {
-    /** Opening timestamp (ms since epoch). */
-    t: number;
-    /** Closing timestamp (ms since epoch). */
-    T: number;
-    /** Asset symbol. */
-    s: string;
-    /** Candle interval (e.g., "1m", "5m", "1h", etc.). */
-    i: string;
-    /** Opening price. */
-    o: string;
-    /** Closing price. */
-    c: string;
-    /** Highest price. */
-    h: string;
-    /** Lowest price. */
-    l: string;
-    /** Total volume traded in base currency. */
-    v: string;
-    /** Number of trades executed. */
-    n: number;
-}
-
-/** Historical funding rate record for an asset. */
-export interface FundingHistory {
-    /** Asset symbol. */
-    coin: string;
-    /** Funding rate. */
-    fundingRate: string;
-    /** Premium price. */
-    premium: string;
-    /** Funding record timestamp (ms since epoch). */
-    time: number;
-}
-
-/**
- * Predicted funding data.
- *
- * The first element is the asset symbol and the second element is an array of predicted funding data for each exchange.
- */
-export type PredictedFunding = [
-    /** Asset symbol. */
-    string,
-    /** Array of predicted funding data for each exchange. */
-    [
-        /** Exchange symbol. */
-        string,
-        /** Predicted funding data. */
-        {
-            /** Predicted funding rate. */
-            fundingRate: string;
-            /** Next funding time (ms since epoch). */
-            nextFundingTime: number;
-        } | null,
-    ][],
-];
-
-/** Deploy state for spot tokens. */
-export interface SpotDeployState {
-    /** Array of deploy states for tokens. */
-    states: {
-        /** Token ID. */
-        token: number;
-        /** Token specification. */
-        spec: {
-            /** Name of the token. */
-            name: string;
-            /** Minimum decimal places for order sizes. */
-            szDecimals: number;
-            /** Number of decimals for the token's smallest unit. */
-            weiDecimals: number;
-        };
-        /** Full name of the token. */
-        fullName: string | null;
-        /** Deployer trading fee share for the token. */
-        deployerTradingFeeShare: string;
-        /** Spot indices for the token. */
-        spots: number[];
-        /** Maximum supply of the token. */
-        maxSupply: string | null;
-        /** Hyperliquidity genesis balance of the token. */
-        hyperliquidityGenesisBalance: string;
-        /** Total genesis balance (in Wei) for the token. */
-        totalGenesisBalanceWei: string;
-        /** User genesis balances for the token. */
-        userGenesisBalances: [Hex, string][];
-        /** Existing token genesis balances for the token. */
-        existingTokenGenesisBalances: [number, string][];
-    }[];
-    /** Gas auction details. */
-    gasAuction: {
-        /** Current gas. */
-        currentGas: string | null;
-        /** Duration in seconds. */
-        durationSeconds: number;
-        /** Ending gas. */
-        endGas: string | null;
-        /** Starting gas. */
-        startGas: string;
-        /** Auction start time (seconds since epoch). */
-        startTimeSeconds: number;
-    };
 }

@@ -1,4 +1,4 @@
-import type { Hex } from "../common.ts";
+import type { Hex } from "../../base.ts";
 
 /** Position for a specific asset. */
 export interface AssetPosition {
@@ -53,6 +53,34 @@ export interface AssetPosition {
     };
 }
 
+/** Extra agent details for a user. */
+export interface ExtraAgent {
+    /** Extra agent address. */
+    address: Hex;
+    /** Extra agent name. */
+    name: string;
+    /** Validity period as a timestamp (in ms since epoch). */
+    validUntil: number;
+}
+
+/** Legal verification status for a user. */
+export interface LegalCheck {
+    /** Whether the user's IP address is allowed. */
+    ipAllowed: boolean;
+    /** Whether the user has accepted the terms of service. */
+    acceptedTerms: boolean;
+    /** Whether the user is allowed to use the platform. */
+    userAllowed: boolean;
+}
+
+/** Multi-sig signers for a user. */
+export interface MultiSigSigners {
+    /** Authorized users addresses. */
+    authorizedUsers: Hex[];
+    /** Threshold number of signatures required. */
+    threshold: number;
+}
+
 /** Perpetual trading clearinghouse state summary. */
 export interface PerpsClearinghouseState {
     /** Margin summary details. */
@@ -87,6 +115,16 @@ export interface PerpsClearinghouseState {
     time: number;
 }
 
+/** Portfolio metrics snapshot. */
+export interface Portfolio {
+    /** History entries for account value as [timestamp, value]. */
+    accountValueHistory: [number, string][];
+    /** History entries for profit and loss as [timestamp, value]. */
+    pnlHistory: [number, string][];
+    /** Volume metric for the portfolio. */
+    vlm: string;
+}
+
 /** Portfolio metrics grouped by time periods. */
 export type PortfolioPeriods = [
     ["day", Portfolio],
@@ -99,16 +137,6 @@ export type PortfolioPeriods = [
     ["perpAllTime", Portfolio],
 ];
 
-/** Portfolio metrics snapshot. */
-export interface Portfolio {
-    /** History entries for account value as [timestamp, value]. */
-    accountValueHistory: [number, string][];
-    /** History entries for profit and loss as [timestamp, value]. */
-    pnlHistory: [number, string][];
-    /** Volume metric for the portfolio. */
-    vlm: string;
-}
-
 /** Pre-transfer user existence check result. */
 export interface PreTransferCheck {
     /** Activation fee. */
@@ -117,6 +145,75 @@ export interface PreTransferCheck {
     isSanctioned: boolean;
     /** Whether the user exists. */
     userExists: boolean;
+}
+
+/** Referral details for a user. */
+export interface Referral {
+    /** Referrer details. */
+    referredBy: {
+        /** Referrer address. */
+        referrer: Hex;
+        /** Referral code used. */
+        code: string;
+    } | null;
+
+    /** Cumulative traded volume. */
+    cumVlm: string;
+    /** Rewards earned but not yet claimed. */
+    unclaimedRewards: string;
+    /** Rewards that have been claimed. */
+    claimedRewards: string;
+    /** Builder reward amount. */
+    builderRewards: string;
+    /** Current state of the referrer. */
+    referrerState:
+        | {
+            /** Referrer is ready to receive rewards. */
+            stage: "ready";
+            /** Referral program details. */
+            data: {
+                /** Assigned referral code. */
+                code: string;
+                /** Summary of each referral state. */
+                referralStates: {
+                    /** Cumulative traded volume. */
+                    cumVlm: string;
+                    /** Total fees rewarded to the referred user since referral. */
+                    cumRewardedFeesSinceReferred: string;
+                    /** Total fees rewarded to the referrer from referred trades. */
+                    cumFeesRewardedToReferrer: string;
+                    /** Timestamp when the referred user joined (in ms since epoch). */
+                    timeJoined: number;
+                    /** Address of the referred user. */
+                    user: string;
+                }[];
+            };
+        }
+        | {
+            /** Referrer needs to create a referral code. */
+            stage: "needToCreateCode";
+        }
+        | {
+            /** Referrer must complete a trade before earning rewards. */
+            stage: "needToTrade";
+            /** Required trading volume details for activation. */
+            data: {
+                /** Required trading volume. */
+                required: string;
+            };
+        };
+
+    /** History of referral rewards. */
+    rewardHistory: {
+        /** Amount of earned rewards. */
+        earned: string;
+        /** Traded volume at the time of reward. */
+        vlm: string;
+        /** Traded volume via referrals. */
+        referralVlm: string;
+        /** Timestamp when the reward was earned (in ms since epoch). */
+        time: number;
+    }[];
 }
 
 /** Balance for a specific spot token. */
@@ -209,6 +306,31 @@ export interface UserFees {
     nextTrialAvailableTimestamp: unknown | null;
 }
 
+/** Funding ledger update for a user. */
+export interface UserFundingUpdate {
+    /** Timestamp of the update (in ms since epoch). */
+    time: number;
+    /** L1 transaction hash. */
+    hash: Hex;
+    /** Update details. */
+    delta: FundingUpdate;
+}
+/** Funding update details. */
+export interface FundingUpdate {
+    /** Update type. */
+    type: "funding";
+    /** Asset symbol. */
+    coin: string;
+    /** Amount transferred in USDC. */
+    usdc: string;
+    /** Signed position size. */
+    szi: string;
+    /** Applied funding rate. */
+    fundingRate: string;
+    /** Number of samples. */
+    nSamples: number | null;
+}
+
 /** Rate limits for a user. */
 export interface UserRateLimit {
     /** Cumulative trading volume. */
@@ -244,103 +366,6 @@ export type UserRole =
         };
     };
 
-/** Extra agent details for a user. */
-export interface ExtraAgent {
-    /** Extra agent address. */
-    address: Hex;
-    /** Extra agent name. */
-    name: string;
-    /** Validity period as a timestamp (in ms since epoch). */
-    validUntil: number;
-}
-
-/** Multi-sig signers for a user. */
-export interface MultiSigSigners {
-    /** Authorized users addresses. */
-    authorizedUsers: Hex[];
-    /** Threshold number of signatures required. */
-    threshold: number;
-}
-
-/** Referral details for a user. */
-export interface Referral {
-    /** Referrer details. */
-    referredBy: {
-        /** Referrer address. */
-        referrer: Hex;
-        /** Referral code used. */
-        code: string;
-    } | null;
-
-    /** Cumulative traded volume. */
-    cumVlm: string;
-    /** Rewards earned but not yet claimed. */
-    unclaimedRewards: string;
-    /** Rewards that have been claimed. */
-    claimedRewards: string;
-    /** Builder reward amount. */
-    builderRewards: string;
-    /** Current state of the referrer. */
-    referrerState:
-        | {
-            /** Referrer is ready to receive rewards. */
-            stage: "ready";
-            /** Referral program details. */
-            data: {
-                /** Assigned referral code. */
-                code: string;
-                /** Summary of each referral state. */
-                referralStates: {
-                    /** Cumulative traded volume. */
-                    cumVlm: string;
-                    /** Total fees rewarded to the referred user since referral. */
-                    cumRewardedFeesSinceReferred: string;
-                    /** Total fees rewarded to the referrer from referred trades. */
-                    cumFeesRewardedToReferrer: string;
-                    /** Timestamp when the referred user joined (in ms since epoch). */
-                    timeJoined: number;
-                    /** Address of the referred user. */
-                    user: string;
-                }[];
-            };
-        }
-        | {
-            /** Referrer needs to create a referral code. */
-            stage: "needToCreateCode";
-        }
-        | {
-            /** Referrer must complete a trade before earning rewards. */
-            stage: "needToTrade";
-            /** Required trading volume details for activation. */
-            data: {
-                /** Required trading volume. */
-                required: string;
-            };
-        };
-
-    /** History of referral rewards. */
-    rewardHistory: {
-        /** Amount of earned rewards. */
-        earned: string;
-        /** Traded volume at the time of reward. */
-        vlm: string;
-        /** Traded volume via referrals. */
-        referralVlm: string;
-        /** Timestamp when the reward was earned (in ms since epoch). */
-        time: number;
-    }[];
-}
-
-/** Funding ledger update for a user. */
-export interface UserFundingUpdate {
-    /** Timestamp of the update (in ms since epoch). */
-    time: number;
-    /** L1 transaction hash. */
-    hash: Hex;
-    /** Update details. */
-    delta: FundingUpdate;
-}
-
 /** Non-funding ledger update for a user. */
 export interface UserNonFundingLedgerUpdate {
     /** Timestamp of the update (in ms since epoch). */
@@ -362,7 +387,6 @@ export interface UserNonFundingLedgerUpdate {
         | VaultWithdrawUpdate
         | WithdrawUpdate;
 }
-
 /** Transfer between spot and perpetual accounts. */
 export interface AccountClassTransferUpdate {
     /** Update type. */
@@ -372,7 +396,6 @@ export interface AccountClassTransferUpdate {
     /** Indicates if the transfer is to the perpetual account. */
     toPerp: boolean;
 }
-
 /** Deposit update to an account. */
 export interface DepositUpdate {
     /** Update type. */
@@ -380,7 +403,6 @@ export interface DepositUpdate {
     /** Amount deposited in USDC. */
     usdc: string;
 }
-
 /** Internal transfer between accounts. */
 export interface InternalTransferUpdate {
     /** Update type. */
@@ -394,7 +416,6 @@ export interface InternalTransferUpdate {
     /** Transfer fee. */
     fee: string;
 }
-
 /** Liquidation event update. */
 export interface LiquidationUpdate {
     /** Update type. */
@@ -413,23 +434,6 @@ export interface LiquidationUpdate {
         szi: string;
     }[];
 }
-
-/** Funding update details. */
-export interface FundingUpdate {
-    /** Update type. */
-    type: "funding";
-    /** Asset symbol. */
-    coin: string;
-    /** Amount transferred in USDC. */
-    usdc: string;
-    /** Signed position size. */
-    szi: string;
-    /** Applied funding rate. */
-    fundingRate: string;
-    /** Number of samples. */
-    nSamples: number | null;
-}
-
 /** Rewards claim event update. */
 export interface RewardsClaimUpdate {
     /** Update type. */
@@ -437,7 +441,6 @@ export interface RewardsClaimUpdate {
     /** Amount of rewards claimed. */
     amount: string;
 }
-
 /** Spot transfer update between accounts. */
 export interface SpotTransferUpdate {
     /** Update type. */
@@ -455,7 +458,6 @@ export interface SpotTransferUpdate {
     /** Transfer fee. */
     fee: string;
 }
-
 /** Transfer update between sub-accounts. */
 export interface SubAccountTransferUpdate {
     /** Update type. */
@@ -467,7 +469,6 @@ export interface SubAccountTransferUpdate {
     /** Destination address. */
     destination: Hex;
 }
-
 /** Vault creation update. */
 export interface VaultCreateUpdate {
     /** Update type. */
@@ -479,7 +480,6 @@ export interface VaultCreateUpdate {
     /** Vault creation fee. */
     fee: string;
 }
-
 /** Vault deposit update. */
 export interface VaultDepositUpdate {
     /** Update type. */
@@ -489,7 +489,6 @@ export interface VaultDepositUpdate {
     /** Amount deposited in USDC. */
     usdc: string;
 }
-
 /** Vault distribution update. */
 export interface VaultDistributionUpdate {
     /** Update type. */
@@ -499,7 +498,6 @@ export interface VaultDistributionUpdate {
     /** Amount distributed in USDC. */
     usdc: string;
 }
-
 /** Vault withdrawal event update. */
 export interface VaultWithdrawUpdate {
     /** Update type. */
@@ -519,7 +517,6 @@ export interface VaultWithdrawUpdate {
     /** Net withdrawn amount in USD after fees and costs. */
     netWithdrawnUsd: string;
 }
-
 /** Withdrawal update from an account. */
 export interface WithdrawUpdate {
     /** Update type. */

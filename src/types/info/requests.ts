@@ -1,4 +1,4 @@
-import type { Hex } from "../common.ts";
+import type { Hex } from "../../base.ts";
 
 /**
  * Request mid coin prices.
@@ -144,6 +144,18 @@ export interface HistoricalOrdersRequest {
 }
 
 /**
+ * Request to check if a user is a VIP.
+ * @returns {boolean} Boolean indicating user's VIP status.
+ * @see null - no documentation
+ */
+export interface IsVipRequest {
+    /** Type of request. */
+    type: "isVip";
+    /** User's address. */
+    user: Hex;
+}
+
+/**
  * Request L2 order book ({@link L2Book}).
  * @returns {Book} L2 order book snapshot.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#l2-book-snapshot
@@ -157,6 +169,18 @@ export interface L2BookRequest {
     nSigFigs?: 2 | 3 | 4 | 5 | null;
     /** Mantissa for aggregation (if {@linkcode nSigFigs} is 5). */
     mantissa?: 2 | 5 | null;
+}
+
+/**
+ * Request legal verification status of a user.
+ * @returns {LegalCheck} Legal verification status for a user.
+ * @see null - no documentation
+ */
+export interface LegalCheckRequest {
+    /** Type of request. */
+    type: "legalCheck";
+    /** User's address. */
+    user: Hex;
 }
 
 /**
@@ -200,6 +224,16 @@ export interface OrderStatusRequest {
 }
 
 /**
+ * Request perpetuals at open interest cap.
+ * @returns {string[]} Array of perpetuals at open interest caps.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#query-perps-at-open-interest-caps
+ */
+export interface PerpsAtOpenInterestCapRequest {
+    /** Type of request. */
+    type: "perpsAtOpenInterestCap";
+}
+
+/**
  * Request user portfolio.
  * @returns {Portfolio} User's portfolio.
  * @see null - no documentation
@@ -209,6 +243,16 @@ export interface PortfolioRequest {
     type: "portfolio";
     /** User's address. */
     user: Hex;
+}
+
+/**
+ * Request predicted funding rates.
+ * @returns {PredictedFunding[]} Array of predicted funding rates.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-predicted-funding-rates-for-different-venues
+ */
+export interface PredictedFundingsRequest {
+    /** Type of request. */
+    type: "predictedFundings";
 }
 
 /**
@@ -223,26 +267,6 @@ export interface PreTransferCheckRequest {
     user: Hex;
     /** Source address. */
     source: Hex;
-}
-
-/**
- * Request perpetuals at open interest cap.
- * @returns {string[]} Array of perpetuals at open interest caps.
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#query-perps-at-open-interest-caps
- */
-export interface PerpsAtOpenInterestCapRequest {
-    /** Type of request. */
-    type: "perpsAtOpenInterestCap";
-}
-
-/**
- * Request predicted funding rates.
- * @returns {PredictedFunding[]} Array of predicted funding rates.
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-predicted-funding-rates-for-different-venues
- */
-export interface PredictedFundingsRequest {
-    /** Type of request. */
-    type: "predictedFundings";
 }
 
 /**
@@ -450,18 +474,6 @@ export interface UserToMultiSigSignersRequest {
 }
 
 /**
- * Request user TWAP slice fills.
- * @returns {TwapSliceFill[]} Array of user's TWAP slice fills.
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills
- */
-export interface UserTwapSliceFillsRequest {
-    /** Type of request. */
-    type: "userTwapSliceFills";
-    /** User's address. */
-    user: Hex;
-}
-
-/**
  * Request user TWAP slice fills by time.
  * @returns {TwapSliceFill[]} Array of user's TWAP slice fills.
  * @see null - no documentation
@@ -477,6 +489,18 @@ export interface UserTwapSliceFillsByTimeRequest {
     endTime?: number | null;
     /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
     aggregateByTime?: boolean;
+}
+
+/**
+ * Request user TWAP slice fills.
+ * @returns {TwapSliceFill[]} Array of user's TWAP slice fills.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills
+ */
+export interface UserTwapSliceFillsRequest {
+    /** Type of request. */
+    type: "userTwapSliceFills";
+    /** User's address. */
+    user: Hex;
 }
 
 /**

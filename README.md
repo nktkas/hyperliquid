@@ -1,8 +1,9 @@
 # Hyperliquid API TypeScript SDK
 
-[![JSR](https://jsr.io/badges/@nktkas/hyperliquid)](https://jsr.io/@nktkas/hyperliquid)
-[![JSR Score](https://jsr.io/badges/@nktkas/hyperliquid/score)](https://jsr.io/@nktkas/hyperliquid)
-[![bundlejs](https://deno.bundlejs.com/badge?q=@nktkas/hyperliquid)](https://bundlejs.com/?q=@nktkas/hyperliquid)
+[![NPM](https://img.shields.io/npm/v/@nktkas/hyperliquid?style=flat-square&color=blue)](https://www.npmjs.com/package/@nktkas/hyperliquid)
+[![JSR](https://img.shields.io/jsr/v/@nktkas/hyperliquid?style=flat-square&color=blue)](https://jsr.io/@nktkas/hyperliquid)
+[![Coveralls](https://img.shields.io/coverallsCoverage/github/nktkas/hyperliquid?style=flat-square)](https://coveralls.io/github/nktkas/hyperliquid)
+[![bundlejs](https://img.shields.io/bundlejs/size/@nktkas/hyperliquid?style=flat-square)](https://bundlejs.com/?q=@nktkas/hyperliquid)
 
 Unofficial [Hyperliquid API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api) SDK for all major JS
 runtimes, written in TypeScript and provided with tests.
@@ -10,12 +11,12 @@ runtimes, written in TypeScript and provided with tests.
 ## Features
 
 - 🖋️ **Typed**: Source code is 100% TypeScript.
-- 🧪 **Tested**: Good code coverage and type validation.
+- 🧪 **Tested**: Good code coverage and type testing.
 - 📦 **Minimal dependencies**: Few small dependencies, standard JS is favored.
 - 🌐 **Cross-Environment Support**: Compatible with all major JS runtimes, including Node.js, Deno, Bun, and browser
   environments.
-- 🔧 **Extensible**: Easily integrates with [viem](https://github.com/wevm/viem) and
-  [ethers](https://github.com/ethers-io/ethers.js).
+- 🔧 **Integratable**: Easy to use with [viem](https://github.com/wevm/viem),
+  [ethers](https://github.com/ethers-io/ethers.js) and web3 wallets.
 - 📚 **Documented**: Comprehensive documentation and usage examples, provided directly in JSDoc annotations within the
   source code.
 
@@ -51,21 +52,15 @@ First, choose and configure your transport layer (more details in the [API Refer
 import * as hl from "@nktkas/hyperliquid";
 
 // HTTP Transport
-const httpTransport = new hl.HttpTransport({ // All options are optional
-    url: "https://api.hyperliquid.xyz", // API base URL for /info, /exchange, /explorer
-    timeout: 10_000, // Request timeout in ms
-});
+const httpTransport = new hl.HttpTransport(); // Accepts optional parameters (e.g. url, timeout, fetchOptions)
 
-// OR WebSocket Transport
-const wsTransport = new hl.WebSocketTransport({ // All options are optional
-    url: "wss://api.hyperliquid.xyz/ws", // WebSocket URL
-    timeout: 10_000, // Request timeout in ms
-});
+// or WebSocket Transport
+const wsTransport = new hl.WebSocketTransport(); // Accepts optional parameters (e.g. url, timeout, keepAlive, reconnect)
 ```
 
 ### Initialize Client
 
-Next, initialize the client with the transport layer (more details in the [API Reference](#clients)):
+Next, initialize a client with the transport layer (more details in the [API Reference](#clients)):
 
 #### Create PublicClient
 
@@ -97,7 +92,10 @@ const ethersClient = new hl.WalletClient({ wallet: ethersWallet, transport });
 // 3. Using external wallet (e.g. MetaMask) via Viem
 const [account] = await window.ethereum.request({ method: "eth_requestAccounts" });
 const externalWallet = createWalletClient({ account, transport: custom(window.ethereum) });
-const metamaskClient = new hl.WalletClient({ wallet: externalWallet, transport });
+const viemMetamaskClient = new hl.WalletClient({ wallet: externalWallet, transport });
+
+// 4. Using external wallet (e.g. MetaMask) via `window.ethereum` directly
+const windowMetamaskClient = new hl.WalletClient({ wallet: window.ethereum, transport });
 ```
 
 #### Create EventClient
@@ -105,8 +103,99 @@ const metamaskClient = new hl.WalletClient({ wallet: externalWallet, transport }
 ```typescript
 import * as hl from "@nktkas/hyperliquid";
 
+const transport = new hl.WebSocketTransport(); // Only WebSocketTransport is supported
+const client = new hl.EventClient({ transport });
+```
+
+### Use Client
+
+Finally, use client methods to interact with the Hyperliquid API (more details in the [API Reference](#clients)):
+
+#### Example of using a public client
+
+```typescript
+import * as hl from "@nktkas/hyperliquid";
+
+const transport = new hl.HttpTransport(); // or WebSocketTransport
+const client = new hl.PublicClient({ transport });
+
+// L2 Book
+const l2Book = await client.l2Book({ coin: "BTC" });
+
+// Account clearinghouse state
+const clearinghouseState = await client.clearinghouseState({ user: "0x..." });
+
+// Open orders
+const openOrders = await client.openOrders({ user: "0x..." });
+```
+
+#### Example of using a wallet client
+
+```typescript
+import * as hl from "@nktkas/hyperliquid";
+import { privateKeyToAccount } from "viem/accounts";
+
+const account = privateKeyToAccount("0x...");
+const transport = new hl.HttpTransport();
+const client = new hl.WalletClient({ wallet: account, transport });
+
+// Place an orders
+const result = await client.order({
+    orders: [{
+        a: 0, // Asset index
+        b: true, // Buy order
+        p: "30000", // Price
+        s: "0.1", // Size
+        r: false, // Not reduce-only
+        t: {
+            limit: {
+                tif: "Gtc", // Good-til-cancelled
+            },
+        },
+    }],
+    grouping: "na", // No grouping
+});
+
+// Approve an agent
+const result = await client.approveAgent({
+    agentAddress: "0x...",
+    agentName: "agentName",
+});
+
+// Withdraw funds
+const result = await client.withdraw3({
+    destination: account.address, // Withdraw funds to your address
+    amount: "100", // 100 USD
+});
+```
+
+#### Example of using an event client
+
+```typescript
+import * as hl from "@nktkas/hyperliquid";
+
 const transport = new hl.WebSocketTransport();
 const client = new hl.EventClient({ transport });
+
+// L2 Book updates
+// Promise is resolved when the subscription is set up
+const sub = await client.l2Book({ coin: "BTC" }, (data) => {
+    console.log(data);
+});
+// Later, you can unsubscribe from receiving events
+await sub.unsubscribe();
+
+// User fills
+const sub = await client.userFills({ user: "0x..." }, (data) => {
+    console.log(data);
+});
+await sub.unsubscribe();
+
+// Explorer block updates
+const sub = await client.explorerBlock((data) => {
+    console.log(data);
+});
+await sub.unsubscribe();
 ```
 
 ## API Reference
@@ -126,12 +215,10 @@ A Public Client which provides access to
 The Public Client class sets up with a given [Transport](#transports).
 
 ```typescript
-interface PublicClientParameters<T extends IRequestTransport = IRequestTransport> {
-    transport: T; // HttpTransport or WebSocketTransport
-}
-
-class PublicClient<T extends IRESTTransport> {
-    constructor(args: PublicClientParameters<T>);
+class PublicClient {
+    constructor(args: {
+        transport: HttpTransport | WebSocketTransport;
+    });
 
     // Market
     allMids(): Promise<AllMids>;
@@ -150,6 +237,8 @@ class PublicClient<T extends IRESTTransport> {
     // Account
     clearinghouseState(args: ClearinghouseStateParameters): Promise<PerpsClearinghouseState>;
     extraAgents(args: ExtraAgentsParameters): Promise<ExtraAgent[]>;
+    isVip(args: IsVipParameters): Promise<boolean>;
+    legalCheck(args: LegalCheckParameters): Promise<LegalCheck>;
     maxBuilderFee(args: MaxBuilderFeeParameters): Promise<number>;
     portfolio(args: PortfolioParameters): Promise<PortfolioPeriods>;
     referral(args: ReferralParameters): Promise<Referral>;
@@ -201,21 +290,18 @@ The Wallet Client class sets up with a given [Transport](#transports) and a wall
 [Ethers Wallet](https://docs.ethers.org/v6/api/providers/#Signer).
 
 ```typescript
-interface WalletClientParameters<
-    T extends ISubscriptionTransport,
-    W extends AbstractViemWalletClient | AbstractEthersSigner | AbstractEthersV5Signer,
-> {
-    transport: T; // HttpTransport or WebSocketTransport
-    wallet: W; // viem, ethers, or ethers v5
-    isTestnet?: boolean; // Whether to use testnet API (default: false)
-    defaultVaultAddress?: Hex; // Vault address used by default if not provided in method call
-}
-
-class WalletClient<
-    T extends IRESTTransport,
-    W extends AbstractViemWalletClient | AbstractEthersSigner | AbstractEthersV5Signer,
-> {
-    constructor(args: WalletClientParameters<T, W>);
+class WalletClient {
+    constructor(args: {
+        transport: HttpTransport | WebSocketTransport;
+        wallet:
+            | AbstractViemWalletClient // viem
+            | AbstractExtendedViemWalletClient // extended viem (e.g. privy)
+            | AbstractEthersSigner // ethers
+            | AbstractEthersV5Signer // ethers v5
+            | AbstractWindowEthereum; // window.ethereum (EIP-1193) directly
+        isTestnet?: boolean; // Whether to use testnet API (default: false)
+        defaultVaultAddress?: Hex; // Vault address used by default if not provided in method call
+    });
 
     // Order
     batchModify(args: BatchModifyParameters): Promise<OrderResponseSuccess>;
@@ -232,22 +318,30 @@ class WalletClient<
     // Account
     approveAgent(args: ApproveAgentParameters): Promise<SuccessResponse>;
     approveBuilderFee(args: ApproveBuilderFeeParameters): Promise<SuccessResponse>;
+    claimRewards(args: ClaimRewardsParameters): Promise<SuccessResponse>;
     createSubAccount(args: CreateSubAccountParameters): Promise<CreateSubAccountResponse>;
+    setDisplayName(args: SetDisplayNameParameters): Promise<SuccessResponse>;
     evmUserModify(args: EvmUserModifyParameters): Promise<SuccessResponse>;
     setReferrer(args: SetReferrerParameters): Promise<SuccessResponse>;
+    spotUser(args: SpotUserParameters): Promise<SuccessResponse>;
 
     // Transfers & Withdrawals
     spotSend(args: SpotSendParameters): Promise<SuccessResponse>;
+    subAccountSpotTransfer(args: SubAccountSpotTransferParameters): Promise<SuccessResponse>;
     subAccountTransfer(args: SubAccountTransferParameters): Promise<SuccessResponse>;
     usdClassTransfer(args: UsdClassTransferParameters): Promise<SuccessResponse>;
     usdSend(args: UsdSendParameters): Promise<SuccessResponse>;
-    vaultTransfer(args: VaultTransferParameters): Promise<SuccessResponse>;
     withdraw3(args: Withdraw3Parameters): Promise<SuccessResponse>;
 
     // Staking
     cDeposit(args: CDepositParameters): Promise<SuccessResponse>;
     cWithdraw(args: CWithdrawParameters): Promise<SuccessResponse>;
     tokenDelegate(args: TokenDelegateParameters): Promise<SuccessResponse>;
+
+    // Vault
+    vaultDistribute(args: VaultDistributeParameters): Promise<SuccessResponse>;
+    vaultModify(args: VaultModifyParameters): Promise<SuccessResponse>;
+    vaultTransfer(args: VaultTransferParameters): Promise<SuccessResponse>;
 }
 ```
 
@@ -261,12 +355,10 @@ The Event Client class sets up with a given [WebSocket Transport](#websocket-tra
 
 <!-- deno-fmt-ignore-start -->
 ```typescript
-interface EventClientParameters<T extends ISubscriptionTransport> {
-    transport: T; // WebSocketTransport
-}
-
-class EventClient<T extends ISubscriptionTransport> {
-    constructor(args: EventClientParameters<T>);
+class EventClient {
+    constructor(args: {
+        transport: WebSocketTransport;
+    });
 
     // Market
     activeAssetCtx(args: EventActiveAssetCtxParameters, listener: (data: WsActiveAssetCtx | WsActiveSpotAssetCtx) => void): Promise<Subscription>;
@@ -309,18 +401,16 @@ A HTTP Transport that executes requests via a [fetch](https://developer.mozilla.
 API.
 
 ```typescript
-class HttpTransport implements IRequestTransport, HttpTransportOptions {
-    constructor(options?: HttpTransportOptions);
+class HttpTransport {
+    constructor(options?: {
+        url?: string | URL; // Base URL for API endpoints (default: "https://api.hyperliquid.xyz")
+        timeout?: number; // Request timeout in ms (default: 10_000)
+        fetchOptions?: RequestInit; // A custom fetch options
+        onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>; // A callback before request is sent
+        onResponse?: (response: Response) => MaybePromise<Response | void | null | undefined>; // A callback after response is received
+    });
 
     request(endpoint: "info" | "action" | "explorer", payload: unknown, signal?: AbortSignal): Promise<unknown>;
-}
-
-interface HttpTransportOptions {
-    url?: string | URL; // Base URL for API endpoints (default: "https://api.hyperliquid.xyz")
-    timeout?: number; // Request timeout in ms (default: 10_000)
-    fetchOptions?: RequestInit; // A custom fetch options
-    onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>; // A callback before request is sent
-    onResponse?: (response: Response) => MaybePromise<Response | void | null | undefined>; // A callback after response is received
 }
 ```
 
@@ -330,8 +420,22 @@ A WebSocket Transport that executes requests and subscribes to events via a
 [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) connection.
 
 ```typescript
-class WebSocketTransport implements IRESTTransport, ISubscriptionTransport {
-    constructor(options?: WebSocketTransportOptions);
+class WebSocketTransport {
+    constructor(options?: {
+        url?: string | URL; // WebSocket URL (default: "wss://api.hyperliquid.xyz/ws")
+        timeout?: number; // Request timeout in ms (default: 10_000)
+        keepAlive?: { // Keep-alive configuration
+            interval?: number; // Ping interval in ms (default: 20_000)
+        };
+        reconnect?: { // Reconnection policy configuration for closed connections
+            maxRetries?: number; // Maximum number of reconnection attempts (default: 3)
+            connectionTimeout?: number; // Connection timeout in ms (default: 10_000)
+            connectionDelay?: number | ((attempt: number) => number | Promise<number>); // Delay between reconnection (default: Exponential backoff (max 10s))
+            shouldReconnect?: (event: CloseEvent) => boolean | Promise<boolean>; // Custom reconnection logic (default: Always reconnect)
+            messageBuffer?: MessageBufferStrategy; // Message buffering strategy between reconnection (default: FIFO buffer)
+            WebSocketConstructor?: typeof WebSocket; // Custom WebSocket constructor (default: globalThis.WebSocket)
+        };
+    });
 
     request(endpoint: "info" | "action" | "explorer", payload: unknown, signal?: AbortSignal): Promise<unknown>;
     subscribe(
@@ -344,28 +448,135 @@ class WebSocketTransport implements IRESTTransport, ISubscriptionTransport {
     ready(signal?: AbortSignal): Promise<void>;
     close(signal?: AbortSignal): Promise<void>;
 }
-
-interface WebSocketTransportOptions {
-    url?: string | URL; // WebSocket URL (default: "wss://api.hyperliquid.xyz/ws")
-    timeout?: number; // Request timeout in ms (default: 10_000)
-    keepAlive?: { // Keep-alive configuration
-        interval?: number; // Ping interval in ms (default: 20_000)
-    };
-    reconnect?: { // Reconnection policy configuration for closed connections
-        maxRetries?: number; // Maximum number of reconnection attempts (default: 3)
-        connectionTimeout?: number; // Connection timeout in ms (default: 10_000)
-        connectionDelay?: number | ((attempt: number) => number | Promise<number>); // Delay between reconnection (default: Exponential backoff (max 10s))
-        shouldReconnect?: (event: CloseEvent) => boolean | Promise<boolean>; // Custom reconnection logic (default: Always reconnect)
-        messageBuffer?: MessageBufferStrategy; // Message buffering strategy between reconnection (default: FIFO buffer)
-        WebSocketConstructor?: typeof WebSocket; // Custom WebSocket constructor (default: globalThis.WebSocket)
-    };
-}
 ```
 
-## Semantic Versioning
+## Additional Import Points
 
-This library follows [Semantic Versioning](https://semver.org/) (or rather
-[this proposal](https://github.com/semver/semver/pull/923)) for its releases.
+The SDK exports additional import points to access internal functions.
+
+### `/types`
+
+The import point gives access to all Hyperliquid-related types, including the base types on which class methods are
+based.
+
+Useful if you want to get all Hyperliquid types.
+
+### `/signing`
+
+The import point gives access to functions that generate signatures for Hyperliquid transactions.
+
+Useful if you want to sign a Hyperliquid transaction yourself.
+
+### Examples
+
+#### Cancel an order without a client
+
+```typescript
+import { signL1Action } from "@nktkas/hyperliquid/signing";
+import type { CancelRequest, CancelResponse } from "@nktkas/hyperliquid/types";
+import { privateKeyToAccount } from "viem/accounts";
+
+// —————————— Prepare ——————————
+
+const wallet = privateKeyToAccount("0x..."); // Change to your private key
+
+// The CancelRequest["action"] type ensures that we collect the correct cancel request action
+const action: CancelRequest["action"] = { type: "cancel", cancels: [{ a: 0, o: 12345 }] };
+const nonce = Date.now();
+
+// —————————— Signing ——————————
+
+const signature = await signL1Action({
+    wallet,
+    action: sortedAction,
+    nonce,
+    isTestnet: true,
+});
+
+// —————————— Request ——————————
+
+// The CancelRequest type guarantees us that the object we want to send is valid in terms of types
+const request: CancelRequest = { action, signature, nonce };
+
+const response = await fetch("https://api.hyperliquid-testnet.xyz/exchange", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+});
+
+if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Failed to cancel order: ${response.statusText} ${body}`);
+}
+
+// If we sent a cancel request and received a successful response, then we got exactly the CancelResponse type
+const body = await response.json() as CancelResponse;
+console.log("Order cancel response:", body);
+```
+
+#### Approve an agent without a client
+
+```typescript
+import { signUserSignedAction } from "@nktkas/hyperliquid/signing";
+import type { ApproveAgentRequest, ErrorResponse, SuccessResponse } from "@nktkas/hyperliquid/types";
+import { privateKeyToAccount } from "viem/accounts";
+
+// —————————— Prepare ——————————
+
+const wallet = privateKeyToAccount("0x..."); // Change to your private key
+
+// The ApproveAgentRequest["action"] type ensures that we collect the correct approve agent request action
+const action: ApproveAgentRequest["action"] = {
+    type: "approveAgent",
+    hyperliquidChain: "Testnet",
+    signatureChainId: "0x66eee",
+    nonce: Date.now(),
+    agentAddress: "0x...", // Change to the agent address you want to approve
+    agentName: "TempAgent",
+};
+
+// —————————— Signing ——————————
+
+const signature = await signUserSignedAction({
+    wallet,
+    action,
+    types: {
+        "HyperliquidTransaction:ApproveAgent": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "agentAddress", type: "address" },
+            { name: "agentName", type: "string" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    chainId: parseInt(action.signatureChainId, 16),
+});
+
+// —————————— Request ——————————
+
+// The ApproveAgentRequest type guarantees us that the object we want to send is valid in terms of types
+const request: ApproveAgentRequest = { action, signature, nonce: action.nonce };
+
+const response = await fetch("https://api.hyperliquid-testnet.xyz/exchange", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+});
+
+if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Failed to approve agent: ${response.statusText} ${body}`);
+}
+
+// If we sent a request for agent approval and received a successful response,
+// we will get either a SuccessResponse type or an ErrorResponse type
+const body = await response.json() as SuccessResponse | ErrorResponse;
+console.log("Agent approval response:", body);
+```
+
+## Versioning Policy
+
+This library follows a [stricter version](https://github.com/semver/semver/pull/923) of
+[Semantic Versioning](https://semver.org/) for its releases.
 
 > [!IMPORTANT]
 > To avoid rapid increase in the main version of the SDK due to changes in Hyperliquid API types, such changes are

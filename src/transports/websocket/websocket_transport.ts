@@ -1,11 +1,12 @@
-import { ReconnectingWebSocket, type ReconnectingWebSocketOptions } from "./reconnecting_websocket.ts";
-import { HyperliquidEventTarget } from "./hyperliquid_event_target.ts";
-import { WebSocketRequestDispatcher } from "./websocket_request_dispatcher.ts";
-import type { IRequestTransport, ISubscriptionTransport, Subscription } from "../base.ts";
+import { ReconnectingWebSocket, type ReconnectingWebSocketOptions } from "./_reconnecting_websocket.ts";
+import { HyperliquidEventTarget } from "./_hyperliquid_event_target.ts";
+import { WebSocketRequestDispatcher, WebSocketRequestError } from "./_websocket_request_dispatcher.ts";
+import type { IRequestTransport, ISubscriptionTransport, Subscription } from "../../base.ts";
 
-/**
- * Configuration options for the WebSocket transport layer.
- */
+export { WebSocketRequestError };
+export type { MessageBufferStrategy, ReconnectingWebSocketOptions } from "./_reconnecting_websocket.ts";
+
+/** Configuration options for the WebSocket transport layer. */
 export interface WebSocketTransportOptions {
     /**
      * The WebSocket URL.
@@ -41,12 +42,10 @@ export interface WebSocketTransportOptions {
     reconnect?: ReconnectingWebSocketOptions;
 }
 
-/**
- * WebSocket implementation of the REST and Subscription transport interfaces.
- */
+/** WebSocket implementation of the REST and Subscription transport interfaces. */
 export class WebSocketTransport implements IRequestTransport, ISubscriptionTransport {
     /** The interval timer ID for keep-alive messages. */
-    protected _keepAliveTimer: number | undefined;
+    protected _keepAliveTimer: number | null = null;
 
     /** The WebSocket request dispatcher instance. */
     protected _wsRequester: WebSocketRequestDispatcher;
@@ -63,13 +62,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
     protected _subscriptions: Map<
         string,
         {
-            listeners: Map<
-                (data: CustomEvent) => void,
-                {
-                    channel: string;
-                    unsubscribe: (signal?: AbortSignal) => Promise<void>;
-                }
-            >;
+            listeners: Map<(data: CustomEvent) => void, (signal?: AbortSignal) => Promise<void>>;
             requestPromise: Promise<unknown>;
         }
     > = new Map();
@@ -113,7 +106,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
         // Initialize listeners
         this.socket.addEventListener("open", () => {
             // Start keep-alive timer
-            if (this.keepAlive.interval && !this._keepAliveTimer) {
+            if (this.keepAlive.interval && this._keepAliveTimer === null) {
                 this._keepAliveTimer = setInterval(() => {
                     this.socket.send(JSON.stringify({ method: "ping" }));
                 }, this.keepAlive.interval);
@@ -121,18 +114,17 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
         });
         this.socket.addEventListener("close", () => {
             // Clear keep-alive timer
-            if (this._keepAliveTimer) {
+            if (this._keepAliveTimer !== null) {
                 clearInterval(this._keepAliveTimer);
-                this._keepAliveTimer = undefined;
+                this._keepAliveTimer = null;
             }
 
             // Clear all subscriptions
             for (const subscriptionInfo of this._subscriptions.values()) {
-                for (const [listener, { channel }] of subscriptionInfo.listeners) {
-                    this._hlEvents.removeEventListener(channel, listener);
+                for (const [_, unsubscribe] of subscriptionInfo.listeners) {
+                    unsubscribe();
                 }
             }
-            this._subscriptions.clear();
         });
     }
 
@@ -148,15 +140,13 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
     request(type: "info" | "action" | "explorer", payload: unknown, signal?: AbortSignal): Promise<unknown> {
         // Reject explorer requests because they are not supported by the Hyperliquid WebSocket API
         if (type === "explorer") {
-            throw new Error("Explorer requests are not supported in the Hyperliquid WebSocket API.");
+            return Promise.reject(
+                new WebSocketRequestError("Explorer requests are not supported in the Hyperliquid WebSocket API."),
+            );
         }
 
         // Send the request and wait for a response
-        const timeoutSignal = this.timeout ? AbortSignal.timeout(this.timeout) : undefined;
-        const combinedSignal = timeoutSignal && signal
-            ? AbortSignal.any([timeoutSignal, signal])
-            : timeoutSignal ?? signal;
-
+        const combinedSignal = this._combineTimeoutWithSignal(this.timeout, signal);
         return this._wsRequester.request("post", { type, payload }, combinedSignal);
     }
 
@@ -178,71 +168,63 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
         const id = WebSocketRequestDispatcher.requestToId(payload);
 
         // Initialize new subscription, if it doesn't exist
-        let subscriptionInfo = this._subscriptions.get(id);
-        if (!subscriptionInfo) {
+        let subscription = this._subscriptions.get(id);
+        if (!subscription) {
             // Send subscription request
-            const timeoutSignal = this.timeout ? AbortSignal.timeout(this.timeout) : undefined;
-            const combinedSignal = timeoutSignal && signal
-                ? AbortSignal.any([timeoutSignal, signal])
-                : timeoutSignal ?? signal;
-
+            const combinedSignal = this._combineTimeoutWithSignal(this.timeout, signal);
             const requestPromise = this._wsRequester.request("subscribe", payload, combinedSignal);
 
             // Cache subscription info
-            subscriptionInfo = { listeners: new Map(), requestPromise };
-            this._subscriptions.set(id, subscriptionInfo);
+            subscription = { listeners: new Map(), requestPromise };
+            this._subscriptions.set(id, subscription);
         }
 
         // Initialize new listener, if it doesn't exist
-        let listenerInfo = subscriptionInfo.listeners.get(listener);
-        if (!listenerInfo) {
+        let unsubscribe = subscription.listeners.get(listener);
+        if (!unsubscribe) {
             // Create new unsubscribe function
-            const unsubscribe = async (signal?: AbortSignal) => {
+            unsubscribe = async (signal?: AbortSignal) => {
                 // Remove listener and cleanup
                 this._hlEvents.removeEventListener(channel, listener);
-                const isDeleted = subscriptionInfo.listeners.delete(listener);
+                const subscription = this._subscriptions.get(id);
+                subscription?.listeners.delete(listener);
 
                 // If no listeners remain, remove subscription entirely
-                // `isDeleted` means that the map had a listener before and became 0 after that
-                if (subscriptionInfo.listeners.size === 0 && isDeleted) {
+                if (subscription?.listeners.size === 0) {
                     // Cleanup subscription
                     this._subscriptions.delete(id);
 
-                    // Send unsubscription request
-                    const timeoutSignal = this.timeout ? AbortSignal.timeout(this.timeout) : undefined;
-                    const combinedSignal = timeoutSignal && signal
-                        ? AbortSignal.any([timeoutSignal, signal])
-                        : timeoutSignal ?? signal;
-
-                    await this._wsRequester.request("unsubscribe", payload, combinedSignal);
+                    // If the socket is open, send unsubscription request
+                    if (this.socket.readyState === WebSocket.OPEN) {
+                        const combinedSignal = this._combineTimeoutWithSignal(this.timeout, signal);
+                        await this._wsRequester.request("unsubscribe", payload, combinedSignal);
+                    }
                 }
             };
 
-            // Cache listener info
-            listenerInfo = { channel, unsubscribe };
-            subscriptionInfo.listeners.set(listener, listenerInfo);
-
-            // Add event listener
+            // Add listener and cache unsubscribe function
             this._hlEvents.addEventListener(channel, listener);
+            subscription.listeners.set(listener, unsubscribe);
         }
 
         // Wait for the initial subscription request to complete
-        await subscriptionInfo.requestPromise.catch((error) => {
+        await subscription.requestPromise.catch((error) => {
             // Remove listener and cleanup
             this._hlEvents.removeEventListener(channel, listener);
-            subscriptionInfo.listeners.delete(listener);
+            const subscription = this._subscriptions.get(id);
+            subscription?.listeners.delete(listener);
 
             // If no listeners remain, remove subscription entirely
-            if (subscriptionInfo.listeners.size === 0) this._subscriptions.delete(id);
+            if (subscription?.listeners.size === 0) {
+                this._subscriptions.delete(id);
+            }
 
             // Rethrow the error
             throw error;
         });
 
         // Return subscription control object
-        return {
-            unsubscribe: listenerInfo.unsubscribe,
-        };
+        return { unsubscribe };
     }
 
     /**
@@ -297,5 +279,12 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
 
             this.socket.close();
         });
+    }
+
+    /** Combines a timeout with an optional abort signal. */
+    protected _combineTimeoutWithSignal(timeout?: number | null, signal?: AbortSignal): AbortSignal | undefined {
+        if (typeof timeout !== "number") return signal;
+        if (!(signal instanceof AbortSignal)) return AbortSignal.timeout(timeout);
+        return AbortSignal.any([AbortSignal.timeout(timeout), signal]);
     }
 }
