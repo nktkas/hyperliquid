@@ -6,7 +6,7 @@ await build({
     entryPoints: [
         { name: ".", path: "./mod.ts" },
         { name: "./types", path: "./src/types/mod.ts" },
-        { name: "./signing", path: "./src/signing/signing.ts" },
+        { name: "./signing", path: "./src/signing.ts" },
     ],
     outDir: "./build/npm",
     shims: {},
