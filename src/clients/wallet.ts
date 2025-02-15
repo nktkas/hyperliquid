@@ -43,7 +43,9 @@ import type {
 import {
     type AbstractEthersSigner,
     type AbstractEthersV5Signer,
+    type AbstractExtendedViemWalletClient,
     type AbstractViemWalletClient,
+    type AbstractWindowEthereum,
     signL1Action,
     signUserSignedAction,
 } from "../signing.ts";
@@ -53,14 +55,19 @@ import {
 /** Parameters for the {@linkcode WalletClient} constructor. */
 export interface WalletClientParameters<
     T extends IRequestTransport = IRequestTransport,
-    W extends AbstractViemWalletClient | AbstractEthersSigner | AbstractEthersV5Signer =
-        | AbstractViemWalletClient
+    W extends
         | AbstractEthersSigner
-        | AbstractEthersV5Signer,
+        | AbstractEthersV5Signer
+        | AbstractExtendedViemWalletClient
+        | AbstractViemWalletClient
+        | AbstractWindowEthereum =
+            | AbstractViemWalletClient
+            | AbstractEthersSigner
+            | AbstractEthersV5Signer,
 > {
     /** The transport used to connect to the Hyperliquid API. */
     transport: T;
-    /** The WalletClient/Account ([viem](https://viem.sh/docs/clients/wallet)) or Signer ([ethers.js](https://docs.ethers.org/v6/api/providers/#Signer)) used for signing transactions. */
+    /** The `viem`, `ethers.js`, or `window.ethereum` wallet used for signing transactions. */
     wallet: W;
     /**
      * Specifies whether the client uses testnet.
@@ -318,18 +325,22 @@ export class ApiRequestError extends HyperliquidError {
  */
 export class WalletClient<
     T extends IRequestTransport = IRequestTransport,
-    W extends AbstractViemWalletClient | AbstractEthersSigner | AbstractEthersV5Signer =
-        | AbstractViemWalletClient
+    W extends
         | AbstractEthersSigner
-        | AbstractEthersV5Signer,
+        | AbstractEthersV5Signer
+        | AbstractExtendedViemWalletClient
+        | AbstractViemWalletClient
+        | AbstractWindowEthereum =
+            | AbstractEthersSigner
+            | AbstractEthersV5Signer
+            | AbstractExtendedViemWalletClient
+            | AbstractViemWalletClient
+            | AbstractWindowEthereum,
 > {
     /** The transport used to connect to the Hyperliquid API. */
     transport: T;
 
-    /**
-     * The [viem](https://viem.sh/docs/clients/wallet) or [ethers.js](https://docs.ethers.org/v6/api/providers/#Signer)
-     * used for signing transactions.
-     */
+    /** The `viem`, `ethers.js`, or `window.ethereum` wallet used for signing transactions. */
     wallet: W;
 
     /** Specifies whether the client uses testnet. */
