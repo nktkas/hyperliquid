@@ -410,7 +410,7 @@ class HttpTransport {
         onResponse?: (response: Response) => MaybePromise<Response | void | null | undefined>; // A callback after response is received
     });
 
-    request(endpoint: "info" | "action" | "explorer", payload: unknown, signal?: AbortSignal): Promise<unknown>;
+    request(endpoint: "info" | "exchange" | "explorer", payload: unknown, signal?: AbortSignal): Promise<unknown>;
 }
 ```
 
@@ -436,7 +436,7 @@ class WebSocketTransport {
         };
     });
 
-    request(endpoint: "info" | "action" | "explorer", payload: unknown, signal?: AbortSignal): Promise<unknown>;
+    request(endpoint: "info" | "exchange" | "explorer", payload: unknown, signal?: AbortSignal): Promise<unknown>;
     subscribe(
         channel: string,
         payload: unknown,
@@ -480,17 +480,17 @@ import { privateKeyToAccount } from "viem/accounts";
 const wallet = privateKeyToAccount("0x..."); // Change to your private key
 
 // The CancelRequest["action"] type ensures that we collect the correct cancel request action
-const action: CancelRequest["action"] = { type: "cancel", cancels: [{ a: 0, o: 12345 }] };
+const action: CancelRequest["action"] = {
+    type: "cancel",
+    cancels: [
+        { a: 0, o: 12345 },
+    ],
+};
 const nonce = Date.now();
 
 // —————————— Signing ——————————
 
-const signature = await signL1Action({
-    wallet,
-    action: sortedAction,
-    nonce,
-    isTestnet: true,
-});
+const signature = await signL1Action({ wallet, action, nonce, isTestnet: true });
 
 // —————————— Request ——————————
 
@@ -571,23 +571,6 @@ if (!response.ok) {
 const body = await response.json() as SuccessResponse | ErrorResponse;
 console.log("Agent approval response:", body);
 ```
-
-## Versioning Policy
-
-This library follows a [stricter version](https://github.com/semver/semver/pull/923) of
-[Semantic Versioning](https://semver.org/) for its releases.
-
-> [!IMPORTANT]
-> To avoid rapid increase in the main version of the SDK due to changes in Hyperliquid API types, such changes are
-> reflected in updates to the patch version of this SDK.
-
-## CI/CD and Release
-
-Before publishing a new version of the SDK, tests are always run in
-[Github Actions](https://github.com/nktkas/hyperliquid/actions). Only if all tests pass successfully, the process of
-publishing the package takes place.
-
-For more details, see our [CI/CD configuration files](./.github/workflows/).
 
 ## Contributing
 
