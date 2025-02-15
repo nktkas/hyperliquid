@@ -40,20 +40,17 @@ git push origin feature/your-feature-name
 - **Create a Pull Request**: Go to the original repository and click on "New Pull Request". Select your branch and
   submit the pull request.
 
-### Coding Guidelines
+#### Coding Guidelines
 
 - **TypeScript**: Ensure your code passes TypeScript compilation without errors.
-- **Style**: Follow existing code style and conventions.
+- **Style**: Follow Deno formatting convention ([deno fmt](https://docs.deno.com/runtime/reference/cli/fmt/)) and code
+  style ([deno lint](https://docs.deno.com/runtime/reference/cli/lint/)).
 - **Dependencies**: Avoid adding unnecessary dependencies.
 - **Docs**: Update or add JSDoc comments where appropriate.
 
-### Testing
+#### Testing
 
 Before submitting your pull request:
 
 - Run existing tests to ensure nothing breaks.
 - If you add new features, consider adding tests for them.
-
-### License
-
-By contributing, you agree that your contributions will be licensed under the MIT License.
