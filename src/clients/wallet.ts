@@ -450,7 +450,7 @@ export class WalletClient<
 
         // Send a request
         const request: ApproveAgentRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -509,7 +509,7 @@ export class WalletClient<
 
         // Send a request
         const request: ApproveBuilderFeeRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -607,7 +607,7 @@ export class WalletClient<
 
         // Send a request
         const request: BatchModifyRequest = { action, signature, nonce, vaultAddress };
-        const response = await this.transport.request("action", request, signal) as OrderResponse;
+        const response = await this.transport.request("exchange", request, signal) as OrderResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -667,7 +667,7 @@ export class WalletClient<
 
         // Send a request
         const request: CancelRequest = { action, signature, nonce, vaultAddress };
-        const response = await this.transport.request("action", request, signal) as CancelResponse;
+        const response = await this.transport.request("exchange", request, signal) as CancelResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -720,7 +720,7 @@ export class WalletClient<
 
         // Send a request
         const request: CDepositRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -766,7 +766,7 @@ export class WalletClient<
 
         // Send a request
         const request: ClaimRewardsRequest = { action: sortedAction, signature, nonce };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -828,7 +828,7 @@ export class WalletClient<
 
         // Send a request
         const request: CancelByCloidRequest = { action, signature, nonce, vaultAddress };
-        const response = await this.transport.request("action", request, signal) as CancelResponse;
+        const response = await this.transport.request("exchange", request, signal) as CancelResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -881,7 +881,7 @@ export class WalletClient<
 
         // Send a request
         const request: CWithdrawRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -933,7 +933,7 @@ export class WalletClient<
 
         // Send a request
         const request: EvmUserModifyRequest = { action, signature, nonce };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -985,7 +985,7 @@ export class WalletClient<
 
         // Send a request
         const request: CreateSubAccountRequest = { action, signature, nonce };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | CreateSubAccountResponse
             | ErrorResponse;
 
@@ -1076,7 +1076,7 @@ export class WalletClient<
 
         // Send a request
         const request: ModifyRequest = { action, signature, nonce, vaultAddress };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -1177,7 +1177,7 @@ export class WalletClient<
 
         // Send a request
         const request: OrderRequest = { action, signature, nonce, vaultAddress };
-        const response = await this.transport.request("action", request, signal) as OrderResponse;
+        const response = await this.transport.request("exchange", request, signal) as OrderResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -1230,7 +1230,7 @@ export class WalletClient<
 
         // Send a request
         const request: ScheduleCancelRequest = { action, signature, nonce, vaultAddress };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -1282,7 +1282,7 @@ export class WalletClient<
 
         // Send a request
         const request: SetDisplayNameRequest = { action, signature, nonce };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -1334,7 +1334,7 @@ export class WalletClient<
 
         // Send a request
         const request: SetReferrerRequest = { action, signature, nonce };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -1395,7 +1395,7 @@ export class WalletClient<
 
         // Send a request
         const request: SpotSendRequest = { action, signature, nonce: action.time };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -1451,7 +1451,7 @@ export class WalletClient<
 
         // Send a request
         const request: SpotUserRequest = { action, signature, nonce };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -1514,7 +1514,7 @@ export class WalletClient<
 
         // Send a request
         const request: SubAccountSpotTransferRequest = { action, signature, nonce };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -1572,7 +1572,7 @@ export class WalletClient<
 
         // Send a request
         const request: SubAccountTransferRequest = { action, signature, nonce };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -1633,7 +1633,7 @@ export class WalletClient<
 
         // Send a request
         const request: TokenDelegateRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -1691,7 +1691,7 @@ export class WalletClient<
 
         // Send a request
         const request: TwapCancelRequest = { action, signature, nonce, vaultAddress };
-        const response = await this.transport.request("action", request, signal) as TwapCancelResponse;
+        const response = await this.transport.request("exchange", request, signal) as TwapCancelResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -1757,7 +1757,7 @@ export class WalletClient<
 
         // Send a request
         const request: TwapOrderRequest = { action, signature, nonce, vaultAddress };
-        const response = await this.transport.request("action", request, signal) as TwapOrderResponse;
+        const response = await this.transport.request("exchange", request, signal) as TwapOrderResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -1815,7 +1815,7 @@ export class WalletClient<
 
         // Send a request
         const request: UpdateIsolatedMarginRequest = { action, signature, nonce, vaultAddress };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -1875,7 +1875,7 @@ export class WalletClient<
 
         // Send a request
         const request: UpdateLeverageRequest = { action, signature, nonce, vaultAddress };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -1934,7 +1934,7 @@ export class WalletClient<
 
         // Send a request
         const request: UsdClassTransferRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -1993,7 +1993,7 @@ export class WalletClient<
 
         // Send a request
         const request: UsdSendRequest = { action, signature, nonce: action.time };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -2049,7 +2049,7 @@ export class WalletClient<
 
         // Send a request
         const request: VaultDistributeRequest = { action, signature, nonce };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -2107,7 +2107,7 @@ export class WalletClient<
 
         // Send a request
         const request: VaultModifyRequest = { action, signature, nonce };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -2165,7 +2165,7 @@ export class WalletClient<
 
         // Send a request
         const request: VaultTransferRequest = { action, signature, nonce };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 
@@ -2224,7 +2224,7 @@ export class WalletClient<
 
         // Send a request
         const request: Withdraw3Request = { action, signature, nonce: action.time };
-        const response = await this.transport.request("action", request, signal) as
+        const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
 

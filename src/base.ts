@@ -16,7 +16,11 @@ export interface IRequestTransport {
      * @param signal - An ptional abort signal.
      * @returns A promise that resolves with parsed JSON response body.
      */
-    request(endpoint: "info" | "action" | "explorer", payload: unknown, signal?: AbortSignal): Promise<unknown>;
+    request(
+        endpoint: "info" | "exchange" | "explorer",
+        payload: unknown,
+        signal?: AbortSignal,
+    ): Promise<unknown>;
 }
 
 /**

@@ -69,13 +69,6 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
     onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>;
     onResponse?: (response: Response) => MaybePromise<Response | void | null | undefined>;
 
-    /** Mapping of endpoint types to their API paths. */
-    protected _endpointPaths: Record<"info" | "action" | "explorer", string> = {
-        info: "/info",
-        action: "/exchange",
-        explorer: "/explorer",
-    };
-
     /**
      * Creates a new HTTP transport instance.
      * @param options - Configuration options for the HTTP transport layer.
@@ -97,9 +90,13 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
      * @throws {HttpRequestError} - Thrown when an HTTP response is deemed invalid.
      * @throws May throw {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch#exceptions | fetch errors}.
      */
-    async request(endpoint: "info" | "action" | "explorer", payload: unknown, signal?: AbortSignal): Promise<unknown> {
+    async request(
+        endpoint: "info" | "exchange" | "explorer",
+        payload: unknown,
+        signal?: AbortSignal,
+    ): Promise<unknown> {
         // Construct a Request
-        const url = new URL(this._endpointPaths[endpoint], this.url);
+        const url = new URL(endpoint, this.url);
 
         // FIXME: Temporary hack: replace `api.hyperliquid-testnet.xyz/explorer` with `rpc.hyperliquid-testnet.xyz/explorer`
         // until the new rpc url becomes the standard for mainnet.

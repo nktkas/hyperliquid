@@ -137,7 +137,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
      * @throws {WebSocketRequestError} - An error that occurs when a WebSocket request fails.
      * @note Explorer requests are not supported in the Hyperliquid WebSocket API.
      */
-    request(type: "info" | "action" | "explorer", payload: unknown, signal?: AbortSignal): Promise<unknown> {
+    request(type: "info" | "exchange" | "explorer", payload: unknown, signal?: AbortSignal): Promise<unknown> {
         // Reject explorer requests because they are not supported by the Hyperliquid WebSocket API
         if (type === "explorer") {
             return Promise.reject(
@@ -147,7 +147,14 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
 
         // Send the request and wait for a response
         const combinedSignal = this._combineTimeoutWithSignal(this.timeout, signal);
-        return this._wsRequester.request("post", { type, payload }, combinedSignal);
+        return this._wsRequester.request(
+            "post",
+            {
+                type: type === "exchange" ? "action" : type,
+                payload,
+            },
+            combinedSignal,
+        );
     }
 
     /**
