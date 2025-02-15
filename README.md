@@ -320,8 +320,8 @@ class WalletClient {
     approveBuilderFee(args: ApproveBuilderFeeParameters): Promise<SuccessResponse>;
     claimRewards(args: ClaimRewardsParameters): Promise<SuccessResponse>;
     createSubAccount(args: CreateSubAccountParameters): Promise<CreateSubAccountResponse>;
-    setDisplayName(args: SetDisplayNameParameters): Promise<SuccessResponse>;
     evmUserModify(args: EvmUserModifyParameters): Promise<SuccessResponse>;
+    setDisplayName(args: SetDisplayNameParameters): Promise<SuccessResponse>;
     setReferrer(args: SetReferrerParameters): Promise<SuccessResponse>;
     spotUser(args: SpotUserParameters): Promise<SuccessResponse>;
 
@@ -433,7 +433,6 @@ class WebSocketTransport {
             connectionDelay?: number | ((attempt: number) => number | Promise<number>); // Delay between reconnection (default: Exponential backoff (max 10s))
             shouldReconnect?: (event: CloseEvent) => boolean | Promise<boolean>; // Custom reconnection logic (default: Always reconnect)
             messageBuffer?: MessageBufferStrategy; // Message buffering strategy between reconnection (default: FIFO buffer)
-            WebSocketConstructor?: typeof WebSocket; // Custom WebSocket constructor (default: globalThis.WebSocket)
         };
     });
 
