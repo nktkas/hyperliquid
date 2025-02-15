@@ -100,6 +100,14 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
     async request(endpoint: "info" | "action" | "explorer", payload: unknown, signal?: AbortSignal): Promise<unknown> {
         // Construct a Request
         const url = new URL(this._endpointPaths[endpoint], this.url);
+
+        // FIXME: Temporary hack: replace `api.hyperliquid-testnet.xyz/explorer` with `rpc.hyperliquid-testnet.xyz/explorer`
+        // until the new rpc url becomes the standard for mainnet.
+        // Maybe after that should split the url property into api and rpc variants.
+        if (url.hostname === "api.hyperliquid-testnet.xyz" && url.pathname === "/explorer") {
+            url.hostname = "rpc.hyperliquid-testnet.xyz";
+        }
+
         const init = mergeRequestInit(
             {
                 body: JSON.stringify(payload),
