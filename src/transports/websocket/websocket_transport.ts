@@ -1,10 +1,15 @@
-import { ReconnectingWebSocket, type ReconnectingWebSocketOptions } from "./_reconnecting_websocket.ts";
+import {
+    type MessageBufferStrategy,
+    ReconnectingWebSocket,
+    ReconnectingWebSocketError,
+    type ReconnectingWebSocketOptions,
+} from "./_reconnecting_websocket.ts";
 import { HyperliquidEventTarget } from "./_hyperliquid_event_target.ts";
 import { WebSocketRequestDispatcher, WebSocketRequestError } from "./_websocket_request_dispatcher.ts";
 import type { IRequestTransport, ISubscriptionTransport, Subscription } from "../../base.ts";
 
 export { WebSocketRequestError };
-export type { MessageBufferStrategy, ReconnectingWebSocketOptions } from "./_reconnecting_websocket.ts";
+export { type MessageBufferStrategy, ReconnectingWebSocketError, type ReconnectingWebSocketOptions };
 
 /** Configuration options for the WebSocket transport layer. */
 export interface WebSocketTransportOptions {
@@ -146,7 +151,11 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
         }
 
         // Send the request and wait for a response
-        const combinedSignal = this._combineTimeoutWithSignal(this.timeout, signal);
+        const timeoutSignal = this.timeout ? AbortSignal.timeout(this.timeout) : undefined;
+        const combinedSignal = signal && timeoutSignal
+            ? AbortSignal.any([signal, timeoutSignal])
+            : signal ?? timeoutSignal;
+
         return this._wsRequester.request(
             "post",
             {
@@ -178,7 +187,11 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
         let subscription = this._subscriptions.get(id);
         if (!subscription) {
             // Send subscription request
-            const combinedSignal = this._combineTimeoutWithSignal(this.timeout, signal);
+            const timeoutSignal = this.timeout ? AbortSignal.timeout(this.timeout) : undefined;
+            const combinedSignal = signal && timeoutSignal
+                ? AbortSignal.any([signal, timeoutSignal])
+                : signal ?? timeoutSignal;
+
             const requestPromise = this._wsRequester.request("subscribe", payload, combinedSignal);
 
             // Cache subscription info
@@ -203,7 +216,11 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
 
                     // If the socket is open, send unsubscription request
                     if (this.socket.readyState === WebSocket.OPEN) {
-                        const combinedSignal = this._combineTimeoutWithSignal(this.timeout, signal);
+                        const timeoutSignal = this.timeout ? AbortSignal.timeout(this.timeout) : undefined;
+                        const combinedSignal = signal && timeoutSignal
+                            ? AbortSignal.any([signal, timeoutSignal])
+                            : signal ?? timeoutSignal;
+
                         await this._wsRequester.request("unsubscribe", payload, combinedSignal);
                     }
                 }
@@ -286,12 +303,5 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
 
             this.socket.close();
         });
-    }
-
-    /** Combines a timeout with an optional abort signal. */
-    protected _combineTimeoutWithSignal(timeout?: number | null, signal?: AbortSignal): AbortSignal | undefined {
-        if (typeof timeout !== "number") return signal;
-        if (!(signal instanceof AbortSignal)) return AbortSignal.timeout(timeout);
-        return AbortSignal.any([AbortSignal.timeout(timeout), signal]);
     }
 }
