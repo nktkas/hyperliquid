@@ -5,7 +5,7 @@ import { assertJsonSchema } from "../../utils.ts";
 
 // —————————— Constants ——————————
 
-const USER_ADDRESS = "0x563C175E6f11582f65D6d9E360A618699DEe14a9";
+const USER_ADDRESS = "0xe019d6167E7e324aEd003d94098496b6d986aB05";
 
 // —————————— Type schema ——————————
 
