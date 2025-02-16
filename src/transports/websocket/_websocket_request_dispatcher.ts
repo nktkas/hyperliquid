@@ -1,6 +1,16 @@
 import { TransportError } from "../../base.ts";
 import type { HyperliquidEventTarget } from "./_hyperliquid_event_target.ts";
 
+interface PostRequest {
+    method: "post";
+    id: number;
+    request: unknown;
+}
+interface SubscribeRequest {
+    method: "subscribe" | "unsubscribe";
+    subscription: unknown;
+}
+
 /**
  * Error thrown when a WebSocket request fails:
  * - When the WebSocket connection is closed
@@ -18,13 +28,16 @@ export class WebSocketRequestError extends TransportError {
  * Handles request creation, sending, and mapping responses to their corresponding requests.
  */
 export class WebSocketRequestDispatcher {
-    /** Last used request ID */
-    protected lastId: number = 0;
+    /** Last used post request ID */
+    private lastId: number = 0;
 
     /** Map of pending requests waiting for responses */
-    protected pending: Map<
+    private pending: Map<
         number | string,
-        { resolve: (value: unknown) => void; reject: (reason: unknown) => void }
+        {
+            resolve: (value: unknown) => void;
+            reject: (reason: unknown) => void;
+        }
     > = new Map();
 
     /**
@@ -32,7 +45,7 @@ export class WebSocketRequestDispatcher {
      * @param socket - WebSocket connection instance for sending requests to the Hyperliquid WebSocket API
      * @param hlEvents - Used to recognize Hyperliquid responses and match them with sent requests
      */
-    constructor(protected socket: WebSocket, hlEvents: HyperliquidEventTarget) {
+    constructor(private socket: WebSocket, hlEvents: HyperliquidEventTarget) {
         // Monitor responses and match the pending request
         hlEvents.addEventListener("subscriptionResponse", (event) => {
             // Use a stringified request as an id
@@ -91,11 +104,6 @@ export class WebSocketRequestDispatcher {
         });
     }
 
-    /** Gets the next request ID */
-    protected get nextId(): number {
-        return ++this.lastId;
-    }
-
     /**
      * Sends a request to the Hyperliquid API.
      * @param method - The method of websocket request.
@@ -108,15 +116,14 @@ export class WebSocketRequestDispatcher {
         payload: unknown,
         signal?: AbortSignal,
     ): Promise<unknown> {
-        signal?.throwIfAborted();
+        // Reject the request if the signal is aborted
+        if (signal?.aborted) return Promise.reject(signal.reason);
 
         // Create a request object
         let id: number | string;
-        let request:
-            | { method: "post"; id: number; request: unknown }
-            | { method: "subscribe" | "unsubscribe"; subscription: unknown };
+        let request: PostRequest | SubscribeRequest;
         if (method === "post") {
-            id = this.nextId;
+            id = ++this.lastId;
             request = { method, id, request: payload };
         } else {
             id = WebSocketRequestDispatcher.requestToId(payload);
@@ -146,7 +153,7 @@ export class WebSocketRequestDispatcher {
      * @param id - A request ID or a stringified request.
      * @param value - A resolution value.
      */
-    protected resolve(id: number | string, value: unknown): void {
+    private resolve(id: number | string, value: unknown): void {
         this.pending.get(id)?.resolve(value);
         this.pending.delete(id);
     }
@@ -156,7 +163,7 @@ export class WebSocketRequestDispatcher {
      * @param id - A request ID or a stringified request.
      * @param reason - A rejection reason.
      */
-    protected reject(id: number | string, reason: unknown): void {
+    private reject(id: number | string, reason: unknown): void {
         this.pending.get(id)?.reject(reason);
         this.pending.delete(id);
     }
@@ -181,16 +188,17 @@ export class WebSocketRequestDispatcher {
 function deepLowerHex(obj: unknown): unknown {
     if (Array.isArray(obj)) {
         return obj.map(deepLowerHex);
-    } else if (obj && typeof obj === "object") {
+    }
+    if (typeof obj === "object" && obj !== null) {
         return Object.entries(obj).reduce((acc, [key, val]) => ({
             ...acc,
             [key]: deepLowerHex(val),
         }), {});
-    } else if (typeof obj === "string" && /^0x[0-9A-Fa-f]+$/.test(obj)) {
-        return obj.toLowerCase();
-    } else {
-        return obj;
     }
+    if (typeof obj === "string" && /^0x[0-9A-Fa-f]+$/.test(obj)) {
+        return obj.toLowerCase();
+    }
+    return obj;
 }
 
 /**
