@@ -49,7 +49,7 @@ import * as hl from "https://esm.sh/jsr/@nktkas/hyperliquid"
 First, choose and configure your transport layer (more details in the [API Reference](#transports)):
 
 ```typescript
-import * as hl from "@nktkas/hyperliquid";
+import * as hl from "@nktkas/hyperliquid"; // ESM & Common.js
 
 // HTTP Transport
 const httpTransport = new hl.HttpTransport(); // Accepts optional parameters (e.g. url, timeout, fetchOptions)
@@ -65,7 +65,7 @@ Next, initialize a client with the transport layer (more details in the [API Ref
 #### Create PublicClient
 
 ```typescript
-import * as hl from "@nktkas/hyperliquid";
+import * as hl from "@nktkas/hyperliquid"; // ESM & Common.js
 
 const transport = new hl.HttpTransport(); // or WebSocketTransport
 const client = new hl.PublicClient({ transport });
@@ -74,7 +74,7 @@ const client = new hl.PublicClient({ transport });
 #### Create WalletClient
 
 ```typescript
-import * as hl from "@nktkas/hyperliquid";
+import * as hl from "@nktkas/hyperliquid"; // ESM & Common.js
 import { createWalletClient, custom } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { ethers } from "ethers";
@@ -101,7 +101,7 @@ const windowMetamaskClient = new hl.WalletClient({ wallet: window.ethereum, tran
 #### Create EventClient
 
 ```typescript
-import * as hl from "@nktkas/hyperliquid";
+import * as hl from "@nktkas/hyperliquid"; // ESM & Common.js
 
 const transport = new hl.WebSocketTransport(); // Only WebSocketTransport is supported
 const client = new hl.EventClient({ transport });
@@ -116,7 +116,7 @@ Finally, use client methods to interact with the Hyperliquid API (more details i
 ```typescript
 import * as hl from "@nktkas/hyperliquid";
 
-const transport = new hl.HttpTransport(); // or WebSocketTransport
+const transport = new hl.HttpTransport();
 const client = new hl.PublicClient({ transport });
 
 // L2 Book
