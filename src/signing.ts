@@ -1,10 +1,10 @@
 import { keccak_256 } from "@noble/hashes/sha3";
-import { encode, type ValueType } from "@std/msgpack/encode";
+import { encode, type ValueMap, type ValueType } from "@std/msgpack/encode";
 import { decodeHex, encodeHex } from "@std/encoding/hex";
 import type { Hex } from "./base.ts";
 
-export type { Hex } from "./base.ts";
-export type { ValueMap, ValueType } from "@std/msgpack/encode";
+export type { Hex };
+export type { ValueMap, ValueType };
 
 /** Abstract interface for a [viem wallet](https://viem.sh/docs/clients/wallet). */
 export interface AbstractViemWalletClient {
@@ -240,7 +240,12 @@ export async function signUserSignedAction(args: {
 
 /** Signs typed data with the provided wallet using EIP-712. */
 async function abstractSignTypedData(args: {
-    wallet: AbstractEthersSigner | AbstractEthersV5Signer | AbstractViemWalletClient | AbstractWindowEthereum;
+    wallet:
+        | AbstractViemWalletClient
+        | AbstractExtendedViemWalletClient
+        | AbstractEthersSigner
+        | AbstractEthersV5Signer
+        | AbstractWindowEthereum;
     domain: {
         name: string;
         version: string;
