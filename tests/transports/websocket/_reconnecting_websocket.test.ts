@@ -30,180 +30,299 @@ Deno.test("ReconnectingWebSocket Tests", async (t) => {
     );
 
     await t.step("Basic WebSocket", async (t) => {
-        const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
-        await new Promise((resolve) => rws.addEventListener("open", resolve, { once: true }));
-
         await t.step("get url()", () => {
+            const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
             assert(rws.url === "ws://localhost:8080/", `url should be 'ws://localhost:8080', got ${rws.url}`);
+
+            rws.close();
         });
 
         await t.step("get readyState()", () => {
-            assert(rws.readyState === WebSocket.OPEN, `readyState should be WebSocket.OPEN, got ${rws.readyState}`);
+            const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
+            assert(
+                rws.readyState === WebSocket.CONNECTING,
+                `readyState should be WebSocket.CONNECTING, got ${rws.readyState}`,
+            );
+
+            rws.close();
         });
 
         await t.step("get bufferedAmount()", () => {
+            const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
             assert(rws.bufferedAmount === 0, `bufferedAmount should be 0, got ${rws.bufferedAmount}`);
+
+            rws.close();
         });
 
         await t.step("get extensions()", () => {
+            const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
             assert(rws.extensions === "", `extensions should be empty string, got ${rws.extensions}`);
+
+            rws.close();
         });
 
-        await t.step("get protocol()", () => {
+        await t.step("get protocol()", async () => {
+            const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+            await new Promise((resolve) => rws.addEventListener("open", resolve, { once: true }));
+
             assert(rws.protocol === "superchat", `protocol should be 'superchat', got ${rws.protocol}`);
+
+            rws.close();
         });
 
         await t.step("CLOSED", async (t) => {
             await t.step("get CLOSED()", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 assert(rws.CLOSED === WebSocket.CLOSED, `CLOSED should be WebSocket.CLOSED, got ${rws.CLOSED}`);
+
+                rws.close();
             });
             await t.step("static CLOSED", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 assert(
                     ReconnectingWebSocket.CLOSED === WebSocket.CLOSED,
                     `CLOSED should be WebSocket.CLOSED, got ${ReconnectingWebSocket.CLOSED}`,
                 );
+
+                rws.close();
             });
         });
         await t.step("CLOSING", async (t) => {
             await t.step("get CLOSING()", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 assert(rws.CLOSING === WebSocket.CLOSING, `CLOSING should be WebSocket.CLOSING, got ${rws.CLOSING}`);
+
+                rws.close();
             });
             await t.step("static CLOSING", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 assert(
                     ReconnectingWebSocket.CLOSING === WebSocket.CLOSING,
                     `CLOSING should be WebSocket.CLOSING, got ${ReconnectingWebSocket.CLOSING}`,
                 );
+
+                rws.close();
             });
         });
         await t.step("CONNECTING", async (t) => {
             await t.step("get CONNECTING()", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 assert(
                     rws.CONNECTING === WebSocket.CONNECTING,
                     `CONNECTING should be WebSocket.CONNECTING, got ${rws.CONNECTING}`,
                 );
+
+                rws.close();
             });
             await t.step("static CONNECTING", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 assert(
                     ReconnectingWebSocket.CONNECTING === WebSocket.CONNECTING,
                     `CONNECTING should be WebSocket.CONNECTING, got ${ReconnectingWebSocket.CONNECTING}`,
                 );
+
+                rws.close();
             });
         });
         await t.step("OPEN", async (t) => {
             await t.step("get OPEN()", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 assert(rws.OPEN === WebSocket.OPEN, `OPEN should be WebSocket.OPEN, got ${rws.OPEN}`);
+
+                rws.close();
             });
             await t.step("static OPEN", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 assert(
                     ReconnectingWebSocket.OPEN === WebSocket.OPEN,
                     `OPEN should be WebSocket.OPEN, got ${ReconnectingWebSocket.OPEN}`,
                 );
+
+                rws.close();
             });
         });
 
         await t.step("binaryType", async (t) => {
             await t.step("get binaryType()", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 assert(rws.binaryType === "blob", `binaryType should be 'blob', got ${rws.binaryType}`);
+
+                rws.close();
             });
             await t.step("set binaryType()", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 rws.binaryType = "arraybuffer";
                 assert(rws.binaryType === "arraybuffer", `binaryType should be 'arraybuffer', got ${rws.binaryType}`);
+
+                rws.close();
             });
         });
 
         await t.step("onclose", async (t) => {
             await t.step("get onclose()", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 assert(rws.onclose === null, `onclose should be null, got ${rws.onclose}`);
+
+                rws.close();
             });
             await t.step("set onclose()", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 rws.onclose = () => {};
                 assert(rws.onclose !== null, `onclose should not be null, got ${rws.onclose}`);
+
+                rws.close();
             });
         });
 
         await t.step("onerror", async (t) => {
             await t.step("get onerror()", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 assert(rws.onerror === null, `onerror should be null, got ${rws.onerror}`);
+
+                rws.close();
             });
             await t.step("set onerror()", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 rws.onerror = () => {};
                 assert(rws.onerror !== null, `onerror should not be null, got ${rws.onerror}`);
+
+                rws.close();
             });
         });
 
         await t.step("onmessage", async (t) => {
             await t.step("get onmessage()", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 assert(rws.onmessage === null, `onmessage should be null, got ${rws.onmessage}`);
+
+                rws.close();
             });
             await t.step("set onmessage()", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 rws.onmessage = () => {};
                 assert(rws.onmessage !== null, `onmessage should not be null, got ${rws.onmessage}`);
+
+                rws.close();
             });
         });
 
         await t.step("onopen", async (t) => {
             await t.step("get onopen()", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 assert(rws.onopen === null, `onopen should be null, got ${rws.onopen}`);
+
+                rws.close();
             });
             await t.step("set onopen()", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 rws.onopen = () => {};
                 assert(rws.onopen !== null, `onopen should not be null, got ${rws.onopen}`);
+
+                rws.close();
             });
         });
 
         await t.step("close()", () => {
+            const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
             assert(rws.readyState !== WebSocket.CLOSED, "Should not be closed yet");
             rws.close();
             assert(rws.readyState === WebSocket.CLOSED || rws.readyState === WebSocket.CLOSING, "Should be closed");
         });
 
         await t.step("send()", () => {
+            const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
             const message = "Hello, World!";
             let received = "";
-            rws.addEventListener("message", (ev) => received = ev.data);
+            rws.addEventListener("message", (ev) => received = ev.data, { once: true });
             rws.dispatchEvent(new MessageEvent("message", { data: message }));
             assert(received === message, "Should receive the message");
+
+            rws.close();
         });
 
         await t.step("addEventListener()", async (t) => {
             await t.step("listener is fn", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 let called = false;
-                rws.addEventListener("message", () => called = true);
+                rws.addEventListener("message", () => called = true, { once: true });
                 rws.dispatchEvent(new Event("message"));
                 assert(called, "Should call listener");
+
+                rws.close();
             });
             await t.step("listener is an object", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 let called = false;
-                rws.addEventListener("message", { handleEvent: () => called = true });
+                rws.addEventListener("message", { handleEvent: () => called = true }, { once: true });
                 rws.dispatchEvent(new Event("message"));
                 assert(called, "Should call listener");
+
+                rws.close();
             });
         });
 
         await t.step("removeEventListener()", async (t) => {
             await t.step("listener is fn", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 let called = false;
                 const listener = () => called = true;
-                rws.addEventListener("message", listener);
+                rws.addEventListener("message", listener, { once: true });
                 rws.removeEventListener("message", listener);
                 rws.dispatchEvent(new Event("message"));
                 assert(!called, "Should not call listener");
+
+                rws.close();
             });
             await t.step("listener is an object", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
                 let called = false;
                 const listener = { handleEvent: () => called = true };
-                rws.addEventListener("message", listener);
+                rws.addEventListener("message", listener, { once: true });
                 rws.removeEventListener("message", listener);
                 rws.dispatchEvent(new Event("message"));
                 assert(!called, "Should not call listener");
+
+                rws.close();
             });
         });
 
         await t.step("dispatchEvent()", () => {
+            const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
             let called = false;
-            rws.addEventListener("open", () => called = true);
+            rws.addEventListener("open", () => called = true, { once: true });
             rws.dispatchEvent(new Event("open"));
             assert(called, "Should call listener");
+
+            rws.close();
         });
     });
 
@@ -586,6 +705,63 @@ Deno.test("ReconnectingWebSocket Tests", async (t) => {
 
                 rws.close();
             });
+
+            await t.step("Reattaches on* properties after reconnection", async () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080", undefined, {
+                    maxRetries: 1,
+                });
+
+                // Counters for checking handler calls
+                let onopenCalled = 0;
+                let oncloseCalled = 0;
+                let onerrorCalled = 0;
+                let onmessageCalled = 0;
+
+                // Assign handlers via on* properties
+                const onopen = () => onopenCalled++;
+                const onclose = () => oncloseCalled++;
+                const onerror = () => onerrorCalled++;
+                const onmessage = () => onmessageCalled++;
+                rws.onopen = onopen;
+                rws.onclose = onclose;
+                rws.onerror = onerror;
+                rws.onmessage = onmessage;
+
+                // Waiting for the first connection to open
+                await new Promise((resolve) => rws.addEventListener("open", resolve, { once: true }));
+
+                // Initiate reconnect: close the connection, but not permanently
+                rws.close(undefined, undefined, false);
+
+                // Wait for the connection to reopen (re-connect)
+                await new Promise((resolve) => rws.addEventListener("open", resolve, { once: true }));
+
+                // Check that the on* properties are re-set
+                assert(rws.onopen === onopen, "onopen must be reconnected after a reconnect");
+                assert(rws.onclose === onclose, "onclose must be reconnected after a reconnect");
+                assert(rws.onerror === onerror, "onerror must be reconnected after a reconnect");
+                assert(rws.onmessage === onmessage, "onmessage must be reconnected after a reconnect");
+
+                // Dispatches events manually to check the handlers work
+                rws.dispatchEvent(new Event("open"));
+                rws.dispatchEvent(new CloseEvent("close"));
+                rws.dispatchEvent(new Event("error"));
+                rws.dispatchEvent(new MessageEvent("message", { data: "test" }));
+
+                // Wait a little while for the handlers to execute
+                await new Promise((resolve) => setTimeout(resolve, 500));
+
+                // Check that each handler has been called at least once
+                assert(onopenCalled === 3, `onopen must be called 3 times after a reconnect, got ${onopenCalled}`);
+                assert(oncloseCalled === 2, `onclose must be called 2 times after a reconnect, got ${oncloseCalled}`);
+                assert(onerrorCalled === 2, `onerror must be called 2 time after a reconnect, got ${onerrorCalled}`);
+                assert(
+                    onmessageCalled === 1,
+                    `onmessage must be called 1 time after a reconnect, got ${onmessageCalled}`,
+                );
+
+                rws.close();
+            });
         });
 
         await t.step("Cleans up resources after closing", async () => {
@@ -733,6 +909,61 @@ Deno.test("ReconnectingWebSocket Tests", async (t) => {
                     "Expected USER_INITIATED_CLOSE reason",
                 );
             });
+        });
+
+        await t.step("Extended logic no-op cases", async (t) => {
+            await t.step("addEventListener: Does not wrap listener when termination signal is aborted", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+                // Permanently close the connection to abort the termination signal.
+                rws.close();
+                // Ensure termination signal is aborted.
+                assert(rws.terminationSignal.aborted, "Termination signal should be aborted after permanent close");
+
+                // Capture the initial count of internal event listeners.
+                // @ts-ignore - accessing private property for testing purposes
+                const initialListenersCount = rws._eventListeners.length;
+
+                // Add an event listener.
+                const listener = () => {};
+                rws.addEventListener("message", listener);
+
+                // Since the termination signal is aborted, the listener should not be wrapped or stored.
+                // @ts-ignore - accessing private property for testing purposes
+                const finalListenersCount = rws._eventListeners.length;
+                assertEquals(
+                    finalListenersCount,
+                    initialListenersCount,
+                    "addEventListener should not wrap the listener when termination signal is aborted",
+                );
+            });
+
+            await t.step(
+                "removeEventListener: Removing a non-registered listener does not affect internal state",
+                () => {
+                    const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
+
+                    // Add a listener so that the _eventListeners array is not empty.
+                    const registeredListener = () => {};
+                    rws.addEventListener("message", registeredListener);
+                    // @ts-ignore - accessing private property for testing purposes
+                    const initialListenersCount = rws._eventListeners.length;
+
+                    // Attempt to remove a listener that was never added.
+                    const listener = () => {};
+                    rws.removeEventListener("message", listener);
+
+                    // Verify that the internal event listeners remain unchanged.
+                    // @ts-ignore - accessing private property for testing purposes
+                    const finalListenersCount = rws._eventListeners.length;
+                    assertEquals(
+                        finalListenersCount,
+                        initialListenersCount,
+                        "removeEventListener should not modify internal state when listener is not registered",
+                    );
+
+                    rws.close();
+                },
+            );
         });
     });
 
