@@ -97,31 +97,40 @@ export class ReconnectingWebSocketError extends TransportError {
  * Fully compatible with standard WebSocket API.
  */
 export class ReconnectingWebSocket implements WebSocket {
-    /** Controller for handling connection termination */
-    protected _terminationController: AbortController = new AbortController();
+    /** Controller for handling connection termination. */
+    private _terminationController: AbortController = new AbortController();
 
-    /** WebSocket protocols */
-    protected _protocols?: string | string[];
+    /** WebSocket protocols defined in constructor. */
+    private _protocols?: string | string[];
 
-    /** The underlying WebSocket instance */
-    protected _socket: WebSocket;
+    /** Non-permanent original instance of WebSocket. */
+    private _socket: WebSocket;
 
     /** Current number of reconnection attempts */
     protected _reconnectCount: number = 0;
 
-    /** Array of registered event listeners */
-    protected _eventListeners: {
+    /** The array of registered event listeners to recover from reconnection. */
+    private _eventListeners: {
         type: string;
         listener: EventListenerOrEventListenerObject;
         options?: boolean | AddEventListenerOptions;
         listenerProxy: EventListenerOrEventListenerObject;
     }[] = [];
 
-    /** Configuration options */
+    /** WebSocket event handlers for reconnection. */
+    private _onclose: ((this: WebSocket, ev: CloseEvent) => any) | null;
+    /** WebSocket event handlers for reconnection. */
+    private _onerror: ((this: WebSocket, ev: Event) => any) | null;
+    /** WebSocket event handlers for reconnection. */
+    private _onmessage: ((this: WebSocket, ev: MessageEvent<any>) => any) | null;
+    /** WebSocket event handlers for reconnection. */
+    private _onopen: ((this: WebSocket, ev: Event) => any) | null;
+
+    /** Configuration options for WebSocket reconnection. */
     public reconnectOptions: Required<ReconnectingWebSocketOptions>;
 
-    /** An AbortSignal that is triggered when the connection is permanently closed */
-    public readonly terminationSignal: AbortSignal = this._terminationController.signal;
+    /** The signal that is aborted when the connection is permanently closed. */
+    public terminationSignal: AbortSignal = this._terminationController.signal;
 
     /**
      * Creates a new reconnecting WebSocket.
@@ -134,6 +143,7 @@ export class ReconnectingWebSocket implements WebSocket {
         protocols?: string | string[],
         options?: ReconnectingWebSocketOptions,
     ) {
+        // Set the default options
         this.reconnectOptions = {
             maxRetries: options?.maxRetries ?? 3,
             connectionTimeout: options?.connectionTimeout === undefined ? 10_000 : options.connectionTimeout,
@@ -141,67 +151,38 @@ export class ReconnectingWebSocket implements WebSocket {
             shouldReconnect: options?.shouldReconnect ?? (() => true),
             messageBuffer: options?.messageBuffer ?? new FIFOMessageBuffer(),
         };
-
         this._protocols = protocols;
-        this._socket = this.reconnectOptions.connectionTimeout
-            ? this._connectWithTimeout(url, this._protocols, this.reconnectOptions.connectionTimeout)
-            : new WebSocket(url, this._protocols);
 
+        // Create the WebSocket instance
+        this._socket = createWebSocketWithTimeout(
+            url,
+            this._protocols,
+            this.reconnectOptions.connectionTimeout,
+        );
+
+        // Initialize the reconnection event listeners
         this._initEventListeners();
-    }
 
-    /**
-     * Creates a WebSocket connection with timeout.
-     * @param url - The WebSocket URL to connect to.
-     * @param protocols - The WebSocket protocols to use.
-     * @param timeout - The connection timeout in ms.
-     * @returns A new WebSocket instance.
-     */
-    protected _connectWithTimeout(
-        url: string | URL,
-        protocols: string | string[] | undefined,
-        timeout: number,
-    ): WebSocket {
-        const socket = new WebSocket(url, protocols);
-
-        const timeoutId = setTimeout(() => {
-            socket.removeEventListener("open", openHandler);
-            socket.removeEventListener("close", closeHandler);
-            socket.close(3008, "Timeout"); // https://www.iana.org/assignments/websocket/websocket.xml#close-code-number
-        }, timeout);
-
-        const openHandler = () => {
-            socket.removeEventListener("close", closeHandler);
-            clearTimeout(timeoutId);
-        };
-        const closeHandler = () => {
-            socket.removeEventListener("open", openHandler);
-            clearTimeout(timeoutId);
-        };
-
-        socket.addEventListener("open", openHandler, { once: true });
-        socket.addEventListener("close", closeHandler, { once: true });
-
-        return socket;
+        // Store the original event listeners for reconnection
+        this._onclose = this._socket.onclose;
+        this._onerror = this._socket.onerror;
+        this._onmessage = this._socket.onmessage;
+        this._onopen = this._socket.onopen;
     }
 
     /** Initializes the internal event listeners for the WebSocket. */
-    protected _initEventListeners(): void {
+    private _initEventListeners(): void {
         this._socket.addEventListener("open", () => {
-            // Reset reconnection count
-            this._reconnectCount = 0;
-
             // Send all buffered messages
             let message: (string | ArrayBufferLike | Blob | ArrayBufferView) | undefined;
             while ((message = this.reconnectOptions.messageBuffer.shift()) !== undefined) {
                 this._socket.send(message);
             }
         }, { once: true });
-
         this._socket.addEventListener("close", async (event) => {
             try {
                 // If the termination signal is already aborted, do not attempt to reconnect
-                if (this.terminationSignal.aborted) return;
+                if (this._terminationController.signal.aborted) return;
 
                 // Check if reconnection should be attempted
                 if (++this._reconnectCount > this.reconnectOptions.maxRetries) {
@@ -210,7 +191,7 @@ export class ReconnectingWebSocket implements WebSocket {
                 }
 
                 const userDecision = await this.reconnectOptions.shouldReconnect(event);
-                if (this.terminationSignal.aborted) return; // Check again after the await
+                if (this._terminationController.signal.aborted) return; // Check again after the await
                 if (!userDecision) {
                     this._cleanup(new ReconnectingWebSocketError("RECONNECTION_STOPPED_BY_USER"));
                     return;
@@ -220,19 +201,27 @@ export class ReconnectingWebSocket implements WebSocket {
                 const delay = typeof this.reconnectOptions.connectionDelay === "number"
                     ? this.reconnectOptions.connectionDelay
                     : await this.reconnectOptions.connectionDelay(this._reconnectCount);
-                if (this.terminationSignal.aborted) return; // Check again after the await
-                await sleep(delay, this.terminationSignal);
+                if (this._terminationController.signal.aborted) return; // Check again after the await
+                await sleep(delay, this._terminationController.signal);
 
-                // Reconnect the socket
-                this._socket = this.reconnectOptions.connectionTimeout
-                    ? this._connectWithTimeout(this.url, this._protocols, this.reconnectOptions.connectionTimeout)
-                    : new WebSocket(this.url, this._protocols);
+                // Create a new WebSocket instance
+                this._socket = createWebSocketWithTimeout(
+                    this.url,
+                    this._protocols,
+                    this.reconnectOptions.connectionTimeout,
+                );
 
                 // Reconnect all listeners
                 this._initEventListeners();
+
                 this._eventListeners.forEach(({ type, listenerProxy, options }) => {
                     this._socket.addEventListener(type, listenerProxy, options);
                 });
+
+                this._socket.onclose = this._onclose;
+                this._socket.onerror = this._onerror;
+                this._socket.onmessage = this._onmessage;
+                this._socket.onopen = this._onopen;
             } catch (error) {
                 this._cleanup(new ReconnectingWebSocketError("UNKNOWN_ERROR", error));
             }
@@ -243,25 +232,11 @@ export class ReconnectingWebSocket implements WebSocket {
      * Clean up internal resources.
      * @param reason - The reason for cleanup.
      */
-    protected _cleanup(reason: unknown): void {
+    private _cleanup(reason: ReconnectingWebSocketError): void {
         this._terminationController.abort(reason);
         this.reconnectOptions.messageBuffer.clear();
         this._eventListeners = [];
-    }
-
-    /**
-     * Check if two event listeners are the same (just like EventTarget).
-     * @param a - First event listener configuration.
-     * @param b - Second event listener configuration.
-     * @returns True if the listeners match.
-     */
-    protected _isListenerMatch(
-        a: { type: string; listener: EventListenerOrEventListenerObject; options?: boolean | AddEventListenerOptions },
-        b: { type: string; listener: EventListenerOrEventListenerObject; options?: boolean | AddEventListenerOptions },
-    ): boolean {
-        const aCapture = Boolean(typeof a.options === "object" ? a.options.capture : a.options);
-        const bCapture = Boolean(typeof b.options === "object" ? b.options.capture : b.options);
-        return a.type === b.type && a.listener === b.listener && aCapture === bCapture;
+        this._socket.dispatchEvent(new CustomEvent("error", { detail: reason }));
     }
 
     // WebSocket property implementations
@@ -287,10 +262,10 @@ export class ReconnectingWebSocket implements WebSocket {
         this._socket.binaryType = value;
     }
 
-    public readonly CLOSED = WebSocket.CLOSED;
-    public readonly CLOSING = WebSocket.CLOSING;
-    public readonly CONNECTING = WebSocket.CONNECTING;
-    public readonly OPEN = WebSocket.OPEN;
+    readonly CLOSED = WebSocket.CLOSED;
+    readonly CLOSING = WebSocket.CLOSING;
+    readonly CONNECTING = WebSocket.CONNECTING;
+    readonly OPEN = WebSocket.OPEN;
 
     static readonly CLOSED = WebSocket.CLOSED;
     static readonly CLOSING = WebSocket.CLOSING;
@@ -302,6 +277,7 @@ export class ReconnectingWebSocket implements WebSocket {
     }
     set onclose(value: ((this: WebSocket, ev: CloseEvent) => any) | null) {
         this._socket.onclose = value;
+        this._onclose = value; // Store the listener for reconnection
     }
 
     get onerror(): ((this: WebSocket, ev: Event) => any) | null {
@@ -309,15 +285,15 @@ export class ReconnectingWebSocket implements WebSocket {
     }
     set onerror(value: ((this: WebSocket, ev: Event) => any) | null) {
         this._socket.onerror = value;
+        this._onerror = value; // Store the listener for reconnection
     }
 
     get onmessage(): ((this: WebSocket, ev: MessageEvent<any>) => any) | null {
         return this._socket.onmessage;
     }
-    set onmessage(
-        value: ((this: WebSocket, ev: MessageEvent<any>) => any) | null,
-    ) {
+    set onmessage(value: ((this: WebSocket, ev: MessageEvent<any>) => any) | null) {
         this._socket.onmessage = value;
+        this._onmessage = value; // Store the listener for reconnection
     }
 
     get onopen(): ((this: WebSocket, ev: Event) => any) | null {
@@ -325,21 +301,24 @@ export class ReconnectingWebSocket implements WebSocket {
     }
     set onopen(value: ((this: WebSocket, ev: Event) => any) | null) {
         this._socket.onopen = value;
+        this._onopen = value; // Store the listener for reconnection
     }
 
     /**
-     * @param permanently - If true, the connection will be permanently closed. Default is true.
+     * @param permanently - If `true`, the connection will be permanently closed. Default is `true`.
      */
     close(code?: number, reason?: string, permanently: boolean = true): void {
-        if (permanently) this._cleanup(new ReconnectingWebSocketError("USER_INITIATED_CLOSE"));
         this._socket.close(code, reason);
+        if (permanently) {
+            this._cleanup(new ReconnectingWebSocketError("USER_INITIATED_CLOSE"));
+        }
     }
 
     /**
      * @note If the connection is not open, the data will be buffered and sent when the connection is established.
      */
     send(data: string | ArrayBufferLike | Blob | ArrayBufferView): void {
-        if (this._socket.readyState !== WebSocket.OPEN && !this.terminationSignal.aborted) {
+        if (this._socket.readyState !== WebSocket.OPEN && !this._terminationController.signal.aborted) {
             this.reconnectOptions.messageBuffer.push(data);
         } else {
             this._socket.send(data);
@@ -358,28 +337,42 @@ export class ReconnectingWebSocket implements WebSocket {
         listener: EventListenerOrEventListenerObject,
         options?: boolean | AddEventListenerOptions,
     ): void {
-        // Check if the listener is already added
-        const exists = this._eventListeners.some((e) => this._isListenerMatch(e, { type, listener, options }));
-        if (exists) return;
-
-        // Wrap the original listener to follow the once option when reconnecting
-        const listenerProxy = (event: Event) => {
-            try {
-                if (typeof listener === "function") {
-                    listener.call(this, event);
-                } else {
-                    listener.handleEvent(event);
-                }
-            } finally {
-                if (typeof options === "object" && options.once === true) {
-                    const index = this._eventListeners.findIndex((e) =>
-                        this._isListenerMatch(e, { type, listener, options })
-                    );
-                    if (index !== -1) this._eventListeners.splice(index, 1);
-                }
+        // Wrap the listener to handle reconnection
+        let listenerProxy: EventListenerOrEventListenerObject;
+        if (this._terminationController.signal.aborted) {
+            // If the connection is permanently closed, use the original listener
+            listenerProxy = listener;
+        } else {
+            // Check if the listener is already registered
+            const index = this._eventListeners.findIndex((e) => listenersMatch(e, { type, listener, options }));
+            if (index !== -1) {
+                // Use the existing listener proxy
+                listenerProxy = this._eventListeners[index].listenerProxy;
+            } else {
+                // Wrap the original listener to follow the once option when reconnecting
+                listenerProxy = (event: Event) => {
+                    try {
+                        if (typeof listener === "function") {
+                            listener.call(this, event);
+                        } else {
+                            listener.handleEvent(event);
+                        }
+                    } finally {
+                        if (typeof options === "object" && options.once === true) {
+                            const index = this._eventListeners.findIndex((e) =>
+                                listenersMatch(e, { type, listener, options })
+                            );
+                            if (index !== -1) {
+                                this._eventListeners.splice(index, 1);
+                            }
+                        }
+                    }
+                };
+                this._eventListeners.push({ type, listener, options, listenerProxy });
             }
-        };
-        this._eventListeners.push({ type, listener, options, listenerProxy });
+        }
+
+        // Add the wrapped (or original) listener
         this._socket.addEventListener(type, listenerProxy, options);
     }
 
@@ -395,17 +388,62 @@ export class ReconnectingWebSocket implements WebSocket {
         listener: EventListenerOrEventListenerObject,
         options?: boolean | EventListenerOptions,
     ): void {
-        const index = this._eventListeners.findIndex((e) => this._isListenerMatch(e, { type, listener, options }));
+        // Remove a wrapped listener, not an original listener
+        const index = this._eventListeners.findIndex((e) => listenersMatch(e, { type, listener, options }));
         if (index !== -1) {
             const { listenerProxy } = this._eventListeners[index];
             this._socket.removeEventListener(type, listenerProxy, options);
             this._eventListeners.splice(index, 1);
+        } else {
+            // If the wrapped listener is not found, remove the original listener
+            this._socket.removeEventListener(type, listener, options);
         }
     }
 
     dispatchEvent(event: Event): boolean {
         return this._socket.dispatchEvent(event);
     }
+}
+
+/** Creates a WebSocket with connection timeout. */
+function createWebSocketWithTimeout(
+    url: string | URL,
+    protocols?: string | string[],
+    timeout?: number | null,
+): WebSocket {
+    const socket = new WebSocket(url, protocols);
+    if (timeout === null || timeout === undefined) return socket;
+
+    const timeoutId = setTimeout(() => {
+        socket.removeEventListener("open", openHandler);
+        socket.removeEventListener("close", closeHandler);
+        socket.close(3008, "Timeout"); // https://www.iana.org/assignments/websocket/websocket.xml#close-code-number
+    }, timeout);
+
+    const openHandler = () => {
+        socket.removeEventListener("close", closeHandler);
+        clearTimeout(timeoutId);
+    };
+    const closeHandler = () => {
+        socket.removeEventListener("open", openHandler);
+        clearTimeout(timeoutId);
+    };
+
+    socket.addEventListener("open", openHandler, { once: true });
+    socket.addEventListener("close", closeHandler, { once: true });
+
+    return socket;
+}
+
+/** Check if two event listeners are the same (just like EventTarget). */
+function listenersMatch(
+    a: { type: string; listener: EventListenerOrEventListenerObject; options?: boolean | AddEventListenerOptions },
+    b: { type: string; listener: EventListenerOrEventListenerObject; options?: boolean | AddEventListenerOptions },
+): boolean {
+    // EventTarget only compares capture in options, even if one is an object and the other is boolean
+    const aCapture = Boolean(typeof a.options === "object" ? a.options.capture : a.options);
+    const bCapture = Boolean(typeof b.options === "object" ? b.options.capture : b.options);
+    return a.type === b.type && a.listener === b.listener && aCapture === bCapture;
 }
 
 /**
