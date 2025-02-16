@@ -22,9 +22,7 @@ export class HttpRequestError extends TransportError {
     }
 }
 
-/**
- * Configuration options for the HTTP transport layer.
- */
+/** Configuration options for the HTTP transport layer. */
 export interface HttpTransportOptions {
     /**
      * Base URL for API endpoints.
@@ -59,9 +57,7 @@ export interface HttpTransportOptions {
     onResponse?: (response: Response) => MaybePromise<Response | void | null | undefined>;
 }
 
-/**
- * HTTP implementation of the REST transport interface.
- */
+/** HTTP implementation of the REST transport interface. */
 export class HttpTransport implements IRequestTransport, HttpTransportOptions {
     url: string | URL;
     timeout: number | null;
@@ -100,7 +96,7 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
 
         // FIXME: Temporary hack: replace `api.hyperliquid-testnet.xyz/explorer` with `rpc.hyperliquid-testnet.xyz/explorer`
         // until the new rpc url becomes the standard for mainnet.
-        // Maybe after that should split the url property into api and rpc variants.
+        // TODO: Maybe after that should split the url property into api and rpc variants.
         if (url.hostname === "api.hyperliquid-testnet.xyz" && url.pathname === "/explorer") {
             url.hostname = "rpc.hyperliquid-testnet.xyz";
         }
