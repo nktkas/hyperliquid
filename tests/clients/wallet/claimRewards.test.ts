@@ -29,6 +29,6 @@ Deno.test("claimRewards", async () => {
     await assertRejects(
         () => walletClient.claimRewards(),
         ApiRequestError,
-        "Must have at least 1 USDC in rewards to claim",
+        "Cannot process API request: No rewards to claim",
     );
 });
