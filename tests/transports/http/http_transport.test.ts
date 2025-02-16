@@ -35,7 +35,7 @@ Deno.test("HttpTransport Tests", async (t) => {
             });
 
         const transport = new HttpTransport();
-        await assertRejects(() => transport.request("action", { foo: "bar" }), HttpRequestError);
+        await assertRejects(() => transport.request("exchange", { foo: "bar" }), HttpRequestError);
     });
 
     // 3) Response body unloading on failed request
