@@ -104,26 +104,22 @@ function isHyperliquidMsg(value: unknown): value is HyperliquidMsg {
 /** Type guard for explorer block messages. */
 function isExplorerBlockMsg(value: unknown): value is Omit<BlockDetails, "txs">[] {
     return Array.isArray(value) && value.length > 0 &&
-        value.every((block) =>
-            typeof block === "object" && block !== null && !Array.isArray(block) &&
-            "height" in block && typeof block.height === "number" &&
-            "blockTime" in block && typeof block.blockTime === "number" &&
-            "hash" in block && typeof block.hash === "string" &&
-            "proposer" in block && typeof block.proposer === "string" &&
-            "numTxs" in block && typeof block.numTxs === "number"
-        );
+        (typeof value[0] === "object" && value[0] !== null && !Array.isArray(value[0]) &&
+            "height" in value[0] && typeof value[0].height === "number" &&
+            "blockTime" in value[0] && typeof value[0].blockTime === "number" &&
+            "hash" in value[0] && typeof value[0].hash === "string" &&
+            "proposer" in value[0] && typeof value[0].proposer === "string" &&
+            "numTxs" in value[0] && typeof value[0].numTxs === "number");
 }
 
 /** Type guard for explorer transactions messages. */
 function isExplorerTxsMsg(value: unknown): value is TxDetails[] {
     return Array.isArray(value) && value.length > 0 &&
-        value.every((tx) => {
-            return typeof tx === "object" && tx !== null && !Array.isArray(tx) &&
-                "action" in tx && typeof tx.action === "object" && tx.action !== null &&
-                "block" in tx && typeof tx.block === "number" &&
-                "error" in tx && (typeof tx.error === "string" || tx.error === null) &&
-                "hash" in tx && typeof tx.hash === "string" &&
-                "time" in tx && typeof tx.time === "number" &&
-                "user" in tx && typeof tx.user === "string";
-        });
+        (typeof value[0] === "object" && value[0] !== null && !Array.isArray(value[0]) &&
+            "action" in value[0] && typeof value[0].action === "object" && value[0].action !== null &&
+            "block" in value[0] && typeof value[0].block === "number" &&
+            "error" in value[0] && (typeof value[0].error === "string" || value[0].error === null) &&
+            "hash" in value[0] && typeof value[0].hash === "string" &&
+            "time" in value[0] && typeof value[0].time === "number" &&
+            "user" in value[0] && typeof value[0].user === "string");
 }
