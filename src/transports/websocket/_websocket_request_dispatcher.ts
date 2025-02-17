@@ -50,13 +50,13 @@ export class WebSocketRequestDispatcher {
         hlEvents.addEventListener("subscriptionResponse", (event) => {
             // Use a stringified request as an id
             const id = WebSocketRequestDispatcher.requestToId(event.detail.subscription);
-            this.resolve(id, event.detail);
+            this.pending.get(id)?.resolve(event.detail);
         });
         hlEvents.addEventListener("post", (event) => {
             const data = event.detail.response.type === "info"
                 ? event.detail.response.payload.data
                 : event.detail.response.payload;
-            this.resolve(event.detail.id, data);
+            this.pending.get(event.detail.id)?.resolve(data);
         });
         hlEvents.addEventListener("error", (event) => {
             try {
@@ -66,8 +66,7 @@ export class WebSocketRequestDispatcher {
                     const parsedRequest = JSON.parse(request) as Record<string, unknown>;
                     if ("id" in parsedRequest && typeof parsedRequest.id === "number") {
                         // If a post request was sent, it is possible to get the id from the request
-                        this.reject(
-                            parsedRequest.id,
+                        this.pending.get(parsedRequest.id)?.reject(
                             new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
                         );
                     } else if (
@@ -77,15 +76,13 @@ export class WebSocketRequestDispatcher {
                     ) {
                         // If a subscription/unsubscribe request was sent, use the request as an id
                         const id = WebSocketRequestDispatcher.requestToId(parsedRequest.subscription);
-                        this.reject(
-                            id,
+                        this.pending.get(id)?.reject(
                             new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
                         );
                     } else {
                         // If the request is not recognized, use the parsed request as an id
                         const id = WebSocketRequestDispatcher.requestToId(parsedRequest);
-                        this.reject(
-                            id,
+                        this.pending.get(id)?.reject(
                             new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
                         );
                     }
@@ -145,27 +142,10 @@ export class WebSocketRequestDispatcher {
         }).finally(() => {
             // Remove the abort listener when the promise is settled
             signal?.removeEventListener("abort", onAbort);
+
+            // Clean up the pending list
+            this.pending.delete(id);
         });
-    }
-
-    /**
-     * Resolves a pending request.
-     * @param id - A request ID or a stringified request.
-     * @param value - A resolution value.
-     */
-    private resolve(id: number | string, value: unknown): void {
-        this.pending.get(id)?.resolve(value);
-        this.pending.delete(id);
-    }
-
-    /**
-     * Rejects a pending request.
-     * @param id - A request ID or a stringified request.
-     * @param reason - A rejection reason.
-     */
-    private reject(id: number | string, reason: unknown): void {
-        this.pending.get(id)?.reject(reason);
-        this.pending.delete(id);
     }
 
     /**
