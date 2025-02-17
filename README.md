@@ -339,6 +339,7 @@ class WalletClient {
     tokenDelegate(args: TokenDelegateParameters): Promise<SuccessResponse>;
 
     // Vault
+    createVault(args: CreateVaultParameters): Promise<CreateVaultResponse>;
     vaultDistribute(args: VaultDistributeParameters): Promise<SuccessResponse>;
     vaultModify(args: VaultModifyParameters): Promise<SuccessResponse>;
     vaultTransfer(args: VaultTransferParameters): Promise<SuccessResponse>;
