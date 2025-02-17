@@ -8,6 +8,7 @@ import type {
     CDepositRequest,
     ClaimRewardsRequest,
     CreateSubAccountRequest,
+    CreateVaultRequest,
     CWithdrawRequest,
     EvmUserModifyRequest,
     ModifyRequest,
@@ -34,6 +35,7 @@ import type {
 import type {
     CancelResponse,
     CreateSubAccountResponse,
+    CreateVaultResponse,
     ErrorResponse,
     OrderResponse,
     SuccessResponse,
@@ -135,6 +137,11 @@ export type EvmUserModifyParameters =
 export type CreateSubAccountParameters =
     & Omit<CreateSubAccountRequest["action"], "type">
     & Partial<Pick<CreateSubAccountRequest, "nonce">>;
+
+/** Parameters for the {@linkcode WalletClient.createVault} method. */
+export type CreateVaultParameters =
+    & Omit<CreateVaultRequest["action"], "type" | "nonce">
+    & Partial<Pick<CreateVaultRequest, "nonce">>;
 
 /** Parameters for the {@linkcode WalletClient.modify} method. */
 export type ModifyParameters =
@@ -998,6 +1005,65 @@ export class WalletClient<
         const request: CreateSubAccountRequest = { action, signature, nonce };
         const response = await this.transport.request("exchange", request, signal) as
             | CreateSubAccountResponse
+            | ErrorResponse;
+
+        // Validate a response
+        this._validateResponse(response);
+        return response;
+    }
+
+    /**
+     * Create a vault.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Response for creating a vault.
+     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @see null - no documentation
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
+     * const result = await client.createVault({
+     *   name: "VaultName",
+     *   description: "This is an example of a vault description",
+     *   initialUsd: 100 * 1e6,
+     * });
+     * ```
+     */
+    async createVault(args: CreateVaultParameters, signal?: AbortSignal): Promise<CreateVaultResponse> {
+        // Destructure the parameters
+        const {
+            nonce = Date.now(),
+            ...actionArgs
+        } = args;
+
+        // Construct an action
+        const action: CreateVaultRequest["action"] = {
+            type: "createVault",
+            name: actionArgs.name,
+            description: actionArgs.description,
+            initialUsd: actionArgs.initialUsd,
+            nonce,
+        };
+
+        // Sign the action
+        const signature = await signL1Action({
+            wallet: this.wallet,
+            action,
+            nonce,
+            isTestnet: this.isTestnet,
+        });
+
+        // Send a request
+        const request: CreateVaultRequest = { action, signature, nonce };
+        const response = await this.transport.request("exchange", request, signal) as
+            | CreateVaultResponse
             | ErrorResponse;
 
         // Validate a response
@@ -2251,6 +2317,7 @@ export class WalletClient<
             | ErrorResponse
             | CancelResponse
             | CreateSubAccountResponse
+            | CreateVaultResponse
             | OrderResponse
             | TwapOrderResponse
             | TwapCancelResponse,
@@ -2258,6 +2325,7 @@ export class WalletClient<
         | SuccessResponse
         | CancelResponseSuccess
         | CreateSubAccountResponse
+        | CreateVaultResponse
         | OrderResponseSuccess
         | TwapOrderResponseSuccess
         | TwapCancelResponseSuccess {

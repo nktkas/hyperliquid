@@ -214,6 +214,27 @@ export interface CreateSubAccountRequest extends BaseExchangeRequest {
 }
 
 /**
+ * Create a vault.
+ * @returns {CreateVaultResponse}
+ * @see null - no documentation
+ */
+export interface CreateVaultRequest extends BaseExchangeRequest {
+    /** Action to perform. */
+    action: {
+        /** Type of action. */
+        type: "createVault";
+        /** Vault name. */
+        name: string;
+        /** Vault description. */
+        description: string;
+        /** Raw initial balance (float * 1e6). */
+        initialUsd: number;
+        /** Unique request identifier (recommended current timestamp in ms). */
+        nonce: number;
+    };
+}
+
+/**
  * Withdraw from staking balance.
  * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#withdraw-from-staking

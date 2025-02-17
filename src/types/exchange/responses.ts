@@ -50,6 +50,19 @@ export interface CreateSubAccountResponse extends BaseExchangeResponse {
     };
 }
 
+/** Response for creating a vault. */
+export interface CreateVaultResponse extends BaseExchangeResponse {
+    /** Successful status. */
+    status: "ok";
+    /** Response details. */
+    response: {
+        /** Type of response. */
+        type: "createVault";
+        /** Vault address. */
+        data: Hex;
+    };
+}
+
 /** Error response for failed operations. */
 export interface ErrorResponse extends BaseExchangeResponse {
     /** Error status. */
