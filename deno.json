@@ -1,6 +1,6 @@
 {
     "name": "@nktkas/hyperliquid",
-    "version": "0.15.3",
+    "version": "0.15.4",
     "exports": {
         ".": "./mod.ts",
         "./types": "./src/types/mod.ts",
