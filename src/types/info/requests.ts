@@ -45,7 +45,7 @@ export interface ClearinghouseStateRequest {
 
 /**
  * Request user staking delegations.
- * @returns {Delegation[]} Array of user's staking delegations.
+ * @returns {Delegation[]} Array of user's delegations to validators.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-staking-delegations
  */
 export interface DelegationsRequest {
@@ -57,7 +57,7 @@ export interface DelegationsRequest {
 
 /**
  * Request user staking history.
- * @returns {DelegatorUpdate[]} Array of user's staking history.
+ * @returns {DelegatorUpdate[]} Array of user's staking updates.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-staking-history
  */
 export interface DelegatorHistoryRequest {
@@ -81,7 +81,7 @@ export interface DelegatorRewardsRequest {
 
 /**
  * Request user staking summary.
- * @returns {DelegatorSummary} Summary of a user's staking.
+ * @returns {DelegatorSummary} Summary of a user's staking delegations.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-staking-summary
  */
 export interface DelegatorSummaryRequest {
@@ -93,7 +93,7 @@ export interface DelegatorSummaryRequest {
 
 /**
  * Request user's extra agents.
- * @returns {ExtraAgent[]} The extra agents of a user.
+ * @returns {ExtraAgent[]} User's extra agents.
  * @see null - no documentation
  */
 export interface ExtraAgentsRequest {
@@ -133,7 +133,7 @@ export interface FundingHistoryRequest {
 
 /**
  * Request user historical orders.
- * @returns {OrderStatus[]} Array of user's historical orders.
+ * @returns {OrderStatus<FrontendOrder>[]} Array of user's historical orders.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-historical-orders
  */
 export interface HistoricalOrdersRequest {
@@ -185,7 +185,7 @@ export interface LegalCheckRequest {
 
 /**
  * Request builder fee approval.
- * @returns {number} 1 (means 0.001%)
+ * @returns {number} Maximum builder fee approval.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#check-builder-fee-approval
  */
 export interface MaxBuilderFeeRequest {
@@ -219,7 +219,7 @@ export interface MetaRequest {
 
 /**
  * Request open orders.
- * @returns {Order[]} Array of open orders.
+ * @returns {Order[]} Array of open order.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders
  */
 export interface OpenOrdersRequest {
@@ -255,7 +255,7 @@ export interface PerpsAtOpenInterestCapRequest {
 
 /**
  * Request user portfolio.
- * @returns {Portfolio} User's portfolio.
+ * @returns {PortfolioPeriods} User's portfolio.
  * @see null - no documentation
  */
 export interface PortfolioRequest {
@@ -347,7 +347,7 @@ export interface SpotMetaRequest {
 
 /**
  * Request user sub-accounts.
- * @returns {SubAccount[]} Array of user sub-accounts.
+ * @returns {SubAccount[] | null} Array of user sub-account or null if the user does not have any sub-accounts.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-subaccounts
  */
 export interface SubAccountsRequest {
@@ -395,7 +395,7 @@ export interface UserFeesRequest {
 
 /**
  * Request user fills by time.
- * @returns {Fill[]} Array of user's trade fills.
+ * @returns {Fill[]} Array of user's trade fill.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills-by-time
  */
 export interface UserFillsByTimeRequest {
@@ -413,7 +413,7 @@ export interface UserFillsByTimeRequest {
 
 /**
  * Request user fills.
- * @returns {Fill[]} Array of user's trade fills.
+ * @returns {Fill[]} Array of user's trade fill.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills
  */
 export interface UserFillsRequest {
@@ -427,7 +427,7 @@ export interface UserFillsRequest {
 
 /**
  * Request user funding.
- * @returns {UserFundingUpdate[]} Array of user's funding ledger updates.
+ * @returns {UserFundingUpdate[]} Array of user's funding ledger update.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates
  */
 export interface UserFundingRequest {
@@ -443,7 +443,7 @@ export interface UserFundingRequest {
 
 /**
  * Request user non-funding ledger updates.
- * @returns {UserNonFundingLedgerUpdate[]} Array of user's non-funding ledger updates.
+ * @returns {UserNonFundingLedgerUpdate[]} Array of user's non-funding ledger update.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates
  */
 export interface UserNonFundingLedgerUpdatesRequest {
@@ -471,7 +471,7 @@ export interface UserRateLimitRequest {
 
 /**
  * Request user role.
- * @returns {UserRole} User role.
+ * @returns {UserRole} User's role.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-role
  */
 export interface UserRoleRequest {
@@ -483,7 +483,7 @@ export interface UserRoleRequest {
 
 /**
  * Request user to multi-sig signers.
- * @returns {MultiSigSigner[]} Array of user's multi-sig signers.
+ * @returns {MultiSigSigners | null} Multi-sig signers for a user or null if the user does not have any multi-sig signers.
  * @see null - no documentation
  */
 export interface UserToMultiSigSignersRequest {
@@ -495,7 +495,7 @@ export interface UserToMultiSigSignersRequest {
 
 /**
  * Request user TWAP slice fills by time.
- * @returns {TwapSliceFill[]} Array of user's TWAP slice fills.
+ * @returns {TwapSliceFill[]} Array of user's twap slice fill.
  * @see null - no documentation
  */
 export interface UserTwapSliceFillsByTimeRequest {
@@ -513,7 +513,7 @@ export interface UserTwapSliceFillsByTimeRequest {
 
 /**
  * Request user TWAP slice fills.
- * @returns {TwapSliceFill[]} Array of user's TWAP slice fills.
+ * @returns {TwapSliceFill[]} Array of user's twap slice fill.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills
  */
 export interface UserTwapSliceFillsRequest {
@@ -547,7 +547,7 @@ export interface ValidatorSummariesRequest {
 
 /**
  * Request details of a vault.
- * @returns {VaultDetails} Details of a vault.
+ * @returns {VaultDetails | null} Details of a vault or null if the vault does not exist.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-details-for-a-vault
  */
 export interface VaultDetailsRequest {

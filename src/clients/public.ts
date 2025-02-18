@@ -47,6 +47,7 @@ import type {
     TwapSliceFill,
 } from "../types/info/orders.ts";
 import type {
+    AllMidsRequest,
     CandleSnapshotRequest,
     ClearinghouseStateRequest,
     DelegationsRequest,
@@ -61,13 +62,19 @@ import type {
     L2BookRequest,
     LegalCheckRequest,
     MaxBuilderFeeRequest,
+    MetaAndAssetCtxsRequest,
+    MetaRequest,
     OpenOrdersRequest,
     OrderStatusRequest,
+    PerpsAtOpenInterestCapRequest,
     PortfolioRequest,
+    PredictedFundingsRequest,
     PreTransferCheckRequest,
     ReferralRequest,
     SpotClearinghouseStateRequest,
     SpotDeployStateRequest,
+    SpotMetaAndAssetCtxsRequest,
+    SpotMetaRequest,
     SubAccountsRequest,
     TokenDetailsRequest,
     TwapHistoryRequest,
@@ -82,7 +89,9 @@ import type {
     UserTwapSliceFillsByTimeRequest,
     UserTwapSliceFillsRequest,
     UserVaultEquitiesRequest,
+    ValidatorSummariesRequest,
     VaultDetailsRequest,
+    VaultSummariesRequest,
 } from "../types/info/requests.ts";
 import type { VaultDetails, VaultEquity, VaultSummary } from "../types/info/vaults.ts";
 
@@ -258,11 +267,10 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     allMids(signal?: AbortSignal): Promise<AllMids> {
-        return this.transport.request(
-            "info",
-            { type: "allMids" },
-            signal,
-        ) as Promise<AllMids>;
+        const request: AllMidsRequest = {
+            type: "allMids",
+        };
+        return this.transport.request("info", request, signal) as Promise<AllMids>;
     }
 
     /**
@@ -287,11 +295,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     candleSnapshot(args: CandleSnapshotParameters, signal?: AbortSignal): Promise<Candle[]> {
-        return this.transport.request(
-            "info",
-            { type: "candleSnapshot", req: args },
-            signal,
-        ) as Promise<Candle[]>;
+        const request: CandleSnapshotRequest = {
+            type: "candleSnapshot",
+            req: args,
+        };
+        return this.transport.request("info", request, signal) as Promise<Candle[]>;
     }
 
     /**
@@ -312,11 +320,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     clearinghouseState(args: ClearinghouseStateParameters, signal?: AbortSignal): Promise<PerpsClearinghouseState> {
-        return this.transport.request(
-            "info",
-            { type: "clearinghouseState", ...args },
-            signal,
-        ) as Promise<PerpsClearinghouseState>;
+        const request: ClearinghouseStateRequest = {
+            type: "clearinghouseState",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<PerpsClearinghouseState>;
     }
 
     /**
@@ -337,11 +345,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     delegations(args: DelegationsParameters, signal?: AbortSignal): Promise<Delegation[]> {
-        return this.transport.request(
-            "info",
-            { type: "delegations", ...args },
-            signal,
-        ) as Promise<Delegation[]>;
+        const request: DelegationsRequest = {
+            type: "delegations",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<Delegation[]>;
     }
 
     /**
@@ -362,11 +370,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     delegatorHistory(args: DelegatorHistoryParameters, signal?: AbortSignal): Promise<DelegatorUpdate[]> {
-        return this.transport.request(
-            "info",
-            { type: "delegatorHistory", ...args },
-            signal,
-        ) as Promise<DelegatorUpdate[]>;
+        const request: DelegatorHistoryRequest = {
+            type: "delegatorHistory",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<DelegatorUpdate[]>;
     }
 
     /**
@@ -387,11 +395,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     delegatorRewards(args: DelegatorRewardsParameters, signal?: AbortSignal): Promise<DelegatorReward[]> {
-        return this.transport.request(
-            "info",
-            { type: "delegatorRewards", ...args },
-            signal,
-        ) as Promise<DelegatorReward[]>;
+        const request: DelegatorRewardsRequest = {
+            type: "delegatorRewards",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<DelegatorReward[]>;
     }
 
     /**
@@ -412,11 +420,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     delegatorSummary(args: DelegatorSummaryParameters, signal?: AbortSignal): Promise<DelegatorSummary> {
-        return this.transport.request(
-            "info",
-            { type: "delegatorSummary", ...args },
-            signal,
-        ) as Promise<DelegatorSummary>;
+        const request: DelegatorSummaryRequest = {
+            type: "delegatorSummary",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<DelegatorSummary>;
     }
 
     /**
@@ -437,11 +445,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     extraAgents(args: ExtraAgentsParameters, signal?: AbortSignal): Promise<ExtraAgent[]> {
-        return this.transport.request(
-            "info",
-            { type: "extraAgents", ...args },
-            signal,
-        ) as Promise<ExtraAgent[]>;
+        const request: ExtraAgentsRequest = {
+            type: "extraAgents",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<ExtraAgent[]>;
     }
 
     /**
@@ -462,11 +470,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     frontendOpenOrders(args: FrontendOpenOrdersParameters, signal?: AbortSignal): Promise<FrontendOrder[]> {
-        return this.transport.request(
-            "info",
-            { type: "frontendOpenOrders", ...args },
-            signal,
-        ) as Promise<FrontendOrder[]>;
+        const request: FrontendOpenOrdersRequest = {
+            type: "frontendOpenOrders",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<FrontendOrder[]>;
     }
 
     /**
@@ -490,11 +498,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     fundingHistory(args: FundingHistoryParameters, signal?: AbortSignal): Promise<FundingHistory[]> {
-        return this.transport.request(
-            "info",
-            { type: "fundingHistory", ...args },
-            signal,
-        ) as Promise<FundingHistory[]>;
+        const request: FundingHistoryRequest = {
+            type: "fundingHistory",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<FundingHistory[]>;
     }
 
     /**
@@ -515,11 +523,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     isVip(args: IsVipParameters, signal?: AbortSignal): Promise<boolean> {
-        return this.transport.request(
-            "info",
-            { type: "isVip", ...args },
-            signal,
-        ) as Promise<boolean>;
+        const request: IsVipRequest = {
+            type: "isVip",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<boolean>;
     }
 
     /**
@@ -540,11 +548,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     historicalOrders(args: HistoricalOrdersParameters, signal?: AbortSignal): Promise<OrderStatus<FrontendOrder>[]> {
-        return this.transport.request(
-            "info",
-            { type: "historicalOrders", ...args },
-            signal,
-        ) as Promise<OrderStatus<FrontendOrder>[]>;
+        const request: HistoricalOrdersRequest = {
+            type: "historicalOrders",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<OrderStatus<FrontendOrder>[]>;
     }
 
     /**
@@ -565,11 +573,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     l2Book(args: L2BookParameters, signal?: AbortSignal): Promise<Book> {
-        return this.transport.request(
-            "info",
-            { type: "l2Book", ...args },
-            signal,
-        ) as Promise<Book>;
+        const request: L2BookRequest = {
+            type: "l2Book",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<Book>;
     }
 
     /**
@@ -590,11 +598,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     legalCheck(args: LegalCheckParameters, signal?: AbortSignal): Promise<LegalCheck> {
-        return this.transport.request(
-            "info",
-            { type: "legalCheck", ...args },
-            signal,
-        ) as Promise<LegalCheck>;
+        const request: LegalCheckRequest = {
+            type: "legalCheck",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<LegalCheck>;
     }
 
     /**
@@ -615,11 +623,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     maxBuilderFee(args: MaxBuilderFeeParameters, signal?: AbortSignal): Promise<number> {
-        return this.transport.request(
-            "info",
-            { type: "maxBuilderFee", ...args },
-            signal,
-        ) as Promise<number>;
+        const request: MaxBuilderFeeRequest = {
+            type: "maxBuilderFee",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<number>;
     }
 
     /**
@@ -639,11 +647,10 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     meta(signal?: AbortSignal): Promise<PerpsMeta> {
-        return this.transport.request(
-            "info",
-            { type: "meta" },
-            signal,
-        ) as Promise<PerpsMeta>;
+        const request: MetaRequest = {
+            type: "meta",
+        };
+        return this.transport.request("info", request, signal) as Promise<PerpsMeta>;
     }
 
     /**
@@ -663,11 +670,10 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     metaAndAssetCtxs(signal?: AbortSignal): Promise<PerpsMetaAndAssetCtxs> {
-        return this.transport.request(
-            "info",
-            { type: "metaAndAssetCtxs" },
-            signal,
-        ) as Promise<PerpsMetaAndAssetCtxs>;
+        const request: MetaAndAssetCtxsRequest = {
+            type: "metaAndAssetCtxs",
+        };
+        return this.transport.request("info", request, signal) as Promise<PerpsMetaAndAssetCtxs>;
     }
 
     /**
@@ -688,11 +694,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     openOrders(args: OpenOrdersParameters, signal?: AbortSignal): Promise<Order[]> {
-        return this.transport.request(
-            "info",
-            { type: "openOrders", ...args },
-            signal,
-        ) as Promise<Order[]>;
+        const request: OpenOrdersRequest = {
+            type: "openOrders",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<Order[]>;
     }
 
     /**
@@ -713,11 +719,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     orderStatus(args: OrderStatusParameters, signal?: AbortSignal): Promise<OrderLookup> {
-        return this.transport.request(
-            "info",
-            { type: "orderStatus", ...args },
-            signal,
-        ) as Promise<OrderLookup>;
+        const request: OrderStatusRequest = {
+            type: "orderStatus",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<OrderLookup>;
     }
 
     /**
@@ -738,11 +744,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     portfolio(args: PortfolioParameters, signal?: AbortSignal): Promise<PortfolioPeriods> {
-        return this.transport.request(
-            "info",
-            { type: "portfolio", ...args },
-            signal,
-        ) as Promise<PortfolioPeriods>;
+        const request: PortfolioRequest = {
+            type: "portfolio",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<PortfolioPeriods>;
     }
 
     /**
@@ -763,11 +769,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     preTransferCheck(args: PreTransferCheckParameters, signal?: AbortSignal): Promise<PreTransferCheck> {
-        return this.transport.request(
-            "info",
-            { type: "preTransferCheck", ...args },
-            signal,
-        ) as Promise<PreTransferCheck>;
+        const request: PreTransferCheckRequest = {
+            type: "preTransferCheck",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<PreTransferCheck>;
     }
 
     /**
@@ -788,11 +794,10 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     perpsAtOpenInterestCap(signal?: AbortSignal): Promise<string[]> {
-        return this.transport.request(
-            "info",
-            { type: "perpsAtOpenInterestCap" },
-            signal,
-        ) as Promise<string[]>;
+        const request: PerpsAtOpenInterestCapRequest = {
+            type: "perpsAtOpenInterestCap",
+        };
+        return this.transport.request("info", request, signal) as Promise<string[]>;
     }
 
     /**
@@ -812,11 +817,10 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     predictedFundings(signal?: AbortSignal): Promise<PredictedFunding[]> {
-        return this.transport.request(
-            "info",
-            { type: "predictedFundings" },
-            signal,
-        ) as Promise<PredictedFunding[]>;
+        const request: PredictedFundingsRequest = {
+            type: "predictedFundings",
+        };
+        return this.transport.request("info", request, signal) as Promise<PredictedFunding[]>;
     }
 
     /**
@@ -837,11 +841,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     referral(args: ReferralParameters, signal?: AbortSignal): Promise<Referral> {
-        return this.transport.request(
-            "info",
-            { type: "referral", ...args },
-            signal,
-        ) as Promise<Referral>;
+        const request: ReferralRequest = {
+            type: "referral",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<Referral>;
     }
 
     /**
@@ -865,11 +869,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
         args: SpotClearinghouseStateParameters,
         signal?: AbortSignal,
     ): Promise<SpotClearinghouseState> {
-        return this.transport.request(
-            "info",
-            { type: "spotClearinghouseState", ...args },
-            signal,
-        ) as Promise<SpotClearinghouseState>;
+        const request: SpotClearinghouseStateRequest = {
+            type: "spotClearinghouseState",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<SpotClearinghouseState>;
     }
 
     /**
@@ -890,11 +894,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     spotDeployState(args: SpotDeployStateParameters, signal?: AbortSignal): Promise<SpotDeployState> {
-        return this.transport.request(
-            "info",
-            { type: "spotDeployState", ...args },
-            signal,
-        ) as Promise<SpotDeployState>;
+        const request: SpotDeployStateRequest = {
+            type: "spotDeployState",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<SpotDeployState>;
     }
 
     /**
@@ -914,11 +918,10 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     spotMeta(signal?: AbortSignal): Promise<SpotMeta> {
-        return this.transport.request(
-            "info",
-            { type: "spotMeta" },
-            signal,
-        ) as Promise<SpotMeta>;
+        const request: SpotMetaRequest = {
+            type: "spotMeta",
+        };
+        return this.transport.request("info", request, signal) as Promise<SpotMeta>;
     }
 
     /**
@@ -938,11 +941,10 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     spotMetaAndAssetCtxs(signal?: AbortSignal): Promise<SpotMetaAndAssetCtxs> {
-        return this.transport.request(
-            "info",
-            { type: "spotMetaAndAssetCtxs" },
-            signal,
-        ) as Promise<SpotMetaAndAssetCtxs>;
+        const request: SpotMetaAndAssetCtxsRequest = {
+            type: "spotMetaAndAssetCtxs",
+        };
+        return this.transport.request("info", request, signal) as Promise<SpotMetaAndAssetCtxs>;
     }
 
     /**
@@ -963,11 +965,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     subAccounts(args: SubAccountsParameters, signal?: AbortSignal): Promise<SubAccount[] | null> {
-        return this.transport.request(
-            "info",
-            { type: "subAccounts", ...args },
-            signal,
-        ) as Promise<SubAccount[] | null>;
+        const request: SubAccountsRequest = {
+            type: "subAccounts",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<SubAccount[] | null>;
     }
 
     /**
@@ -988,11 +990,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     tokenDetails(args: TokenDetailsParameters, signal?: AbortSignal): Promise<TokenDetails> {
-        return this.transport.request(
-            "info",
-            { type: "tokenDetails", ...args },
-            signal,
-        ) as Promise<TokenDetails>;
+        const request: TokenDetailsRequest = {
+            type: "tokenDetails",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<TokenDetails>;
     }
 
     /**
@@ -1013,11 +1015,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     twapHistory(args: TwapHistoryParameters, signal?: AbortSignal): Promise<TwapHistory[]> {
-        return this.transport.request(
-            "info",
-            { type: "twapHistory", ...args },
-            signal,
-        ) as Promise<TwapHistory[]>;
+        const request: TwapHistoryRequest = {
+            type: "twapHistory",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<TwapHistory[]>;
     }
 
     /**
@@ -1038,11 +1040,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     userFees(args: UserFeesParameters, signal?: AbortSignal): Promise<UserFees> {
-        return this.transport.request(
-            "info",
-            { type: "userFees", ...args },
-            signal,
-        ) as Promise<UserFees>;
+        const request: UserFeesRequest = {
+            type: "userFees",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<UserFees>;
     }
 
     /**
@@ -1063,11 +1065,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     userFills(args: UserFillsParameters, signal?: AbortSignal): Promise<Fill[]> {
-        return this.transport.request(
-            "info",
-            { type: "userFills", ...args },
-            signal,
-        ) as Promise<Fill[]>;
+        const request: UserFillsRequest = {
+            type: "userFills",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<Fill[]>;
     }
 
     /**
@@ -1091,11 +1093,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     userFillsByTime(args: UserFillsByTimeParameters, signal?: AbortSignal): Promise<Fill[]> {
-        return this.transport.request(
-            "info",
-            { type: "userFillsByTime", ...args },
-            signal,
-        ) as Promise<Fill[]>;
+        const request: UserFillsByTimeRequest = {
+            type: "userFillsByTime",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<Fill[]>;
     }
 
     /**
@@ -1119,11 +1121,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     userFunding(args: UserFundingParameters, signal?: AbortSignal): Promise<UserFundingUpdate[]> {
-        return this.transport.request(
-            "info",
-            { type: "userFunding", ...args },
-            signal,
-        ) as Promise<UserFundingUpdate[]>;
+        const request: UserFundingRequest = {
+            type: "userFunding",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<UserFundingUpdate[]>;
     }
 
     /**
@@ -1150,11 +1152,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
         args: UserNonFundingLedgerUpdatesParameters,
         signal?: AbortSignal,
     ): Promise<UserNonFundingLedgerUpdate[]> {
-        return this.transport.request(
-            "info",
-            { type: "userNonFundingLedgerUpdates", ...args },
-            signal,
-        ) as Promise<UserNonFundingLedgerUpdate[]>;
+        const request: UserNonFundingLedgerUpdatesRequest = {
+            type: "userNonFundingLedgerUpdates",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<UserNonFundingLedgerUpdate[]>;
     }
 
     /**
@@ -1175,11 +1177,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     userRateLimit(args: UserRateLimitParameters, signal?: AbortSignal): Promise<UserRateLimit> {
-        return this.transport.request(
-            "info",
-            { type: "userRateLimit", ...args },
-            signal,
-        ) as Promise<UserRateLimit>;
+        const request: UserRateLimitRequest = {
+            type: "userRateLimit",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<UserRateLimit>;
     }
 
     /**
@@ -1200,11 +1202,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     userRole(args: UserRoleParameters, signal?: AbortSignal): Promise<UserRole> {
-        return this.transport.request(
-            "info",
-            { type: "userRole", ...args },
-            signal,
-        ) as Promise<UserRole>;
+        const request: UserRoleRequest = {
+            type: "userRole",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<UserRole>;
     }
 
     /**
@@ -1228,11 +1230,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
         args: UserToMultiSigSignersParameters,
         signal?: AbortSignal,
     ): Promise<MultiSigSigners | null> {
-        return this.transport.request(
-            "info",
-            { type: "userToMultiSigSigners", ...args },
-            signal,
-        ) as Promise<MultiSigSigners | null>;
+        const request: UserToMultiSigSignersRequest = {
+            type: "userToMultiSigSigners",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<MultiSigSigners | null>;
     }
 
     /**
@@ -1253,11 +1255,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     userTwapSliceFills(args: UserTwapSliceFillsParameters, signal?: AbortSignal): Promise<TwapSliceFill[]> {
-        return this.transport.request(
-            "info",
-            { type: "userTwapSliceFills", ...args },
-            signal,
-        ) as Promise<TwapSliceFill[]>;
+        const request: UserTwapSliceFillsRequest = {
+            type: "userTwapSliceFills",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<TwapSliceFill[]>;
     }
 
     /**
@@ -1281,11 +1283,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     userTwapSliceFillsByTime(args: UserTwapSliceFillsByTimeParameters, signal?: AbortSignal): Promise<TwapSliceFill[]> {
-        return this.transport.request(
-            "info",
-            { type: "userTwapSliceFillsByTime", ...args },
-            signal,
-        ) as Promise<TwapSliceFill[]>;
+        const request: UserTwapSliceFillsByTimeRequest = {
+            type: "userTwapSliceFillsByTime",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<TwapSliceFill[]>;
     }
 
     /**
@@ -1306,11 +1308,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     userVaultEquities(args: UserVaultEquitiesParameters, signal?: AbortSignal): Promise<VaultEquity[]> {
-        return this.transport.request(
-            "info",
-            { type: "userVaultEquities", ...args },
-            signal,
-        ) as Promise<VaultEquity[]>;
+        const request: UserVaultEquitiesRequest = {
+            type: "userVaultEquities",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<VaultEquity[]>;
     }
 
     /**
@@ -1330,11 +1332,10 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     validatorSummaries(signal?: AbortSignal): Promise<ValidatorSummary[]> {
-        return this.transport.request(
-            "info",
-            { type: "validatorSummaries" },
-            signal,
-        ) as Promise<ValidatorSummary[]>;
+        const request: ValidatorSummariesRequest = {
+            type: "validatorSummaries",
+        };
+        return this.transport.request("info", request, signal) as Promise<ValidatorSummary[]>;
     }
 
     /**
@@ -1355,11 +1356,11 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     vaultDetails(args: VaultDetailsParameters, signal?: AbortSignal): Promise<VaultDetails | null> {
-        return this.transport.request(
-            "info",
-            { type: "vaultDetails", ...args },
-            signal,
-        ) as Promise<VaultDetails | null>;
+        const request: VaultDetailsRequest = {
+            type: "vaultDetails",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<VaultDetails | null>;
     }
 
     /**
@@ -1380,20 +1381,19 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     vaultSummaries(signal?: AbortSignal): Promise<VaultSummary[]> {
-        return this.transport.request(
-            "info",
-            { type: "vaultSummaries" },
-            signal,
-        ) as Promise<VaultSummary[]>;
+        const request: VaultSummariesRequest = {
+            type: "vaultSummaries",
+        };
+        return this.transport.request("info", request, signal) as Promise<VaultSummary[]>;
     }
 
     // ——————————————— Explorer API ———————————————
 
     /**
-     * Gets the details of a block.
+     * Request for block details by block height.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns A promise that resolves with the details of the block.
+     * @returns Block details response.
      *
      * @see null - no documentation
      * @example
@@ -1407,18 +1407,18 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     blockDetails(args: BlockDetailsParameters, signal?: AbortSignal): Promise<BlockDetailsResponse> {
-        return this.transport.request(
-            "explorer",
-            { type: "blockDetails", ...args },
-            signal,
-        ) as Promise<BlockDetailsResponse>;
+        const request: BlockDetailsRequest = {
+            type: "blockDetails",
+            ...args,
+        };
+        return this.transport.request("explorer", request, signal) as Promise<BlockDetailsResponse>;
     }
 
     /**
-     * Gets the details of a transaction.
+     * Request for transaction details by transaction hash.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns A promise that resolves with the details of the transaction.
+     * @returns Transaction details response.
      *
      * @see null - no documentation
      * @example
@@ -1432,18 +1432,18 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     txDetails(args: TxDetailsParameters, signal?: AbortSignal): Promise<TxDetailsResponse> {
-        return this.transport.request(
-            "explorer",
-            { type: "txDetails", ...args },
-            signal,
-        ) as Promise<TxDetailsResponse>;
+        const request: TxDetailsRequest = {
+            type: "txDetails",
+            ...args,
+        };
+        return this.transport.request("explorer", request, signal) as Promise<TxDetailsResponse>;
     }
 
     /**
-     * Request user details.
+     * Request for user details by user's address.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns User details.
+     * @returns User details response.
      *
      * @see null - no documentation
      * @example
@@ -1457,10 +1457,10 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * ```
      */
     userDetails(args: UserDetailsParameters, signal?: AbortSignal): Promise<UserDetailsResponse> {
-        return this.transport.request(
-            "explorer",
-            { type: "userDetails", ...args },
-            signal,
-        ) as Promise<UserDetailsResponse>;
+        const request: UserDetailsRequest = {
+            type: "userDetails",
+            ...args,
+        };
+        return this.transport.request("explorer", request, signal) as Promise<UserDetailsResponse>;
     }
 }
