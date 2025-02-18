@@ -362,6 +362,20 @@ export class WalletClient<
      */
     signatureChainId: Hex;
 
+    /** The last nonce used for signing transactions. */
+    protected _lastNonce = 0;
+
+    /** Gets the next nonce for signing transactions. */
+    protected get _nonce(): number {
+        let nonce = Date.now();
+        if (nonce <= this._lastNonce) {
+            nonce = ++this._lastNonce;
+        } else {
+            this._lastNonce = nonce;
+        }
+        return nonce;
+    }
+
     /**
      * Initialises a new instance.
      * @param args - The parameters for the client.
@@ -448,7 +462,7 @@ export class WalletClient<
             type: "approveAgent",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
             signatureChainId: this.signatureChainId,
-            nonce: args.nonce ?? Date.now(),
+            nonce: args.nonce ?? this._nonce,
         };
 
         // Sign the action
@@ -507,7 +521,7 @@ export class WalletClient<
             type: "approveBuilderFee",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
             signatureChainId: this.signatureChainId,
-            nonce: args.nonce ?? Date.now(),
+            nonce: args.nonce ?? this._nonce,
         };
 
         // Sign the action
@@ -577,7 +591,7 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -661,7 +675,7 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -719,7 +733,7 @@ export class WalletClient<
             type: "cDeposit",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
             signatureChainId: this.signatureChainId,
-            nonce: args.nonce ?? Date.now(),
+            nonce: args.nonce ?? this._nonce,
         };
 
         // Sign the action
@@ -769,7 +783,9 @@ export class WalletClient<
      */
     async claimRewards(args: ClaimRewardsParameters = {}, signal?: AbortSignal): Promise<SuccessResponse> {
         // Destructure the parameters
-        const { nonce = Date.now() } = args;
+        const {
+            nonce = this._nonce,
+        } = args;
 
         // Construct an action
         const sortedAction: ClaimRewardsRequest["action"] = { type: "claimRewards" };
@@ -822,7 +838,7 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -880,7 +896,7 @@ export class WalletClient<
             type: "cWithdraw",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
             signatureChainId: this.signatureChainId,
-            nonce: args.nonce ?? Date.now(),
+            nonce: args.nonce ?? this._nonce,
         };
 
         // Sign the action
@@ -931,7 +947,7 @@ export class WalletClient<
     async evmUserModify(args: EvmUserModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Destructure the parameters
         const {
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -983,7 +999,7 @@ export class WalletClient<
     async createSubAccount(args: CreateSubAccountParameters, signal?: AbortSignal): Promise<CreateSubAccountResponse> {
         // Destructure the parameters
         const {
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -1039,7 +1055,7 @@ export class WalletClient<
     async createVault(args: CreateVaultParameters, signal?: AbortSignal): Promise<CreateVaultResponse> {
         // Destructure the parameters
         const {
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -1110,7 +1126,7 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -1201,7 +1217,7 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -1285,7 +1301,7 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -1339,7 +1355,7 @@ export class WalletClient<
     async setDisplayName(args: SetDisplayNameParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Destructure the parameters
         const {
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -1391,7 +1407,7 @@ export class WalletClient<
     async setReferrer(args: SetReferrerParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Destructure the parameters
         const {
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -1451,7 +1467,7 @@ export class WalletClient<
             type: "spotSend",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
             signatureChainId: this.signatureChainId,
-            time: args.time ?? Date.now(),
+            time: args.time ?? this._nonce,
         };
 
         // Sign the action
@@ -1506,7 +1522,7 @@ export class WalletClient<
     async spotUser(args: SpotUserParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Destructure the parameters
         const {
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -1568,7 +1584,7 @@ export class WalletClient<
     ): Promise<SuccessResponse> {
         // Destructure the parameters
         const {
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -1627,7 +1643,7 @@ export class WalletClient<
     async subAccountTransfer(args: SubAccountTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Destructure the parameters
         const {
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -1689,7 +1705,7 @@ export class WalletClient<
             type: "tokenDelegate",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
             signatureChainId: this.signatureChainId,
-            nonce: args.nonce ?? Date.now(),
+            nonce: args.nonce ?? this._nonce,
         };
 
         // Sign the action
@@ -1746,7 +1762,7 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -1806,7 +1822,7 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -1869,7 +1885,7 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -1929,7 +1945,7 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -1991,7 +2007,7 @@ export class WalletClient<
             type: "usdClassTransfer",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
             signatureChainId: this.signatureChainId,
-            nonce: args.nonce ?? Date.now(),
+            nonce: args.nonce ?? this._nonce,
         };
 
         // Sign the action
@@ -2050,7 +2066,7 @@ export class WalletClient<
             type: "usdSend",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
             signatureChainId: this.signatureChainId,
-            time: args.time ?? Date.now(),
+            time: args.time ?? this._nonce,
         };
 
         // Sign the action
@@ -2105,7 +2121,7 @@ export class WalletClient<
     async vaultDistribute(args: VaultDistributeParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Destructure the parameters
         const {
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -2162,7 +2178,7 @@ export class WalletClient<
     async vaultModify(args: VaultModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Destructure the parameters
         const {
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -2220,7 +2236,7 @@ export class WalletClient<
     async vaultTransfer(args: VaultTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Destructure the parameters
         const {
-            nonce = Date.now(),
+            nonce = this._nonce,
             ...actionArgs
         } = args;
 
@@ -2281,7 +2297,7 @@ export class WalletClient<
             type: "withdraw3",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
             signatureChainId: this.signatureChainId,
-            time: args.time ?? Date.now(),
+            time: args.time ?? this._nonce,
         };
 
         // Sign the action
