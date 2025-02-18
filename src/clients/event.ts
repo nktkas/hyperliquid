@@ -281,6 +281,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      * @param listener - The callback function to be called when the event is received.
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @note Make sure the endpoint in the {@link transport} supports this method.
      *
      * @see null - no documentation
      * @example
@@ -317,6 +318,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      * @param listener - The callback function to be called when the event is received.
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @note Make sure the endpoint in the {@link transport} supports this method.
      *
      * @see null - no documentation
      * @example

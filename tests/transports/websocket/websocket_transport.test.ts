@@ -171,24 +171,6 @@ Deno.test("WebSocketTransport Tests", async (t) => {
         });
 
         await t.step("Reject", async (t) => {
-            await t.step("Reject explorer type", async () => {
-                // Calling request with type "explorer" should throw immediately
-
-                // Setup
-                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
-
-                await assertRejects(
-                    async () => {
-                        await transport.request("explorer", { key: "value" });
-                    },
-                    Error,
-                    "Explorer requests are not supported in the Hyperliquid WebSocket API.",
-                );
-
-                // Clean up
-                await transport.close();
-            });
-
             await t.step("Reject an unsuccessful request", async () => {
                 // Setup
                 const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-fail" });

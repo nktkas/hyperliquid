@@ -135,7 +135,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
 
     /**
      * Sends a request to the Hyperliquid API via WebSocket.
-     * @param endpoint - The API endpoint to send the request to.
+     * @param endpoint - The API endpoint to send the request to (`explorer` requests are not supported).
      * @param payload - The payload to send with the request.
      * @param signal - An optional abort signal.
      * @returns A promise that resolves with parsed JSON response body.
@@ -143,13 +143,6 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
      * @note Explorer requests are not supported in the Hyperliquid WebSocket API.
      */
     request(type: "info" | "exchange" | "explorer", payload: unknown, signal?: AbortSignal): Promise<unknown> {
-        // Reject explorer requests because they are not supported by the Hyperliquid WebSocket API
-        if (type === "explorer") {
-            return Promise.reject(
-                new WebSocketRequestError("Explorer requests are not supported in the Hyperliquid WebSocket API."),
-            );
-        }
-
         // Send the request and wait for a response
         const timeoutSignal = this.timeout ? AbortSignal.timeout(this.timeout) : undefined;
         const combinedSignal = signal && timeoutSignal
