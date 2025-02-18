@@ -26,11 +26,30 @@ export class HttpRequestError extends TransportError {
 export interface HttpTransportOptions {
     /**
      * Base URL for API endpoints.
-     * - Mainnet: `https://api.hyperliquid.xyz`
-     * - Testnet: `https://api.hyperliquid-testnet.xyz`
-     * @defaultValue `https://api.hyperliquid.xyz`
+     *
+     * When given as a string or URL, the URL is modified based on the request type:
+     * - For `"info"` and `"exchange"`, the hostname is replaced with `api.<baseDomain>`.
+     * - For `"explorer"`, the hostname is replaced with `rpc.<baseDomain>`.
+     *
+     * Alternatively, you can supply an object to specify separate URLs:
+     * ```ts
+     * {
+     *   api: "https://api.hyperliquid.xyz",
+     *   rpc: "https://rpc.hyperliquid.xyz"
+     * }
+     * ```
+     *
+     * - Mainnet: `https://hyperliquid.xyz`
+     * - Testnet: `https://hyperliquid-testnet.xyz`
+     * @defaultValue `https://hyperliquid.xyz`
      */
-    url?: string | URL;
+    url?:
+        | string
+        | URL
+        | {
+            api?: string | URL;
+            rpc?: string | URL;
+        };
 
     /**
      * Request timeout in ms.
@@ -59,7 +78,13 @@ export interface HttpTransportOptions {
 
 /** HTTP implementation of the REST transport interface. */
 export class HttpTransport implements IRequestTransport, HttpTransportOptions {
-    url: string | URL;
+    url:
+        | string
+        | URL
+        | {
+            api?: string | URL;
+            rpc?: string | URL;
+        };
     timeout: number | null;
     fetchOptions: Omit<RequestInit, "body" | "method">;
     onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>;
@@ -92,13 +117,17 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
         signal?: AbortSignal,
     ): Promise<unknown> {
         // Construct a Request
-        const url = new URL(endpoint, this.url);
-
-        // FIXME: Temporary hack: replace `api.hyperliquid-testnet.xyz/explorer` with `rpc.hyperliquid-testnet.xyz/explorer`
-        // until the new rpc url becomes the standard for mainnet.
-        // TODO: Maybe after that should split the url property into api and rpc variants.
-        if (url.hostname === "api.hyperliquid-testnet.xyz" && url.pathname === "/explorer") {
-            url.hostname = "rpc.hyperliquid-testnet.xyz";
+        let url: URL;
+        if (typeof this.url === "string" || this.url instanceof URL) {
+            // If a string is provided, get the base domain and apply the modification to it
+            const parsedUrl = new URL(this.url);
+            const parts = parsedUrl.hostname.split(".");
+            const baseDomain = parts.slice(-2).join(".");
+            const baseUrl = `${parsedUrl.protocol}//${endpoint === "explorer" ? "rpc" : "api"}.${baseDomain}`;
+            url = new URL(endpoint, baseUrl);
+        } else {
+            // If an object is specified, use the specific url and add a path to it
+            url = new URL(endpoint, endpoint === "explorer" ? this.url.rpc : this.url.api);
         }
 
         const init = mergeRequestInit(

@@ -407,7 +407,7 @@ API.
 ```typescript
 class HttpTransport {
     constructor(options?: {
-        url?: string | URL; // Base URL for API endpoints (default: "https://api.hyperliquid.xyz")
+        url?: string | URL; // Base URL for API endpoints (default: "https://hyperliquid.xyz")
         timeout?: number; // Request timeout in ms (default: 10_000)
         fetchOptions?: RequestInit; // A custom fetch options
         onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>; // A callback before request is sent
@@ -440,7 +440,7 @@ class WebSocketTransport {
         };
     });
 
-    request(endpoint: "info" | "exchange" | "explorer", payload: unknown, signal?: AbortSignal): Promise<unknown>;
+    request(endpoint: "info" | "exchange", payload: unknown, signal?: AbortSignal): Promise<unknown>;
     subscribe(
         channel: string,
         payload: unknown,

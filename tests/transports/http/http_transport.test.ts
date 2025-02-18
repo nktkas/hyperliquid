@@ -1,12 +1,76 @@
 // deno-lint-ignore-file require-await
 
-import { assert, assertEquals, assertRejects } from "jsr:@std/assert@^1.0.10";
+import { assert, assertEquals, assertIsError, assertRejects } from "jsr:@std/assert@^1.0.10";
 import { HttpRequestError, HttpTransport } from "../../../src/transports/http/http_transport.ts";
 
 Deno.test("HttpTransport Tests", async (t) => {
     const originalFetch = globalThis.fetch;
 
-    // 1) Successful JSON response using default base + endpoint path
+    // 1) URL Modifications
+    await t.step("URL Modifications", async (t) => {
+        await t.step("url is a string", async () => {
+            const transport = new HttpTransport({ url: "https://hyperliquid.xyz" });
+
+            // Test for endpoint 'exchange': the URL is expected to be generated as 'https://api.hyperliquid.xyz/exchange'
+            // @ts-ignore - Mock fetch API
+            globalThis.fetch = async (request: Request) => {
+                assertEquals(request.url, "https://api.hyperliquid.xyz/info");
+                return new Response(JSON.stringify({ result: "info" }), {
+                    status: 200,
+                    headers: { "Content-Type": "application/json" },
+                });
+            };
+            const resInfo = await transport.request("info", {});
+            assertEquals(resInfo, { result: "info" });
+
+            // Test for endpoint 'explorer': the URL is expected to be generated as 'https://rpc.hyperliquid.xyz/explorer'
+            // @ts-ignore - Mock fetch API
+            globalThis.fetch = async (request: Request) => {
+                assertEquals(request.url, "https://rpc.hyperliquid.xyz/explorer");
+                return new Response(JSON.stringify({ result: "explorer" }), {
+                    status: 200,
+                    headers: { "Content-Type": "application/json" },
+                });
+            };
+            const resExplorer = await transport.request("explorer", {});
+            assertEquals(resExplorer, { result: "explorer" });
+        });
+
+        await t.step("url is an object", async () => {
+            const transport = new HttpTransport({
+                url: {
+                    api: "https://custom-api.example",
+                    rpc: "https://custom-rpc.example",
+                },
+            });
+
+            // Test for endpoint 'info': the URL is expected to be generated as 'https://custom-api.example/info'
+            // @ts-ignore - Mock fetch API
+            globalThis.fetch = async (request: Request) => {
+                assertEquals(request.url, "https://custom-api.example/info");
+                return new Response(JSON.stringify({ result: "info" }), {
+                    status: 200,
+                    headers: { "Content-Type": "application/json" },
+                });
+            };
+            const resInfo = await transport.request("info", {});
+            assertEquals(resInfo, { result: "info" });
+
+            // Test for endpoint 'explorer': the URL is expected to be generated as 'https://custom-rpc.example/explorer'
+            // @ts-ignore - Mock fetch API
+            globalThis.fetch = async (request: Request) => {
+                assertEquals(request.url, "https://custom-rpc.example/explorer");
+                return new Response(JSON.stringify({ result: "explorer" }), {
+                    status: 200,
+                    headers: { "Content-Type": "application/json" },
+                });
+            };
+            const resExplorer = await transport.request("explorer", {});
+            assertEquals(resExplorer, { result: "explorer" });
+        });
+    });
+
+    // 2) Successful JSON response using default base + endpoint path
     await t.step("Success response (status 200, JSON)", async () => {
         // @ts-ignore - Mock fetch API
         globalThis.fetch = async (request: Request) => {
@@ -25,7 +89,7 @@ Deno.test("HttpTransport Tests", async (t) => {
         assertEquals(result, { success: true });
     });
 
-    // 2) Non-200 status => HttpRequestError
+    // 3) Non-200 status => HttpRequestError
     await t.step("Non-200 status (throws HttpRequestError)", async () => {
         globalThis.fetch = async () =>
             new Response("Server Error", {
@@ -38,7 +102,7 @@ Deno.test("HttpTransport Tests", async (t) => {
         await assertRejects(() => transport.request("exchange", { foo: "bar" }), HttpRequestError);
     });
 
-    // 3) Response body unloading on failed request
+    // 4) Response body unloading on failed request
     await t.step("Response body unloading on failed request", async () => {
         // @ts-ignore - Mock fetch API
         globalThis.fetch = async () => {
@@ -63,7 +127,7 @@ Deno.test("HttpTransport Tests", async (t) => {
         }
     });
 
-    // 4) Invalid Content-Type => HttpRequestError
+    // 5) Invalid Content-Type => HttpRequestError
     await t.step("Invalid Content-Type (text/html)", async () => {
         globalThis.fetch = async () =>
             new Response("<html>not json</html>", {
@@ -75,7 +139,7 @@ Deno.test("HttpTransport Tests", async (t) => {
         await assertRejects(() => transport.request("explorer", {}), HttpRequestError);
     });
 
-    // 5) onRequest callback modifies request (URL, custom headers, etc.)
+    // 6) onRequest callback modifies request (URL, custom headers, etc.)
     await t.step("onRequest callback modifies request", async () => {
         // @ts-ignore - Mock fetch API
         globalThis.fetch = async (request: Request) => {
@@ -102,7 +166,7 @@ Deno.test("HttpTransport Tests", async (t) => {
         assertEquals(result, { changed: true });
     });
 
-    // 6) onResponse callback replaces the original response
+    // 7) onResponse callback replaces the original response
     await t.step("onResponse callback replaces response", async () => {
         globalThis.fetch = async () =>
             new Response(JSON.stringify({ original: true }), {
@@ -122,22 +186,6 @@ Deno.test("HttpTransport Tests", async (t) => {
 
         const result = await transport.request("info", { data: 2 });
         assertEquals(result, { replaced: true });
-    });
-
-    // 7) Custom base URL usage
-    await t.step("Custom base URL usage", async () => {
-        // @ts-ignore - Mock fetch API
-        globalThis.fetch = async (request: Request) => {
-            assertEquals(request.url, "https://my-base.example/explorer");
-            return new Response(JSON.stringify({ baseUrlUsed: true }), {
-                status: 200,
-                headers: { "Content-Type": "application/json" },
-            });
-        };
-
-        const transport = new HttpTransport({ url: "https://my-base.example" });
-        const result = await transport.request("explorer", {});
-        assertEquals(result, { baseUrlUsed: true });
     });
 
     // 8) fetchOptions merging
@@ -205,13 +253,13 @@ Deno.test("HttpTransport Tests", async (t) => {
     await t.step("Internal timeout triggers TimeoutError", async () => {
         globalThis.fetch = originalFetch;
 
-        const transport = new HttpTransport({ timeout: 50 });
+        const transport = new HttpTransport({ timeout: 1 });
         try {
-            await transport.request("info", { type: "meta" });
+            await transport.request("info", { type: "metaAndAssetCtxs" });
             throw new Error("Expected request to throw an error due to timeout");
         } catch (err) {
             // In Deno, an aborted fetch typically throws a DOMException with name "TimeoutError"
-            assert(err instanceof DOMException, "Expected a DOMException on abort");
+            assertIsError(err, DOMException);
             assertEquals(err.name, "TimeoutError");
         }
     });
