@@ -198,6 +198,26 @@ export interface MaxBuilderFeeRequest {
 }
 
 /**
+ * Request metadata and asset contexts.
+ * @returns {PerpsMetaAndAssetCtxs} Metadata and context information for each perpetual asset.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-asset-contexts-includes-mark-price-current-funding-open-interest-etc
+ */
+export interface MetaAndAssetCtxsRequest {
+    /** Type of request. */
+    type: "metaAndAssetCtxs";
+}
+
+/**
+ * Request trading metadata.
+ * @returns {PerpsMeta} Metadata for perpetual assets.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-metadata
+ */
+export interface MetaRequest {
+    /** Type of request. */
+    type: "meta";
+}
+
+/**
  * Request open orders.
  * @returns {Order[]} Array of open orders.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders
