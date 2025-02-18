@@ -16,6 +16,11 @@ import type {
     ScheduleCancelRequest,
     SetDisplayNameRequest,
     SetReferrerRequest,
+    SpotDeployRequest_Genesis,
+    SpotDeployRequest_RegisterHyperliquidity,
+    SpotDeployRequest_RegisterSpot,
+    SpotDeployRequest_RegisterToken2,
+    SpotDeployRequest_UserGenesis,
     SpotSendRequest,
     SpotUserRequest,
     SubAccountSpotTransferRequest,
@@ -33,6 +38,7 @@ import type {
     Withdraw3Request,
 } from "../types/exchange/requests.ts";
 import type {
+    BaseExchangeResponse,
     CancelResponse,
     CreateSubAccountResponse,
     CreateVaultResponse,
@@ -167,6 +173,34 @@ export type SetDisplayNameParameters =
 export type SetReferrerParameters =
     & Omit<SetReferrerRequest["action"], "type">
     & Partial<Pick<SetReferrerRequest, "nonce">>;
+
+/** Parameters for the {@linkcode WalletClient.spotDeploy} method. */
+export type SpotDeployParameters =
+    | SpotDeployParameters_RegisterToken2
+    | SpotDeployParameters_UserGenesis
+    | SpotDeployParameters_Genesis
+    | SpotDeployParameters_RegisterSpot
+    | SpotDeployParameters_RegisterHyperliquidity;
+/** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
+export type SpotDeployParameters_RegisterToken2 =
+    & Omit<SpotDeployRequest_RegisterToken2["action"], "type">
+    & Partial<Pick<SpotDeployRequest_RegisterToken2, "nonce">>;
+/** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
+export type SpotDeployParameters_UserGenesis =
+    & Omit<SpotDeployRequest_UserGenesis["action"], "type">
+    & Partial<Pick<SpotDeployRequest_UserGenesis, "nonce">>;
+/** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
+export type SpotDeployParameters_Genesis =
+    & Omit<SpotDeployRequest_Genesis["action"], "type">
+    & Partial<Pick<SpotDeployRequest_Genesis, "nonce">>;
+/** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
+export type SpotDeployParameters_RegisterSpot =
+    & Omit<SpotDeployRequest_RegisterSpot["action"], "type">
+    & Partial<Pick<SpotDeployRequest_RegisterSpot, "nonce">>;
+/** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
+export type SpotDeployParameters_RegisterHyperliquidity =
+    & Omit<SpotDeployRequest_RegisterHyperliquidity["action"], "type">
+    & Partial<Pick<SpotDeployRequest_RegisterHyperliquidity, "nonce">>;
 
 /** Parameters for the {@linkcode WalletClient.spotSend} method. */
 export type SpotSendParameters =
@@ -430,7 +464,7 @@ export class WalletClient<
         this.signatureChainId = args.signatureChainId ?? (this.isTestnet ? "0x66eee" : "0xa4b1");
     }
 
-    // ———————————————Actions———————————————
+    // ——————————————— Exchange API ———————————————
 
     /**
      * Approve an agent to sign on behalf of the master or sub-accounts.
@@ -1437,6 +1471,126 @@ export class WalletClient<
     }
 
     /**
+     * Deploying HIP-1 and HIP-2 assets.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
+     * @throws {ApiRequestError} When the API returns an error response.
+     * @untested
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
+     * // Unknown what the successful response will be
+     * const result = await client.spotDeploy({
+     *   registerToken2: {
+     *     spec: {
+     *       name: "TestToken",
+     *       szDecimals: 8,
+     *       weiDecimals: 8,
+     *     },
+     *     maxGas: 1000000,
+     *     fullName: "TestToken (TT)"
+     *   }
+     * });
+     * ```
+     */
+    async spotDeploy(args: SpotDeployParameters, signal?: AbortSignal): Promise<BaseExchangeResponse> {
+        // Destructure the parameters
+        const {
+            nonce = this._nonce,
+            ...actionArgs
+        } = args;
+
+        // Construct an action
+        let action:
+            | SpotDeployRequest_RegisterToken2["action"]
+            | SpotDeployRequest_UserGenesis["action"]
+            | SpotDeployRequest_Genesis["action"]
+            | SpotDeployRequest_RegisterSpot["action"]
+            | SpotDeployRequest_RegisterHyperliquidity["action"];
+        if ("registerToken2" in actionArgs) {
+            action = {
+                type: "spotDeploy",
+                registerToken2: {
+                    spec: {
+                        name: actionArgs.registerToken2.spec.name,
+                        szDecimals: actionArgs.registerToken2.spec.szDecimals,
+                        weiDecimals: actionArgs.registerToken2.spec.weiDecimals,
+                    },
+                    maxGas: actionArgs.registerToken2.maxGas,
+                    fullName: actionArgs.registerToken2.fullName,
+                },
+            };
+        } else if ("userGenesis" in actionArgs) {
+            action = {
+                type: "spotDeploy",
+                userGenesis: {
+                    token: actionArgs.userGenesis.token,
+                    userAndWei: actionArgs.userGenesis.userAndWei,
+                    existingTokenAndWei: actionArgs.userGenesis.existingTokenAndWei,
+                },
+            };
+        } else if ("genesis" in actionArgs) {
+            action = {
+                type: "spotDeploy",
+                genesis: {
+                    token: actionArgs.genesis.token,
+                    maxSupply: actionArgs.genesis.maxSupply,
+                },
+            };
+        } else if ("registerSpot" in actionArgs) {
+            action = {
+                type: "spotDeploy",
+                registerSpot: {
+                    tokens: actionArgs.registerSpot.tokens,
+                },
+            };
+        } else {
+            action = {
+                type: "spotDeploy",
+                registerHyperliquidity: {
+                    spot: actionArgs.registerHyperliquidity.spot,
+                    startPx: actionArgs.registerHyperliquidity.startPx,
+                    orderSz: actionArgs.registerHyperliquidity.orderSz,
+                    nOrders: actionArgs.registerHyperliquidity.nOrders,
+                    nSeededLevels: actionArgs.registerHyperliquidity.nSeededLevels,
+                },
+            };
+        }
+
+        // Sign the action
+        const signature = await signL1Action({
+            wallet: this.wallet,
+            action,
+            nonce,
+            isTestnet: this.isTestnet,
+        });
+
+        // Send a request
+        const request = { action, signature, nonce } as
+            | SpotDeployRequest_RegisterToken2
+            | SpotDeployRequest_UserGenesis
+            | SpotDeployRequest_Genesis
+            | SpotDeployRequest_RegisterSpot
+            | SpotDeployRequest_RegisterHyperliquidity;
+        const response = await this.transport.request("exchange", request, signal) as
+            | SuccessResponse
+            | ErrorResponse;
+
+        // Validate a response
+        this._validateResponse(response);
+        return response;
+    }
+
+    /**
      * Transfer a spot asset on L1 to another address.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -2325,6 +2479,8 @@ export class WalletClient<
         this._validateResponse(response);
         return response;
     }
+
+    // ——————————————— Private methods ———————————————
 
     /** Formats a decimal number as a string, removing trailing zeros. */
     protected _formatDecimal(numStr: string): string {

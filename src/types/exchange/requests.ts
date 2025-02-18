@@ -377,6 +377,127 @@ export interface SetReferrerRequest extends BaseExchangeRequest {
 }
 
 /**
+ * Deploying HIP-1 and HIP-2 assets.
+ *
+ * Step 1: Register Token
+ * @returns {unknown}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
+ */
+export interface SpotDeployRequest_RegisterToken2 extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "spotDeploy";
+        /** Register Token parameters. */
+        registerToken2: {
+            /** Token specifications. */
+            spec: {
+                /** Token name. */
+                name: string;
+                /** Number of decimals for token size. */
+                szDecimals: number;
+                /** Number of decimals for token amounts in wei. */
+                weiDecimals: number;
+            };
+            /** Maximum gas allowed for registration. */
+            maxGas: number;
+            /** Optional full token name. */
+            fullName?: string;
+        };
+    };
+}
+/**
+ * Deploying HIP-1 and HIP-2 assets.
+ *
+ * Step 2: User Genesis
+ * @returns {unknown}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
+ */
+export interface SpotDeployRequest_UserGenesis extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "spotDeploy";
+        /** User Genesis parameters. */
+        userGenesis: {
+            /** Token identifier. */
+            token: number;
+            /** Array of tuples: [user address, genesis amount in wei]. */
+            userAndWei: [string, string][];
+            /** Array of tuples: [existing token identifier, genesis amount in wei]. */
+            existingTokenAndWei: [number, string][];
+        };
+    };
+}
+/**
+ * Deploying HIP-1 and HIP-2 assets.
+ *
+ * Step 3: Genesis
+ * @returns {unknown}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
+ */
+export interface SpotDeployRequest_Genesis extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "spotDeploy";
+        /** Genesis parameters. */
+        genesis: {
+            /** Token identifier. */
+            token: number;
+            /** Maximum token supply. */
+            maxSupply: string;
+        };
+    };
+}
+/**
+ * Deploying HIP-1 and HIP-2 assets.
+ *
+ * Step 4: Register Spot
+ * @returns {unknown}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
+ */
+export interface SpotDeployRequest_RegisterSpot extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "spotDeploy";
+        /** Register Spot parameters. */
+        registerSpot: {
+            /** Tuple containing base and quote token indices. */
+            tokens: [number, number];
+        };
+    };
+}
+/**
+ * Deploying HIP-1 and HIP-2 assets.
+ *
+ * Step 5: Register Hyperliquidity
+ * @returns {unknown}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
+ */
+export interface SpotDeployRequest_RegisterHyperliquidity extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "spotDeploy";
+        /** Register Hyperliquidity parameters. */
+        registerHyperliquidity: {
+            /** Spot index (distinct from base token index). */
+            spot: number;
+            /** Starting price for liquidity seeding. */
+            startPx: string;
+            /** Order size as a float (not in wei). */
+            orderSz: string;
+            /** Total number of orders to place. */
+            nOrders: number;
+            /** Number of levels to seed with USDC. */
+            nSeededLevels: number;
+        };
+    };
+}
+
+/**
  * Transfer a spot asset on L1 to another address.
  * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-spot-transfer

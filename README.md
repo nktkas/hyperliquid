@@ -338,6 +338,9 @@ class WalletClient {
     cWithdraw(args: CWithdrawParameters): Promise<SuccessResponse>;
     tokenDelegate(args: TokenDelegateParameters): Promise<SuccessResponse>;
 
+    // Market
+    spotDeploy(args: SpotDeployParameters): Promise<BaseExchangeResponse>;
+
     // Vault
     createVault(args: CreateVaultParameters): Promise<CreateVaultResponse>;
     vaultDistribute(args: VaultDistributeParameters): Promise<SuccessResponse>;
