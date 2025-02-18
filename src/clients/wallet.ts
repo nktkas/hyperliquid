@@ -590,8 +590,8 @@ export class WalletClient<
                     order: {
                         a: modify.order.a,
                         b: modify.order.b,
-                        p: modify.order.p,
-                        s: modify.order.s,
+                        p: this._formatDecimal(modify.order.p),
+                        s: this._formatDecimal(modify.order.s),
                         r: modify.order.r,
                         t: "limit" in modify.order.t
                             ? {
@@ -602,7 +602,7 @@ export class WalletClient<
                             : {
                                 trigger: {
                                     isMarket: modify.order.t.trigger.isMarket,
-                                    triggerPx: modify.order.t.trigger.triggerPx,
+                                    triggerPx: this._formatDecimal(modify.order.t.trigger.triggerPx),
                                     tpsl: modify.order.t.trigger.tpsl,
                                 },
                             },
@@ -1121,8 +1121,8 @@ export class WalletClient<
             order: {
                 a: actionArgs.order.a,
                 b: actionArgs.order.b,
-                p: actionArgs.order.p,
-                s: actionArgs.order.s,
+                p: this._formatDecimal(actionArgs.order.p),
+                s: this._formatDecimal(actionArgs.order.s),
                 r: actionArgs.order.r,
                 t: "limit" in actionArgs.order.t
                     ? {
@@ -1133,7 +1133,7 @@ export class WalletClient<
                     : {
                         trigger: {
                             isMarket: actionArgs.order.t.trigger.isMarket,
-                            triggerPx: actionArgs.order.t.trigger.triggerPx,
+                            triggerPx: this._formatDecimal(actionArgs.order.t.trigger.triggerPx),
                             tpsl: actionArgs.order.t.trigger.tpsl,
                         },
                     },
@@ -1212,8 +1212,8 @@ export class WalletClient<
                 const sortedOrder = {
                     a: order.a,
                     b: order.b,
-                    p: order.p,
-                    s: order.s,
+                    p: this._formatDecimal(order.p),
+                    s: this._formatDecimal(order.s),
                     r: order.r,
                     t: "limit" in order.t
                         ? {
@@ -1224,7 +1224,7 @@ export class WalletClient<
                         : {
                             trigger: {
                                 isMarket: order.t.trigger.isMarket,
-                                triggerPx: order.t.trigger.triggerPx,
+                                triggerPx: this._formatDecimal(order.t.trigger.triggerPx),
                                 tpsl: order.t.trigger.tpsl,
                             },
                         },
@@ -1816,7 +1816,7 @@ export class WalletClient<
             twap: {
                 a: actionArgs.a,
                 b: actionArgs.b,
-                s: actionArgs.s,
+                s: this._formatDecimal(actionArgs.s),
                 r: actionArgs.r,
                 m: actionArgs.m,
                 t: actionArgs.t,
@@ -2308,6 +2308,16 @@ export class WalletClient<
         // Validate a response
         this._validateResponse(response);
         return response;
+    }
+
+    /** Formats a decimal number as a string, removing trailing zeros. */
+    protected _formatDecimal(numStr: string): string {
+        if (!numStr.includes(".")) return numStr;
+
+        const [intPart, fracPart] = numStr.split(".");
+        const newFrac = fracPart.replace(/0+$/, "");
+
+        return newFrac ? `${intPart}.${newFrac}` : intPart;
     }
 
     /** Validate a response from the API. */
