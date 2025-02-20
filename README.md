@@ -241,6 +241,7 @@ class PublicClient {
     legalCheck(args: LegalCheckParameters): Promise<LegalCheck>;
     maxBuilderFee(args: MaxBuilderFeeParameters): Promise<number>;
     portfolio(args: PortfolioParameters): Promise<PortfolioPeriods>;
+    preTransferCheck(args: PreTransferCheckParameters): Promise<PreTransferCheck>;
     referral(args: ReferralParameters): Promise<Referral>;
     spotClearinghouseState(args: SpotClearinghouseStateParameters): Promise<SpotClearinghouseState>;
     subAccounts(args: SubAccountsParameters): Promise<SubAccount[] | null>;
@@ -249,6 +250,7 @@ class PublicClient {
     userNonFundingLedgerUpdates(args: UserNonFundingLedgerUpdatesParameters): Promise<UserNonFundingLedgerUpdate[]>;
     userRateLimit(args: UserRateLimitParameters): Promise<UserRateLimit>;
     userRole(args: UserRoleParameters): Promise<UserRole>;
+    userToMultiSigSigners(args: UserToMultiSigSignersParameters): Promise<MultiSigSigners | null>;
 
     // Order
     frontendOpenOrders(args: FrontendOpenOrdersParameters): Promise<FrontendOrder[]>;
@@ -259,6 +261,7 @@ class PublicClient {
     userFills(args: UserFillsParameters): Promise<Fill[]>;
     userFillsByTime(args: UserFillsByTimeParameters): Promise<Fill[]>;
     userTwapSliceFills(args: UserTwapSliceFillsParameters): Promise<TwapSliceFill[]>;
+    userTwapSliceFillsByTime(args: UserTwapSliceFillsByTimeParameters): Promise<TwapSliceFill[]>;
 
     // Staking
     delegations(args: DelegationsParameters): Promise<Delegation[]>;
@@ -289,6 +292,8 @@ The Wallet Client class sets up with a given [Transport](#transports) and a wall
 [Viem Wallet](https://viem.sh/docs/clients/wallet) or an
 [Ethers Wallet](https://docs.ethers.org/v6/api/providers/#Signer).
 
+> NOTE: When using a web3 wallet, the wallet network must be set to 1337 for proper generation of L1 transactions.
+
 ```typescript
 class WalletClient {
     constructor(args: {
@@ -301,6 +306,7 @@ class WalletClient {
             | AbstractWindowEthereum; // window.ethereum (EIP-1193) directly
         isTestnet?: boolean; // Whether to use testnet API (default: false)
         defaultVaultAddress?: Hex; // Vault address used by default if not provided in method call
+        signatureChainId?: Hex; // Chain ID used for signing (default: trying to guess based on wallet and isTestnet)
     });
 
     // Order

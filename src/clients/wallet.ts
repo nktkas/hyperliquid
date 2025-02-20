@@ -1,4 +1,4 @@
-import { type Hex, HyperliquidError, type IRequestTransport } from "../base.ts";
+import { type Hex, HyperliquidError, type IRequestTransport, type MaybePromise } from "../base.ts";
 import type {
     ApproveAgentRequest,
     ApproveBuilderFeeRequest,
@@ -54,6 +54,10 @@ import {
     type AbstractExtendedViemWalletClient,
     type AbstractViemWalletClient,
     type AbstractWindowEthereum,
+    isAbstractEthersSigner,
+    isAbstractEthersV5Signer,
+    isAbstractViemWalletClient,
+    isAbstractWindowEthereum,
     signL1Action,
     signUserSignedAction,
 } from "../signing.ts";
@@ -89,9 +93,9 @@ export interface WalletClientParameters<
      * The network that will be used to sign transactions.
      * Must match the network of the {@link wallet}.
      *
-     * Defaults to `0xa4b1` for `isTestnet = false` or `0x66eee` for `isTestnet = true`.
+     * Defaults to trying to get the current wallet network. Otherwise `0xa4b1` for `isTestnet = false` or `0x66eee` for `isTestnet = true` will be used.
      */
-    signatureChainId?: Hex;
+    signatureChainId?: Hex | (() => MaybePromise<Hex>);
 }
 
 /** Parameters for the {@linkcode WalletClient.approveAgent} method. */
@@ -394,7 +398,7 @@ export class WalletClient<
      * The network that will be used to sign transactions.
      * Must match the network of the {@link wallet}.
      */
-    signatureChainId: Hex;
+    signatureChainId: Hex | (() => MaybePromise<Hex>);
 
     /** The last nonce used for signing transactions. */
     protected _lastNonce = 0;
@@ -461,7 +465,30 @@ export class WalletClient<
         this.wallet = args.wallet;
         this.isTestnet = args.isTestnet ?? false;
         this.defaultVaultAddress = args.defaultVaultAddress;
-        this.signatureChainId = args.signatureChainId ?? (this.isTestnet ? "0x66eee" : "0xa4b1");
+        this.signatureChainId = args.signatureChainId ?? (async () => {
+            // Trying to get chain id of the wallet
+            if (isAbstractViemWalletClient(this.wallet)) {
+                if ("getChainId" in this.wallet && typeof this.wallet.getChainId === "function") {
+                    const chainId = await this.wallet.getChainId() as number;
+                    return `0x${chainId.toString(16)}`;
+                }
+            } else if (isAbstractEthersSigner(this.wallet) || isAbstractEthersV5Signer(this.wallet)) {
+                if (
+                    "provider" in this.wallet &&
+                    typeof this.wallet.provider === "object" && this.wallet.provider !== null &&
+                    "getNetwork" in this.wallet.provider &&
+                    typeof this.wallet.provider.getNetwork === "function"
+                ) {
+                    const network = await this.wallet.provider.getNetwork() as { chainId: number | bigint };
+                    return `0x${network.chainId.toString(16)}`;
+                }
+            } else if (isAbstractWindowEthereum(this.wallet)) {
+                const [chainId] = await this.wallet.request({ method: "eth_chainId", params: [] }) as Hex[];
+                return chainId;
+            }
+            // Trying to guess chain id based on isTestnet
+            return this.isTestnet ? "0x66eee" : "0xa4b1";
+        });
     }
 
     // ——————————————— Exchange API ———————————————
@@ -495,7 +522,9 @@ export class WalletClient<
             ...args,
             type: "approveAgent",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: this.signatureChainId,
+            signatureChainId: typeof this.signatureChainId === "string"
+                ? this.signatureChainId
+                : await this.signatureChainId(),
             nonce: args.nonce ?? this._nonce,
         };
 
@@ -554,7 +583,9 @@ export class WalletClient<
             ...args,
             type: "approveBuilderFee",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: this.signatureChainId,
+            signatureChainId: typeof this.signatureChainId === "string"
+                ? this.signatureChainId
+                : await this.signatureChainId(),
             nonce: args.nonce ?? this._nonce,
         };
 
@@ -766,7 +797,9 @@ export class WalletClient<
             ...args,
             type: "cDeposit",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: this.signatureChainId,
+            signatureChainId: typeof this.signatureChainId === "string"
+                ? this.signatureChainId
+                : await this.signatureChainId(),
             nonce: args.nonce ?? this._nonce,
         };
 
@@ -929,7 +962,9 @@ export class WalletClient<
             ...args,
             type: "cWithdraw",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: this.signatureChainId,
+            signatureChainId: typeof this.signatureChainId === "string"
+                ? this.signatureChainId
+                : await this.signatureChainId(),
             nonce: args.nonce ?? this._nonce,
         };
 
@@ -1620,7 +1655,9 @@ export class WalletClient<
             ...args,
             type: "spotSend",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: this.signatureChainId,
+            signatureChainId: typeof this.signatureChainId === "string"
+                ? this.signatureChainId
+                : await this.signatureChainId(),
             time: args.time ?? this._nonce,
         };
 
@@ -1858,7 +1895,9 @@ export class WalletClient<
             ...args,
             type: "tokenDelegate",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: this.signatureChainId,
+            signatureChainId: typeof this.signatureChainId === "string"
+                ? this.signatureChainId
+                : await this.signatureChainId(),
             nonce: args.nonce ?? this._nonce,
         };
 
@@ -2160,7 +2199,9 @@ export class WalletClient<
             ...args,
             type: "usdClassTransfer",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: this.signatureChainId,
+            signatureChainId: typeof this.signatureChainId === "string"
+                ? this.signatureChainId
+                : await this.signatureChainId(),
             nonce: args.nonce ?? this._nonce,
         };
 
@@ -2219,7 +2260,9 @@ export class WalletClient<
             ...args,
             type: "usdSend",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: this.signatureChainId,
+            signatureChainId: typeof this.signatureChainId === "string"
+                ? this.signatureChainId
+                : await this.signatureChainId(),
             time: args.time ?? this._nonce,
         };
 
@@ -2450,7 +2493,9 @@ export class WalletClient<
             ...args,
             type: "withdraw3",
             hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: this.signatureChainId,
+            signatureChainId: typeof this.signatureChainId === "string"
+                ? this.signatureChainId
+                : await this.signatureChainId(),
             time: args.time ?? this._nonce,
         };
 

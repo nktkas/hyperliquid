@@ -1,6 +1,8 @@
 /** Hexadecimal string starting with `0x`. */
 export type Hex = `0x${string}`;
 
+export type MaybePromise<T> = T | Promise<T>;
+
 /**
  * Interface representing a REST transport.
  * Handles communication with Hyperliquid API endpoints.

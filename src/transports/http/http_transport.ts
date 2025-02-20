@@ -1,6 +1,4 @@
-import { type IRequestTransport, TransportError } from "../../base.ts";
-
-type MaybePromise<T> = T | Promise<T>;
+import { type IRequestTransport, type MaybePromise, TransportError } from "../../base.ts";
 
 /**
  * Error thrown when an HTTP response is deemed invalid:

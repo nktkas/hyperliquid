@@ -1,8 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 
-import { TransportError } from "../../base.ts";
-
-type MaybePromise<T> = T | Promise<T>;
+import { type MaybePromise, TransportError } from "../../base.ts";
 
 /** Configuration options for the `ReconnectingWebSocket`. */
 export interface ReconnectingWebSocketOptions {

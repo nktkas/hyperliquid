@@ -89,7 +89,8 @@ export interface AbstractEthersV5Signer {
 
 /** Abstract interface for a [window.ethereum](https://eips.ethereum.org/EIPS/eip-1193) object. */
 export interface AbstractWindowEthereum {
-    request: (args: { method: string; params: unknown[] }) => Promise<unknown>;
+    // deno-lint-ignore no-explicit-any
+    request(args: { method: any; params: any }): Promise<any>;
 }
 
 /**
@@ -330,35 +331,35 @@ function splitSignature(signature: Hex): { r: Hex; s: Hex; v: number } {
 }
 
 /** Checks if the given value is an abstract viem wallet. */
-function isAbstractViemWalletClient(client: unknown): client is AbstractViemWalletClient {
+export function isAbstractViemWalletClient(client: unknown): client is AbstractViemWalletClient {
     return typeof client === "object" && client !== null &&
         "signTypedData" in client && typeof client.signTypedData === "function" &&
         client.signTypedData.length === 1;
 }
 
 /** Checks if the given value is an abstract extended viem wallet (e.g. privy `useSignTypedData`). */
-function isAbstractExtendedViemWalletClient(client: unknown): client is AbstractViemWalletClient {
+export function isAbstractExtendedViemWalletClient(client: unknown): client is AbstractViemWalletClient {
     return typeof client === "object" && client !== null &&
         "signTypedData" in client && typeof client.signTypedData === "function" &&
         client.signTypedData.length === 2;
 }
 
 /** Checks if the given value is an abstract ethers signer. */
-function isAbstractEthersSigner(client: unknown): client is AbstractEthersSigner {
+export function isAbstractEthersSigner(client: unknown): client is AbstractEthersSigner {
     return typeof client === "object" && client !== null &&
         "signTypedData" in client && typeof client.signTypedData === "function" &&
         client.signTypedData.length === 3;
 }
 
 /** Checks if the given value is an abstract ethers v5 signer. */
-function isAbstractEthersV5Signer(client: unknown): client is AbstractEthersV5Signer {
+export function isAbstractEthersV5Signer(client: unknown): client is AbstractEthersV5Signer {
     return typeof client === "object" && client !== null &&
         "_signTypedData" in client && typeof client._signTypedData === "function" &&
         client._signTypedData.length === 3;
 }
 
 /** Checks if the given value is an abstract `window.ethereum` object. */
-function isAbstractWindowEthereum(client: unknown): client is AbstractWindowEthereum {
+export function isAbstractWindowEthereum(client: unknown): client is AbstractWindowEthereum {
     return typeof client === "object" && client !== null &&
         "request" in client && typeof client.request === "function" &&
         client.request.length >= 1;
