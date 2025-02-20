@@ -304,9 +304,9 @@ class WalletClient {
             | AbstractEthersSigner // ethers
             | AbstractEthersV5Signer // ethers v5
             | AbstractWindowEthereum; // window.ethereum (EIP-1193) directly
-        isTestnet?: boolean; // Whether to use testnet API (default: false)
+        isTestnet?: boolean; // Whether to use testnet (default: false)
         defaultVaultAddress?: Hex; // Vault address used by default if not provided in method call
-        signatureChainId?: Hex; // Chain ID used for signing (default: trying to guess based on wallet and isTestnet)
+        signatureChainId?: Hex | (() => MaybePromise<Hex>); // Chain ID used for signing (default: trying to guess based on wallet and isTestnet)
     });
 
     // Order
