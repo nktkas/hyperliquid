@@ -1,3 +1,27 @@
+/**
+ * Hyperliquid transaction signing utilities.
+ * This module provides functions for generating signatures for Hyperliquid transactions
+ * and interfaces for different wallet implementations.
+ *
+ * @module
+ * @example
+ * ```ts
+ * import { signL1Action } from "@nktkas/hyperliquid/signing";
+ * import type { CancelRequest } from "@nktkas/hyperliquid/types";
+ * import { privateKeyToAccount } from "viem/accounts";
+ *
+ * const wallet = privateKeyToAccount("0x...");
+ *
+ * const action: CancelRequest["action"] = {
+ *   type: "cancel",
+ *   cancels: [{ a: 0, o: 12345 }],
+ * };
+ * const nonce = Date.now();
+ *
+ * const signature = await signL1Action({ wallet, action, nonce, isTestnet: true });
+ * ```
+ */
+
 import { keccak_256 } from "@noble/hashes/sha3";
 import { encode, type ValueMap, type ValueType } from "@std/msgpack/encode";
 import { decodeHex, encodeHex } from "@std/encoding/hex";
