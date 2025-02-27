@@ -125,20 +125,36 @@ export type OrderLookup =
 
 /**
  * Order processing status.
- * - filled: Order fully executed.
- * - open: Order active and waiting to be filled.
- * - canceled: Order canceled by the user.
- * - triggered: Order triggered and awaiting execution.
- * - rejected: Order rejected by the system.
- * - marginCanceled: Order canceled due to insufficient margin.
+ * - `open`: Order active and waiting to be filled.
+ * - `filled`: Order fully executed.
+ * - `canceled`: Order canceled by the user.
+ * - `triggered`: Order triggered and awaiting execution.
+ * - `rejected`: Order rejected by the system.
+ * - `marginCanceled`: Order canceled due to insufficient margin.
+ * - `vaultWithdrawalCanceled`: Canceled due to a user's withdrawal from vault.
+ * - `openInterestCapCanceled`: Canceled due to order being too aggressive when open interest was at cap.
+ * - `selfTradeCanceled`: Canceled due to self-trade prevention.
+ * - `reduceOnlyCanceled`: Canceled reduced-only order that does not reduce position.
+ * - `siblingFilledCanceled`: Canceled due to sibling ordering being filled.
+ * - `delistedCanceled`: Canceled due to asset delisting.
+ * - `liquidatedCanceled`: Canceled due to liquidation.
+ * - `scheduledCancel`: Canceled due to exceeding scheduled cancel deadline (dead man's switch).
  */
 export type OrderProcessingStatus =
-    | "filled"
     | "open"
+    | "filled"
     | "canceled"
     | "triggered"
     | "rejected"
-    | "marginCanceled";
+    | "marginCanceled"
+    | "vaultWithdrawalCanceled"
+    | "openInterestCapCanceled"
+    | "selfTradeCanceled"
+    | "reduceOnlyCanceled"
+    | "siblingFilledCanceled"
+    | "delistedCanceled"
+    | "liquidatedCanceled"
+    | "scheduledCancel";
 
 /** Order with current processing status. */
 export interface OrderStatus<O extends Order | FrontendOrder> {
@@ -152,10 +168,10 @@ export interface OrderStatus<O extends Order | FrontendOrder> {
 
 /**
  * Order types for market execution.
- * - Market: Executes immediately at the market price.
- * - Limit: Executes at the specified limit price or better.
- * - Stop Market: Activates as a market order when a stop price is reached.
- * - Stop Limit: Activates as a limit order when a stop price is reached.
+ * - `Market`: Executes immediately at the market price.
+ * - `Limit`: Executes at the specified limit price or better.
+ * - `Stop Market`: Activates as a market order when a stop price is reached.
+ * - `Stop Limit`: Activates as a limit order when a stop price is reached.
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/trading/order-types
  */
@@ -163,11 +179,11 @@ export type OrderType = "Market" | "Limit" | "Stop Market" | "Stop Limit";
 
 /**
  * Time-in-force options.
- * - Gtc: Remains active until filled or canceled.
- * - Ioc: Fills immediately or cancels any unfilled portion.
- * - Alo: Adds liquidity only.
- * - FrontendMarket: Similar to Ioc, used in Hyperliquid UI.
- * - LiquidationMarket: Similar to Ioc, used in Hyperliquid UI.
+ * - `Gtc`: Remains active until filled or canceled.
+ * - `Ioc`: Fills immediately or cancels any unfilled portion.
+ * - `Alo`: Adds liquidity only.
+ * - `FrontendMarket`: Similar to Ioc, used in Hyperliquid UI.
+ * - `LiquidationMarket`: Similar to Ioc, used in Hyperliquid UI.
  */
 export type TIF = "Gtc" | "Ioc" | "Alo" | "FrontendMarket" | "LiquidationMarket";
 
@@ -215,10 +231,10 @@ export interface TwapState {
 
 /**
  * TWAP order status.
- * - finished: Fully executed.
- * - activated: Active and executing.
- * - terminated: Terminated.
- * - error: An error occurred.
+ * - `finished`: Fully executed.
+ * - `activated`: Active and executing.
+ * - `terminated`: Terminated.
+ * - `error`: An error occurred.
  */
 export type TwapStatus =
     | {
