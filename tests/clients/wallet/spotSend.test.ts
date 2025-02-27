@@ -27,7 +27,7 @@ Deno.test("spotSend", async () => {
     // —————————— Prepare ——————————
 
     const account = privateKeyToAccount(TEST_PRIVATE_KEY as `0x${string}`);
-    const transport = new HttpTransport({ url: "https://api.hyperliquid-testnet.xyz" });
+    const transport = new HttpTransport({ isTestnet: true });
     const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
 
     // Preparation of balance

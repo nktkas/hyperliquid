@@ -6,67 +6,102 @@ import { HttpRequestError, HttpTransport } from "../../../src/transports/http/ht
 Deno.test("HttpTransport Tests", async (t) => {
     const originalFetch = globalThis.fetch;
 
-    // 1) URL Modifications
-    await t.step("URL Modifications", async (t) => {
-        await t.step("url is a string", async () => {
-            const transport = new HttpTransport({ url: "https://hyperliquid.xyz" });
+    // 1) Testnet / Mainnet URL Modifications
+    await t.step("Testnet / Mainnet URL Modifications", async (t) => {
+        await t.step("isTestnet=true", async () => {
+            const transport = new HttpTransport({ isTestnet: true });
 
-            // Test for endpoint 'exchange': the URL is expected to be generated as 'https://api.hyperliquid.xyz/exchange'
+            // Test for endpoint 'info' with isTestnet=true
+            // @ts-ignore - Mock fetch API
+            globalThis.fetch = async (request: Request) => {
+                assertEquals(request.url, "https://api.hyperliquid-testnet.xyz/info");
+                return new Response(JSON.stringify({ result: "testnet-info" }), {
+                    status: 200,
+                    headers: { "Content-Type": "application/json" },
+                });
+            };
+            const resInfo = await transport.request("info", {});
+            assertEquals(resInfo, { result: "testnet-info" });
+
+            // Test for endpoint 'explorer' with isTestnet=true
+            // @ts-ignore - Mock fetch API
+            globalThis.fetch = async (request: Request) => {
+                assertEquals(request.url, "https://rpc.hyperliquid-testnet.xyz/explorer");
+                return new Response(JSON.stringify({ result: "testnet-explorer" }), {
+                    status: 200,
+                    headers: { "Content-Type": "application/json" },
+                });
+            };
+            const resExplorer = await transport.request("explorer", {});
+            assertEquals(resExplorer, { result: "testnet-explorer" });
+
+            // Test for endpoint 'exchange' with isTestnet=true
+            // @ts-ignore - Mock fetch API
+            globalThis.fetch = async (request: Request) => {
+                assertEquals(request.url, "https://api.hyperliquid-testnet.xyz/exchange");
+                return new Response(JSON.stringify({ result: "testnet-exchange" }), {
+                    status: 200,
+                    headers: { "Content-Type": "application/json" },
+                });
+            };
+            const resExchange = await transport.request("exchange", {});
+            assertEquals(resExchange, { result: "testnet-exchange" });
+        });
+
+        await t.step("isTestnet=false (default)", async () => {
+            const transport = new HttpTransport(); // isTestnet defaults to false
+
+            // Test for endpoint 'info' with isTestnet=false
             // @ts-ignore - Mock fetch API
             globalThis.fetch = async (request: Request) => {
                 assertEquals(request.url, "https://api.hyperliquid.xyz/info");
-                return new Response(JSON.stringify({ result: "info" }), {
+                return new Response(JSON.stringify({ result: "mainnet-info" }), {
                     status: 200,
                     headers: { "Content-Type": "application/json" },
                 });
             };
             const resInfo = await transport.request("info", {});
-            assertEquals(resInfo, { result: "info" });
+            assertEquals(resInfo, { result: "mainnet-info" });
 
-            // Test for endpoint 'explorer': the URL is expected to be generated as 'https://rpc.hyperliquid.xyz/explorer'
+            // Test for endpoint 'explorer' with isTestnet=false
             // @ts-ignore - Mock fetch API
             globalThis.fetch = async (request: Request) => {
                 assertEquals(request.url, "https://rpc.hyperliquid.xyz/explorer");
-                return new Response(JSON.stringify({ result: "explorer" }), {
+                return new Response(JSON.stringify({ result: "mainnet-explorer" }), {
                     status: 200,
                     headers: { "Content-Type": "application/json" },
                 });
             };
             const resExplorer = await transport.request("explorer", {});
-            assertEquals(resExplorer, { result: "explorer" });
-        });
+            assertEquals(resExplorer, { result: "mainnet-explorer" });
 
-        await t.step("url is an object", async () => {
-            const transport = new HttpTransport({
-                url: {
-                    api: "https://custom-api.example",
-                    rpc: "https://custom-rpc.example",
-                },
-            });
-
-            // Test for endpoint 'info': the URL is expected to be generated as 'https://custom-api.example/info'
+            // Test for endpoint 'exchange' with isTestnet=false
             // @ts-ignore - Mock fetch API
             globalThis.fetch = async (request: Request) => {
-                assertEquals(request.url, "https://custom-api.example/info");
-                return new Response(JSON.stringify({ result: "info" }), {
+                assertEquals(request.url, "https://api.hyperliquid.xyz/exchange");
+                return new Response(JSON.stringify({ result: "mainnet-exchange" }), {
+                    status: 200,
+                    headers: { "Content-Type": "application/json" },
+                });
+            };
+            const resExchange = await transport.request("exchange", {});
+            assertEquals(resExchange, { result: "mainnet-exchange" });
+        });
+
+        await t.step("explicitly set isTestnet=false", async () => {
+            const transport = new HttpTransport({ isTestnet: false });
+
+            // Test for endpoint 'info' with explicit isTestnet=false
+            // @ts-ignore - Mock fetch API
+            globalThis.fetch = async (request: Request) => {
+                assertEquals(request.url, "https://api.hyperliquid.xyz/info");
+                return new Response(JSON.stringify({ result: "explicit-mainnet-info" }), {
                     status: 200,
                     headers: { "Content-Type": "application/json" },
                 });
             };
             const resInfo = await transport.request("info", {});
-            assertEquals(resInfo, { result: "info" });
-
-            // Test for endpoint 'explorer': the URL is expected to be generated as 'https://custom-rpc.example/explorer'
-            // @ts-ignore - Mock fetch API
-            globalThis.fetch = async (request: Request) => {
-                assertEquals(request.url, "https://custom-rpc.example/explorer");
-                return new Response(JSON.stringify({ result: "explorer" }), {
-                    status: 200,
-                    headers: { "Content-Type": "application/json" },
-                });
-            };
-            const resExplorer = await transport.request("explorer", {});
-            assertEquals(resExplorer, { result: "explorer" });
+            assertEquals(resInfo, { result: "explicit-mainnet-info" });
         });
     });
 

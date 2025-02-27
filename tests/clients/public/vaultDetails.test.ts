@@ -25,7 +25,7 @@ Deno.test("vaultDetails", async (t) => {
 
     // —————————— Prepare ——————————
 
-    const transport = new HttpTransport({ url: "https://api.hyperliquid-testnet.xyz" });
+    const transport = new HttpTransport({ isTestnet: true });
     const client = new PublicClient({ transport });
 
     // —————————— Test ——————————

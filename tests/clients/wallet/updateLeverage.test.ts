@@ -31,7 +31,7 @@ Deno.test("updateLeverage", async (t) => {
     // —————————— Prepare ——————————
 
     const account = privateKeyToAccount(TEST_PRIVATE_KEY);
-    const transport = new HttpTransport({ url: "https://api.hyperliquid-testnet.xyz" });
+    const transport = new HttpTransport({ isTestnet: true });
     const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
     const publicClient = new PublicClient({ transport });
 
