@@ -52,7 +52,7 @@ First, choose and configure your transport layer (more details in the [API Refer
 import * as hl from "@nktkas/hyperliquid"; // ESM & Common.js
 
 // HTTP Transport
-const httpTransport = new hl.HttpTransport(); // Accepts optional parameters (e.g. url, timeout, fetchOptions)
+const httpTransport = new hl.HttpTransport(); // Accepts optional parameters (e.g. isTestnet, timeout, fetchOptions)
 
 // or WebSocket Transport
 const wsTransport = new hl.WebSocketTransport(); // Accepts optional parameters (e.g. url, timeout, keepAlive, reconnect)
@@ -413,7 +413,7 @@ API.
 ```typescript
 class HttpTransport {
     constructor(options?: {
-        url?: string | URL; // Base URL for API endpoints (default: "https://hyperliquid.xyz")
+        isTestnet?: boolean; // Whether to use testnet url (default: false)
         timeout?: number; // Request timeout in ms (default: 10_000)
         fetchOptions?: RequestInit; // A custom fetch options
         onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>; // A callback before request is sent
