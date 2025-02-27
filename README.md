@@ -55,7 +55,7 @@ import * as hl from "@nktkas/hyperliquid"; // ESM & Common.js
 const httpTransport = new hl.HttpTransport(); // Accepts optional parameters (e.g. isTestnet, timeout, fetchOptions)
 
 // or WebSocket Transport
-const wsTransport = new hl.WebSocketTransport(); // Accepts optional parameters (e.g. url, timeout, keepAlive, reconnect)
+const wsTransport = new hl.WebSocketTransport(); // Accepts optional parameters (e.g. isTestnet, timeout, keepAlive, reconnect)
 ```
 
 ### Initialize Client
@@ -432,7 +432,7 @@ A WebSocket Transport that executes requests and subscribes to events via a
 ```typescript
 class WebSocketTransport {
     constructor(options?: {
-        url?: string | URL; // WebSocket URL (default: "wss://api.hyperliquid.xyz/ws")
+        isTestnet?: boolean; // Whether to use testnet url (default: false)
         timeout?: number; // Request timeout in ms (default: 10_000)
         keepAlive?: { // Keep-alive configuration
             interval?: number; // Ping interval in ms (default: 20_000)
