@@ -53,8 +53,35 @@ Deno.test("historicalOrders", async (t) => {
                     assert(data.some((item) => item.status === "rejected"));
                 });
 
-                // Failed to find an order with 'status === marginCanceled'
+                // Failed to find an order with 'order.status === triggered'
+                await t.step({ name: "some should be 'triggered'", fn: () => {}, ignore: true });
+
+                // Failed to find an order with 'order.status === marginCanceled'
                 await t.step({ name: "some should be 'marginCanceled'", fn: () => {}, ignore: true });
+
+                // Failed to find an order with 'order.status === vaultWithdrawalCanceled'
+                await t.step({ name: "some should be 'vaultWithdrawalCanceled'", fn: () => {}, ignore: true });
+
+                // Failed to find an order with 'order.status === openInterestCapCanceled'
+                await t.step({ name: "some should be 'openInterestCapCanceled'", fn: () => {}, ignore: true });
+
+                // Failed to find an order with 'order.status === selfTradeCanceled'
+                await t.step({ name: "some should be 'selfTradeCanceled'", fn: () => {}, ignore: true });
+
+                // Failed to find an order with 'order.status === reduceOnlyCanceled'
+                await t.step({ name: "some should be 'reduceOnlyCanceled'", fn: () => {}, ignore: true });
+
+                // Failed to find an order with 'order.status === siblingFilledCanceled'
+                await t.step({ name: "some should be 'siblingFilledCanceled'", fn: () => {}, ignore: true });
+
+                // Failed to find an order with 'order.status === delistedCanceled'
+                await t.step({ name: "some should be 'delistedCanceled'", fn: () => {}, ignore: true });
+
+                // Failed to find an order with 'order.status === liquidatedCanceled'
+                await t.step({ name: "some should be 'liquidatedCanceled'", fn: () => {}, ignore: true });
+
+                // Failed to find an order with 'order.status === scheduledCancel'
+                await t.step({ name: "some should be 'scheduledCancel'", fn: () => {}, ignore: true });
             });
 
             await t.step("Check key 'order.side'", async (t) => {

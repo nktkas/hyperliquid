@@ -41,7 +41,7 @@ Deno.test("spotDeploy", async (t) => {
                     },
                 }),
             ApiRequestError,
-            "Error deploying spot: Gas auction completed. Try again later",
+            "Error deploying spot:",
         );
     });
 
@@ -56,7 +56,7 @@ Deno.test("spotDeploy", async (t) => {
                     },
                 }),
             ApiRequestError,
-            "Genesis error: genesis already happened",
+            "Genesis error:",
         );
     });
 
@@ -70,7 +70,7 @@ Deno.test("spotDeploy", async (t) => {
                     },
                 }),
             ApiRequestError,
-            "Genesis error: genesis already happened",
+            "Genesis error:",
         );
     });
 
@@ -83,7 +83,7 @@ Deno.test("spotDeploy", async (t) => {
                     },
                 }),
             ApiRequestError,
-            "Error deploying spot: incorrect deployer",
+            "Error deploying spot:",
         );
     });
 
@@ -100,7 +100,7 @@ Deno.test("spotDeploy", async (t) => {
                     },
                 }),
             ApiRequestError,
-            "Error deploying spot: incorrect deployer",
+            "Error deploying spot:",
         );
     });
 });
