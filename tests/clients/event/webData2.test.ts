@@ -28,7 +28,7 @@ Deno.test("webData2", async (t) => {
     // —————————— Prepare ——————————
 
     // Create clients
-    const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws", timeout: 20_000 });
+    const transport = new WebSocketTransport({ isTestnet: true, timeout: 20_000 });
     const publicClient = new PublicClient({ transport });
     const eventClient = new EventClient({ transport });
     const walletClient = new WalletClient({
