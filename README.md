@@ -428,7 +428,7 @@ A WebSocket Transport that executes requests and subscribes to events via a
 ```typescript
 class WebSocketTransport {
     constructor(options?: {
-        isTestnet?: boolean; // Whether to use testnet url (default: false)
+        url?: string | URL; // WebSocket URL (default: "wss://api.hyperliquid.xyz/ws")
         timeout?: number; // Request timeout in ms (default: 10_000)
         keepAlive?: { // Keep-alive configuration
             interval?: number; // Ping interval in ms (default: 20_000)

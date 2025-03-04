@@ -16,7 +16,7 @@ Deno.test("userTwapSliceFills", async (t) => {
 
     // —————————— Prepare ——————————
 
-    const transport = new WebSocketTransport({ isTestnet: true });
+    const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
     const client = new EventClient({ transport });
 
     // —————————— Test ——————————

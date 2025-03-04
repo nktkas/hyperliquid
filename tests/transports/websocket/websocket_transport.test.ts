@@ -1,15 +1,7 @@
 import { assert, assertEquals, assertRejects } from "jsr:@std/assert@^1.0.10";
-import {
-    WebSocketTransport,
-    type WebSocketTransportOptions,
-} from "../../../src/transports/websocket/websocket_transport.ts";
-import { ReconnectingWebSocket } from "../../../src/transports/websocket/_reconnecting_websocket.ts";
-import { HyperliquidEventTarget } from "../../../src/transports/websocket/_hyperliquid_event_target.ts";
-import { WebSocketRequestDispatcher } from "../../../src/transports/websocket/_websocket_request_dispatcher.ts";
+import { WebSocketTransport } from "../../../src/transports/websocket/websocket_transport.ts";
 
 Deno.test("WebSocketTransport Tests", async (t) => {
-    // Mock server to simulate different responses.
-    // So as not to change the logic of the operation WebSocketTransport.
     const server = Deno.serve(
         { port: 8080, onListen: () => {} },
         (request) => {
@@ -126,62 +118,19 @@ Deno.test("WebSocketTransport Tests", async (t) => {
         },
     );
 
-    // WebSocketTransport extension to use a custom URL
-    class TestWebSocketTransport extends WebSocketTransport {
-        constructor(options: WebSocketTransportOptions & { url: string }) {
-            super(options);
-
-            // Clearing resources created by `super`
-
-            this.socket.close();
-
-            // Repeating the initialization, but with a custom url
-
-            // @ts-ignore: Change readonly property
-            this.socket = new ReconnectingWebSocket(options.url, undefined, options?.reconnect);
-            this._hlEvents = new HyperliquidEventTarget(this.socket);
-            this._wsRequester = new WebSocketRequestDispatcher(this.socket, this._hlEvents);
-
-            // Initialize listeners
-            this.socket.addEventListener("open", () => {
-                // Start keep-alive timer
-                if (this.keepAlive.interval && this._keepAliveTimer === null) {
-                    this._keepAliveTimer = setInterval(() => {
-                        this.socket.send(JSON.stringify({ method: "ping" }));
-                    }, this.keepAlive.interval);
-                }
-            });
-            this.socket.addEventListener("close", () => {
-                // Clear keep-alive timer
-                if (this._keepAliveTimer !== null) {
-                    clearInterval(this._keepAliveTimer);
-                    this._keepAliveTimer = null;
-                }
-
-                // Clear all subscriptions
-                for (const subscriptionInfo of this._subscriptions.values()) {
-                    for (const [_, unsubscribe] of subscriptionInfo.listeners) {
-                        unsubscribe();
-                    }
-                }
-            });
-        }
-    }
-
     await t.step("constructor", async (t) => {
-        await t.step("isTestnet", async (t) => {
-            await t.step("isTestnet=false | Mainnet", async () => {
+        await t.step("url", async (t) => {
+            await t.step("default url", async () => {
                 const transport = new WebSocketTransport();
                 assertEquals(transport.socket.url, "wss://api.hyperliquid.xyz/ws");
                 await transport.close();
             });
-            await t.step("isTestnet=true | Testnet", async () => {
-                const transport = new WebSocketTransport({ isTestnet: true });
-                assertEquals(transport.socket.url, "wss://api.hyperliquid-testnet.xyz/ws");
+            await t.step("custom url", async () => {
+                const transport = new WebSocketTransport({ url: "ws://localhost-test-123:8080" });
+                assertEquals(transport.socket.url, "ws://localhost-test-123:8080/");
                 await transport.close();
             });
         });
-
         await t.step("custom timeout", async (t) => {
             await t.step("default timeout", async () => {
                 const transport = new WebSocketTransport();
@@ -194,7 +143,6 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                 await transport.close();
             });
         });
-
         await t.step("custom keepAlive.interval", async (t) => {
             await t.step("default keepAlive.interval", async () => {
                 const transport = new WebSocketTransport();
@@ -212,7 +160,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
     await t.step("request()", async (t) => {
         await t.step("Send post request and resolves with server response", async () => {
             // Setup
-            const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+            const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
             await transport.ready();
 
             const result = await transport.request("info", { key: "value" });
@@ -225,7 +173,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
         await t.step("Reject", async (t) => {
             await t.step("Reject an unsuccessful request", async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=request-fail" });
+                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-fail" });
                 await transport.ready();
 
                 await assertRejects(
@@ -242,7 +190,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
 
             await t.step("Reject if AbortSignal is aborted", async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
                 await transport.ready();
 
                 const signal = AbortSignal.abort(new Error("Aborted"));
@@ -260,7 +208,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
 
             await t.step("Reject after timeout expires", async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({
+                const transport = new WebSocketTransport({
                     url: "ws://localhost:8080/?test=request-timeout",
                     timeout: 100,
                 });
@@ -282,7 +230,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                 // Context: Default timeout is 10 seconds, but the server will respond after 15 seconds
 
                 // Setup
-                const transport = new TestWebSocketTransport({
+                const transport = new WebSocketTransport({
                     url: "ws://localhost:8080/?test=request-no-timeout",
                     timeout: null,
                 });
@@ -308,7 +256,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
             "Standard use: subscription request/response, receive event, unsubscribe request/response",
             async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-success" });
+                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-success" });
                 await transport.ready();
 
                 // Subscribe to an event
@@ -346,7 +294,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
             "A listener added twice should not be added to the internal list of listeners",
             async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-success" });
+                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-success" });
                 await transport.ready();
 
                 const payload = { channel: "testEvent", extra: "data" };
@@ -376,7 +324,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
             "Two different listeners for the same event should not create a new list of event listeners",
             async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-success" });
+                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-success" });
                 await transport.ready();
 
                 const payload = { channel: "testEvent", extra: "data" };
@@ -407,7 +355,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
             "A subscription object must be the same across different listeners for the same event",
             async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-success" });
+                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-success" });
                 await transport.ready();
 
                 const payload = { channel: "testEvent", extra: "data" };
@@ -426,7 +374,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
             "A second listener added after the first listener should not send a subscription request",
             async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-success" });
+                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-success" });
                 await transport.ready();
 
                 const payload = { channel: "singleSubRequest", extra: "data" };
@@ -452,7 +400,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
             "New listeners must wait for a response to a subscription request",
             async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-delay" });
+                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-delay" });
                 await transport.ready();
 
                 const payload = { channel: "slowSub", extra: "data" };
@@ -482,7 +430,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
             "If the subscription request fails, resources must be released",
             async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-fail" });
+                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-fail" });
                 await transport.ready();
 
                 const payload = { channel: "failSub", reason: "testing" };
@@ -510,7 +458,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
         await t.step("Reject", async (t) => {
             await t.step("Reject if AbortSignal is aborted", async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-success" });
+                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-success" });
                 await transport.ready();
 
                 await assertRejects(
@@ -531,7 +479,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
 
             await t.step("Reject after timeout expires", async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({
+                const transport = new WebSocketTransport({
                     url: "ws://localhost:8080/?test=subscribe-timeout",
                     timeout: 100,
                 });
@@ -553,7 +501,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                 // Context: Default timeout is 10 seconds, but the server will respond after 15 seconds
 
                 // Setup
-                const transport = new TestWebSocketTransport({
+                const transport = new WebSocketTransport({
                     url: "ws://localhost:8080/?test=subscribe-no-timeout",
                     timeout: null,
                 });
@@ -570,7 +518,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
     await t.step("unsubscribe()", async (t) => {
         await t.step("Unsubscribe a listener, request to be unsubscribed and clear resources", async () => {
             // Setup
-            const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=unsubscribe-success" });
+            const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=unsubscribe-success" });
             await transport.ready();
 
             // First, subscribe to an event
@@ -592,7 +540,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
 
         await t.step("Do not send an unsubscribe request if there are more listeners", async () => {
             // Setup
-            const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=unsubscribe-success" });
+            const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=unsubscribe-success" });
             await transport.ready();
 
             // First, subscribe to an event
@@ -618,7 +566,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
 
         await t.step("Clears subscriptions on close", async () => {
             // Setup
-            const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=unsubscribe-success" });
+            const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=unsubscribe-success" });
             await transport.ready();
 
             // First, subscribe to an event
@@ -639,7 +587,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
         await t.step("Reject", async (t) => {
             await t.step("Reject if AbortSignal is aborted", async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=unsubscribe-success" });
+                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=unsubscribe-success" });
                 await transport.ready();
 
                 // First, subscribe to an event
@@ -662,7 +610,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
 
             await t.step("Reject after timeout expires", async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({
+                const transport = new WebSocketTransport({
                     url: "ws://localhost:8080/?test=unsubscribe-timeout",
                     timeout: 100,
                 });
@@ -690,7 +638,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                 // Context: Default timeout is 10 seconds, but the server will respond after 15 seconds
 
                 // Setup
-                const transport = new TestWebSocketTransport({
+                const transport = new WebSocketTransport({
                     url: "ws://localhost:8080/?test=unsubscribe-no-timeout",
                     timeout: null,
                 });
@@ -719,7 +667,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
         await t.step("Resolve", async (t) => {
             await t.step("Resolve as soon as the socket is open", async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
                 await transport.ready();
                 // Clean up
                 await transport.close();
@@ -727,7 +675,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
 
             await t.step("Resolve immediately if the socket is already open", async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
                 await transport.ready();
 
                 const start = performance.now();
@@ -743,7 +691,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
         await t.step("AbortSIgnal check", async (t) => {
             await t.step("Reject immediately if the signal has already been aborted", async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
 
                 const alreadyAborted = AbortSignal.abort(new Error("Already aborted"));
                 await assertRejects(
@@ -759,7 +707,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
 
             await t.step("Reject if the signal is later aborted", async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
 
                 const controller = new AbortController();
                 const promise = transport.ready(controller.signal);
@@ -780,7 +728,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
 
         await t.step("Reject if the connection is permanently closed", async () => {
             // Setup
-            const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+            const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
 
             await transport.close();
             await assertRejects(
@@ -797,7 +745,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
         await t.step("Resolve", async (t) => {
             await t.step("Resolve as soon as the socket is closed", async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
                 await transport.ready();
                 // Clean up
                 await transport.close();
@@ -805,7 +753,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
 
             await t.step("Resolve immediately if the socket is already closed", async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
                 await transport.ready();
                 await transport.close();
 
@@ -819,7 +767,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
         await t.step("AbortSIgnal check", async (t) => {
             await t.step("Reject immediately if the signal has already been aborted", async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
                 await transport.ready();
 
                 const aborted = AbortSignal.abort(new Error("Already aborted close"));
@@ -837,7 +785,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
 
             await t.step("Reject if the signal is later aborted", async () => {
                 // Setup
-                const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
                 await transport.ready();
 
                 const controller = new AbortController();
@@ -861,7 +809,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
     await t.step("keepAlive", async (t) => {
         await t.step("Send ping messages after connection open", async () => {
             // Setup
-            const transport = new TestWebSocketTransport({
+            const transport = new WebSocketTransport({
                 url: "ws://localhost:8080/?test=ping",
                 keepAlive: { interval: 5000 },
             });
@@ -904,7 +852,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
 
         await t.step("Stops sending ping messages after closing", async () => {
             // Setup
-            const transport = new TestWebSocketTransport({ url: "ws://localhost:8080/?test=ping" });
+            const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=ping" });
             await transport.ready();
 
             // Check that the timer is set

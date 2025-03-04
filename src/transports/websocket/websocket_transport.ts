@@ -14,10 +14,16 @@ export { type MessageBufferStrategy, ReconnectingWebSocketError, type Reconnecti
 /** Configuration options for the WebSocket transport layer. */
 export interface WebSocketTransportOptions {
     /**
-     * Specifies whether to use the testnet RPC endpoint.
-     * @defaultValue `false`
+     * The WebSocket URL.
+     * - Mainnet:
+     *   - API: `wss://api.hyperliquid.xyz/ws`
+     *   - RPC: `wss://rpc.hyperliquid.xyz/ws`
+     * - Testnet:
+     *   - API: `wss://api.hyperliquid-testnet.xyz/ws`
+     *   - RPC: `wss://rpc.hyperliquid-testnet.xyz/ws`
+     * @defaultValue `wss://api.hyperliquid.xyz/ws`
      */
-    isTestnet?: boolean;
+    url?: string | URL;
 
     /**
      * Request timeout in ms.
@@ -94,7 +100,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
      */
     constructor(options?: WebSocketTransportOptions) {
         this.socket = new ReconnectingWebSocket(
-            options?.isTestnet ? "wss://api.hyperliquid-testnet.xyz/ws" : "wss://api.hyperliquid.xyz/ws",
+            options?.url ?? "wss://api.hyperliquid.xyz/ws",
             undefined,
             options?.reconnect,
         );

@@ -35,7 +35,7 @@ Deno.test("userEvents", async (t) => {
 
     // —————————— Prepare ——————————
 
-    const transport = new WebSocketTransport({ isTestnet: true });
+    const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
     const publicClient = new PublicClient({ transport });
     const eventClient = new EventClient({ transport });
     const walletClient = new WalletClient({
