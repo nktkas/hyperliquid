@@ -18,7 +18,7 @@ Deno.test("explorerTxs", async (t) => {
 
     // —————————— Prepare ——————————
 
-    const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
+    const transport = new WebSocketTransport({ url: "wss://rpc.hyperliquid-testnet.xyz/ws" });
     const client = new EventClient({ transport });
 
     // —————————— Test ——————————
