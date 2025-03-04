@@ -1,25 +1,7 @@
 /**
- * Hyperliquid transaction signing utilities.
- * This module provides functions for generating signatures for Hyperliquid transactions
- * and interfaces for different wallet implementations.
- *
- * @module
- * @example
- * ```ts
- * import { signL1Action } from "@nktkas/hyperliquid/signing";
- * import type { CancelRequest } from "@nktkas/hyperliquid/types";
- * import { privateKeyToAccount } from "viem/accounts";
- *
- * const wallet = privateKeyToAccount("0x...");
- *
- * const action: CancelRequest["action"] = {
- *   type: "cancel",
- *   cancels: [{ a: 0, o: 12345 }],
- * };
- * const nonce = Date.now();
- *
- * const signature = await signL1Action({ wallet, action, nonce, isTestnet: true });
- * ```
+ * This module contains functions for generating Hyperliquid transaction signatures
+ * and interfaces to various wallet implementations.
+ * @module hl_signing
  */
 
 import { keccak_256 } from "@noble/hashes/sha3";
@@ -179,23 +161,53 @@ function normalizeIntegersForMsgPack(obj: ValueType): ValueType {
  * Sign an L1 action.
  *
  * Note: Signature generation depends on the order of the action keys.
- * @param args.wallet - Wallet to sign the action.
- * @param args.action - The action to be signed.
- * @param args.nonce - Unique request identifier (recommended current timestamp in ms).
- * @param args.isTestnet - Indicates if the action is for the testnet. Default is `false`.
- * @param args.vaultAddress - Optional vault address used in the action.
+ * @param args - Arguments for signing the action.
  * @returns The signature components r, s, and v.
+ * @example
+ * ```ts
+ * import { signL1Action } from "@nktkas/hyperliquid/signing";
+ * import { privateKeyToAccount } from "viem/accounts";
+ *
+ * const wallet = privateKeyToAccount("0x..."); // Change to your private key
+ *
+ * const action = {
+ *     type: "cancel",
+ *     cancels: [
+ *         { a: 0, o: 12345 }, // Asset index and order ID
+ *     ],
+ * };
+ * const nonce = Date.now();
+ *
+ * const signature = await signL1Action({
+ *     wallet,
+ *     action,
+ *     nonce,
+ *     isTestnet: true, // Change to false for mainnet
+ * });
+ *
+ * const response = await fetch("https://api.hyperliquid-testnet.xyz/exchange", {
+ *     method: "POST",
+ *     headers: { "Content-Type": "application/json" },
+ *     body: JSON.stringify({ action, signature, nonce }),
+ * });
+ * const body = await response.json();
+ * ```
  */
 export async function signL1Action(args: {
+    /** Wallet to sign the action. */
     wallet:
         | AbstractViemWalletClient
         | AbstractExtendedViemWalletClient
         | AbstractEthersSigner
         | AbstractEthersV5Signer
         | AbstractWindowEthereum;
+    /** The action to be signed. */
     action: ValueType;
+    /** Unique request identifier (recommended current timestamp in ms). */
     nonce: number;
+    /** Indicates if the action is for the testnet. Default is `false`. */
     isTestnet?: boolean;
+    /** Optional vault address used in the action. */
     vaultAddress?: Hex;
 }): Promise<{ r: Hex; s: Hex; v: number }> {
     const {
@@ -233,21 +245,59 @@ export async function signL1Action(args: {
  * Sign a user-signed action.
  *
  * Note: Signature generation depends on the order of types.
- * @param args.wallet - Wallet to sign the action.
- * @param args.action - The action to be signed.
- * @param args.types - The types of the action.
- * @param args.chainId - The chain ID.
+ * @param args - Arguments for signing the action.
  * @returns The signature components r, s, and v.
+ * @example
+ * ```ts
+ * import { signUserSignedAction } from "@nktkas/hyperliquid/signing";
+ * import { privateKeyToAccount } from "viem/accounts";
+ *
+ * const wallet = privateKeyToAccount("0x..."); // Change to your private key
+ *
+ * const action = {
+ *     type: "approveAgent",
+ *     hyperliquidChain: "Testnet", // "Mainnet" or "Testnet"
+ *     signatureChainId: "0x66eee",
+ *     nonce: Date.now(),
+ *     agentAddress: "0x...", // Change to your agent address
+ *     agentName: "Agent",
+ * };
+ *
+ * const signature = await signUserSignedAction({
+ *     wallet,
+ *     action,
+ *     types: {
+ *         "HyperliquidTransaction:ApproveAgent": [
+ *             { name: "hyperliquidChain", type: "string" },
+ *             { name: "agentAddress", type: "address" },
+ *             { name: "agentName", type: "string" },
+ *             { name: "nonce", type: "uint64" },
+ *         ],
+ *     },
+ *     chainId: parseInt(action.signatureChainId, 16),
+ * });
+ *
+ * const response = await fetch("https://api.hyperliquid-testnet.xyz/exchange", {
+ *     method: "POST",
+ *     headers: { "Content-Type": "application/json" },
+ *     body: JSON.stringify({ action, signature, nonce: action.nonce }),
+ * });
+ * const body = await response.json();
+ * ```
  */
 export async function signUserSignedAction(args: {
+    /** Wallet to sign the action. */
     wallet:
         | AbstractViemWalletClient
         | AbstractExtendedViemWalletClient
         | AbstractEthersSigner
         | AbstractEthersV5Signer
         | AbstractWindowEthereum;
+    /** The action to be signed. */
     action: Record<string, unknown>;
+    /** The types of the action. */
     types: { [key: string]: { name: string; type: string }[] };
+    /** The chain ID. */
     chainId: number;
 }): Promise<{ r: Hex; s: Hex; v: number }> {
     const { wallet, action, types, chainId } = args;

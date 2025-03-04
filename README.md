@@ -52,10 +52,10 @@ First, choose and configure your transport layer (more details in the [API Refer
 import * as hl from "@nktkas/hyperliquid"; // ESM & Common.js
 
 // HTTP Transport
-const httpTransport = new hl.HttpTransport(); // Accepts optional parameters (e.g. isTestnet, timeout, fetchOptions)
+const httpTransport = new hl.HttpTransport(); // Accepts optional parameters
 
-// or WebSocket Transport
-const wsTransport = new hl.WebSocketTransport(); // Accepts optional parameters (e.g. isTestnet, timeout, keepAlive, reconnect)
+// WebSocket Transport
+const wsTransport = new hl.WebSocketTransport(); // Accepts optional parameters
 ```
 
 ### Initialize Client
@@ -103,7 +103,7 @@ const windowMetamaskClient = new hl.WalletClient({ wallet: window.ethereum, tran
 ```typescript
 import * as hl from "@nktkas/hyperliquid"; // ESM & Common.js
 
-const transport = new hl.WebSocketTransport(); // Only WebSocketTransport is supported
+const transport = new hl.WebSocketTransport(); // Only WebSocketTransport
 const client = new hl.EventClient({ transport });
 ```
 
@@ -178,24 +178,22 @@ const transport = new hl.WebSocketTransport();
 const client = new hl.EventClient({ transport });
 
 // L2 Book updates
-// Promise is resolved when the subscription is set up
 const sub = await client.l2Book({ coin: "BTC" }, (data) => {
     console.log(data);
 });
-// Later, you can unsubscribe from receiving events
-await sub.unsubscribe();
+await sub.unsubscribe(); // Unsubscribe from the event
 
 // User fills
 const sub = await client.userFills({ user: "0x..." }, (data) => {
     console.log(data);
 });
-await sub.unsubscribe();
+await sub.unsubscribe(); // Unsubscribe from the event
 
 // Explorer block updates
 const sub = await client.explorerBlock((data) => {
     console.log(data);
 });
-await sub.unsubscribe();
+await sub.unsubscribe(); // Unsubscribe from the event
 ```
 
 ## API Reference
@@ -291,8 +289,6 @@ and `withdraw3`.
 The Wallet Client class sets up with a given [Transport](#transports) and a wallet instance, which can be a
 [Viem Wallet](https://viem.sh/docs/clients/wallet) or an
 [Ethers Wallet](https://docs.ethers.org/v6/api/providers/#Signer).
-
-> NOTE: When using a web3 wallet, the wallet network must be set to 1337 for proper generation of L1 transactions.
 
 ```typescript
 class WalletClient {
@@ -482,69 +478,49 @@ Useful if you want to sign a Hyperliquid transaction yourself.
 
 ```typescript
 import { signL1Action } from "@nktkas/hyperliquid/signing";
-import type { CancelRequest, CancelResponse } from "@nktkas/hyperliquid/types";
 import { privateKeyToAccount } from "viem/accounts";
-
-// —————————— Prepare ——————————
 
 const wallet = privateKeyToAccount("0x..."); // Change to your private key
 
-// The CancelRequest["action"] type ensures that we collect the correct cancel request action
-const action: CancelRequest["action"] = {
+const action = {
     type: "cancel",
     cancels: [
-        { a: 0, o: 12345 },
+        { a: 0, o: 12345 }, // Asset index and order ID
     ],
 };
 const nonce = Date.now();
 
-// —————————— Signing ——————————
-
-const signature = await signL1Action({ wallet, action, nonce, isTestnet: true });
-
-// —————————— Request ——————————
-
-// The CancelRequest type guarantees us that the object we want to send is valid in terms of types
-const request: CancelRequest = { action, signature, nonce };
+const signature = await signL1Action({
+    wallet,
+    action,
+    nonce,
+    isTestnet: true, // Change to false for mainnet
+});
 
 const response = await fetch("https://api.hyperliquid-testnet.xyz/exchange", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(request),
+    body: JSON.stringify({ action, signature, nonce }),
 });
-
-if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Failed to cancel order: ${response.statusText} ${body}`);
-}
-
-// If we sent a cancel request and received a successful response, then we got exactly the CancelResponse type
-const body = await response.json() as CancelResponse;
-console.log("Order cancel response:", body);
+const body = await response.json();
 ```
 
 #### Approve an agent without a client
 
 ```typescript
 import { signUserSignedAction } from "@nktkas/hyperliquid/signing";
-import type { ApproveAgentRequest, ErrorResponse, SuccessResponse } from "@nktkas/hyperliquid/types";
 import { privateKeyToAccount } from "viem/accounts";
-
-// —————————— Prepare ——————————
 
 const wallet = privateKeyToAccount("0x..."); // Change to your private key
 
-// The ApproveAgentRequest["action"] type ensures that we collect the correct approve agent request action
-const action: ApproveAgentRequest["action"] = {
+const action = {
     type: "approveAgent",
-    hyperliquidChain: "Testnet",
+    hyperliquidChain: "Testnet", // "Mainnet" or "Testnet"
     signatureChainId: "0x66eee",
     nonce: Date.now(),
-    agentAddress: "0x...", // Change to the agent address you want to approve
-    agentName: "TempAgent",
+    agentAddress: "0x...", // Change to your agent address
+    agentName: "Agent",
 };
-
-// —————————— Signing ——————————
 
 const signature = await signUserSignedAction({
     wallet,
@@ -560,26 +536,12 @@ const signature = await signUserSignedAction({
     chainId: parseInt(action.signatureChainId, 16),
 });
 
-// —————————— Request ——————————
-
-// The ApproveAgentRequest type guarantees us that the object we want to send is valid in terms of types
-const request: ApproveAgentRequest = { action, signature, nonce: action.nonce };
-
 const response = await fetch("https://api.hyperliquid-testnet.xyz/exchange", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(request),
+    body: JSON.stringify({ action, signature, nonce: action.nonce }),
 });
-
-if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Failed to approve agent: ${response.statusText} ${body}`);
-}
-
-// If we sent a request for agent approval and received a successful response,
-// we will get either a SuccessResponse type or an ErrorResponse type
-const body = await response.json() as SuccessResponse | ErrorResponse;
-console.log("Agent approval response:", body);
+const body = await response.json();
 ```
 
 ## Contributing

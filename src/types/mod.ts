@@ -1,13 +1,10 @@
 /**
- * Hyperliquid API type definitions.
- * This module exports all types related to Hyperliquid API interactions.
+ * This module contains all types related to the Hyperliquid API.
  *
- * @module
  * @example
  * ```ts
  * import type { OrderParams } from "@nktkas/hyperliquid/types";
  *
- * // Use types for custom implementations
  * const myOrder: OrderParams = {
  *   a: 0, // Asset index
  *   b: true, // Buy order
@@ -21,6 +18,8 @@
  *   },
  * };
  * ```
+ *
+ * @module hl_types
  */
 
 export type { Hex } from "../base.ts";
