@@ -303,6 +303,7 @@ class WalletClient {
         isTestnet?: boolean; // Whether to use testnet (default: false)
         defaultVaultAddress?: Hex; // Vault address used by default if not provided in method call
         signatureChainId?: Hex | (() => MaybePromise<Hex>); // Chain ID used for signing (default: trying to guess based on wallet and isTestnet)
+        nonceManager?: () => MaybePromise<number>; // Function to get the next nonce (default: auto-incrementing Date.now())
     });
 
     // Order
@@ -320,7 +321,7 @@ class WalletClient {
     // Account
     approveAgent(args: ApproveAgentParameters): Promise<SuccessResponse>;
     approveBuilderFee(args: ApproveBuilderFeeParameters): Promise<SuccessResponse>;
-    claimRewards(args: ClaimRewardsParameters): Promise<SuccessResponse>;
+    claimRewards(): Promise<SuccessResponse>;
     createSubAccount(args: CreateSubAccountParameters): Promise<CreateSubAccountResponse>;
     evmUserModify(args: EvmUserModifyParameters): Promise<SuccessResponse>;
     setDisplayName(args: SetDisplayNameParameters): Promise<SuccessResponse>;
