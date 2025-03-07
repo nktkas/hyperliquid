@@ -96,87 +96,97 @@ export interface WalletClientParameters<
      * Defaults to trying to get the current wallet network. Otherwise `0xa4b1` for `isTestnet = false` or `0x66eee` for `isTestnet = true` will be used.
      */
     signatureChainId?: Hex | (() => MaybePromise<Hex>);
+    /**
+     * Function to get the next nonce for signing transactions.
+     *
+     * Defaults to a function that returns the current timestamp or, if duplicated, increments the last nonce.
+     */
+    nonceManager?: () => MaybePromise<number>;
 }
 
 /** Parameters for the {@linkcode WalletClient.approveAgent} method. */
-export type ApproveAgentParameters =
-    & Omit<ApproveAgentRequest["action"], "type" | "hyperliquidChain" | "signatureChainId" | "nonce">
-    & Partial<Pick<ApproveAgentRequest["action"], "nonce">>;
+export type ApproveAgentParameters = Omit<
+    ApproveAgentRequest["action"],
+    "type" | "hyperliquidChain" | "signatureChainId" | "nonce"
+>;
 
 /** Parameters for the {@linkcode WalletClient.approveBuilderFee} method. */
-export type ApproveBuilderFeeParameters =
-    & Omit<ApproveBuilderFeeRequest["action"], "type" | "hyperliquidChain" | "signatureChainId" | "nonce">
-    & Partial<Pick<ApproveBuilderFeeRequest["action"], "nonce">>;
+export type ApproveBuilderFeeParameters = Omit<
+    ApproveBuilderFeeRequest["action"],
+    "type" | "hyperliquidChain" | "signatureChainId" | "nonce"
+>;
 
 /** Parameters for the {@linkcode WalletClient.batchModify} method. */
 export type BatchModifyParameters =
     & Omit<BatchModifyRequest["action"], "type">
-    & Partial<Pick<BatchModifyRequest, "vaultAddress" | "nonce">>;
+    & Partial<Pick<BatchModifyRequest, "vaultAddress">>;
 
 /** Parameters for the {@linkcode WalletClient.cancel} method. */
 export type CancelParameters =
     & Omit<CancelRequest["action"], "type">
-    & Partial<Pick<CancelRequest, "vaultAddress" | "nonce">>;
+    & Partial<Pick<CancelRequest, "vaultAddress">>;
 
 /** Parameters for the {@linkcode WalletClient.cDeposit} method. */
-export type CDepositParameters =
-    & Omit<CDepositRequest["action"], "type" | "hyperliquidChain" | "signatureChainId" | "nonce">
-    & Partial<Pick<CDepositRequest["action"], "nonce">>;
-
-/** Parameters for the {@linkcode WalletClient.claimRewards} method. */
-export type ClaimRewardsParameters =
-    & Omit<ClaimRewardsRequest["action"], "type">
-    & Partial<Pick<ClaimRewardsRequest, "nonce">>;
+export type CDepositParameters = Omit<
+    CDepositRequest["action"],
+    "type" | "hyperliquidChain" | "signatureChainId" | "nonce"
+>;
 
 /** Parameters for the {@linkcode WalletClient.cancelByCloid} method. */
 export type CancelByCloidParameters =
     & Omit<CancelByCloidRequest["action"], "type">
-    & Partial<Pick<CancelByCloidRequest, "vaultAddress" | "nonce">>;
+    & Partial<Pick<CancelByCloidRequest, "vaultAddress">>;
 
 /** Parameters for the {@linkcode WalletClient.cWithdraw} method. */
-export type CWithdrawParameters =
-    & Omit<CWithdrawRequest["action"], "type" | "hyperliquidChain" | "signatureChainId" | "nonce">
-    & Partial<Pick<CWithdrawRequest["action"], "nonce">>;
+export type CWithdrawParameters = Omit<
+    CWithdrawRequest["action"],
+    "type" | "hyperliquidChain" | "signatureChainId" | "nonce"
+>;
 
 /** Parameters for the {@linkcode WalletClient.evmUserModify} method. */
-export type EvmUserModifyParameters =
-    & Omit<EvmUserModifyRequest["action"], "type">
-    & Partial<Pick<EvmUserModifyRequest, "nonce">>;
+export type EvmUserModifyParameters = Omit<
+    EvmUserModifyRequest["action"],
+    "type"
+>;
 
 /** Parameters for the {@linkcode WalletClient.createSubAccount} method. */
-export type CreateSubAccountParameters =
-    & Omit<CreateSubAccountRequest["action"], "type">
-    & Partial<Pick<CreateSubAccountRequest, "nonce">>;
+export type CreateSubAccountParameters = Omit<
+    CreateSubAccountRequest["action"],
+    "type"
+>;
 
 /** Parameters for the {@linkcode WalletClient.createVault} method. */
-export type CreateVaultParameters =
-    & Omit<CreateVaultRequest["action"], "type" | "nonce">
-    & Partial<Pick<CreateVaultRequest, "nonce">>;
+export type CreateVaultParameters = Omit<
+    CreateVaultRequest["action"],
+    "type" | "nonce"
+>;
 
 /** Parameters for the {@linkcode WalletClient.modify} method. */
 export type ModifyParameters =
     & Omit<ModifyRequest["action"], "type">
-    & Partial<Pick<ModifyRequest, "vaultAddress" | "nonce">>;
+    & Partial<Pick<ModifyRequest, "vaultAddress">>;
 
 /** Parameters for the {@linkcode WalletClient.order} method. */
 export type OrderParameters =
     & Omit<OrderRequest["action"], "type">
-    & Partial<Pick<OrderRequest, "vaultAddress" | "nonce">>;
+    & Partial<Pick<OrderRequest, "vaultAddress">>;
 
 /** Parameters for the {@linkcode WalletClient.scheduleCancel} method. */
 export type ScheduleCancelParameters =
     & Omit<ScheduleCancelRequest["action"], "type">
-    & Partial<Pick<ScheduleCancelRequest, "vaultAddress" | "nonce">>;
+    & Partial<Pick<ScheduleCancelRequest, "vaultAddress">>;
 
 /** Parameters for the {@linkcode WalletClient.setDisplayName} method. */
-export type SetDisplayNameParameters =
-    & Omit<SetDisplayNameRequest["action"], "type">
-    & Partial<Pick<SetDisplayNameRequest, "nonce">>;
+export type SetDisplayNameParameters = Omit<
+    SetDisplayNameRequest["action"],
+    "type"
+>;
 
 /** Parameters for the {@linkcode WalletClient.setReferrer} method. */
-export type SetReferrerParameters =
-    & Omit<SetReferrerRequest["action"], "type">
-    & Partial<Pick<SetReferrerRequest, "nonce">>;
+export type SetReferrerParameters = Omit<
+    SetReferrerRequest["action"],
+    "type"
+>;
 
 /** Parameters for the {@linkcode WalletClient.spotDeploy} method. */
 export type SpotDeployParameters =
@@ -186,100 +196,116 @@ export type SpotDeployParameters =
     | SpotDeployParameters_RegisterSpot
     | SpotDeployParameters_RegisterHyperliquidity;
 /** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
-export type SpotDeployParameters_RegisterToken2 =
-    & Omit<SpotDeployRequest_RegisterToken2["action"], "type">
-    & Partial<Pick<SpotDeployRequest_RegisterToken2, "nonce">>;
+export type SpotDeployParameters_RegisterToken2 = Omit<
+    SpotDeployRequest_RegisterToken2["action"],
+    "type"
+>;
 /** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
-export type SpotDeployParameters_UserGenesis =
-    & Omit<SpotDeployRequest_UserGenesis["action"], "type">
-    & Partial<Pick<SpotDeployRequest_UserGenesis, "nonce">>;
+export type SpotDeployParameters_UserGenesis = Omit<
+    SpotDeployRequest_UserGenesis["action"],
+    "type"
+>;
 /** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
-export type SpotDeployParameters_Genesis =
-    & Omit<SpotDeployRequest_Genesis["action"], "type">
-    & Partial<Pick<SpotDeployRequest_Genesis, "nonce">>;
+export type SpotDeployParameters_Genesis = Omit<
+    SpotDeployRequest_Genesis["action"],
+    "type"
+>;
 /** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
-export type SpotDeployParameters_RegisterSpot =
-    & Omit<SpotDeployRequest_RegisterSpot["action"], "type">
-    & Partial<Pick<SpotDeployRequest_RegisterSpot, "nonce">>;
+export type SpotDeployParameters_RegisterSpot = Omit<
+    SpotDeployRequest_RegisterSpot["action"],
+    "type"
+>;
 /** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
-export type SpotDeployParameters_RegisterHyperliquidity =
-    & Omit<SpotDeployRequest_RegisterHyperliquidity["action"], "type">
-    & Partial<Pick<SpotDeployRequest_RegisterHyperliquidity, "nonce">>;
+export type SpotDeployParameters_RegisterHyperliquidity = Omit<
+    SpotDeployRequest_RegisterHyperliquidity["action"],
+    "type"
+>;
 
 /** Parameters for the {@linkcode WalletClient.spotSend} method. */
-export type SpotSendParameters =
-    & Omit<SpotSendRequest["action"], "type" | "hyperliquidChain" | "signatureChainId" | "time">
-    & Partial<Pick<SpotSendRequest["action"], "time">>;
+export type SpotSendParameters = Omit<
+    SpotSendRequest["action"],
+    "type" | "hyperliquidChain" | "signatureChainId" | "time"
+>;
 
 /** Parameters for the {@linkcode WalletClient.spotUser} method. */
-export type SpotUserParameters =
-    & Omit<SpotUserRequest["action"], "type">
-    & Partial<Pick<SpotUserRequest, "nonce">>;
+export type SpotUserParameters = Omit<
+    SpotUserRequest["action"],
+    "type"
+>;
 
 /** Parameters for the {@linkcode WalletClient.subAccountSpotTransfer} method. */
-export type SubAccountSpotTransferParameters =
-    & Omit<SubAccountSpotTransferRequest["action"], "type">
-    & Partial<Pick<SubAccountSpotTransferRequest, "nonce">>;
+export type SubAccountSpotTransferParameters = Omit<
+    SubAccountSpotTransferRequest["action"],
+    "type"
+>;
 
 /** Parameters for the {@linkcode WalletClient.subAccountTransfer} method. */
-export type SubAccountTransferParameters =
-    & Omit<SubAccountTransferRequest["action"], "type">
-    & Partial<Pick<SubAccountTransferRequest, "nonce">>;
+export type SubAccountTransferParameters = Omit<
+    SubAccountTransferRequest["action"],
+    "type"
+>;
 
 /** Parameters for the {@linkcode WalletClient.tokenDelegate} method. */
-export type TokenDelegateParameters =
-    & Omit<TokenDelegateRequest["action"], "type" | "hyperliquidChain" | "signatureChainId" | "nonce">
-    & Partial<Pick<TokenDelegateRequest["action"], "nonce">>;
+export type TokenDelegateParameters = Omit<
+    TokenDelegateRequest["action"],
+    "type" | "hyperliquidChain" | "signatureChainId" | "nonce"
+>;
 
 /** Parameters for the {@linkcode WalletClient.twapCancel} method. */
 export type TwapCancelParameters =
     & Omit<TwapCancelRequest["action"], "type">
-    & Partial<Pick<TwapCancelRequest, "vaultAddress" | "nonce">>;
+    & Partial<Pick<TwapCancelRequest, "vaultAddress">>;
 
 /** Parameters for the {@linkcode WalletClient.twapOrder} method. */
 export type TwapOrderParameters =
     & TwapOrderRequest["action"]["twap"]
-    & Partial<Pick<TwapOrderRequest, "vaultAddress" | "nonce">>;
+    & Partial<Pick<TwapOrderRequest, "vaultAddress">>;
 
 /** Parameters for the {@linkcode WalletClient.updateIsolatedMargin} method. */
 export type UpdateIsolatedMarginParameters =
     & Omit<UpdateIsolatedMarginRequest["action"], "type">
-    & Partial<Pick<UpdateIsolatedMarginRequest, "vaultAddress" | "nonce">>;
+    & Partial<Pick<UpdateIsolatedMarginRequest, "vaultAddress">>;
 
 /** Parameters for the {@linkcode WalletClient.updateLeverage} method. */
 export type UpdateLeverageParameters =
     & Omit<UpdateLeverageRequest["action"], "type">
-    & Partial<Pick<UpdateLeverageRequest, "vaultAddress" | "nonce">>;
+    & Partial<Pick<UpdateLeverageRequest, "vaultAddress">>;
 
 /** Parameters for the {@linkcode WalletClient.usdClassTransfer} method. */
-export type UsdClassTransferParameters =
-    & Omit<UsdClassTransferRequest["action"], "type" | "hyperliquidChain" | "signatureChainId" | "nonce">
-    & Partial<Pick<UsdClassTransferRequest["action"], "nonce">>;
+export type UsdClassTransferParameters = Omit<
+    UsdClassTransferRequest["action"],
+    "type" | "hyperliquidChain" | "signatureChainId" | "nonce"
+>;
 
 /** Parameters for the {@linkcode WalletClient.usdSend} method. */
-export type UsdSendParameters =
-    & Omit<UsdSendRequest["action"], "type" | "hyperliquidChain" | "signatureChainId" | "time">
-    & Partial<Pick<UsdSendRequest["action"], "time">>;
+export type UsdSendParameters = Omit<
+    UsdSendRequest["action"],
+    "type" | "hyperliquidChain" | "signatureChainId" | "time"
+>;
 
 /** Parameters for the {@linkcode WalletClient.vaultDistribute} method. */
-export type VaultDistributeParameters =
-    & Omit<VaultDistributeRequest["action"], "type">
-    & Partial<Pick<VaultDistributeRequest, "nonce">>;
+export type VaultDistributeParameters = Omit<
+    VaultDistributeRequest["action"],
+    "type"
+>;
 
 /** Parameters for the {@linkcode WalletClient.vaultModify} method. */
-export type VaultModifyParameters =
-    & Omit<VaultModifyRequest["action"], "type">
-    & Partial<Pick<VaultModifyRequest, "nonce">>;
+export type VaultModifyParameters = Omit<
+    VaultModifyRequest["action"],
+    "type"
+>;
 
 /** Parameters for the {@linkcode WalletClient.vaultTransfer} method. */
-export type VaultTransferParameters =
-    & Omit<VaultTransferRequest["action"], "type">
-    & Partial<Pick<VaultTransferRequest, "nonce">>;
+export type VaultTransferParameters = Omit<
+    VaultTransferRequest["action"],
+    "type"
+>;
 
 /** Parameters for the {@linkcode WalletClient.withdraw3} method. */
-export type Withdraw3Parameters =
-    & Omit<Withdraw3Request["action"], "type" | "hyperliquidChain" | "signatureChainId" | "time">
-    & Partial<Pick<Withdraw3Request["action"], "time">>;
+export type Withdraw3Parameters = Omit<
+    Withdraw3Request["action"],
+    "type" | "hyperliquidChain" | "signatureChainId" | "time"
+>;
 
 // ——————————————— Responses ———————————————
 
@@ -363,6 +389,26 @@ export class ApiRequestError extends HyperliquidError {
 
 // ——————————————— Client ———————————————
 
+/** Nonce manager for generating unique nonces for signing transactions. */
+class NonceManager {
+    /** The last nonce used for signing transactions. */
+    private lastNonce = 0;
+
+    /**
+     * Gets the next nonce for signing transactions.
+     * @returns The next nonce.
+     */
+    getNonce(): number {
+        let nonce = Date.now();
+        if (nonce <= this.lastNonce) {
+            nonce = ++this.lastNonce;
+        } else {
+            this.lastNonce = nonce;
+        }
+        return nonce;
+    }
+}
+
 /**
  * Wallet client for interacting with the Hyperliquid API.
  * @typeParam T The transport used to connect to the Hyperliquid API.
@@ -400,19 +446,8 @@ export class WalletClient<
      */
     signatureChainId: Hex | (() => MaybePromise<Hex>);
 
-    /** The last nonce used for signing transactions. */
-    protected _lastNonce = 0;
-
-    /** Gets the next nonce for signing transactions. */
-    protected get _nonce(): number {
-        let nonce = Date.now();
-        if (nonce <= this._lastNonce) {
-            nonce = ++this._lastNonce;
-        } else {
-            this._lastNonce = nonce;
-        }
-        return nonce;
-    }
+    /** Function to get the next nonce for signing transactions. */
+    nonceManager: () => MaybePromise<number>;
 
     /**
      * Initialises a new instance.
@@ -466,6 +501,7 @@ export class WalletClient<
         this.isTestnet = args.isTestnet ?? false;
         this.defaultVaultAddress = args.defaultVaultAddress;
         this.signatureChainId = args.signatureChainId ?? this._guessSignatureChainId;
+        this.nonceManager = args.nonceManager ?? new NonceManager().getNonce;
     }
 
     // ——————————————— Exchange API ———————————————
@@ -502,7 +538,7 @@ export class WalletClient<
             signatureChainId: typeof this.signatureChainId === "string"
                 ? this.signatureChainId
                 : await this.signatureChainId(),
-            nonce: args.nonce ?? this._nonce,
+            nonce: await this.nonceManager(),
         };
 
         // Sign the action
@@ -563,7 +599,7 @@ export class WalletClient<
             signatureChainId: typeof this.signatureChainId === "string"
                 ? this.signatureChainId
                 : await this.signatureChainId(),
-            nonce: args.nonce ?? this._nonce,
+            nonce: await this.nonceManager(),
         };
 
         // Sign the action
@@ -633,11 +669,11 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
-            nonce = this._nonce,
             ...actionArgs
         } = args;
 
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: BatchModifyRequest["action"] = {
             type: "batchModify",
             modifies: actionArgs.modifies.map((modify) => {
@@ -717,11 +753,11 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
-            nonce = this._nonce,
             ...actionArgs
         } = args;
 
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: CancelRequest["action"] = {
             type: "cancel",
             cancels: actionArgs.cancels.map((cancel) => ({
@@ -777,7 +813,7 @@ export class WalletClient<
             signatureChainId: typeof this.signatureChainId === "string"
                 ? this.signatureChainId
                 : await this.signatureChainId(),
-            nonce: args.nonce ?? this._nonce,
+            nonce: await this.nonceManager(),
         };
 
         // Sign the action
@@ -825,13 +861,9 @@ export class WalletClient<
      * const result = await client.claimRewards();
      * ```
      */
-    async claimRewards(args: ClaimRewardsParameters = {}, signal?: AbortSignal): Promise<SuccessResponse> {
-        // Destructure the parameters
-        const {
-            nonce = this._nonce,
-        } = args;
-
+    async claimRewards(signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
+        const nonce = await this.nonceManager();
         const sortedAction: ClaimRewardsRequest["action"] = { type: "claimRewards" };
 
         // Sign the action
@@ -882,11 +914,11 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
-            nonce = this._nonce,
             ...actionArgs
         } = args;
 
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: CancelByCloidRequest["action"] = {
             type: "cancelByCloid",
             cancels: actionArgs.cancels.map((cancel) => ({
@@ -942,7 +974,7 @@ export class WalletClient<
             signatureChainId: typeof this.signatureChainId === "string"
                 ? this.signatureChainId
                 : await this.signatureChainId(),
-            nonce: args.nonce ?? this._nonce,
+            nonce: await this.nonceManager(),
         };
 
         // Sign the action
@@ -991,16 +1023,11 @@ export class WalletClient<
      * ```
      */
     async evmUserModify(args: EvmUserModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        // Destructure the parameters
-        const {
-            nonce = this._nonce,
-            ...actionArgs
-        } = args;
-
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: EvmUserModifyRequest["action"] = {
             type: "evmUserModify",
-            usingBigBlocks: actionArgs.usingBigBlocks,
+            usingBigBlocks: args.usingBigBlocks,
         };
 
         // Sign the action
@@ -1043,16 +1070,11 @@ export class WalletClient<
      * ```
      */
     async createSubAccount(args: CreateSubAccountParameters, signal?: AbortSignal): Promise<CreateSubAccountResponse> {
-        // Destructure the parameters
-        const {
-            nonce = this._nonce,
-            ...actionArgs
-        } = args;
-
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: CreateSubAccountRequest["action"] = {
             type: "createSubAccount",
-            name: actionArgs.name,
+            name: args.name,
         };
 
         // Sign the action
@@ -1099,18 +1121,13 @@ export class WalletClient<
      * ```
      */
     async createVault(args: CreateVaultParameters, signal?: AbortSignal): Promise<CreateVaultResponse> {
-        // Destructure the parameters
-        const {
-            nonce = this._nonce,
-            ...actionArgs
-        } = args;
-
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: CreateVaultRequest["action"] = {
             type: "createVault",
-            name: actionArgs.name,
-            description: actionArgs.description,
-            initialUsd: actionArgs.initialUsd,
+            name: args.name,
+            description: args.description,
+            initialUsd: args.initialUsd,
             nonce,
         };
 
@@ -1172,11 +1189,11 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
-            nonce = this._nonce,
             ...actionArgs
         } = args;
 
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: ModifyRequest["action"] = {
             type: "modify",
             oid: actionArgs.oid,
@@ -1263,11 +1280,11 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
-            nonce = this._nonce,
             ...actionArgs
         } = args;
 
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: OrderRequest["action"] = {
             type: "order",
             orders: actionArgs.orders.map((order) => {
@@ -1347,11 +1364,11 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
-            nonce = this._nonce,
             ...actionArgs
         } = args;
 
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: ScheduleCancelRequest["action"] = {
             type: "scheduleCancel",
             time: actionArgs.time,
@@ -1399,16 +1416,11 @@ export class WalletClient<
      * ```
      */
     async setDisplayName(args: SetDisplayNameParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        // Destructure the parameters
-        const {
-            nonce = this._nonce,
-            ...actionArgs
-        } = args;
-
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: SetDisplayNameRequest["action"] = {
             type: "setDisplayName",
-            displayName: actionArgs.displayName,
+            displayName: args.displayName,
         };
 
         // Sign the action
@@ -1451,16 +1463,11 @@ export class WalletClient<
      * ```
      */
     async setReferrer(args: SetReferrerParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        // Destructure the parameters
-        const {
-            nonce = this._nonce,
-            ...actionArgs
-        } = args;
-
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: SetReferrerRequest["action"] = {
             type: "setReferrer",
-            code: actionArgs.code,
+            code: args.code,
         };
 
         // Sign the action
@@ -1515,65 +1522,60 @@ export class WalletClient<
      * ```
      */
     async spotDeploy(args: SpotDeployParameters, signal?: AbortSignal): Promise<BaseExchangeResponse> {
-        // Destructure the parameters
-        const {
-            nonce = this._nonce,
-            ...actionArgs
-        } = args;
-
         // Construct an action
+        const nonce = await this.nonceManager();
         let action:
             | SpotDeployRequest_RegisterToken2["action"]
             | SpotDeployRequest_UserGenesis["action"]
             | SpotDeployRequest_Genesis["action"]
             | SpotDeployRequest_RegisterSpot["action"]
             | SpotDeployRequest_RegisterHyperliquidity["action"];
-        if ("registerToken2" in actionArgs) {
+        if ("registerToken2" in args) {
             action = {
                 type: "spotDeploy",
                 registerToken2: {
                     spec: {
-                        name: actionArgs.registerToken2.spec.name,
-                        szDecimals: actionArgs.registerToken2.spec.szDecimals,
-                        weiDecimals: actionArgs.registerToken2.spec.weiDecimals,
+                        name: args.registerToken2.spec.name,
+                        szDecimals: args.registerToken2.spec.szDecimals,
+                        weiDecimals: args.registerToken2.spec.weiDecimals,
                     },
-                    maxGas: actionArgs.registerToken2.maxGas,
-                    fullName: actionArgs.registerToken2.fullName,
+                    maxGas: args.registerToken2.maxGas,
+                    fullName: args.registerToken2.fullName,
                 },
             };
-        } else if ("userGenesis" in actionArgs) {
+        } else if ("userGenesis" in args) {
             action = {
                 type: "spotDeploy",
                 userGenesis: {
-                    token: actionArgs.userGenesis.token,
-                    userAndWei: actionArgs.userGenesis.userAndWei,
-                    existingTokenAndWei: actionArgs.userGenesis.existingTokenAndWei,
+                    token: args.userGenesis.token,
+                    userAndWei: args.userGenesis.userAndWei,
+                    existingTokenAndWei: args.userGenesis.existingTokenAndWei,
                 },
             };
-        } else if ("genesis" in actionArgs) {
+        } else if ("genesis" in args) {
             action = {
                 type: "spotDeploy",
                 genesis: {
-                    token: actionArgs.genesis.token,
-                    maxSupply: actionArgs.genesis.maxSupply,
+                    token: args.genesis.token,
+                    maxSupply: args.genesis.maxSupply,
                 },
             };
-        } else if ("registerSpot" in actionArgs) {
+        } else if ("registerSpot" in args) {
             action = {
                 type: "spotDeploy",
                 registerSpot: {
-                    tokens: actionArgs.registerSpot.tokens,
+                    tokens: args.registerSpot.tokens,
                 },
             };
         } else {
             action = {
                 type: "spotDeploy",
                 registerHyperliquidity: {
-                    spot: actionArgs.registerHyperliquidity.spot,
-                    startPx: actionArgs.registerHyperliquidity.startPx,
-                    orderSz: actionArgs.registerHyperliquidity.orderSz,
-                    nOrders: actionArgs.registerHyperliquidity.nOrders,
-                    nSeededLevels: actionArgs.registerHyperliquidity.nSeededLevels,
+                    spot: args.registerHyperliquidity.spot,
+                    startPx: args.registerHyperliquidity.startPx,
+                    orderSz: args.registerHyperliquidity.orderSz,
+                    nOrders: args.registerHyperliquidity.nOrders,
+                    nSeededLevels: args.registerHyperliquidity.nSeededLevels,
                 },
             };
         }
@@ -1635,7 +1637,7 @@ export class WalletClient<
             signatureChainId: typeof this.signatureChainId === "string"
                 ? this.signatureChainId
                 : await this.signatureChainId(),
-            time: args.time ?? this._nonce,
+            time: await this.nonceManager(),
         };
 
         // Sign the action
@@ -1688,17 +1690,12 @@ export class WalletClient<
      * ```
      */
     async spotUser(args: SpotUserParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        // Destructure the parameters
-        const {
-            nonce = this._nonce,
-            ...actionArgs
-        } = args;
-
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: SpotUserRequest["action"] = {
             type: "spotUser",
             toggleSpotDusting: {
-                optOut: actionArgs.toggleSpotDusting.optOut,
+                optOut: args.toggleSpotDusting.optOut,
             },
         };
 
@@ -1750,19 +1747,14 @@ export class WalletClient<
         args: SubAccountSpotTransferParameters,
         signal?: AbortSignal,
     ): Promise<SuccessResponse> {
-        // Destructure the parameters
-        const {
-            nonce = this._nonce,
-            ...actionArgs
-        } = args;
-
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: SubAccountSpotTransferRequest["action"] = {
             type: "subAccountSpotTransfer",
-            subAccountUser: actionArgs.subAccountUser,
-            isDeposit: actionArgs.isDeposit,
-            token: actionArgs.token,
-            amount: actionArgs.amount,
+            subAccountUser: args.subAccountUser,
+            isDeposit: args.isDeposit,
+            token: args.token,
+            amount: args.amount,
         };
 
         // Sign the action
@@ -1809,18 +1801,13 @@ export class WalletClient<
      * ```
      */
     async subAccountTransfer(args: SubAccountTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        // Destructure the parameters
-        const {
-            nonce = this._nonce,
-            ...actionArgs
-        } = args;
-
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: SubAccountTransferRequest["action"] = {
             type: "subAccountTransfer",
-            subAccountUser: actionArgs.subAccountUser,
-            isDeposit: actionArgs.isDeposit,
-            usd: actionArgs.usd,
+            subAccountUser: args.subAccountUser,
+            isDeposit: args.isDeposit,
+            usd: args.usd,
         };
 
         // Sign the action
@@ -1875,7 +1862,7 @@ export class WalletClient<
             signatureChainId: typeof this.signatureChainId === "string"
                 ? this.signatureChainId
                 : await this.signatureChainId(),
-            nonce: args.nonce ?? this._nonce,
+            nonce: await this.nonceManager(),
         };
 
         // Sign the action
@@ -1932,11 +1919,11 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
-            nonce = this._nonce,
             ...actionArgs
         } = args;
 
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: TwapCancelRequest["action"] = {
             type: "twapCancel",
             a: actionArgs.a,
@@ -1992,11 +1979,11 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
-            nonce = this._nonce,
             ...actionArgs
         } = args;
 
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: TwapOrderRequest["action"] = {
             type: "twapOrder",
             twap: {
@@ -2055,11 +2042,11 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
-            nonce = this._nonce,
             ...actionArgs
         } = args;
 
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: UpdateIsolatedMarginRequest["action"] = {
             type: "updateIsolatedMargin",
             asset: actionArgs.asset,
@@ -2115,11 +2102,11 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
-            nonce = this._nonce,
             ...actionArgs
         } = args;
 
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: UpdateLeverageRequest["action"] = {
             type: "updateLeverage",
             asset: actionArgs.asset,
@@ -2179,7 +2166,7 @@ export class WalletClient<
             signatureChainId: typeof this.signatureChainId === "string"
                 ? this.signatureChainId
                 : await this.signatureChainId(),
-            nonce: args.nonce ?? this._nonce,
+            nonce: await this.nonceManager(),
         };
 
         // Sign the action
@@ -2240,7 +2227,7 @@ export class WalletClient<
             signatureChainId: typeof this.signatureChainId === "string"
                 ? this.signatureChainId
                 : await this.signatureChainId(),
-            time: args.time ?? this._nonce,
+            time: await this.nonceManager(),
         };
 
         // Sign the action
@@ -2293,17 +2280,12 @@ export class WalletClient<
      * ```
      */
     async vaultDistribute(args: VaultDistributeParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        // Destructure the parameters
-        const {
-            nonce = this._nonce,
-            ...actionArgs
-        } = args;
-
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: VaultDistributeRequest["action"] = {
             type: "vaultDistribute",
-            vaultAddress: actionArgs.vaultAddress,
-            usd: actionArgs.usd,
+            vaultAddress: args.vaultAddress,
+            usd: args.usd,
         };
 
         // Sign the action
@@ -2350,18 +2332,13 @@ export class WalletClient<
      * ```
      */
     async vaultModify(args: VaultModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        // Destructure the parameters
-        const {
-            nonce = this._nonce,
-            ...actionArgs
-        } = args;
-
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: VaultModifyRequest["action"] = {
             type: "vaultModify",
-            vaultAddress: actionArgs.vaultAddress,
-            allowDeposits: actionArgs.allowDeposits,
-            alwaysCloseOnWithdraw: actionArgs.alwaysCloseOnWithdraw,
+            vaultAddress: args.vaultAddress,
+            allowDeposits: args.allowDeposits,
+            alwaysCloseOnWithdraw: args.alwaysCloseOnWithdraw,
         };
 
         // Sign the action
@@ -2408,18 +2385,13 @@ export class WalletClient<
      * ```
      */
     async vaultTransfer(args: VaultTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        // Destructure the parameters
-        const {
-            nonce = this._nonce,
-            ...actionArgs
-        } = args;
-
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: VaultTransferRequest["action"] = {
             type: "vaultTransfer",
-            vaultAddress: actionArgs.vaultAddress,
-            isDeposit: actionArgs.isDeposit,
-            usd: actionArgs.usd,
+            vaultAddress: args.vaultAddress,
+            isDeposit: args.isDeposit,
+            usd: args.usd,
         };
 
         // Sign the action
@@ -2473,7 +2445,7 @@ export class WalletClient<
             signatureChainId: typeof this.signatureChainId === "string"
                 ? this.signatureChainId
                 : await this.signatureChainId(),
-            time: args.time ?? this._nonce,
+            time: await this.nonceManager(),
         };
 
         // Sign the action
