@@ -465,30 +465,7 @@ export class WalletClient<
         this.wallet = args.wallet;
         this.isTestnet = args.isTestnet ?? false;
         this.defaultVaultAddress = args.defaultVaultAddress;
-        this.signatureChainId = args.signatureChainId ?? (async () => {
-            // Trying to get chain id of the wallet
-            if (isAbstractViemWalletClient(this.wallet)) {
-                if ("getChainId" in this.wallet && typeof this.wallet.getChainId === "function") {
-                    const chainId = await this.wallet.getChainId() as number;
-                    return `0x${chainId.toString(16)}`;
-                }
-            } else if (isAbstractEthersSigner(this.wallet) || isAbstractEthersV5Signer(this.wallet)) {
-                if (
-                    "provider" in this.wallet &&
-                    typeof this.wallet.provider === "object" && this.wallet.provider !== null &&
-                    "getNetwork" in this.wallet.provider &&
-                    typeof this.wallet.provider.getNetwork === "function"
-                ) {
-                    const network = await this.wallet.provider.getNetwork() as { chainId: number | bigint };
-                    return `0x${network.chainId.toString(16)}`;
-                }
-            } else if (isAbstractWindowEthereum(this.wallet)) {
-                const [chainId] = await this.wallet.request({ method: "eth_chainId", params: [] }) as Hex[];
-                return chainId;
-            }
-            // Trying to guess chain id based on isTestnet
-            return this.isTestnet ? "0x66eee" : "0xa4b1";
-        });
+        this.signatureChainId = args.signatureChainId ?? this._guessSignatureChainId;
     }
 
     // ——————————————— Exchange API ———————————————
@@ -2535,6 +2512,32 @@ export class WalletClient<
         const newFrac = fracPart.replace(/0+$/, "");
 
         return newFrac ? `${intPart}.${newFrac}` : intPart;
+    }
+
+    /** Guesses the chain ID based on the wallet type or the isTestnet flag. */
+    protected async _guessSignatureChainId(): Promise<Hex> {
+        // Trying to get chain ID of the wallet
+        if (isAbstractViemWalletClient(this.wallet)) {
+            if ("getChainId" in this.wallet && typeof this.wallet.getChainId === "function") {
+                const chainId = await this.wallet.getChainId() as number;
+                return `0x${chainId.toString(16)}`;
+            }
+        } else if (isAbstractEthersSigner(this.wallet) || isAbstractEthersV5Signer(this.wallet)) {
+            if (
+                "provider" in this.wallet &&
+                typeof this.wallet.provider === "object" && this.wallet.provider !== null &&
+                "getNetwork" in this.wallet.provider &&
+                typeof this.wallet.provider.getNetwork === "function"
+            ) {
+                const network = await this.wallet.provider.getNetwork() as { chainId: number | bigint };
+                return `0x${network.chainId.toString(16)}`;
+            }
+        } else if (isAbstractWindowEthereum(this.wallet)) {
+            const [chainId] = await this.wallet.request({ method: "eth_chainId", params: [] }) as Hex[];
+            return chainId;
+        }
+        // Attempt to guess chain ID based on isTestnet
+        return this.isTestnet ? "0x66eee" : "0xa4b1";
     }
 
     /** Validate a response from the API. */

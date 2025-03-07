@@ -5,7 +5,7 @@ import { mainnet } from "npm:viem@^2.21.54/chains";
 import { ethers } from "npm:ethers@^6.13.4";
 import { HttpTransport, WalletClient } from "../../../mod.ts";
 
-Deno.test("signatureChainId", async (t) => {
+Deno.test("_guessSignatureChainId", async (t) => {
     await t.step("viem", async () => {
         const wallet = createWalletClient({
             account: privateKeyToAccount("0x822e9959e022b78423eb653a62ea0020cd283e71a2a8133a6ff2aeffaf373cff"),
