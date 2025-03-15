@@ -19,7 +19,7 @@
  * };
  * ```
  *
- * @module hl_types
+ * @module
  */
 
 export type { Hex } from "../base.ts";

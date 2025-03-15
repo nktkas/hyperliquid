@@ -1,7 +1,7 @@
 /**
  * This module contains functions for generating Hyperliquid transaction signatures
  * and interfaces to various wallet implementations.
- * @module hl_signing
+ * @module
  */
 
 import { keccak_256 } from "@noble/hashes/sha3";
@@ -30,29 +30,6 @@ export interface AbstractViemWalletClient {
         primaryType: string;
         message: Record<string, unknown>;
     }): Promise<Hex>;
-}
-
-/** Abstract interface for an extended [viem wallet](https://viem.sh/docs/clients/wallet) (e.g. privy [useSignTypedData](https://docs.privy.io/reference/sdk/react-auth/functions/useSignTypedData#returns)). */
-export interface AbstractExtendedViemWalletClient {
-    signTypedData(
-        params: {
-            domain: {
-                name: string;
-                version: string;
-                chainId: number;
-                verifyingContract: Hex;
-            };
-            types: {
-                [key: string]: {
-                    name: string;
-                    type: string;
-                }[];
-            };
-            primaryType: string;
-            message: Record<string, unknown>;
-        },
-        options?: unknown,
-    ): Promise<Hex>;
 }
 
 /** Abstract interface for an [ethers.js signer](https://docs.ethers.org/v6/api/providers/#Signer). */
@@ -91,6 +68,29 @@ export interface AbstractEthersV5Signer {
         },
         value: Record<string, unknown>,
     ): Promise<string>;
+}
+
+/** Abstract interface for an extended [viem wallet](https://viem.sh/docs/clients/wallet) (e.g. privy [useSignTypedData](https://docs.privy.io/reference/sdk/react-auth/functions/useSignTypedData#returns)). */
+export interface AbstractExtendedViemWalletClient {
+    signTypedData(
+        params: {
+            domain: {
+                name: string;
+                version: string;
+                chainId: number;
+                verifyingContract: Hex;
+            };
+            types: {
+                [key: string]: {
+                    name: string;
+                    type: string;
+                }[];
+            };
+            primaryType: string;
+            message: Record<string, unknown>;
+        },
+        options?: unknown,
+    ): Promise<Hex>;
 }
 
 /** Abstract interface for a [window.ethereum](https://eips.ethereum.org/EIPS/eip-1193) object. */
@@ -197,9 +197,9 @@ export async function signL1Action(args: {
     /** Wallet to sign the action. */
     wallet:
         | AbstractViemWalletClient
-        | AbstractExtendedViemWalletClient
         | AbstractEthersSigner
         | AbstractEthersV5Signer
+        | AbstractExtendedViemWalletClient
         | AbstractWindowEthereum;
     /** The action to be signed. */
     action: ValueType;
@@ -289,9 +289,9 @@ export async function signUserSignedAction(args: {
     /** Wallet to sign the action. */
     wallet:
         | AbstractViemWalletClient
-        | AbstractExtendedViemWalletClient
         | AbstractEthersSigner
         | AbstractEthersV5Signer
+        | AbstractExtendedViemWalletClient
         | AbstractWindowEthereum;
     /** The action to be signed. */
     action: Record<string, unknown>;
@@ -317,9 +317,9 @@ export async function signUserSignedAction(args: {
 async function abstractSignTypedData(args: {
     wallet:
         | AbstractViemWalletClient
-        | AbstractExtendedViemWalletClient
         | AbstractEthersSigner
         | AbstractEthersV5Signer
+        | AbstractExtendedViemWalletClient
         | AbstractWindowEthereum;
     domain: {
         name: string;
@@ -411,13 +411,6 @@ export function isAbstractViemWalletClient(client: unknown): client is AbstractV
         client.signTypedData.length === 1;
 }
 
-/** Checks if the given value is an abstract extended viem wallet (e.g. privy `useSignTypedData`). */
-export function isAbstractExtendedViemWalletClient(client: unknown): client is AbstractViemWalletClient {
-    return typeof client === "object" && client !== null &&
-        "signTypedData" in client && typeof client.signTypedData === "function" &&
-        client.signTypedData.length === 2;
-}
-
 /** Checks if the given value is an abstract ethers signer. */
 export function isAbstractEthersSigner(client: unknown): client is AbstractEthersSigner {
     return typeof client === "object" && client !== null &&
@@ -430,6 +423,13 @@ export function isAbstractEthersV5Signer(client: unknown): client is AbstractEth
     return typeof client === "object" && client !== null &&
         "_signTypedData" in client && typeof client._signTypedData === "function" &&
         client._signTypedData.length === 3;
+}
+
+/** Checks if the given value is an abstract extended viem wallet (e.g. privy `useSignTypedData`). */
+export function isAbstractExtendedViemWalletClient(client: unknown): client is AbstractViemWalletClient {
+    return typeof client === "object" && client !== null &&
+        "signTypedData" in client && typeof client.signTypedData === "function" &&
+        client.signTypedData.length === 2;
 }
 
 /** Checks if the given value is an abstract `window.ethereum` object. */

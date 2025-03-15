@@ -68,14 +68,16 @@ import {
 export interface WalletClientParameters<
     T extends IRequestTransport = IRequestTransport,
     W extends
+        | AbstractViemWalletClient
         | AbstractEthersSigner
         | AbstractEthersV5Signer
         | AbstractExtendedViemWalletClient
-        | AbstractViemWalletClient
         | AbstractWindowEthereum =
             | AbstractViemWalletClient
             | AbstractEthersSigner
-            | AbstractEthersV5Signer,
+            | AbstractEthersV5Signer
+            | AbstractExtendedViemWalletClient
+            | AbstractWindowEthereum,
 > {
     /** The transport used to connect to the Hyperliquid API. */
     transport: T;
@@ -417,15 +419,15 @@ class NonceManager {
 export class WalletClient<
     T extends IRequestTransport = IRequestTransport,
     W extends
+        | AbstractViemWalletClient
         | AbstractEthersSigner
         | AbstractEthersV5Signer
         | AbstractExtendedViemWalletClient
-        | AbstractViemWalletClient
         | AbstractWindowEthereum =
+            | AbstractViemWalletClient
             | AbstractEthersSigner
             | AbstractEthersV5Signer
             | AbstractExtendedViemWalletClient
-            | AbstractViemWalletClient
             | AbstractWindowEthereum,
 > {
     /** The transport used to connect to the Hyperliquid API. */
