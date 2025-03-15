@@ -145,6 +145,8 @@ export interface PreTransferCheck {
     isSanctioned: boolean;
     /** Whether the user exists. */
     userExists: boolean;
+    /** Whether the user has sent a transaction. */
+    userHasSentTx: boolean;
 }
 
 /** Referral details for a user. */
