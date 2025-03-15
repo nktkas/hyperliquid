@@ -394,8 +394,8 @@ class EventClient {
 
 ### Transports
 
-A [Client](#clients) is instantiated with a Transport, which is the intermediary layer that is responsible for
-executing outgoing requests (ie. API calls and event listeners).
+A [Client](#clients) is instantiated with a Transport, which is the intermediary layer that is responsible for executing
+outgoing requests (ie. API calls and event listeners).
 
 There are two types of Transports in the sdk:
 
