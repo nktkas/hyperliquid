@@ -11,12 +11,11 @@ runtimes, written in TypeScript and provided with tests.
 ## Features
 
 - 🖋️ **Typed**: Source code is 100% TypeScript.
-- 🧪 **Tested**: Good code coverage and type testing.
-- 📦 **Minimal dependencies**: Few small dependencies, standard JS is favored.
-- 🌐 **Cross-Environment Support**: Compatible with all major JS runtimes, including Node.js, Deno, Bun, and browser
-  environments.
+- 🧪 **Tested**: Good code coverage and guarantee of type validity.
+- 📦 **Minimal dependencies**: A few small trusted dependencies.
+- 🌐 **Cross-Environment Support**: Compatible with all major JS runtimes.
 - 🔧 **Integratable**: Easy to use with [viem](https://github.com/wevm/viem),
-  [ethers](https://github.com/ethers-io/ethers.js) and web3 wallets.
+  [ethers](https://github.com/ethers-io/ethers.js) and other wallet libraries.
 - 📚 **Documented**: Comprehensive documentation and usage examples, provided directly in JSDoc annotations within the
   source code.
 
@@ -26,7 +25,7 @@ runtimes, written in TypeScript and provided with tests.
 # npm
 npm i @nktkas/hyperliquid
 
-# yarn 
+# yarn
 yarn add @nktkas/hyperliquid
 
 # pnpm
@@ -44,7 +43,7 @@ import * as hl from "https://esm.sh/jsr/@nktkas/hyperliquid"
 
 ## Usage
 
-### Initialize Transport
+### 1) Initialize Transport
 
 First, choose and configure your transport layer (more details in the [API Reference](#transports)):
 
@@ -58,7 +57,7 @@ const httpTransport = new hl.HttpTransport(); // Accepts optional parameters
 const wsTransport = new hl.WebSocketTransport(); // Accepts optional parameters
 ```
 
-### Initialize Client
+### 2) Initialize Client
 
 Next, initialize a client with the transport layer (more details in the [API Reference](#clients)):
 
@@ -107,7 +106,7 @@ const transport = new hl.WebSocketTransport(); // Only WebSocketTransport
 const client = new hl.EventClient({ transport });
 ```
 
-### Use Client
+### 3) Use Client
 
 Finally, use client methods to interact with the Hyperliquid API (more details in the [API Reference](#clients)):
 
@@ -200,9 +199,7 @@ await sub.unsubscribe(); // Unsubscribe from the event
 
 ### Clients
 
-A **Client** provides access to the Hyperliquid API endpoints.
-
-There are three types of **Clients** in the sdk:
+A Client provides access to the Hyperliquid API endpoints.
 
 #### Public Client
 
@@ -287,8 +284,8 @@ A Wallet Client which provides access to
 and `withdraw3`.
 
 The Wallet Client class sets up with a given [Transport](#transports) and a wallet instance, which can be a
-[Viem Wallet](https://viem.sh/docs/clients/wallet) or an
-[Ethers Wallet](https://docs.ethers.org/v6/api/providers/#Signer).
+[viem](https://viem.sh/docs/clients/wallet), [ethers.js](https://docs.ethers.org/v6/api/providers/#Signer) or other
+wallet libraries.
 
 ```typescript
 class WalletClient {
@@ -296,9 +293,9 @@ class WalletClient {
         transport: HttpTransport | WebSocketTransport;
         wallet:
             | AbstractViemWalletClient // viem
-            | AbstractExtendedViemWalletClient // extended viem (e.g. privy)
             | AbstractEthersSigner // ethers
             | AbstractEthersV5Signer // ethers v5
+            | AbstractExtendedViemWalletClient // privy
             | AbstractWindowEthereum; // window.ethereum (EIP-1193) directly
         isTestnet?: boolean; // Whether to use testnet (default: false)
         defaultVaultAddress?: Hex; // Vault address used by default if not provided in method call
@@ -397,10 +394,10 @@ class EventClient {
 
 ### Transports
 
-A [Client](#clients) is instantiated with a **Transport**, which is the intermediary layer that is responsible for
+A [Client](#clients) is instantiated with a Transport, which is the intermediary layer that is responsible for
 executing outgoing requests (ie. API calls and event listeners).
 
-There are two types of **Transports** in the sdk:
+There are two types of Transports in the sdk:
 
 #### HTTP Transport
 
@@ -544,12 +541,3 @@ const response = await fetch("https://api.hyperliquid-testnet.xyz/exchange", {
 });
 const body = await response.json();
 ```
-
-## Contributing
-
-Contributions are welcome! Please see the [CONTRIBUTING](./CONTRIBUTING.md) file for guidelines on how to contribute to
-this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
