@@ -59,6 +59,8 @@ export interface VaultEquity {
     vaultAddress: Hex;
     /** User's deposited equity. */
     equity: string;
+    /** Timestamp when the user can withdraw their equity. */
+    lockedUntilTimestamp: number;
 }
 
 /** Vault relationship configuration. */
