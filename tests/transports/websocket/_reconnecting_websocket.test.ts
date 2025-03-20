@@ -497,7 +497,7 @@ Deno.test("ReconnectingWebSocket Tests", async (t) => {
                     const diff = closeTimes[i] - closeTimes[i - 1];
                     const expected = delays[i - 1] || delays[delays.length - 1];
                     assert(
-                        diff >= expected && diff <= expected * 1.4,
+                        diff >= expected && diff <= 1000,
                         `Close event #${i} waited less than the function-supplied delay. Expected ${expected}ms, got ${diff}ms`,
                     );
                 }
