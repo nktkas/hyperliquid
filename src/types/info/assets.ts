@@ -108,6 +108,8 @@ export type PredictedFunding = [
             fundingRate: string;
             /** Next funding time (ms since epoch). */
             nextFundingTime: number;
+            /** Funding interval in hours. */
+            fundingIntervalHours?: number;
         } | null,
     ][],
 ];

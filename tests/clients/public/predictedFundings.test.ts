@@ -36,12 +36,22 @@ Deno.test("predictedFundings", async (t) => {
                 await t.step("some should be 'null'", () => {
                     assert(data.some(([_, item1]) => item1.some(([_, item2]) => item2 === null)));
                 });
-                await t.step("some should be an 'object'", () => {
+                await t.step("some should be an 'object'", async (t) => {
                     assert(
                         data.some(([_, item1]) =>
                             item1.some(([_, item2]) => typeof item2 === "object" && item2 !== null)
                         ),
                     );
+                    await t.step("some should have 'fundingIntervalHours'", () => {
+                        assert(
+                            data.some(([_, item1]) =>
+                                item1.some(([_, item2]) =>
+                                    typeof item2 === "object" && item2 !== null &&
+                                    typeof item2.fundingIntervalHours === "number"
+                                )
+                            ),
+                        );
+                    });
                 });
             });
         },
