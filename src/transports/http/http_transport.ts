@@ -56,7 +56,7 @@ export interface HttpTransportOptions {
 /** HTTP implementation of the REST transport interface. */
 export class HttpTransport implements IRequestTransport, HttpTransportOptions {
     /** API endpoint paths for mainnet and testnet. */
-    protected endpointPaths = {
+    protected static readonly endpointPaths = {
         mainnet: {
             api: "https://api.hyperliquid.xyz",
             rpc: "https://rpc.hyperliquid.xyz",
@@ -102,7 +102,8 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
         // Construct a Request
         const url = new URL(
             endpoint,
-            this.endpointPaths[this.isTestnet ? "testnet" : "mainnet"][endpoint === "explorer" ? "rpc" : "api"],
+            HttpTransport
+                .endpointPaths[this.isTestnet ? "testnet" : "mainnet"][endpoint === "explorer" ? "rpc" : "api"],
         );
         const init = mergeRequestInit(
             {
