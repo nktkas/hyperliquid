@@ -129,27 +129,15 @@ export type CancelParameters =
     & Omit<CancelRequest["action"], "type">
     & Partial<Pick<CancelRequest, "vaultAddress">>;
 
-/** Parameters for the {@linkcode WalletClient.cDeposit} method. */
-export type CDepositParameters = Omit<
-    CDepositRequest["action"],
-    "type" | "hyperliquidChain" | "signatureChainId" | "nonce"
->;
-
 /** Parameters for the {@linkcode WalletClient.cancelByCloid} method. */
 export type CancelByCloidParameters =
     & Omit<CancelByCloidRequest["action"], "type">
     & Partial<Pick<CancelByCloidRequest, "vaultAddress">>;
 
-/** Parameters for the {@linkcode WalletClient.cWithdraw} method. */
-export type CWithdrawParameters = Omit<
-    CWithdrawRequest["action"],
+/** Parameters for the {@linkcode WalletClient.cDeposit} method. */
+export type CDepositParameters = Omit<
+    CDepositRequest["action"],
     "type" | "hyperliquidChain" | "signatureChainId" | "nonce"
->;
-
-/** Parameters for the {@linkcode WalletClient.evmUserModify} method. */
-export type EvmUserModifyParameters = Omit<
-    EvmUserModifyRequest["action"],
-    "type"
 >;
 
 /** Parameters for the {@linkcode WalletClient.createSubAccount} method. */
@@ -162,6 +150,18 @@ export type CreateSubAccountParameters = Omit<
 export type CreateVaultParameters = Omit<
     CreateVaultRequest["action"],
     "type" | "nonce"
+>;
+
+/** Parameters for the {@linkcode WalletClient.cWithdraw} method. */
+export type CWithdrawParameters = Omit<
+    CWithdrawRequest["action"],
+    "type" | "hyperliquidChain" | "signatureChainId" | "nonce"
+>;
+
+/** Parameters for the {@linkcode WalletClient.evmUserModify} method. */
+export type EvmUserModifyParameters = Omit<
+    EvmUserModifyRequest["action"],
+    "type"
 >;
 
 /** Parameters for the {@linkcode WalletClient.modify} method. */
@@ -794,6 +794,66 @@ export class WalletClient<
     }
 
     /**
+     * Cancel order(s) by cloid.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Successful variant of {@link CancelResponse} without error statuses.
+     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
+     * const result = await client.cancelByCloid({
+     *   cancels: [{
+     *     asset: 0,
+     *     cloid: "0x...", // Client Order ID
+     *   }],
+     * });
+     * ```
+     */
+    async cancelByCloid(args: CancelByCloidParameters, signal?: AbortSignal): Promise<CancelResponseSuccess> {
+        // Destructure the parameters
+        const {
+            vaultAddress = this.defaultVaultAddress,
+            ...actionArgs
+        } = args;
+
+        // Construct an action
+        const nonce = await this.nonceManager();
+        const action: CancelByCloidRequest["action"] = {
+            type: "cancelByCloid",
+            cancels: actionArgs.cancels.map((cancel) => ({
+                asset: cancel.asset,
+                cloid: cancel.cloid,
+            })),
+        };
+
+        // Sign the action
+        const signature = await signL1Action({
+            wallet: this.wallet,
+            action,
+            nonce,
+            isTestnet: this.isTestnet,
+            vaultAddress,
+        });
+
+        // Send a request
+        const request: CancelByCloidRequest = { action, signature, nonce, vaultAddress };
+        const response = await this.transport.request("exchange", request, signal) as CancelResponse;
+
+        // Validate a response
+        this._validateResponse(response);
+        return response;
+    }
+
+    /**
      * Deposit into staking balance.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -885,170 +945,6 @@ export class WalletClient<
 
         // Send a request
         const request: ClaimRewardsRequest = { action: sortedAction, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
-    }
-
-    /**
-     * Cancel order(s) by cloid.
-     * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
-     * @returns Successful variant of {@link CancelResponse} without error statuses.
-     * @throws {ApiRequestError} When the API returns an error response.
-     *
-     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid
-     * @example
-     * ```ts
-     * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
-     *
-     * const wallet = privateKeyToAccount("0x...");
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
-     *
-     * const result = await client.cancelByCloid({
-     *   cancels: [{
-     *     asset: 0,
-     *     cloid: "0x...", // Client Order ID
-     *   }],
-     * });
-     * ```
-     */
-    async cancelByCloid(args: CancelByCloidParameters, signal?: AbortSignal): Promise<CancelResponseSuccess> {
-        // Destructure the parameters
-        const {
-            vaultAddress = this.defaultVaultAddress,
-            ...actionArgs
-        } = args;
-
-        // Construct an action
-        const nonce = await this.nonceManager();
-        const action: CancelByCloidRequest["action"] = {
-            type: "cancelByCloid",
-            cancels: actionArgs.cancels.map((cancel) => ({
-                asset: cancel.asset,
-                cloid: cancel.cloid,
-            })),
-        };
-
-        // Sign the action
-        const signature = await signL1Action({
-            wallet: this.wallet,
-            action,
-            nonce,
-            isTestnet: this.isTestnet,
-            vaultAddress,
-        });
-
-        // Send a request
-        const request: CancelByCloidRequest = { action, signature, nonce, vaultAddress };
-        const response = await this.transport.request("exchange", request, signal) as CancelResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
-    }
-
-    /**
-     * Withdraw from staking balance.
-     * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
-     * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
-     *
-     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#withdraw-from-staking
-     * @example
-     * ```ts
-     * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
-     *
-     * const wallet = privateKeyToAccount("0x...");
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
-     *
-     * const result = await client.cWithdraw({ wei: 1 * 1e8 });
-     * ```
-     */
-    async cWithdraw(args: CWithdrawParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        // Construct an action
-        const action: CWithdrawRequest["action"] = {
-            ...args,
-            type: "cWithdraw",
-            hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: typeof this.signatureChainId === "string"
-                ? this.signatureChainId
-                : await this.signatureChainId(),
-            nonce: await this.nonceManager(),
-        };
-
-        // Sign the action
-        const signature = await signUserSignedAction({
-            wallet: this.wallet,
-            action,
-            types: {
-                "HyperliquidTransaction:CWithdraw": [
-                    { name: "hyperliquidChain", type: "string" },
-                    { name: "wei", type: "uint64" },
-                    { name: "nonce", type: "uint64" },
-                ],
-            },
-            chainId: parseInt(action.signatureChainId, 16),
-        });
-
-        // Send a request
-        const request: CWithdrawRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
-    }
-
-    /**
-     * Configure block type for EVM transactions.
-     * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
-     * @returns Response for creating a sub-account.
-     * @throws {ApiRequestError} When the API returns an error response.
-     *
-     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/evm/dual-block-architecture
-     * @example
-     * ```ts
-     * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
-     *
-     * const wallet = privateKeyToAccount("0x...");
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
-     *
-     * const result = await client.evmUserModify({ usingBigBlocks: true });
-     * ```
-     */
-    async evmUserModify(args: EvmUserModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        // Construct an action
-        const nonce = await this.nonceManager();
-        const action: EvmUserModifyRequest["action"] = {
-            type: "evmUserModify",
-            usingBigBlocks: args.usingBigBlocks,
-        };
-
-        // Sign the action
-        const signature = await signL1Action({
-            wallet: this.wallet,
-            action,
-            nonce,
-            isTestnet: this.isTestnet,
-        });
-
-        // Send a request
-        const request: EvmUserModifyRequest = { action, signature, nonce };
         const response = await this.transport.request("exchange", request, signal) as
             | SuccessResponse
             | ErrorResponse;
@@ -1152,6 +1048,110 @@ export class WalletClient<
         const request: CreateVaultRequest = { action, signature, nonce };
         const response = await this.transport.request("exchange", request, signal) as
             | CreateVaultResponse
+            | ErrorResponse;
+
+        // Validate a response
+        this._validateResponse(response);
+        return response;
+    }
+
+    /**
+     * Withdraw from staking balance.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
+     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#withdraw-from-staking
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
+     * const result = await client.cWithdraw({ wei: 1 * 1e8 });
+     * ```
+     */
+    async cWithdraw(args: CWithdrawParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Construct an action
+        const action: CWithdrawRequest["action"] = {
+            ...args,
+            type: "cWithdraw",
+            hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
+            signatureChainId: typeof this.signatureChainId === "string"
+                ? this.signatureChainId
+                : await this.signatureChainId(),
+            nonce: await this.nonceManager(),
+        };
+
+        // Sign the action
+        const signature = await signUserSignedAction({
+            wallet: this.wallet,
+            action,
+            types: {
+                "HyperliquidTransaction:CWithdraw": [
+                    { name: "hyperliquidChain", type: "string" },
+                    { name: "wei", type: "uint64" },
+                    { name: "nonce", type: "uint64" },
+                ],
+            },
+            chainId: parseInt(action.signatureChainId, 16),
+        });
+
+        // Send a request
+        const request: CWithdrawRequest = { action, signature, nonce: action.nonce };
+        const response = await this.transport.request("exchange", request, signal) as
+            | SuccessResponse
+            | ErrorResponse;
+
+        // Validate a response
+        this._validateResponse(response);
+        return response;
+    }
+
+    /**
+     * Configure block type for EVM transactions.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Response for creating a sub-account.
+     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/evm/dual-block-architecture
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
+     * const result = await client.evmUserModify({ usingBigBlocks: true });
+     * ```
+     */
+    async evmUserModify(args: EvmUserModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Construct an action
+        const nonce = await this.nonceManager();
+        const action: EvmUserModifyRequest["action"] = {
+            type: "evmUserModify",
+            usingBigBlocks: args.usingBigBlocks,
+        };
+
+        // Sign the action
+        const signature = await signL1Action({
+            wallet: this.wallet,
+            action,
+            nonce,
+            isTestnet: this.isTestnet,
+        });
+
+        // Send a request
+        const request: EvmUserModifyRequest = { action, signature, nonce };
+        const response = await this.transport.request("exchange", request, signal) as
+            | SuccessResponse
             | ErrorResponse;
 
         // Validate a response

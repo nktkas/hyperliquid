@@ -121,28 +121,6 @@ export interface BatchModifyRequest extends BaseExchangeRequest {
 }
 
 /**
- * Cancel order(s) by cloid.
- * @returns {CancelResponse}
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid
- */
-export interface CancelByCloidRequest extends BaseExchangeRequest {
-    /** Action to be performed. */
-    action: {
-        /** Type of action. */
-        type: "cancelByCloid";
-        /** Orders to cancel. */
-        cancels: {
-            /** Asset ID. */
-            asset: number;
-            /** Client Order ID. */
-            cloid: Hex;
-        }[];
-    };
-    /** Vault address (for vault trading). */
-    vaultAddress?: Hex;
-}
-
-/**
  * Cancel order(s).
  * @returns {CancelResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s
@@ -158,6 +136,28 @@ export interface CancelRequest extends BaseExchangeRequest {
             a: number;
             /** Order ID. */
             o: number;
+        }[];
+    };
+    /** Vault address (for vault trading). */
+    vaultAddress?: Hex;
+}
+
+/**
+ * Cancel order(s) by cloid.
+ * @returns {CancelResponse}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid
+ */
+export interface CancelByCloidRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "cancelByCloid";
+        /** Orders to cancel. */
+        cancels: {
+            /** Asset ID. */
+            asset: number;
+            /** Client Order ID. */
+            cloid: Hex;
         }[];
     };
     /** Vault address (for vault trading). */

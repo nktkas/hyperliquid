@@ -320,8 +320,8 @@ class WalletClient {
     approveBuilderFee(args: ApproveBuilderFeeParameters): Promise<SuccessResponse>;
     claimRewards(): Promise<SuccessResponse>;
     createSubAccount(args: CreateSubAccountParameters): Promise<CreateSubAccountResponse>;
-    reserveRequestWeight(args: ReserveRequestWeightParameters): Promise<SuccessResponse>;
     evmUserModify(args: EvmUserModifyParameters): Promise<SuccessResponse>;
+    reserveRequestWeight(args: ReserveRequestWeightParameters): Promise<SuccessResponse>;
     setDisplayName(args: SetDisplayNameParameters): Promise<SuccessResponse>;
     setReferrer(args: SetReferrerParameters): Promise<SuccessResponse>;
     spotUser(args: SpotUserParameters): Promise<SuccessResponse>;
