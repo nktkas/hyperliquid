@@ -46,6 +46,9 @@ await build({
             url: "https://github.com/nktkas/hyperliquid/issues",
         },
         license: "MIT",
+        engines: {
+            node: ">=22.4.0",
+        },
     },
     importMap: "deno.json",
     compilerOptions: {
