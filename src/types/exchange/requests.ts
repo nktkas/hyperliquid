@@ -321,6 +321,21 @@ export interface OrderRequest extends BaseExchangeRequest {
 }
 
 /**
+ * Reserve additional rate-limited actions for a fee.
+ * @returns {SuccessResponse}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#reserve-additional-actions
+ */
+export interface ReserveRequestWeightRequest extends BaseExchangeRequest {
+    /** Action to perform. */
+    action: {
+        /** Type of action. */
+        type: "reserveRequestWeight";
+        /** Amount of request weight to reserve. */
+        weight: number;
+    };
+}
+
+/**
  * Schedule a time to cancel all open orders.
  * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#schedule-cancel-dead-mans-switch
