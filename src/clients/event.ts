@@ -38,8 +38,6 @@ import type { Candle } from "../types/info/assets.ts";
 import type { Book, Order, OrderStatus } from "../types/info/orders.ts";
 import type { TxDetails } from "../types/explorer/responses.ts";
 
-// ——————————————— Parameters ———————————————
-
 /** Parameters for the {@linkcode EventClient} constructor. */
 export interface EventClientParameters<T extends ISubscriptionTransport = ISubscriptionTransport> {
     /** The transport used to connect to the Hyperliquid API. */
@@ -87,8 +85,6 @@ export type EventUserTwapSliceFills = Omit<WsUserTwapSliceFillsRequest, "type">;
 
 /** Parameters for the {@linkcode EventClient.webData2} method. */
 export type EventWebData2Parameters = Omit<WsWebData2Request, "type">;
-
-// ——————————————— Client ———————————————
 
 /**
  * Event client for subscribing to various Hyperliquid events.

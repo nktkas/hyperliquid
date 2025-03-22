@@ -30,8 +30,8 @@ export interface WsCandleRequest {
     type: "candle";
     /** Asset symbol. */
     coin: string;
-    /** Time interval (e.g., "15m"). */
-    interval: string;
+    /** Time interval. */
+    interval: "1m" | "3m" | "5m" | "15m" | "30m" | "1h" | "2h" | "4h" | "8h" | "12h" | "1d" | "3d" | "1w" | "1M";
 }
 
 /** Subscribe to explorer block updates. */
@@ -52,15 +52,9 @@ export interface WsL2BookRequest {
     type: "l2Book";
     /** Asset symbol. */
     coin: string;
-    /**
-     * Number of significant figures.
-     * @defaultValue `null`
-     */
+    /** Number of significant figures. */
     nSigFigs?: 2 | 3 | 4 | 5 | null;
-    /**
-     * Mantissa for aggregation.
-     * @defaultValue `null`
-     */
+    /** Mantissa for aggregation. */
     mantissa?: 2 | 5 | null;
 }
 
@@ -102,10 +96,7 @@ export interface WsUserFillsRequest {
     type: "userFills";
     /** User's address. */
     user: Hex;
-    /**
-     * Whether to aggregate fills by time.
-     * @defaultValue `false`
-     */
+    /** Whether to aggregate fills by time. */
     aggregateByTime?: boolean;
 }
 

@@ -26,7 +26,6 @@ export interface AssetPosition {
                 /** Leverage value used. */
                 value: number;
             };
-
         /** Average entry price. */
         entryPx: string;
         /** Position value. */
@@ -204,7 +203,6 @@ export interface Referral {
                 required: string;
             };
         };
-
     /** History of referral rewards. */
     rewardHistory: {
         /** Amount of earned rewards. */
@@ -265,7 +263,6 @@ export interface UserFees {
         /** Exchange total volume. */
         exchange: string;
     }[];
-
     /** Fee schedule information. */
     feeSchedule: {
         /** Cross-trade fee rate. */

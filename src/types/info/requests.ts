@@ -22,8 +22,8 @@ export interface CandleSnapshotRequest {
     req: {
         /** Asset symbol. */
         coin: string;
-        /** Time interval (e.g., "15m"). */
-        interval: string;
+        /** Time interval. */
+        interval: "1m" | "3m" | "5m" | "15m" | "30m" | "1h" | "2h" | "4h" | "8h" | "12h" | "1d" | "3d" | "1w" | "1M";
         /** Start time (in ms since epoch). */
         startTime: number;
         /** End time (in ms since epoch). */
@@ -46,7 +46,7 @@ export interface ClearinghouseStateRequest {
 /**
  * Request user staking delegations.
  * @returns {Delegation[]} Array of user's delegations to validators.
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-staking-delegations
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-delegations
  */
 export interface DelegationsRequest {
     /** Type of request. */
@@ -58,7 +58,7 @@ export interface DelegationsRequest {
 /**
  * Request user staking history.
  * @returns {DelegatorUpdate[]} Array of user's staking updates.
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-staking-history
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-history
  */
 export interface DelegatorHistoryRequest {
     /** Type of request. */
@@ -70,7 +70,7 @@ export interface DelegatorHistoryRequest {
 /**
  * Request user staking rewards.
  * @returns {DelegatorReward[]} Array of user's staking rewards.
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-staking-rewards
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-rewards
  */
 export interface DelegatorRewardsRequest {
     /** Type of request. */
@@ -82,7 +82,7 @@ export interface DelegatorRewardsRequest {
 /**
  * Request user staking summary.
  * @returns {DelegatorSummary} Summary of a user's staking delegations.
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-staking-summary
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-summary
  */
 export interface DelegatorSummaryRequest {
     /** Type of request. */
@@ -156,7 +156,7 @@ export interface IsVipRequest {
 }
 
 /**
- * Request L2 order book ({@link L2Book}).
+ * Request L2 order book.
  * @returns {Book} L2 order book snapshot.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#l2-book-snapshot
  */
@@ -167,7 +167,7 @@ export interface L2BookRequest {
     coin: string;
     /** Number of significant figures. */
     nSigFigs?: 2 | 3 | 4 | 5 | null;
-    /** Mantissa for aggregation (if {@linkcode nSigFigs} is 5). */
+    /** Mantissa for aggregation (if {@link nSigFigs} is 5). */
     mantissa?: 2 | 5 | null;
 }
 

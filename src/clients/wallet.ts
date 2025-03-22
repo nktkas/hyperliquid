@@ -63,8 +63,6 @@ import {
     signUserSignedAction,
 } from "../signing.ts";
 
-// ——————————————— Parameters ———————————————
-
 /** Parameters for the {@linkcode WalletClient} constructor. */
 export interface WalletClientParameters<
     T extends IRequestTransport = IRequestTransport,
@@ -316,8 +314,6 @@ export type Withdraw3Parameters = Omit<
     "type" | "hyperliquidChain" | "signatureChainId" | "time"
 >;
 
-// ——————————————— Responses ———————————————
-
 /** Successful variant of {@linkcode CancelResponse} without error statuses. */
 export type CancelResponseSuccess = CancelResponse & {
     response: {
@@ -353,8 +349,6 @@ export type TwapOrderResponseSuccess = TwapOrderResponse & {
         };
     };
 };
-
-// ——————————————— Errors ———————————————
 
 /** Error thrown when the API returns an error response. */
 export class ApiRequestError extends HyperliquidError {
@@ -395,8 +389,6 @@ export class ApiRequestError extends HyperliquidError {
         this.name = "ApiRequestError";
     }
 }
-
-// ——————————————— Client ———————————————
 
 /** Nonce manager for generating unique nonces for signing transactions. */
 class NonceManager {
@@ -513,8 +505,6 @@ export class WalletClient<
         this.nonceManager = args.nonceManager ?? new NonceManager().getNonce;
     }
 
-    // ——————————————— Exchange API ———————————————
-
     /**
      * Approve an agent to sign on behalf of the master or sub-accounts.
      * @param args - The parameters for the request.
@@ -532,10 +522,7 @@ export class WalletClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.WalletClient({ wallet, transport });
      *
-     * const result = await client.approveAgent({
-     *   agentAddress: "0x...",
-     *   agentName: "agentName",
-     * });
+     * const result = await client.approveAgent({ agentAddress: "0x...", agentName: "agentName" });
      * ```
      */
     async approveAgent(args: ApproveAgentParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -593,10 +580,7 @@ export class WalletClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.WalletClient({ wallet, transport });
      *
-     * const result = await client.approveBuilderFee({
-     *   maxFeeRate: "0.01%",
-     *   builder: "0x...",
-     * });
+     * const result = await client.approveBuilderFee({ maxFeeRate: "0.01%", builder: "0x..." });
      * ```
      */
     async approveBuilderFee(args: ApproveBuilderFeeParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -656,7 +640,7 @@ export class WalletClient<
      *
      * const result = await client.batchModify({
      *   modifies: [{
-     *     oid: 123, // Order ID
+     *     oid: 123,
      *     order: {
      *       a: 0, // Asset index
      *       b: true, // Buy order
@@ -811,10 +795,9 @@ export class WalletClient<
      * const client = new hl.WalletClient({ wallet, transport });
      *
      * const result = await client.cancelByCloid({
-     *   cancels: [{
-     *     asset: 0,
-     *     cloid: "0x...", // Client Order ID
-     *   }],
+     *   cancels: [
+     *     { asset: 0, cloid: "0x..." },
+     *   ],
      * });
      * ```
      */
@@ -1177,7 +1160,7 @@ export class WalletClient<
      * const client = new hl.WalletClient({ wallet, transport });
      *
      * const result = await client.modify({
-     *   oid: 123, // Order ID
+     *   oid: 123,
      *   order: {
      *     a: 0, // Asset index
      *     b: true, // Buy order
@@ -1563,7 +1546,6 @@ export class WalletClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.WalletClient({ wallet, transport });
      *
-     * // Unknown what the successful response will be
      * const result = await client.spotDeploy({
      *   registerToken2: {
      *     spec: {
@@ -1667,7 +1649,7 @@ export class WalletClient<
      * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-spot-transfer
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-spot-transfer
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -1740,9 +1722,7 @@ export class WalletClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.WalletClient({ wallet, transport });
      *
-     * const result = await client.spotUser({
-     *   toggleSpotDusting: { optOut: false },
-     * });
+     * const result = await client.spotUser({ toggleSpotDusting: { optOut: false } });
      * ```
      */
     async spotUser(args: SpotUserParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -2087,11 +2067,7 @@ export class WalletClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.WalletClient({ wallet, transport });
      *
-     * const result = await client.updateIsolatedMargin({
-     *   asset: 0,
-     *   isBuy: true, // Add to long position
-     *   ntli: 1, // Add 1 USD margin (integer only)
-     * });
+     * const result = await client.updateIsolatedMargin({ asset: 0, isBuy: true, ntli: 1 * 1e6 });
      * ```
      */
     async updateIsolatedMargin(args: UpdateIsolatedMarginParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -2147,11 +2123,7 @@ export class WalletClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.WalletClient({ wallet, transport });
      *
-     * const result = await client.updateLeverage({
-     *   asset: 0,
-     *   isCross: true,
-     *   leverage: 5,
-     * });
+     * const result = await client.updateLeverage({ asset: 0, isCross: true, leverage: 5 });
      * ```
      */
     async updateLeverage(args: UpdateLeverageParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -2207,10 +2179,7 @@ export class WalletClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.WalletClient({ wallet, transport });
      *
-     * const result = await client.usdClassTransfer({
-     *   amount: "1",
-     *   toPerp: true, // Transfer from Spot to Perp
-     * });
+     * const result = await client.usdClassTransfer({ amount: "1", toPerp: true });
      * ```
      */
     async usdClassTransfer(args: UsdClassTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -2258,7 +2227,7 @@ export class WalletClient<
      * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-usdc-transfer
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-usdc-transfer
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -2268,10 +2237,7 @@ export class WalletClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.WalletClient({ wallet, transport });
      *
-     * const result = await client.usdSend({
-     *   destination: "0x...",
-     *   amount: "1",
-     * });
+     * const result = await client.usdSend({ destination: "0x...", amount: "1" });
      * ```
      */
     async usdSend(args: UsdSendParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -2329,10 +2295,7 @@ export class WalletClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.WalletClient({ wallet, transport });
      *
-     * const result = await client.vaultDistribute({
-     *   vaultAddress: "0x...",
-     *   usd: 10 * 1e6,
-     * });
+     * const result = await client.vaultDistribute({ vaultAddress: "0x...", usd: 10 * 1e6 });
      * ```
      */
     async vaultDistribute(args: VaultDistributeParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -2486,10 +2449,7 @@ export class WalletClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const client = new hl.WalletClient({ wallet, transport });
      *
-     * const result = await client.withdraw3({
-     *   destination: "0x...",
-     *   amount: "1",
-     * });
+     * const result = await client.withdraw3({ destination: "0x...", amount: "1" });
      * ```
      */
     async withdraw3(args: Withdraw3Parameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -2529,8 +2489,6 @@ export class WalletClient<
         this._validateResponse(response);
         return response;
     }
-
-    // ——————————————— Private methods ———————————————
 
     /** Formats a decimal number as a string, removing trailing zeros. */
     protected _formatDecimal(numStr: string): string {

@@ -46,7 +46,7 @@ export interface BaseExchangeRequest {
         /** Additional action parameters. */
         [key: string]: unknown;
     };
-    /** Unique request identifier (recommended current timestamp in ms). */
+    /** Unique request identifier (current timestamp in ms). */
     nonce: number;
     /** Cryptographic signature. */
     signature: { r: Hex; s: Hex; v: number };
@@ -66,7 +66,7 @@ export interface ApproveAgentRequest extends BaseExchangeRequest {
         hyperliquidChain: "Mainnet" | "Testnet";
         /** Chain ID used for signing. */
         signatureChainId: Hex;
-        /** Unique request identifier (recommended current timestamp in ms). */
+        /** Unique request identifier (current timestamp in ms). */
         nonce: number;
         /** Agent address. */
         agentAddress: Hex;
@@ -89,7 +89,7 @@ export interface ApproveBuilderFeeRequest extends BaseExchangeRequest {
         hyperliquidChain: "Mainnet" | "Testnet";
         /** Chain ID used for signing. */
         signatureChainId: Hex;
-        /** Unique request identifier (recommended current timestamp in ms). */
+        /** Unique request identifier (current timestamp in ms). */
         nonce: number;
         /** Max fee rate (e.g., "0.01%"). */
         maxFeeRate: `${string}%`;
@@ -110,7 +110,7 @@ export interface BatchModifyRequest extends BaseExchangeRequest {
         type: "batchModify";
         /** Order modifications. */
         modifies: {
-            /** Order ID to modify. */
+            /** Order ID. */
             oid: number;
             /** New order parameters. */
             order: OrderParams;
@@ -178,9 +178,9 @@ export interface CDepositRequest extends BaseExchangeRequest {
         hyperliquidChain: "Mainnet" | "Testnet";
         /** Chain ID used for signing. */
         signatureChainId: Hex;
-        /** Unique request identifier (recommended current timestamp in ms). */
+        /** Unique request identifier (current timestamp in ms). */
         nonce: number;
-        /** Amount of wei to deposit into staking balance. */
+        /** Amount of wei to deposit into staking balance (float * 1e8). */
         wei: number;
     };
 }
@@ -229,7 +229,7 @@ export interface CreateVaultRequest extends BaseExchangeRequest {
         description: string;
         /** Raw initial balance (float * 1e6). */
         initialUsd: number;
-        /** Unique request identifier (recommended current timestamp in ms). */
+        /** Unique request identifier (current timestamp in ms). */
         nonce: number;
     };
 }
@@ -248,9 +248,9 @@ export interface CWithdrawRequest extends BaseExchangeRequest {
         hyperliquidChain: "Mainnet" | "Testnet";
         /** Chain ID used for signing. */
         signatureChainId: Hex;
-        /** Unique request identifier (recommended current timestamp in ms). */
+        /** Unique request identifier (current timestamp in ms). */
         nonce: number;
-        /** Amount of wei to withdraw from staking balance. */
+        /** Amount of wei to withdraw from staking balance (float * 1e8). */
         wei: number;
     };
 }
@@ -280,7 +280,7 @@ export interface ModifyRequest extends BaseExchangeRequest {
     action: {
         /** Type of action. */
         type: "modify";
-        /** Order ID to modify. */
+        /** Order ID. */
         oid: number;
         /** New order parameters. */
         order: OrderParams;
@@ -515,7 +515,7 @@ export interface SpotDeployRequest_RegisterHyperliquidity extends BaseExchangeRe
 /**
  * Transfer a spot asset on L1 to another address.
  * @returns {SuccessResponse}
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-spot-transfer
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-spot-transfer
  */
 export interface SpotSendRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -526,13 +526,13 @@ export interface SpotSendRequest extends BaseExchangeRequest {
         hyperliquidChain: "Mainnet" | "Testnet";
         /** Chain ID used for signing. */
         signatureChainId: Hex;
-        /** Unique request identifier (recommended current timestamp in ms). */
+        /** Unique request identifier (current timestamp in ms). */
         time: number;
         /** Destination address. */
         destination: Hex;
         /** Token identifier. */
         token: `${string}:${Hex}`;
-        /** Amount to send. */
+        /** Amount to send (1 = 1$). */
         amount: string;
     };
 }
@@ -571,7 +571,7 @@ export interface SubAccountSpotTransferRequest extends BaseExchangeRequest {
         isDeposit: boolean;
         /** Token identifier. */
         token: `${string}:${Hex}`;
-        /** Amount to send. */
+        /** Amount to send (1 = 1$). */
         amount: string;
     };
 }
@@ -609,13 +609,13 @@ export interface TokenDelegateRequest extends BaseExchangeRequest {
         hyperliquidChain: "Mainnet" | "Testnet";
         /** Chain ID used for signing. */
         signatureChainId: Hex;
-        /** Unique request identifier (recommended current timestamp in ms). */
+        /** Unique request identifier (current timestamp in ms). */
         nonce: number;
         /** Validator address. */
         validator: Hex;
         /** `true` for undelegate, `false` for delegate. */
         isUndelegate: boolean;
-        /** Amount of wei to delegate. */
+        /** Amount of wei to delegate (float * 1e8). */
         wei: number;
     };
 }
@@ -683,7 +683,7 @@ export interface UpdateIsolatedMarginRequest extends BaseExchangeRequest {
         asset: number;
         /** Position side (`true` for long, `false` for short). */
         isBuy: boolean;
-        /** Amount to adjust (in USD). */
+        /** Amount to adjust (float * 1e6). */
         ntli: number;
     };
     /** Vault address (for vault trading). */
@@ -725,9 +725,9 @@ export interface UsdClassTransferRequest extends BaseExchangeRequest {
         hyperliquidChain: "Mainnet" | "Testnet";
         /** Chain ID used for signing. */
         signatureChainId: Hex;
-        /** Unique request identifier (recommended current timestamp in ms). */
+        /** Unique request identifier (current timestamp in ms). */
         nonce: number;
-        /** Amount to transfer. */
+        /** Amount to transfer (1 = 1$). */
         amount: string;
         /** `true` for Spot to Perp, `false` for Perp to Spot. */
         toPerp: boolean;
@@ -737,7 +737,7 @@ export interface UsdClassTransferRequest extends BaseExchangeRequest {
 /**
  * Transfer USDC on L1 to another address.
  * @returns {SuccessResponse}
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#l1-usdc-transfer
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-usdc-transfer
  */
 export interface UsdSendRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -748,11 +748,11 @@ export interface UsdSendRequest extends BaseExchangeRequest {
         hyperliquidChain: "Mainnet" | "Testnet";
         /** Chain ID used for signing. */
         signatureChainId: Hex;
-        /** Unique request identifier (recommended current timestamp in ms). */
+        /** Unique request identifier (current timestamp in ms). */
         time: number;
         /** Destination address. */
         destination: Hex;
-        /** Amount to send. */
+        /** Amount to send (1 = 1$). */
         amount: string;
     };
 }
@@ -830,9 +830,9 @@ export interface Withdraw3Request extends BaseExchangeRequest {
         hyperliquidChain: "Mainnet" | "Testnet";
         /** Chain ID used for signing. */
         signatureChainId: Hex;
-        /** Unique request identifier (recommended current timestamp in ms). */
+        /** Unique request identifier (current timestamp in ms). */
         time: number;
-        /** Amount to withdraw. */
+        /** Amount to withdraw (1 = 1$). */
         amount: string;
         /** Destination address. */
         destination: Hex;

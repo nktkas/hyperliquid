@@ -95,8 +95,6 @@ import type {
 } from "../types/info/requests.ts";
 import type { VaultDetails, VaultEquity, VaultSummary } from "../types/info/vaults.ts";
 
-// ——————————————— Info Parameters ———————————————
-
 /** Parameters for the {@linkcode PublicClient} constructor. */
 export interface PublicClientParameters<T extends IRequestTransport = IRequestTransport> {
     /** The transport used to connect to the Hyperliquid API. */
@@ -211,8 +209,6 @@ export type UserVaultEquitiesParameters = Omit<UserVaultEquitiesRequest, "type">
 /** Parameters for the {@linkcode PublicClient.vaultDetails} method. */
 export type VaultDetailsParameters = Omit<VaultDetailsRequest, "type">;
 
-// ——————————————— Explorer Parameters ———————————————
-
 /** Parameters for the {@linkcode PublicClient.blockDetails} method. */
 export type BlockDetailsParameters = Omit<BlockDetailsRequest, "type">;
 
@@ -221,8 +217,6 @@ export type TxDetailsParameters = Omit<TxDetailsRequest, "type">;
 
 /** Parameters for the {@linkcode PublicClient.userDetails} method. */
 export type UserDetailsParameters = Omit<UserDetailsRequest, "type">;
-
-// ——————————————— Client ———————————————
 
 /**
  * Public client for interacting with the Hyperliquid API.
@@ -247,8 +241,6 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
     constructor(args: PublicClientParameters<T>) {
         this.transport = args.transport;
     }
-
-    // ——————————————— Info API ———————————————
 
     /**
      * Request mid coin prices.
@@ -333,7 +325,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Array of user's delegations to validators.
      *
-     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-staking-delegations
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-delegations
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -358,7 +350,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Array of user's staking updates.
      *
-     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-staking-history
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-history
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -383,7 +375,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Array of user's staking rewards.
      *
-     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-staking-rewards
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-rewards
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -408,7 +400,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Summary of a user's staking delegations.
      *
-     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-staking-summary
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-summary
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -1386,8 +1378,6 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
         };
         return this.transport.request("info", request, signal) as Promise<VaultSummary[]>;
     }
-
-    // ——————————————— Explorer API ———————————————
 
     /**
      * Request for block details by block height.

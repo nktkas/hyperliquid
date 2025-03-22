@@ -76,11 +76,7 @@ export type PerpsMetaAndAssetCtxs = [
 export interface PerpsUniverse {
     /** Minimum decimal places for order sizes. */
     szDecimals: number;
-    /**
-     * Name of the universe.
-     *
-     * Note: Maximum length 6 characters. No uniqueness constraints.
-     */
+    /** Name of the universe. */
     name: string;
     /** Maximum allowed leverage. */
     maxLeverage: number;
@@ -163,7 +159,7 @@ export interface SpotDeployState {
         maxSupply: string | null;
         /** Hyperliquidity genesis balance of the token. */
         hyperliquidityGenesisBalance: string;
-        /** Total genesis balance (in Wei) for the token. */
+        /** Total genesis balance (in wei) for the token. */
         totalGenesisBalanceWei: string;
         /** User genesis balances for the token. */
         userGenesisBalances: [Hex, string][];

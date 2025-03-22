@@ -47,7 +47,7 @@ import * as hl from "https://esm.sh/jsr/@nktkas/hyperliquid"
 
 First, choose and configure your transport layer (more details in the [API Reference](#transports)):
 
-```typescript
+```ts
 import * as hl from "@nktkas/hyperliquid"; // ESM & Common.js
 
 // HTTP Transport
@@ -63,7 +63,7 @@ Next, initialize a client with the transport layer (more details in the [API Ref
 
 #### Create PublicClient
 
-```typescript
+```ts
 import * as hl from "@nktkas/hyperliquid"; // ESM & Common.js
 
 const transport = new hl.HttpTransport(); // or WebSocketTransport
@@ -72,7 +72,7 @@ const client = new hl.PublicClient({ transport });
 
 #### Create WalletClient
 
-```typescript
+```ts
 import * as hl from "@nktkas/hyperliquid"; // ESM & Common.js
 import { createWalletClient, custom } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
@@ -99,7 +99,7 @@ const windowMetamaskClient = new hl.WalletClient({ wallet: window.ethereum, tran
 
 #### Create EventClient
 
-```typescript
+```ts
 import * as hl from "@nktkas/hyperliquid"; // ESM & Common.js
 
 const transport = new hl.WebSocketTransport(); // Only WebSocketTransport
@@ -112,7 +112,7 @@ Finally, use client methods to interact with the Hyperliquid API (more details i
 
 #### Example of using a public client
 
-```typescript
+```ts
 import * as hl from "@nktkas/hyperliquid";
 
 const transport = new hl.HttpTransport();
@@ -130,7 +130,7 @@ const openOrders = await client.openOrders({ user: "0x..." });
 
 #### Example of using a wallet client
 
-```typescript
+```ts
 import * as hl from "@nktkas/hyperliquid";
 import { privateKeyToAccount } from "viem/accounts";
 
@@ -170,7 +170,7 @@ const result = await client.withdraw3({
 
 #### Example of using an event client
 
-```typescript
+```ts
 import * as hl from "@nktkas/hyperliquid";
 
 const transport = new hl.WebSocketTransport();
@@ -209,7 +209,7 @@ A Public Client which provides access to
 
 The Public Client class sets up with a given [Transport](#transports).
 
-```typescript
+```ts
 class PublicClient {
     constructor(args: {
         transport: HttpTransport | WebSocketTransport;
@@ -287,7 +287,7 @@ The Wallet Client class sets up with a given [Transport](#transports) and a wall
 [viem](https://viem.sh/docs/clients/wallet), [ethers.js](https://docs.ethers.org/v6/api/providers/#Signer) or other
 wallet libraries.
 
-```typescript
+```ts
 class WalletClient {
     constructor(args: {
         transport: HttpTransport | WebSocketTransport;
@@ -359,7 +359,7 @@ real-time updates for `l2Book` and `userFills`.
 The Event Client class sets up with a given [WebSocket Transport](#websocket-transport).
 
 <!-- deno-fmt-ignore-start -->
-```typescript
+```ts
 class EventClient {
     constructor(args: {
         transport: WebSocketTransport;
@@ -405,7 +405,7 @@ There are two types of Transports in the sdk:
 A HTTP Transport that executes requests via a [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch)
 API.
 
-```typescript
+```ts
 class HttpTransport {
     constructor(options?: {
         isTestnet?: boolean; // Whether to use testnet url (default: false)
@@ -424,7 +424,7 @@ class HttpTransport {
 A WebSocket Transport that executes requests and subscribes to events via a
 [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) connection.
 
-```typescript
+```ts
 class WebSocketTransport {
     constructor(options?: {
         url?: string | URL; // WebSocket URL (default: "wss://api.hyperliquid.xyz/ws")
@@ -475,7 +475,7 @@ Useful if you want to sign a Hyperliquid transaction yourself.
 
 #### Cancel an order without a client
 
-```typescript
+```ts
 import { signL1Action } from "@nktkas/hyperliquid/signing";
 import { privateKeyToAccount } from "viem/accounts";
 
@@ -506,7 +506,7 @@ const body = await response.json();
 
 #### Approve an agent without a client
 
-```typescript
+```ts
 import { signUserSignedAction } from "@nktkas/hyperliquid/signing";
 import { privateKeyToAccount } from "viem/accounts";
 

@@ -1,6 +1,50 @@
 /**
  * This module contains functions for generating Hyperliquid transaction signatures
  * and interfaces to various wallet implementations.
+ * @example
+ * ```ts
+ * import { signL1Action } from "@nktkas/hyperliquid/signing";
+ *
+ * const action = {
+ *   type: "cancel",
+ *   cancels: [{ a: 0, o: 12345 }],
+ * };
+ * const nonce = Date.now();
+ *
+ * const signature = await signL1Action({
+ *   wallet,
+ *   action,
+ *   nonce,
+ *   isTestnet: true, // Change to false for mainnet
+ * });
+ * ```
+ * @example
+ * ```ts
+ * import { signUserSignedAction } from "@nktkas/hyperliquid/signing";
+ *
+ * const action = {
+ *   type: "approveAgent",
+ *   hyperliquidChain: "Testnet", // "Mainnet" or "Testnet"
+ *   signatureChainId: "0x66eee",
+ *   nonce: Date.now(),
+ *   agentAddress: "0x...",
+ *   agentName: "Agent",
+ * };
+ *
+ * const signature = await signUserSignedAction({
+ *   wallet,
+ *   action,
+ *   types: {
+ *     "HyperliquidTransaction:ApproveAgent": [
+ *       { name: "hyperliquidChain", type: "string" },
+ *       { name: "agentAddress", type: "address" },
+ *       { name: "agentName", type: "string" },
+ *       { name: "nonce", type: "uint64" },
+ *     ],
+ *   },
+ *   chainId: parseInt(action.signatureChainId, 16),
+ * });
+ * ```
  * @module
  */
 

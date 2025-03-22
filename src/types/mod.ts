@@ -1,6 +1,5 @@
 /**
  * This module contains all types related to the Hyperliquid API.
- *
  * @example
  * ```ts
  * import type { OrderParams } from "@nktkas/hyperliquid/types";
@@ -18,7 +17,6 @@
  *   },
  * };
  * ```
- *
  * @module
  */
 
