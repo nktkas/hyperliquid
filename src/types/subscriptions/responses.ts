@@ -95,8 +95,8 @@ export interface WsTrade {
     hash: string;
     /** Trade price. */
     px: string;
-    /** Trade side. */
-    side: string;
+    /** Trade side ("B" = Bid/Buy, "A" = Ask/Sell). */
+    side: "B" | "A";
     /** Trade size. */
     sz: string;
     /** Trade ID. */
