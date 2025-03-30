@@ -15,30 +15,16 @@ export interface VaultDetails {
     portfolio: PortfolioPeriods;
     /** Annual percentage rate. */
     apr: number;
-    /** unknown */
-    // FIXME: add type
-    followerState: unknown | null;
+    followerState: VaultFollowerState | null;
     /** Ownership percentage held by leader. */
     leaderFraction: number;
     /** Leader's commission percentage. */
     leaderCommission: number;
     /** Vault followers list. */
-    followers: {
-        /** Follower address or "Leader". */
+    followers: (Omit<VaultFollowerState, "user"> & {
+        /** Follower's address or Leader. */
         user: Hex | "Leader";
-        /** Follower's vault equity. */
-        vaultEquity: string;
-        /** Current profit and loss. */
-        pnl: string;
-        /** All-time profit and loss. */
-        allTimePnl: string;
-        /** Subscription duration in days. */
-        daysFollowing: number;
-        /** Vault entry timestamp. */
-        vaultEntryTime: number;
-        /** Timestamp when funds become unlocked. */
-        lockupUntil: number;
-    }[];
+    })[];
     /** Maximum distributable amount. */
     maxDistributable: number;
     /** Maximum withdrawable amount. */
@@ -61,6 +47,24 @@ export interface VaultEquity {
     equity: string;
     /** Timestamp when the user can withdraw their equity. */
     lockedUntilTimestamp: number;
+}
+
+/** Vault follower state. */
+export interface VaultFollowerState {
+    /** Follower address. */
+    user: Hex;
+    /** Follower's vault equity. */
+    vaultEquity: string;
+    /** Current profit and loss. */
+    pnl: string;
+    /** All-time profit and loss. */
+    allTimePnl: string;
+    /** Subscription duration in days. */
+    daysFollowing: number;
+    /** Vault entry timestamp. */
+    vaultEntryTime: number;
+    /** Timestamp when funds become unlocked. */
+    lockupUntil: number;
 }
 
 /** Vault relationship configuration. */

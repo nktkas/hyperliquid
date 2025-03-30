@@ -9,6 +9,7 @@ import { assertJsonSchema } from "../../utils.ts";
 const INVALID_VAULT_ADDRESS = "0x0000000000000000000000000000000000000000";
 const VAULT_ADDRESS_WITH_NORMAL_RELATIONSHIP = "0x1719884eb866cb12b2287399b15f7db5e7d775ea";
 const VAULT_ADDRESS_WITH_PARENT_RELATIONSHIP = "0xa15099a30bbf2e68942d6f4c43d70d04faeab0a0";
+const VAULT_ADDRESS_WITH_PARENT_RELATIONSHIP_USER = "0xe019d6167E7e324aEd003d94098496b6d986aB05";
 const VAULT_ADDRESS_WITH_CHILD_RELATIONSHIP = "0x768484f7e2ebb675c57838366c02ae99ba2a9b08";
 
 // —————————— Type schema ——————————
@@ -56,8 +57,15 @@ Deno.test("vaultDetails", async (t) => {
                 await t.step("Check key 'followerState'", async (t) => {
                     await t.step("should be 'null'", () => assert(data.followerState === null));
 
-                    // FIXME: Failed to find a vault with 'followerState !== null'
-                    await t.step({ name: "should not be 'null'", fn: () => {}, ignore: true });
+                    await t.step("should be an 'object'", async () => {
+                        const data = await client.vaultDetails({
+                            vaultAddress: VAULT_ADDRESS_WITH_PARENT_RELATIONSHIP,
+                            user: VAULT_ADDRESS_WITH_PARENT_RELATIONSHIP_USER,
+                        });
+                        assertJsonSchema(MethodReturnType, data);
+                        assert(typeof data === "object" && data !== null);
+                        assert(data.followerState !== null);
+                    });
                 });
 
                 await t.step("Check key 'followers[].user'", async (t) => {
