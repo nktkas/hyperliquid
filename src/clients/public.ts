@@ -1380,7 +1380,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
     }
 
     /**
-     * Request for block details by block height.
+     * Block details by block height.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Block details response.
@@ -1405,7 +1405,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
     }
 
     /**
-     * Request for transaction details by transaction hash.
+     * Transaction details by transaction hash.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Transaction details response.
@@ -1430,7 +1430,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
     }
 
     /**
-     * Request for user details by user's address.
+     * User details by user's address.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns User details response.

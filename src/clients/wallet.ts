@@ -506,7 +506,7 @@ export class WalletClient<
     }
 
     /**
-     * Approve an agent to sign on behalf of the master or sub-accounts.
+     * Approve an agent to sign on behalf of the master account.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal
      * @returns Successful response without specific data.
@@ -564,7 +564,7 @@ export class WalletClient<
     }
 
     /**
-     * Approve a max fee rate for a builder address.
+     * Approve a maximum fee rate for a builder.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
@@ -837,7 +837,7 @@ export class WalletClient<
     }
 
     /**
-     * Deposit into staking balance.
+     * Transfer native token from the user's spot account into staking for delegating to validators.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
@@ -1039,7 +1039,7 @@ export class WalletClient<
     }
 
     /**
-     * Withdraw from staking balance.
+     * Transfer native token from staking into the user's spot account.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
@@ -1380,7 +1380,7 @@ export class WalletClient<
     }
 
     /**
-     * Schedule a time to cancel all open orders.
+     * Schedule a cancel-all operation at a future time.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
@@ -1643,7 +1643,7 @@ export class WalletClient<
     }
 
     /**
-     * Transfer a spot asset on L1 to another address.
+     * Send spot assets to another address.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
@@ -1866,7 +1866,7 @@ export class WalletClient<
     }
 
     /**
-     * Delegate or undelegate stake from a validator.
+     * Delegate or undelegate native tokens to or from a validator.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
@@ -2051,7 +2051,7 @@ export class WalletClient<
     }
 
     /**
-     * Update isolated margin for a position.
+     * Add or remove margin from isolated position.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
@@ -2107,7 +2107,7 @@ export class WalletClient<
     }
 
     /**
-     * Update leverage for cross or isolated margin.
+     * Update cross or isolated leverage on a coin.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
@@ -2221,7 +2221,7 @@ export class WalletClient<
     }
 
     /**
-     * Transfer USDC on L1 to another address.
+     * Send usd to another address.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
@@ -2380,7 +2380,7 @@ export class WalletClient<
     }
 
     /**
-     * Add or remove funds from a vault.
+     * Deposit or withdraw from a vault.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
