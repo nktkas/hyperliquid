@@ -53,7 +53,7 @@ export interface BaseExchangeRequest {
 }
 
 /**
- * Approve an agent to sign on behalf of the master or sub-accounts.
+ * Approve an agent to sign on behalf of the master account.
  * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet
  */
@@ -76,7 +76,7 @@ export interface ApproveAgentRequest extends BaseExchangeRequest {
 }
 
 /**
- * Approve a max fee rate for a builder address.
+ * Approve a maximum fee rate for a builder.
  * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-a-builder-fee
  */
@@ -165,7 +165,7 @@ export interface CancelByCloidRequest extends BaseExchangeRequest {
 }
 
 /**
- * Deposit into staking balance.
+ * Transfer native token from the user's spot account into staking for delegating to validators.
  * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-into-staking
  */
@@ -227,7 +227,7 @@ export interface CreateVaultRequest extends BaseExchangeRequest {
         name: string;
         /** Vault description. */
         description: string;
-        /** Raw initial balance (float * 1e6). */
+        /** Initial balance (float * 1e6). */
         initialUsd: number;
         /** Unique request identifier (current timestamp in ms). */
         nonce: number;
@@ -235,7 +235,7 @@ export interface CreateVaultRequest extends BaseExchangeRequest {
 }
 
 /**
- * Withdraw from staking balance.
+ * Transfer native token from staking into the user's spot account.
  * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#withdraw-from-staking
  */
@@ -336,7 +336,7 @@ export interface ReserveRequestWeightRequest extends BaseExchangeRequest {
 }
 
 /**
- * Schedule a time to cancel all open orders.
+ * Schedule a cancel-all operation at a future time.
  * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#schedule-cancel-dead-mans-switch
  */
@@ -403,7 +403,7 @@ export interface SpotDeployRequest_RegisterToken2 extends BaseExchangeRequest {
     action: {
         /** Type of action. */
         type: "spotDeploy";
-        /** Register Token parameters. */
+        /** Register token parameters. */
         registerToken2: {
             /** Token specifications. */
             spec: {
@@ -433,7 +433,7 @@ export interface SpotDeployRequest_UserGenesis extends BaseExchangeRequest {
     action: {
         /** Type of action. */
         type: "spotDeploy";
-        /** User Genesis parameters. */
+        /** User genesis parameters. */
         userGenesis: {
             /** Token identifier. */
             token: number;
@@ -477,7 +477,7 @@ export interface SpotDeployRequest_RegisterSpot extends BaseExchangeRequest {
     action: {
         /** Type of action. */
         type: "spotDeploy";
-        /** Register Spot parameters. */
+        /** Register spot parameters. */
         registerSpot: {
             /** Tuple containing base and quote token indices. */
             tokens: [number, number];
@@ -496,7 +496,7 @@ export interface SpotDeployRequest_RegisterHyperliquidity extends BaseExchangeRe
     action: {
         /** Type of action. */
         type: "spotDeploy";
-        /** Register Hyperliquidity parameters. */
+        /** Register hyperliquidity parameters. */
         registerHyperliquidity: {
             /** Spot index (distinct from base token index). */
             spot: number;
@@ -513,7 +513,7 @@ export interface SpotDeployRequest_RegisterHyperliquidity extends BaseExchangeRe
 }
 
 /**
- * Transfer a spot asset on L1 to another address.
+ * Send spot assets to another address.
  * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-spot-transfer
  */
@@ -532,7 +532,7 @@ export interface SpotSendRequest extends BaseExchangeRequest {
         destination: Hex;
         /** Token identifier. */
         token: `${string}:${Hex}`;
-        /** Amount to send (1 = 1$). */
+        /** Amount to send (not in wei). */
         amount: string;
     };
 }
@@ -571,7 +571,7 @@ export interface SubAccountSpotTransferRequest extends BaseExchangeRequest {
         isDeposit: boolean;
         /** Token identifier. */
         token: `${string}:${Hex}`;
-        /** Amount to send (1 = 1$). */
+        /** Amount to send (not in wei). */
         amount: string;
     };
 }
@@ -590,13 +590,13 @@ export interface SubAccountTransferRequest extends BaseExchangeRequest {
         subAccountUser: Hex;
         /** `true` for deposit, `false` for withdrawal. */
         isDeposit: boolean;
-        /** Raw amount to transfer (float * 1e6). */
+        /** Amount to transfer (float * 1e6). */
         usd: number;
     };
 }
 
 /**
- * Delegate or undelegate stake from a validator.
+ * Delegate or undelegate native tokens to or from a validator.
  * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#delegate-or-undelegate-stake-from-validator
  */
@@ -615,7 +615,7 @@ export interface TokenDelegateRequest extends BaseExchangeRequest {
         validator: Hex;
         /** `true` for undelegate, `false` for delegate. */
         isUndelegate: boolean;
-        /** Amount of wei to delegate (float * 1e8). */
+        /** Amount for delegate/undelegate (float * 1e8). */
         wei: number;
     };
 }
@@ -670,7 +670,7 @@ export interface TwapOrderRequest extends BaseExchangeRequest {
 }
 
 /**
- * Update isolated margin for a position.
+ * Add or remove margin from isolated position.
  * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin
  */
@@ -691,7 +691,7 @@ export interface UpdateIsolatedMarginRequest extends BaseExchangeRequest {
 }
 
 /**
- * Update leverage for cross or isolated margin.
+ * Update cross or isolated leverage on a coin.
  * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-leverage
  */
@@ -735,7 +735,7 @@ export interface UsdClassTransferRequest extends BaseExchangeRequest {
 }
 
 /**
- * Transfer USDC on L1 to another address.
+ * Send usd to another address.
  * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-usdc-transfer
  */
@@ -770,7 +770,7 @@ export interface VaultDistributeRequest extends BaseExchangeRequest {
         /** Vault address. */
         vaultAddress: Hex;
         /**
-         * Raw amount to distribute (float * 1e6).
+         * Amount to distribute (float * 1e6).
          *
          * Set to 0 to close the vault.
          */
@@ -798,7 +798,7 @@ export interface VaultModifyRequest extends BaseExchangeRequest {
 }
 
 /**
- * Add or remove funds from a vault.
+ * Deposit or withdraw from a vault.
  * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-a-vault
  */
@@ -811,7 +811,7 @@ export interface VaultTransferRequest extends BaseExchangeRequest {
         vaultAddress: Hex;
         /** `true` for deposit, `false` for withdrawal. */
         isDeposit: boolean;
-        /** Raw amount to transfer (float * 1e6). */
+        /** Amount for deposit/withdrawal (float * 1e6). */
         usd: number;
     };
 }

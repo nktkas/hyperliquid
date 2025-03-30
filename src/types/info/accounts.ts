@@ -17,7 +17,7 @@ export interface AssetPosition {
                 type: "isolated";
                 /** Leverage value used. */
                 value: number;
-                /** Amount of raw USD used. */
+                /** Amount of USD used (1 = 1$). */
                 rawUsd: string;
             }
             | {

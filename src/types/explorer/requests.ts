@@ -1,7 +1,7 @@
 import type { Hex } from "../../base.ts";
 
 /**
- * Request for block details by block height.
+ * Block details by block height.
  * @returns {BlockDetailsResponse} Block details response.
  * @see null - no documentation
  */
@@ -13,7 +13,7 @@ export interface BlockDetailsRequest {
 }
 
 /**
- * Request for transaction details by transaction hash.
+ * Transaction details by transaction hash.
  * @returns {TxDetailsResponse} Transaction details response.
  * @see null - no documentation
  */
@@ -25,7 +25,7 @@ export interface TxDetailsRequest {
 }
 
 /**
- * Request for user details by user's address.
+ * User details by user's address.
  * @returns {UserDetailsResponse} User details response.
  * @see null - no documentation
  */

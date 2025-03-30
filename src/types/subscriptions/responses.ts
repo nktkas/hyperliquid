@@ -8,29 +8,21 @@ import type {
     UserNonFundingLedgerUpdate,
 } from "../info/accounts.ts";
 import type { AllMids, PerpsAssetCtx, PerpsMeta, SpotAssetCtx } from "../info/assets.ts";
-import type {
-    Fill,
-    FrontendOrder,
-    Order,
-    OrderProcessingStatus,
-    TwapHistory,
-    TwapSliceFill,
-    TwapState,
-} from "../info/orders.ts";
+import type { Fill, FrontendOrder, TwapHistory, TwapSliceFill, TwapState } from "../info/orders.ts";
 
-/** WebSocket message containing active perpetual asset context. */
+/** Active perpetual asset context. */
 export interface WsActiveAssetCtx {
-    /** Asset symbol. */
+    /** Asset symbol (e.g., BTC). */
     coin: string;
     /** Context information for the perpetual asset. */
     ctx: PerpsAssetCtx;
 }
 
-/** WebSocket message containing active asset trading data. */
+/** Active asset trading data. */
 export interface WsActiveAssetData {
-    /** Available to trade range [min, max]. */
-    availableToTrade: [string, string];
-    /** Asset symbol. */
+    /** User's address. */
+    user: Hex;
+    /** Asset symbol (e.g., BTC). */
     coin: string;
     /** Leverage configuration. */
     leverage:
@@ -39,7 +31,7 @@ export interface WsActiveAssetData {
             type: "isolated";
             /** Leverage value used. */
             value: number;
-            /** Amount of raw USD used. */
+            /** Amount of USD used (1 = 1$). */
             rawUsd: string;
         }
         | {
@@ -50,64 +42,54 @@ export interface WsActiveAssetData {
         };
     /** Maximum trade size range [min, max]. */
     maxTradeSzs: [string, string];
-    /** User's address. */
-    user: Hex;
+    /** Available to trade range [min, max]. */
+    availableToTrade: [string, string];
 }
 
-/** WebSocket message containing active spot asset context. */
+/** Active spot asset context. */
 export interface WsActiveSpotAssetCtx {
-    /** Asset symbol. */
+    /** Asset symbol (e.g., BTC). */
     coin: string;
     /** Context information for the spot asset. */
     ctx: SpotAssetCtx;
 }
 
-/** WebSocket message containing mid prices for all assets. */
+/** Mid prices for all assets. */
 export interface WsAllMids {
-    /** Mid prices for all assets. */
+    /** Mapping of coin symbols to mid prices. */
     mids: AllMids;
 }
 
-/** WebSocket message containing block details. */
+/** Block details. */
 export type WsBlockDetails = Omit<BlockDetails, "txs">;
 
-/** WebSocket message containing user notifications. */
+/** User's notifications. */
 export interface WsNotification {
     /** Notification content. */
     notification: string;
 }
 
-/** WebSocket message containing order information. */
-export interface WsOrder {
-    /** Order details. */
-    order: Order;
-    /** Order processing status. */
-    status: OrderProcessingStatus;
-    /** Status timestamp (in ms since epoch). */
-    statusTimestamp: number;
-}
-
-/** WebSocket message containing trade information. */
+/** Trade information. */
 export interface WsTrade {
-    /** Asset symbol. */
+    /** Asset symbol (e.g., BTC). */
     coin: string;
-    /** Transaction hash. */
-    hash: string;
-    /** Trade price. */
-    px: string;
     /** Trade side ("B" = Bid/Buy, "A" = Ask/Sell). */
     side: "B" | "A";
+    /** Trade price. */
+    px: string;
     /** Trade size. */
     sz: string;
-    /** Trade ID. */
-    tid: number;
     /** Trade timestamp (in ms since epoch). */
     time: number;
-    /** Addresses of users involved in the trade. */
+    /** Transaction hash. */
+    hash: Hex;
+    /** Trade ID. */
+    tid: number;
+    /** Addresses of users involved in the trade [Maker, Taker]. */
     users: [Hex, Hex];
 }
 
-/** WebSocket message containing user event. */
+/** User's event. */
 export type WsUserEvent =
     | WsUserEventFill
     | WsUserEventFunding
@@ -116,19 +98,19 @@ export type WsUserEvent =
     | WsUserEventTwapHistory
     | WsUserEventTwapSliceFills;
 
-/** WebSocket message containing fill event information. */
+/** User's fill event. */
 export interface WsUserEventFill {
     /** Array of trade fills. */
     fills: Fill[];
 }
 
-/** WebSocket message containing funding event information. */
+/** User's funding event. */
 export interface WsUserEventFunding {
     /** Funding update details. */
     funding: Omit<FundingUpdate, "type">;
 }
 
-/** WebSocket message containing liquidation event information. */
+/** User's liquidation event. */
 export interface WsUserEventLiquidation {
     /** Liquidation event details. */
     liquidation: {
@@ -145,30 +127,30 @@ export interface WsUserEventLiquidation {
     };
 }
 
-/** WebSocket message containing non-user initiated order cancellation information. */
+/** Non-user initiated order cancellation event. */
 export interface WsUserEventNonUserCancel {
     /** Array of cancelled orders not initiated by the user. */
     nonUserCancel: {
-        /** Asset symbol. */
+        /** Asset symbol (e.g., BTC). */
         coin: string;
         /** Order ID. */
         oid: number;
     }[];
 }
 
-/** WebSocket message containing user's TWAP history. */
+/** User's TWAP history event. */
 export interface WsUserEventTwapHistory {
     /** Array of historical TWAP fills. */
     twapHistory: TwapHistory[];
 }
 
-/** WebSocket message containing user's TWAP slice fills. */
+/** User's TWAP slice fills event. */
 export interface WsUserEventTwapSliceFills {
     /** Array of TWAP slice fills. */
     twapSliceFills: TwapSliceFill[];
 }
 
-/** WebSocket message containing user's fills. */
+/** User's fills. */
 export interface WsUserFills {
     /** User's address. */
     user: Hex;
@@ -178,7 +160,7 @@ export interface WsUserFills {
     isSnapshot?: true;
 }
 
-/** WebSocket message containing user's fundings. */
+/** User's fundings. */
 export interface WsUserFundings {
     /** User's address. */
     user: Hex;
@@ -188,7 +170,7 @@ export interface WsUserFundings {
     isSnapshot?: true;
 }
 
-/** WebSocket message containing user's non-funding ledger updates. */
+/** User's non-funding ledger updates. */
 export interface WsUserNonFundingLedgerUpdates {
     /** User's address. */
     user: Hex;
@@ -198,7 +180,7 @@ export interface WsUserNonFundingLedgerUpdates {
     isSnapshot?: true;
 }
 
-/** WebSocket message containing user's TWAP history. */
+/** User's TWAP history. */
 export interface WsUserTwapHistory {
     /** User's address. */
     user: Hex;
@@ -208,7 +190,7 @@ export interface WsUserTwapHistory {
     isSnapshot?: true;
 }
 
-/** WebSocket message containing user's TWAP slice fills. */
+/** User's TWAP slice fills. */
 export interface WsUserTwapSliceFills {
     /** User's address. */
     user: Hex;
@@ -218,7 +200,7 @@ export interface WsUserTwapSliceFills {
     isSnapshot?: true;
 }
 
-/** WebSocket message containing comprehensive user and market data. */
+/** Comprehensive user and market data. */
 export interface WsWebData2 {
     /** Account summary for perpetual trading. */
     clearinghouseState: PerpsClearinghouseState;
