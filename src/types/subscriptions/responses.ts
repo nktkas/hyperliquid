@@ -8,7 +8,7 @@ import type {
     UserNonFundingLedgerUpdate,
 } from "../info/accounts.ts";
 import type { AllMids, PerpsAssetCtx, PerpsMeta, SpotAssetCtx } from "../info/assets.ts";
-import type { Fill, FrontendOrder, TwapHistory, TwapSliceFill, TwapState } from "../info/orders.ts";
+import type { BookLevel, Fill, FrontendOrder, TwapHistory, TwapSliceFill, TwapState } from "../info/orders.ts";
 
 /** Active perpetual asset context. */
 export interface WsActiveAssetCtx {
@@ -58,6 +58,16 @@ export interface WsActiveSpotAssetCtx {
 export interface WsAllMids {
     /** Mapping of coin symbols to mid prices. */
     mids: AllMids;
+}
+
+/** Best Bid and Offer. */
+export interface WsBbo {
+    /** Asset symbol (e.g., BTC). */
+    coin: string;
+    /** Time of the BBO update (in ms since epoch). */
+    time: number;
+    /** Best bid and offer tuple [bid, offer], either can be undefined if unavailable. */
+    bbo: [BookLevel | undefined, BookLevel | undefined];
 }
 
 /** Block details. */

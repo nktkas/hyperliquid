@@ -24,6 +24,14 @@ export interface WsAllMidsRequest {
     type: "allMids";
 }
 
+/** Best bid and offer events for a specific asset. */
+export interface WsBboRequest {
+    /** Type of subscription. */
+    type: "bbo";
+    /** Asset symbol (e.g., BTC). */
+    coin: string;
+}
+
 /** Candlestick data events for a specific asset. */
 export interface WsCandleRequest {
     /** Type of subscription. */

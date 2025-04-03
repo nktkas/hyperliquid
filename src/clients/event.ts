@@ -3,6 +3,7 @@ import type {
     WsActiveAssetCtxRequest,
     WsActiveAssetDataRequest,
     WsAllMidsRequest,
+    WsBboRequest,
     WsCandleRequest,
     WsExplorerBlockRequest,
     WsExplorerTxsRequest,
@@ -23,6 +24,7 @@ import type {
     WsActiveAssetData,
     WsActiveSpotAssetCtx,
     WsAllMids,
+    WsBbo,
     WsBlockDetails,
     WsNotification,
     WsTrade,
@@ -49,6 +51,9 @@ export type EventActiveAssetCtxParameters = Omit<WsActiveAssetCtxRequest, "type"
 
 /** Parameters for the {@linkcode EventClient.activeAssetData} method. */
 export type EventActiveAssetDataParameters = Omit<WsActiveAssetDataRequest, "type">;
+
+/** Parameters for the {@linkcode EventClient.bbo} method. */
+export type EventBboParameters = Omit<WsBboRequest, "type">;
 
 /** Parameters for the {@linkcode EventClient.candle} method. */
 export type EventCandleParameters = Omit<WsCandleRequest, "type">;
@@ -225,6 +230,47 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
             payload,
             (event: CustomEvent<WsAllMids>) => {
                 listener(event.detail);
+            },
+            signal,
+        );
+    }
+
+    /**
+     * Subscribe to best bid and offer updates for a specific asset.
+     * @param args - The parameters for the subscription.
+     * @param listener - The callback function to be called when the event is received.
+     * @param signal - An optional abort signal for canceling the subscription request.
+     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * 
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.WebSocketTransport();
+     * const client = new hl.EventClient({ transport });
+     *
+     * const sub = await client.bbo({ coin: "BTC" }, (data) => {
+     *   console.log(data);
+     * });
+     * ```
+     */
+    bbo(
+        args: EventBboParameters,
+        listener: (data: WsBbo) => void,
+        signal?: AbortSignal,
+    ): Promise<Subscription> {
+        const payload: WsBboRequest = {
+            type: "bbo",
+            coin: args.coin,
+        };
+        return this.transport.subscribe(
+            payload.type,
+            payload,
+            (event: CustomEvent<WsBbo>) => {
+                if (event.detail.coin === args.coin) {
+                    listener(event.detail);
+                }
             },
             signal,
         );

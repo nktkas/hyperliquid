@@ -370,6 +370,7 @@ class EventClient {
     activeAssetCtx(args: EventActiveAssetCtxParameters, listener: (data: WsActiveAssetCtx | WsActiveSpotAssetCtx) => void): Promise<Subscription>;
     activeAssetData(args: EventActiveAssetDataParameters, listener: (data: WsActiveAssetData) => void): Promise<Subscription>;
     allMids(listener: (data: WsAllMids) => void): Promise<Subscription>;
+    bbo(args: EventBboParameters, listener: (data: WsBbo) => void): Promise<Subscription>;
     candle(args: EventCandleParameters, listener: (data: Candle) => void): Promise<Subscription>;
     l2Book(args: EventL2BookParameters, listener: (data: Book) => void): Promise<Subscription>;
     trades(args: EventTradesParameters, listener: (data: WsTrade[]) => void): Promise<Subscription>;
