@@ -269,6 +269,10 @@ export interface UserFees {
         cross: string;
         /** Add-liquidity fee rate. */
         add: string;
+        /** Spot cross-trade fee rate. */
+        spotCross: string;
+        /** Spot add-liquidity fee rate. */
+        spotAdd: string;
         /** Fee tiers details. */
         tiers: {
             /** VIP fee tier information. */
@@ -279,6 +283,10 @@ export interface UserFees {
                 cross: string;
                 /** Add-liquidity fee rate. */
                 add: string;
+                /** Spot cross-trade fee rate. */
+                spotCross: string;
+                /** Spot add-liquidity fee rate. */
+                spotAdd: string;
             }[];
             /** Market maker fee tier information. */
             mm: {
@@ -295,6 +303,10 @@ export interface UserFees {
     userCrossRate: string;
     /** User add-liquidity rate. */
     userAddRate: string;
+    /** User spot cross-trade rate. */
+    userSpotCrossRate: string;
+    /** User spot add-liquidity rate. */
+    userSpotAddRate: string;
     /** Active referral discount rate. */
     activeReferralDiscount: string;
     /** Trial details. */

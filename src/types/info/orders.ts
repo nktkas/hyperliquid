@@ -172,10 +172,18 @@ export interface OrderStatus<O extends Order | FrontendOrder> {
  * - `Limit`: Executes at the specified limit price or better.
  * - `Stop Market`: Activates as a market order when a stop price is reached.
  * - `Stop Limit`: Activates as a limit order when a stop price is reached.
+ * - `Take Profit Market`: Executes as a market order when a take profit price is reached.
+ * - `Take Profit Limit`: Executes as a limit order when a take profit price is reached.
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/trading/order-types
  */
-export type OrderType = "Market" | "Limit" | "Stop Market" | "Stop Limit";
+export type OrderType =
+    | "Market"
+    | "Limit"
+    | "Stop Market"
+    | "Stop Limit"
+    | "Take Profit Market"
+    | "Take Profit Limit";
 
 /**
  * Time-in-force options.
