@@ -1,17 +1,21 @@
-import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
 import { deadline } from "jsr:@std/async@^1.0.10/deadline";
-import { assert } from "jsr:@std/assert@^1.0.10";
-import { EventClient, WebSocketTransport, type WsUserNonFundingLedgerUpdates } from "../../../mod.ts";
-import { assertJsonSchema } from "../../utils.ts";
+import { EventClient, WebSocketTransport } from "../../../mod.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
-Deno.test("userNonFundingLedgerUpdates", async (t) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+// —————————— Constants ——————————
 
-    // —————————— Type schema ——————————
+const USER_ADDRESS = "0x563C175E6f11582f65D6d9E360A618699DEe14a9";
 
-    const WsUserNonFundingLedgerUpdates = tsj
-        .createGenerator({ path: "./mod.ts", skipTypeCheck: true })
-        .createSchema("WsUserNonFundingLedgerUpdates");
+// —————————— Type schema ——————————
+
+export type MethodReturnType = Parameters<Parameters<EventClient["userNonFundingLedgerUpdates"]>[1]>[0];
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
+
+// —————————— Test ——————————
+
+Deno.test("userNonFundingLedgerUpdates", async () => {
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
@@ -21,84 +25,19 @@ Deno.test("userNonFundingLedgerUpdates", async (t) => {
     // —————————— Test ——————————
 
     const data = await deadline(
-        new Promise<WsUserNonFundingLedgerUpdates>((resolve, reject) => {
-            const subscrPromise = client.userNonFundingLedgerUpdates(
-                { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" },
-                async (data) => {
-                    try {
-                        await (await subscrPromise).unsubscribe();
-                        resolve(data);
-                    } catch (error) {
-                        reject(error);
-                    }
-                },
-            );
+        new Promise((resolve) => {
+            client.userNonFundingLedgerUpdates({ user: USER_ADDRESS }, resolve);
         }),
         15_000,
     );
 
-    const isMatchToScheme = await t.step("Matching data to type schema", () => {
-        assertJsonSchema(WsUserNonFundingLedgerUpdates, data);
-    });
-
-    await t.step({
-        name: "Additional checks",
-        fn: async (t) => {
-            await t.step("Check key 'type'", async (t) => {
-                await t.step("some should be 'accountClassTransfer'", () => {
-                    assert(data.nonFundingLedgerUpdates.some((item) => item.delta.type === "accountClassTransfer"));
-                });
-
-                await t.step("some should be 'deposit'", () => {
-                    assert(data.nonFundingLedgerUpdates.some((item) => item.delta.type === "deposit"));
-                });
-
-                await t.step("some should be 'internalTransfer'", () => {
-                    assert(data.nonFundingLedgerUpdates.some((item) => item.delta.type === "internalTransfer"));
-                });
-
-                await t.step("some should be 'liquidation'", () => {
-                    assert(data.nonFundingLedgerUpdates.some((item) => item.delta.type === "liquidation"));
-                });
-
-                await t.step("some should be 'rewardsClaim'", () => {
-                    assert(data.nonFundingLedgerUpdates.some((item) => item.delta.type === "rewardsClaim"));
-                });
-
-                await t.step("some should be 'spotTransfer'", () => {
-                    assert(data.nonFundingLedgerUpdates.some((item) => item.delta.type === "spotTransfer"));
-                });
-
-                await t.step("some should be 'subAccountTransfer'", () => {
-                    assert(data.nonFundingLedgerUpdates.some((item) => item.delta.type === "subAccountTransfer"));
-                });
-
-                await t.step("some should be 'vaultCreate'", () => {
-                    assert(data.nonFundingLedgerUpdates.some((item) => item.delta.type === "vaultCreate"));
-                });
-
-                await t.step("some should be 'vaultDeposit'", () => {
-                    assert(data.nonFundingLedgerUpdates.some((item) => item.delta.type === "vaultDeposit"));
-                });
-
-                await t.step("some should be 'vaultDistribution'", () => {
-                    assert(data.nonFundingLedgerUpdates.some((item) => item.delta.type === "vaultDistribution"));
-                });
-
-                await t.step("some should be 'vaultWithdraw'", () => {
-                    assert(data.nonFundingLedgerUpdates.some((item) => item.delta.type === "vaultWithdraw"));
-                });
-
-                await t.step("some should be 'withdraw'", () => {
-                    assert(data.nonFundingLedgerUpdates.some((item) => item.delta.type === "withdraw"));
-                });
-            });
+    schemaCoverage(MethodReturnType, [data], {
+        ignoreEnumValuesByPath: {
+            "#/properties/nonFundingLedgerUpdates/items/properties/delta/anyOf/3/properties/leverageType": ["Cross"],
         },
-        ignore: !isMatchToScheme,
     });
 
     // —————————— Cleanup ——————————
 
-    // Close the transport
     await transport.close();
 });

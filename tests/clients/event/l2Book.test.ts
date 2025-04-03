@@ -1,16 +1,17 @@
-import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
 import { deadline } from "jsr:@std/async@^1.0.10/deadline";
-import { type Book, EventClient, WebSocketTransport } from "../../../mod.ts";
-import { assertJsonSchema } from "../../utils.ts";
+import { EventClient, WebSocketTransport } from "../../../mod.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
-Deno.test("l2Book", async (t) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+// —————————— Type schema ——————————
 
-    // —————————— Type schema ——————————
+export type MethodReturnType = Parameters<Parameters<EventClient["l2Book"]>[1]>[0];
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
-    const Book = tsj
-        .createGenerator({ path: "./mod.ts", skipTypeCheck: true })
-        .createSchema("Book");
+// —————————— Test ——————————
+
+Deno.test("l2Book", async () => {
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
@@ -19,217 +20,93 @@ Deno.test("l2Book", async (t) => {
 
     // —————————— Test ——————————
 
-    const isMatchToScheme = await t.step("Matching data to type schema", async () => {
-        const data = await deadline(
-            new Promise<Book>((resolve, reject) => {
-                const subscrPromise = client.l2Book({ coin: "BTC" }, async (data) => {
-                    try {
-                        await (await subscrPromise).unsubscribe();
-                        resolve(data);
-                    } catch (error) {
-                        reject(error);
-                    }
-                });
+    const data = await Promise.all([
+        // Check without arguments
+        deadline(
+            new Promise((resolve) => {
+                client.l2Book({ coin: "BTC" }, resolve);
             }),
             15_000,
-        );
-        assertJsonSchema(Book, data);
-    });
+        ),
+        // Check argument 'nSigFigs'
+        deadline(
+            new Promise((resolve) => {
+                client.l2Book({ coin: "BTC", nSigFigs: 2 }, resolve);
+            }),
+            15_000,
+        ),
+        deadline(
+            new Promise((resolve) => {
+                client.l2Book({ coin: "BTC", nSigFigs: 3 }, resolve);
+            }),
+            15_000,
+        ),
+        deadline(
+            new Promise((resolve) => {
+                client.l2Book({ coin: "BTC", nSigFigs: 4 }, resolve);
+            }),
+            15_000,
+        ),
+        deadline(
+            new Promise((resolve) => {
+                client.l2Book({ coin: "BTC", nSigFigs: 5 }, resolve);
+            }),
+            15_000,
+        ),
+        deadline(
+            new Promise((resolve) => {
+                client.l2Book({ coin: "BTC", nSigFigs: null }, resolve);
+            }),
+            15_000,
+        ),
+        deadline(
+            new Promise((resolve) => {
+                client.l2Book({ coin: "BTC", nSigFigs: undefined }, resolve);
+            }),
+            15_000,
+        ),
+        // Check argument 'mantissa'
+        deadline(
+            new Promise((resolve) => {
+                client.l2Book(
+                    { coin: "BTC", nSigFigs: 5, mantissa: 2 },
+                    resolve,
+                );
+            }),
+            15_000,
+        ),
+        deadline(
+            new Promise((resolve) => {
+                client.l2Book(
+                    { coin: "BTC", nSigFigs: 5, mantissa: 5 },
+                    resolve,
+                );
+            }),
+            15_000,
+        ),
+        deadline(
+            new Promise((resolve) => {
+                client.l2Book(
+                    { coin: "BTC", nSigFigs: 5, mantissa: null },
+                    resolve,
+                );
+            }),
+            15_000,
+        ),
+        deadline(
+            new Promise((resolve) => {
+                client.l2Book(
+                    { coin: "BTC", nSigFigs: 5, mantissa: undefined },
+                    resolve,
+                );
+            }),
+            15_000,
+        ),
+    ]);
 
-    await t.step({
-        name: "Additional checks",
-        fn: async (t) => {
-            await t.step("Check argument 'nSigFigs'", async (t) => {
-                await t.step("nSigFigs: 2", async () => {
-                    const data = await deadline(
-                        new Promise<Book>((resolve, reject) => {
-                            const subscrPromise = client.l2Book({ coin: "BTC", nSigFigs: 2 }, async (data) => {
-                                try {
-                                    await (await subscrPromise).unsubscribe();
-                                    resolve(data);
-                                } catch (error) {
-                                    reject(error);
-                                }
-                            });
-                        }),
-                        15_000,
-                    );
-                    assertJsonSchema(Book, data);
-                });
-
-                await t.step("nSigFigs: 3", async () => {
-                    const data = await deadline(
-                        new Promise<Book>((resolve, reject) => {
-                            const subscrPromise = client.l2Book({ coin: "BTC", nSigFigs: 3 }, async (data) => {
-                                try {
-                                    await (await subscrPromise).unsubscribe();
-                                    resolve(data);
-                                } catch (error) {
-                                    reject(error);
-                                }
-                            });
-                        }),
-                        15_000,
-                    );
-                    assertJsonSchema(Book, data);
-                });
-
-                await t.step("nSigFigs: 4", async () => {
-                    const data = await deadline(
-                        new Promise<Book>((resolve, reject) => {
-                            const subscrPromise = client.l2Book({ coin: "BTC", nSigFigs: 4 }, async (data) => {
-                                try {
-                                    await (await subscrPromise).unsubscribe();
-                                    resolve(data);
-                                } catch (error) {
-                                    reject(error);
-                                }
-                            });
-                        }),
-                        15_000,
-                    );
-                    assertJsonSchema(Book, data);
-                });
-
-                await t.step("nSigFigs: 5", async () => {
-                    const data = await deadline(
-                        new Promise<Book>((resolve, reject) => {
-                            const subscrPromise = client.l2Book({ coin: "BTC", nSigFigs: 5 }, async (data) => {
-                                try {
-                                    await (await subscrPromise).unsubscribe();
-                                    resolve(data);
-                                } catch (error) {
-                                    reject(error);
-                                }
-                            });
-                        }),
-                        15_000,
-                    );
-                    assertJsonSchema(Book, data);
-                });
-
-                await t.step("nSigFigs: null", async () => {
-                    const data = await deadline(
-                        new Promise<Book>((resolve, reject) => {
-                            const subscrPromise = client.l2Book({ coin: "BTC", nSigFigs: null }, async (data) => {
-                                try {
-                                    await (await subscrPromise).unsubscribe();
-                                    resolve(data);
-                                } catch (error) {
-                                    reject(error);
-                                }
-                            });
-                        }),
-                        15_000,
-                    );
-                    assertJsonSchema(Book, data);
-                });
-
-                await t.step("nSigFigs: undefined", async () => {
-                    const data = await deadline(
-                        new Promise<Book>((resolve, reject) => {
-                            const subscrPromise = client.l2Book({ coin: "BTC", nSigFigs: undefined }, async (data) => {
-                                try {
-                                    await (await subscrPromise).unsubscribe();
-                                    resolve(data);
-                                } catch (error) {
-                                    reject(error);
-                                }
-                            });
-                        }),
-                        15_000,
-                    );
-                    assertJsonSchema(Book, data);
-                });
-            });
-
-            await t.step("Check argument 'mantissa'", async (t) => {
-                await t.step("mantissa: 2", async () => {
-                    const data = await deadline(
-                        new Promise<Book>((resolve, reject) => {
-                            const subscrPromise = client.l2Book(
-                                { coin: "BTC", nSigFigs: 5, mantissa: 2 },
-                                async (data) => {
-                                    try {
-                                        await (await subscrPromise).unsubscribe();
-                                        resolve(data);
-                                    } catch (error) {
-                                        reject(error);
-                                    }
-                                },
-                            );
-                        }),
-                        15_000,
-                    );
-                    assertJsonSchema(Book, data);
-                });
-
-                await t.step("mantissa: 5", async () => {
-                    const data = await deadline(
-                        new Promise<Book>((resolve, reject) => {
-                            const subscrPromise = client.l2Book(
-                                { coin: "BTC", nSigFigs: 5, mantissa: 5 },
-                                async (data) => {
-                                    try {
-                                        await (await subscrPromise).unsubscribe();
-                                        resolve(data);
-                                    } catch (error) {
-                                        reject(error);
-                                    }
-                                },
-                            );
-                        }),
-                        15_000,
-                    );
-                    assertJsonSchema(Book, data);
-                });
-
-                await t.step("mantissa: null", async () => {
-                    const data = await deadline(
-                        new Promise<Book>((resolve, reject) => {
-                            const subscrPromise = client.l2Book(
-                                { coin: "BTC", nSigFigs: 5, mantissa: null },
-                                async (data) => {
-                                    try {
-                                        await (await subscrPromise).unsubscribe();
-                                        resolve(data);
-                                    } catch (error) {
-                                        reject(error);
-                                    }
-                                },
-                            );
-                        }),
-                        15_000,
-                    );
-                    assertJsonSchema(Book, data);
-                });
-
-                await t.step("mantissa: undefined", async () => {
-                    const data = await deadline(
-                        new Promise<Book>((resolve, reject) => {
-                            const subscrPromise = client.l2Book(
-                                { coin: "BTC", nSigFigs: 5, mantissa: undefined },
-                                async (data) => {
-                                    try {
-                                        await (await subscrPromise).unsubscribe();
-                                        resolve(data);
-                                    } catch (error) {
-                                        reject(error);
-                                    }
-                                },
-                            );
-                        }),
-                        15_000,
-                    );
-                    assertJsonSchema(Book, data);
-                });
-            });
-        },
-        ignore: !isMatchToScheme,
-    });
+    schemaCoverage(MethodReturnType, data);
 
     // —————————— Cleanup ——————————
 
-    // Close the transport
     await transport.close();
 });

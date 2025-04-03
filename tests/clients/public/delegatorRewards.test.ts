@@ -1,24 +1,21 @@
-import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
-import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
-import { assert } from "jsr:@std/assert@^1.0.10";
 import { HttpTransport, PublicClient } from "../../../mod.ts";
-import { assertJsonSchema } from "../../utils.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Constants ——————————
 
-const USER_ADDRESS = "0xedc88158266c50628a9ffbaa1db2635376577eea";
+const DELEGATION_ADDRESS = "0xedc88158266c50628a9ffbaa1db2635376577eea";
+const COMMISSION_ADDRESS = "0x3c83a5cae32a05e88ca6a0350edb540194851a76";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = ReturnType<PublicClient["delegatorRewards"]>;
-const MethodReturnType = tsj
-    .createGenerator({ path: fromFileUrl(import.meta.url), skipTypeCheck: true })
-    .createSchema("MethodReturnType");
+export type MethodReturnType = Awaited<ReturnType<PublicClient["delegatorRewards"]>>;
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
 
-Deno.test("delegatorRewards", async (t) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+Deno.test("delegatorRewards", async () => {
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
@@ -27,24 +24,10 @@ Deno.test("delegatorRewards", async (t) => {
 
     // —————————— Test ——————————
 
-    const data = await client.delegatorRewards({ user: USER_ADDRESS });
+    const data = await Promise.all([
+        client.delegatorRewards({ user: DELEGATION_ADDRESS }),
+        client.delegatorRewards({ user: COMMISSION_ADDRESS }),
+    ]);
 
-    const isMatchToScheme = await t.step("Matching data to type schema", () => {
-        assertJsonSchema(MethodReturnType, data);
-    });
-
-    await t.step({
-        name: "Additional checks",
-        fn: async (t) => {
-            await t.step("Check key 'source'", async (t) => {
-                await t.step("some should be 'delegation'", () => {
-                    assert(data.some((x) => x.source === "delegation"));
-                });
-                await t.step("some should be 'commission'", () => {
-                    assert(data.some((x) => x.source === "commission"));
-                });
-            });
-        },
-        ignore: !isMatchToScheme,
-    });
+    schemaCoverage(MethodReturnType, data);
 });

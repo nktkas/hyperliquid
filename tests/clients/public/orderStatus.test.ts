@@ -1,42 +1,45 @@
-import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
-import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
-import { assert } from "jsr:@std/assert@^1.0.10";
 import { HttpTransport, PublicClient } from "../../../mod.ts";
-import { assertJsonSchema } from "../../utils.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Constants ——————————
 
 const USER_ADDRESS = "0x563C175E6f11582f65D6d9E360A618699DEe14a9";
 
-const ORDER_TYPE_LONG = 15029784876;
-const ORDER_TYPE_SHORT = 15029758931;
-const ORDER_TYPE_LIMIT = 15030023260;
-const ORDER_TYPE_STOP_MARKET = 15030149356;
-const ORDER_TYPE_STOP_LIMIT = 15030701730;
+const SIDE_B = 15029784876;
+const SIDE_A = 27379010444;
 
-const TIF_NULL = 15030701730;
-const TIF_GTC = 15030023260;
-const TIF_ALO = 15030054922;
+const ORDER_TYPE_LIMIT = 15029784876;
+const ORDER_TYPE_STOP_MARKET = 15030144135;
+const ORDER_TYPE_STOP_LIMIT = 14940693141;
+const ORDER_TYPE_TAKE_PROFIT_MARKET = 27379010444;
+const ORDER_TYPE_TAKE_PROFIT_LIMIT = 27379156434;
 
-const STATUS_OPEN = 15030023260;
-const STATUS_FILLED = 20776436362;
-const STATUS_CANCELED = 15548023407;
+const TIF_NULL = 15030144135;
+const TIF_GTC = 15029784876;
+const TIF_ALO = 14947967914;
+const TIF_IOC = 23629760457;
+const TIF_FRONTEND_MARKET = 20776394366;
+const TIF_LIQUIDATION_MARKET = 21904297440;
+
+const STATUS_OPEN = 27379010444;
+const STATUS_FILLED = 15029784876;
+const STATUS_CANCELED = 15030144135;
 const STATUS_REJECTED = 20776394366;
+const STATUS_REDUCE_ONLY_CANCELED = 27378915177;
 
-const CLOID = "0xa81c445e1ece30c6bbf20c237409700b" as const;
+const CLOID = "0xd4bb069b673a48161bca56cfc88deb6b";
 const WITHOUT_CLOID = 15548036277;
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = ReturnType<PublicClient["orderStatus"]>;
-const MethodReturnType = tsj
-    .createGenerator({ path: fromFileUrl(import.meta.url), skipTypeCheck: true })
-    .createSchema("MethodReturnType");
+export type MethodReturnType = Awaited<ReturnType<PublicClient["orderStatus"]>>;
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
 
-Deno.test("orderStatus", async (t) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+Deno.test("orderStatus", async () => {
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
@@ -45,243 +48,49 @@ Deno.test("orderStatus", async (t) => {
 
     // —————————— Test ——————————
 
-    const isMatchToScheme = await t.step("Matching data to type schema", async (t) => {
-        await t.step("Check key 'status: unknownOid'", async () => {
-            const data = await client.orderStatus({ user: USER_ADDRESS, oid: 0 });
-            assertJsonSchema(MethodReturnType, data);
-            assert(data.status === "unknownOid", `Expected 'status' to be 'unknownOid', got '${data.status}'`);
-        });
-        await t.step("Check key 'status: order'", async () => {
-            const data = await client.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_LONG });
-            assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["children"] });
-            assert(data.status === "order", `Expected 'status' to be 'order', got '${data.status}'`);
-        });
-    });
+    const data = await Promise.all([
+        client.orderStatus({ user: USER_ADDRESS, oid: 0 }),
+        client.orderStatus({ user: USER_ADDRESS, oid: SIDE_B }),
+        client.orderStatus({ user: USER_ADDRESS, oid: SIDE_A }),
+        client.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_LIMIT }),
+        client.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_STOP_MARKET }),
+        client.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_STOP_LIMIT }),
+        client.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_TAKE_PROFIT_MARKET }),
+        client.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_TAKE_PROFIT_LIMIT }),
 
-    await t.step({
-        name: "Additional checks",
-        fn: async (t) => {
-            await t.step("Check keys", async (t) => {
-                await t.step("Check key 'order.order'", async (t) => {
-                    await t.step("Check key 'side'", async (t) => {
-                        await t.step("some should be 'B'", async () => {
-                            const data = await client.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_LONG });
-                            assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["children"] });
-                            assert(data.status === "order", "Expected status to be 'order', got: " + data.status);
-                            assert(
-                                data.order.order.side === "B",
-                                "Expected 'side' to be 'B', got: " + data.order.order.side,
-                            );
-                        });
+        client.orderStatus({ user: USER_ADDRESS, oid: TIF_NULL }),
+        client.orderStatus({ user: USER_ADDRESS, oid: TIF_GTC }),
+        client.orderStatus({ user: USER_ADDRESS, oid: TIF_ALO }),
+        client.orderStatus({ user: USER_ADDRESS, oid: TIF_IOC }),
+        client.orderStatus({ user: USER_ADDRESS, oid: TIF_FRONTEND_MARKET }),
+        client.orderStatus({ user: USER_ADDRESS, oid: TIF_LIQUIDATION_MARKET }),
 
-                        await t.step("some should be 'A'", async () => {
-                            const data = await client.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_SHORT });
-                            assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["children"] });
-                            assert(data.status === "order", "Expected status to be 'order', got: " + data.status);
-                            assert(
-                                data.order.order.side === "A",
-                                "Expected 'side' to be 'A', got: " + data.order.order.side,
-                            );
-                        });
-                    });
+        client.orderStatus({ user: USER_ADDRESS, oid: STATUS_OPEN }),
+        client.orderStatus({ user: USER_ADDRESS, oid: STATUS_FILLED }),
+        client.orderStatus({ user: USER_ADDRESS, oid: STATUS_CANCELED }),
+        client.orderStatus({ user: USER_ADDRESS, oid: STATUS_REJECTED }),
+        client.orderStatus({ user: USER_ADDRESS, oid: STATUS_REDUCE_ONLY_CANCELED }),
 
-                    // Failed to re-find an order with 'children.length > 0'
-                    await t.step({ name: "Check key 'children'", fn: () => {}, ignore: true });
+        client.orderStatus({ user: USER_ADDRESS, oid: CLOID }),
+        client.orderStatus({ user: USER_ADDRESS, oid: WITHOUT_CLOID }),
+    ]);
 
-                    await t.step("Check key 'orderType'", async (t) => {
-                        // Failed to find an order with 'orderType === Market'
-                        await t.step({ name: "some should be 'Market'", fn: () => {}, ignore: true });
-
-                        await t.step("some should be 'Limit'", async () => {
-                            const data = await client.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_LIMIT });
-                            assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["children"] });
-                            assert(data.status === "order", "Expected status to be 'order', got: " + data.status);
-                            assert(
-                                data.order.order.orderType === "Limit",
-                                "Expected 'orderType' to be 'Limit', got: " + data.order.order.orderType,
-                            );
-                        });
-
-                        await t.step("some should be 'Stop Market'", async () => {
-                            const data = await client.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_STOP_MARKET });
-                            assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["children"] });
-                            assert(data.status === "order", "Expected status to be 'order', got: " + data.status);
-                            assert(
-                                data.order.order.orderType === "Stop Market",
-                                "Expected 'orderType' to be 'Stop Market', got: " + data.order.order.orderType,
-                            );
-                        });
-
-                        await t.step("some should be 'Stop Limit'", async () => {
-                            const data = await client.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_STOP_LIMIT });
-                            assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["children"] });
-                            assert(data.status === "order", "Expected status to be 'order', got: " + data.status);
-                            assert(
-                                data.order.order.orderType === "Stop Limit",
-                                "Expected 'orderType' to be 'Stop Limit', got: " + data.order.order.orderType,
-                            );
-                        });
-                    });
-
-                    await t.step("Check key 'tif'", async (t) => {
-                        await t.step("some should be null", async () => {
-                            const data = await client.orderStatus({ user: USER_ADDRESS, oid: TIF_NULL });
-                            assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["children"] });
-                            assert(data.status === "order", "Expected status to be 'order', got: " + data.status);
-                            assert(
-                                data.order.order.tif === null,
-                                "Expected 'tif' to be null, got: " + data.order.order.tif,
-                            );
-                        });
-
-                        await t.step("some should be 'Gtc'", async () => {
-                            const data = await client.orderStatus({ user: USER_ADDRESS, oid: TIF_GTC });
-                            assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["children"] });
-                            assert(data.status === "order", "Expected status to be 'order', got: " + data.status);
-                            assert(
-                                data.order.order.tif === "Gtc",
-                                "Expected 'tif' to be 'Gtc', got: " + data.order.order.tif,
-                            );
-                        });
-
-                        await t.step("some should be 'Alo'", async () => {
-                            const data = await client.orderStatus({ user: USER_ADDRESS, oid: TIF_ALO });
-                            assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["children"] });
-                            assert(data.status === "order", "Expected status to be 'order', got: " + data.status);
-                            assert(
-                                data.order.order.tif === "Alo",
-                                "Expected 'tif' to be 'Alo', got: " + data.order.order.tif,
-                            );
-                        });
-
-                        // Failed to find an order with 'tif === Ioc'
-                        await t.step({ name: "some should be 'Ioc'", fn: () => {}, ignore: true });
-
-                        // Failed to find an order with 'tif === FrontendMarket'
-                        await t.step({ name: "some should be 'FrontendMarket'", fn: () => {}, ignore: true });
-
-                        // Failed to find an order with 'tif === LiquidationMarket'
-                        await t.step({ name: "some should be 'LiquidationMarket'", fn: () => {}, ignore: true });
-                    });
-
-                    await t.step("Check key 'cloid'", async (t) => {
-                        await t.step("some should be a 'string'", async () => {
-                            const data = await client.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_LONG });
-                            assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["children"] });
-                            assert(data.status === "order", "Expected status to be 'order', got: " + data.status);
-                            assert(
-                                typeof data.order.order.cloid === "string",
-                                "Expected 'cloid' to be a string, got: " + data.order.order.cloid,
-                            );
-                        });
-
-                        await t.step("some should be 'null'", async () => {
-                            const data = await client.orderStatus({ user: USER_ADDRESS, oid: WITHOUT_CLOID });
-                            assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["children"] });
-                            assert(data.status === "order", "Expected status to be 'order', got: " + data.status);
-                            assert(
-                                data.order.order.cloid === null,
-                                "Expected 'cloid' to be null, got: " + data.order.order.cloid,
-                            );
-                        });
-                    });
-                });
-
-                await t.step("Check key 'order.status'", async (t) => {
-                    await t.step("some should be 'open'", async () => {
-                        const data = await client.orderStatus({ user: USER_ADDRESS, oid: STATUS_OPEN });
-                        assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["children"] });
-                        assert(data.status === "order", "Expected status to be 'order', got: " + data.status);
-                        assert(
-                            data.order.status === "open",
-                            "Expected 'status' to be 'open', got: " + data.order.status,
-                        );
-                    });
-
-                    await t.step("some should be 'filled'", async () => {
-                        const data = await client.orderStatus({ user: USER_ADDRESS, oid: STATUS_FILLED });
-                        assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["children"] });
-                        assert(data.status === "order", "Expected status to be 'order', got: " + data.status);
-                        assert(
-                            data.order.status === "filled",
-                            "Expected 'status' to be 'filled', got: " + data.order.status,
-                        );
-                    });
-
-                    await t.step("some should be 'canceled'", async () => {
-                        const data = await client.orderStatus({ user: USER_ADDRESS, oid: STATUS_CANCELED });
-                        assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["children"] });
-                        assert(data.status === "order", "Expected status to be 'order', got: " + data.status);
-                        assert(
-                            data.order.status === "canceled",
-                            "Expected 'status' to be 'canceled', got: " + data.order.status,
-                        );
-                    });
-
-                    await t.step("some should be 'rejected'", async () => {
-                        const data = await client.orderStatus({ user: USER_ADDRESS, oid: STATUS_REJECTED });
-                        assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["children"] });
-                        assert(data.status === "order", "Expected status to be 'order', got: " + data.status);
-                        assert(
-                            data.order.status === "rejected",
-                            "Expected 'status' to be 'rejected', got: " + data.order.status,
-                        );
-                    });
-
-                    // Failed to find an order with 'order.status === triggered'
-                    await t.step({ name: "some should be 'triggered'", fn: () => {}, ignore: true });
-
-                    // Failed to find an order with 'order.status === marginCanceled'
-                    await t.step({ name: "some should be 'marginCanceled'", fn: () => {}, ignore: true });
-
-                    // Failed to find an order with 'order.status === vaultWithdrawalCanceled'
-                    await t.step({ name: "some should be 'vaultWithdrawalCanceled'", fn: () => {}, ignore: true });
-
-                    // Failed to find an order with 'order.status === openInterestCapCanceled'
-                    await t.step({ name: "some should be 'openInterestCapCanceled'", fn: () => {}, ignore: true });
-
-                    // Failed to find an order with 'order.status === selfTradeCanceled'
-                    await t.step({ name: "some should be 'selfTradeCanceled'", fn: () => {}, ignore: true });
-
-                    // Failed to find an order with 'order.status === reduceOnlyCanceled'
-                    await t.step({ name: "some should be 'reduceOnlyCanceled'", fn: () => {}, ignore: true });
-
-                    // Failed to find an order with 'order.status === siblingFilledCanceled'
-                    await t.step({ name: "some should be 'siblingFilledCanceled'", fn: () => {}, ignore: true });
-
-                    // Failed to find an order with 'order.status === delistedCanceled'
-                    await t.step({ name: "some should be 'delistedCanceled'", fn: () => {}, ignore: true });
-
-                    // Failed to find an order with 'order.status === liquidatedCanceled'
-                    await t.step({ name: "some should be 'liquidatedCanceled'", fn: () => {}, ignore: true });
-
-                    // Failed to find an order with 'order.status === scheduledCancel'
-                    await t.step({ name: "some should be 'scheduledCancel'", fn: () => {}, ignore: true });
-                });
-            });
-
-            await t.step("Check arguments", async (t) => {
-                await t.step("Check argument 'oid: number'", async () => {
-                    const data = await client.orderStatus({ user: USER_ADDRESS, oid: WITHOUT_CLOID });
-                    assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["children"] });
-                    assert(data.status === "order", `Expected status to be 'order', got '${data.status}'`);
-                    assert(
-                        data.order.order.cloid === null,
-                        `Expected 'cloid' to be 'null', but got '${data.order.order.cloid}'`,
-                    );
-                });
-
-                await t.step("Check argument 'oid: hex'", async () => {
-                    const data = await client.orderStatus({ user: USER_ADDRESS, oid: CLOID });
-                    assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["children"] });
-                    assert(data.status === "order", `Expected status to be 'order', got '${data.status}'`);
-                    assert(
-                        data.order.order.cloid === CLOID,
-                        `Expected 'cloid' to be '${CLOID}', got '${data.order.order.cloid}'`,
-                    );
-                });
-            });
+    schemaCoverage(MethodReturnType, data, {
+        ignoreEmptyArrayPaths: [
+            "#/anyOf/0/properties/order/properties/order/properties/children",
+        ],
+        ignoreEnumValuesByPath: {
+            "#/anyOf/0/properties/order/properties/status": [
+                "delistedCanceled",
+                "liquidatedCanceled",
+                "marginCanceled",
+                "openInterestCapCanceled",
+                "scheduledCancel",
+                "selfTradeCanceled",
+                "siblingFilledCanceled",
+                "triggered",
+                "vaultWithdrawalCanceled",
+            ],
         },
-        ignore: !isMatchToScheme,
     });
 });

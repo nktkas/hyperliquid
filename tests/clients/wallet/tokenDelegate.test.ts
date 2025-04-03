@@ -1,54 +1,34 @@
-import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
-import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
-import { assertJsonSchema, isHex } from "../../utils.ts";
 import { HttpTransport, WalletClient } from "../../../mod.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Constants ——————————
 
-const TEST_PRIVATE_KEY = Deno.args[0] as string | undefined;
-
-if (!isHex(TEST_PRIVATE_KEY)) {
-    throw new Error(`Expected a hex string, but got ${typeof TEST_PRIVATE_KEY}`);
-}
+const PRIVATE_KEY = Deno.args[0] as `0x${string}`;
+const VALIDATOR_ADDRESS = "0xa012b9040d83c5cbad9e6ea73c525027b755f596";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = ReturnType<WalletClient["tokenDelegate"]>;
-const MethodReturnType = tsj
-    .createGenerator({ path: fromFileUrl(import.meta.url), skipTypeCheck: true })
-    .createSchema("MethodReturnType");
+export type MethodReturnType = Awaited<ReturnType<WalletClient["tokenDelegate"]>>;
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
 
-Deno.test("tokenDelegate", async (t) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+Deno.test("tokenDelegate", async () => {
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
-    const account = privateKeyToAccount(TEST_PRIVATE_KEY);
+    const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
     const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
 
     // —————————— Test ——————————
 
-    await t.step("Check 'isUndelegate' argument", async (t) => {
-        await t.step("isUndelegate: true", async () => {
-            const result = await walletClient.tokenDelegate({
-                validator: "0xa012b9040d83c5cbad9e6ea73c525027b755f596",
-                wei: 1,
-                isUndelegate: true,
-            });
-            assertJsonSchema(MethodReturnType, result);
-        });
+    // Check argument 'isUndelegate'
+    const data1 = await walletClient.tokenDelegate({ validator: VALIDATOR_ADDRESS, wei: 1, isUndelegate: true });
+    const data2 = await walletClient.tokenDelegate({ validator: VALIDATOR_ADDRESS, wei: 1, isUndelegate: false });
 
-        await t.step("isUndelegate: false", async () => {
-            const result = await walletClient.tokenDelegate({
-                validator: "0xa012b9040d83c5cbad9e6ea73c525027b755f596",
-                wei: 1,
-                isUndelegate: false,
-            });
-            assertJsonSchema(MethodReturnType, result);
-        });
-    });
+    schemaCoverage(MethodReturnType, [data1, data2]);
 });

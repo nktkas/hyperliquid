@@ -1,19 +1,16 @@
-import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
-import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
 import { HttpTransport, PublicClient } from "../../../mod.ts";
-import { assertJsonSchema } from "../../utils.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = ReturnType<PublicClient["vaultSummaries"]>;
-const MethodReturnType = tsj
-    .createGenerator({ path: fromFileUrl(import.meta.url), skipTypeCheck: true })
-    .createSchema("MethodReturnType");
+export type MethodReturnType = Awaited<ReturnType<PublicClient["vaultSummaries"]>>;
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
 
-Deno.test("vaultSummaries", async (t) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+Deno.test("vaultSummaries", async () => {
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
@@ -24,9 +21,7 @@ Deno.test("vaultSummaries", async (t) => {
 
     const data = await client.vaultSummaries();
 
-    await t.step({
-        name: "Matching data to type schema",
-        fn: () => assertJsonSchema(MethodReturnType, data),
-        ignore: data.length === 0, // NOTE: Events cannot be artificially triggered
+    schemaCoverage(MethodReturnType, [data], {
+        ignoreEmptyArrayPaths: ["#"],
     });
 });

@@ -1,53 +1,54 @@
-import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
-import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
-import { assertJsonSchema, getAssetData, isHex } from "../../utils.ts";
+import { BigNumber } from "npm:bignumber.js@^9.1.2";
 import { HttpTransport, PublicClient, WalletClient } from "../../../mod.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
+import { formatPrice, getAssetData } from "../../_utils/utils.ts";
 
 // —————————— Constants ——————————
 
-const TEST_PRIVATE_KEY = Deno.args[0] as string | undefined;
-const TEST_PERPS_ASSET = Deno.args[1] as string | undefined;
-
-if (!isHex(TEST_PRIVATE_KEY)) {
-    throw new Error(`Expected a hex string, but got ${typeof TEST_PRIVATE_KEY}`);
-}
-if (typeof TEST_PERPS_ASSET !== "string") {
-    throw new Error(`Expected a string, but got ${typeof TEST_PERPS_ASSET}`);
-}
+const PRIVATE_KEY = Deno.args[0] as `0x${string}`;
+const PERPS_ASSET = "BTC";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = ReturnType<WalletClient["updateLeverage"]>;
-const MethodReturnType = tsj
-    .createGenerator({ path: fromFileUrl(import.meta.url), skipTypeCheck: true })
-    .createSchema("MethodReturnType");
+export type MethodReturnType = Awaited<ReturnType<WalletClient["updateLeverage"]>>;
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
 
-Deno.test("updateLeverage", async (t) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+Deno.test("updateLeverage", async () => {
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
-    const account = privateKeyToAccount(TEST_PRIVATE_KEY);
+    const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
     const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
     const publicClient = new PublicClient({ transport });
 
-    const { id } = await getAssetData(publicClient, TEST_PERPS_ASSET);
+    const { id, universe, ctx } = await getAssetData(publicClient, PERPS_ASSET);
+    const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
+
+    await walletClient.order({
+        orders: [{
+            a: id,
+            b: false,
+            p: pxDown,
+            s: "0", // Full position size
+            r: true,
+            t: { limit: { tif: "Gtc" } },
+        }],
+        grouping: "na",
+    }).catch(() => undefined);
 
     // —————————— Test ——————————
 
-    await t.step("Check 'isCross' argument", async (t) => {
-        await t.step("isCross: true", async () => {
-            const result = await walletClient.updateLeverage({ asset: id, isCross: true, leverage: 1 });
-            assertJsonSchema(MethodReturnType, result);
-        });
+    const data = await Promise.all([
+        // Check argument 'isCross'
+        walletClient.updateLeverage({ asset: id, isCross: true, leverage: 1 }),
+        walletClient.updateLeverage({ asset: id, isCross: false, leverage: 1 }),
+    ]);
 
-        await t.step("isCross: false", async () => {
-            const result = await walletClient.updateLeverage({ asset: id, isCross: false, leverage: 1 });
-            assertJsonSchema(MethodReturnType, result);
-        });
-    });
+    schemaCoverage(MethodReturnType, data);
 });

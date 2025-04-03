@@ -1,8 +1,6 @@
-import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
-import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
-import { assert } from "jsr:@std/assert@^1.0.10";
 import { HttpTransport, PublicClient } from "../../../mod.ts";
-import { assertJsonSchema } from "../../utils.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Constants ——————————
 
@@ -20,15 +18,13 @@ const TOKEN_ID_WITHOUT_DEPLOY_TIME = "0xc4bf3f870c0e9465323c0b6ed28096c2";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = ReturnType<PublicClient["tokenDetails"]>;
-const MethodReturnType = tsj
-    .createGenerator({ path: fromFileUrl(import.meta.url), skipTypeCheck: true })
-    .createSchema("MethodReturnType");
+export type MethodReturnType = Awaited<ReturnType<PublicClient["tokenDetails"]>>;
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
 
-Deno.test("tokenDetails", async (t) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+Deno.test("tokenDetails", async () => {
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
@@ -37,84 +33,20 @@ Deno.test("tokenDetails", async (t) => {
 
     // —————————— Test ——————————
 
-    const isMatchToScheme = await t.step("Matching data to type schema", async () => {
-        const data = await client.tokenDetails({ tokenId: TOKEN_ID_WITHOUT_GENESIS });
-        assertJsonSchema(MethodReturnType, data);
-    });
+    const data = await Promise.all([
+        client.tokenDetails({ tokenId: TOKEN_ID_WITH_GENESIS }),
+        client.tokenDetails({ tokenId: TOKEN_ID_WITHOUT_GENESIS }),
+        client.tokenDetails({ tokenId: TOKEN_ID_WITH_DEPLOYER }),
+        client.tokenDetails({ tokenId: TOKEN_ID_WITHOUT_DEPLOYER }),
+        client.tokenDetails({ tokenId: TOKEN_ID_WITH_DEPLOY_GAS }),
+        client.tokenDetails({ tokenId: TOKEN_ID_WITHOUT_DEPLOY_GAS }),
+        client.tokenDetails({ tokenId: TOKEN_ID_WITH_DEPLOY_TIME }),
+        client.tokenDetails({ tokenId: TOKEN_ID_WITHOUT_DEPLOY_TIME }),
+    ]);
 
-    await t.step({
-        name: "Additional checks",
-        fn: async (t) => {
-            await t.step("Check key 'genesis'", async (t) => {
-                await t.step("should be an 'object'", async () => {
-                    const data = await client.tokenDetails({ tokenId: TOKEN_ID_WITH_GENESIS });
-                    assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["blacklistUsers"] });
-                    assert(
-                        typeof data.genesis === "object" && data.genesis !== null,
-                        "'genesis' should be an 'object'",
-                    );
-                });
-                await t.step("should be 'null'", async () => {
-                    const data = await client.tokenDetails({ tokenId: TOKEN_ID_WITHOUT_GENESIS });
-                    assertJsonSchema(MethodReturnType, data);
-                    assert(data.genesis === null);
-                });
-            });
-
-            await t.step("Check key 'deployer'", async (t) => {
-                await t.step("should be a 'string'", async () => {
-                    const data = await client.tokenDetails({ tokenId: TOKEN_ID_WITH_DEPLOYER });
-                    assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["blacklistUsers"] });
-                    assert(typeof data.deployer === "string");
-                });
-                await t.step("should be 'null'", async () => {
-                    const data = await client.tokenDetails({ tokenId: TOKEN_ID_WITHOUT_DEPLOYER });
-                    assertJsonSchema(MethodReturnType, data);
-                    assert(data.deployer === null);
-                });
-            });
-
-            await t.step("Check key 'deployGas'", async (t) => {
-                await t.step("should be a 'string'", async () => {
-                    const data = await client.tokenDetails({ tokenId: TOKEN_ID_WITH_DEPLOY_GAS });
-                    assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["blacklistUsers"] });
-                    assert(typeof data.deployGas === "string");
-                });
-                await t.step("should be 'null'", async () => {
-                    const data = await client.tokenDetails({ tokenId: TOKEN_ID_WITHOUT_DEPLOY_GAS });
-                    assertJsonSchema(MethodReturnType, data, {
-                        skipMinItemsCheck: ["blacklistUsers", "nonCirculatingUserBalances"],
-                    });
-                    assert(data.deployGas === null);
-                });
-            });
-
-            await t.step("Check key 'deployTime'", async (t) => {
-                await t.step("should be a 'string'", async () => {
-                    const data = await client.tokenDetails({ tokenId: TOKEN_ID_WITH_DEPLOY_TIME });
-                    assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["blacklistUsers"] });
-                    assert(typeof data.deployTime === "string");
-                });
-                await t.step("should be 'null'", async () => {
-                    const data = await client.tokenDetails({ tokenId: TOKEN_ID_WITHOUT_DEPLOY_TIME });
-                    assertJsonSchema(MethodReturnType, data);
-                    assert(data.deployTime === null);
-                });
-            });
-
-            await t.step("Check key 'nonCirculatingUserBalances'", async () => {
-                const data = await client.tokenDetails({ tokenId: TOKEN_ID_WITH_GENESIS });
-                assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["blacklistUsers"] });
-                assert(
-                    data.nonCirculatingUserBalances.length > 0,
-                    "'nonCirculatingUserBalances' should be a non-empty array",
-                );
-                assert(
-                    data.nonCirculatingUserBalances.every(([a, b]) => typeof a === "string" && typeof b === "string"),
-                    "all elements of 'nonCirculatingUserBalances' should be an array of tuples [string, string]",
-                );
-            });
-        },
-        ignore: !isMatchToScheme,
+    schemaCoverage(MethodReturnType, data, {
+        ignoreEmptyArrayPaths: [
+            "#/properties/genesis/anyOf/0/properties/blacklistUsers",
+        ],
     });
 });

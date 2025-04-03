@@ -1,17 +1,21 @@
-import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
 import { deadline } from "jsr:@std/async@^1.0.10/deadline";
-import { EventClient, WebSocketTransport, type WsUserFundings } from "../../../mod.ts";
-import { assertJsonSchema } from "../../utils.ts";
+import { EventClient, WebSocketTransport } from "../../../mod.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
-// FIXME: Not an in-depth test
-Deno.test("userFundings", async (t) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+// —————————— Constants ——————————
 
-    // —————————— Type schema ——————————
+const USER_ADDRESS = "0xe019d6167E7e324aEd003d94098496b6d986aB05";
 
-    const WsUserFundings = tsj
-        .createGenerator({ path: "./mod.ts", skipTypeCheck: true })
-        .createSchema("WsUserFundings");
+// —————————— Type schema ——————————
+
+export type MethodReturnType = Parameters<Parameters<EventClient["userFundings"]>[1]>[0];
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
+
+// —————————— Test ——————————
+
+Deno.test("userFundings", async () => {
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
@@ -20,28 +24,20 @@ Deno.test("userFundings", async (t) => {
 
     // —————————— Test ——————————
 
-    await t.step("Matching data to type schema", async () => {
-        const data = await deadline(
-            new Promise<WsUserFundings>((resolve, reject) => {
-                const subscrPromise = client.userFundings(
-                    { user: "0xe019d6167E7e324aEd003d94098496b6d986aB05" },
-                    async (data) => {
-                        try {
-                            await (await subscrPromise).unsubscribe();
-                            resolve(data);
-                        } catch (error) {
-                            reject(error);
-                        }
-                    },
-                );
-            }),
-            15_000,
-        );
-        assertJsonSchema(WsUserFundings, data);
+    const data = await deadline(
+        new Promise((resolve) => {
+            client.userFundings({ user: USER_ADDRESS }, resolve);
+        }),
+        15_000,
+    );
+
+    schemaCoverage(MethodReturnType, [data], {
+        ignoreTypesByPath: {
+            "#/properties/fundings/items/properties/nSamples": ["number"],
+        },
     });
 
     // —————————— Cleanup ——————————
 
-    // Close the transport
     await transport.close();
 });

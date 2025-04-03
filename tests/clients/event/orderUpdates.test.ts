@@ -1,4 +1,3 @@
-import { Type } from "npm:@sinclair/typebox@^0.34.14";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import { BigNumber } from "npm:bignumber.js@^9.1.2";
 import { deadline } from "jsr:@std/async@^1.0.10/deadline";
@@ -10,47 +9,22 @@ import {
     WalletClient,
     WebSocketTransport,
 } from "../../../mod.ts";
-import { assertJsonSchema, formatPrice, formatSize, getAssetData, isHex } from "../../utils.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
+import { formatPrice, formatSize, getAssetData, randomCloid } from "../../_utils/utils.ts";
 
-const TEST_PRIVATE_KEY = Deno.args[0] as string | undefined;
-const TEST_PERPS_ASSET = Deno.args[1] as string | undefined;
+const PRIVATE_KEY = Deno.args[0] as `0x${string}`;
+const PERPS_ASSET = "BTC";
 
-if (!isHex(TEST_PRIVATE_KEY)) {
-    throw new Error(`Expected a hex string, but got ${typeof TEST_PRIVATE_KEY}`);
-}
-if (typeof TEST_PERPS_ASSET !== "string") {
-    throw new Error(`Expected a string, but got ${typeof TEST_PERPS_ASSET}`);
-}
+// —————————— Type schema ——————————
 
-Deno.test("orderUpdates", async (t) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+export type MethodReturnType = Parameters<Parameters<EventClient["orderUpdates"]>[1]>[0];
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
-    // —————————— Type schema ——————————
+// —————————— Test ——————————
 
-    const OrderStatusArray = Type.Array(
-        Type.Object({
-            order: Type.Object({
-                coin: Type.String(),
-                side: Type.Union([Type.Literal("B"), Type.Literal("A")]),
-                limitPx: Type.String(),
-                sz: Type.String(),
-                oid: Type.Number(),
-                timestamp: Type.Number(),
-                origSz: Type.String(),
-                cloid: Type.Optional(Type.TemplateLiteral([Type.Literal("0x"), Type.String()])),
-                reduceOnly: Type.Optional(Type.Literal(true)),
-            }),
-            status: Type.Union([
-                Type.Literal("filled"),
-                Type.Literal("open"),
-                Type.Literal("canceled"),
-                Type.Literal("triggered"),
-                Type.Literal("rejected"),
-                Type.Literal("marginCanceled"),
-            ]),
-            statusTimestamp: Type.Number(),
-        }),
-    );
+Deno.test("orderUpdates", { sanitizeOps: false, sanitizeResources: false }, async () => {
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
@@ -58,270 +32,128 @@ Deno.test("orderUpdates", async (t) => {
     const publicClient = new PublicClient({ transport });
     const eventClient = new EventClient({ transport });
     const walletClient = new WalletClient({
-        wallet: privateKeyToAccount(TEST_PRIVATE_KEY),
+        wallet: privateKeyToAccount(PRIVATE_KEY),
         transport,
         isTestnet: true,
     });
 
     // —————————— Test ——————————
 
-    const isMatchToScheme = await t.step("Matching data to type schema", async () => {
-        const data = await deadline(
-            new Promise<OrderStatus<Order>[]>((resolve, reject) => {
-                const subscrPromise = eventClient.orderUpdates(
-                    { user: walletClient.wallet.address },
-                    async (data) => {
-                        try {
-                            await subPromise;
-                            await (await subscrPromise).unsubscribe();
-                            resolve(data);
-                        } catch (error) {
-                            reject(error);
-                        }
-                    },
-                );
-
-                // Create and close an order for triggering the event
-                // deno-lint-ignore no-async-promise-executor
-                const subPromise = new Promise<void>(async (r2, j2) => {
+    const data = await deadline<OrderStatus<Order>[][]>(
+        // deno-lint-ignore no-async-promise-executor
+        new Promise(async (resolve, reject) => {
+            const events: OrderStatus<Order>[][] = [];
+            await eventClient.orderUpdates(
+                { user: walletClient.wallet.address },
+                async (data) => {
                     try {
-                        const { id, universe, ctx } = await getAssetData(publicClient, TEST_PERPS_ASSET);
-                        const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
-                        const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);
-
-                        const openOrder = await walletClient.order({
-                            orders: [
-                                {
-                                    a: id,
-                                    b: true,
-                                    p: pxDown,
-                                    s: sz,
-                                    r: false,
-                                    t: { limit: { tif: "Gtc" } },
-                                },
-                            ],
-                            grouping: "na",
-                        });
-                        const [order] = openOrder.response.data.statuses;
-                        await walletClient.cancel({
-                            cancels: [{ a: id, o: "resting" in order ? order.resting.oid : order.filled.oid }],
-                        });
+                        events.push(data);
+                        await new Promise((resolve) => setTimeout(resolve, 5000));
+                        await Promise.all([order1Promise, order2Promise, order3Promise]);
+                        resolve(events);
                     } catch (error) {
-                        j2(error);
-                    } finally {
-                        r2();
+                        reject(error);
                     }
-                });
-            }),
-            25_000,
-        );
-        assertJsonSchema(OrderStatusArray, data);
-    });
+                },
+            );
 
-    await t.step({
-        name: "Additional checks",
-        fn: async (t) => {
-            await t.step("Check key 'status'", async (t) => {
-                await t.step("some should be 'filled'", async () => {
-                    const data = await deadline(
-                        new Promise<OrderStatus<Order>[]>((resolve, reject) => {
-                            const subscrPromise = eventClient.orderUpdates(
-                                { user: walletClient.wallet.address },
-                                async (data) => {
-                                    try {
-                                        if (data.some((x) => x.status === "filled")) {
-                                            await subPromise;
-                                            await (await subscrPromise).unsubscribe();
-                                            resolve(data);
-                                        }
-                                    } catch (error) {
-                                        reject(error);
-                                    }
-                                },
-                            );
+            const order1Promise = createOrder(publicClient, walletClient, PERPS_ASSET, "open_filled");
+            const order2Promise = createOrder(publicClient, walletClient, PERPS_ASSET, "open_canceled");
+            const order3Promise = createOrder(publicClient, walletClient, PERPS_ASSET, "rejected");
+        }),
+        25_000,
+    );
 
-                            // Create and close an position for triggering the event
-                            // deno-lint-ignore no-async-promise-executor
-                            const subPromise = new Promise<void>(async (r2, j2) => {
-                                try {
-                                    const { id, universe, ctx } = await getAssetData(publicClient, TEST_PERPS_ASSET);
-                                    const pxUp = formatPrice(
-                                        new BigNumber(ctx.markPx).times(1.01),
-                                        universe.szDecimals,
-                                    );
-                                    const pxDown = formatPrice(
-                                        new BigNumber(ctx.markPx).times(0.99),
-                                        universe.szDecimals,
-                                    );
-                                    const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);
-
-                                    await walletClient.order({
-                                        orders: [
-                                            {
-                                                a: id,
-                                                b: true,
-                                                p: pxUp,
-                                                s: sz,
-                                                r: false,
-                                                t: { limit: { tif: "Gtc" } },
-                                            },
-                                        ],
-                                        grouping: "na",
-                                    });
-
-                                    await walletClient.order({
-                                        orders: [{
-                                            a: id,
-                                            b: false,
-                                            p: pxDown,
-                                            s: "0", // Full position size
-                                            r: true,
-                                            t: { limit: { tif: "Gtc" } },
-                                        }],
-                                        grouping: "na",
-                                    });
-                                } catch (error) {
-                                    j2(error);
-                                } finally {
-                                    r2();
-                                }
-                            });
-                        }),
-                        25_000,
-                    );
-                    assertJsonSchema(OrderStatusArray, data);
-                });
-                await t.step("some should be 'open'", async () => {
-                    const data = await deadline(
-                        new Promise<OrderStatus<Order>[]>((resolve, reject) => {
-                            const subscrPromise = eventClient.orderUpdates(
-                                { user: walletClient.wallet.address },
-                                async (data) => {
-                                    try {
-                                        if (data.some((x) => x.status === "open")) {
-                                            await subPromise;
-                                            await (await subscrPromise).unsubscribe();
-                                            resolve(data);
-                                        }
-                                    } catch (error) {
-                                        reject(error);
-                                    }
-                                },
-                            );
-
-                            // Create and close an order for triggering the event
-                            // deno-lint-ignore no-async-promise-executor
-                            const subPromise = new Promise<void>(async (r2, j2) => {
-                                try {
-                                    const { id, universe, ctx } = await getAssetData(publicClient, TEST_PERPS_ASSET);
-                                    const pxDown = formatPrice(
-                                        new BigNumber(ctx.markPx).times(0.99),
-                                        universe.szDecimals,
-                                    );
-                                    const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);
-
-                                    const openOrder = await walletClient.order({
-                                        orders: [
-                                            {
-                                                a: id,
-                                                b: true,
-                                                p: pxDown,
-                                                s: sz,
-                                                r: false,
-                                                t: { limit: { tif: "Gtc" } },
-                                            },
-                                        ],
-                                        grouping: "na",
-                                    });
-                                    const [order] = openOrder.response.data.statuses;
-                                    await walletClient.cancel({
-                                        cancels: [{
-                                            a: id,
-                                            o: "resting" in order ? order.resting.oid : order.filled.oid,
-                                        }],
-                                    });
-                                } catch (error) {
-                                    j2(error);
-                                } finally {
-                                    r2();
-                                }
-                            });
-                        }),
-                        25_000,
-                    );
-                    assertJsonSchema(OrderStatusArray, data);
-                });
-                await t.step("some should be 'canceled'", async () => {
-                    const data = await deadline(
-                        new Promise<OrderStatus<Order>[]>((resolve, reject) => {
-                            const subscrPromise = eventClient.orderUpdates(
-                                { user: walletClient.wallet.address },
-                                async (data) => {
-                                    try {
-                                        if (data.some((x) => x.status === "canceled")) {
-                                            await subPromise;
-                                            await (await subscrPromise).unsubscribe();
-                                            resolve(data);
-                                        }
-                                    } catch (error) {
-                                        reject(error);
-                                    }
-                                },
-                            );
-
-                            // Create and close an order for triggering the event
-                            // deno-lint-ignore no-async-promise-executor
-                            const subPromise = new Promise<void>(async (r2, j2) => {
-                                try {
-                                    const { id, universe, ctx } = await getAssetData(publicClient, TEST_PERPS_ASSET);
-                                    const pxDown = formatPrice(
-                                        new BigNumber(ctx.markPx).times(0.99),
-                                        universe.szDecimals,
-                                    );
-                                    const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);
-
-                                    const openOrder = await walletClient.order({
-                                        orders: [
-                                            {
-                                                a: id,
-                                                b: true,
-                                                p: pxDown,
-                                                s: sz,
-                                                r: false,
-                                                t: { limit: { tif: "Gtc" } },
-                                            },
-                                        ],
-                                        grouping: "na",
-                                    });
-                                    const [order] = openOrder.response.data.statuses;
-                                    await walletClient.cancel({
-                                        cancels: [{
-                                            a: id,
-                                            o: "resting" in order ? order.resting.oid : order.filled.oid,
-                                        }],
-                                    });
-                                } catch (error) {
-                                    j2(error);
-                                } finally {
-                                    r2();
-                                }
-                            });
-                        }),
-                        25_000,
-                    );
-                    assertJsonSchema(OrderStatusArray, data);
-                });
-                // FIME: Incomplete check
-                await t.step({ name: "some should be 'triggered'", fn: () => {}, ignore: true });
-                await t.step({ name: "some should be 'rejected'", fn: () => {}, ignore: true });
-                await t.step({ name: "some should be 'marginCanceled'", fn: () => {}, ignore: true });
-            });
+    schemaCoverage(MethodReturnType, data, {
+        ignoreEnumValuesByPath: {
+            "#/items/properties/status": [
+                "triggered",
+                "delistedCanceled",
+                "liquidatedCanceled",
+                "marginCanceled",
+                "openInterestCapCanceled",
+                "reduceOnlyCanceled",
+                "scheduledCancel",
+                "selfTradeCanceled",
+                "siblingFilledCanceled",
+                "vaultWithdrawalCanceled",
+            ],
         },
-        ignore: !isMatchToScheme,
     });
 
     // —————————— Cleanup ——————————
 
-    // Close the transport
     await transport.close();
 });
+
+async function createOrder(
+    publicClient: PublicClient,
+    walletClient: WalletClient,
+    asset: string,
+    mode: "open_filled" | "open_canceled" | "rejected",
+): Promise<void> {
+    const { id, universe, ctx } = await getAssetData(publicClient, asset);
+    const pxUp = formatPrice(new BigNumber(ctx.markPx).times(1.01), universe.szDecimals);
+    const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
+    const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);
+
+    if (mode === "open_filled") {
+        await walletClient.order({
+            orders: [{
+                a: id,
+                b: true,
+                p: pxUp,
+                s: sz,
+                r: false,
+                t: { limit: { tif: "Gtc" } },
+                c: randomCloid(),
+            }],
+            grouping: "na",
+        });
+
+        await walletClient.order({
+            orders: [{
+                a: id,
+                b: false,
+                p: pxDown,
+                s: "0",
+                r: true,
+                t: { limit: { tif: "Gtc" } },
+                c: randomCloid(),
+            }],
+            grouping: "na",
+        }).catch(() => undefined);
+    } else if (mode === "open_canceled") {
+        const openOrder = await walletClient.order({
+            orders: [{
+                a: id,
+                b: true,
+                p: pxDown,
+                s: sz,
+                r: false,
+                t: { limit: { tif: "Gtc" } },
+            }],
+            grouping: "na",
+        });
+
+        const [order] = openOrder.response.data.statuses;
+        await walletClient.cancel({
+            cancels: [{
+                a: id,
+                o: "resting" in order ? order.resting.oid : order.filled.oid,
+            }],
+        });
+    } else if (mode === "rejected") {
+        await walletClient.order({
+            orders: [{
+                a: id,
+                b: false,
+                p: pxDown,
+                s: "0",
+                r: true,
+                t: { limit: { tif: "Gtc" } },
+            }],
+            grouping: "na",
+        }).catch(() => undefined);
+    }
+}

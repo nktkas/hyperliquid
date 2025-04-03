@@ -1,32 +1,25 @@
-import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
-import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
 import { generatePrivateKey, privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
-import { assertJsonSchema, isHex } from "../../utils.ts";
 import { HttpTransport, WalletClient } from "../../../mod.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Constants ——————————
 
-const TEST_PRIVATE_KEY = Deno.args[0] as string | undefined;
-
-if (!isHex(TEST_PRIVATE_KEY)) {
-    throw new Error(`Expected a hex string, but got ${typeof TEST_PRIVATE_KEY}`);
-}
+const PRIVATE_KEY = Deno.args[0] as `0x${string}`;
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = ReturnType<WalletClient["setReferrer"]>;
-const MethodReturnType = tsj
-    .createGenerator({ path: fromFileUrl(import.meta.url), skipTypeCheck: true })
-    .createSchema("MethodReturnType");
+export type MethodReturnType = Awaited<ReturnType<WalletClient["setReferrer"]>>;
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
 
 Deno.test("setReferrer", async () => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
-    const account = privateKeyToAccount(TEST_PRIVATE_KEY);
+    const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
     const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
 
@@ -34,13 +27,11 @@ Deno.test("setReferrer", async () => {
     const tempPrivKey = generatePrivateKey();
     const tempAccount = privateKeyToAccount(tempPrivKey);
     const tempWalletClient = new WalletClient({ wallet: tempAccount, transport, isTestnet: true });
-    await walletClient.usdSend({
-        destination: tempAccount.address,
-        amount: "2",
-    });
+    await walletClient.usdSend({ destination: tempAccount.address, amount: "2" });
 
     // —————————— Test ——————————
 
-    const result = await tempWalletClient.setReferrer({ code: "TEST" });
-    assertJsonSchema(MethodReturnType, result);
+    const data = await tempWalletClient.setReferrer({ code: "TEST" });
+
+    schemaCoverage(MethodReturnType, [data]);
 });

@@ -1,8 +1,6 @@
-import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
-import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
-import { assert } from "jsr:@std/assert@^1.0.10";
 import { HttpTransport, PublicClient } from "../../../mod.ts";
-import { assertJsonSchema } from "../../utils.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Constants ——————————
 
@@ -10,15 +8,13 @@ const USER_ADDRESS = "0x563C175E6f11582f65D6d9E360A618699DEe14a9";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = ReturnType<PublicClient["userTwapSliceFills"]>;
-const MethodReturnType = tsj
-    .createGenerator({ path: fromFileUrl(import.meta.url), skipTypeCheck: true })
-    .createSchema("MethodReturnType");
+export type MethodReturnType = Awaited<ReturnType<PublicClient["userTwapSliceFills"]>>;
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
 
-Deno.test("userTwapSliceFills", async (t) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+Deno.test("userTwapSliceFills", async () => {
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
@@ -29,22 +25,5 @@ Deno.test("userTwapSliceFills", async (t) => {
 
     const data = await client.userTwapSliceFills({ user: USER_ADDRESS });
 
-    const isMatchToScheme = await t.step("Matching data to type schema", () => {
-        assertJsonSchema(MethodReturnType, data);
-    });
-
-    await t.step({
-        name: "Additional checks",
-        fn: async (t) => {
-            await t.step("Check key 'side'", async (t) => {
-                await t.step("some should be 'B'", () => {
-                    assert(data.some((userTwapSliceFill) => userTwapSliceFill.fill.side === "B"));
-                });
-                await t.step("some should be 'A'", () => {
-                    assert(data.some((userTwapSliceFill) => userTwapSliceFill.fill.side === "A"));
-                });
-            });
-        },
-        ignore: !isMatchToScheme,
-    });
+    schemaCoverage(MethodReturnType, [data]);
 });

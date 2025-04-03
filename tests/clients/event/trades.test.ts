@@ -1,17 +1,17 @@
-import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
 import { deadline } from "jsr:@std/async@^1.0.10/deadline";
-import { assertGreater } from "jsr:@std/assert@^1.0.10";
-import { EventClient, WebSocketTransport, type WsTrade } from "../../../mod.ts";
-import { assertJsonSchema } from "../../utils.ts";
+import { EventClient, WebSocketTransport } from "../../../mod.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
-Deno.test("trades", async (t) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+// —————————— Type schema ——————————
 
-    // —————————— Type schema ——————————
+export type MethodReturnType = Parameters<Parameters<EventClient["trades"]>[1]>[0];
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
-    const WsTrade = tsj
-        .createGenerator({ path: "./mod.ts", skipTypeCheck: true })
-        .createSchema("WsTrade");
+// —————————— Test ——————————
+
+Deno.test("trades", async () => {
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
@@ -20,26 +20,16 @@ Deno.test("trades", async (t) => {
 
     // —————————— Test ——————————
 
-    await t.step("Matching data to type schema", async () => {
-        const data = await deadline(
-            new Promise<WsTrade[]>((resolve, reject) => {
-                const subscrPromise = client.trades({ coin: "ETH" }, async (data) => {
-                    try {
-                        await (await subscrPromise).unsubscribe();
-                        resolve(data);
-                    } catch (error) {
-                        reject(error);
-                    }
-                });
-            }),
-            15_000,
-        );
-        assertGreater(data.length, 0, "Expected data to have at least one element");
-        data.forEach((item) => assertJsonSchema(WsTrade, item));
-    });
+    const data = await deadline(
+        new Promise((resolve) => {
+            client.trades({ coin: "ETH" }, resolve);
+        }),
+        15_000,
+    );
+
+    schemaCoverage(MethodReturnType, [data]);
 
     // —————————— Cleanup ——————————
 
-    // Close the transport
     await transport.close();
 });

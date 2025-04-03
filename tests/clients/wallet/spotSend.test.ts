@@ -1,32 +1,27 @@
-import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
-import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
-import { assertJsonSchema, generateEthereumAddress, isHex } from "../../utils.ts";
 import { HttpTransport, WalletClient } from "../../../mod.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Constants ——————————
 
-const TEST_PRIVATE_KEY = Deno.args[0] as string | undefined;
-
-if (!isHex(TEST_PRIVATE_KEY)) {
-    throw new Error(`Expected a hex string, but got ${typeof TEST_PRIVATE_KEY}`);
-}
+const PRIVATE_KEY = Deno.args[0] as `0x${string}`;
+const DESTINATION_ADDRESS = "0x0000000000000000000000000000000000000000";
+const TOKEN_ADDRESS = "USDC:0xeb62eee3685fc4c43992febcd9e75443";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = ReturnType<WalletClient["spotSend"]>;
-const MethodReturnType = tsj
-    .createGenerator({ path: fromFileUrl(import.meta.url), skipTypeCheck: true })
-    .createSchema("MethodReturnType");
+export type MethodReturnType = Awaited<ReturnType<WalletClient["spotSend"]>>;
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
 
 Deno.test("spotSend", async () => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
-    const account = privateKeyToAccount(TEST_PRIVATE_KEY as `0x${string}`);
+    const account = privateKeyToAccount(PRIVATE_KEY as `0x${string}`);
     const transport = new HttpTransport({ isTestnet: true });
     const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
 
@@ -38,10 +33,11 @@ Deno.test("spotSend", async () => {
 
     // —————————— Test ——————————
 
-    const result = await walletClient.spotSend({
-        destination: generateEthereumAddress(),
-        token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
+    const data = await walletClient.spotSend({
+        destination: DESTINATION_ADDRESS,
+        token: TOKEN_ADDRESS,
         amount: "1",
     });
-    assertJsonSchema(MethodReturnType, result);
+
+    schemaCoverage(MethodReturnType, [data]);
 });

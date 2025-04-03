@@ -1,29 +1,24 @@
-import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
 import { deadline } from "jsr:@std/async@^1.0.10/deadline";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import { BigNumber } from "npm:bignumber.js@^9.1.2";
-import { EventClient, PublicClient, WalletClient, WebSocketTransport, type WsWebData2 } from "../../../mod.ts";
-import { assertJsonSchema, formatPrice, formatSize, getAssetData, isHex } from "../../utils.ts";
+import { EventClient, PublicClient, WalletClient, WebSocketTransport } from "../../../mod.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
+import { formatPrice, formatSize, getAssetData, randomCloid } from "../../_utils/utils.ts";
 
-const TEST_PRIVATE_KEY = Deno.args[0] as string | undefined;
-const TEST_PERPS_ASSET = Deno.args[1] as string | undefined;
+const PRIVATE_KEY = Deno.args[0] as `0x${string}`;
+const PERPS_ASSET_1 = "BTC";
+const PERPS_ASSET_2 = "ETH";
 
-if (!isHex(TEST_PRIVATE_KEY)) {
-    throw new Error(`Expected a hex string, but got ${typeof TEST_PRIVATE_KEY}`);
-}
-if (typeof TEST_PERPS_ASSET !== "string") {
-    throw new Error(`Expected a string, but got ${typeof TEST_PERPS_ASSET}`);
-}
+// —————————— Type schema ——————————
 
-// FIXME: Not an in-depth test
-Deno.test("webData2", async (t) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+export type MethodReturnType = Parameters<Parameters<EventClient["webData2"]>[1]>[0];
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
-    // —————————— Type schema ——————————
+// —————————— Test ——————————
 
-    const WsWebData2 = tsj
-        .createGenerator({ path: "./mod.ts", skipTypeCheck: true })
-        .createSchema("WsWebData2");
+Deno.test("webData2", async () => {
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
@@ -32,105 +27,168 @@ Deno.test("webData2", async (t) => {
     const publicClient = new PublicClient({ transport });
     const eventClient = new EventClient({ transport });
     const walletClient = new WalletClient({
-        wallet: privateKeyToAccount(TEST_PRIVATE_KEY),
+        wallet: privateKeyToAccount(PRIVATE_KEY),
         transport,
         isTestnet: true,
     });
 
     // Get asset data
-    const { id, universe, ctx } = await getAssetData(publicClient, TEST_PERPS_ASSET);
+    const { id: id1, pxUp: pxUp1, pxDown: pxDown1, sz: sz1, twapSz: twapSz1 } = await getAssetDataExtended(
+        publicClient,
+        PERPS_ASSET_1,
+    );
+    const { id: id2, pxUp: pxUp2, pxDown: pxDown2, sz: sz2, twapSz: twapSz2 } = await getAssetDataExtended(
+        publicClient,
+        PERPS_ASSET_2,
+    );
+
+    await Promise.all([
+        walletClient.updateLeverage({ asset: id1, isCross: true, leverage: 5 }),
+        walletClient.updateLeverage({ asset: id2, isCross: false, leverage: 5 }),
+    ]);
+    const [twap1, twap2] = await Promise.all([
+        // Create TWAP orders
+        walletClient.twapOrder({ a: id1, b: true, s: twapSz1, r: false, m: 5, t: false }),
+        walletClient.twapOrder({ a: id2, b: false, s: twapSz2, r: false, m: 5, t: false }),
+        // Create orders
+        walletClient.order({
+            orders: [{ a: id1, b: true, p: pxDown1, s: sz1, r: false, t: { limit: { tif: "Gtc" } } }],
+            grouping: "na",
+        }),
+        walletClient.order({
+            orders: [{ a: id1, b: false, p: pxUp1, s: sz1, r: false, t: { limit: { tif: "Gtc" } } }],
+            grouping: "na",
+        }),
+        walletClient.order({
+            orders: [{ a: id1, b: false, p: pxUp1, s: sz1, r: false, t: { limit: { tif: "Alo" } }, c: randomCloid() }],
+            grouping: "na",
+        }),
+        walletClient.order({ // orderType = "Stop Market"
+            orders: [{
+                a: id1,
+                b: false,
+                p: pxDown1,
+                s: sz1,
+                r: false,
+                t: { trigger: { isMarket: true, tpsl: "sl", triggerPx: pxDown1 } },
+            }],
+            grouping: "na",
+        }),
+        walletClient.order({ // orderType = "Stop Limit"
+            orders: [{
+                a: id1,
+                b: false,
+                p: pxDown1,
+                s: sz1,
+                r: false,
+                t: { trigger: { isMarket: false, tpsl: "sl", triggerPx: pxDown1 } },
+            }],
+            grouping: "na",
+        }),
+        // Create positions
+        walletClient.order({
+            orders: [{ a: id1, b: true, p: pxUp1, s: sz1, r: false, t: { limit: { tif: "Gtc" } } }],
+            grouping: "na",
+        }),
+        walletClient.order({
+            orders: [{ a: id2, b: false, p: pxDown2, s: sz2, r: false, t: { limit: { tif: "Gtc" } } }],
+            grouping: "na",
+        }),
+        // Change spot dusting opt-out
+        walletClient.spotUser({ toggleSpotDusting: { optOut: true } }),
+    ]);
+
+    // —————————— Test ——————————
+
+    try {
+        const data = await deadline(
+            new Promise((resolve) => {
+                eventClient.webData2({ user: walletClient.wallet.address }, resolve);
+            }),
+            40_000,
+        );
+
+        schemaCoverage(MethodReturnType, [data], {
+            ignoreBranchesByPath: {
+                "#/properties/openOrders/items/properties/tif/anyOf": [
+                    1, // tif = null
+                ],
+                "#/properties/agentAddress/anyOf": [
+                    1, // agentAddress = null
+                ],
+            },
+            ignoreEmptyArrayPaths: [
+                "#/properties/openOrders/items/properties/children",
+            ],
+            ignoreEnumValuesByPath: {
+                "#/properties/openOrders/items/properties/orderType": [
+                    "Market",
+                    "Take Profit Limit",
+                    "Take Profit Market",
+                ],
+                "#/properties/openOrders/items/properties/tif/anyOf/0": ["FrontendMarket", "Ioc", "LiquidationMarket"],
+            },
+            ignoreTypesByPath: {
+                "#/properties/agentValidUntil": ["null"], // related to agentAddress
+            },
+        });
+    } finally {
+        // —————————— Cleanup ——————————
+
+        // Close open orders & TWAP's
+        const openOrders = await publicClient.openOrders({ user: walletClient.wallet.address });
+        const cancels = openOrders.map((o) => ({ a: o.coin === PERPS_ASSET_1 ? id1 : id2, o: o.oid }));
+        await Promise.all([
+            walletClient.cancel({ cancels }),
+            walletClient.twapCancel({ a: id1, t: twap1.response.data.status.running.twapId }),
+            walletClient.twapCancel({ a: id2, t: twap2.response.data.status.running.twapId }),
+        ]);
+
+        // Close open positions
+        await Promise.all([
+            walletClient.order({
+                orders: [{
+                    a: id1,
+                    b: false,
+                    p: pxDown1,
+                    s: "0", // Full position size
+                    r: true,
+                    t: { limit: { tif: "Gtc" } },
+                }],
+                grouping: "na",
+            }),
+            walletClient.order({
+                orders: [{
+                    a: id2,
+                    b: true,
+                    p: pxUp2,
+                    s: "0", // Full position size
+                    r: true,
+                    t: { limit: { tif: "Gtc" } },
+                }],
+                grouping: "na",
+            }),
+        ]);
+
+        // Change spot dusting opt-out
+        await walletClient.spotUser({ toggleSpotDusting: { optOut: false } });
+
+        // Close the transport
+        await transport.close();
+    }
+});
+
+async function getAssetDataExtended(publicClient: PublicClient, asset: string): Promise<{
+    id: number;
+    pxUp: string;
+    pxDown: string;
+    sz: string;
+    twapSz: string;
+}> {
+    const { id, universe, ctx } = await getAssetData(publicClient, asset);
     const pxUp = formatPrice(new BigNumber(ctx.markPx).times(1.01), universe.szDecimals);
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);
     const twapSz = formatSize(new BigNumber(55).div(ctx.markPx), universe.szDecimals);
-
-    // Create an order
-    const openOrder = await walletClient.order({
-        orders: [
-            {
-                a: id,
-                b: true,
-                p: pxDown,
-                s: sz,
-                r: false,
-                t: { limit: { tif: "Gtc" } },
-            },
-        ],
-        grouping: "na",
-    });
-    const [order] = openOrder.response.data.statuses;
-
-    // Create a position
-    await walletClient.order({
-        orders: [
-            {
-                a: id,
-                b: true,
-                p: pxUp,
-                s: sz,
-                r: false,
-                t: { limit: { tif: "Gtc" } },
-            },
-        ],
-        grouping: "na",
-    });
-
-    // Create a twap
-    const result = await walletClient.twapOrder({
-        a: id,
-        b: true,
-        s: twapSz,
-        r: false,
-        m: 5,
-        t: false,
-    });
-    const twapId = result.response.data.status.running.twapId;
-
-    // —————————— Test ——————————
-
-    await t.step("Matching data to type schema", async () => {
-        const data = await deadline(
-            new Promise<WsWebData2>((resolve, reject) => {
-                const subscrPromise = eventClient.webData2(
-                    { user: walletClient.wallet.address },
-                    async (data) => {
-                        try {
-                            await (await subscrPromise).unsubscribe();
-                            resolve(data);
-                        } catch (error) {
-                            reject(error);
-                        }
-                    },
-                );
-            }),
-            40_000,
-        );
-        assertJsonSchema(WsWebData2, data, { skipMinItemsCheck: ["children"] });
-    });
-
-    // —————————— Cleanup ——————————
-
-    // Close the order
-    await walletClient.cancel({
-        cancels: [{ a: id, o: "resting" in order ? order.resting.oid : order.filled.oid }],
-    });
-
-    // Close the twap
-    await walletClient.twapCancel({ a: id, t: twapId });
-
-    // Close the position
-    await walletClient.order({
-        orders: [{
-            a: id,
-            b: false,
-            p: pxDown,
-            s: "0", // Full position size
-            r: true,
-            t: { limit: { tif: "Gtc" } },
-        }],
-        grouping: "na",
-    });
-
-    // Close the transport
-    await transport.close();
-});
+    return { id, pxUp, pxDown, sz, twapSz };
+}

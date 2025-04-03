@@ -1,7 +1,6 @@
-import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
-import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
 import { HttpTransport, PublicClient } from "../../../mod.ts";
-import { assertJsonSchema } from "../../utils.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Constants ——————————
 
@@ -9,15 +8,13 @@ const USER_ADDRESS = "0xe019d6167E7e324aEd003d94098496b6d986aB05";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = ReturnType<PublicClient["userDetails"]>;
-const MethodReturnType = tsj
-    .createGenerator({ path: fromFileUrl(import.meta.url), skipTypeCheck: true })
-    .createSchema("MethodReturnType");
+export type MethodReturnType = Awaited<ReturnType<PublicClient["userDetails"]>>;
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
 
-Deno.test("userDetails", async (t) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+Deno.test("userDetails", async () => {
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
@@ -26,8 +23,11 @@ Deno.test("userDetails", async (t) => {
 
     // —————————— Test ——————————
 
-    await t.step("Matching data to type schema", async () => {
-        const data = await client.userDetails({ user: USER_ADDRESS });
-        assertJsonSchema(MethodReturnType, data);
+    const data = await client.userDetails({ user: USER_ADDRESS });
+
+    schemaCoverage(MethodReturnType, [data], {
+        ignoreTypesByPath: {
+            "#/properties/txs/items/properties/error": ["string"],
+        },
     });
 });

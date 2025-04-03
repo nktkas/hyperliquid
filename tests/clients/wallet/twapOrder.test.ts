@@ -1,46 +1,38 @@
-import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
-import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import { BigNumber } from "npm:bignumber.js@^9.1.2";
-import { assertJsonSchema, formatSize, getAssetData, isHex } from "../../utils.ts";
 import { HttpTransport, PublicClient, WalletClient } from "../../../mod.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
+import { formatSize, getAssetData } from "../../_utils/utils.ts";
 
 // —————————— Constants ——————————
 
-const TEST_PRIVATE_KEY = Deno.args[0] as string | undefined;
-const TEST_PERPS_ASSET = Deno.args[1] as string | undefined;
-
-if (!isHex(TEST_PRIVATE_KEY)) {
-    throw new Error(`Expected a hex string, but got ${typeof TEST_PRIVATE_KEY}`);
-}
-if (typeof TEST_PERPS_ASSET !== "string") {
-    throw new Error(`Expected a string, but got ${typeof TEST_PERPS_ASSET}`);
-}
+const PRIVATE_KEY = Deno.args[0] as `0x${string}`;
+const PERPS_ASSET = "BTC";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = ReturnType<WalletClient["twapOrder"]>;
-const MethodReturnType = tsj
-    .createGenerator({ path: fromFileUrl(import.meta.url), skipTypeCheck: true })
-    .createSchema("MethodReturnType");
+export type MethodReturnType = Awaited<ReturnType<WalletClient["twapOrder"]>>;
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
 
 Deno.test("twapOrder", async () => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
-    const account = privateKeyToAccount(TEST_PRIVATE_KEY);
+    const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
     const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
     const publicClient = new PublicClient({ transport });
 
-    const { id, universe, ctx } = await getAssetData(publicClient, TEST_PERPS_ASSET);
+    const { id, universe, ctx } = await getAssetData(publicClient, PERPS_ASSET);
     const sz = formatSize(new BigNumber(55).div(ctx.markPx), universe.szDecimals);
 
     // —————————— Test ——————————
-    const result = await walletClient.twapOrder({
+
+    const data = await walletClient.twapOrder({
         a: id,
         b: true,
         s: sz,
@@ -48,10 +40,17 @@ Deno.test("twapOrder", async () => {
         m: 5,
         t: false,
     });
-    assertJsonSchema(MethodReturnType, result);
 
-    // —————————— Cleanup ——————————
+    try {
+        schemaCoverage(MethodReturnType, [data], {
+            ignoreBranchesByPath: {
+                "#/properties/response/properties/data/properties/status/anyOf": [1], // error
+            },
+        });
+    } finally {
+        // —————————— Cleanup ——————————
 
-    const twapId = result.response.data.status.running.twapId;
-    await walletClient.twapCancel({ a: id, t: twapId });
+        const twapId = data.response.data.status.running.twapId;
+        await walletClient.twapCancel({ a: id, t: twapId });
+    }
 });

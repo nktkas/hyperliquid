@@ -1,28 +1,19 @@
 import { privateKeyToAccount } from "npm:viem@^2.21.54/accounts";
 import { assertRejects } from "jsr:@std/assert@^1.0.10";
 import { ApiRequestError, HttpTransport, WalletClient } from "../../../mod.ts";
-import { isHex } from "../../utils.ts";
 
 // —————————— Constants ——————————
 
-const TEST_PRIVATE_KEY = Deno.args[0] as string | undefined;
-const TEST_PERPS_ASSET = Deno.args[1] as string | undefined;
-
-if (!isHex(TEST_PRIVATE_KEY)) {
-    throw new Error(`Expected a hex string, but got ${typeof TEST_PRIVATE_KEY}`);
-}
-if (typeof TEST_PERPS_ASSET !== "string") {
-    throw new Error(`Expected a string, but got ${typeof TEST_PERPS_ASSET}`);
-}
+const PRIVATE_KEY = Deno.args[0] as `0x${string}`;
 
 // —————————— Test ——————————
 
 Deno.test("_validateResponse", async (t) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
-    const account = privateKeyToAccount(TEST_PRIVATE_KEY);
+    const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
     const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
 

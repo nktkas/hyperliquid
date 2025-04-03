@@ -1,16 +1,17 @@
-import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
 import { deadline } from "jsr:@std/async@^1.0.10/deadline";
-import { EventClient, WebSocketTransport, type WsActiveAssetCtx, type WsActiveSpotAssetCtx } from "../../../mod.ts";
-import { assertJsonSchema } from "../../utils.ts";
+import { EventClient, WebSocketTransport } from "../../../mod.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
-Deno.test("activeAssetCtx", async (t) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+// —————————— Type schema ——————————
 
-    // —————————— Type schema ——————————
+export type MethodReturnType = Parameters<Parameters<EventClient["activeAssetCtx"]>[1]>[0];
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
-    const tsGenerator = tsj.createGenerator({ path: "./mod.ts", skipTypeCheck: true });
-    const WsActiveAssetCtx = tsGenerator.createSchema("WsActiveAssetCtx");
-    const WsActiveSpotAssetCtx = tsGenerator.createSchema("WsActiveSpotAssetCtx");
+// —————————— Test ——————————
+
+Deno.test("activeAssetCtx", async () => {
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
@@ -19,46 +20,38 @@ Deno.test("activeAssetCtx", async (t) => {
 
     // —————————— Test ——————————
 
-    await t.step("return type === WsActiveAssetCtx", async (t) => {
-        await t.step("Matching data to type schema", async () => {
-            const data = await deadline(
-                new Promise<WsActiveAssetCtx>((resolve, reject) => {
-                    const subscrPromise = client.activeAssetCtx({ coin: "BTC" }, async (data) => {
-                        try {
-                            await (await subscrPromise).unsubscribe();
-                            resolve(data as WsActiveAssetCtx);
-                        } catch (error) {
-                            reject(error);
-                        }
-                    });
-                }),
-                15_000,
-            );
-            assertJsonSchema(WsActiveAssetCtx, data);
-        });
-    });
+    const data = await Promise.all([
+        // Check response 'WsActiveAssetCtx'
+        deadline(
+            new Promise((resolve) => {
+                client.activeAssetCtx({ coin: "BTC" }, resolve);
+            }),
+            15_000,
+        ),
+        deadline(
+            new Promise((resolve) => {
+                client.activeAssetCtx({ coin: "AXL" }, resolve);
+            }),
+            15_000,
+        ),
+        // Check response 'WsActiveSpotAssetCtx'
+        deadline(
+            new Promise((resolve) => {
+                client.activeAssetCtx({ coin: "@107" }, resolve);
+            }),
+            15_000,
+        ),
+        deadline(
+            new Promise((resolve) => {
+                client.activeAssetCtx({ coin: "@27" }, resolve);
+            }),
+            15_000,
+        ),
+    ]);
 
-    await t.step("return type === WsActiveSpotAssetCtx", async (t) => {
-        await t.step("Matching data to type schema", async () => {
-            const data = await deadline(
-                new Promise<WsActiveSpotAssetCtx>((resolve, reject) => {
-                    const subscrPromise = client.activeAssetCtx({ coin: "@107" }, async (data) => {
-                        try {
-                            await (await subscrPromise).unsubscribe();
-                            resolve(data as WsActiveSpotAssetCtx);
-                        } catch (error) {
-                            reject(error);
-                        }
-                    });
-                }),
-                15_000,
-            );
-            assertJsonSchema(WsActiveSpotAssetCtx, data);
-        });
-    });
+    schemaCoverage(MethodReturnType, data);
 
     // —————————— Cleanup ——————————
 
-    // Close the transport
     await transport.close();
 });

@@ -1,20 +1,16 @@
-import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
-import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
-import { assert } from "jsr:@std/assert@^1.0.10";
 import { HttpTransport, PublicClient } from "../../../mod.ts";
-import { assertJsonSchema } from "../../utils.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = ReturnType<PublicClient["predictedFundings"]>;
-const MethodReturnType = tsj
-    .createGenerator({ path: fromFileUrl(import.meta.url), skipTypeCheck: true })
-    .createSchema("MethodReturnType");
+export type MethodReturnType = Awaited<ReturnType<PublicClient["predictedFundings"]>>;
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
 
-Deno.test("predictedFundings", async (t) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+Deno.test("predictedFundings", async () => {
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
@@ -25,36 +21,5 @@ Deno.test("predictedFundings", async (t) => {
 
     const data = await client.predictedFundings();
 
-    const isMatchToScheme = await t.step("Matching data to type schema", () => {
-        assertJsonSchema(MethodReturnType, data);
-    });
-
-    await t.step({
-        name: "Additional checks",
-        fn: async (t) => {
-            await t.step("Check key [][1][][1]", async (t) => {
-                await t.step("some should be 'null'", () => {
-                    assert(data.some(([_, item1]) => item1.some(([_, item2]) => item2 === null)));
-                });
-                await t.step("some should be an 'object'", async (t) => {
-                    assert(
-                        data.some(([_, item1]) =>
-                            item1.some(([_, item2]) => typeof item2 === "object" && item2 !== null)
-                        ),
-                    );
-                    await t.step("some should have 'fundingIntervalHours'", () => {
-                        assert(
-                            data.some(([_, item1]) =>
-                                item1.some(([_, item2]) =>
-                                    typeof item2 === "object" && item2 !== null &&
-                                    typeof item2.fundingIntervalHours === "number"
-                                )
-                            ),
-                        );
-                    });
-                });
-            });
-        },
-        ignore: !isMatchToScheme,
-    });
+    schemaCoverage(MethodReturnType, [data]);
 });

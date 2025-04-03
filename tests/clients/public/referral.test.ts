@@ -1,8 +1,6 @@
-import * as tsj from "npm:ts-json-schema-generator@^2.3.0";
-import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
-import { assert } from "jsr:@std/assert@^1.0.10";
 import { HttpTransport, PublicClient } from "../../../mod.ts";
-import { assertJsonSchema } from "../../utils.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Constants ——————————
 
@@ -15,86 +13,29 @@ const REWARD_HISTORY = "0x745d208c08be6743481cdaf5984956be87ec5a3f"; // Mainnet
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = ReturnType<PublicClient["referral"]>;
-const MethodReturnType = tsj
-    .createGenerator({ path: fromFileUrl(import.meta.url), skipTypeCheck: true })
-    .createSchema("MethodReturnType");
+export type MethodReturnType = Awaited<ReturnType<PublicClient["referral"]>>;
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
 
-Deno.test("referral", async (t) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+Deno.test("referral", async () => {
+    if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
-    const transport = new HttpTransport({ isTestnet: true });
-    const client = new PublicClient({ transport });
+    const client = new PublicClient({ transport: new HttpTransport({ isTestnet: true }) });
+    const mainnetClient = new PublicClient({ transport: new HttpTransport({ isTestnet: false }) });
 
     // —————————— Test ——————————
 
-    const isMatchToScheme = await t.step("Matching data to type schema", async () => {
-        const data = await client.referral({ user: REFERRED });
-        assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["rewardHistory"] });
-    });
+    const data = await Promise.all([
+        client.referral({ user: NON_REFERRED }),
+        client.referral({ user: REFERRED }),
+        client.referral({ user: STATE_READY }),
+        client.referral({ user: STATE_NEED_TO_CREATE_CODE }),
+        client.referral({ user: STATE_NEED_TO_TRADE }),
+        mainnetClient.referral({ user: REWARD_HISTORY }),
+    ]);
 
-    await t.step({
-        name: "Additional checks",
-        fn: async (t) => {
-            await t.step("Check key 'referredBy'", async (t) => {
-                await t.step("should be 'null'", async () => {
-                    const data = await client.referral({ user: NON_REFERRED });
-                    assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["rewardHistory"] });
-                    assert(
-                        data.referredBy === null,
-                        "'referredBy' should be 'null', but got: " + data.referredBy,
-                    );
-                });
-                await t.step("should be an 'object'", async () => {
-                    const data = await client.referral({ user: REFERRED });
-                    assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["rewardHistory"] });
-                    assert(
-                        typeof data.referredBy === "object" && data.referredBy !== null,
-                        "'referredBy' should be an 'object', but got: " + data.referredBy,
-                    );
-                });
-            });
-
-            await t.step("Check key 'referrerState'", async (t) => {
-                await t.step("Check key 'stage'", async (t) => {
-                    await t.step("should be 'ready'", async () => {
-                        const data = await client.referral({ user: STATE_READY });
-                        assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["rewardHistory"] });
-                        assert(
-                            data.referrerState.stage === "ready",
-                            "stage should be 'ready', but got: " + data.referrerState.stage,
-                        );
-                    });
-                    await t.step("should be 'needToCreateCode'", async () => {
-                        const data = await client.referral({ user: STATE_NEED_TO_CREATE_CODE });
-                        assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["rewardHistory"] });
-                        assert(
-                            data.referrerState.stage === "needToCreateCode",
-                            "stage should be 'needToCreateCode', but got: " + data.referrerState.stage,
-                        );
-                    });
-                    await t.step("should be 'needToTrade'", async () => {
-                        const data = await client.referral({ user: STATE_NEED_TO_TRADE });
-                        assertJsonSchema(MethodReturnType, data, { skipMinItemsCheck: ["rewardHistory"] });
-                        assert(
-                            data.referrerState.stage === "needToTrade",
-                            "stage should be 'needToTrade', but got: " + data.referrerState.stage,
-                        );
-                    });
-                });
-            });
-
-            await t.step("Check key 'rewardHistory'", async () => {
-                // REWARD_HISTORY is required by mainnet
-                client.transport.isTestnet = false;
-                const data = await client.referral({ user: REWARD_HISTORY });
-                assertJsonSchema(MethodReturnType, data);
-            });
-        },
-        ignore: !isMatchToScheme,
-    });
+    schemaCoverage(MethodReturnType, data);
 });
