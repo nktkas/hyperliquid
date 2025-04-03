@@ -15,6 +15,7 @@ export interface VaultDetails {
     portfolio: PortfolioPeriods;
     /** Annual percentage rate. */
     apr: number;
+    /** Current user's follower state */
     followerState: VaultFollowerState | null;
     /** Ownership percentage held by leader. */
     leaderFraction: number;
