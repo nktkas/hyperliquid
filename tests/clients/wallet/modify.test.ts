@@ -31,21 +31,56 @@ Deno.test("modify", async () => {
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);
 
-    const openOrderRes = await walletClient.order({
-        orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
-        grouping: "na",
-    });
-    const [order] = openOrderRes.response.data.statuses;
-
     // —————————— Test ——————————
 
     try {
-        const data = await walletClient.modify({
-            oid: "resting" in order ? order.resting.oid : order.filled.oid,
-            order: { a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } },
-        });
+        const data = await Promise.all([
+            (async () => {
+                const openOrderRes = await walletClient.order({
+                    orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
+                    grouping: "na",
+                });
+                const [order] = openOrderRes.response.data.statuses;
+                return await walletClient.modify({
+                    oid: "resting" in order ? order.resting.oid : order.filled.oid,
+                    order: {
+                        a: id,
+                        b: true,
+                        p: pxDown,
+                        s: sz,
+                        r: false,
+                        t: { limit: { tif: "Gtc" } },
+                    },
+                });
+            })(),
+            // Check argument 't.trigger'
+            (async () => {
+                const openOrderRes = await walletClient.order({
+                    orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
+                    grouping: "na",
+                });
+                const [order] = openOrderRes.response.data.statuses;
+                return await walletClient.modify({
+                    oid: "resting" in order ? order.resting.oid : order.filled.oid,
+                    order: {
+                        a: id,
+                        b: true,
+                        p: pxDown,
+                        s: sz, 
+                        r: false,
+                        t: {
+                            trigger: {
+                                isMarket: false,
+                                tpsl: "tp",
+                                triggerPx: pxDown,
+                            },
+                        },
+                    },
+                });
+            })(),
+        ]);
 
-        schemaCoverage(MethodReturnType, [data]);
+        schemaCoverage(MethodReturnType, data);
     } finally {
         // —————————— Cleanup ——————————
 

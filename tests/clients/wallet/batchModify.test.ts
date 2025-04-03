@@ -120,6 +120,33 @@ Deno.test("batchModify", async () => {
                     }],
                 });
             })(),
+            // Check argument 't.trigger'
+            (async () => {
+                const orderResp = await walletClient.order({
+                    orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
+                    grouping: "na",
+                });
+                const [order] = orderResp.response.data.statuses;
+                return await walletClient.batchModify({
+                    modifies: [{
+                        oid: "resting" in order ? order.resting.oid : order.filled.oid,
+                        order: {
+                            a: id,
+                            b: true,
+                            p: pxDown,
+                            s: sz,
+                            r: false,
+                            t: {
+                                trigger: {
+                                    isMarket: false,
+                                    tpsl: "tp",
+                                    triggerPx: pxDown,
+                                },
+                            },
+                        },
+                    }],
+                });
+            })(),
         ]);
 
         schemaCoverage(MethodReturnType, data, {
