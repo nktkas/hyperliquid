@@ -66,7 +66,7 @@ Deno.test("modify", async () => {
                         a: id,
                         b: true,
                         p: pxDown,
-                        s: sz, 
+                        s: sz,
                         r: false,
                         t: {
                             trigger: {
