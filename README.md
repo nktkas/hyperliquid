@@ -321,6 +321,7 @@ class WalletClient {
     claimRewards(): Promise<SuccessResponse>;
     createSubAccount(args: CreateSubAccountParameters): Promise<CreateSubAccountResponse>;
     evmUserModify(args: EvmUserModifyParameters): Promise<SuccessResponse>;
+    registerReferrer(args: RegisterReferrerParameters): Promise<SuccessResponse>;
     reserveRequestWeight(args: ReserveRequestWeightParameters): Promise<SuccessResponse>;
     setDisplayName(args: SetDisplayNameParameters): Promise<SuccessResponse>;
     setReferrer(args: SetReferrerParameters): Promise<SuccessResponse>;

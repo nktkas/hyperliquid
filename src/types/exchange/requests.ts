@@ -321,6 +321,21 @@ export interface OrderRequest extends BaseExchangeRequest {
 }
 
 /**
+ * Create a referral code.
+ * @returns {SuccessResponse}
+ * @see null - no documentation
+ */
+export interface RegisterReferrerRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "registerReferrer";
+        /** Referral code to create. */
+        code: string;
+    };
+}
+
+/**
  * Reserve additional rate-limited actions for a fee.
  * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#reserve-additional-actions

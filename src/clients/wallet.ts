@@ -13,6 +13,7 @@ import type {
     EvmUserModifyRequest,
     ModifyRequest,
     OrderRequest,
+    RegisterReferrerRequest,
     ReserveRequestWeightRequest,
     ScheduleCancelRequest,
     SetDisplayNameRequest,
@@ -171,6 +172,9 @@ export type ModifyParameters =
 export type OrderParameters =
     & Omit<OrderRequest["action"], "type">
     & Partial<Pick<OrderRequest, "vaultAddress">>;
+
+/** Parameters for the {@linkcode WalletClient.registerReferrer} method. */
+export type RegisterReferrerParameters = Omit<RegisterReferrerRequest["action"], "type">;
 
 /** Parameters for the {@linkcode WalletClient.reserveRequestWeight} method. */
 export type ReserveRequestWeightParameters = Omit<
@@ -1333,10 +1337,57 @@ export class WalletClient<
     }
 
     /**
+     * Create a referral code.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
+     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @see null - no documentation
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
+     * const result = await client.registerReferrer({ code: "TEST" });
+     * ```
+     */
+    async registerReferrer(args: RegisterReferrerParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Construct an action
+        const nonce = await this.nonceManager();
+        const action: RegisterReferrerRequest["action"] = {
+            type: "registerReferrer",
+            code: args.code,
+        };
+
+        // Sign the action
+        const signature = await signL1Action({
+            wallet: this.wallet,
+            action,
+            nonce,
+            isTestnet: this.isTestnet,
+        });
+
+        // Send a request
+        const request: RegisterReferrerRequest = { action, signature, nonce };
+        const response = await this.transport.request("exchange", request, signal) as
+            | SuccessResponse
+            | ErrorResponse;
+
+        // Validate a response
+        this._validateResponse(response);
+        return response;
+    }
+
+    /**
      * Reserve additional rate-limited actions for a fee.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
-     * @returns Successful response indicating the weight reservation.
+     * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#reserve-additional-actions
