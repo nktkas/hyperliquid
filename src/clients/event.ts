@@ -241,7 +241,7 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
      * @param listener - The callback function to be called when the event is received.
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
-     * 
+     *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
