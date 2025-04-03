@@ -724,7 +724,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Portfolio of a user.
      *
-     * @see null - no documentation
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-portfolio
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -821,7 +821,7 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
      * @param signal - An optional abort signal.
      * @returns Referral information for a user.
      *
-     * @see null - no documentation
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-referral-information
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";

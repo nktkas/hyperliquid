@@ -256,7 +256,7 @@ export interface PerpsAtOpenInterestCapRequest {
 /**
  * Request user portfolio.
  * @returns {PortfolioPeriods} User's portfolio.
- * @see null - no documentation
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-portfolio
  */
 export interface PortfolioRequest {
     /** Type of request. */
@@ -292,7 +292,7 @@ export interface PreTransferCheckRequest {
 /**
  * Request user referral.
  * @returns {Referral} Referral information for a user.
- * @see null - no documentation
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-referral-information
  */
 export interface ReferralRequest {
     /** Type of request. */
