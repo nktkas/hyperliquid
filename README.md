@@ -11,13 +11,12 @@ runtimes, written in TypeScript and provided with tests.
 ## Features
 
 - 🖋️ **Typed**: Source code is 100% TypeScript.
-- 🧪 **Tested**: Good code coverage and guarantee of type validity.
+- 🧪 **Tested**: Good code coverage and type-safe API responses.
 - 📦 **Minimal dependencies**: A few small trusted dependencies.
 - 🌐 **Cross-Environment Support**: Compatible with all major JS runtimes.
 - 🔧 **Integratable**: Easy to use with [viem](https://github.com/wevm/viem),
   [ethers](https://github.com/ethers-io/ethers.js) and other wallet libraries.
-- 📚 **Documented**: Comprehensive documentation and usage examples, provided directly in JSDoc annotations within the
-  source code.
+- 📚 **Documented**: JSDoc annotations with usage examples in source code.
 
 ## Installation
 
@@ -38,7 +37,44 @@ bun i @nktkas/hyperliquid
 deno add jsr:@nktkas/hyperliquid
 
 # web (import directly)
-import * as hl from "https://esm.sh/jsr/@nktkas/hyperliquid"
+import * as hl from "https://esm.sh/jsr/@nktkas/hyperliquid";
+```
+
+## Quick Start
+
+```ts
+import * as hl from "@nktkas/hyperliquid";
+
+const transport = new hl.HttpTransport();
+const publicClient = new hl.PublicClient({ transport });
+
+const openOrders = await publicClient.openOrders({ user: "0x..." });
+```
+
+```ts
+import * as hl from "@nktkas/hyperliquid";
+import { privateKeyToAccount } from "viem/accounts";
+
+const account = privateKeyToAccount("0x..."); // Change to your private key
+
+const transport = new hl.HttpTransport();
+const walletClient = new hl.WalletClient({ wallet: account, transport });
+
+const result = await walletClient.order({
+    orders: [{
+        a: 0, // Asset index
+        b: true, // Buy order
+        p: "30000", // Price
+        s: "0.1", // Size
+        r: false, // Not reduce-only
+        t: {
+            limit: {
+                tif: "Gtc", // Good-til-cancelled
+            },
+        },
+    }],
+    grouping: "na", // No grouping
+});
 ```
 
 ## Usage
