@@ -266,6 +266,31 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
     }
 
     /**
+     * Block details by block height.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Block details response.
+     *
+     * @see null - no documentation
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const { blockDetails } = await client.blockDetails({ height: 123 });
+     * ```
+     */
+    blockDetails(args: BlockDetailsParameters, signal?: AbortSignal): Promise<BlockDetailsResponse> {
+        const request: BlockDetailsRequest = {
+            type: "blockDetails",
+            ...args,
+        };
+        return this.transport.request("explorer", request, signal) as Promise<BlockDetailsResponse>;
+    }
+
+    /**
      * Request candlestick snapshots.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -498,31 +523,6 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
     }
 
     /**
-     * Request to check if a user is a VIP.
-     * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
-     * @returns Boolean indicating user's VIP status.
-     *
-     * @see null - no documentation
-     * @example
-     * ```ts
-     * import * as hl from "@nktkas/hyperliquid";
-     *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
-     *
-     * const isVip = await client.isVip({ user: "0x..." });
-     * ```
-     */
-    isVip(args: IsVipParameters, signal?: AbortSignal): Promise<boolean> {
-        const request: IsVipRequest = {
-            type: "isVip",
-            ...args,
-        };
-        return this.transport.request("info", request, signal) as Promise<boolean>;
-    }
-
-    /**
      * Request user's historical orders.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -545,6 +545,31 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
             ...args,
         };
         return this.transport.request("info", request, signal) as Promise<OrderStatus<FrontendOrder>[]>;
+    }
+
+    /**
+     * Request to check if a user is a VIP.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Boolean indicating user's VIP status.
+     *
+     * @see null - no documentation
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const isVip = await client.isVip({ user: "0x..." });
+     * ```
+     */
+    isVip(args: IsVipParameters, signal?: AbortSignal): Promise<boolean> {
+        const request: IsVipRequest = {
+            type: "isVip",
+            ...args,
+        };
+        return this.transport.request("info", request, signal) as Promise<boolean>;
     }
 
     /**
@@ -719,6 +744,30 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
     }
 
     /**
+     * Request perpetuals at open interest cap.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Array of perpetuals at open interest caps.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#query-perps-at-open-interest-caps
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const perpsAtOpenInterestCap = await client.perpsAtOpenInterestCap();
+     * ```
+     */
+    perpsAtOpenInterestCap(signal?: AbortSignal): Promise<string[]> {
+        const request: PerpsAtOpenInterestCapRequest = {
+            type: "perpsAtOpenInterestCap",
+        };
+        return this.transport.request("info", request, signal) as Promise<string[]>;
+    }
+
+    /**
      * Request portfolio.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -744,6 +793,29 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
     }
 
     /**
+     * Request predicted funding rates.
+     * @param signal - An optional abort signal.
+     * @returns Array of predicted funding rates.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-predicted-funding-rates-for-different-venues
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const predictedFundings = await client.predictedFundings();
+     * ```
+     */
+    predictedFundings(signal?: AbortSignal): Promise<PredictedFunding[]> {
+        const request: PredictedFundingsRequest = {
+            type: "predictedFundings",
+        };
+        return this.transport.request("info", request, signal) as Promise<PredictedFunding[]>;
+    }
+
+    /**
      * Request user's existence check before transfer.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -766,53 +838,6 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
             ...args,
         };
         return this.transport.request("info", request, signal) as Promise<PreTransferCheck>;
-    }
-
-    /**
-     * Request perpetuals at open interest cap.
-     * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
-     * @returns Array of perpetuals at open interest caps.
-     *
-     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#query-perps-at-open-interest-caps
-     * @example
-     * ```ts
-     * import * as hl from "@nktkas/hyperliquid";
-     *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
-     *
-     * const perpsAtOpenInterestCap = await client.perpsAtOpenInterestCap();
-     * ```
-     */
-    perpsAtOpenInterestCap(signal?: AbortSignal): Promise<string[]> {
-        const request: PerpsAtOpenInterestCapRequest = {
-            type: "perpsAtOpenInterestCap",
-        };
-        return this.transport.request("info", request, signal) as Promise<string[]>;
-    }
-
-    /**
-     * Request predicted funding rates.
-     * @param signal - An optional abort signal.
-     * @returns Array of predicted funding rates.
-     *
-     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-predicted-funding-rates-for-different-venues
-     * @example
-     * ```ts
-     * import * as hl from "@nktkas/hyperliquid";
-     *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
-     *
-     * const predictedFundings = await client.predictedFundings();
-     * ```
-     */
-    predictedFundings(signal?: AbortSignal): Promise<PredictedFunding[]> {
-        const request: PredictedFundingsRequest = {
-            type: "predictedFundings",
-        };
-        return this.transport.request("info", request, signal) as Promise<PredictedFunding[]>;
     }
 
     /**
@@ -1012,6 +1037,56 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
             ...args,
         };
         return this.transport.request("info", request, signal) as Promise<TwapHistory[]>;
+    }
+
+    /**
+     * Transaction details by transaction hash.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Transaction details response.
+     *
+     * @see null - no documentation
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const { tx } = await client.txDetails({ hash: "0x..." });
+     * ```
+     */
+    txDetails(args: TxDetailsParameters, signal?: AbortSignal): Promise<TxDetailsResponse> {
+        const request: TxDetailsRequest = {
+            type: "txDetails",
+            ...args,
+        };
+        return this.transport.request("explorer", request, signal) as Promise<TxDetailsResponse>;
+    }
+
+    /**
+     * User details by user's address.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns User details response.
+     *
+     * @see null - no documentation
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const { txs } = await client.userDetails({ user: "0x..." });
+     * ```
+     */
+    userDetails(args: UserDetailsParameters, signal?: AbortSignal): Promise<UserDetailsResponse> {
+        const request: UserDetailsRequest = {
+            type: "userDetails",
+            ...args,
+        };
+        return this.transport.request("explorer", request, signal) as Promise<UserDetailsResponse>;
     }
 
     /**
@@ -1377,80 +1452,5 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
             type: "vaultSummaries",
         };
         return this.transport.request("info", request, signal) as Promise<VaultSummary[]>;
-    }
-
-    /**
-     * Block details by block height.
-     * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
-     * @returns Block details response.
-     *
-     * @see null - no documentation
-     * @example
-     * ```ts
-     * import * as hl from "@nktkas/hyperliquid";
-     *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
-     *
-     * const { blockDetails } = await client.blockDetails({ height: 123 });
-     * ```
-     */
-    blockDetails(args: BlockDetailsParameters, signal?: AbortSignal): Promise<BlockDetailsResponse> {
-        const request: BlockDetailsRequest = {
-            type: "blockDetails",
-            ...args,
-        };
-        return this.transport.request("explorer", request, signal) as Promise<BlockDetailsResponse>;
-    }
-
-    /**
-     * Transaction details by transaction hash.
-     * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
-     * @returns Transaction details response.
-     *
-     * @see null - no documentation
-     * @example
-     * ```ts
-     * import * as hl from "@nktkas/hyperliquid";
-     *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
-     *
-     * const { tx } = await client.txDetails({ hash: "0x..." });
-     * ```
-     */
-    txDetails(args: TxDetailsParameters, signal?: AbortSignal): Promise<TxDetailsResponse> {
-        const request: TxDetailsRequest = {
-            type: "txDetails",
-            ...args,
-        };
-        return this.transport.request("explorer", request, signal) as Promise<TxDetailsResponse>;
-    }
-
-    /**
-     * User details by user's address.
-     * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
-     * @returns User details response.
-     *
-     * @see null - no documentation
-     * @example
-     * ```ts
-     * import * as hl from "@nktkas/hyperliquid";
-     *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
-     *
-     * const { txs } = await client.userDetails({ user: "0x..." });
-     * ```
-     */
-    userDetails(args: UserDetailsParameters, signal?: AbortSignal): Promise<UserDetailsResponse> {
-        const request: UserDetailsRequest = {
-            type: "userDetails",
-            ...args,
-        };
-        return this.transport.request("explorer", request, signal) as Promise<UserDetailsResponse>;
     }
 }
