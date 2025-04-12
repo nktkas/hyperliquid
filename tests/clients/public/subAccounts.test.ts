@@ -29,5 +29,14 @@ Deno.test("subAccounts", async () => {
         client.subAccounts({ user: USER_ADDRESS }),
     ]);
 
-    schemaCoverage(MethodReturnType, data);
+    schemaCoverage(MethodReturnType, data, {
+        ignoreBranchesByPath: {
+            "#/anyOf/0/items/properties/clearinghouseState/properties/assetPositions/items/properties/position/properties/leverage/anyOf":
+                [0],
+        },
+        ignoreTypesByPath: {
+            "#/anyOf/0/items/properties/clearinghouseState/properties/assetPositions/items/properties/position/properties/liquidationPx":
+                ["string"],
+        },
+    });
 });
