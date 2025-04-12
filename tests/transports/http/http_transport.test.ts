@@ -124,7 +124,9 @@ Deno.test("HttpTransport Tests", async (t) => {
         assertEquals(result, { success: true });
     });
 
-    // 3) Non-200 status => HttpRequestError
+    // 3) Error response tests:
+
+    // 3a) Non-200 status => HttpRequestError
     await t.step("Non-200 status (throws HttpRequestError)", async () => {
         globalThis.fetch = async () =>
             new Response("Server Error", {
@@ -137,7 +139,7 @@ Deno.test("HttpTransport Tests", async (t) => {
         await assertRejects(() => transport.request("exchange", { foo: "bar" }), HttpRequestError);
     });
 
-    // 4) Response body unloading on failed request
+    // 3b) Response body unloading on failed request
     await t.step("Response body unloading on failed request", async () => {
         // @ts-ignore - Mock fetch API
         globalThis.fetch = async () => {
@@ -162,7 +164,7 @@ Deno.test("HttpTransport Tests", async (t) => {
         }
     });
 
-    // 5) Invalid Content-Type => HttpRequestError
+    // 3c) Invalid Content-Type => HttpRequestError
     await t.step("Invalid Content-Type (text/html)", async () => {
         globalThis.fetch = async () =>
             new Response("<html>not json</html>", {
@@ -174,7 +176,23 @@ Deno.test("HttpTransport Tests", async (t) => {
         await assertRejects(() => transport.request("explorer", {}), HttpRequestError);
     });
 
-    // 6) onRequest callback modifies request (URL, custom headers, etc.)
+    // 3d) Body includes error type
+    await t.step("Body includes error type", async () => {
+        // Example of a real error:
+        // txDetails({ hash: "0x556ecab2c80c2d0124690412855269000009aec1fbc0bc9a7df2f8e786eca2e1" })
+
+        globalThis.fetch = async () => {
+            return new Response(JSON.stringify({ type: "error", message: "test error" }), {
+                status: 200,
+                headers: { "Content-Type": "application/json" },
+            });
+        };
+
+        const transport = new HttpTransport();
+        await assertRejects(() => transport.request("explorer", {}), HttpRequestError);
+    });
+
+    // 4) onRequest callback modifies request (URL, custom headers, etc.)
     await t.step("onRequest callback modifies request", async () => {
         // @ts-ignore - Mock fetch API
         globalThis.fetch = async (request: Request) => {
@@ -201,7 +219,7 @@ Deno.test("HttpTransport Tests", async (t) => {
         assertEquals(result, { changed: true });
     });
 
-    // 7) onResponse callback replaces the original response
+    // 5) onResponse callback replaces the original response
     await t.step("onResponse callback replaces response", async () => {
         globalThis.fetch = async () =>
             new Response(JSON.stringify({ original: true }), {
@@ -223,7 +241,7 @@ Deno.test("HttpTransport Tests", async (t) => {
         assertEquals(result, { replaced: true });
     });
 
-    // 8) fetchOptions merging
+    // 6) fetchOptions merging
     // FIXME: Not all RequestInit options can be checked, see https://github.com/denoland/deno/issues/27763
     await t.step("fetchOptions merging", async (t) => {
         await t.step("headers are an object", async () => {
@@ -282,9 +300,9 @@ Deno.test("HttpTransport Tests", async (t) => {
         });
     });
 
-    // 9) AbortSignal tests:
+    // 7) AbortSignal tests:
 
-    // 9a) Internal timeout => triggers TimeoutError if fetch doesn't resolve in time
+    // 7a) Internal timeout => triggers TimeoutError if fetch doesn't resolve in time
     await t.step("Internal timeout triggers TimeoutError", async () => {
         globalThis.fetch = originalFetch;
 
@@ -299,7 +317,7 @@ Deno.test("HttpTransport Tests", async (t) => {
         }
     });
 
-    // 9b) User-supplied signal triggers CustomError
+    // 7b) User-supplied signal triggers CustomError
     await t.step("User-supplied signal triggers CustomError", async () => {
         globalThis.fetch = originalFetch;
         class CustomError extends Error {}
@@ -311,7 +329,7 @@ Deno.test("HttpTransport Tests", async (t) => {
         await assertRejects(() => promise, CustomError, "user-supplied abort");
     });
 
-    // 9c) timeout: null disables internal timeout
+    // 7c) timeout: null disables internal timeout
     await t.step("timeout: null disables internal timeout", async () => {
         // We save the original function so that we can restore it later.
         const originalTimeout = AbortSignal.timeout;

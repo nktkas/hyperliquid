@@ -144,8 +144,16 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
             throw new HttpRequestError(response, body);
         }
 
-        // Parse and return the response body
-        return await response.json();
+        // Parse the response body
+        const body = await response.json();
+
+        // Check if the response is an error
+        if (body?.type === "error") {
+            throw new HttpRequestError(response, body?.message);
+        }
+
+        // Return the response body
+        return body;
     }
 }
 
