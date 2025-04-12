@@ -315,6 +315,7 @@ export interface UserFees {
     feeTrialReward: string;
     /** Timestamp when next trial becomes available. */
     nextTrialAvailableTimestamp: unknown | null;
+    stakingLink: unknown | null;
 }
 
 /** Funding ledger update for a user. */
