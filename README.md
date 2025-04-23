@@ -448,6 +448,7 @@ class HttpTransport {
     constructor(options?: {
         isTestnet?: boolean; // Whether to use testnet url (default: false)
         timeout?: number; // Request timeout in ms (default: 10_000)
+        server?: "api" | "api2" | "api-ui"; // Server URL (default: "api" = "https://api.hyperliquid.xyz")
         fetchOptions?: RequestInit; // A custom fetch options
         onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>; // A callback before request is sent
         onResponse?: (response: Response) => MaybePromise<Response | void | null | undefined>; // A callback after response is received
