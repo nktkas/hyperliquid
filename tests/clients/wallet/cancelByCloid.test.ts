@@ -1,5 +1,5 @@
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
-import { BigNumber } from "npm:bignumber.js@^9.1.2";
+import BigNumber from "npm:bignumber.js@^9.1.2";
 import { HttpTransport, PublicClient, WalletClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";

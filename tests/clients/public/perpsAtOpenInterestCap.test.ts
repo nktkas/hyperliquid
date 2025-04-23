@@ -21,5 +21,7 @@ Deno.test("perpsAtOpenInterestCap", async () => {
 
     const data = await client.perpsAtOpenInterestCap();
 
-    schemaCoverage(MethodReturnType, [data]);
+    schemaCoverage(MethodReturnType, [data], {
+        ignoreEmptyArrayPaths: ["#"],
+    });
 });

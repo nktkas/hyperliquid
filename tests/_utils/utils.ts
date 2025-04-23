@@ -1,5 +1,5 @@
 import type { Hex, PerpsAssetCtx, PerpsUniverse, PublicClient } from "../../mod.ts";
-import { BigNumber } from "npm:bignumber.js@^9.1.2";
+import BigNumber from "npm:bignumber.js@^9.1.2";
 import { keccak_256 } from "@noble/hashes/sha3";
 
 interface AssetData {

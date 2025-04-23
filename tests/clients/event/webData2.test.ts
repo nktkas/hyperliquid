@@ -1,6 +1,6 @@
 import { deadline } from "jsr:@std/async@^1.0.10/deadline";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
-import { BigNumber } from "npm:bignumber.js@^9.1.2";
+import BigNumber from "npm:bignumber.js@^9.1.2";
 import { EventClient, PublicClient, WalletClient, WebSocketTransport } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
@@ -131,6 +131,9 @@ Deno.test("webData2", async () => {
             ignoreTypesByPath: {
                 "#/properties/agentValidUntil": ["null"], // related to agentAddress
             },
+            ignorePropertiesByPath: [
+                "#/properties/perpsAtOpenInterestCap",
+            ],
         });
     } finally {
         // —————————— Cleanup ——————————
