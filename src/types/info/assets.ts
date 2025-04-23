@@ -80,6 +80,8 @@ export interface PerpsUniverse {
     name: string;
     /** Maximum allowed leverage. */
     maxLeverage: number;
+    /** Unique identifier for the margin requirements table. */
+    marginTableId: number;
     /** Indicates if only isolated margin trading is allowed. */
     onlyIsolated?: true;
     /** Indicates if the universe is delisted. */
