@@ -21,23 +21,20 @@ runtimes, written in TypeScript and provided with tests.
 ## Installation
 
 ```
-# Deno
+# npm
+npm i @nktkas/hyperliquid
+
+# deno
 deno add jsr:@nktkas/hyperliquid
 
 # pnpm >=10.9.0
 pnpm i jsr:@nktkas/hyperliquid
 
-# Yarn >=4.9.0
+# yarn >=4.9.0
 yarn add jsr:@nktkas/hyperliquid
 
-# npm
-npm i @nktkas/hyperliquid
-
-# Bun
+# bun
 bun i @nktkas/hyperliquid
-
-# web (import directly)
-import * as hl from "https://esm.sh/jsr/@nktkas/hyperliquid";
 ```
 
 ## Quick Start
@@ -46,21 +43,21 @@ import * as hl from "https://esm.sh/jsr/@nktkas/hyperliquid";
 import * as hl from "@nktkas/hyperliquid";
 
 const transport = new hl.HttpTransport();
-const publicClient = new hl.PublicClient({ transport });
+const client = new hl.PublicClient({ transport });
 
-const openOrders = await publicClient.openOrders({ user: "0x..." });
+const openOrders = await client.openOrders({ user: "0x..." }); // Change to your address
 ```
 
 ```ts
 import * as hl from "@nktkas/hyperliquid";
 import { privateKeyToAccount } from "viem/accounts";
 
-const account = privateKeyToAccount("0x..."); // Change to your private key
+const wallet = privateKeyToAccount("0x..."); // Change to your private key
 
 const transport = new hl.HttpTransport();
-const walletClient = new hl.WalletClient({ wallet: account, transport });
+const client = new hl.WalletClient({ wallet, transport });
 
-const result = await walletClient.order({
+const result = await client.order({
     orders: [{
         a: 0, // Asset index
         b: true, // Buy order
@@ -73,8 +70,23 @@ const result = await walletClient.order({
             },
         },
     }],
-    grouping: "na", // No grouping
+    grouping: "na", // No grouping orders
 });
+```
+
+```ts
+import * as hl from "@nktkas/hyperliquid";
+
+const transport = new hl.WebSocketTransport();
+const client = new hl.EventClient({ transport });
+
+// Subscribe to events
+const sub = await client.allMids((event) => {
+    // Handle the event
+    console.log(event);
+});
+
+await sub.unsubscribe(); // Unsubscribe from the event
 ```
 
 ## Usage
@@ -84,7 +96,7 @@ const result = await walletClient.order({
 First, choose and configure your transport layer (more details in the [API Reference](#transports)):
 
 ```ts
-import * as hl from "@nktkas/hyperliquid"; // ESM & Common.js
+import * as hl from "@nktkas/hyperliquid"; // support ESM & Common.js
 
 // HTTP Transport
 const httpTransport = new hl.HttpTransport(); // Accepts optional parameters
@@ -100,7 +112,7 @@ Next, initialize a client with the transport layer (more details in the [API Ref
 #### Create PublicClient
 
 ```ts
-import * as hl from "@nktkas/hyperliquid"; // ESM & Common.js
+import * as hl from "@nktkas/hyperliquid"; // support ESM & Common.js
 
 const transport = new hl.HttpTransport(); // or WebSocketTransport
 const client = new hl.PublicClient({ transport });
@@ -109,7 +121,7 @@ const client = new hl.PublicClient({ transport });
 #### Create WalletClient
 
 ```ts
-import * as hl from "@nktkas/hyperliquid"; // ESM & Common.js
+import * as hl from "@nktkas/hyperliquid"; // support ESM & Common.js
 import { createWalletClient, custom } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { ethers } from "ethers";
@@ -136,9 +148,9 @@ const windowMetamaskClient = new hl.WalletClient({ wallet: window.ethereum, tran
 #### Create EventClient
 
 ```ts
-import * as hl from "@nktkas/hyperliquid"; // ESM & Common.js
+import * as hl from "@nktkas/hyperliquid"; // support ESM & Common.js
 
-const transport = new hl.WebSocketTransport(); // Only WebSocketTransport
+const transport = new hl.WebSocketTransport(); // only WebSocketTransport
 const client = new hl.EventClient({ transport });
 ```
 
@@ -177,18 +189,18 @@ const client = new hl.WalletClient({ wallet: account, transport });
 // Place an orders
 const result = await client.order({
     orders: [{
-        a: 0, // Asset index
-        b: true, // Buy order
-        p: "30000", // Price
-        s: "0.1", // Size
-        r: false, // Not reduce-only
+        a: 0,
+        b: true,
+        p: "30000",
+        s: "0.1",
+        r: false,
         t: {
             limit: {
-                tif: "Gtc", // Good-til-cancelled
+                tif: "Gtc",
             },
         },
     }],
-    grouping: "na", // No grouping
+    grouping: "na",
 });
 
 // Approve an agent
@@ -199,8 +211,8 @@ const result = await client.approveAgent({
 
 // Withdraw funds
 const result = await client.withdraw3({
-    destination: account.address, // Withdraw funds to your address
-    amount: "100", // 100 USD
+    destination: account.address,
+    amount: "100",
 });
 ```
 
@@ -216,19 +228,19 @@ const client = new hl.EventClient({ transport });
 const sub = await client.l2Book({ coin: "BTC" }, (data) => {
     console.log(data);
 });
-await sub.unsubscribe(); // Unsubscribe from the event
+await sub.unsubscribe();
 
 // User fills
 const sub = await client.userFills({ user: "0x..." }, (data) => {
     console.log(data);
 });
-await sub.unsubscribe(); // Unsubscribe from the event
+await sub.unsubscribe();
 
 // Explorer block updates
 const sub = await client.explorerBlock((data) => {
     console.log(data);
 });
-await sub.unsubscribe(); // Unsubscribe from the event
+await sub.unsubscribe();
 ```
 
 ## API Reference
@@ -523,7 +535,7 @@ const wallet = privateKeyToAccount("0x..."); // Change to your private key
 const action = {
     type: "cancel",
     cancels: [
-        { a: 0, o: 12345 }, // Asset index and order ID
+        { a: 0, o: 12345 },
     ],
 };
 const nonce = Date.now();
@@ -556,7 +568,7 @@ const action = {
     hyperliquidChain: "Testnet", // "Mainnet" or "Testnet"
     signatureChainId: "0x66eee",
     nonce: Date.now(),
-    agentAddress: "0x...", // Change to your agent address
+    agentAddress: "0x...",
     agentName: "Agent",
 };
 
