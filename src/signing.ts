@@ -396,8 +396,20 @@ async function abstractSignTypedData(args: {
 }): Promise<Hex> {
     const { wallet, domain, types, message } = args;
     if (isAbstractViemWalletClient(wallet) || isAbstractExtendedViemWalletClient(wallet)) {
-        const primaryType = Object.keys(types)[0];
-        return await wallet.signTypedData({ domain, types, primaryType, message });
+        return await wallet.signTypedData({
+            domain,
+            types: {
+                EIP712Domain: [
+                    { name: "name", type: "string" },
+                    { name: "version", type: "string" },
+                    { name: "chainId", type: "uint256" },
+                    { name: "verifyingContract", type: "address" },
+                ],
+                ...types,
+            },
+            primaryType: Object.keys(types)[0],
+            message,
+        });
     } else if (isAbstractEthersSigner(wallet)) {
         return await wallet.signTypedData(domain, types, message) as Hex;
     } else if (isAbstractEthersV5Signer(wallet)) {
