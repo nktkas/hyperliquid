@@ -1,4 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
+import { delay } from "@std/async/delay";
 
 import { type MaybePromise, TransportError } from "../../base.ts";
 
@@ -196,11 +197,11 @@ export class ReconnectingWebSocket implements WebSocket {
                 }
 
                 // Delay before reconnecting
-                const delay = typeof this.reconnectOptions.connectionDelay === "number"
+                const delayTime = typeof this.reconnectOptions.connectionDelay === "number"
                     ? this.reconnectOptions.connectionDelay
                     : await this.reconnectOptions.connectionDelay(this._reconnectCount);
                 if (this._terminationController.signal.aborted) return; // Check again after the await
-                await sleep(delay, this._terminationController.signal);
+                await delay(delayTime, { signal: this._terminationController.signal });
 
                 // Create a new WebSocket instance
                 this._socket = createWebSocketWithTimeout(
@@ -442,27 +443,4 @@ function listenersMatch(
     const aCapture = Boolean(typeof a.options === "object" ? a.options.capture : a.options);
     const bCapture = Boolean(typeof b.options === "object" ? b.options.capture : b.options);
     return a.type === b.type && a.listener === b.listener && aCapture === bCapture;
-}
-
-/**
- * Returns a promise that resolves after the specified number of ms,
- * or rejects as soon as the given signal is aborted.
- * @param ms - The number of ms to sleep.
- * @param signal - An optional abort signal.
- * @returns A promise that resolves after the specified delay.
- */
-function sleep(ms: number, signal?: AbortSignal): Promise<void> {
-    if (signal?.aborted) return Promise.reject(signal.reason);
-    return new Promise((resolve, reject) => {
-        const onAbort = () => {
-            clearTimeout(timer);
-            reject(signal?.reason);
-        };
-        const onTimeout = () => {
-            signal?.removeEventListener("abort", onAbort);
-            resolve();
-        };
-        const timer = setTimeout(onTimeout, ms);
-        signal?.addEventListener("abort", onAbort, { once: true });
-    });
 }
