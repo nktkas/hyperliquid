@@ -45,9 +45,14 @@ Deno.test("updateLeverage", async () => {
     // —————————— Test ——————————
 
     const data = await Promise.all([
-        // Check argument 'isCross'
+        // Check argument 'isCross' + argument 'expiresAfter'
         walletClient.updateLeverage({ asset: id, isCross: true, leverage: 1 }),
-        walletClient.updateLeverage({ asset: id, isCross: false, leverage: 1 }),
+        walletClient.updateLeverage({
+            asset: id,
+            isCross: false,
+            leverage: 1,
+            expiresAfter: Date.now() + 1000 * 60 * 60,
+        }),
     ]);
 
     schemaCoverage(MethodReturnType, data);

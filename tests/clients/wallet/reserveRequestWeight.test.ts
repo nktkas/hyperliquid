@@ -25,7 +25,12 @@ Deno.test("reserveRequestWeight", async () => {
 
     // —————————— Test ——————————
 
-    const data = await walletClient.reserveRequestWeight({ weight: 1 });
+    const data = await Promise.all([
+        // Check response 'success'
+        walletClient.reserveRequestWeight({ weight: 1 }),
+        // Check argument 'expiresAfter'
+        walletClient.reserveRequestWeight({ weight: 1, expiresAfter: Date.now() + 1000 * 60 * 60 }),
+    ]);
 
-    schemaCoverage(MethodReturnType, [data]);
+    schemaCoverage(MethodReturnType, data);
 });

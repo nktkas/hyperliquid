@@ -30,21 +30,42 @@ Deno.test("twapCancel", async () => {
     const { id, universe, ctx } = await getAssetData(publicClient, PERPS_ASSET);
     const sz = formatSize(new BigNumber(55).div(ctx.markPx), universe.szDecimals);
 
-    const twapOrderResult = await walletClient.twapOrder({
-        a: id,
-        b: true,
-        s: sz,
-        r: false,
-        m: 5,
-        t: false,
-    });
-    const twapId = twapOrderResult.response.data.status.running.twapId;
-
     // —————————— Test ——————————
 
-    const data = await walletClient.twapCancel({ a: id, t: twapId });
+    const data = await Promise.all([
+        // Check response 'success'
+        (async () => {
+            const twapOrderResult = await walletClient.twapOrder({
+                a: id,
+                b: true,
+                s: sz,
+                r: false,
+                m: 5,
+                t: false,
+            });
+            const twapId = twapOrderResult.response.data.status.running.twapId;
+            return await walletClient.twapCancel({ a: id, t: twapId });
+        })(),
+        // Check argument 'expiresAfter'
+        (async () => {
+            const twapOrderResult = await walletClient.twapOrder({
+                a: id,
+                b: true,
+                s: sz,
+                r: false,
+                m: 5,
+                t: false,
+            });
+            const twapId = twapOrderResult.response.data.status.running.twapId;
+            return await walletClient.twapCancel({
+                a: id,
+                t: twapId,
+                expiresAfter: Date.now() + 1000 * 60 * 60,
+            });
+        })(),
+    ]);
 
-    schemaCoverage(MethodReturnType, [data], {
+    schemaCoverage(MethodReturnType, data, {
         ignoreBranchesByPath: {
             "#/properties/response/properties/data/properties/status/anyOf": [0], // error
         },

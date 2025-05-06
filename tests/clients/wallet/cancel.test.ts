@@ -31,24 +31,46 @@ Deno.test("cancel", async () => {
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const sz = formatSize(new BigNumber(11).div(ctx.markPx), universe.szDecimals);
 
-    // Preparing order
-    await walletClient.updateLeverage({ asset: id, isCross: true, leverage: 3 });
-    const openOrderRes = await walletClient.order({
-        orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
-        grouping: "na",
-    });
-    const [order] = openOrderRes.response.data.statuses;
-
     // —————————— Test ——————————
 
     const data = await Promise.all([
         // Check response 'success'
-        walletClient.cancel({
-            cancels: [{
-                a: id,
-                o: "resting" in order ? order.resting.oid : order.filled.oid,
-            }],
-        }),
+        (async () => {
+            // Preparing order
+            await walletClient.updateLeverage({ asset: id, isCross: true, leverage: 3 });
+            const openOrderRes = await walletClient.order({
+                orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
+                grouping: "na",
+            });
+            const [order] = openOrderRes.response.data.statuses;
+
+            // Cancel order
+            return await walletClient.cancel({
+                cancels: [{
+                    a: id,
+                    o: "resting" in order ? order.resting.oid : order.filled.oid,
+                }],
+            });
+        })(),
+        // Check argument 'expiresAfter'
+        (async () => {
+            // Preparing order
+            await walletClient.updateLeverage({ asset: id, isCross: true, leverage: 3 });
+            const openOrderRes = await walletClient.order({
+                orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
+                grouping: "na",
+            });
+            const [order] = openOrderRes.response.data.statuses;
+
+            // Cancel order
+            return await walletClient.cancel({
+                cancels: [{
+                    a: id,
+                    o: "resting" in order ? order.resting.oid : order.filled.oid,
+                }],
+                expiresAfter: Date.now() + 1000 * 60 * 60,
+            });
+        })(),
     ]);
 
     schemaCoverage(MethodReturnType, data, {

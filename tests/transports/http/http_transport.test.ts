@@ -570,6 +570,20 @@ Deno.test("HttpTransport Tests", async (t) => {
                 });
             };
             await transport.request("info", {});
+
+            // Empty mainnet.api should also return default value
+            transport.isTestnet = false;
+            transport.server = {};
+            globalThis.fetch = async (req: RequestInfo | URL) => {
+                req = new Request(req);
+
+                assertEquals(req.url, "https://api.hyperliquid.xyz/info");
+                return new Response("{}", {
+                    status: 200,
+                    headers: { "Content-Type": "application/json" },
+                });
+            };
+            await transport.request("info", {});
         });
     });
 

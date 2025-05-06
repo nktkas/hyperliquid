@@ -26,9 +26,9 @@ Deno.test("scheduleCancel", async () => {
     // —————————— Test ——————————
 
     const data = await Promise.all([
-        // Check argument 'time'
+        // Check argument 'time' + argument 'expiresAfter'
         walletClient.scheduleCancel({ time: Date.now() + 10000 }),
-        walletClient.scheduleCancel(),
+        walletClient.scheduleCancel({ expiresAfter: Date.now() + 1000 * 60 * 60 }),
     ]);
 
     schemaCoverage(MethodReturnType, data);

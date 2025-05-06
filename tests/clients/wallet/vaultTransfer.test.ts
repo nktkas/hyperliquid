@@ -26,7 +26,7 @@ Deno.test("vaultTransfer", async () => {
 
     // —————————— Test ——————————
 
-    // Check argument 'isDeposit'
+    // Check argument 'isDeposit' + argument 'expiresAfter'
     const data1 = await walletClient.vaultTransfer({
         vaultAddress: VAULT_ADDRESS,
         isDeposit: false,
@@ -36,6 +36,7 @@ Deno.test("vaultTransfer", async () => {
         vaultAddress: VAULT_ADDRESS,
         isDeposit: true,
         usd: 5 * 1e6,
+        expiresAfter: Date.now() + 1000 * 60 * 60,
     });
 
     schemaCoverage(MethodReturnType, [data1, data2]);

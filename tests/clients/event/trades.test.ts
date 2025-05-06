@@ -24,10 +24,14 @@ Deno.test("trades", async () => {
         new Promise((resolve) => {
             client.trades({ coin: "ETH" }, resolve);
         }),
-        15_000,
+        30_000,
     );
 
-    schemaCoverage(MethodReturnType, [data]);
+    schemaCoverage(MethodReturnType, [data], {
+        ignoreEnumValuesByPath: {
+            "#/items/properties/side": ["B", "A"], // some of them may be missing
+        },
+    });
 
     // —————————— Cleanup ——————————
 

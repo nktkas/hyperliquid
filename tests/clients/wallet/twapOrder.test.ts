@@ -32,17 +32,30 @@ Deno.test("twapOrder", async () => {
 
     // —————————— Test ——————————
 
-    const data = await walletClient.twapOrder({
-        a: id,
-        b: true,
-        s: sz,
-        r: false,
-        m: 5,
-        t: false,
-    });
+    const data = await Promise.all([
+        // Check response 'success'
+        walletClient.twapOrder({
+            a: id,
+            b: true,
+            s: sz,
+            r: false,
+            m: 5,
+            t: false,
+        }),
+        // Check argument 'expiresAfter'
+        walletClient.twapOrder({
+            a: id,
+            b: true,
+            s: sz,
+            r: false,
+            m: 5,
+            t: false,
+            expiresAfter: Date.now() + 1000 * 60 * 60,
+        }),
+    ]);
 
     try {
-        schemaCoverage(MethodReturnType, [data], {
+        schemaCoverage(MethodReturnType, data, {
             ignoreBranchesByPath: {
                 "#/properties/response/properties/data/properties/status/anyOf": [1], // error
             },
@@ -50,7 +63,8 @@ Deno.test("twapOrder", async () => {
     } finally {
         // —————————— Cleanup ——————————
 
-        const twapId = data.response.data.status.running.twapId;
-        await walletClient.twapCancel({ a: id, t: twapId });
+        await Promise.all(data.map((d) => {
+            return walletClient.twapCancel({ a: id, t: d.response.data.status.running.twapId });
+        }));
     }
 });

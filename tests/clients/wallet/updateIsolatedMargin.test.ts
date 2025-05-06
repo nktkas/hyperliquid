@@ -61,9 +61,14 @@ Deno.test("updateIsolatedMargin", async () => {
 
     try {
         const data = await Promise.all([
-            // Check argument 'isBuy'
+            // Check argument 'isBuy' + argument 'expiresAfter'
             walletClient.updateIsolatedMargin({ asset: id, isBuy: true, ntli: 1 }),
-            walletClient.updateIsolatedMargin({ asset: id, isBuy: false, ntli: 1 }),
+            walletClient.updateIsolatedMargin({
+                asset: id,
+                isBuy: false,
+                ntli: 1,
+                expiresAfter: Date.now() + 1000 * 60 * 60,
+            }),
         ]);
 
         schemaCoverage(MethodReturnType, data);

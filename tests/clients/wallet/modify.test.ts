@@ -35,6 +35,7 @@ Deno.test("modify", async () => {
 
     try {
         const data = await Promise.all([
+            // Check response 'success' + argument 'expiresAfter'
             (async () => {
                 const openOrderRes = await walletClient.order({
                     orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
@@ -51,6 +52,7 @@ Deno.test("modify", async () => {
                         r: false,
                         t: { limit: { tif: "Gtc" } },
                     },
+                    expiresAfter: Date.now() + 1000 * 60 * 60,
                 });
             })(),
             // Check argument 't.trigger'

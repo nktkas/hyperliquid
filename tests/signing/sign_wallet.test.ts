@@ -2,11 +2,20 @@ import { assert, assertRejects } from "jsr:@std/assert@^1.0.10";
 import { privateKeyToAccount } from "npm:viem@^2.21.54/accounts";
 import { ethers } from "npm:ethers@^6.13.4";
 import { ethers as ethersV5 } from "npm:ethers@^5.7.2";
-import { createL1ActionHash, signL1Action, signUserSignedAction } from "../../src/signing.ts";
+import {
+    type AbstractEthersSigner,
+    type AbstractEthersV5Signer,
+    type AbstractExtendedViemWalletClient,
+    type AbstractViemWalletClient,
+    type AbstractWindowEthereum,
+    createL1ActionHash,
+    signL1Action,
+    signUserSignedAction,
+} from "../../src/signing.ts";
 
 // —————————— Constants ——————————
 
-const PRIVATE_KEY = "0x822e9959e022b78423eb653a62ea0020cd283e71a2a8133a6ff2aeffaf373cff" as const;
+const PRIVATE_KEY = "0x822e9959e022b78423eb653a62ea0020cd283e71a2a8133a6ff2aeffaf373cff";
 const L1_ACTION_SIGNATURE = {
     data: {
         action: {
@@ -24,40 +33,62 @@ const L1_ACTION_SIGNATURE = {
                 },
             }],
             grouping: "na",
-            _bigIntTest: 1000000000000000,
         },
         nonce: 1234567890,
         vaultAddress: "0x1234567890123456789012345678901234567890",
+        expiresAfter: 1234567890,
     },
     signature: {
         mainnet: {
-            withVaultAddress: {
-                r: "0x08b577503dbbb5121356622329289b7638f3b5725e88d20670f9a245ebd2d80a",
-                s: "0x567e319904c37a7a92d47be922719df4b989b57a26ac19fb5cc478c727209ab8",
+            withoutVaultAddressAndExpiresAfter: {
+                r: "0x61078d8ffa3cb591de045438a1ae2ed299b271891d1943a33901e7cfb3a31ed8",
+                s: "0x0e91df4f9841641d3322dad8d932874b74d7e082cdb5b533f804964a6963aef9",
                 v: 28,
             },
-            withoutVaultAddress: {
-                r: "0x55b0aa007bd84ff7547289a30bf0ad3c4e3537f08b12fccf2dce5e30810f703f",
-                s: "0x512e030a3c34616a64e329a4039ce756f91880da788cb4186a1d406882550336",
+            withVaultAddress: {
+                r: "0x77151b3ae29b83c8affb3791568c6452019ba8c30019236003abb1efcd809433",
+                s: "0x55668c02f6ad4a1c335ce99987b7545984c4edc1765fe52cf115a423dc8279bb",
+                v: 27,
+            },
+            withExpiresAfter: {
+                r: "0x162a52128fb58bc6adb783e3d36913c53127851144fc45c5603a51e97b9202fd",
+                s: "0x469571eb0a2101a32f81f9584e15fd35c723a6089e106f4f33798dbccf7cd416",
                 v: 28,
+            },
+            withVaultAddressAndExpiresAfter: {
+                r: "0x78fcca006d7fdfaf1f66978ef7a60280246fc3e7a5b39a68a1656c3e42c58bf1",
+                s: "0x61a09957de7f0886c2bdffb7a94e3a257bf240796883ea6ceaf4d0be37055cdd",
+                v: 27,
             },
         },
         testnet: {
-            withVaultAddress: {
-                r: "0x5aa89b20d28340929e83b0eee77d7ed83655d22047f05f5830677f19c3cbbca7",
-                s: "0x0f38f9f606fd71375274b081215a8a98ce2bb5d39424ec3c174094c73d98f78a",
+            withoutVaultAddressAndExpiresAfter: {
+                r: "0x6b0283a894d87b996ad0182b86251cc80d27d61ef307449a2ed249a508ded1f7",
+                s: "0x6f884e79f4a0a10af62db831af6f8e03b3f11d899eb49b352f836746ee9226da",
                 v: 27,
             },
-            withoutVaultAddress: {
-                r: "0xe596570918086ef505643a42f5280e3a4e091127b0c29a83dd22033c812aff40",
-                s: "0x06145d2918974f1e9779f7cd8511fe00690f0f1becd6855079c1ff2b51e0b419",
+            withVaultAddress: {
+                r: "0x294a6cf713483c129be9af5c7450aca59c9082f391f02325715c0d04b7f48ac1",
+                s: "0x119cfd947dcd2da1d1064a9d08bcf07e01fc9b72dd7cca69a988c74249e300f0",
+                v: 27,
+            },
+            withExpiresAfter: {
+                r: "0x5094989a7c0317db6553f21dd7f90d43415e8bd01af03829de249d4ea0aa5f66",
+                s: "0x491d04966e81662bd4e70d607fac30e71803c01733f4f66ff7299b0470675b8b",
+                v: 27,
+            },
+            withVaultAddressAndExpiresAfter: {
+                r: "0x3a0bbbd9fadca54f58a2b7050899cecb97f68b2f693c63e91ca60510427326d7",
+                s: "0x60f75f12cae7b9dc18b889406192afcaf13f40d2f8c68cc01f7f83f3fb5deb23",
                 v: 27,
             },
         },
     },
     actionHash: {
-        withVaultAddress: "0xbfeb02dfba487de4da4bf5b9a9bc2e5d0f0aa205b74ad5a4b459c95fbe583a06",
-        withoutVaultAddress: "0x21a8fc6e6ca5a771bef30fe5b423193f4acb7e32ae013fb4c35a50d66b6f6cbe",
+        withoutVaultAddressAndExpiresAfter: "0x25367e0dba84351148288c2233cd6130ed6cec5967ded0c0b7334f36f957cc90",
+        withVaultAddress: "0x214e2ea3270981b6fd18174216691e69f56872663139d396b10ded319cb4bb1e",
+        withExpiresAfter: "0xc30b002ba3775e4c31c43c1dfd3291dfc85c6ae06c6b9f393991de86cad5fac7",
+        withVaultAddressAndExpiresAfter: "0x2d62412aa0fc57441b5189841d81554a6a9680bf07204e1454983a9ca44f0744",
     },
 } as const;
 const USER_SIGNED_ACTION_SIGNATURE = {
@@ -139,13 +170,27 @@ Deno.test("Signature Generation Tests", async (t) => {
                                 L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.s.slice(2) +
                                 L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.v.toString(16);
                         }
-                        if (connectionId === L1_ACTION_SIGNATURE.actionHash.withoutVaultAddress) {
+                        if (connectionId === L1_ACTION_SIGNATURE.actionHash.withoutVaultAddressAndExpiresAfter) {
                             return "0x" +
-                                L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.r.slice(2) +
-                                L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.s.slice(2) +
-                                L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.v.toString(16);
+                                L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddressAndExpiresAfter.r.slice(2) +
+                                L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddressAndExpiresAfter.s.slice(2) +
+                                L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddressAndExpiresAfter.v.toString(16);
                         }
-                        throw new Error("Invalid connectionId");
+                        if (connectionId === L1_ACTION_SIGNATURE.actionHash.withExpiresAfter) {
+                            return "0x" +
+                                L1_ACTION_SIGNATURE.signature.mainnet.withExpiresAfter.r.slice(2) +
+                                L1_ACTION_SIGNATURE.signature.mainnet.withExpiresAfter.s.slice(2) +
+                                L1_ACTION_SIGNATURE.signature.mainnet.withExpiresAfter.v.toString(16);
+                        }
+                        if (connectionId === L1_ACTION_SIGNATURE.actionHash.withVaultAddressAndExpiresAfter) {
+                            return "0x" +
+                                L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddressAndExpiresAfter.r.slice(2) +
+                                L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddressAndExpiresAfter.s.slice(2) +
+                                L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddressAndExpiresAfter.v.toString(16);
+                        }
+                        throw new Error(
+                            `Invalid connectionId, expected: ${L1_ACTION_SIGNATURE.actionHash.withVaultAddress} or ${L1_ACTION_SIGNATURE.actionHash.withoutVaultAddressAndExpiresAfter}, got: ${connectionId}`,
+                        );
                     }
                     if (source === "b") {
                         if (connectionId === L1_ACTION_SIGNATURE.actionHash.withVaultAddress) {
@@ -154,15 +199,29 @@ Deno.test("Signature Generation Tests", async (t) => {
                                 L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.s.slice(2) +
                                 L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.v.toString(16);
                         }
-                        if (connectionId === L1_ACTION_SIGNATURE.actionHash.withoutVaultAddress) {
+                        if (connectionId === L1_ACTION_SIGNATURE.actionHash.withoutVaultAddressAndExpiresAfter) {
                             return "0x" +
-                                L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.r.slice(2) +
-                                L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.s.slice(2) +
-                                L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.v.toString(16);
+                                L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddressAndExpiresAfter.r.slice(2) +
+                                L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddressAndExpiresAfter.s.slice(2) +
+                                L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddressAndExpiresAfter.v.toString(16);
                         }
-                        throw new Error("Invalid connectionId");
+                        if (connectionId === L1_ACTION_SIGNATURE.actionHash.withExpiresAfter) {
+                            return "0x" +
+                                L1_ACTION_SIGNATURE.signature.testnet.withExpiresAfter.r.slice(2) +
+                                L1_ACTION_SIGNATURE.signature.testnet.withExpiresAfter.s.slice(2) +
+                                L1_ACTION_SIGNATURE.signature.testnet.withExpiresAfter.v.toString(16);
+                        }
+                        if (connectionId === L1_ACTION_SIGNATURE.actionHash.withVaultAddressAndExpiresAfter) {
+                            return "0x" +
+                                L1_ACTION_SIGNATURE.signature.testnet.withVaultAddressAndExpiresAfter.r.slice(2) +
+                                L1_ACTION_SIGNATURE.signature.testnet.withVaultAddressAndExpiresAfter.s.slice(2) +
+                                L1_ACTION_SIGNATURE.signature.testnet.withVaultAddressAndExpiresAfter.v.toString(16);
+                        }
+                        throw new Error(
+                            `Invalid connectionId, expected: ${L1_ACTION_SIGNATURE.actionHash.withVaultAddress} or ${L1_ACTION_SIGNATURE.actionHash.withoutVaultAddressAndExpiresAfter}, got: ${connectionId}`,
+                        );
                     }
-                    throw new Error("Invalid source");
+                    throw new Error(`Invalid source, expected: a or b, got: ${source}`);
                 }
                 if (domainName === "HyperliquidSignTransaction") {
                     return "0x" +
@@ -170,7 +229,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                         USER_SIGNED_ACTION_SIGNATURE.signature.s.slice(2) +
                         USER_SIGNED_ACTION_SIGNATURE.signature.v.toString(16);
                 }
-                throw new Error("Invalid domain");
+                throw new Error(`Invalid domain, expected: Exchange or HyperliquidSignTransaction, got: ${domainName}`);
             }
         },
     };
@@ -178,7 +237,17 @@ Deno.test("Signature Generation Tests", async (t) => {
     await t.step("L1 Action Signatures", async (t) => {
         await t.step("Action Hash", async (t) => {
             await t.step("should generate matching action hashes", async (t) => {
-                await t.step("with VaultAddress", () => {
+                await t.step("without vaultAddress + expiresAfter", () => {
+                    const actionHash = createL1ActionHash(
+                        L1_ACTION_SIGNATURE.data.action,
+                        L1_ACTION_SIGNATURE.data.nonce,
+                    );
+                    assert(
+                        actionHash === L1_ACTION_SIGNATURE.actionHash.withoutVaultAddressAndExpiresAfter,
+                        `Hash does not match, expected: ${L1_ACTION_SIGNATURE.actionHash.withoutVaultAddressAndExpiresAfter}, got: ${actionHash}`,
+                    );
+                });
+                await t.step("with vaultAddress", () => {
                     const actionHash = createL1ActionHash(
                         L1_ACTION_SIGNATURE.data.action,
                         L1_ACTION_SIGNATURE.data.nonce,
@@ -189,14 +258,28 @@ Deno.test("Signature Generation Tests", async (t) => {
                         `Hash does not match, expected: ${L1_ACTION_SIGNATURE.actionHash.withVaultAddress}, got: ${actionHash}`,
                     );
                 });
-                await t.step("without VaultAddress", () => {
+                await t.step("with expiresAfter", () => {
                     const actionHash = createL1ActionHash(
                         L1_ACTION_SIGNATURE.data.action,
                         L1_ACTION_SIGNATURE.data.nonce,
+                        undefined,
+                        L1_ACTION_SIGNATURE.data.expiresAfter,
                     );
                     assert(
-                        actionHash === L1_ACTION_SIGNATURE.actionHash.withoutVaultAddress,
-                        `Hash does not match, expected: ${L1_ACTION_SIGNATURE.actionHash.withoutVaultAddress}, got: ${actionHash}`,
+                        actionHash === L1_ACTION_SIGNATURE.actionHash.withExpiresAfter,
+                        `Hash does not match, expected: ${L1_ACTION_SIGNATURE.actionHash.withExpiresAfter}, got: ${actionHash}`,
+                    );
+                });
+                await t.step("with vaultAddress + expiresAfter", () => {
+                    const actionHash = createL1ActionHash(
+                        L1_ACTION_SIGNATURE.data.action,
+                        L1_ACTION_SIGNATURE.data.nonce,
+                        L1_ACTION_SIGNATURE.data.vaultAddress,
+                        L1_ACTION_SIGNATURE.data.expiresAfter,
+                    );
+                    assert(
+                        actionHash === L1_ACTION_SIGNATURE.actionHash.withVaultAddressAndExpiresAfter,
+                        `Hash does not match, expected: ${L1_ACTION_SIGNATURE.actionHash.withVaultAddressAndExpiresAfter}, got: ${actionHash}`,
                     );
                 });
             });
@@ -205,432 +288,308 @@ Deno.test("Signature Generation Tests", async (t) => {
         await t.step("Signatures", async (t) => {
             await t.step("should generate matching signatures", async (t) => {
                 await t.step("in mainnet", async (t) => {
-                    await t.step("with VaultAddress", async (t) => {
-                        await t.step("Viem", async () => {
-                            const viemSignature = await signL1Action({
-                                wallet: viemWallet,
+                    await t.step("without vaultAddress + expiresAfter", async (t) => {
+                        const fn = async (
+                            wallet:
+                                | AbstractViemWalletClient
+                                | AbstractEthersSigner
+                                | AbstractEthersV5Signer
+                                | AbstractExtendedViemWalletClient
+                                | AbstractWindowEthereum,
+                        ) => {
+                            const signature = await signL1Action({
+                                wallet,
                                 isTestnet: false,
                                 action: L1_ACTION_SIGNATURE.data.action,
                                 nonce: L1_ACTION_SIGNATURE.data.nonce,
-                                vaultAddress: L1_ACTION_SIGNATURE.data.vaultAddress,
                             });
                             assert(
-                                viemSignature.r === L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.r,
-                                `Viem Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.r}, got: ${viemSignature.r}`,
+                                signature.r ===
+                                    L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddressAndExpiresAfter.r,
+                                `Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddressAndExpiresAfter.r}, got: ${signature.r}`,
                             );
                             assert(
-                                viemSignature.s === L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.s,
-                                `Viem Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.s}, got: ${viemSignature.s}`,
+                                signature.s ===
+                                    L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddressAndExpiresAfter.s,
+                                `Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddressAndExpiresAfter.s}, got: ${signature.s}`,
                             );
                             assert(
-                                viemSignature.v === L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.v,
-                                `Viem Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.v}, got: ${viemSignature.v}`,
+                                signature.v ===
+                                    L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddressAndExpiresAfter.v,
+                                `Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddressAndExpiresAfter.v}, got: ${signature.v}`,
                             );
-                        });
-                        await t.step("Extended Viem", async () => {
-                            const viemSignature = await signL1Action({
-                                wallet: extendedViemWallet,
-                                isTestnet: false,
-                                action: L1_ACTION_SIGNATURE.data.action,
-                                nonce: L1_ACTION_SIGNATURE.data.nonce,
-                                vaultAddress: L1_ACTION_SIGNATURE.data.vaultAddress,
-                            });
-                            assert(
-                                viemSignature.r === L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.r,
-                                `Viem Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.r}, got: ${viemSignature.r}`,
-                            );
-                            assert(
-                                viemSignature.s === L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.s,
-                                `Viem Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.s}, got: ${viemSignature.s}`,
-                            );
-                            assert(
-                                viemSignature.v === L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.v,
-                                `Viem Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.v}, got: ${viemSignature.v}`,
-                            );
-                        });
-                        await t.step("Ethers", async () => {
-                            const ethersSignature = await signL1Action({
-                                wallet: ethersWallet,
-                                isTestnet: false,
-                                action: L1_ACTION_SIGNATURE.data.action,
-                                nonce: L1_ACTION_SIGNATURE.data.nonce,
-                                vaultAddress: L1_ACTION_SIGNATURE.data.vaultAddress,
-                            });
-                            assert(
-                                ethersSignature.r === L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.r,
-                                `Ethers Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.r}, got: ${ethersSignature.r}`,
-                            );
-                            assert(
-                                ethersSignature.s === L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.s,
-                                `Ethers Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.s}, got: ${ethersSignature.s}`,
-                            );
-                            assert(
-                                ethersSignature.v === L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.v,
-                                `Ethers Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.v}, got: ${ethersSignature.v}`,
-                            );
-                        });
-                        await t.step("Ethers v5", async () => {
-                            const ethersV5Signature = await signL1Action({
-                                wallet: ethersV5Wallet,
-                                isTestnet: false,
-                                action: L1_ACTION_SIGNATURE.data.action,
-                                nonce: L1_ACTION_SIGNATURE.data.nonce,
-                                vaultAddress: L1_ACTION_SIGNATURE.data.vaultAddress,
-                            });
-                            assert(
-                                ethersV5Signature.r === L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.r,
-                                `Ethers v5 Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.r}, got: ${ethersV5Signature.r}`,
-                            );
-                            assert(
-                                ethersV5Signature.s === L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.s,
-                                `Ethers v5 Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.s}, got: ${ethersV5Signature.s}`,
-                            );
-                            assert(
-                                ethersV5Signature.v === L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.v,
-                                `Ethers v5 Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.v}, got: ${ethersV5Signature.v}`,
-                            );
-                        });
-                        await t.step("window.ethereum", async () => {
-                            const windowEthereumSignature = await signL1Action({
-                                wallet: windowEthereum,
-                                isTestnet: false,
-                                action: L1_ACTION_SIGNATURE.data.action,
-                                nonce: L1_ACTION_SIGNATURE.data.nonce,
-                                vaultAddress: L1_ACTION_SIGNATURE.data.vaultAddress,
-                            });
-                            assert(
-                                windowEthereumSignature.r === L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.r,
-                                `Window Ethereum Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.r}, got: ${windowEthereumSignature.r}`,
-                            );
-                            assert(
-                                windowEthereumSignature.s === L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.s,
-                                `Window Ethereum Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.s}, got: ${windowEthereumSignature.s}`,
-                            );
-                            assert(
-                                windowEthereumSignature.v === L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.v,
-                                `Window Ethereum Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.v}, got: ${windowEthereumSignature.v}`,
-                            );
-                        });
+                        };
+
+                        await t.step("Viem", async () => await fn(viemWallet));
+                        await t.step("Extended Viem", async () => await fn(extendedViemWallet));
+                        await t.step("Ethers", async () => await fn(ethersWallet));
+                        await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+                        await t.step("window.ethereum", async () => await fn(windowEthereum));
                     });
-                    await t.step("without VaultAddress", async (t) => {
-                        await t.step("Viem", async () => {
-                            const viemSignature = await signL1Action({
-                                wallet: viemWallet,
+                    await t.step("with vaultAddress", async (t) => {
+                        const fn = async (
+                            wallet:
+                                | AbstractViemWalletClient
+                                | AbstractEthersSigner
+                                | AbstractEthersV5Signer
+                                | AbstractExtendedViemWalletClient
+                                | AbstractWindowEthereum,
+                        ) => {
+                            const signature = await signL1Action({
+                                wallet,
                                 isTestnet: false,
                                 action: L1_ACTION_SIGNATURE.data.action,
                                 nonce: L1_ACTION_SIGNATURE.data.nonce,
+                                vaultAddress: L1_ACTION_SIGNATURE.data.vaultAddress,
                             });
                             assert(
-                                viemSignature.r === L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.r,
-                                `Viem Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.r}, got: ${viemSignature.r}`,
+                                signature.r === L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.r,
+                                `Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.r}, got: ${signature.r}`,
                             );
                             assert(
-                                viemSignature.s === L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.s,
-                                `Viem Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.s}, got: ${viemSignature.s}`,
+                                signature.s === L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.s,
+                                `Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.s}, got: ${signature.s}`,
                             );
                             assert(
-                                viemSignature.v === L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.v,
-                                `Viem Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.v}, got: ${viemSignature.v}`,
+                                signature.v === L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.v,
+                                `Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddress.v}, got: ${signature.v}`,
                             );
-                        });
-                        await t.step("Extended Viem", async () => {
-                            const viemSignature = await signL1Action({
-                                wallet: extendedViemWallet,
+                        };
+
+                        await t.step("Viem", async () => await fn(viemWallet));
+                        await t.step("Extended Viem", async () => await fn(extendedViemWallet));
+                        await t.step("Ethers", async () => await fn(ethersWallet));
+                        await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+                        await t.step("window.ethereum", async () => await fn(windowEthereum));
+                    });
+                    await t.step("with expiresAfter", async (t) => {
+                        const fn = async (
+                            wallet:
+                                | AbstractViemWalletClient
+                                | AbstractEthersSigner
+                                | AbstractEthersV5Signer
+                                | AbstractExtendedViemWalletClient
+                                | AbstractWindowEthereum,
+                        ) => {
+                            const signature = await signL1Action({
+                                wallet,
                                 isTestnet: false,
                                 action: L1_ACTION_SIGNATURE.data.action,
                                 nonce: L1_ACTION_SIGNATURE.data.nonce,
+                                expiresAfter: L1_ACTION_SIGNATURE.data.expiresAfter,
                             });
                             assert(
-                                viemSignature.r === L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.r,
-                                `Viem Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.r}, got: ${viemSignature.r}`,
+                                signature.r === L1_ACTION_SIGNATURE.signature.mainnet.withExpiresAfter.r,
+                                `Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withExpiresAfter.r}, got: ${signature.r}`,
                             );
                             assert(
-                                viemSignature.s === L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.s,
-                                `Viem Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.s}, got: ${viemSignature.s}`,
+                                signature.s === L1_ACTION_SIGNATURE.signature.mainnet.withExpiresAfter.s,
+                                `Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withExpiresAfter.s}, got: ${signature.s}`,
                             );
                             assert(
-                                viemSignature.v === L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.v,
-                                `Viem Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.v}, got: ${viemSignature.v}`,
+                                signature.v === L1_ACTION_SIGNATURE.signature.mainnet.withExpiresAfter.v,
+                                `Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withExpiresAfter.v}, got: ${signature.v}`,
                             );
-                        });
-                        await t.step("Ethers", async () => {
-                            const ethersSignature = await signL1Action({
-                                wallet: ethersWallet,
+                        };
+
+                        await t.step("Viem", async () => await fn(viemWallet));
+                        await t.step("Extended Viem", async () => await fn(extendedViemWallet));
+                        await t.step("Ethers", async () => await fn(ethersWallet));
+                        await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+                        await t.step("window.ethereum", async () => await fn(windowEthereum));
+                    });
+                    await t.step("with vaultAddress + expiresAfter", async (t) => {
+                        const fn = async (
+                            wallet:
+                                | AbstractViemWalletClient
+                                | AbstractEthersSigner
+                                | AbstractEthersV5Signer
+                                | AbstractExtendedViemWalletClient
+                                | AbstractWindowEthereum,
+                        ) => {
+                            const signature = await signL1Action({
+                                wallet,
                                 isTestnet: false,
                                 action: L1_ACTION_SIGNATURE.data.action,
                                 nonce: L1_ACTION_SIGNATURE.data.nonce,
+                                vaultAddress: L1_ACTION_SIGNATURE.data.vaultAddress,
+                                expiresAfter: L1_ACTION_SIGNATURE.data.expiresAfter,
                             });
                             assert(
-                                ethersSignature.r === L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.r,
-                                `Ethers Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.r}, got: ${ethersSignature.r}`,
+                                signature.r ===
+                                    L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddressAndExpiresAfter.r,
+                                `Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddressAndExpiresAfter.r}, got: ${signature.r}`,
                             );
                             assert(
-                                ethersSignature.s === L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.s,
-                                `Ethers Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.s}, got: ${ethersSignature.s}`,
+                                signature.s ===
+                                    L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddressAndExpiresAfter.s,
+                                `Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddressAndExpiresAfter.s}, got: ${signature.s}`,
                             );
                             assert(
-                                ethersSignature.v === L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.v,
-                                `Ethers Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.v}, got: ${ethersSignature.v}`,
+                                signature.v ===
+                                    L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddressAndExpiresAfter.v,
+                                `Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withVaultAddressAndExpiresAfter.v}, got: ${signature.v}`,
                             );
-                        });
-                        await t.step("Ethers v5", async () => {
-                            const ethersV5Signature = await signL1Action({
-                                wallet: ethersV5Wallet,
-                                isTestnet: false,
-                                action: L1_ACTION_SIGNATURE.data.action,
-                                nonce: L1_ACTION_SIGNATURE.data.nonce,
-                            });
-                            assert(
-                                ethersV5Signature.r === L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.r,
-                                `Ethers v5 Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.r}, got: ${ethersV5Signature.r}`,
-                            );
-                            assert(
-                                ethersV5Signature.s === L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.s,
-                                `Ethers v5 Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.s}, got: ${ethersV5Signature.s}`,
-                            );
-                            assert(
-                                ethersV5Signature.v === L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.v,
-                                `Ethers v5 Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.v}, got: ${ethersV5Signature.v}`,
-                            );
-                        });
-                        await t.step("window.ethereum", async () => {
-                            const windowEthereumSignature = await signL1Action({
-                                wallet: windowEthereum,
-                                isTestnet: false,
-                                action: L1_ACTION_SIGNATURE.data.action,
-                                nonce: L1_ACTION_SIGNATURE.data.nonce,
-                            });
-                            assert(
-                                windowEthereumSignature.r ===
-                                    L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.r,
-                                `Window Ethereum Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.r}, got: ${windowEthereumSignature.r}`,
-                            );
-                            assert(
-                                windowEthereumSignature.s ===
-                                    L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.s,
-                                `Window Ethereum Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.s}, got: ${windowEthereumSignature.s}`,
-                            );
-                            assert(
-                                windowEthereumSignature.v ===
-                                    L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.v,
-                                `Window Ethereum Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.mainnet.withoutVaultAddress.v}, got: ${windowEthereumSignature.v}`,
-                            );
-                        });
+                        };
+
+                        await t.step("Viem", async () => await fn(viemWallet));
+                        await t.step("Extended Viem", async () => await fn(extendedViemWallet));
+                        await t.step("Ethers", async () => await fn(ethersWallet));
+                        await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+                        await t.step("window.ethereum", async () => await fn(windowEthereum));
                     });
                 });
 
                 await t.step("in testnet", async (t) => {
-                    await t.step("with VaultAddress", async (t) => {
-                        await t.step("Viem", async () => {
-                            const viemSignature = await signL1Action({
-                                wallet: viemWallet,
+                    await t.step("without vaultAddress + expiresAfter", async (t) => {
+                        const fn = async (
+                            wallet:
+                                | AbstractViemWalletClient
+                                | AbstractEthersSigner
+                                | AbstractEthersV5Signer
+                                | AbstractExtendedViemWalletClient
+                                | AbstractWindowEthereum,
+                        ) => {
+                            const signature = await signL1Action({
+                                wallet,
                                 isTestnet: true,
                                 action: L1_ACTION_SIGNATURE.data.action,
                                 nonce: L1_ACTION_SIGNATURE.data.nonce,
-                                vaultAddress: L1_ACTION_SIGNATURE.data.vaultAddress,
                             });
                             assert(
-                                viemSignature.r === L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.r,
-                                `Viem Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.r}, got: ${viemSignature.r}`,
+                                signature.r ===
+                                    L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddressAndExpiresAfter.r,
+                                `Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddressAndExpiresAfter.r}, got: ${signature.r}`,
                             );
                             assert(
-                                viemSignature.s === L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.s,
-                                `Viem Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.s}, got: ${viemSignature.s}`,
+                                signature.s ===
+                                    L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddressAndExpiresAfter.s,
+                                `Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddressAndExpiresAfter.s}, got: ${signature.s}`,
                             );
                             assert(
-                                viemSignature.v === L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.v,
-                                `Viem Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.v}, got: ${viemSignature.v}`,
+                                signature.v ===
+                                    L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddressAndExpiresAfter.v,
+                                `Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddressAndExpiresAfter.v}, got: ${signature.v}`,
                             );
-                        });
-                        await t.step("Extended Viem", async () => {
-                            const viemSignature = await signL1Action({
-                                wallet: extendedViemWallet,
-                                isTestnet: true,
-                                action: L1_ACTION_SIGNATURE.data.action,
-                                nonce: L1_ACTION_SIGNATURE.data.nonce,
-                                vaultAddress: L1_ACTION_SIGNATURE.data.vaultAddress,
-                            });
-                            assert(
-                                viemSignature.r === L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.r,
-                                `Viem Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.r}, got: ${viemSignature.r}`,
-                            );
-                            assert(
-                                viemSignature.s === L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.s,
-                                `Viem Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.s}, got: ${viemSignature.s}`,
-                            );
-                            assert(
-                                viemSignature.v === L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.v,
-                                `Viem Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.v}, got: ${viemSignature.v}`,
-                            );
-                        });
-                        await t.step("Ethers", async () => {
-                            const ethersSignature = await signL1Action({
-                                wallet: ethersWallet,
-                                isTestnet: true,
-                                action: L1_ACTION_SIGNATURE.data.action,
-                                nonce: L1_ACTION_SIGNATURE.data.nonce,
-                                vaultAddress: L1_ACTION_SIGNATURE.data.vaultAddress,
-                            });
-                            assert(
-                                ethersSignature.r === L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.r,
-                                `Ethers Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.r}, got: ${ethersSignature.r}`,
-                            );
-                            assert(
-                                ethersSignature.s === L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.s,
-                                `Ethers Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.s}, got: ${ethersSignature.s}`,
-                            );
-                            assert(
-                                ethersSignature.v === L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.v,
-                                `Ethers Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.v}, got: ${ethersSignature.v}`,
-                            );
-                        });
-                        await t.step("Ethers v5", async () => {
-                            const ethersV5Signature = await signL1Action({
-                                wallet: ethersV5Wallet,
-                                isTestnet: true,
-                                action: L1_ACTION_SIGNATURE.data.action,
-                                nonce: L1_ACTION_SIGNATURE.data.nonce,
-                                vaultAddress: L1_ACTION_SIGNATURE.data.vaultAddress,
-                            });
-                            assert(
-                                ethersV5Signature.r === L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.r,
-                                `Ethers v5 Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.r}, got: ${ethersV5Signature.r}`,
-                            );
-                            assert(
-                                ethersV5Signature.s === L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.s,
-                                `Ethers v5 Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.s}, got: ${ethersV5Signature.s}`,
-                            );
-                            assert(
-                                ethersV5Signature.v === L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.v,
-                                `Ethers v5 Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.v}, got: ${ethersV5Signature.v}`,
-                            );
-                        });
-                        await t.step("window.ethereum", async () => {
-                            const windowEthereumSignature = await signL1Action({
-                                wallet: windowEthereum,
-                                isTestnet: true,
-                                action: L1_ACTION_SIGNATURE.data.action,
-                                nonce: L1_ACTION_SIGNATURE.data.nonce,
-                                vaultAddress: L1_ACTION_SIGNATURE.data.vaultAddress,
-                            });
-                            assert(
-                                windowEthereumSignature.r === L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.r,
-                                `Window Ethereum Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.r}, got: ${windowEthereumSignature.r}`,
-                            );
-                            assert(
-                                windowEthereumSignature.s === L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.s,
-                                `Window Ethereum Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.s}, got: ${windowEthereumSignature.s}`,
-                            );
-                            assert(
-                                windowEthereumSignature.v === L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.v,
-                                `Window Ethereum Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.v}, got: ${windowEthereumSignature.v}`,
-                            );
-                        });
+                        };
+
+                        await t.step("Viem", async () => await fn(viemWallet));
+                        await t.step("Extended Viem", async () => await fn(extendedViemWallet));
+                        await t.step("Ethers", async () => await fn(ethersWallet));
+                        await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+                        await t.step("window.ethereum", async () => await fn(windowEthereum));
                     });
-                    await t.step("without VaultAddress", async (t) => {
-                        await t.step("Viem", async () => {
-                            const viemSignature = await signL1Action({
-                                wallet: viemWallet,
+                    await t.step("with vaultAddress", async (t) => {
+                        const fn = async (
+                            wallet:
+                                | AbstractViemWalletClient
+                                | AbstractEthersSigner
+                                | AbstractEthersV5Signer
+                                | AbstractExtendedViemWalletClient
+                                | AbstractWindowEthereum,
+                        ) => {
+                            const signature = await signL1Action({
+                                wallet,
                                 isTestnet: true,
                                 action: L1_ACTION_SIGNATURE.data.action,
                                 nonce: L1_ACTION_SIGNATURE.data.nonce,
+                                vaultAddress: L1_ACTION_SIGNATURE.data.vaultAddress,
                             });
                             assert(
-                                viemSignature.r === L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.r,
-                                `Viem Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.r}, got: ${viemSignature.r}`,
+                                signature.r === L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.r,
+                                `Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.r}, got: ${signature.r}`,
                             );
                             assert(
-                                viemSignature.s === L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.s,
-                                `Viem Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.s}, got: ${viemSignature.s}`,
+                                signature.s === L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.s,
+                                `Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.s}, got: ${signature.s}`,
                             );
                             assert(
-                                viemSignature.v === L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.v,
-                                `Viem Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.v}, got: ${viemSignature.v}`,
+                                signature.v === L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.v,
+                                `Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddress.v}, got: ${signature.v}`,
                             );
-                        });
-                        await t.step("Extended Viem", async () => {
-                            const viemSignature = await signL1Action({
-                                wallet: extendedViemWallet,
+                        };
+
+                        await t.step("Viem", async () => await fn(viemWallet));
+                        await t.step("Extended Viem", async () => await fn(extendedViemWallet));
+                        await t.step("Ethers", async () => await fn(ethersWallet));
+                        await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+                        await t.step("window.ethereum", async () => await fn(windowEthereum));
+                    });
+                    await t.step("with expiresAfter", async (t) => {
+                        const fn = async (
+                            wallet:
+                                | AbstractViemWalletClient
+                                | AbstractEthersSigner
+                                | AbstractEthersV5Signer
+                                | AbstractExtendedViemWalletClient
+                                | AbstractWindowEthereum,
+                        ) => {
+                            const signature = await signL1Action({
+                                wallet,
                                 isTestnet: true,
                                 action: L1_ACTION_SIGNATURE.data.action,
                                 nonce: L1_ACTION_SIGNATURE.data.nonce,
+                                expiresAfter: L1_ACTION_SIGNATURE.data.expiresAfter,
                             });
                             assert(
-                                viemSignature.r === L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.r,
-                                `Viem Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.r}, got: ${viemSignature.r}`,
+                                signature.r === L1_ACTION_SIGNATURE.signature.testnet.withExpiresAfter.r,
+                                `Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withExpiresAfter.r}, got: ${signature.r}`,
                             );
                             assert(
-                                viemSignature.s === L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.s,
-                                `Viem Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.s}, got: ${viemSignature.s}`,
+                                signature.s === L1_ACTION_SIGNATURE.signature.testnet.withExpiresAfter.s,
+                                `Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withExpiresAfter.s}, got: ${signature.s}`,
                             );
                             assert(
-                                viemSignature.v === L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.v,
-                                `Viem Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.v}, got: ${viemSignature.v}`,
+                                signature.v === L1_ACTION_SIGNATURE.signature.testnet.withExpiresAfter.v,
+                                `Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withExpiresAfter.v}, got: ${signature.v}`,
                             );
-                        });
-                        await t.step("Ethers", async () => {
-                            const ethersSignature = await signL1Action({
-                                wallet: ethersWallet,
+                        };
+
+                        await t.step("Viem", async () => await fn(viemWallet));
+                        await t.step("Extended Viem", async () => await fn(extendedViemWallet));
+                        await t.step("Ethers", async () => await fn(ethersWallet));
+                        await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+                        await t.step("window.ethereum", async () => await fn(windowEthereum));
+                    });
+                    await t.step("with vaultAddress + expiresAfter", async (t) => {
+                        const fn = async (
+                            wallet:
+                                | AbstractViemWalletClient
+                                | AbstractEthersSigner
+                                | AbstractEthersV5Signer
+                                | AbstractExtendedViemWalletClient
+                                | AbstractWindowEthereum,
+                        ) => {
+                            const signature = await signL1Action({
+                                wallet,
                                 isTestnet: true,
                                 action: L1_ACTION_SIGNATURE.data.action,
                                 nonce: L1_ACTION_SIGNATURE.data.nonce,
+                                vaultAddress: L1_ACTION_SIGNATURE.data.vaultAddress,
+                                expiresAfter: L1_ACTION_SIGNATURE.data.expiresAfter,
                             });
                             assert(
-                                ethersSignature.r === L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.r,
-                                `Ethers Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.r}, got: ${ethersSignature.r}`,
+                                signature.r ===
+                                    L1_ACTION_SIGNATURE.signature.testnet.withVaultAddressAndExpiresAfter.r,
+                                `Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddressAndExpiresAfter.r}, got: ${signature.r}`,
                             );
                             assert(
-                                ethersSignature.s === L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.s,
-                                `Ethers Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.s}, got: ${ethersSignature.s}`,
+                                signature.s ===
+                                    L1_ACTION_SIGNATURE.signature.testnet.withVaultAddressAndExpiresAfter.s,
+                                `Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddressAndExpiresAfter.s}, got: ${signature.s}`,
                             );
                             assert(
-                                ethersSignature.v === L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.v,
-                                `Ethers Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.v}, got: ${ethersSignature.v}`,
+                                signature.v ===
+                                    L1_ACTION_SIGNATURE.signature.testnet.withVaultAddressAndExpiresAfter.v,
+                                `Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withVaultAddressAndExpiresAfter.v}, got: ${signature.v}`,
                             );
-                        });
-                        await t.step("Ethers v5", async () => {
-                            const ethersV5Signature = await signL1Action({
-                                wallet: ethersV5Wallet,
-                                isTestnet: true,
-                                action: L1_ACTION_SIGNATURE.data.action,
-                                nonce: L1_ACTION_SIGNATURE.data.nonce,
-                            });
-                            assert(
-                                ethersV5Signature.r === L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.r,
-                                `Ethers v5 Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.r}, got: ${ethersV5Signature.r}`,
-                            );
-                            assert(
-                                ethersV5Signature.s === L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.s,
-                                `Ethers v5 Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.s}, got: ${ethersV5Signature.s}`,
-                            );
-                            assert(
-                                ethersV5Signature.v === L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.v,
-                                `Ethers v5 Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.v}, got: ${ethersV5Signature.v}`,
-                            );
-                        });
-                        await t.step("window.ethereum", async () => {
-                            const windowEthereumSignature = await signL1Action({
-                                wallet: windowEthereum,
-                                isTestnet: true,
-                                action: L1_ACTION_SIGNATURE.data.action,
-                                nonce: L1_ACTION_SIGNATURE.data.nonce,
-                            });
-                            assert(
-                                windowEthereumSignature.r ===
-                                    L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.r,
-                                `Window Ethereum Signature r does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.r}, got: ${windowEthereumSignature.r}`,
-                            );
-                            assert(
-                                windowEthereumSignature.s ===
-                                    L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.s,
-                                `Window Ethereum Signature s does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.s}, got: ${windowEthereumSignature.s}`,
-                            );
-                            assert(
-                                windowEthereumSignature.v ===
-                                    L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.v,
-                                `Window Ethereum Signature v does not match, expected: ${L1_ACTION_SIGNATURE.signature.testnet.withoutVaultAddress.v}, got: ${windowEthereumSignature.v}`,
-                            );
-                        });
+                        };
+
+                        await t.step("Viem", async () => await fn(viemWallet));
+                        await t.step("Extended Viem", async () => await fn(extendedViemWallet));
+                        await t.step("Ethers", async () => await fn(ethersWallet));
+                        await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+                        await t.step("window.ethereum", async () => await fn(windowEthereum));
                     });
                 });
             });
@@ -639,9 +598,16 @@ Deno.test("Signature Generation Tests", async (t) => {
 
     await t.step("User-Signed Action Signatures", async (t) => {
         await t.step("should generate matching signatures", async (t) => {
-            await t.step("Viem", async () => {
-                const viemSignature = await signUserSignedAction({
-                    wallet: viemWallet,
+            const fn = async (
+                wallet:
+                    | AbstractViemWalletClient
+                    | AbstractEthersSigner
+                    | AbstractEthersV5Signer
+                    | AbstractExtendedViemWalletClient
+                    | AbstractWindowEthereum,
+            ) => {
+                const signature = await signUserSignedAction({
+                    wallet,
                     action: USER_SIGNED_ACTION_SIGNATURE.data.action,
                     types: {
                         [USER_SIGNED_ACTION_SIGNATURE.data.primaryType]: [
@@ -651,114 +617,24 @@ Deno.test("Signature Generation Tests", async (t) => {
                     chainId: USER_SIGNED_ACTION_SIGNATURE.data.chainId,
                 });
                 assert(
-                    viemSignature.r === USER_SIGNED_ACTION_SIGNATURE.signature.r,
-                    `Viem Signature r does not match, expected: ${USER_SIGNED_ACTION_SIGNATURE.signature.r}, got: ${viemSignature.r}`,
+                    signature.r === USER_SIGNED_ACTION_SIGNATURE.signature.r,
+                    `Signature r does not match, expected: ${USER_SIGNED_ACTION_SIGNATURE.signature.r}, got: ${signature.r}`,
                 );
                 assert(
-                    viemSignature.s === USER_SIGNED_ACTION_SIGNATURE.signature.s,
-                    `Viem Signature s does not match, expected: ${USER_SIGNED_ACTION_SIGNATURE.signature.s}, got: ${viemSignature.s}`,
+                    signature.s === USER_SIGNED_ACTION_SIGNATURE.signature.s,
+                    `Signature s does not match, expected: ${USER_SIGNED_ACTION_SIGNATURE.signature.s}, got: ${signature.s}`,
                 );
                 assert(
-                    viemSignature.v === USER_SIGNED_ACTION_SIGNATURE.signature.v,
-                    `Viem Signature v does not match, expected: ${USER_SIGNED_ACTION_SIGNATURE.signature.v}, got: ${viemSignature.v}`,
+                    signature.v === USER_SIGNED_ACTION_SIGNATURE.signature.v,
+                    `Signature v does not match, expected: ${USER_SIGNED_ACTION_SIGNATURE.signature.v}, got: ${signature.v}`,
                 );
-            });
-            await t.step("Extended Viem", async () => {
-                const viemSignature = await signUserSignedAction({
-                    wallet: extendedViemWallet,
-                    action: USER_SIGNED_ACTION_SIGNATURE.data.action,
-                    types: {
-                        [USER_SIGNED_ACTION_SIGNATURE.data.primaryType]: [
-                            ...USER_SIGNED_ACTION_SIGNATURE.data.payloadTypes,
-                        ],
-                    },
-                    chainId: USER_SIGNED_ACTION_SIGNATURE.data.chainId,
-                });
-                assert(
-                    viemSignature.r === USER_SIGNED_ACTION_SIGNATURE.signature.r,
-                    `Viem Signature r does not match, expected: ${USER_SIGNED_ACTION_SIGNATURE.signature.r}, got: ${viemSignature.r}`,
-                );
-                assert(
-                    viemSignature.s === USER_SIGNED_ACTION_SIGNATURE.signature.s,
-                    `Viem Signature s does not match, expected: ${USER_SIGNED_ACTION_SIGNATURE.signature.s}, got: ${viemSignature.s}`,
-                );
-                assert(
-                    viemSignature.v === USER_SIGNED_ACTION_SIGNATURE.signature.v,
-                    `Viem Signature v does not match, expected: ${USER_SIGNED_ACTION_SIGNATURE.signature.v}, got: ${viemSignature.v}`,
-                );
-            });
-            await t.step("Ethers", async () => {
-                const ethersSignature = await signUserSignedAction({
-                    wallet: ethersWallet,
-                    action: USER_SIGNED_ACTION_SIGNATURE.data.action,
-                    types: {
-                        [USER_SIGNED_ACTION_SIGNATURE.data.primaryType]: [
-                            ...USER_SIGNED_ACTION_SIGNATURE.data.payloadTypes,
-                        ],
-                    },
-                    chainId: USER_SIGNED_ACTION_SIGNATURE.data.chainId,
-                });
-                assert(
-                    ethersSignature.r === USER_SIGNED_ACTION_SIGNATURE.signature.r,
-                    `Ethers Signature r does not match, expected: ${USER_SIGNED_ACTION_SIGNATURE.signature.r}, got: ${ethersSignature.r}`,
-                );
-                assert(
-                    ethersSignature.s === USER_SIGNED_ACTION_SIGNATURE.signature.s,
-                    `Ethers Signature s does not match, expected: ${USER_SIGNED_ACTION_SIGNATURE.signature.s}, got: ${ethersSignature.s}`,
-                );
-                assert(
-                    ethersSignature.v === USER_SIGNED_ACTION_SIGNATURE.signature.v,
-                    `Ethers Signature v does not match, expected: ${USER_SIGNED_ACTION_SIGNATURE.signature.v}, got: ${ethersSignature.v}`,
-                );
-            });
-            await t.step("Ethers v5", async () => {
-                const ethersV5Signature = await signUserSignedAction({
-                    wallet: ethersV5Wallet,
-                    action: USER_SIGNED_ACTION_SIGNATURE.data.action,
-                    types: {
-                        [USER_SIGNED_ACTION_SIGNATURE.data.primaryType]: [
-                            ...USER_SIGNED_ACTION_SIGNATURE.data.payloadTypes,
-                        ],
-                    },
-                    chainId: USER_SIGNED_ACTION_SIGNATURE.data.chainId,
-                });
-                assert(
-                    ethersV5Signature.r === USER_SIGNED_ACTION_SIGNATURE.signature.r,
-                    `Ethers v5 Signature r does not match, expected: ${USER_SIGNED_ACTION_SIGNATURE.signature.r}, got: ${ethersV5Signature.r}`,
-                );
-                assert(
-                    ethersV5Signature.s === USER_SIGNED_ACTION_SIGNATURE.signature.s,
-                    `Ethers v5 Signature s does not match, expected: ${USER_SIGNED_ACTION_SIGNATURE.signature.s}, got: ${ethersV5Signature.s}`,
-                );
-                assert(
-                    ethersV5Signature.v === USER_SIGNED_ACTION_SIGNATURE.signature.v,
-                    `Ethers v5 Signature v does not match, expected: ${USER_SIGNED_ACTION_SIGNATURE.signature.v}, got: ${ethersV5Signature.v}`,
-                );
-            });
-            await t.step("window.ethereum", async () => {
-                const windowEthereumSignature = await signUserSignedAction({
-                    wallet: windowEthereum,
-                    action: USER_SIGNED_ACTION_SIGNATURE.data.action,
-                    types: {
-                        [USER_SIGNED_ACTION_SIGNATURE.data.primaryType]: [
-                            ...USER_SIGNED_ACTION_SIGNATURE.data.payloadTypes,
-                        ],
-                    },
-                    chainId: USER_SIGNED_ACTION_SIGNATURE.data.chainId,
-                });
-                assert(
-                    windowEthereumSignature.r === USER_SIGNED_ACTION_SIGNATURE.signature.r,
-                    `Window Ethereum Signature r does not match, expected: ${USER_SIGNED_ACTION_SIGNATURE.signature.r}, got: ${windowEthereumSignature.r}`,
-                );
-                assert(
-                    windowEthereumSignature.s === USER_SIGNED_ACTION_SIGNATURE.signature.s,
-                    `Window Ethereum Signature s does not match, expected: ${USER_SIGNED_ACTION_SIGNATURE.signature.s}, got: ${windowEthereumSignature.s}`,
-                );
-                assert(
-                    windowEthereumSignature.v === USER_SIGNED_ACTION_SIGNATURE.signature.v,
-                    `Window Ethereum Signature v does not match, expected: ${USER_SIGNED_ACTION_SIGNATURE.signature.v}, got: ${windowEthereumSignature.v}`,
-                );
-            });
+            };
+
+            await t.step("Viem", async () => await fn(viemWallet));
+            await t.step("Extended Viem", async () => await fn(extendedViemWallet));
+            await t.step("Ethers", async () => await fn(ethersWallet));
+            await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+            await t.step("window.ethereum", async () => await fn(windowEthereum));
         });
     });
 });

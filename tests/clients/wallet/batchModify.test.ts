@@ -36,7 +36,7 @@ Deno.test("batchModify", async () => {
 
     try {
         const data = await Promise.all([
-            // Check response 'resting'
+            // Check response 'resting' + argument 'expiresAfter'
             (async () => {
                 const orderResp = await walletClient.order({
                     orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
@@ -55,6 +55,7 @@ Deno.test("batchModify", async () => {
                             t: { limit: { tif: "Gtc" } },
                         },
                     }],
+                    expiresAfter: Date.now() + 1000 * 60 * 60,
                 });
             })(),
             (async () => {

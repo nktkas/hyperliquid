@@ -31,24 +31,62 @@ Deno.test("cancelByCloid", async () => {
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const sz = formatSize(new BigNumber(11).div(ctx.markPx), universe.szDecimals);
 
-    // Preparing order
-    await walletClient.updateLeverage({ asset: id, isCross: true, leverage: 3 });
-    const openOrderRes = await walletClient.order({
-        orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } }, c: randomCloid() }],
-        grouping: "na",
-    });
-    const [order] = openOrderRes.response.data.statuses;
-
     // —————————— Test ——————————
 
     const data = await Promise.all([
         // Check response 'success'
-        walletClient.cancelByCloid({
-            cancels: [{
-                asset: id,
-                cloid: "resting" in order ? order.resting.cloid! : order.filled.cloid!,
-            }],
-        }),
+        (async () => {
+            // Preparing order
+            await walletClient.updateLeverage({ asset: id, isCross: true, leverage: 3 });
+            const openOrderRes = await walletClient.order({
+                orders: [{
+                    a: id,
+                    b: true,
+                    p: pxDown,
+                    s: sz,
+                    r: false,
+                    t: { limit: { tif: "Gtc" } },
+                    c: randomCloid(),
+                }],
+                grouping: "na",
+            });
+            const [order] = openOrderRes.response.data.statuses;
+
+            // Cancel order
+            return await walletClient.cancelByCloid({
+                cancels: [{
+                    asset: id,
+                    cloid: "resting" in order ? order.resting.cloid! : order.filled.cloid!,
+                }],
+            });
+        })(),
+        // Check argument 'expiresAfter'
+        (async () => {
+            // Preparing order
+            await walletClient.updateLeverage({ asset: id, isCross: true, leverage: 3 });
+            const openOrderRes = await walletClient.order({
+                orders: [{
+                    a: id,
+                    b: true,
+                    p: pxDown,
+                    s: sz,
+                    r: false,
+                    t: { limit: { tif: "Gtc" } },
+                    c: randomCloid(),
+                }],
+                grouping: "na",
+            });
+            const [order] = openOrderRes.response.data.statuses;
+
+            // Cancel order
+            return await walletClient.cancelByCloid({
+                cancels: [{
+                    asset: id,
+                    cloid: "resting" in order ? order.resting.cloid! : order.filled.cloid!,
+                }],
+                expiresAfter: Date.now() + 1000 * 60 * 60,
+            });
+        })(),
     ]);
 
     schemaCoverage(MethodReturnType, data, {

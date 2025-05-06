@@ -36,10 +36,11 @@ Deno.test("order", async () => {
 
     try {
         const data = await Promise.all([
-            // Check response 'resting'
+            // Check response 'resting' + argument 'expiresAfter'
             walletClient.order({
                 orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
                 grouping: "na",
+                expiresAfter: Date.now() + 1000 * 60 * 60,
             }),
             // Check response 'filled'
             walletClient.order({
