@@ -298,6 +298,13 @@ export interface UserFees {
         };
         /** Referral discount rate. */
         referralDiscount: string;
+        /** Staking discount tiers details. */
+        stakingDiscountTiers: {
+            /** Basis points of maximum supply. */
+            bpsOfMaxSupply: string;
+            /** Discount rate applied. */
+            discount: string;
+        }[];
     };
     /** User cross-trade rate. */
     userCrossRate: string;
@@ -316,6 +323,13 @@ export interface UserFees {
     /** Timestamp when next trial becomes available. */
     nextTrialAvailableTimestamp: unknown | null;
     stakingLink: unknown | null;
+    /** Active staking discount details. */
+    activeStakingDiscount: {
+        /** Basis points of maximum supply. */
+        bpsOfMaxSupply: string;
+        /** Discount rate applied. */
+        discount: string;
+    };
 }
 
 /** Funding ledger update for a user. */

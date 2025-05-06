@@ -42,6 +42,25 @@ export interface FundingHistory {
     time: number;
 }
 
+/** Collection of margin tables indexed by ID. */
+export type MarginTables = [number, MarginTable][];
+
+/** Margin requirements table with multiple tiers. */
+export interface MarginTable {
+    /** Description of the margin table. */
+    description: string;
+    /** Array of margin tiers defining leverage limits. */
+    marginTiers: MarginTier[];
+}
+
+/** Individual tier in a margin requirements table. */
+export interface MarginTier {
+    /** Lower position size boundary for this tier. */
+    lowerBound: string;
+    /** Maximum allowed leverage for this tier. */
+    maxLeverage: number;
+}
+
 /** Context for a perpetual asset. */
 export interface PerpsAssetCtx extends SharedAssetCtx {
     /** Funding rate. */
@@ -62,6 +81,8 @@ export interface PerpsAssetCtx extends SharedAssetCtx {
 export interface PerpsMeta {
     /** Trading universes available for perpetual trading. */
     universe: PerpsUniverse[];
+    /** Margin requirement tables for different leverage tiers. */
+    marginTables: MarginTables;
 }
 
 /** Metadata and context for perpetual assets. */
