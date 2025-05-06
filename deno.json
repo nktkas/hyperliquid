@@ -9,6 +9,7 @@
     "imports": {
         "@derzade/typescript-event-target": "jsr:@derzade/typescript-event-target@1.1.1",
         "@noble/hashes/sha3": "jsr:@noble/hashes@^1.8.0/sha3",
+        "@std/bytes/concat": "jsr:@std/bytes@^1.0.5/concat",
         "@std/encoding/hex": "jsr:@std/encoding@^1.0.9/hex",
         "@std/msgpack/encode": "jsr:@std/msgpack@^1.0.3/encode"
     },

@@ -118,6 +118,8 @@ export interface BatchModifyRequest extends BaseExchangeRequest {
     };
     /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
+    expiresAfter?: number;
 }
 
 /**
@@ -140,6 +142,8 @@ export interface CancelRequest extends BaseExchangeRequest {
     };
     /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
+    expiresAfter?: number;
 }
 
 /**
@@ -162,6 +166,8 @@ export interface CancelByCloidRequest extends BaseExchangeRequest {
     };
     /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
+    expiresAfter?: number;
 }
 
 /**
@@ -287,6 +293,8 @@ export interface ModifyRequest extends BaseExchangeRequest {
     };
     /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
+    expiresAfter?: number;
 }
 
 /**
@@ -318,6 +326,8 @@ export interface OrderRequest extends BaseExchangeRequest {
     };
     /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
+    expiresAfter?: number;
 }
 
 /**
@@ -348,6 +358,8 @@ export interface ReserveRequestWeightRequest extends BaseExchangeRequest {
         /** Amount of request weight to reserve. */
         weight: number;
     };
+    /** Expiration time of the action. */
+    expiresAfter?: number;
 }
 
 /**
@@ -370,6 +382,8 @@ export interface ScheduleCancelRequest extends BaseExchangeRequest {
     };
     /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
+    expiresAfter?: number;
 }
 
 /**
@@ -652,6 +666,8 @@ export interface TwapCancelRequest extends BaseExchangeRequest {
     };
     /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
+    expiresAfter?: number;
 }
 
 /**
@@ -682,6 +698,8 @@ export interface TwapOrderRequest extends BaseExchangeRequest {
     };
     /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
+    expiresAfter?: number;
 }
 
 /**
@@ -703,6 +721,8 @@ export interface UpdateIsolatedMarginRequest extends BaseExchangeRequest {
     };
     /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
+    expiresAfter?: number;
 }
 
 /**
@@ -724,6 +744,8 @@ export interface UpdateLeverageRequest extends BaseExchangeRequest {
     };
     /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
+    expiresAfter?: number;
 }
 
 /**
@@ -829,6 +851,8 @@ export interface VaultTransferRequest extends BaseExchangeRequest {
         /** Amount for deposit/withdrawal (float * 1e6). */
         usd: number;
     };
+    /** Expiration time of the action. */
+    expiresAfter?: number;
 }
 
 /**

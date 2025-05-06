@@ -49,8 +49,9 @@
  */
 
 import { keccak_256 } from "@noble/hashes/sha3";
-import { encode, type ValueMap, type ValueType } from "@std/msgpack/encode";
+import { encode as encodeMsgpack, type ValueMap, type ValueType } from "@std/msgpack/encode";
 import { decodeHex, encodeHex } from "@std/encoding/hex";
+import { concat } from "@std/bytes/concat";
 import type { Hex } from "./base.ts";
 
 export type { Hex };
@@ -150,29 +151,40 @@ export interface AbstractWindowEthereum {
  * @param action - The action to be hashed.
  * @param nonce - Unique request identifier (recommended current timestamp in ms).
  * @param vaultAddress - Optional vault address used in the action.
+ * @param expiresAfter - Optional expiration time of the action in milliseconds since the epoch.
  * @returns The hash of the action.
  */
-export function createL1ActionHash(action: ValueType, nonce: number, vaultAddress?: Hex): Hex {
-    const normalizedAction = normalizeIntegersForMsgPack(action);
-    const msgPackBytes = encode(normalizedAction);
+export function createL1ActionHash(action: ValueType, nonce: number, vaultAddress?: Hex, expiresAfter?: number): Hex {
+    // 1. Action
+    const actionBytes = encodeMsgpack(normalizeIntegersForMsgPack(action));
 
-    const additionalBytesLength = vaultAddress ? 29 : 9;
-    const data = new Uint8Array(msgPackBytes.length + additionalBytesLength);
-    data.set(msgPackBytes);
+    // 2. Nonce
+    const nonceBytes = new Uint8Array(8);
+    new DataView(nonceBytes.buffer).setBigUint64(0, BigInt(nonce));
 
-    const view = new DataView(data.buffer);
-    view.setBigUint64(msgPackBytes.length, BigInt(nonce));
+    // 3. Vault address
+    const vaultMarker = Uint8Array.of(vaultAddress ? 0x01 : 0x00);
+    const vaultBytes = vaultAddress ? decodeHex(vaultAddress.slice(2)) : new Uint8Array();
 
-    if (vaultAddress) {
-        view.setUint8(msgPackBytes.length + 8, 1);
-        data.set(decodeHex(vaultAddress.slice(2)), msgPackBytes.length + 9);
-    } else {
-        view.setUint8(msgPackBytes.length + 8, 0);
+    // 4. Expires after
+    const expiresMarker = new Uint8Array(expiresAfter !== undefined ? 1 : 0);
+    const expiresBytes = new Uint8Array(expiresAfter !== undefined ? 8 : 0);
+    if (expiresAfter !== undefined) {
+        new DataView(expiresBytes.buffer).setBigUint64(0, BigInt(expiresAfter));
     }
 
-    const hashBytes = keccak_256(data);
-    const hashHex = encodeHex(hashBytes);
-    return `0x${hashHex}`;
+    // Create a keccak256 hash
+    const chunks: Uint8Array[] = [
+        actionBytes,
+        nonceBytes,
+        vaultMarker,
+        vaultBytes,
+        expiresMarker,
+        expiresBytes,
+    ];
+    const bytes = concat(chunks);
+    const hash = keccak_256(bytes);
+    return `0x${encodeHex(hash)}`;
 }
 
 /** Layer to make {@link https://jsr.io/@std/msgpack | @std/msgpack} compatible with {@link https://github.com/msgpack/msgpack-javascript | @msgpack/msgpack}. */
@@ -253,6 +265,8 @@ export async function signL1Action(args: {
     isTestnet?: boolean;
     /** Optional vault address used in the action. */
     vaultAddress?: Hex;
+    /** Optional expiration time of the action in milliseconds since the epoch. */
+    expiresAfter?: number;
 }): Promise<{ r: Hex; s: Hex; v: number }> {
     const {
         wallet,
@@ -260,6 +274,7 @@ export async function signL1Action(args: {
         nonce,
         isTestnet = false,
         vaultAddress,
+        expiresAfter,
     } = args;
 
     const domain = {
@@ -275,7 +290,7 @@ export async function signL1Action(args: {
         ],
     };
 
-    const actionHash = createL1ActionHash(action, nonce, vaultAddress);
+    const actionHash = createL1ActionHash(action, nonce, vaultAddress, expiresAfter);
     const message = {
         source: isTestnet ? "b" : "a",
         connectionId: actionHash,

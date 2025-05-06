@@ -91,6 +91,8 @@ export interface WalletClientParameters<
     isTestnet?: boolean;
     /** Sets a default vaultAddress to be used if no vaultAddress is explicitly passed to a method. */
     defaultVaultAddress?: Hex;
+    /** Sets a default expiresAfter to be used if no expiresAfter is explicitly passed to a method. */
+    defaultExpiresAfter?: number | (() => MaybePromise<number>);
     /**
      * The network that will be used to sign transactions.
      * Must match the network of the {@link wallet}.
@@ -121,17 +123,20 @@ export type ApproveBuilderFeeParameters = Omit<
 /** Parameters for the {@linkcode WalletClient.batchModify} method. */
 export type BatchModifyParameters =
     & Omit<BatchModifyRequest["action"], "type">
-    & Partial<Pick<BatchModifyRequest, "vaultAddress">>;
+    & Partial<Pick<BatchModifyRequest, "vaultAddress">>
+    & Partial<Pick<BatchModifyRequest, "expiresAfter">>;
 
 /** Parameters for the {@linkcode WalletClient.cancel} method. */
 export type CancelParameters =
     & Omit<CancelRequest["action"], "type">
-    & Partial<Pick<CancelRequest, "vaultAddress">>;
+    & Partial<Pick<CancelRequest, "vaultAddress">>
+    & Partial<Pick<CancelRequest, "expiresAfter">>;
 
 /** Parameters for the {@linkcode WalletClient.cancelByCloid} method. */
 export type CancelByCloidParameters =
     & Omit<CancelByCloidRequest["action"], "type">
-    & Partial<Pick<CancelByCloidRequest, "vaultAddress">>;
+    & Partial<Pick<CancelByCloidRequest, "vaultAddress">>
+    & Partial<Pick<CancelByCloidRequest, "expiresAfter">>;
 
 /** Parameters for the {@linkcode WalletClient.cDeposit} method. */
 export type CDepositParameters = Omit<
@@ -166,26 +171,28 @@ export type EvmUserModifyParameters = Omit<
 /** Parameters for the {@linkcode WalletClient.modify} method. */
 export type ModifyParameters =
     & Omit<ModifyRequest["action"], "type">
-    & Partial<Pick<ModifyRequest, "vaultAddress">>;
+    & Partial<Pick<ModifyRequest, "vaultAddress">>
+    & Partial<Pick<ModifyRequest, "expiresAfter">>;
 
 /** Parameters for the {@linkcode WalletClient.order} method. */
 export type OrderParameters =
     & Omit<OrderRequest["action"], "type">
-    & Partial<Pick<OrderRequest, "vaultAddress">>;
+    & Partial<Pick<OrderRequest, "vaultAddress">>
+    & Partial<Pick<OrderRequest, "expiresAfter">>;
 
 /** Parameters for the {@linkcode WalletClient.registerReferrer} method. */
 export type RegisterReferrerParameters = Omit<RegisterReferrerRequest["action"], "type">;
 
 /** Parameters for the {@linkcode WalletClient.reserveRequestWeight} method. */
-export type ReserveRequestWeightParameters = Omit<
-    ReserveRequestWeightRequest["action"],
-    "type"
->;
+export type ReserveRequestWeightParameters =
+    & Omit<ReserveRequestWeightRequest["action"], "type">
+    & Partial<Pick<ReserveRequestWeightRequest, "expiresAfter">>;
 
 /** Parameters for the {@linkcode WalletClient.scheduleCancel} method. */
 export type ScheduleCancelParameters =
     & Omit<ScheduleCancelRequest["action"], "type">
-    & Partial<Pick<ScheduleCancelRequest, "vaultAddress">>;
+    & Partial<Pick<ScheduleCancelRequest, "vaultAddress">>
+    & Partial<Pick<ScheduleCancelRequest, "expiresAfter">>;
 
 /** Parameters for the {@linkcode WalletClient.setDisplayName} method. */
 export type SetDisplayNameParameters = Omit<
@@ -265,22 +272,26 @@ export type TokenDelegateParameters = Omit<
 /** Parameters for the {@linkcode WalletClient.twapCancel} method. */
 export type TwapCancelParameters =
     & Omit<TwapCancelRequest["action"], "type">
-    & Partial<Pick<TwapCancelRequest, "vaultAddress">>;
+    & Partial<Pick<TwapCancelRequest, "vaultAddress">>
+    & Partial<Pick<TwapCancelRequest, "expiresAfter">>;
 
 /** Parameters for the {@linkcode WalletClient.twapOrder} method. */
 export type TwapOrderParameters =
     & TwapOrderRequest["action"]["twap"]
-    & Partial<Pick<TwapOrderRequest, "vaultAddress">>;
+    & Partial<Pick<TwapOrderRequest, "vaultAddress">>
+    & Partial<Pick<TwapOrderRequest, "expiresAfter">>;
 
 /** Parameters for the {@linkcode WalletClient.updateIsolatedMargin} method. */
 export type UpdateIsolatedMarginParameters =
     & Omit<UpdateIsolatedMarginRequest["action"], "type">
-    & Partial<Pick<UpdateIsolatedMarginRequest, "vaultAddress">>;
+    & Partial<Pick<UpdateIsolatedMarginRequest, "vaultAddress">>
+    & Partial<Pick<UpdateIsolatedMarginRequest, "expiresAfter">>;
 
 /** Parameters for the {@linkcode WalletClient.updateLeverage} method. */
 export type UpdateLeverageParameters =
     & Omit<UpdateLeverageRequest["action"], "type">
-    & Partial<Pick<UpdateLeverageRequest, "vaultAddress">>;
+    & Partial<Pick<UpdateLeverageRequest, "vaultAddress">>
+    & Partial<Pick<UpdateLeverageRequest, "expiresAfter">>;
 
 /** Parameters for the {@linkcode WalletClient.usdClassTransfer} method. */
 export type UsdClassTransferParameters = Omit<
@@ -307,10 +318,9 @@ export type VaultModifyParameters = Omit<
 >;
 
 /** Parameters for the {@linkcode WalletClient.vaultTransfer} method. */
-export type VaultTransferParameters = Omit<
-    VaultTransferRequest["action"],
-    "type"
->;
+export type VaultTransferParameters =
+    & Omit<VaultTransferRequest["action"], "type">
+    & Partial<Pick<VaultTransferRequest, "expiresAfter">>;
 
 /** Parameters for the {@linkcode WalletClient.withdraw3} method. */
 export type Withdraw3Parameters = Omit<
@@ -445,6 +455,9 @@ export class WalletClient<
     /** Sets a default vaultAddress to be used if no vaultAddress is explicitly passed to a method. */
     defaultVaultAddress?: Hex;
 
+    /** Sets a default expiresAfter to be used if no expiresAfter is explicitly passed to a method. */
+    defaultExpiresAfter?: number | (() => MaybePromise<number>);
+
     /**
      * The network that will be used to sign transactions.
      * Must match the network of the {@link wallet}.
@@ -505,6 +518,7 @@ export class WalletClient<
         this.wallet = args.wallet;
         this.isTestnet = args.isTestnet ?? false;
         this.defaultVaultAddress = args.defaultVaultAddress;
+        this.defaultExpiresAfter = args.defaultExpiresAfter;
         this.signatureChainId = args.signatureChainId ?? this._guessSignatureChainId;
         this.nonceManager = args.nonceManager ?? new NonceManager().getNonce;
     }
@@ -534,10 +548,8 @@ export class WalletClient<
         const action: ApproveAgentRequest["action"] = {
             ...args,
             type: "approveAgent",
-            hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: typeof this.signatureChainId === "string"
-                ? this.signatureChainId
-                : await this.signatureChainId(),
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
             nonce: await this.nonceManager(),
         };
 
@@ -558,9 +570,7 @@ export class WalletClient<
 
         // Send a request
         const request: ApproveAgentRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -592,10 +602,8 @@ export class WalletClient<
         const action: ApproveBuilderFeeRequest["action"] = {
             ...args,
             type: "approveBuilderFee",
-            hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: typeof this.signatureChainId === "string"
-                ? this.signatureChainId
-                : await this.signatureChainId(),
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
             nonce: await this.nonceManager(),
         };
 
@@ -616,9 +624,7 @@ export class WalletClient<
 
         // Send a request
         const request: ApproveBuilderFeeRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -666,6 +672,7 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
+            expiresAfter = await this._getDefaultExpiresAfter(),
             ...actionArgs
         } = args;
 
@@ -710,10 +717,11 @@ export class WalletClient<
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
+            expiresAfter,
         });
 
         // Send a request
-        const request: BatchModifyRequest = { action, signature, nonce, vaultAddress };
+        const request: BatchModifyRequest = { action, signature, nonce, vaultAddress, expiresAfter };
         const response = await this.transport.request("exchange", request, signal) as OrderResponse;
 
         // Validate a response
@@ -750,6 +758,7 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
+            expiresAfter = await this._getDefaultExpiresAfter(),
             ...actionArgs
         } = args;
 
@@ -770,10 +779,11 @@ export class WalletClient<
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
+            expiresAfter,
         });
 
         // Send a request
-        const request: CancelRequest = { action, signature, nonce, vaultAddress };
+        const request: CancelRequest = { action, signature, nonce, vaultAddress, expiresAfter };
         const response = await this.transport.request("exchange", request, signal) as CancelResponse;
 
         // Validate a response
@@ -809,6 +819,7 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
+            expiresAfter = await this._getDefaultExpiresAfter(),
             ...actionArgs
         } = args;
 
@@ -829,10 +840,11 @@ export class WalletClient<
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
+            expiresAfter,
         });
 
         // Send a request
-        const request: CancelByCloidRequest = { action, signature, nonce, vaultAddress };
+        const request: CancelByCloidRequest = { action, signature, nonce, vaultAddress, expiresAfter };
         const response = await this.transport.request("exchange", request, signal) as CancelResponse;
 
         // Validate a response
@@ -865,10 +877,8 @@ export class WalletClient<
         const action: CDepositRequest["action"] = {
             ...args,
             type: "cDeposit",
-            hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: typeof this.signatureChainId === "string"
-                ? this.signatureChainId
-                : await this.signatureChainId(),
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
             nonce: await this.nonceManager(),
         };
 
@@ -888,9 +898,7 @@ export class WalletClient<
 
         // Send a request
         const request: CDepositRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -932,9 +940,7 @@ export class WalletClient<
 
         // Send a request
         const request: ClaimRewardsRequest = { action: sortedAction, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -980,8 +986,8 @@ export class WalletClient<
         // Send a request
         const request: CreateSubAccountRequest = { action, signature, nonce };
         const response = await this.transport.request("exchange", request, signal) as
-            | CreateSubAccountResponse
-            | ErrorResponse;
+            | ErrorResponse
+            | CreateSubAccountResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -1034,8 +1040,8 @@ export class WalletClient<
         // Send a request
         const request: CreateVaultRequest = { action, signature, nonce };
         const response = await this.transport.request("exchange", request, signal) as
-            | CreateVaultResponse
-            | ErrorResponse;
+            | ErrorResponse
+            | CreateVaultResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -1067,10 +1073,8 @@ export class WalletClient<
         const action: CWithdrawRequest["action"] = {
             ...args,
             type: "cWithdraw",
-            hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: typeof this.signatureChainId === "string"
-                ? this.signatureChainId
-                : await this.signatureChainId(),
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
             nonce: await this.nonceManager(),
         };
 
@@ -1090,9 +1094,7 @@ export class WalletClient<
 
         // Send a request
         const request: CWithdrawRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -1137,9 +1139,7 @@ export class WalletClient<
 
         // Send a request
         const request: EvmUserModifyRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -1185,6 +1185,7 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
+            expiresAfter = await this._getDefaultExpiresAfter(),
             ...actionArgs
         } = args;
 
@@ -1224,13 +1225,12 @@ export class WalletClient<
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
+            expiresAfter,
         });
 
         // Send a request
-        const request: ModifyRequest = { action, signature, nonce, vaultAddress };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const request: ModifyRequest = { action, signature, nonce, vaultAddress, expiresAfter };
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -1276,6 +1276,7 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
+            expiresAfter = await this._getDefaultExpiresAfter(),
             ...actionArgs
         } = args;
 
@@ -1325,10 +1326,11 @@ export class WalletClient<
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
+            expiresAfter,
         });
 
         // Send a request
-        const request: OrderRequest = { action, signature, nonce, vaultAddress };
+        const request: OrderRequest = { action, signature, nonce, vaultAddress, expiresAfter };
         const response = await this.transport.request("exchange", request, signal) as OrderResponse;
 
         // Validate a response
@@ -1374,9 +1376,7 @@ export class WalletClient<
 
         // Send a request
         const request: RegisterReferrerRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -1404,11 +1404,17 @@ export class WalletClient<
      * ```
      */
     async reserveRequestWeight(args: ReserveRequestWeightParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const {
+            expiresAfter = await this._getDefaultExpiresAfter(),
+            ...actionArgs
+        } = args;
+
         // Construct an action
         const nonce = await this.nonceManager();
         const action: ReserveRequestWeightRequest["action"] = {
             type: "reserveRequestWeight",
-            weight: args.weight,
+            weight: actionArgs.weight,
         };
 
         // Sign the action
@@ -1417,13 +1423,12 @@ export class WalletClient<
             action,
             nonce,
             isTestnet: this.isTestnet,
+            expiresAfter,
         });
 
         // Send a request
-        const request: ReserveRequestWeightRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const request: ReserveRequestWeightRequest = { action, signature, nonce, expiresAfter };
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -1454,6 +1459,7 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
+            expiresAfter = await this._getDefaultExpiresAfter(),
             ...actionArgs
         } = args;
 
@@ -1472,13 +1478,12 @@ export class WalletClient<
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
+            expiresAfter,
         });
 
         // Send a request
-        const request: ScheduleCancelRequest = { action, signature, nonce, vaultAddress };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const request: ScheduleCancelRequest = { action, signature, nonce, vaultAddress, expiresAfter };
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -1523,9 +1528,7 @@ export class WalletClient<
 
         // Send a request
         const request: SetDisplayNameRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -1570,9 +1573,7 @@ export class WalletClient<
 
         // Send a request
         const request: SetReferrerRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -1684,9 +1685,7 @@ export class WalletClient<
             | SpotDeployRequest_Genesis
             | SpotDeployRequest_RegisterSpot
             | SpotDeployRequest_RegisterHyperliquidity;
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -1722,10 +1721,8 @@ export class WalletClient<
         const action: SpotSendRequest["action"] = {
             ...args,
             type: "spotSend",
-            hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: typeof this.signatureChainId === "string"
-                ? this.signatureChainId
-                : await this.signatureChainId(),
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
             time: await this.nonceManager(),
         };
 
@@ -1747,9 +1744,7 @@ export class WalletClient<
 
         // Send a request
         const request: SpotSendRequest = { action, signature, nonce: action.time };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -1796,9 +1791,7 @@ export class WalletClient<
 
         // Send a request
         const request: SpotUserRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -1854,9 +1847,7 @@ export class WalletClient<
 
         // Send a request
         const request: SubAccountSpotTransferRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -1907,9 +1898,7 @@ export class WalletClient<
 
         // Send a request
         const request: SubAccountTransferRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -1945,10 +1934,8 @@ export class WalletClient<
         const action: TokenDelegateRequest["action"] = {
             ...args,
             type: "tokenDelegate",
-            hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: typeof this.signatureChainId === "string"
-                ? this.signatureChainId
-                : await this.signatureChainId(),
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
             nonce: await this.nonceManager(),
         };
 
@@ -1970,9 +1957,7 @@ export class WalletClient<
 
         // Send a request
         const request: TokenDelegateRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -2006,6 +1991,7 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
+            expiresAfter = await this._getDefaultExpiresAfter(),
             ...actionArgs
         } = args;
 
@@ -2024,10 +2010,11 @@ export class WalletClient<
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
+            expiresAfter,
         });
 
         // Send a request
-        const request: TwapCancelRequest = { action, signature, nonce, vaultAddress };
+        const request: TwapCancelRequest = { action, signature, nonce, vaultAddress, expiresAfter };
         const response = await this.transport.request("exchange", request, signal) as TwapCancelResponse;
 
         // Validate a response
@@ -2066,6 +2053,7 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
+            expiresAfter = await this._getDefaultExpiresAfter(),
             ...actionArgs
         } = args;
 
@@ -2090,10 +2078,11 @@ export class WalletClient<
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
+            expiresAfter,
         });
 
         // Send a request
-        const request: TwapOrderRequest = { action, signature, nonce, vaultAddress };
+        const request: TwapOrderRequest = { action, signature, nonce, vaultAddress, expiresAfter };
         const response = await this.transport.request("exchange", request, signal) as TwapOrderResponse;
 
         // Validate a response
@@ -2125,6 +2114,7 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
+            expiresAfter = await this._getDefaultExpiresAfter(),
             ...actionArgs
         } = args;
 
@@ -2144,13 +2134,12 @@ export class WalletClient<
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
+            expiresAfter,
         });
 
         // Send a request
-        const request: UpdateIsolatedMarginRequest = { action, signature, nonce, vaultAddress };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const request: UpdateIsolatedMarginRequest = { action, signature, nonce, vaultAddress, expiresAfter };
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -2181,6 +2170,7 @@ export class WalletClient<
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
+            expiresAfter = await this._getDefaultExpiresAfter(),
             ...actionArgs
         } = args;
 
@@ -2200,13 +2190,12 @@ export class WalletClient<
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
+            expiresAfter,
         });
 
         // Send a request
-        const request: UpdateLeverageRequest = { action, signature, nonce, vaultAddress };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const request: UpdateLeverageRequest = { action, signature, nonce, vaultAddress, expiresAfter };
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -2238,10 +2227,8 @@ export class WalletClient<
         const action: UsdClassTransferRequest["action"] = {
             ...args,
             type: "usdClassTransfer",
-            hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: typeof this.signatureChainId === "string"
-                ? this.signatureChainId
-                : await this.signatureChainId(),
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
             nonce: await this.nonceManager(),
         };
 
@@ -2262,9 +2249,7 @@ export class WalletClient<
 
         // Send a request
         const request: UsdClassTransferRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -2296,10 +2281,8 @@ export class WalletClient<
         const action: UsdSendRequest["action"] = {
             ...args,
             type: "usdSend",
-            hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: typeof this.signatureChainId === "string"
-                ? this.signatureChainId
-                : await this.signatureChainId(),
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
             time: await this.nonceManager(),
         };
 
@@ -2320,9 +2303,7 @@ export class WalletClient<
 
         // Send a request
         const request: UsdSendRequest = { action, signature, nonce: action.time };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -2368,9 +2349,7 @@ export class WalletClient<
 
         // Send a request
         const request: VaultDistributeRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -2421,9 +2400,7 @@ export class WalletClient<
 
         // Send a request
         const request: VaultModifyRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -2455,13 +2432,19 @@ export class WalletClient<
      * ```
      */
     async vaultTransfer(args: VaultTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const {
+            expiresAfter = await this._getDefaultExpiresAfter(),
+            ...actionArgs
+        } = args;
+
         // Construct an action
         const nonce = await this.nonceManager();
         const action: VaultTransferRequest["action"] = {
             type: "vaultTransfer",
-            vaultAddress: args.vaultAddress,
-            isDeposit: args.isDeposit,
-            usd: args.usd,
+            vaultAddress: actionArgs.vaultAddress,
+            isDeposit: actionArgs.isDeposit,
+            usd: actionArgs.usd,
         };
 
         // Sign the action
@@ -2470,13 +2453,12 @@ export class WalletClient<
             action,
             nonce,
             isTestnet: this.isTestnet,
+            expiresAfter,
         });
 
         // Send a request
-        const request: VaultTransferRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const request: VaultTransferRequest = { action, signature, nonce, expiresAfter };
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -2508,10 +2490,8 @@ export class WalletClient<
         const action: Withdraw3Request["action"] = {
             ...args,
             type: "withdraw3",
-            hyperliquidChain: this.isTestnet ? "Testnet" : "Mainnet",
-            signatureChainId: typeof this.signatureChainId === "string"
-                ? this.signatureChainId
-                : await this.signatureChainId(),
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
             time: await this.nonceManager(),
         };
 
@@ -2532,9 +2512,7 @@ export class WalletClient<
 
         // Send a request
         const request: Withdraw3Request = { action, signature, nonce: action.time };
-        const response = await this.transport.request("exchange", request, signal) as
-            | SuccessResponse
-            | ErrorResponse;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
         this._validateResponse(response);
@@ -2575,6 +2553,23 @@ export class WalletClient<
         }
         // Attempt to guess chain ID based on isTestnet
         return this.isTestnet ? "0x66eee" : "0xa4b1";
+    }
+
+    /** Get the default expiration time for an action. */
+    protected async _getDefaultExpiresAfter(): Promise<number | undefined> {
+        return typeof this.defaultExpiresAfter === "number"
+            ? this.defaultExpiresAfter
+            : await this.defaultExpiresAfter?.();
+    }
+
+    /** Get the signature chain ID for the wallet. */
+    protected async _getSignatureChainId(): Promise<Hex> {
+        return typeof this.signatureChainId === "string" ? this.signatureChainId : await this.signatureChainId();
+    }
+
+    /** Get the Hyperliquid chain based on the isTestnet flag. */
+    protected _getHyperliquidChain(): "Mainnet" | "Testnet" {
+        return this.isTestnet ? "Testnet" : "Mainnet";
     }
 
     /** Validate a response from the API. */
