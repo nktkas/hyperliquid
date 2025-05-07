@@ -70,8 +70,8 @@ export interface ApproveAgentRequest extends BaseExchangeRequest {
         nonce: number;
         /** Agent address. */
         agentAddress: Hex;
-        /** Agent name. */
-        agentName: string;
+        /** Agent name or undefined for unnamed agent. */
+        agentName?: string;
     };
 }
 

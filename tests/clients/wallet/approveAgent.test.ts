@@ -26,10 +26,15 @@ Deno.test("approveAgent", async () => {
 
     // —————————— Test ——————————
 
-    const data = await walletClient.approveAgent({
-        agentAddress: generateEthereumAddress(),
-        agentName: "agentName",
-    });
+    const data = await Promise.all([
+        walletClient.approveAgent({
+            agentAddress: generateEthereumAddress(),
+            agentName: "agentName",
+        }),
+        walletClient.approveAgent({
+            agentAddress: generateEthereumAddress(),
+        }),
+    ]);
 
-    schemaCoverage(MethodReturnType, [data]);
+    schemaCoverage(MethodReturnType, data);
 });

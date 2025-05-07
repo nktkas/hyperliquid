@@ -547,6 +547,7 @@ export class WalletClient<
         // Construct an action
         const action: ApproveAgentRequest["action"] = {
             ...args,
+            agentName: args.agentName ?? "",
             type: "approveAgent",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
@@ -567,6 +568,7 @@ export class WalletClient<
             },
             chainId: parseInt(action.signatureChainId, 16),
         });
+        if (action.agentName === "") delete action.agentName;
 
         // Send a request
         const request: ApproveAgentRequest = { action, signature, nonce: action.nonce };
