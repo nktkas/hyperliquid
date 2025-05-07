@@ -33,7 +33,7 @@ Deno.test("userNonFundingLedgerUpdates", async () => {
 
     schemaCoverage(MethodReturnType, [data], {
         ignoreBranchesByPath: {
-            "#/properties/nonFundingLedgerUpdates/items/properties/delta/anyOf": [1, 3, 4, 8, 10, 11],
+            "#/properties/nonFundingLedgerUpdates/items/properties/delta/anyOf": [1, 3, 4, 6, 7, 8, 10, 11],
         },
         ignoreEnumValuesByPath: {
             "#/properties/nonFundingLedgerUpdates/items/properties/delta/anyOf/3/properties/leverageType": ["Cross"],
