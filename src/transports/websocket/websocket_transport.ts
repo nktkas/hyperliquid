@@ -147,20 +147,11 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
      * @note Explorer requests are not supported in the Hyperliquid WebSocket API.
      */
     request(type: "info" | "exchange" | "explorer", payload: unknown, signal?: AbortSignal): Promise<unknown> {
-        // Send the request and wait for a response
-        const timeoutSignal = this.timeout ? AbortSignal.timeout(this.timeout) : undefined;
-        const combinedSignal = signal && timeoutSignal
-            ? AbortSignal.any([signal, timeoutSignal])
-            : signal ?? timeoutSignal;
-
-        return this._wsRequester.request(
-            "post",
-            {
-                type: type === "exchange" ? "action" : type,
-                payload,
-            },
-            combinedSignal,
-        );
+        const combinedTimeoutSignal = this._getCombinedTimeoutSignal(signal);
+        return this._wsRequester.request("post", {
+            type: type === "exchange" ? "action" : type,
+            payload,
+        }, combinedTimeoutSignal);
     }
 
     /**
@@ -184,12 +175,8 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
         let subscription = this._subscriptions.get(id);
         if (!subscription) {
             // Send subscription request
-            const timeoutSignal = this.timeout ? AbortSignal.timeout(this.timeout) : undefined;
-            const combinedSignal = signal && timeoutSignal
-                ? AbortSignal.any([signal, timeoutSignal])
-                : signal ?? timeoutSignal;
-
-            const requestPromise = this._wsRequester.request("subscribe", payload, combinedSignal);
+            const combinedTimeoutSignal = this._getCombinedTimeoutSignal(signal);
+            const requestPromise = this._wsRequester.request("subscribe", payload, combinedTimeoutSignal);
 
             // Cache subscription info
             subscription = { listeners: new Map(), requestPromise };
@@ -212,13 +199,9 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
                     this._subscriptions.delete(id);
 
                     // If the socket is open, send unsubscription request
-                    if (this.socket.readyState === WebSocket.OPEN) {
-                        const timeoutSignal = this.timeout ? AbortSignal.timeout(this.timeout) : undefined;
-                        const combinedSignal = signal && timeoutSignal
-                            ? AbortSignal.any([signal, timeoutSignal])
-                            : signal ?? timeoutSignal;
-
-                        await this._wsRequester.request("unsubscribe", payload, combinedSignal);
+                    if (this.socket.readyState === ReconnectingWebSocket.OPEN) {
+                        const combinedTimeoutSignal = this._getCombinedTimeoutSignal(signal);
+                        await this._wsRequester.request("unsubscribe", payload, combinedTimeoutSignal);
                     }
                 }
             };
@@ -256,11 +239,11 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
     ready(signal?: AbortSignal): Promise<void> {
         return new Promise((resolve, reject) => {
             const combinedSignal = signal
-                ? AbortSignal.any([this.socket.terminationSignal, signal])
-                : this.socket.terminationSignal;
+                ? AbortSignal.any([this.socket.reconnectAbortController.signal, signal])
+                : this.socket.reconnectAbortController.signal;
 
             if (combinedSignal.aborted) return reject(combinedSignal.reason);
-            if (this.socket.readyState === WebSocket.OPEN) return resolve();
+            if (this.socket.readyState === ReconnectingWebSocket.OPEN) return resolve();
 
             const handleOpen = () => {
                 combinedSignal.removeEventListener("abort", handleAbort);
@@ -284,7 +267,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
     close(signal?: AbortSignal): Promise<void> {
         return new Promise((resolve, reject) => {
             if (signal?.aborted) return reject(signal.reason);
-            if (this.socket.readyState === WebSocket.CLOSED) return resolve();
+            if (this.socket.readyState === ReconnectingWebSocket.CLOSED) return resolve();
 
             const handleClose = () => {
                 signal?.removeEventListener("abort", handleAbort);
@@ -300,5 +283,18 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
 
             this.socket.close();
         });
+    }
+
+    /**
+     * Combines the provided abort signal with the timeout signal.
+     * @param signal An optional abort signal.
+     * @returns A combined abort signal or undefined.
+     */
+    protected _getCombinedTimeoutSignal(signal?: AbortSignal): AbortSignal | undefined {
+        const timeoutSignal = this.timeout ? AbortSignal.timeout(this.timeout) : undefined;
+        const combinedSignal = signal && timeoutSignal
+            ? AbortSignal.any([signal, timeoutSignal])
+            : signal ?? timeoutSignal;
+        return combinedSignal;
     }
 }

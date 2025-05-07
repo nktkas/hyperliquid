@@ -2,17 +2,17 @@ import type { Hex } from "../../base.ts";
 
 /** Base structure for exchange responses. */
 export interface BaseExchangeResponse {
-    /** Response status */
+    /** Response status indicating success or failure of the action. */
     status: "ok" | "err";
-    /** Error message or success data */
+    /** Success data or error message. */
     response:
-        | string
         | {
-            /** Type of response. */
+            /** Type of operation. */
             type: string;
-            /** Specific data for the operation. */
+            /** Specific data for the action. */
             data?: unknown;
-        };
+        }
+        | string;
 }
 
 /** Response for order cancellation. */
