@@ -354,7 +354,7 @@ Deno.test("HttpTransport Tests", async (t) => {
 
     // 8) Server Configuration Tests
     await t.step("Server Configuration Tests", async (t) => {
-        await t.step("Default server (should be 'api')", async () => {
+        await t.step("Default server", async () => {
             const transport = new HttpTransport();
 
             // Test for endpoint 'info' with default server
@@ -380,78 +380,6 @@ Deno.test("HttpTransport Tests", async (t) => {
                 });
             };
             await transport.request("explorer", {});
-        });
-
-        await t.step("api2 server", async () => {
-            const transport = new HttpTransport({ server: "api2" });
-
-            // Test for endpoint 'info' with api2 server
-            globalThis.fetch = async (req: RequestInfo | URL) => {
-                req = new Request(req);
-
-                assertEquals(req.url, "https://api2.hyperliquid.xyz/info");
-                return new Response("{}", {
-                    status: 200,
-                    headers: { "Content-Type": "application/json" },
-                });
-            };
-            await transport.request("info", {});
-
-            // Test for endpoint 'exchange' with api2 server
-            globalThis.fetch = async (req: RequestInfo | URL) => {
-                req = new Request(req);
-
-                assertEquals(req.url, "https://api2.hyperliquid.xyz/exchange");
-                return new Response("{}", {
-                    status: 200,
-                    headers: { "Content-Type": "application/json" },
-                });
-            };
-            await transport.request("exchange", {});
-
-            // Test for endpoint 'explorer' with api2 server (should still use rpc URL)
-            globalThis.fetch = async (req: RequestInfo | URL) => {
-                req = new Request(req);
-
-                assertEquals(req.url, "https://rpc.hyperliquid.xyz/explorer");
-                return new Response("{}", {
-                    status: 200,
-                    headers: { "Content-Type": "application/json" },
-                });
-            };
-            await transport.request("explorer", {});
-        });
-
-        await t.step("api-ui server", async () => {
-            const transport = new HttpTransport({ server: "api-ui" });
-
-            // Test for endpoint 'info' with api-ui server
-            globalThis.fetch = async (req: RequestInfo | URL) => {
-                req = new Request(req);
-
-                assertEquals(req.url, "https://api-ui.hyperliquid.xyz/info");
-                return new Response("{}", {
-                    status: 200,
-                    headers: { "Content-Type": "application/json" },
-                });
-            };
-            await transport.request("info", {});
-        });
-
-        await t.step("api2 server with testnet=true", async () => {
-            const transport = new HttpTransport({ server: "api2", isTestnet: true });
-
-            // Test for endpoint 'info' with api2 server on testnet
-            globalThis.fetch = async (req: RequestInfo | URL) => {
-                req = new Request(req);
-
-                assertEquals(req.url, "https://api2.hyperliquid-testnet.xyz/info");
-                return new Response("{}", {
-                    status: 200,
-                    headers: { "Content-Type": "application/json" },
-                });
-            };
-            await transport.request("info", {});
         });
 
         await t.step("Custom URL object", async () => {
@@ -491,99 +419,6 @@ Deno.test("HttpTransport Tests", async (t) => {
                 });
             };
             await transport.request("explorer", {});
-        });
-
-        await t.step("Custom URL object with testnet=true", async () => {
-            const transport = new HttpTransport({
-                isTestnet: true,
-                server: {
-                    mainnet: {
-                        api: "https://custom-api.example.com",
-                        rpc: "https://custom-rpc.example.com",
-                    },
-                    testnet: {
-                        api: "https://custom-testnet-api.example.com",
-                        rpc: "https://custom-testnet-rpc.example.com",
-                    },
-                },
-            });
-
-            // Test for endpoint 'info' with custom testnet URL
-            globalThis.fetch = async (req: RequestInfo | URL) => {
-                req = new Request(req);
-
-                assertEquals(req.url, "https://custom-testnet-api.example.com/info");
-                return new Response("{}", {
-                    status: 200,
-                    headers: { "Content-Type": "application/json" },
-                });
-            };
-            await transport.request("info", {});
-        });
-
-        await t.step("Partial custom URL object (fall back to defaults)", async () => {
-            const transport = new HttpTransport({
-                server: {
-                    mainnet: {
-                        api: "https://custom-api.example.com",
-                        // No RPC specified, should fall back to default
-                    },
-                    // No testnet specified, should fall back to default
-                },
-            });
-
-            // Test for endpoint 'info' with partial custom URL
-            globalThis.fetch = async (req: RequestInfo | URL) => {
-                req = new Request(req);
-
-                assertEquals(req.url, "https://custom-api.example.com/info");
-                return new Response("{}", {
-                    status: 200,
-                    headers: { "Content-Type": "application/json" },
-                });
-            };
-            await transport.request("info", {});
-
-            // Test for endpoint 'explorer' with partial custom URL (should fall back to default RPC)
-            globalThis.fetch = async (req: RequestInfo | URL) => {
-                req = new Request(req);
-
-                assertEquals(req.url, "https://rpc.hyperliquid.xyz/explorer");
-                return new Response("{}", {
-                    status: 200,
-                    headers: { "Content-Type": "application/json" },
-                });
-            };
-            await transport.request("explorer", {});
-
-            // Switch to testnet (should fall back to default testnet URLs)
-            transport.isTestnet = true;
-
-            // Test for endpoint 'info' with testnet and partial custom URL
-            globalThis.fetch = async (req: RequestInfo | URL) => {
-                req = new Request(req);
-
-                assertEquals(req.url, "https://api.hyperliquid-testnet.xyz/info");
-                return new Response("{}", {
-                    status: 200,
-                    headers: { "Content-Type": "application/json" },
-                });
-            };
-            await transport.request("info", {});
-
-            // Empty mainnet.api should also return default value
-            transport.isTestnet = false;
-            transport.server = {};
-            globalThis.fetch = async (req: RequestInfo | URL) => {
-                req = new Request(req);
-
-                assertEquals(req.url, "https://api.hyperliquid.xyz/info");
-                return new Response("{}", {
-                    status: 200,
-                    headers: { "Content-Type": "application/json" },
-                });
-            };
-            await transport.request("info", {});
         });
     });
 

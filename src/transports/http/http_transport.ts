@@ -35,25 +35,11 @@ export interface HttpTransportOptions {
      */
     timeout?: number | null;
 
-    /**
-     * Server to use for API requests.
-     * Can be a predefined server name or a custom URLs object.
-     * @defaultValue `api`
-     */
-    server?:
-        | "api"
-        | "api2"
-        | "api-ui"
-        | {
-            mainnet?: {
-                api?: string | URL;
-                rpc?: string | URL;
-            };
-            testnet?: {
-                api?: string | URL;
-                rpc?: string | URL;
-            };
-        };
+    /** Custom server to use for API requests. */
+    server?: {
+        mainnet?: { api?: string | URL; rpc?: string | URL };
+        testnet?: { api?: string | URL; rpc?: string | URL };
+    };
 
     /** A custom {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/RequestInit | RequestInit} that is merged with a fetch request. */
     fetchOptions?: Omit<RequestInit, "body" | "method">;
@@ -75,51 +61,11 @@ export interface HttpTransportOptions {
 
 /** HTTP implementation of the REST transport interface. */
 export class HttpTransport implements IRequestTransport, HttpTransportOptions {
-    /** Predefined server configurations for the Hyperliquid API. */
-    protected static readonly servers = {
-        api: {
-            mainnet: {
-                api: "https://api.hyperliquid.xyz",
-                rpc: "https://rpc.hyperliquid.xyz",
-            },
-            testnet: {
-                api: "https://api.hyperliquid-testnet.xyz",
-                rpc: "https://rpc.hyperliquid-testnet.xyz",
-            },
-        },
-        api2: {
-            mainnet: {
-                api: "https://api2.hyperliquid.xyz",
-                rpc: "https://rpc.hyperliquid.xyz",
-            },
-            testnet: {
-                api: "https://api2.hyperliquid-testnet.xyz",
-                rpc: "https://rpc.hyperliquid-testnet.xyz",
-            },
-        },
-        "api-ui": {
-            mainnet: {
-                api: "https://api-ui.hyperliquid.xyz",
-                rpc: "https://rpc.hyperliquid.xyz",
-            },
-            testnet: {
-                api: "https://api-ui.hyperliquid-testnet.xyz",
-                rpc: "https://rpc.hyperliquid-testnet.xyz",
-            },
-        },
-    };
-
     isTestnet: boolean;
     timeout: number | null;
-    server: "api" | "api2" | "api-ui" | {
-        mainnet?: {
-            api?: string | URL;
-            rpc?: string | URL;
-        };
-        testnet?: {
-            api?: string | URL;
-            rpc?: string | URL;
-        };
+    server: {
+        mainnet: { api: string | URL; rpc: string | URL };
+        testnet: { api: string | URL; rpc: string | URL };
     };
     fetchOptions: Omit<RequestInit, "body" | "method">;
     onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>;
@@ -132,33 +78,19 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
     constructor(options?: HttpTransportOptions) {
         this.isTestnet = options?.isTestnet ?? false;
         this.timeout = options?.timeout === undefined ? 10_000 : options.timeout;
-        this.server = options?.server ?? "api";
+        this.server = {
+            mainnet: {
+                api: options?.server?.mainnet?.api ?? "https://api.hyperliquid.xyz",
+                rpc: options?.server?.mainnet?.rpc ?? "https://rpc.hyperliquid.xyz",
+            },
+            testnet: {
+                api: options?.server?.testnet?.api ?? "https://api.hyperliquid-testnet.xyz",
+                rpc: options?.server?.testnet?.rpc ?? "https://rpc.hyperliquid-testnet.xyz",
+            },
+        };
         this.fetchOptions = options?.fetchOptions ?? {};
         this.onRequest = options?.onRequest;
         this.onResponse = options?.onResponse;
-    }
-
-    /**
-     * Returns the API and RPC endpoint URLs for the specified server.
-     * @returns An object containing the API and RPC endpoint URLs for the mainnet and testnet.
-     */
-    protected get endpointPaths(): {
-        mainnet: { api: string | URL; rpc: string | URL };
-        testnet: { api: string | URL; rpc: string | URL };
-    } {
-        if (typeof this.server === "string") {
-            return HttpTransport.servers[this.server];
-        }
-        return {
-            mainnet: {
-                api: this.server.mainnet?.api ?? HttpTransport.servers.api.mainnet.api,
-                rpc: this.server.mainnet?.rpc ?? HttpTransport.servers.api.mainnet.rpc,
-            },
-            testnet: {
-                api: this.server.testnet?.api ?? HttpTransport.servers.api.testnet.api,
-                rpc: this.server.testnet?.rpc ?? HttpTransport.servers.api.testnet.rpc,
-            },
-        };
     }
 
     /**
@@ -178,7 +110,7 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
         // Construct a Request
         const url = new URL(
             endpoint,
-            this.endpointPaths[this.isTestnet ? "testnet" : "mainnet"][endpoint === "explorer" ? "rpc" : "api"],
+            this.server[this.isTestnet ? "testnet" : "mainnet"][endpoint === "explorer" ? "rpc" : "api"],
         );
         const init = mergeRequestInit(
             {
