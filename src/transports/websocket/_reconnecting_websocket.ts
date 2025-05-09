@@ -105,7 +105,7 @@ export class ReconnectingWebSocket implements WebSocket {
     }[] = [];
     private _attempt = 0;
     public reconnectOptions: Required<ReconnectingWebSocketOptions>;
-    public readonly reconnectAbortController = new AbortController();
+    public readonly reconnectAbortController: AbortController = new AbortController();
 
     constructor(url: string | URL, protocols?: string | string[], options?: ReconnectingWebSocketOptions) {
         this.reconnectOptions = {
