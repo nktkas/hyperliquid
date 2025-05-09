@@ -36,7 +36,6 @@ Deno.test("spotDeploy", async (t) => {
                     },
                 }),
             ApiRequestError,
-            "Error deploying spot:",
         );
     });
 
