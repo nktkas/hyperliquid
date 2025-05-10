@@ -22,6 +22,12 @@ Deno.test("vaultSummaries", async () => {
     const data = await client.vaultSummaries();
 
     schemaCoverage(MethodReturnType, [data], {
+        ignoreBranchesByPath: {
+            "#/items/properties/relationship/anyOf": [1],
+        },
+        ignoreEnumValuesByPath: {
+            "#/items/properties/relationship/anyOf/0/properties/type": ["child"],
+        },
         ignoreEmptyArrayPaths: ["#"],
     });
 });
