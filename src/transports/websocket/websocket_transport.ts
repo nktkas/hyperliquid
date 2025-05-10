@@ -52,7 +52,7 @@ export interface WebSocketTransportOptions {
 }
 
 /** WebSocket implementation of the REST and Subscription transport interfaces. */
-export class WebSocketTransport implements IRequestTransport, ISubscriptionTransport {
+export class WebSocketTransport implements IRequestTransport, ISubscriptionTransport, AsyncDisposable {
     /** The interval timer ID for keep-alive messages. */
     protected _keepAliveTimer: number | null = null;
 
@@ -296,5 +296,9 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
             ? AbortSignal.any([signal, timeoutSignal])
             : signal ?? timeoutSignal;
         return combinedSignal;
+    }
+
+    async [Symbol.asyncDispose](): Promise<void> {
+        await this.close();
     }
 }

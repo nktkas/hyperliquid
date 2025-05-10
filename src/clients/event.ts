@@ -95,7 +95,9 @@ export type EventWebData2Parameters = Omit<WsWebData2Request, "type">;
  * Event client for subscribing to various Hyperliquid events.
  * @typeParam T The type of transport used to connect to the Hyperliquid Websocket API.
  */
-export class EventClient<T extends ISubscriptionTransport = ISubscriptionTransport> {
+export class EventClient<
+    T extends ISubscriptionTransport = ISubscriptionTransport,
+> implements AsyncDisposable {
     /** The transport used to connect to the Hyperliquid API. */
     transport: T;
 
@@ -840,5 +842,9 @@ export class EventClient<T extends ISubscriptionTransport = ISubscriptionTranspo
             },
             signal,
         );
+    }
+
+    async [Symbol.asyncDispose](): Promise<void> {
+        await this.transport[Symbol.asyncDispose]?.();
     }
 }

@@ -442,7 +442,7 @@ export class WalletClient<
             | AbstractEthersV5Signer
             | AbstractExtendedViemWalletClient
             | AbstractWindowEthereum,
-> {
+> implements AsyncDisposable {
     /** The transport used to connect to the Hyperliquid API. */
     transport: T;
 
@@ -2604,5 +2604,9 @@ export class WalletClient<
                 throw new ApiRequestError(response as TwapOrderResponse | TwapCancelResponse);
             }
         }
+    }
+
+    async [Symbol.asyncDispose](): Promise<void> {
+        await this.transport[Symbol.asyncDispose]?.();
     }
 }

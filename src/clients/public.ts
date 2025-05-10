@@ -222,7 +222,9 @@ export type UserDetailsParameters = Omit<UserDetailsRequest, "type">;
  * Public client for interacting with the Hyperliquid API.
  * @typeParam T The type of transport used to connect to the Hyperliquid API.
  */
-export class PublicClient<T extends IRequestTransport = IRequestTransport> {
+export class PublicClient<
+    T extends IRequestTransport = IRequestTransport,
+> implements AsyncDisposable {
     /** The transport used to connect to the Hyperliquid API. */
     transport: T;
 
@@ -1452,5 +1454,9 @@ export class PublicClient<T extends IRequestTransport = IRequestTransport> {
             type: "vaultSummaries",
         };
         return this.transport.request("info", request, signal) as Promise<VaultSummary[]>;
+    }
+
+    async [Symbol.asyncDispose](): Promise<void> {
+        await this.transport[Symbol.asyncDispose]?.();
     }
 }

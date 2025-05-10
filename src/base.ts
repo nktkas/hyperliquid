@@ -10,7 +10,7 @@ export type MaybePromise<T> = T | Promise<T>;
  * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint | Exchange endpoint}
  * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/post-requests | Websocket post requests}
  */
-export interface IRequestTransport {
+export interface IRequestTransport extends Partial<AsyncDisposable> {
     /**
      * Sends a request to the Hyperliquid API.
      * @param endpoint - The API endpoint to send the request to.
@@ -30,7 +30,7 @@ export interface IRequestTransport {
  * Handles WebSocket subscriptions for real-time updates.
  * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | Websocket subscriptions}
  */
-export interface ISubscriptionTransport {
+export interface ISubscriptionTransport extends Partial<AsyncDisposable> {
     /**
      * Subscribes to a Hyperliquid event channel.
      * @param channel - The event channel to listen to.
