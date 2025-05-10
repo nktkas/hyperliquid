@@ -1,4 +1,4 @@
-import { build, emptyDir } from "jsr:@deno/dnt@0.41.3";
+import { build, emptyDir } from "jsr:@deno/dnt@^0.42.1";
 
 await emptyDir("./build/npm");
 
@@ -50,9 +50,8 @@ await build({
             node: ">=22.4.0",
         },
     },
-    importMap: "deno.json",
     compilerOptions: {
-        lib: ["ES2022", "DOM"],
+        lib: ["ES2022", "DOM", "ESNext.Disposable"],
     },
     postBuild() {
         Deno.copyFileSync("CONTRIBUTING.md", "build/npm/CONTRIBUTING.md");
