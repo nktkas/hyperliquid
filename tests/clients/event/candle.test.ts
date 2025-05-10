@@ -16,7 +16,7 @@ Deno.test("candle", async () => {
     // —————————— Prepare ——————————
 
     const transport = new WebSocketTransport();
-    const client = new EventClient({ transport });
+    await using client = new EventClient({ transport });
 
     // —————————— Test ——————————
 
@@ -24,12 +24,8 @@ Deno.test("candle", async () => {
         new Promise((resolve) => {
             client.candle({ coin: "BTC", interval: "1m" }, resolve);
         }),
-        120_000,
+        90_000,
     );
 
     schemaCoverage(MethodReturnType, [data]);
-
-    // —————————— Cleanup ——————————
-
-    await transport.close();
 });

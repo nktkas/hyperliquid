@@ -16,7 +16,7 @@ Deno.test("explorerBlock", async () => {
     // —————————— Prepare ——————————
 
     const transport = new WebSocketTransport({ url: "wss://rpc.hyperliquid-testnet.xyz/ws" });
-    const client = new EventClient({ transport });
+    await using client = new EventClient({ transport });
 
     // —————————— Test ——————————
 
@@ -24,12 +24,8 @@ Deno.test("explorerBlock", async () => {
         new Promise((resolve) => {
             client.explorerBlock(resolve);
         }),
-        120_000,
+        10_000,
     );
 
     schemaCoverage(MethodReturnType, [data]);
-
-    // —————————— Cleanup ——————————
-
-    await transport.close();
 });

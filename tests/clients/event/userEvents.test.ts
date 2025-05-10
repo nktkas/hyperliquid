@@ -23,9 +23,9 @@ Deno.test("userEvents", { sanitizeOps: false, sanitizeResources: false }, async 
     // —————————— Prepare ——————————
 
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
-    const publicClient = new PublicClient({ transport });
-    const eventClient = new EventClient({ transport });
-    const walletClient = new WalletClient({
+    await using publicClient = new PublicClient({ transport });
+    await using eventClient = new EventClient({ transport });
+    await using walletClient = new WalletClient({
         wallet: privateKeyToAccount(PRIVATE_KEY),
         transport,
         isTestnet: true,
@@ -42,21 +42,23 @@ Deno.test("userEvents", { sanitizeOps: false, sanitizeResources: false }, async 
                 async (data) => {
                     try {
                         events.push(data);
-                        await new Promise((resolve) => setTimeout(resolve, 10000));
-                        await Promise.all([
-                            order1Promise,
-                            order2Promise,
-                            twap1Promise,
-                            twap2Promise,
-                            twapFill1Promise,
-                            twapFill2Promise,
-                        ]);
-                        resolve(events);
+                        if (events.length === 1) {
+                            await Promise.all([
+                                order1Promise,
+                                order2Promise,
+                                twap1Promise,
+                                twap2Promise,
+                                twapFill1Promise,
+                                twapFill2Promise,
+                            ]);
+                            resolve(events);
+                        }
                     } catch (error) {
                         reject(error);
                     }
                 },
             );
+
             const order1Promise = openCloseOrder(publicClient, walletClient, PERPS_ASSET_1, true);
             const order2Promise = openCloseOrder(publicClient, walletClient, PERPS_ASSET_2, false);
 
@@ -66,7 +68,7 @@ Deno.test("userEvents", { sanitizeOps: false, sanitizeResources: false }, async 
             const twapFill1Promise = openCloseTwap(publicClient, walletClient, PERPS_ASSET_1, true, true);
             const twapFill2Promise = openCloseTwap(publicClient, walletClient, PERPS_ASSET_2, false, true);
         }),
-        25_000,
+        20_000,
     );
 
     schemaCoverage(MethodReturnType, data, {
@@ -90,10 +92,6 @@ Deno.test("userEvents", { sanitizeOps: false, sanitizeResources: false }, async 
             "#/anyOf/0/properties/fills/items/properties/liquidation",
         ],
     });
-
-    // —————————— Cleanup ——————————
-
-    await transport.close();
 });
 
 async function openCloseOrder(
@@ -157,7 +155,7 @@ async function openCloseTwap(
     });
     const twapId = result.response.data.status.running.twapId;
 
-    if (position) await new Promise((resolve) => setTimeout(resolve, 5000));
+    if (position) await new Promise((resolve) => setTimeout(resolve, 3000));
 
     await walletClient.twapCancel({ a: id, t: twapId });
 

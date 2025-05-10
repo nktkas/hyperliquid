@@ -20,7 +20,7 @@ Deno.test("userFundings", async () => {
     // —————————— Prepare ——————————
 
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
-    const client = new EventClient({ transport });
+    await using client = new EventClient({ transport });
 
     // —————————— Test ——————————
 
@@ -28,7 +28,7 @@ Deno.test("userFundings", async () => {
         new Promise((resolve) => {
             client.userFundings({ user: USER_ADDRESS }, resolve);
         }),
-        15_000,
+        10_000,
     );
 
     schemaCoverage(MethodReturnType, [data], {
@@ -36,8 +36,4 @@ Deno.test("userFundings", async () => {
             "#/properties/fundings/items/properties/nSamples": ["number"],
         },
     });
-
-    // —————————— Cleanup ——————————
-
-    await transport.close();
 });

@@ -16,7 +16,7 @@ Deno.test("allMids", async () => {
     // —————————— Prepare ——————————
 
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
-    const client = new EventClient({ transport });
+    await using client = new EventClient({ transport });
 
     // —————————— Test ——————————
 
@@ -24,12 +24,8 @@ Deno.test("allMids", async () => {
         new Promise((resolve) => {
             client.allMids(resolve);
         }),
-        15_000,
+        10_000,
     );
 
     schemaCoverage(MethodReturnType, [data]);
-
-    // —————————— Cleanup ——————————
-
-    await transport.close();
 });

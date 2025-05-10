@@ -16,7 +16,7 @@ Deno.test("trades", async () => {
     // —————————— Prepare ——————————
 
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
-    const client = new EventClient({ transport });
+    await using client = new EventClient({ transport });
 
     // —————————— Test ——————————
 
@@ -24,7 +24,7 @@ Deno.test("trades", async () => {
         new Promise((resolve) => {
             client.trades({ coin: "ETH" }, resolve);
         }),
-        30_000,
+        10_000,
     );
 
     schemaCoverage(MethodReturnType, [data], {
@@ -32,8 +32,4 @@ Deno.test("trades", async () => {
             "#/items/properties/side": ["B", "A"], // some of them may be missing
         },
     });
-
-    // —————————— Cleanup ——————————
-
-    await transport.close();
 });

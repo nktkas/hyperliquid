@@ -16,7 +16,7 @@ Deno.test("activeAssetCtx", async () => {
     // —————————— Prepare ——————————
 
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
-    const client = new EventClient({ transport });
+    await using client = new EventClient({ transport });
 
     // —————————— Test ——————————
 
@@ -26,32 +26,28 @@ Deno.test("activeAssetCtx", async () => {
             new Promise((resolve) => {
                 client.activeAssetCtx({ coin: "BTC" }, resolve);
             }),
-            15_000,
+            10_000,
         ),
         deadline(
             new Promise((resolve) => {
                 client.activeAssetCtx({ coin: "AXL" }, resolve);
             }),
-            15_000,
+            10_000,
         ),
         // Check response 'WsActiveSpotAssetCtx'
         deadline(
             new Promise((resolve) => {
                 client.activeAssetCtx({ coin: "@107" }, resolve);
             }),
-            15_000,
+            10_000,
         ),
         deadline(
             new Promise((resolve) => {
                 client.activeAssetCtx({ coin: "@27" }, resolve);
             }),
-            15_000,
+            10_000,
         ),
     ]);
 
     schemaCoverage(MethodReturnType, data);
-
-    // —————————— Cleanup ——————————
-
-    await transport.close();
 });

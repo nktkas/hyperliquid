@@ -20,7 +20,7 @@ Deno.test("userTwapHistory", async () => {
     // —————————— Prepare ——————————
 
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
-    const client = new EventClient({ transport });
+    await using client = new EventClient({ transport });
 
     // —————————— Test ——————————
 
@@ -28,12 +28,8 @@ Deno.test("userTwapHistory", async () => {
         new Promise((resolve) => {
             client.userTwapHistory({ user: USER_ADDRESS }, resolve);
         }),
-        15_000,
+        10_000,
     );
 
     schemaCoverage(MethodReturnType, [data]);
-
-    // —————————— Cleanup ——————————
-
-    await transport.close();
 });

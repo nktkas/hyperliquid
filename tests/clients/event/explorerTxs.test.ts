@@ -16,7 +16,7 @@ Deno.test("explorerTxs", async () => {
     // —————————— Prepare ——————————
 
     const transport = new WebSocketTransport({ url: "wss://rpc.hyperliquid-testnet.xyz/ws" });
-    const client = new EventClient({ transport });
+    await using client = new EventClient({ transport });
 
     // —————————— Test ——————————
 
@@ -24,7 +24,7 @@ Deno.test("explorerTxs", async () => {
         new Promise((resolve) => {
             client.explorerTxs(resolve);
         }),
-        120_000,
+        10_000,
     );
 
     schemaCoverage(MethodReturnType, [data], {
@@ -32,8 +32,4 @@ Deno.test("explorerTxs", async () => {
             "#/items/properties/error": ["string"],
         },
     });
-
-    // —————————— Cleanup ——————————
-
-    await transport.close();
 });

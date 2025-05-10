@@ -16,7 +16,7 @@ Deno.test("bbo", async () => {
     // —————————— Prepare ——————————
 
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
-    const client = new EventClient({ transport });
+    await using client = new EventClient({ transport });
 
     // —————————— Test ——————————
 
@@ -24,12 +24,8 @@ Deno.test("bbo", async () => {
         new Promise((resolve) => {
             client.bbo({ coin: "ETH" }, resolve);
         }),
-        60_000,
+        10_000,
     );
 
     schemaCoverage(MethodReturnType, [data]);
-
-    // —————————— Cleanup ——————————
-
-    await transport.close();
 });

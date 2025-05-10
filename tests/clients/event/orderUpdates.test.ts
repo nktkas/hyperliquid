@@ -1,6 +1,7 @@
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import BigNumber from "npm:bignumber.js@^9.1.2";
 import { deadline } from "jsr:@std/async@^1.0.10/deadline";
+import { delay } from "@std/async/delay";
 import {
     EventClient,
     type Order,
@@ -23,15 +24,15 @@ const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
 
-Deno.test("orderUpdates", { sanitizeOps: false, sanitizeResources: false }, async () => {
+Deno.test("orderUpdates", async () => {
     if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
 
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
-    const publicClient = new PublicClient({ transport });
-    const eventClient = new EventClient({ transport });
-    const walletClient = new WalletClient({
+    await using publicClient = new PublicClient({ transport });
+    await using eventClient = new EventClient({ transport });
+    await using walletClient = new WalletClient({
         wallet: privateKeyToAccount(PRIVATE_KEY),
         transport,
         isTestnet: true,
@@ -48,9 +49,11 @@ Deno.test("orderUpdates", { sanitizeOps: false, sanitizeResources: false }, asyn
                 async (data) => {
                     try {
                         events.push(data);
-                        await new Promise((resolve) => setTimeout(resolve, 5000));
-                        await Promise.all([order1Promise, order2Promise, order3Promise]);
-                        resolve(events);
+                        if (events.length === 1) { // Only first event should trigger promise
+                            await Promise.all([order1Promise, order2Promise, order3Promise]);
+                            await delay(3000);
+                            resolve(events);
+                        }
                     } catch (error) {
                         reject(error);
                     }
@@ -61,7 +64,7 @@ Deno.test("orderUpdates", { sanitizeOps: false, sanitizeResources: false }, asyn
             const order2Promise = createOrder(publicClient, walletClient, PERPS_ASSET, "open_canceled");
             const order3Promise = createOrder(publicClient, walletClient, PERPS_ASSET, "rejected");
         }),
-        25_000,
+        20_000,
     );
 
     schemaCoverage(MethodReturnType, data, {
@@ -80,10 +83,6 @@ Deno.test("orderUpdates", { sanitizeOps: false, sanitizeResources: false }, asyn
             ],
         },
     });
-
-    // —————————— Cleanup ——————————
-
-    await transport.close();
 });
 
 async function createOrder(

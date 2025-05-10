@@ -24,28 +24,43 @@ Deno.test("webData2", async () => {
 
     // Create clients
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws", timeout: 20_000 });
-    const publicClient = new PublicClient({ transport });
-    const eventClient = new EventClient({ transport });
-    const walletClient = new WalletClient({
+    await using publicClient = new PublicClient({ transport });
+    await using eventClient = new EventClient({ transport });
+    await using walletClient = new WalletClient({
         wallet: privateKeyToAccount(PRIVATE_KEY),
         transport,
         isTestnet: true,
     });
 
     // Get asset data
-    const { id: id1, pxUp: pxUp1, pxDown: pxDown1, sz: sz1, twapSz: twapSz1 } = await getAssetDataExtended(
+    const {
+        id: id1,
+        pxUp: pxUp1,
+        pxDown: pxDown1,
+        sz: sz1,
+        twapSz: twapSz1,
+    } = await getAssetDataExtended(
         publicClient,
         PERPS_ASSET_1,
     );
-    const { id: id2, pxUp: pxUp2, pxDown: pxDown2, sz: sz2, twapSz: twapSz2 } = await getAssetDataExtended(
+    const {
+        id: id2,
+        pxUp: pxUp2,
+        pxDown: pxDown2,
+        sz: sz2,
+        twapSz: twapSz2,
+    } = await getAssetDataExtended(
         publicClient,
         PERPS_ASSET_2,
     );
 
+    // Update leverage
     await Promise.all([
         walletClient.updateLeverage({ asset: id1, isCross: true, leverage: 5 }),
         walletClient.updateLeverage({ asset: id2, isCross: false, leverage: 5 }),
     ]);
+
+    // Create orders/positions/TWAP's and set up spot dusting opt-out
     const [twap1, twap2] = await Promise.all([
         // Create TWAP orders
         walletClient.twapOrder({ a: id1, b: true, s: twapSz1, r: false, m: 5, t: false }),
@@ -105,7 +120,7 @@ Deno.test("webData2", async () => {
             new Promise((resolve) => {
                 eventClient.webData2({ user: walletClient.wallet.address }, resolve);
             }),
-            40_000,
+            10_000,
         );
 
         schemaCoverage(MethodReturnType, [data], {
@@ -175,9 +190,6 @@ Deno.test("webData2", async () => {
 
         // Change spot dusting opt-out
         await walletClient.spotUser({ toggleSpotDusting: { optOut: false } });
-
-        // Close the transport
-        await transport.close();
     }
 });
 

@@ -16,7 +16,7 @@ Deno.test("l2Book", async () => {
     // —————————— Prepare ——————————
 
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
-    const client = new EventClient({ transport });
+    await using client = new EventClient({ transport });
 
     // —————————— Test ——————————
 
@@ -26,44 +26,44 @@ Deno.test("l2Book", async () => {
             new Promise((resolve) => {
                 client.l2Book({ coin: "BTC" }, resolve);
             }),
-            15_000,
+            10_000,
         ),
         // Check argument 'nSigFigs'
         deadline(
             new Promise((resolve) => {
                 client.l2Book({ coin: "BTC", nSigFigs: 2 }, resolve);
             }),
-            15_000,
+            10_000,
         ),
         deadline(
             new Promise((resolve) => {
                 client.l2Book({ coin: "BTC", nSigFigs: 3 }, resolve);
             }),
-            15_000,
+            10_000,
         ),
         deadline(
             new Promise((resolve) => {
                 client.l2Book({ coin: "BTC", nSigFigs: 4 }, resolve);
             }),
-            15_000,
+            10_000,
         ),
         deadline(
             new Promise((resolve) => {
                 client.l2Book({ coin: "BTC", nSigFigs: 5 }, resolve);
             }),
-            15_000,
+            10_000,
         ),
         deadline(
             new Promise((resolve) => {
                 client.l2Book({ coin: "BTC", nSigFigs: null }, resolve);
             }),
-            15_000,
+            10_000,
         ),
         deadline(
             new Promise((resolve) => {
                 client.l2Book({ coin: "BTC", nSigFigs: undefined }, resolve);
             }),
-            15_000,
+            10_000,
         ),
         // Check argument 'mantissa'
         deadline(
@@ -73,7 +73,7 @@ Deno.test("l2Book", async () => {
                     resolve,
                 );
             }),
-            15_000,
+            10_000,
         ),
         deadline(
             new Promise((resolve) => {
@@ -82,7 +82,7 @@ Deno.test("l2Book", async () => {
                     resolve,
                 );
             }),
-            15_000,
+            10_000,
         ),
         deadline(
             new Promise((resolve) => {
@@ -91,7 +91,7 @@ Deno.test("l2Book", async () => {
                     resolve,
                 );
             }),
-            15_000,
+            10_000,
         ),
         deadline(
             new Promise((resolve) => {
@@ -100,13 +100,9 @@ Deno.test("l2Book", async () => {
                     resolve,
                 );
             }),
-            15_000,
+            10_000,
         ),
     ]);
 
     schemaCoverage(MethodReturnType, data);
-
-    // —————————— Cleanup ——————————
-
-    await transport.close();
 });
