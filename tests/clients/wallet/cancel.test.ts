@@ -35,47 +35,30 @@ Deno.test("cancel", async () => {
 
     const data = await Promise.all([
         // Check response 'success'
-        (async () => {
-            // Preparing order
-            await walletClient.updateLeverage({ asset: id, isCross: true, leverage: 3 });
-            const openOrderRes = await walletClient.order({
-                orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
-                grouping: "na",
-            });
-            const [order] = openOrderRes.response.data.statuses;
-
-            // Cancel order
-            return await walletClient.cancel({
-                cancels: [{
-                    a: id,
-                    o: "resting" in order ? order.resting.oid : order.filled.oid,
-                }],
-            });
-        })(),
+        walletClient.cancel({
+            cancels: [{
+                a: id,
+                o: await openOrder(walletClient, id, pxDown, sz),
+            }],
+        }),
         // Check argument 'expiresAfter'
-        (async () => {
-            // Preparing order
-            await walletClient.updateLeverage({ asset: id, isCross: true, leverage: 3 });
-            const openOrderRes = await walletClient.order({
-                orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
-                grouping: "na",
-            });
-            const [order] = openOrderRes.response.data.statuses;
-
-            // Cancel order
-            return await walletClient.cancel({
-                cancels: [{
-                    a: id,
-                    o: "resting" in order ? order.resting.oid : order.filled.oid,
-                }],
-                expiresAfter: Date.now() + 1000 * 60 * 60,
-            });
-        })(),
+        walletClient.cancel({
+            cancels: [{
+                a: id,
+                o: await openOrder(walletClient, id, pxDown, sz),
+            }],
+            expiresAfter: Date.now() + 1000 * 60 * 60,
+        }),
     ]);
-
-    schemaCoverage(MethodReturnType, data, {
-        ignoreBranchesByPath: {
-            "#/properties/response/properties/data/properties/statuses/items/anyOf": [0], // error
-        },
-    });
+    schemaCoverage(MethodReturnType, data);
 });
+
+async function openOrder(client: WalletClient, id: number, pxDown: string, sz: string): Promise<number> {
+    await client.updateLeverage({ asset: id, isCross: true, leverage: 3 });
+    const openOrderRes = await client.order({
+        orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
+        grouping: "na",
+    });
+    const [order] = openOrderRes.response.data.statuses;
+    return "resting" in order ? order.resting.oid : order.filled.oid;
+}

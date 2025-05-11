@@ -1,6 +1,6 @@
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import BigNumber from "npm:bignumber.js@^9.1.2";
-import { HttpTransport, PublicClient, WalletClient } from "../../../mod.ts";
+import { type Hex, HttpTransport, PublicClient, WalletClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 import { formatPrice, formatSize, getAssetData, randomCloid } from "../../_utils/utils.ts";
@@ -35,63 +35,39 @@ Deno.test("cancelByCloid", async () => {
 
     const data = await Promise.all([
         // Check response 'success'
-        (async () => {
-            // Preparing order
-            await walletClient.updateLeverage({ asset: id, isCross: true, leverage: 3 });
-            const openOrderRes = await walletClient.order({
-                orders: [{
-                    a: id,
-                    b: true,
-                    p: pxDown,
-                    s: sz,
-                    r: false,
-                    t: { limit: { tif: "Gtc" } },
-                    c: randomCloid(),
-                }],
-                grouping: "na",
-            });
-            const [order] = openOrderRes.response.data.statuses;
-
-            // Cancel order
-            return await walletClient.cancelByCloid({
-                cancels: [{
-                    asset: id,
-                    cloid: "resting" in order ? order.resting.cloid! : order.filled.cloid!,
-                }],
-            });
-        })(),
+        walletClient.cancelByCloid({
+            cancels: [{
+                asset: id,
+                cloid: await openOrder(walletClient, id, pxDown, sz),
+            }],
+        }),
         // Check argument 'expiresAfter'
-        (async () => {
-            // Preparing order
-            await walletClient.updateLeverage({ asset: id, isCross: true, leverage: 3 });
-            const openOrderRes = await walletClient.order({
-                orders: [{
-                    a: id,
-                    b: true,
-                    p: pxDown,
-                    s: sz,
-                    r: false,
-                    t: { limit: { tif: "Gtc" } },
-                    c: randomCloid(),
-                }],
-                grouping: "na",
-            });
-            const [order] = openOrderRes.response.data.statuses;
-
-            // Cancel order
-            return await walletClient.cancelByCloid({
-                cancels: [{
-                    asset: id,
-                    cloid: "resting" in order ? order.resting.cloid! : order.filled.cloid!,
-                }],
-                expiresAfter: Date.now() + 1000 * 60 * 60,
-            });
-        })(),
+        walletClient.cancelByCloid({
+            cancels: [{
+                asset: id,
+                cloid: await openOrder(walletClient, id, pxDown, sz),
+            }],
+            expiresAfter: Date.now() + 1000 * 60 * 60,
+        }),
     ]);
 
-    schemaCoverage(MethodReturnType, data, {
-        ignoreBranchesByPath: {
-            "#/properties/response/properties/data/properties/statuses/items/anyOf": [0], // error
-        },
-    });
+    schemaCoverage(MethodReturnType, data);
 });
+
+async function openOrder(client: WalletClient, id: number, pxDown: string, sz: string): Promise<Hex> {
+    await client.updateLeverage({ asset: id, isCross: true, leverage: 3 });
+    const openOrderRes = await client.order({
+        orders: [{
+            a: id,
+            b: true,
+            p: pxDown,
+            s: sz,
+            r: false,
+            t: { limit: { tif: "Gtc" } },
+            c: randomCloid(),
+        }],
+        grouping: "na",
+    });
+    const [order] = openOrderRes.response.data.statuses;
+    return "resting" in order ? order.resting.cloid! : order.filled.cloid!;
+}

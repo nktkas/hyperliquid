@@ -25,12 +25,6 @@ Deno.test("spotSend", async () => {
     const transport = new HttpTransport({ isTestnet: true });
     const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
 
-    // Preparation of balance
-    await walletClient.usdClassTransfer({
-        amount: "1",
-        toPerp: false,
-    });
-
     // —————————— Test ——————————
 
     const data = await walletClient.spotSend({

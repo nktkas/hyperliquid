@@ -37,124 +37,87 @@ Deno.test("batchModify", async () => {
     try {
         const data = await Promise.all([
             // Check response 'resting' + argument 'expiresAfter'
-            (async () => {
-                const orderResp = await walletClient.order({
-                    orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
-                    grouping: "na",
-                });
-                const [order] = orderResp.response.data.statuses;
-                return await walletClient.batchModify({
-                    modifies: [{
-                        oid: "resting" in order ? order.resting.oid : order.filled.oid,
-                        order: {
-                            a: id,
-                            b: true,
-                            p: pxDown,
-                            s: sz,
-                            r: false,
-                            t: { limit: { tif: "Gtc" } },
-                        },
-                    }],
-                    expiresAfter: Date.now() + 1000 * 60 * 60,
-                });
-            })(),
-            (async () => {
-                const orderResp = await walletClient.order({
-                    orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
-                    grouping: "na",
-                });
-                const [order] = orderResp.response.data.statuses;
-                return await walletClient.batchModify({
-                    modifies: [{
-                        oid: "resting" in order ? order.resting.oid : order.filled.oid,
-                        order: {
-                            a: id,
-                            b: true,
-                            p: pxDown,
-                            s: sz,
-                            r: false,
-                            t: { limit: { tif: "Gtc" } },
-                            c: randomCloid(),
-                        },
-                    }],
-                });
-            })(),
+            walletClient.batchModify({
+                modifies: [{
+                    oid: await openOrder(walletClient, id, pxDown, sz),
+                    order: {
+                        a: id,
+                        b: true,
+                        p: pxDown,
+                        s: sz,
+                        r: false,
+                        t: { limit: { tif: "Gtc" } },
+                    },
+                }],
+                expiresAfter: Date.now() + 1000 * 60 * 60,
+            }),
+            // Check response 'resting' + `cloid`
+            walletClient.batchModify({
+                modifies: [{
+                    oid: await openOrder(walletClient, id, pxDown, sz),
+                    order: {
+                        a: id,
+                        b: true,
+                        p: pxDown,
+                        s: sz,
+                        r: false,
+                        t: { limit: { tif: "Gtc" } },
+                        c: randomCloid(),
+                    },
+                }],
+            }),
             // Check response 'filled'
-            (async () => {
-                const orderResp = await walletClient.order({
-                    orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
-                    grouping: "na",
-                });
-                const [order] = orderResp.response.data.statuses;
-                return await walletClient.batchModify({
-                    modifies: [{
-                        oid: "resting" in order ? order.resting.oid : order.filled.oid,
-                        order: {
-                            a: id,
-                            b: true,
-                            p: pxUp,
-                            s: sz,
-                            r: false,
-                            t: { limit: { tif: "Gtc" } },
-                        },
-                    }],
-                });
-            })(),
-            (async () => {
-                const orderResp = await walletClient.order({
-                    orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
-                    grouping: "na",
-                });
-                const [order] = orderResp.response.data.statuses;
-                return await walletClient.batchModify({
-                    modifies: [{
-                        oid: "resting" in order ? order.resting.oid : order.filled.oid,
-                        order: {
-                            a: id,
-                            b: true,
-                            p: pxUp,
-                            s: sz,
-                            r: false,
-                            t: { limit: { tif: "Gtc" } },
-                            c: randomCloid(),
-                        },
-                    }],
-                });
-            })(),
+            walletClient.batchModify({
+                modifies: [{
+                    oid: await openOrder(walletClient, id, pxDown, sz),
+                    order: {
+                        a: id,
+                        b: true,
+                        p: pxUp,
+                        s: sz,
+                        r: false,
+                        t: { limit: { tif: "Gtc" } },
+                    },
+                }],
+            }),
+            // Check response 'filled' + `cloid`
+            walletClient.batchModify({
+                modifies: [{
+                    oid: await openOrder(walletClient, id, pxDown, sz),
+                    order: {
+                        a: id,
+                        b: true,
+                        p: pxUp,
+                        s: sz,
+                        r: false,
+                        t: { limit: { tif: "Gtc" } },
+                        c: randomCloid(),
+                    },
+                }],
+            }),
             // Check argument 't.trigger'
-            (async () => {
-                const orderResp = await walletClient.order({
-                    orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
-                    grouping: "na",
-                });
-                const [order] = orderResp.response.data.statuses;
-                return await walletClient.batchModify({
-                    modifies: [{
-                        oid: "resting" in order ? order.resting.oid : order.filled.oid,
-                        order: {
-                            a: id,
-                            b: true,
-                            p: pxDown,
-                            s: sz,
-                            r: false,
-                            t: {
-                                trigger: {
-                                    isMarket: false,
-                                    tpsl: "tp",
-                                    triggerPx: pxDown,
-                                },
+            walletClient.batchModify({
+                modifies: [{
+                    oid: await openOrder(walletClient, id, pxDown, sz),
+                    order: {
+                        a: id,
+                        b: true,
+                        p: pxDown,
+                        s: sz,
+                        r: false,
+                        t: {
+                            trigger: {
+                                isMarket: false,
+                                tpsl: "tp",
+                                triggerPx: pxDown,
                             },
                         },
-                    }],
-                });
-            })(),
+                    },
+                }],
+            }),
         ]);
 
-        schemaCoverage(MethodReturnType, data, {
-            ignoreBranchesByPath: {
-                "#/properties/response/properties/data/properties/statuses/items/anyOf": [2], // error
-            },
-        });
+        schemaCoverage(MethodReturnType, data);
     } finally {
         // —————————— Cleanup ——————————
 
@@ -172,6 +135,15 @@ Deno.test("batchModify", async () => {
                 t: { limit: { tif: "Gtc" } },
             }],
             grouping: "na",
-        }).catch(() => undefined);
+        });
     }
 });
+
+async function openOrder(client: WalletClient, id: number, pxDown: string, sz: string): Promise<number> {
+    const orderResp = await client.order({
+        orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
+        grouping: "na",
+    });
+    const [order] = orderResp.response.data.statuses;
+    return "resting" in order ? order.resting.oid : order.filled.oid;
+}

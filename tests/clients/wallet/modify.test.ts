@@ -35,51 +35,49 @@ Deno.test("modify", async () => {
 
     try {
         const data = await Promise.all([
-            // Check response 'success' + argument 'expiresAfter'
-            (async () => {
-                const openOrderRes = await walletClient.order({
-                    orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
-                    grouping: "na",
-                });
-                const [order] = openOrderRes.response.data.statuses;
-                return await walletClient.modify({
-                    oid: "resting" in order ? order.resting.oid : order.filled.oid,
-                    order: {
-                        a: id,
-                        b: true,
-                        p: pxDown,
-                        s: sz,
-                        r: false,
-                        t: { limit: { tif: "Gtc" } },
-                    },
-                    expiresAfter: Date.now() + 1000 * 60 * 60,
-                });
-            })(),
+            // Check response 'success'
+            walletClient.modify({
+                oid: await openOrder(walletClient, id, pxDown, sz),
+                order: {
+                    a: id,
+                    b: true,
+                    p: pxDown,
+                    s: sz,
+                    r: false,
+                    t: { limit: { tif: "Gtc" } },
+                },
+            }),
+            // Check argument 'expiresAfter'
+            walletClient.modify({
+                oid: await openOrder(walletClient, id, pxDown, sz),
+                order: {
+                    a: id,
+                    b: true,
+                    p: pxDown,
+                    s: sz,
+                    r: false,
+                    t: { limit: { tif: "Gtc" } },
+                },
+                expiresAfter: Date.now() + 1000 * 60 * 60,
+            }),
             // Check argument 't.trigger'
-            (async () => {
-                const openOrderRes = await walletClient.order({
-                    orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
-                    grouping: "na",
-                });
-                const [order] = openOrderRes.response.data.statuses;
-                return await walletClient.modify({
-                    oid: "resting" in order ? order.resting.oid : order.filled.oid,
-                    order: {
-                        a: id,
-                        b: true,
-                        p: pxDown,
-                        s: sz,
-                        r: false,
-                        t: {
-                            trigger: {
-                                isMarket: false,
-                                tpsl: "tp",
-                                triggerPx: pxDown,
-                            },
+            walletClient.modify({
+                oid: await openOrder(walletClient, id, pxDown, sz),
+                order: {
+                    a: id,
+                    b: true,
+                    p: pxDown,
+                    s: sz,
+                    r: false,
+                    t: {
+                        trigger: {
+                            isMarket: false,
+                            tpsl: "tp",
+                            triggerPx: pxDown,
                         },
                     },
-                });
-            })(),
+                },
+            }),
         ]);
 
         schemaCoverage(MethodReturnType, data);
@@ -91,3 +89,12 @@ Deno.test("modify", async () => {
         await walletClient.cancel({ cancels });
     }
 });
+
+async function openOrder(client: WalletClient, id: number, pxDown: string, sz: string): Promise<number> {
+    const openOrderRes = await client.order({
+        orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
+        grouping: "na",
+    });
+    const [order] = openOrderRes.response.data.statuses;
+    return "resting" in order ? order.resting.oid : order.filled.oid;
+}

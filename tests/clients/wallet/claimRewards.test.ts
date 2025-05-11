@@ -1,15 +1,20 @@
-import { assertRejects } from "jsr:@std/assert@^1.0.10";
+import { assertIsError } from "jsr:@std/assert@^1.0.10";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import { ApiRequestError, HttpTransport, WalletClient } from "../../../mod.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Constants ——————————
 
 const PRIVATE_KEY = Deno.args[0] as `0x${string}`;
 
+// —————————— Type schema ——————————
+
+export type MethodReturnType = Awaited<ReturnType<WalletClient["claimRewards"]>>;
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
+
 // —————————— Test ——————————
 
-// NOTE: It's hard to artificially get >=$1$ referral earnings artificially.
-// So to prove that the method works, we will expect a specific error when referral earnings are less than $1.
 Deno.test("claimRewards", async () => {
     if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -21,9 +26,11 @@ Deno.test("claimRewards", async () => {
 
     // —————————— Test ——————————
 
-    await assertRejects(
-        () => walletClient.claimRewards(),
-        ApiRequestError,
-        "Cannot process API request: No rewards to claim",
-    );
+    await walletClient.claimRewards()
+        .then((data) => {
+            schemaCoverage(MethodReturnType, [data]);
+        })
+        .catch((e) => {
+            assertIsError(e, ApiRequestError, "No rewards to claim");
+        });
 });

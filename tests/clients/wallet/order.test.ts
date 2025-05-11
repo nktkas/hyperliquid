@@ -38,47 +38,69 @@ Deno.test("order", async () => {
         const data = await Promise.all([
             // Check response 'resting' + argument 'expiresAfter'
             walletClient.order({
-                orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
+                orders: [{
+                    a: id,
+                    b: true,
+                    p: pxDown,
+                    s: sz,
+                    r: false,
+                    t: { limit: { tif: "Gtc" } },
+                }],
                 grouping: "na",
                 expiresAfter: Date.now() + 1000 * 60 * 60,
             }),
+            // Check response 'resting' + `cloid`
+            walletClient.order({
+                orders: [{
+                    a: id,
+                    b: true,
+                    p: pxDown,
+                    s: sz,
+                    r: false,
+                    t: { limit: { tif: "Gtc" } },
+                    c: randomCloid(),
+                }],
+                grouping: "na",
+            }),
             // Check response 'filled'
             walletClient.order({
-                orders: [{ a: id, b: true, p: pxUp, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
+                orders: [{
+                    a: id,
+                    b: true,
+                    p: pxUp,
+                    s: sz,
+                    r: false,
+                    t: { limit: { tif: "Gtc" } },
+                }],
+                grouping: "na",
+            }),
+            // Check response 'filled' + `cloid`
+            walletClient.order({
+                orders: [{
+                    a: id,
+                    b: true,
+                    p: pxUp,
+                    s: sz,
+                    r: false,
+                    t: { limit: { tif: "Gtc" } },
+                    c: randomCloid(),
+                }],
                 grouping: "na",
             }),
             // Check argument 'builder'
             walletClient.order({
-                orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
+                orders: [{
+                    a: id,
+                    b: true,
+                    p: pxDown,
+                    s: sz,
+                    r: false,
+                    t: { limit: { tif: "Gtc" } },
+                }],
                 grouping: "na",
                 builder: { b: account.address, f: 1 },
             }),
-            // Check argument 'c'
-            walletClient.order({ // resting
-                orders: [{
-                    a: id,
-                    b: true,
-                    p: pxDown,
-                    s: sz,
-                    r: false,
-                    t: { limit: { tif: "Gtc" } },
-                    c: randomCloid(),
-                }],
-                grouping: "na",
-            }),
-            walletClient.order({ // filled
-                orders: [{
-                    a: id,
-                    b: true,
-                    p: pxUp,
-                    s: sz,
-                    r: false,
-                    t: { limit: { tif: "Gtc" } },
-                    c: randomCloid(),
-                }],
-                grouping: "na",
-            }),
-            // Check argument 'trigger: { tpsl: "tp" }'
+            // Check argument 't.trigger'
             walletClient.order({
                 orders: [{
                     a: id,
@@ -86,29 +108,19 @@ Deno.test("order", async () => {
                     p: pxUp,
                     s: sz,
                     r: false,
-                    t: { trigger: { isMarket: true, triggerPx: pxDown, tpsl: "tp" } },
-                }],
-                grouping: "na",
-            }),
-            // Check argument 'trigger: { tpsl: "sl" }'
-            walletClient.order({
-                orders: [{
-                    a: id,
-                    b: true,
-                    p: pxDown,
-                    s: sz,
-                    r: false,
-                    t: { trigger: { isMarket: true, triggerPx: pxUp, tpsl: "sl" } },
+                    t: {
+                        trigger: {
+                            isMarket: true,
+                            triggerPx: pxDown,
+                            tpsl: "tp",
+                        },
+                    },
                 }],
                 grouping: "na",
             }),
         ]);
 
-        schemaCoverage(MethodReturnType, data, {
-            ignoreBranchesByPath: {
-                "#/properties/response/properties/data/properties/statuses/items/anyOf": [2], // error
-            },
-        });
+        schemaCoverage(MethodReturnType, data);
     } finally {
         // —————————— Cleanup ——————————
 
@@ -126,6 +138,6 @@ Deno.test("order", async () => {
                 t: { limit: { tif: "Gtc" } },
             }],
             grouping: "na",
-        }).catch(() => undefined);
+        });
     }
 });

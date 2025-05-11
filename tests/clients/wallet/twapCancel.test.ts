@@ -34,40 +34,30 @@ Deno.test("twapCancel", async () => {
 
     const data = await Promise.all([
         // Check response 'success'
-        (async () => {
-            const twapOrderResult = await walletClient.twapOrder({
-                a: id,
-                b: true,
-                s: sz,
-                r: false,
-                m: 5,
-                t: false,
-            });
-            const twapId = twapOrderResult.response.data.status.running.twapId;
-            return await walletClient.twapCancel({ a: id, t: twapId });
-        })(),
+        walletClient.twapCancel({
+            a: id,
+            t: await createTWAP(walletClient, id, sz),
+        }),
         // Check argument 'expiresAfter'
-        (async () => {
-            const twapOrderResult = await walletClient.twapOrder({
-                a: id,
-                b: true,
-                s: sz,
-                r: false,
-                m: 5,
-                t: false,
-            });
-            const twapId = twapOrderResult.response.data.status.running.twapId;
-            return await walletClient.twapCancel({
-                a: id,
-                t: twapId,
-                expiresAfter: Date.now() + 1000 * 60 * 60,
-            });
-        })(),
+        walletClient.twapCancel({
+            a: id,
+            t: await createTWAP(walletClient, id, sz),
+            expiresAfter: Date.now() + 1000 * 60 * 60,
+        }),
     ]);
 
-    schemaCoverage(MethodReturnType, data, {
-        ignoreBranchesByPath: {
-            "#/properties/response/properties/data/properties/status/anyOf": [0], // error
-        },
-    });
+    schemaCoverage(MethodReturnType, data);
 });
+
+async function createTWAP(client: WalletClient, id: number, sz: string): Promise<number> {
+    const twapOrderResult = await client.twapOrder({
+        a: id,
+        b: true,
+        s: sz,
+        r: false,
+        m: 5,
+        t: false,
+    });
+    const twapId = twapOrderResult.response.data.status.running.twapId;
+    return twapId;
+}
