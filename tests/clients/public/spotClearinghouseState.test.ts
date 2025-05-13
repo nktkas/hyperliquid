@@ -23,7 +23,10 @@ Deno.test("spotClearinghouseState", async () => {
 
     // —————————— Test ——————————
 
-    const data = await client.spotClearinghouseState({ user: USER_ADDRESS });
+    const data = await Promise.all([
+        client.spotClearinghouseState({ user: USER_ADDRESS }),
+        client.spotClearinghouseState({ user: USER_ADDRESS, dex: "test" }),
+    ]);
 
-    schemaCoverage(MethodReturnType, [data]);
+    schemaCoverage(MethodReturnType, data);
 });

@@ -23,7 +23,10 @@ Deno.test("openOrders", async () => {
 
     // —————————— Test ——————————
 
-    const data = await client.openOrders({ user: USER_ADDRESS });
+    const data = await Promise.all([
+        client.openOrders({ user: USER_ADDRESS }),
+        client.openOrders({ user: USER_ADDRESS, dex: "test" }),
+    ]);
 
-    schemaCoverage(MethodReturnType, [data]);
+    schemaCoverage(MethodReturnType, data);
 });

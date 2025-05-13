@@ -19,7 +19,10 @@ Deno.test("meta", async () => {
 
     // —————————— Test ——————————
 
-    const data = await client.meta();
+    const data = await Promise.all([
+        client.meta(),
+        client.meta({ dex: "test" }),
+    ]);
 
-    schemaCoverage(MethodReturnType, [data]);
+    schemaCoverage(MethodReturnType, data);
 });

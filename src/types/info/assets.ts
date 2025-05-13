@@ -42,6 +42,18 @@ export interface FundingHistory {
     time: number;
 }
 
+/** Perpetual dex metadata. */
+export interface PerpDex {
+    /** Short name of the perpetual dex. */
+    name: string;
+    /** Complete name of the perpetual dex. */
+    full_name: string;
+    /** Hex address of the dex deployer. */
+    deployer: Hex;
+    /** Hex address of the oracle updater, or null if not available. */
+    oracle_updater: Hex | null;
+}
+
 /** Collection of margin tables indexed by ID. */
 export type MarginTables = [number, MarginTable][];
 

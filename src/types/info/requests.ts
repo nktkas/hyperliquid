@@ -8,6 +8,8 @@ import type { Hex } from "../../base.ts";
 export interface AllMidsRequest {
     /** Type of request. */
     type: "allMids";
+    /** Perp dex name. */
+    dex?: string;
 }
 
 /**
@@ -113,6 +115,8 @@ export interface FrontendOpenOrdersRequest {
     type: "frontendOpenOrders";
     /** User's address. */
     user: Hex;
+    /** Perp dex name. */
+    dex?: string;
 }
 
 /**
@@ -215,6 +219,8 @@ export interface MetaAndAssetCtxsRequest {
 export interface MetaRequest {
     /** Type of request. */
     type: "meta";
+    /** Perp dex name. */
+    dex?: string;
 }
 
 /**
@@ -227,6 +233,8 @@ export interface OpenOrdersRequest {
     type: "openOrders";
     /** User's address. */
     user: Hex;
+    /** Perp dex name. */
+    dex?: string;
 }
 
 /**
@@ -241,6 +249,16 @@ export interface OrderStatusRequest {
     user: Hex;
     /** Order ID or client order ID. */
     oid: number | Hex;
+}
+
+/**
+ * Request all perpetual dexs.
+ * @returns {PerpDexs} Perp dexes.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-all-perpetual-dexs
+ */
+export interface PerpDexsRequest {
+    /** Type of request. */
+    type: "perpDexs";
 }
 
 /**
@@ -311,6 +329,8 @@ export interface SpotClearinghouseStateRequest {
     type: "spotClearinghouseState";
     /** User's address. */
     user: Hex;
+    /** Perp dex name. */
+    dex?: string;
 }
 
 /**

@@ -21,6 +21,7 @@ import type {
     AllMids,
     Candle,
     FundingHistory,
+    PerpDex,
     PerpsMeta,
     PerpsMetaAndAssetCtxs,
     PredictedFunding,
@@ -66,6 +67,7 @@ import type {
     MetaRequest,
     OpenOrdersRequest,
     OrderStatusRequest,
+    PerpDexsRequest,
     PerpsAtOpenInterestCapRequest,
     PortfolioRequest,
     PredictedFundingsRequest,
@@ -100,6 +102,9 @@ export interface PublicClientParameters<T extends IRequestTransport = IRequestTr
     /** The transport used to connect to the Hyperliquid API. */
     transport: T;
 }
+
+/** Parameters for the {@linkcode PublicClient.allMids} method. */
+export type AllMidsParameters = Omit<AllMidsRequest, "type">;
 
 /** Parameters for the {@linkcode PublicClient.candleSnapshot} method. */
 export type CandleSnapshotParameters = CandleSnapshotRequest["req"];
@@ -143,11 +148,17 @@ export type LegalCheckParameters = Omit<LegalCheckRequest, "type">;
 /** Parameters for the {@linkcode PublicClient.maxBuilderFee} method. */
 export type MaxBuilderFeeParameters = Omit<MaxBuilderFeeRequest, "type">;
 
+/** Parameters for the {@linkcode PublicClient.meta} method. */
+export type MetaParameters = Omit<MetaRequest, "type">;
+
 /** Parameters for the {@linkcode PublicClient.openOrders} method. */
 export type OpenOrdersParameters = Omit<OpenOrdersRequest, "type">;
 
 /** Parameters for the {@linkcode PublicClient.orderStatus} method. */
 export type OrderStatusParameters = Omit<OrderStatusRequest, "type">;
+
+/** Parameters for the {@linkcode PublicClient.perpDexs} method. */
+export type PerpDexsParameters = Omit<PerpDexsRequest, "type">;
 
 /** Parameters for the {@linkcode PublicClient.portfolio} method. */
 export type PortfolioParameters = Omit<PortfolioRequest, "type">;
@@ -260,9 +271,10 @@ export class PublicClient<
      * const allMids = await client.allMids();
      * ```
      */
-    allMids(signal?: AbortSignal): Promise<AllMids> {
+    allMids(args?: AllMidsParameters, signal?: AbortSignal): Promise<AllMids> {
         const request: AllMidsRequest = {
             type: "allMids",
+            ...args,
         };
         return this.transport.request("info", request, signal) as Promise<AllMids>;
     }
@@ -665,9 +677,10 @@ export class PublicClient<
      * const meta = await client.meta();
      * ```
      */
-    meta(signal?: AbortSignal): Promise<PerpsMeta> {
+    meta(args?: MetaParameters, signal?: AbortSignal): Promise<PerpsMeta> {
         const request: MetaRequest = {
             type: "meta",
+            ...args,
         };
         return this.transport.request("info", request, signal) as Promise<PerpsMeta>;
     }
@@ -743,6 +756,29 @@ export class PublicClient<
             ...args,
         };
         return this.transport.request("info", request, signal) as Promise<OrderLookup>;
+    }
+
+    /**
+     * Request all perpetual dexs.
+     * @param signal - An optional abort signal.
+     * @returns Array of perpetual dexes.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-all-perpetual-dexs
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const perpDexs = await client.perpDexs();
+     * ```
+     */
+    perpDexs(signal?: AbortSignal): Promise<(PerpDex | null)[]> {
+        const request: PerpDexsRequest = {
+            type: "perpDexs",
+        };
+        return this.transport.request("info", request, signal) as Promise<(PerpDex | null)[]>;
     }
 
     /**

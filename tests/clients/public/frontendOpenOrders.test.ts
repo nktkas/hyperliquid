@@ -23,9 +23,12 @@ Deno.test("frontendOpenOrders", async () => {
 
     // —————————— Test ——————————
 
-    const data = await client.frontendOpenOrders({ user: USER_ADDRESS });
+    const data = await Promise.all([
+        client.frontendOpenOrders({ user: USER_ADDRESS }),
+        client.frontendOpenOrders({ user: USER_ADDRESS, dex: "test" }),
+    ]);
 
-    schemaCoverage(MethodReturnType, [data], {
+    schemaCoverage(MethodReturnType, data, {
         ignoreEnumValuesByPath: {
             "#/items/properties/orderType": ["Market"],
             "#/items/properties/tif/anyOf/0": ["Ioc", "FrontendMarket", "LiquidationMarket"],

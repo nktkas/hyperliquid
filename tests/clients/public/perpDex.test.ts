@@ -4,12 +4,12 @@ import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<PublicClient["allMids"]>>;
+export type MethodReturnType = Awaited<ReturnType<PublicClient["perpDexs"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
 
-Deno.test("allMids", async () => {
+Deno.test("perpDex", async () => {
     if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
@@ -19,10 +19,7 @@ Deno.test("allMids", async () => {
 
     // —————————— Test ——————————
 
-    const data = await Promise.all([
-        client.allMids(),
-        client.allMids({ dex: "test" }),
-    ]);
+    const data = await client.perpDexs();
 
-    schemaCoverage(MethodReturnType, data);
+    schemaCoverage(MethodReturnType, [data]);
 });
