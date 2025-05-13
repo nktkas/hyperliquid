@@ -6,7 +6,7 @@ import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 // —————————— Constants ——————————
 
 const PRIVATE_KEY = Deno.args[0] as `0x${string}`;
-const SUB_ACCOUNT_ADDRESS = Deno.args[1] as `0x${string}`;
+const SUB_ACCOUNT_ADDRESS = "0xcb3f0bd249a89e45e86a44bcfc7113e4ffe84cd1";
 const TOKEN_ADDRESS = "USDC:0xeb62eee3685fc4c43992febcd9e75443";
 
 // —————————— Type schema ——————————

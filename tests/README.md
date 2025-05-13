@@ -25,7 +25,7 @@ Some tests require a testnet account with a funded balance and a private key. Pa
 all tests:
 
 ```bash
-deno test --allow-net --allow-read -- PRIVATE_KEY SUB_ACCOUNT_ADDRESS VAULT_ADDRESS
+deno test --allow-net --allow-read -- PRIVATE_KEY
 ```
 
 > **Note**: `--allow-read` is necessary for dynamically building type schemas during the test process.
