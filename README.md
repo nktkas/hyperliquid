@@ -390,7 +390,8 @@ class WalletClient {
     tokenDelegate(args: TokenDelegateParameters): Promise<SuccessResponse>;
 
     // Market
-    spotDeploy(args: SpotDeployParameters): Promise<BaseExchangeResponse>;
+    perpDeploy(args: PerpDeployParameters): Promise<SuccessResponse>;
+    spotDeploy(args: SpotDeployParameters): Promise<SuccessResponse>;
 
     // Vault
     createVault(args: CreateVaultParameters): Promise<CreateVaultResponse>;

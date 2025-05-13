@@ -13,6 +13,8 @@ import type {
     EvmUserModifyRequest,
     ModifyRequest,
     OrderRequest,
+    PerpDeployRequest_RegisterAsset,
+    PerpDeployRequest_SetOracle,
     RegisterReferrerRequest,
     ReserveRequestWeightRequest,
     ScheduleCancelRequest,
@@ -22,6 +24,7 @@ import type {
     SpotDeployRequest_RegisterHyperliquidity,
     SpotDeployRequest_RegisterSpot,
     SpotDeployRequest_RegisterToken2,
+    SpotDeployRequest_SetDeployerTradingFeeShare,
     SpotDeployRequest_UserGenesis,
     SpotSendRequest,
     SpotUserRequest,
@@ -40,7 +43,6 @@ import type {
     Withdraw3Request,
 } from "../types/exchange/requests.ts";
 import type {
-    BaseExchangeResponse,
     CancelResponse,
     CreateSubAccountResponse,
     CreateVaultResponse,
@@ -180,6 +182,15 @@ export type OrderParameters =
     & Partial<Pick<OrderRequest, "vaultAddress">>
     & Partial<Pick<OrderRequest, "expiresAfter">>;
 
+/** Parameters for the {@linkcode WalletClient.perpDeploy} method. */
+export type PerpDeployParameters =
+    | PerpDeployParameters_RegisterAsset
+    | PerpDeployParameters_SetOracle;
+/** One of the parameters for the {@linkcode WalletClient.perpDeploy} method. */
+export type PerpDeployParameters_RegisterAsset = Omit<PerpDeployRequest_RegisterAsset["action"], "type">;
+/** One of the parameters for the {@linkcode WalletClient.perpDeploy} method. */
+export type PerpDeployParameters_SetOracle = Omit<PerpDeployRequest_SetOracle["action"], "type">;
+
 /** Parameters for the {@linkcode WalletClient.registerReferrer} method. */
 export type RegisterReferrerParameters = Omit<RegisterReferrerRequest["action"], "type">;
 
@@ -212,7 +223,8 @@ export type SpotDeployParameters =
     | SpotDeployParameters_UserGenesis
     | SpotDeployParameters_Genesis
     | SpotDeployParameters_RegisterSpot
-    | SpotDeployParameters_RegisterHyperliquidity;
+    | SpotDeployParameters_RegisterHyperliquidity
+    | SpotDeployParameters_SetDeployerTradingFeeShare;
 /** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
 export type SpotDeployParameters_RegisterToken2 = Omit<
     SpotDeployRequest_RegisterToken2["action"],
@@ -236,6 +248,11 @@ export type SpotDeployParameters_RegisterSpot = Omit<
 /** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
 export type SpotDeployParameters_RegisterHyperliquidity = Omit<
     SpotDeployRequest_RegisterHyperliquidity["action"],
+    "type"
+>;
+/** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
+export type SpotDeployParameters_SetDeployerTradingFeeShare = Omit<
+    SpotDeployRequest_SetDeployerTradingFeeShare["action"],
     "type"
 >;
 
@@ -1341,6 +1358,75 @@ export class WalletClient<
     }
 
     /**
+     * Deploying HIP-3 assets.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
+     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-3-assets
+     * @untested
+     */
+    async perpDeploy(args: PerpDeployParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Construct an action
+        const nonce = await this.nonceManager();
+        let action:
+            | PerpDeployRequest_RegisterAsset["action"]
+            | PerpDeployRequest_SetOracle["action"];
+        if ("registerAsset" in args) {
+            action = {
+                type: "perpDeploy",
+                registerAsset: {
+                    maxGas: args.registerAsset.maxGas ?? null,
+                    assetRequest: {
+                        coin: args.registerAsset.assetRequest.coin,
+                        szDecimals: args.registerAsset.assetRequest.szDecimals,
+                        oraclePx: args.registerAsset.assetRequest.oraclePx,
+                        marginTableId: args.registerAsset.assetRequest.marginTableId,
+                        onlyIsolated: args.registerAsset.assetRequest.onlyIsolated,
+                    },
+                    dex: args.registerAsset.dex,
+                    schema: args.registerAsset.schema
+                        ? {
+                            fullName: args.registerAsset.schema.fullName,
+                            collateralToken: args.registerAsset.schema.collateralToken,
+                            oracleUpdater: args.registerAsset.schema.oracleUpdater?.toLowerCase() as `0x${string}` ??
+                                null,
+                        }
+                        : null,
+                },
+            };
+        } else {
+            action = {
+                type: "perpDeploy",
+                setOracle: {
+                    dex: args.setOracle.dex,
+                    oraclePxs: args.setOracle.oraclePxs,
+                    markPxs: args.setOracle.markPxs,
+                },
+            };
+        }
+
+        // Sign the action
+        const signature = await signL1Action({
+            wallet: this.wallet,
+            action,
+            nonce,
+            isTestnet: this.isTestnet,
+        });
+
+        // Send a request
+        const request = { action, signature, nonce } as
+            | PerpDeployRequest_RegisterAsset
+            | PerpDeployRequest_SetOracle;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
+
+        // Validate a response
+        this._validateResponse(response);
+        return response;
+    }
+
+    /**
      * Create a referral code.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -1588,32 +1674,11 @@ export class WalletClient<
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
      * @throws {ApiRequestError} When the API returns an error response.
-     * @untested
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
-     * @example
-     * ```ts
-     * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
-     *
-     * const wallet = privateKeyToAccount("0x...");
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
-     *
-     * const result = await client.spotDeploy({
-     *   registerToken2: {
-     *     spec: {
-     *       name: "TestToken",
-     *       szDecimals: 8,
-     *       weiDecimals: 8,
-     *     },
-     *     maxGas: 1000000,
-     *     fullName: "TestToken (TT)"
-     *   }
-     * });
-     * ```
+     * @untested
      */
-    async spotDeploy(args: SpotDeployParameters, signal?: AbortSignal): Promise<BaseExchangeResponse> {
+    async spotDeploy(args: SpotDeployParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
         let action:
@@ -1621,7 +1686,8 @@ export class WalletClient<
             | SpotDeployRequest_UserGenesis["action"]
             | SpotDeployRequest_Genesis["action"]
             | SpotDeployRequest_RegisterSpot["action"]
-            | SpotDeployRequest_RegisterHyperliquidity["action"];
+            | SpotDeployRequest_RegisterHyperliquidity["action"]
+            | SpotDeployRequest_SetDeployerTradingFeeShare["action"];
         if ("registerToken2" in args) {
             action = {
                 type: "spotDeploy",
@@ -1635,6 +1701,9 @@ export class WalletClient<
                     fullName: args.registerToken2.fullName,
                 },
             };
+            if (action.registerToken2.fullName === undefined) {
+                delete action.registerToken2.fullName;
+            }
         } else if ("userGenesis" in args) {
             action = {
                 type: "spotDeploy",
@@ -1642,16 +1711,24 @@ export class WalletClient<
                     token: args.userGenesis.token,
                     userAndWei: args.userGenesis.userAndWei,
                     existingTokenAndWei: args.userGenesis.existingTokenAndWei,
+                    blacklistUsers: args.userGenesis.blacklistUsers,
                 },
             };
+            if (action.userGenesis.blacklistUsers === undefined) {
+                delete action.userGenesis.blacklistUsers;
+            }
         } else if ("genesis" in args) {
             action = {
                 type: "spotDeploy",
                 genesis: {
                     token: args.genesis.token,
                     maxSupply: args.genesis.maxSupply,
+                    noHyperliquidity: args.genesis.noHyperliquidity,
                 },
             };
+            if (action.genesis.noHyperliquidity === undefined) {
+                delete action.genesis.noHyperliquidity;
+            }
         } else if ("registerSpot" in args) {
             action = {
                 type: "spotDeploy",
@@ -1659,7 +1736,7 @@ export class WalletClient<
                     tokens: args.registerSpot.tokens,
                 },
             };
-        } else {
+        } else if ("registerHyperliquidity" in args) {
             action = {
                 type: "spotDeploy",
                 registerHyperliquidity: {
@@ -1668,6 +1745,17 @@ export class WalletClient<
                     orderSz: args.registerHyperliquidity.orderSz,
                     nOrders: args.registerHyperliquidity.nOrders,
                     nSeededLevels: args.registerHyperliquidity.nSeededLevels,
+                },
+            };
+            if (action.registerHyperliquidity.nSeededLevels === undefined) {
+                delete action.registerHyperliquidity.nSeededLevels;
+            }
+        } else {
+            action = {
+                type: "spotDeploy",
+                setDeployerTradingFeeShare: {
+                    token: args.setDeployerTradingFeeShare.token,
+                    share: args.setDeployerTradingFeeShare.share,
                 },
             };
         }
@@ -1686,7 +1774,8 @@ export class WalletClient<
             | SpotDeployRequest_UserGenesis
             | SpotDeployRequest_Genesis
             | SpotDeployRequest_RegisterSpot
-            | SpotDeployRequest_RegisterHyperliquidity;
+            | SpotDeployRequest_RegisterHyperliquidity
+            | SpotDeployRequest_SetDeployerTradingFeeShare;
         const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response

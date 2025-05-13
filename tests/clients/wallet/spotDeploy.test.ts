@@ -21,7 +21,7 @@ Deno.test("spotDeploy", async (t) => {
 
     // —————————— Test ——————————
 
-    await t.step("Step 1", async () => {
+    await t.step("Register Token", async () => {
         await assertRejects(
             () =>
                 walletClient.spotDeploy({
@@ -36,10 +36,11 @@ Deno.test("spotDeploy", async (t) => {
                     },
                 }),
             ApiRequestError,
+            "Deploy gas auction error:",
         );
     });
 
-    await t.step("Step 2", async () => {
+    await t.step("User Genesis", async () => {
         await assertRejects(
             () =>
                 walletClient.spotDeploy({
@@ -54,7 +55,7 @@ Deno.test("spotDeploy", async (t) => {
         );
     });
 
-    await t.step("Step 3", async () => {
+    await t.step("Genesis", async () => {
         await assertRejects(
             () =>
                 walletClient.spotDeploy({
@@ -68,7 +69,7 @@ Deno.test("spotDeploy", async (t) => {
         );
     });
 
-    await t.step("Step 4", async () => {
+    await t.step("Register Spot", async () => {
         await assertRejects(
             () =>
                 walletClient.spotDeploy({
@@ -81,7 +82,7 @@ Deno.test("spotDeploy", async (t) => {
         );
     });
 
-    await t.step("Step 5", async () => {
+    await t.step("Register Hyperliquidity", async () => {
         await assertRejects(
             () =>
                 walletClient.spotDeploy({
@@ -91,6 +92,20 @@ Deno.test("spotDeploy", async (t) => {
                         orderSz: "1",
                         nOrders: 1,
                         nSeededLevels: 1,
+                    },
+                }),
+            ApiRequestError,
+            "Error deploying spot:",
+        );
+    });
+
+    await t.step("Set Deployer Trading Fee Share", async () => {
+        await assertRejects(
+            () =>
+                walletClient.spotDeploy({
+                    setDeployerTradingFeeShare: {
+                        token: 0,
+                        share: "0%",
                     },
                 }),
             ApiRequestError,

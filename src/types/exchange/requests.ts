@@ -331,6 +331,69 @@ export interface OrderRequest extends BaseExchangeRequest {
 }
 
 /**
+ * Deploying HIP-3 assets (Register Asset).
+ * @returns {unknown}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-3-assets
+ */
+export interface PerpDeployRequest_RegisterAsset extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "perpDeploy";
+        /** Parameters for registering a new perpetual asset. */
+        registerAsset: {
+            /** Max gas in native token wei. If not provided, then uses current deploy auction price. */
+            maxGas?: number | null;
+            /** Contains new asset listing parameters. */
+            assetRequest: {
+                /** Coin symbol for the new asset. */
+                coin: string;
+                /** Number of decimal places for size. */
+                szDecimals: number;
+                /** Initial oracle price for the asset. */
+                oraclePx: string;
+                /** Margin table identifier for risk management. */
+                marginTableId: number;
+                /** Whether the asset can only be traded with isolated margin. */
+                onlyIsolated: boolean;
+            };
+            /** Name of the perp dex (<= 6 characters). */
+            dex: string;
+            /** Contains new perp dex parameters. */
+            schema?: {
+                /** Full name of the perp dex. */
+                fullName: string;
+                /** Collateral token index. */
+                collateralToken: number;
+                /** User to update oracles. If not provided, then deployer is assumed to be oracle updater. */
+                oracleUpdater?: Hex | null;
+            } | null;
+        };
+    };
+}
+/**
+ * Deploying HIP-3 assets (Set Oracle).
+ * @returns {unknown}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-3-assets
+ */
+export interface PerpDeployRequest_SetOracle extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "perpDeploy";
+        /** Parameters for setting oracle and mark prices for assets. */
+        setOracle: {
+            /** Name of the perp dex (<= 6 characters). */
+            dex: string;
+            /** A list (sorted by key) of asset and oracle prices. */
+            oraclePxs: [string, string][];
+            /** A list (sorted by key) of asset and mark prices. */
+            markPxs: [string, string][];
+        };
+    };
+}
+
+/**
  * Create a referral code.
  * @returns {SuccessResponse}
  * @see null - no documentation
@@ -421,9 +484,7 @@ export interface SetReferrerRequest extends BaseExchangeRequest {
 }
 
 /**
- * Deploying HIP-1 and HIP-2 assets.
- *
- * Step 1: Register Token
+ * Deploying HIP-1 and HIP-2 assets (Register Token).
  * @returns {unknown}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
  */
@@ -451,9 +512,7 @@ export interface SpotDeployRequest_RegisterToken2 extends BaseExchangeRequest {
     };
 }
 /**
- * Deploying HIP-1 and HIP-2 assets.
- *
- * Step 2: User Genesis
+ * Deploying HIP-1 and HIP-2 assets (User Genesis).
  * @returns {unknown}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
  */
@@ -470,13 +529,13 @@ export interface SpotDeployRequest_UserGenesis extends BaseExchangeRequest {
             userAndWei: [string, string][];
             /** Array of tuples: [existing token identifier, genesis amount in wei]. */
             existingTokenAndWei: [number, string][];
+            /** Array of tuples: [user address, blacklist status] (`true` for blacklist, `false` to remove existing blacklisted user). */
+            blacklistUsers?: [string, boolean][];
         };
     };
 }
 /**
- * Deploying HIP-1 and HIP-2 assets.
- *
- * Step 3: Genesis
+ * Deploying HIP-1 and HIP-2 assets (Genesis).
  * @returns {unknown}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
  */
@@ -491,13 +550,13 @@ export interface SpotDeployRequest_Genesis extends BaseExchangeRequest {
             token: number;
             /** Maximum token supply. */
             maxSupply: string;
+            /** Set hyperliquidity balance to 0. */
+            noHyperliquidity?: boolean;
         };
     };
 }
 /**
- * Deploying HIP-1 and HIP-2 assets.
- *
- * Step 4: Register Spot
+ * Deploying HIP-1 and HIP-2 assets (Register Spot).
  * @returns {unknown}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
  */
@@ -514,9 +573,7 @@ export interface SpotDeployRequest_RegisterSpot extends BaseExchangeRequest {
     };
 }
 /**
- * Deploying HIP-1 and HIP-2 assets.
- *
- * Step 5: Register Hyperliquidity
+ * Deploying HIP-1 and HIP-2 assets (Register Hyperliquidity).
  * @returns {unknown}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
  */
@@ -536,7 +593,26 @@ export interface SpotDeployRequest_RegisterHyperliquidity extends BaseExchangeRe
             /** Total number of orders to place. */
             nOrders: number;
             /** Number of levels to seed with USDC. */
-            nSeededLevels: number;
+            nSeededLevels?: number;
+        };
+    };
+}
+/**
+ * Deploying HIP-1 and HIP-2 assets (Set Deployer Trading Fee Share).
+ * @returns {unknown}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
+ */
+export interface SpotDeployRequest_SetDeployerTradingFeeShare extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "spotDeploy";
+        /** Set deployer trading fee share parameters. */
+        setDeployerTradingFeeShare: {
+            /** Token identifier. */
+            token: number;
+            /**  The deployer trading fee share. Range: ["0%", "100%"]. */
+            share: `${string}%`;
         };
     };
 }
