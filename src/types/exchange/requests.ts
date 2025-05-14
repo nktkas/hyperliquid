@@ -551,7 +551,7 @@ export interface SpotDeployRequest_Genesis extends BaseExchangeRequest {
             /** Maximum token supply. */
             maxSupply: string;
             /** Set hyperliquidity balance to 0. */
-            noHyperliquidity?: boolean;
+            noHyperliquidity?: true;
         };
     };
 }
