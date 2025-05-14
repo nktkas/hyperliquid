@@ -947,18 +947,18 @@ export class WalletClient<
     async claimRewards(signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const sortedAction: ClaimRewardsRequest["action"] = { type: "claimRewards" };
+        const action: ClaimRewardsRequest["action"] = { type: "claimRewards" };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action: sortedAction,
+            action,
             nonce,
             isTestnet: this.isTestnet,
         });
 
         // Send a request
-        const request: ClaimRewardsRequest = { action: sortedAction, signature, nonce };
+        const request: ClaimRewardsRequest = { action, signature, nonce };
         const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
 
         // Validate a response
