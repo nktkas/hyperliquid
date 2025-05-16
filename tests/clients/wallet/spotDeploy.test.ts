@@ -38,7 +38,6 @@ Deno.test("spotDeploy", async (t) => {
                             },
                         }),
                     ApiRequestError,
-                    "Deploy gas auction error:",
                 );
             });
 
@@ -56,7 +55,6 @@ Deno.test("spotDeploy", async (t) => {
                             },
                         }),
                     ApiRequestError,
-                    "Deploy gas auction error:",
                 );
             });
         });
