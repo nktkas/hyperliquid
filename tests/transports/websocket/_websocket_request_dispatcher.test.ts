@@ -311,8 +311,8 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
         const strId = WebSocketRequestDispatcher.requestToId(complex);
         const parsed = JSON.parse(strId);
 
-        // Keys should be sorted by ASCII: "arr" > "boolVal" > "nested" > "textVal" > "Z"
-        assertEquals(Object.keys(parsed), ["arr", "boolVal", "nested", "textVal", "Z"]);
+        // Keys should be sorted by ASCII: "Z" > "arr" > "boolVal" > "nested" > "textVal"
+        assertEquals(Object.keys(parsed), ["Z", "arr", "boolVal", "nested", "textVal"]);
 
         // Check hex transformations
         assertEquals(parsed.Z, "0xabc123", "Hex string must be lowercased");
