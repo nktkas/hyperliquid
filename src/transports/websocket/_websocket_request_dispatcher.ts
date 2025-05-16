@@ -154,31 +154,48 @@ export class WebSocketRequestDispatcher {
      * @returns A stringified request.
      */
     static requestToId(value: unknown): string {
-        const lowerHex = deepLowerHex(value);
+        const lowerHex = containsUppercaseHex(value) ? deepLowerHex(value) : value;
         const sorted = deepSortKeys(lowerHex);
         return JSON.stringify(sorted);
     }
 }
 
 /**
- * Convert all hexadecimal strings to lowercase in an object/array.
+ * Deeply converts hexadecimal strings in an object/array to lowercase.
  * @param obj - The object/array to convert hexadecimal strings to lowercase.
  * @returns A new object/array with hexadecimal strings converted to lowercase.
  */
 function deepLowerHex(obj: unknown): unknown {
+    if (typeof obj === "string") {
+        return /^(0X[0-9a-fA-F]*|0x[0-9a-fA-F]*[A-F][0-9a-fA-F]*)$/.test(obj) ? obj.toLowerCase() : obj;
+    }
+
     if (Array.isArray(obj)) {
         return obj.map(deepLowerHex);
     }
+
     if (typeof obj === "object" && obj !== null) {
-        return Object.entries(obj).reduce((acc, [key, val]) => ({
-            ...acc,
-            [key]: deepLowerHex(val),
-        }), {});
+        const result: Record<string, unknown> = {};
+        const entries = Object.entries(obj);
+
+        for (const [key, value] of entries) {
+            result[key] = deepLowerHex(value);
+        }
+
+        return result;
     }
-    if (typeof obj === "string" && /^0x[0-9A-Fa-f]+$/.test(obj)) {
-        return obj.toLowerCase();
-    }
+
     return obj;
+}
+
+/**
+ * Check if an object contains uppercase hexadecimal strings.
+ * @param obj - The object to check.
+ * @returns True if the object contains uppercase hexadecimal strings, false otherwise.
+ */
+function containsUppercaseHex(obj: unknown): boolean {
+    const str = JSON.stringify(obj);
+    return /0X[0-9a-fA-F]*|0x[0-9a-fA-F]*[A-F][0-9a-fA-F]*/.test(str);
 }
 
 /**
@@ -187,15 +204,20 @@ function deepLowerHex(obj: unknown): unknown {
  * @returns A new object with sorted keys.
  */
 function deepSortKeys<T>(obj: T): T {
-    if (obj === null || typeof obj !== "object") {
+    if (typeof obj !== "object" || obj === null) {
         return obj;
     }
+
     if (Array.isArray(obj)) {
         return obj.map(deepSortKeys) as T;
     }
-    return Object.fromEntries(
-        Object.entries(obj)
-            .sort(([a], [b]) => a.localeCompare(b))
-            .map(([k, v]) => [k, deepSortKeys(v)]),
-    ) as T;
+
+    const result: Record<string, unknown> = {};
+    const keys = Object.keys(obj).sort();
+
+    for (const key of keys) {
+        result[key] = deepSortKeys((obj as Record<string, unknown>)[key]);
+    }
+
+    return result as T;
 }
