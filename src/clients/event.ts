@@ -52,6 +52,9 @@ export type EventActiveAssetCtxParameters = Omit<WsActiveAssetCtxRequest, "type"
 /** Parameters for the {@linkcode EventClient.activeAssetData} method. */
 export type EventActiveAssetDataParameters = Omit<WsActiveAssetDataRequest, "type">;
 
+/** Parameters for the {@linkcode EventClient.allMids} method. */
+export type WsAllMidsParameters = Omit<WsAllMidsRequest, "type">;
+
 /** Parameters for the {@linkcode EventClient.bbo} method. */
 export type EventBboParameters = Omit<WsBboRequest, "type">;
 
@@ -215,17 +218,19 @@ export class EventClient<
      * const transport = new hl.WebSocketTransport();
      * const client = new hl.EventClient({ transport });
      *
-     * const sub = await client.allMids((data) => {
+     * const sub = await client.allMids({}, (data) => {
      *   console.log(data);
      * });
      * ```
      */
     allMids(
+        args: WsAllMidsParameters,
         listener: (data: WsAllMids) => void,
         signal?: AbortSignal,
     ): Promise<Subscription> {
         const payload: WsAllMidsRequest = {
             type: "allMids",
+            dex: args.dex,
         };
         return this.transport.subscribe(
             payload.type,

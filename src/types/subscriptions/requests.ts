@@ -22,6 +22,8 @@ export interface WsActiveAssetDataRequest {
 export interface WsAllMidsRequest {
     /** Type of subscription. */
     type: "allMids";
+    /** Name of perp dex. */
+    dex?: string;
 }
 
 /** Best bid and offer events for a specific asset. */

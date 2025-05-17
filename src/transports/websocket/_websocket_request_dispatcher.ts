@@ -156,7 +156,7 @@ export class WebSocketRequestDispatcher {
     static requestToId(value: unknown): string {
         const lowerHex = containsUppercaseHex(value) ? deepLowerHex(value) : value;
         const sorted = deepSortKeys(lowerHex);
-        return JSON.stringify(sorted);
+        return JSON.stringify(sorted); // Also removes undefined
     }
 }
 
