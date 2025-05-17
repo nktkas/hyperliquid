@@ -57,6 +57,14 @@ import type { Hex } from "./base.ts";
 export type { Hex };
 export type { ValueMap, ValueType };
 
+/** Abstract interface for a wallet that can sign typed data. */
+export type AbstractWallet =
+    | AbstractViemWalletClient
+    | AbstractEthersSigner
+    | AbstractEthersV5Signer
+    | AbstractExtendedViemWalletClient
+    | AbstractWindowEthereum;
+
 /** Abstract interface for a [viem wallet](https://viem.sh/docs/clients/wallet). */
 export interface AbstractViemWalletClient {
     signTypedData(params: {
@@ -251,12 +259,7 @@ function normalizeIntegersForMsgPack(obj: ValueType): ValueType {
  */
 export async function signL1Action(args: {
     /** Wallet to sign the action. */
-    wallet:
-        | AbstractViemWalletClient
-        | AbstractEthersSigner
-        | AbstractEthersV5Signer
-        | AbstractExtendedViemWalletClient
-        | AbstractWindowEthereum;
+    wallet: AbstractWallet;
     /** The action to be signed. */
     action: ValueType;
     /** Unique request identifier (recommended current timestamp in ms). */
@@ -346,12 +349,7 @@ export async function signL1Action(args: {
  */
 export async function signUserSignedAction(args: {
     /** Wallet to sign the action. */
-    wallet:
-        | AbstractViemWalletClient
-        | AbstractEthersSigner
-        | AbstractEthersV5Signer
-        | AbstractExtendedViemWalletClient
-        | AbstractWindowEthereum;
+    wallet: AbstractWallet;
     /** The action to be signed. */
     action: Record<string, unknown>;
     /** The types of the action. */
@@ -374,12 +372,7 @@ export async function signUserSignedAction(args: {
 
 /** Signs typed data with the provided wallet using EIP-712. */
 async function abstractSignTypedData(args: {
-    wallet:
-        | AbstractViemWalletClient
-        | AbstractEthersSigner
-        | AbstractEthersV5Signer
-        | AbstractExtendedViemWalletClient
-        | AbstractWindowEthereum;
+    wallet: AbstractWallet;
     domain: {
         name: string;
         version: string;

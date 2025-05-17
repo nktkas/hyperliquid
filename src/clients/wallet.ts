@@ -53,11 +53,7 @@ import type {
     TwapOrderResponse,
 } from "../types/exchange/responses.ts";
 import {
-    type AbstractEthersSigner,
-    type AbstractEthersV5Signer,
-    type AbstractExtendedViemWalletClient,
-    type AbstractViemWalletClient,
-    type AbstractWindowEthereum,
+    type AbstractWallet,
     isAbstractEthersSigner,
     isAbstractEthersV5Signer,
     isAbstractViemWalletClient,
@@ -69,17 +65,7 @@ import {
 /** Parameters for the {@linkcode WalletClient} constructor. */
 export interface WalletClientParameters<
     T extends IRequestTransport = IRequestTransport,
-    W extends
-        | AbstractViemWalletClient
-        | AbstractEthersSigner
-        | AbstractEthersV5Signer
-        | AbstractExtendedViemWalletClient
-        | AbstractWindowEthereum =
-            | AbstractViemWalletClient
-            | AbstractEthersSigner
-            | AbstractEthersV5Signer
-            | AbstractExtendedViemWalletClient
-            | AbstractWindowEthereum,
+    W extends AbstractWallet = AbstractWallet,
 > {
     /** The transport used to connect to the Hyperliquid API. */
     transport: T;
@@ -448,17 +434,7 @@ class NonceManager {
  */
 export class WalletClient<
     T extends IRequestTransport = IRequestTransport,
-    W extends
-        | AbstractViemWalletClient
-        | AbstractEthersSigner
-        | AbstractEthersV5Signer
-        | AbstractExtendedViemWalletClient
-        | AbstractWindowEthereum =
-            | AbstractViemWalletClient
-            | AbstractEthersSigner
-            | AbstractEthersV5Signer
-            | AbstractExtendedViemWalletClient
-            | AbstractWindowEthereum,
+    W extends AbstractWallet = AbstractWallet,
 > implements AsyncDisposable {
     /** The transport used to connect to the Hyperliquid API. */
     transport: T;
