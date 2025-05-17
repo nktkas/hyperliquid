@@ -15,6 +15,7 @@ import type {
     OrderRequest,
     PerpDeployRequest_RegisterAsset,
     PerpDeployRequest_SetOracle,
+    PerpDexClassTransferRequest,
     RegisterReferrerRequest,
     ReserveRequestWeightRequest,
     ScheduleCancelRequest,
@@ -177,6 +178,12 @@ export type PerpDeployParameters =
 export type PerpDeployParameters_RegisterAsset = Omit<PerpDeployRequest_RegisterAsset["action"], "type">;
 /** One of the parameters for the {@linkcode WalletClient.perpDeploy} method. */
 export type PerpDeployParameters_SetOracle = Omit<PerpDeployRequest_SetOracle["action"], "type">;
+
+/** Parameters for the {@linkcode WalletClient.perpDexClassTransfer} method. */
+export type PerpDexClassTransferParameters = Omit<
+    PerpDexClassTransferRequest["action"],
+    "type" | "hyperliquidChain" | "signatureChainId" | "nonce"
+>;
 
 /** Parameters for the {@linkcode WalletClient.registerReferrer} method. */
 export type RegisterReferrerParameters = Omit<RegisterReferrerRequest["action"], "type">;
@@ -1404,6 +1411,66 @@ export class WalletClient<
     }
 
     /**
+     * Transfer funds between Spot account and Perp dex account.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
+     * 
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
+     * const result = await client.perpDexClassTransfer({
+     *   dex: "test",
+     *   token: "USDC",
+     *   amount: "1",
+     *   toPerp: true,
+     * });
+     * ```
+     */
+    async perpDexClassTransfer(args: PerpDexClassTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Construct an action
+        const action: PerpDexClassTransferRequest["action"] = {
+            ...args,
+            type: "PerpDexClassTransfer",
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
+            nonce: await this.nonceManager(),
+        };
+
+        // Sign the action
+        const signature = await signUserSignedAction({
+            wallet: this.wallet,
+            action,
+            types: {
+                "HyperliquidTransaction:PerpDexClassTransfer": [
+                    { name: "hyperliquidChain", type: "string" },
+                    { name: "dex", type: "string" },
+                    { name: "token", type: "string" },
+                    { name: "amount", type: "string" },
+                    { name: "toPerp", type: "bool" },
+                    { name: "nonce", type: "uint64" },
+                ],
+            },
+            chainId: parseInt(action.signatureChainId, 16),
+        });
+
+        // Send a request
+        const request: PerpDexClassTransferRequest = { action, signature, nonce: action.nonce };
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
+
+        // Validate a response
+        this._validateResponse(response);
+        return response;
+    }
+
+    /**
      * Create a referral code.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -2271,7 +2338,7 @@ export class WalletClient<
     }
 
     /**
-     * Transfer funds between Spot and Perp accounts.
+     * Transfer funds between Spot account and Perp account.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.

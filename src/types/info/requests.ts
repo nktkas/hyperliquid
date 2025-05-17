@@ -8,7 +8,7 @@ import type { Hex } from "../../base.ts";
 export interface AllMidsRequest {
     /** Type of request. */
     type: "allMids";
-    /** Perp dex name. */
+    /** Name of perp dex. */
     dex?: string;
 }
 
@@ -115,7 +115,7 @@ export interface FrontendOpenOrdersRequest {
     type: "frontendOpenOrders";
     /** User's address. */
     user: Hex;
-    /** Perp dex name. */
+    /** Name of perp dex. */
     dex?: string;
 }
 
@@ -219,7 +219,7 @@ export interface MetaAndAssetCtxsRequest {
 export interface MetaRequest {
     /** Type of request. */
     type: "meta";
-    /** Perp dex name. */
+    /** Name of perp dex. */
     dex?: string;
 }
 
@@ -233,7 +233,7 @@ export interface OpenOrdersRequest {
     type: "openOrders";
     /** User's address. */
     user: Hex;
-    /** Perp dex name. */
+    /** Name of perp dex. */
     dex?: string;
 }
 
@@ -329,7 +329,7 @@ export interface SpotClearinghouseStateRequest {
     type: "spotClearinghouseState";
     /** User's address. */
     user: Hex;
-    /** Perp dex name. */
+    /** Name of perp dex. */
     dex?: string;
 }
 

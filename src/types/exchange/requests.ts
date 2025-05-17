@@ -394,6 +394,33 @@ export interface PerpDeployRequest_SetOracle extends BaseExchangeRequest {
 }
 
 /**
+ * Transfer funds between Spot account and Perp dex account.
+ * @returns {SuccessResponse}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-for-builder-deployed-dex-and-vice-versa
+ */
+export interface PerpDexClassTransferRequest extends BaseExchangeRequest {
+    /** Action to perform. */
+    action: {
+        /** Type of action. */
+        type: "PerpDexClassTransfer";
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
+        /** Chain ID used for signing. */
+        signatureChainId: Hex;
+        /** Unique request identifier (current timestamp in ms). */
+        nonce: number;
+        /** Name of perp dex. */
+        dex: string;
+        /** Collateral token of the perp dex as a string. */
+        token: string;
+        /** Amount of collateral token to transfer (1 = 1$). */
+        amount: string;
+        /** `true` for transferring from perp dex to spot account, `false` for transferring from spot account to perp dex. */
+        toPerp: boolean;
+    };
+}
+
+/**
  * Create a referral code.
  * @returns {SuccessResponse}
  * @see null - no documentation
@@ -825,7 +852,7 @@ export interface UpdateLeverageRequest extends BaseExchangeRequest {
 }
 
 /**
- * Transfer funds between Spot and Perp accounts.
+ * Transfer funds between Spot account and Perp account.
  * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa
  */
