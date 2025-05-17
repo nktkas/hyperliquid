@@ -42,10 +42,12 @@ git push origin feature/your-feature-name
 
 #### Coding Guidelines
 
-- **TypeScript**: Ensure your code passes TypeScript compilation without errors.
+- **TypeScript**: Ensure your code passes TypeScript compilation without errors. Try not to ignore typescript errors and
+  avoid creating unsafe types.
 - **Style**: Follow Deno formatting convention ([deno fmt](https://docs.deno.com/runtime/reference/cli/fmt/)) and code
   style ([deno lint](https://docs.deno.com/runtime/reference/cli/lint/)).
-- **Dependencies**: Avoid adding unnecessary dependencies.
+- **Dependencies**: Try to use trusted small dependencies (e.g. [@noble](https://github.com/paulmillr/noble-hashes) or
+  [deno @std](https://github.com/denoland/std)).
 - **Docs**: Update or add JSDoc comments where appropriate.
 
 #### Testing
