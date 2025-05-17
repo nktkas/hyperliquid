@@ -22,7 +22,7 @@ Deno.test("allMids", async () => {
 
     const data1 = await deadline(
         new Promise((resolve) => {
-            client.allMids({}, resolve);
+            client.allMids(resolve);
         }),
         10_000,
     );

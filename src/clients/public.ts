@@ -271,7 +271,12 @@ export class PublicClient<
      * const allMids = await client.allMids();
      * ```
      */
-    allMids(args?: AllMidsParameters, signal?: AbortSignal): Promise<AllMids> {
+    allMids(args?: AllMidsParameters, signal?: AbortSignal): Promise<AllMids>;
+    allMids(signal?: AbortSignal): Promise<AllMids>;
+    allMids(args_or_signal?: AllMidsParameters | AbortSignal, maybeSignal?: AbortSignal): Promise<AllMids> {
+        const args = args_or_signal instanceof AbortSignal ? {} : args_or_signal;
+        const signal = args_or_signal instanceof AbortSignal ? args_or_signal : maybeSignal;
+
         const request: AllMidsRequest = {
             type: "allMids",
             ...args,
@@ -677,7 +682,12 @@ export class PublicClient<
      * const meta = await client.meta();
      * ```
      */
-    meta(args?: MetaParameters, signal?: AbortSignal): Promise<PerpsMeta> {
+    meta(args?: MetaParameters, signal?: AbortSignal): Promise<PerpsMeta>;
+    meta(signal?: AbortSignal): Promise<PerpsMeta>;
+    meta(args_or_signal?: MetaParameters | AbortSignal, maybeSignal?: AbortSignal): Promise<PerpsMeta> {
+        const args = args_or_signal instanceof AbortSignal ? {} : args_or_signal;
+        const signal = args_or_signal instanceof AbortSignal ? args_or_signal : maybeSignal;
+
         const request: MetaRequest = {
             type: "meta",
             ...args,

@@ -218,16 +218,30 @@ export class EventClient<
      * const transport = new hl.WebSocketTransport();
      * const client = new hl.EventClient({ transport });
      *
-     * const sub = await client.allMids({}, (data) => {
+     * const sub = await client.allMids((data) => {
      *   console.log(data);
      * });
      * ```
      */
+    allMids(listener: (data: WsAllMids) => void, signal?: AbortSignal): Promise<Subscription>;
     allMids(
         args: WsAllMidsParameters,
         listener: (data: WsAllMids) => void,
         signal?: AbortSignal,
+    ): Promise<Subscription>;
+    allMids(
+        args_or_listener: WsAllMidsParameters | ((data: WsAllMids) => void),
+        listener_or_signal?: ((data: WsAllMids) => void) | AbortSignal,
+        maybeSignal?: AbortSignal,
     ): Promise<Subscription> {
+        const args = typeof args_or_listener === "function" ? {} : args_or_listener;
+        const listener = typeof args_or_listener === "function"
+            ? args_or_listener
+            : listener_or_signal as (data: WsAllMids) => void;
+        const signal = typeof args_or_listener === "function"
+            ? listener_or_signal as AbortSignal | undefined
+            : maybeSignal;
+
         const payload: WsAllMidsRequest = {
             type: "allMids",
             dex: args.dex,

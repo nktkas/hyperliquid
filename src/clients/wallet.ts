@@ -1415,7 +1415,7 @@ export class WalletClient<
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * 
+     *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa
      * @example
      * ```ts
@@ -1587,7 +1587,15 @@ export class WalletClient<
      * const result = await client.scheduleCancel({ time: Date.now() + 3600000 });
      * ```
      */
-    async scheduleCancel(args: ScheduleCancelParameters = {}, signal?: AbortSignal): Promise<SuccessResponse> {
+    async scheduleCancel(args?: ScheduleCancelParameters, signal?: AbortSignal): Promise<SuccessResponse>;
+    async scheduleCancel(signal?: AbortSignal): Promise<SuccessResponse>;
+    async scheduleCancel(
+        args_or_signal?: ScheduleCancelParameters | AbortSignal,
+        maybeSignal?: AbortSignal,
+    ): Promise<SuccessResponse> {
+        const args = args_or_signal instanceof AbortSignal ? {} : args_or_signal ?? {};
+        const signal = args_or_signal instanceof AbortSignal ? args_or_signal : maybeSignal;
+
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
