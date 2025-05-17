@@ -123,7 +123,7 @@ export interface AbstractEthersV5Signer {
     ): Promise<string>;
 }
 
-/** Abstract interface for an extended [viem wallet](https://viem.sh/docs/clients/wallet) (e.g. privy [useSignTypedData](https://docs.privy.io/reference/sdk/react-auth/functions/useSignTypedData#returns)). */
+/** Abstract interface for an extended [viem wallet](https://viem.sh/docs/clients/wallet) (e.g. privy [useSignTypedData](https://docs.privy.io/wallets/using-wallets/ethereum/sign-typed-data)). */
 export interface AbstractExtendedViemWalletClient {
     signTypedData(
         params: {
