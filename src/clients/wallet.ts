@@ -56,6 +56,7 @@ import {
     type AbstractWallet,
     isAbstractEthersSigner,
     isAbstractEthersV5Signer,
+    isAbstractExtendedViemWalletClient,
     isAbstractViemWalletClient,
     isAbstractWindowEthereum,
     signL1Action,
@@ -2599,7 +2600,7 @@ export class WalletClient<
     /** Guesses the chain ID based on the wallet type or the isTestnet flag. */
     protected async _guessSignatureChainId(): Promise<Hex> {
         // Trying to get chain ID of the wallet
-        if (isAbstractViemWalletClient(this.wallet)) {
+        if (isAbstractViemWalletClient(this.wallet) || isAbstractExtendedViemWalletClient(this.wallet)) {
             if ("getChainId" in this.wallet && typeof this.wallet.getChainId === "function") {
                 const chainId = await this.wallet.getChainId() as number;
                 return `0x${chainId.toString(16)}`;
