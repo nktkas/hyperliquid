@@ -52,6 +52,134 @@ export interface BaseExchangeRequest {
 }
 
 /**
+ * Jail a signer to prevent them from signing transactions.
+ * @returns {SuccessResponse}
+ * @see null - no documentation
+ */
+export interface CSignerActionRequest_JailSelf extends BaseExchangeRequest {
+    /** Action to perform. */
+    action: {
+        /** Type of action. */
+        type: "CSignerAction";
+        /** Jail the signer. */
+        jailSelf: null;
+    };
+    /** Expiration time of the action. */
+    expiresAfter?: number;
+}
+
+/**
+ * Unjail a signer to allow them to sign transactions again.
+ * @returns {SuccessResponse}
+ * @see null - no documentation
+ */
+export interface CSignerActionRequest_UnjailSelf extends BaseExchangeRequest {
+    /** Action to perform. */
+    action: {
+        /** Type of action. */
+        type: "CSignerAction";
+        /** Unjail the signer. */
+        unjailSelf: null;
+    };
+    /** Expiration time of the action. */
+    expiresAfter?: number;
+}
+
+/**
+ * Change a validator's profile information.
+ * @returns {SuccessResponse}
+ * @see null - no documentation
+ */
+export interface CValidatorActionRequest_ChangeProfile extends BaseExchangeRequest {
+    /** Action to perform. */
+    action: {
+        /** Type of action. */
+        type: "CValidatorAction";
+        /** Profile changes to apply. */
+        changeProfile: {
+            /** Validator node IP address. */
+            node_ip?:
+                | {
+                    /** IP address. */
+                    Ip: string;
+                }
+                | null;
+            /** Validator name. */
+            name?: string | null;
+            /** Validator description. */
+            description?: string | null;
+            /** Validator jail status. */
+            unjailed: boolean;
+            /** Enable or disable delegations. */
+            disable_delegations?: boolean | null;
+            /** Commission rate in basis points (1 = 0.0001%). */
+            commission_bps?: number | null;
+            /** Signer address. */
+            signer?: Hex | null;
+        };
+    };
+    /** Expiration time of the action. */
+    expiresAfter?: number;
+}
+
+/**
+ * Register a new validator.
+ * @returns {SuccessResponse}
+ * @see null - no documentation
+ */
+export interface CValidatorActionRequest_Register extends BaseExchangeRequest {
+    /** Action to perform. */
+    action: {
+        /** Type of action. */
+        type: "CValidatorAction";
+        /** Registration parameters. */
+        register: {
+            /** Validator profile information. */
+            profile: {
+                /** Validator node IP address. */
+                node_ip: {
+                    /** IP address. */
+                    Ip: string;
+                };
+                /** Validator name. */
+                name: string;
+                /** Validator description. */
+                description: string;
+                /** Whether delegations are disabled. */
+                delegations_disabled: boolean;
+                /** Commission rate in basis points (1 = 0.0001%). */
+                commission_bps: number;
+                /** Signer address. */
+                signer: Hex;
+            };
+            /** Initial jail status. */
+            unjailed: boolean;
+            /** Initial stake amount in wei. */
+            initial_wei: number;
+        };
+    };
+    /** Expiration time of the action. */
+    expiresAfter?: number;
+}
+
+/**
+ * Unregister an existing validator.
+ * @returns {SuccessResponse}
+ * @see null - no documentation
+ */
+export interface CValidatorActionRequest_Unregister extends BaseExchangeRequest {
+    /** Action to perform. */
+    action: {
+        /** Type of action. */
+        type: "CValidatorAction";
+        /** Unregister the validator. */
+        unregister: null;
+    };
+    /** Expiration time of the action. */
+    expiresAfter?: number;
+}
+
+/**
  * Approve an agent to sign on behalf of the master account.
  * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet
@@ -227,6 +355,7 @@ export interface ConvertToMultiSigUserRequest extends BaseExchangeRequest {
         nonce: number;
     };
 }
+
 /** Signers configuration for {@linkcode ConvertToMultiSigUserRequest}. */
 export type ConvertToMultiSigUserRequest_Signers =
     | {
@@ -435,6 +564,7 @@ export interface PerpDeployRequest_RegisterAsset extends BaseExchangeRequest {
         };
     };
 }
+
 /**
  * Deploying HIP-3 assets (Set Oracle).
  * @returns {unknown}
@@ -575,6 +705,72 @@ export interface SetReferrerRequest extends BaseExchangeRequest {
 }
 
 /**
+ * Deploying HIP-1 and HIP-2 assets (Genesis).
+ * @returns {unknown}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
+ */
+export interface SpotDeployRequest_Genesis extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "spotDeploy";
+        /** Genesis parameters. */
+        genesis: {
+            /** Token identifier. */
+            token: number;
+            /** Maximum token supply. */
+            maxSupply: string;
+            /** Set hyperliquidity balance to 0. */
+            noHyperliquidity?: true;
+        };
+    };
+}
+
+/**
+ * Deploying HIP-1 and HIP-2 assets (Register Hyperliquidity).
+ * @returns {unknown}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
+ */
+export interface SpotDeployRequest_RegisterHyperliquidity extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "spotDeploy";
+        /** Register hyperliquidity parameters. */
+        registerHyperliquidity: {
+            /** Spot index (distinct from base token index). */
+            spot: number;
+            /** Starting price for liquidity seeding. */
+            startPx: string;
+            /** Order size as a float (not in wei). */
+            orderSz: string;
+            /** Total number of orders to place. */
+            nOrders: number;
+            /** Number of levels to seed with USDC. */
+            nSeededLevels?: number;
+        };
+    };
+}
+
+/**
+ * Deploying HIP-1 and HIP-2 assets (Register Spot).
+ * @returns {unknown}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
+ */
+export interface SpotDeployRequest_RegisterSpot extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "spotDeploy";
+        /** Register spot parameters. */
+        registerSpot: {
+            /** Tuple containing base and quote token indices. */
+            tokens: [number, number];
+        };
+    };
+}
+
+/**
  * Deploying HIP-1 and HIP-2 assets (Register Token).
  * @returns {unknown}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
@@ -602,6 +798,27 @@ export interface SpotDeployRequest_RegisterToken2 extends BaseExchangeRequest {
         };
     };
 }
+
+/**
+ * Deploying HIP-1 and HIP-2 assets (Set Deployer Trading Fee Share).
+ * @returns {unknown}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
+ */
+export interface SpotDeployRequest_SetDeployerTradingFeeShare extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "spotDeploy";
+        /** Set deployer trading fee share parameters. */
+        setDeployerTradingFeeShare: {
+            /** Token identifier. */
+            token: number;
+            /**  The deployer trading fee share. Range: ["0%", "100%"]. */
+            share: `${string}%`;
+        };
+    };
+}
+
 /**
  * Deploying HIP-1 and HIP-2 assets (User Genesis).
  * @returns {unknown}
@@ -622,88 +839,6 @@ export interface SpotDeployRequest_UserGenesis extends BaseExchangeRequest {
             existingTokenAndWei: [number, string][];
             /** Array of tuples: [user address, blacklist status] (`true` for blacklist, `false` to remove existing blacklisted user). */
             blacklistUsers?: [string, boolean][];
-        };
-    };
-}
-/**
- * Deploying HIP-1 and HIP-2 assets (Genesis).
- * @returns {unknown}
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
- */
-export interface SpotDeployRequest_Genesis extends BaseExchangeRequest {
-    /** Action to be performed. */
-    action: {
-        /** Type of action. */
-        type: "spotDeploy";
-        /** Genesis parameters. */
-        genesis: {
-            /** Token identifier. */
-            token: number;
-            /** Maximum token supply. */
-            maxSupply: string;
-            /** Set hyperliquidity balance to 0. */
-            noHyperliquidity?: true;
-        };
-    };
-}
-/**
- * Deploying HIP-1 and HIP-2 assets (Register Spot).
- * @returns {unknown}
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
- */
-export interface SpotDeployRequest_RegisterSpot extends BaseExchangeRequest {
-    /** Action to be performed. */
-    action: {
-        /** Type of action. */
-        type: "spotDeploy";
-        /** Register spot parameters. */
-        registerSpot: {
-            /** Tuple containing base and quote token indices. */
-            tokens: [number, number];
-        };
-    };
-}
-/**
- * Deploying HIP-1 and HIP-2 assets (Register Hyperliquidity).
- * @returns {unknown}
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
- */
-export interface SpotDeployRequest_RegisterHyperliquidity extends BaseExchangeRequest {
-    /** Action to be performed. */
-    action: {
-        /** Type of action. */
-        type: "spotDeploy";
-        /** Register hyperliquidity parameters. */
-        registerHyperliquidity: {
-            /** Spot index (distinct from base token index). */
-            spot: number;
-            /** Starting price for liquidity seeding. */
-            startPx: string;
-            /** Order size as a float (not in wei). */
-            orderSz: string;
-            /** Total number of orders to place. */
-            nOrders: number;
-            /** Number of levels to seed with USDC. */
-            nSeededLevels?: number;
-        };
-    };
-}
-/**
- * Deploying HIP-1 and HIP-2 assets (Set Deployer Trading Fee Share).
- * @returns {unknown}
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
- */
-export interface SpotDeployRequest_SetDeployerTradingFeeShare extends BaseExchangeRequest {
-    /** Action to be performed. */
-    action: {
-        /** Type of action. */
-        type: "spotDeploy";
-        /** Set deployer trading fee share parameters. */
-        setDeployerTradingFeeShare: {
-            /** Token identifier. */
-            token: number;
-            /**  The deployer trading fee share. Range: ["0%", "100%"]. */
-            share: `${string}%`;
         };
     };
 }

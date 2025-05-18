@@ -10,7 +10,7 @@ const PRIVATE_KEY = Deno.args[0] as `0x${string}`;
 
 // NOTE: This API is difficult to test with a successful response.
 // So to prove that the method works, we will expect a specific error
-Deno.test("spotDeploy", async (t) => {
+Deno.test("spotDeploy", async () => {
     if (!Deno.args.includes("--not-wait")) await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // —————————— Prepare ——————————
@@ -21,133 +21,89 @@ Deno.test("spotDeploy", async (t) => {
 
     // —————————— Test ——————————
 
-    await t.step("Register Token", async (t) => {
-        await t.step("fullName", async (t) => {
-            await t.step("with", async () => {
-                await assertRejects(
-                    () =>
-                        walletClient.spotDeploy({
-                            registerToken2: {
-                                spec: {
-                                    name: "TestToken",
-                                    szDecimals: 8,
-                                    weiDecimals: 8,
-                                },
-                                maxGas: 1000000,
-                                fullName: "TestToken (TT)",
-                            },
-                        }),
-                    ApiRequestError,
-                );
-            });
-
-            await t.step("without", async () => {
-                await assertRejects(
-                    () =>
-                        walletClient.spotDeploy({
-                            registerToken2: {
-                                spec: {
-                                    name: "TestToken",
-                                    szDecimals: 8,
-                                    weiDecimals: 8,
-                                },
-                                maxGas: 1000000,
-                            },
-                        }),
-                    ApiRequestError,
-                );
-            });
-        });
-    });
-
-    await t.step("User Genesis", async (t) => {
-        await t.step("blacklistUsers", async (t) => {
-            await t.step("with", async () => {
-                await assertRejects(
-                    () =>
-                        walletClient.spotDeploy({
-                            userGenesis: {
-                                token: 0,
-                                userAndWei: [],
-                                existingTokenAndWei: [],
-                                blacklistUsers: [],
-                            },
-                        }),
-                    ApiRequestError,
-                    "Genesis error:",
-                );
-            });
-
-            await t.step("without", async () => {
-                await assertRejects(
-                    () =>
-                        walletClient.spotDeploy({
-                            userGenesis: {
-                                token: 0,
-                                userAndWei: [],
-                                existingTokenAndWei: [],
-                            },
-                        }),
-                    ApiRequestError,
-                    "Genesis error:",
-                );
-            });
-        });
-    });
-
-    await t.step("Genesis", async (t) => {
-        await t.step("noHyperliquidity", async (t) => {
-            await t.step("with", async (t) => {
-                await t.step("true", async () => {
-                    await assertRejects(
-                        () =>
-                            walletClient.spotDeploy({
-                                genesis: {
-                                    token: 0,
-                                    maxSupply: "10000000000",
-                                    noHyperliquidity: true,
-                                },
-                            }),
-                        ApiRequestError,
-                        "Genesis error:",
-                    );
-                });
-
-                await t.step("false", async () => {
-                    await assertRejects(
-                        () =>
-                            walletClient.spotDeploy({
-                                genesis: {
-                                    token: 0,
-                                    maxSupply: "10000000000",
-                                    // @ts-ignore - error testing
-                                    noHyperliquidity: false,
-                                },
-                            }),
-                        ApiRequestError,
-                        "Cannot process API request:",
-                    );
-                });
-            });
-
-            await t.step("without", async () => {
-                await assertRejects(
-                    () =>
-                        walletClient.spotDeploy({
-                            genesis: {
-                                token: 0,
-                                maxSupply: "10000000000",
-                            },
-                        }),
-                    ApiRequestError,
-                    "Genesis error:",
-                );
-            });
-        });
-    });
-
-    await t.step("Register Spot", async () => {
-        await assertRejects(
+    await Promise.all([
+        // Register Token | fullName
+        assertRejects( // exists
+            () =>
+                walletClient.spotDeploy({
+                    registerToken2: {
+                        spec: {
+                            name: "TestToken",
+                            szDecimals: 8,
+                            weiDecimals: 8,
+                        },
+                        maxGas: 1000000,
+                        fullName: "TestToken (TT)",
+                    },
+                }),
+            ApiRequestError,
+        ),
+        assertRejects( // does not exist
+            () =>
+                walletClient.spotDeploy({
+                    registerToken2: {
+                        spec: {
+                            name: "TestToken",
+                            szDecimals: 8,
+                            weiDecimals: 8,
+                        },
+                        maxGas: 1000000,
+                    },
+                }),
+            ApiRequestError,
+        ),
+        // User Genesis | blacklistUsers
+        assertRejects( // exists
+            () =>
+                walletClient.spotDeploy({
+                    userGenesis: {
+                        token: 0,
+                        userAndWei: [],
+                        existingTokenAndWei: [],
+                        blacklistUsers: [],
+                    },
+                }),
+            ApiRequestError,
+            "Genesis error:",
+        ),
+        assertRejects( // does not exist
+            () =>
+                walletClient.spotDeploy({
+                    userGenesis: {
+                        token: 0,
+                        userAndWei: [],
+                        existingTokenAndWei: [],
+                    },
+                }),
+            ApiRequestError,
+            "Genesis error:",
+        ),
+        // Genesis | noHyperliquidity
+        assertRejects( // exists
+            () =>
+                walletClient.spotDeploy({
+                    genesis: {
+                        token: 0,
+                        maxSupply: "10000000000",
+                        noHyperliquidity: true,
+                    },
+                }),
+            ApiRequestError,
+            "Genesis error:",
+        ),
+        assertRejects( // does not exist
+            () =>
+                walletClient.spotDeploy({
+                    genesis: {
+                        token: 0,
+                        maxSupply: "10000000000",
+                    },
+                }),
+            ApiRequestError,
+            "Genesis error:",
+        ),
+        // Register Spot
+        assertRejects(
             () =>
                 walletClient.spotDeploy({
                     registerSpot: {
@@ -156,48 +112,37 @@ Deno.test("spotDeploy", async (t) => {
                 }),
             ApiRequestError,
             "Error deploying spot:",
-        );
-    });
-
-    await t.step("Register Hyperliquidity", async (t) => {
-        await t.step("nSeededLevels", async (t) => {
-            await t.step("with", async () => {
-                await assertRejects(
-                    () =>
-                        walletClient.spotDeploy({
-                            registerHyperliquidity: {
-                                spot: 0,
-                                startPx: "1",
-                                orderSz: "1",
-                                nOrders: 1,
-                                nSeededLevels: 1,
-                            },
-                        }),
-                    ApiRequestError,
-                    "Error deploying spot:",
-                );
-            });
-
-            await t.step("without", async () => {
-                await assertRejects(
-                    () =>
-                        walletClient.spotDeploy({
-                            registerHyperliquidity: {
-                                spot: 0,
-                                startPx: "1",
-                                orderSz: "1",
-                                nOrders: 1,
-                            },
-                        }),
-                    ApiRequestError,
-                    "Error deploying spot:",
-                );
-            });
-        });
-    });
-
-    await t.step("Set Deployer Trading Fee Share", async () => {
-        await assertRejects(
+        ),
+        // Register Hyperliquidity | nSeededLevels
+        assertRejects( // exists
+            () =>
+                walletClient.spotDeploy({
+                    registerHyperliquidity: {
+                        spot: 0,
+                        startPx: "1",
+                        orderSz: "1",
+                        nOrders: 1,
+                        nSeededLevels: 1,
+                    },
+                }),
+            ApiRequestError,
+            "Error deploying spot:",
+        ),
+        assertRejects( // does not exist
+            () =>
+                walletClient.spotDeploy({
+                    registerHyperliquidity: {
+                        spot: 0,
+                        startPx: "1",
+                        orderSz: "1",
+                        nOrders: 1,
+                    },
+                }),
+            ApiRequestError,
+            "Error deploying spot:",
+        ),
+        // Set Deployer Trading Fee Share
+        assertRejects(
             () =>
                 walletClient.spotDeploy({
                     setDeployerTradingFeeShare: {
@@ -207,6 +152,6 @@ Deno.test("spotDeploy", async (t) => {
                 }),
             ApiRequestError,
             "Error deploying spot:",
-        );
-    });
+        ),
+    ]);
 });

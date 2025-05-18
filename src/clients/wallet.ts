@@ -11,6 +11,11 @@ import type {
     ConvertToMultiSigUserRequest_Signers,
     CreateSubAccountRequest,
     CreateVaultRequest,
+    CSignerActionRequest_JailSelf,
+    CSignerActionRequest_UnjailSelf,
+    CValidatorActionRequest_ChangeProfile,
+    CValidatorActionRequest_Register,
+    CValidatorActionRequest_Unregister,
     CWithdrawRequest,
     EvmUserModifyRequest,
     ModifyRequest,
@@ -153,6 +158,37 @@ export type CreateVaultParameters = Omit<
     "type" | "nonce"
 >;
 
+/** Parameters for the {@linkcode WalletClient.cSignerAction} method. */
+export type CSignerActionParameters =
+    | CSignerActionParameters_JailSelf
+    | CSignerActionParameters_UnjailSelf;
+/** One of the parameters for the {@linkcode WalletClient.cSignerAction} method. */
+export type CSignerActionParameters_JailSelf =
+    & Omit<CSignerActionRequest_JailSelf["action"], "type">
+    & Partial<Pick<CSignerActionRequest_JailSelf, "expiresAfter">>;
+/** One of the parameters for the {@linkcode WalletClient.cSignerAction} method. */
+export type CSignerActionParameters_UnjailSelf =
+    & Omit<CSignerActionRequest_UnjailSelf["action"], "type">
+    & Partial<Pick<CSignerActionRequest_UnjailSelf, "expiresAfter">>;
+
+/** Parameters for the {@linkcode WalletClient.cValidatorAction} method. */
+export type CValidatorActionParameters =
+    | CValidatorActionParameters_ChangeProfile
+    | CValidatorActionParameters_Register
+    | CValidatorActionParameters_Unregister;
+/** One of the parameters for the {@linkcode WalletClient.cValidatorAction} method. */
+export type CValidatorActionParameters_ChangeProfile =
+    & Omit<CValidatorActionRequest_ChangeProfile["action"], "type">
+    & Partial<Pick<CValidatorActionRequest_ChangeProfile, "expiresAfter">>;
+/** One of the parameters for the {@linkcode WalletClient.cValidatorAction} method. */
+export type CValidatorActionParameters_Register =
+    & Omit<CValidatorActionRequest_Register["action"], "type">
+    & Partial<Pick<CValidatorActionRequest_Register, "expiresAfter">>;
+/** One of the parameters for the {@linkcode WalletClient.cValidatorAction} method. */
+export type CValidatorActionParameters_Unregister =
+    & Omit<CValidatorActionRequest_Unregister["action"], "type">
+    & Partial<Pick<CValidatorActionRequest_Unregister, "expiresAfter">>;
+
 /** Parameters for the {@linkcode WalletClient.cWithdraw} method. */
 export type CWithdrawParameters = Omit<
     CWithdrawRequest["action"],
@@ -230,30 +266,15 @@ export type SetReferrerParameters = Omit<
 
 /** Parameters for the {@linkcode WalletClient.spotDeploy} method. */
 export type SpotDeployParameters =
-    | SpotDeployParameters_RegisterToken2
-    | SpotDeployParameters_UserGenesis
     | SpotDeployParameters_Genesis
-    | SpotDeployParameters_RegisterSpot
     | SpotDeployParameters_RegisterHyperliquidity
-    | SpotDeployParameters_SetDeployerTradingFeeShare;
-/** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
-export type SpotDeployParameters_RegisterToken2 = Omit<
-    SpotDeployRequest_RegisterToken2["action"],
-    "type"
->;
-/** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
-export type SpotDeployParameters_UserGenesis = Omit<
-    SpotDeployRequest_UserGenesis["action"],
-    "type"
->;
+    | SpotDeployParameters_RegisterSpot
+    | SpotDeployParameters_RegisterToken2
+    | SpotDeployParameters_SetDeployerTradingFeeShare
+    | SpotDeployParameters_UserGenesis;
 /** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
 export type SpotDeployParameters_Genesis = Omit<
     SpotDeployRequest_Genesis["action"],
-    "type"
->;
-/** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
-export type SpotDeployParameters_RegisterSpot = Omit<
-    SpotDeployRequest_RegisterSpot["action"],
     "type"
 >;
 /** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
@@ -262,8 +283,23 @@ export type SpotDeployParameters_RegisterHyperliquidity = Omit<
     "type"
 >;
 /** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
+export type SpotDeployParameters_RegisterSpot = Omit<
+    SpotDeployRequest_RegisterSpot["action"],
+    "type"
+>;
+/** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
+export type SpotDeployParameters_RegisterToken2 = Omit<
+    SpotDeployRequest_RegisterToken2["action"],
+    "type"
+>;
+/** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
 export type SpotDeployParameters_SetDeployerTradingFeeShare = Omit<
     SpotDeployRequest_SetDeployerTradingFeeShare["action"],
+    "type"
+>;
+/** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
+export type SpotDeployParameters_UserGenesis = Omit<
+    SpotDeployRequest_UserGenesis["action"],
     "type"
 >;
 
@@ -1125,6 +1161,177 @@ export class WalletClient<
     }
 
     /**
+     * Jail or unjail self as a validator signer.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
+     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @see null - no documentation
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
+     * // Jail self
+     * const result = await client.cSignerAction({ jailSelf: null });
+     *
+     * // Unjail self
+     * const result = await client.cSignerAction({ unjailSelf: null });
+     * ```
+     */
+    async cSignerAction(args: CSignerActionParameters_JailSelf, signal?: AbortSignal): Promise<SuccessResponse>;
+    async cSignerAction(args: CSignerActionParameters_UnjailSelf, signal?: AbortSignal): Promise<SuccessResponse>;
+    async cSignerAction(args: CSignerActionParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const {
+            expiresAfter = await this._getDefaultExpiresAfter(),
+            ...actionArgs
+        } = args;
+
+        // Construct an action
+        const nonce = await this.nonceManager();
+        const action: CSignerActionRequest_JailSelf["action"] | CSignerActionRequest_UnjailSelf["action"] = {
+            type: "CSignerAction",
+            ...actionArgs,
+        };
+
+        // Sign the action
+        const signature = await signL1Action({
+            wallet: this.wallet,
+            action,
+            nonce,
+            isTestnet: this.isTestnet,
+            expiresAfter,
+        });
+
+        // Send a request
+        const request = { action, signature, nonce, expiresAfter } as
+            | CSignerActionRequest_JailSelf
+            | CSignerActionRequest_UnjailSelf;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
+
+        // Validate a response
+        this._validateResponse(response);
+        return response;
+    }
+
+    /**
+     * Action related to validator management.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
+     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
+     * // Change validator profile
+     * const result = await client.cValidatorAction({
+     *   changeProfile: {
+     *     name: "My Validator",
+     *     description: "My validator description",
+     *     unjailed: true,
+     *   }
+     * });
+     * ```
+     */
+    async cValidatorAction(
+        args: CValidatorActionParameters_ChangeProfile,
+        signal?: AbortSignal,
+    ): Promise<SuccessResponse>;
+    async cValidatorAction(
+        args: CValidatorActionParameters_Register,
+        signal?: AbortSignal,
+    ): Promise<SuccessResponse>;
+    async cValidatorAction(
+        args: CValidatorActionParameters_Unregister,
+        signal?: AbortSignal,
+    ): Promise<SuccessResponse>;
+    async cValidatorAction(
+        args: CValidatorActionParameters,
+        signal?: AbortSignal,
+    ): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const {
+            expiresAfter = await this._getDefaultExpiresAfter(),
+            ...actionArgs
+        } = args;
+
+        // Construct an action
+        const nonce = await this.nonceManager();
+        let action:
+            | CValidatorActionRequest_ChangeProfile["action"]
+            | CValidatorActionRequest_Register["action"]
+            | CValidatorActionRequest_Unregister["action"];
+        if ("changeProfile" in actionArgs) {
+            action = {
+                type: "CValidatorAction",
+                changeProfile: {
+                    node_ip: actionArgs.changeProfile.node_ip ?? null,
+                    name: actionArgs.changeProfile.name ?? null,
+                    description: actionArgs.changeProfile.description ?? null,
+                    unjailed: actionArgs.changeProfile.unjailed,
+                    disable_delegations: actionArgs.changeProfile.disable_delegations ?? null,
+                    commission_bps: actionArgs.changeProfile.commission_bps ?? null,
+                    signer: actionArgs.changeProfile.signer?.toLowerCase() as Hex ?? null,
+                },
+            };
+        } else if ("register" in actionArgs) {
+            action = {
+                type: "CValidatorAction",
+                register: {
+                    profile: {
+                        node_ip: { Ip: actionArgs.register.profile.node_ip.Ip },
+                        name: actionArgs.register.profile.name,
+                        description: actionArgs.register.profile.description,
+                        delegations_disabled: actionArgs.register.profile.delegations_disabled,
+                        commission_bps: actionArgs.register.profile.commission_bps,
+                        signer: actionArgs.register.profile.signer?.toLowerCase() as Hex,
+                    },
+                    unjailed: actionArgs.register.unjailed,
+                    initial_wei: actionArgs.register.initial_wei,
+                },
+            };
+        } else {
+            action = {
+                type: "CValidatorAction",
+                unregister: actionArgs.unregister,
+            };
+        }
+
+        // Sign the action
+        const signature = await signL1Action({
+            wallet: this.wallet,
+            action,
+            nonce,
+            isTestnet: this.isTestnet,
+            expiresAfter,
+        });
+
+        // Send a request
+        const request = { action, signature, nonce, expiresAfter } as
+            | CValidatorActionRequest_ChangeProfile
+            | CValidatorActionRequest_Register
+            | CValidatorActionRequest_Unregister;
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
+
+        // Validate a response
+        this._validateResponse(response);
+        return response;
+    }
+
+    /**
      * Transfer native token from staking into the user's spot account.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -1521,8 +1728,9 @@ export class WalletClient<
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-3-assets
-     * @untested Not tested in real conditions.
      */
+    async perpDeploy(args: PerpDeployParameters_RegisterAsset, signal?: AbortSignal): Promise<SuccessResponse>;
+    async perpDeploy(args: PerpDeployParameters_SetOracle, signal?: AbortSignal): Promise<SuccessResponse>;
     async perpDeploy(args: PerpDeployParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
@@ -1901,18 +2109,44 @@ export class WalletClient<
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
-     * @untested Not tested in real conditions.
      */
-    async spotDeploy(args: SpotDeployParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+    async spotDeploy(
+        args: SpotDeployParameters_Genesis,
+        signal?: AbortSignal,
+    ): Promise<SuccessResponse>;
+    async spotDeploy(
+        args: SpotDeployParameters_RegisterHyperliquidity,
+        signal?: AbortSignal,
+    ): Promise<SuccessResponse>;
+    async spotDeploy(
+        args: SpotDeployParameters_RegisterSpot,
+        signal?: AbortSignal,
+    ): Promise<SuccessResponse>;
+    async spotDeploy(
+        args: SpotDeployParameters_RegisterToken2,
+        signal?: AbortSignal,
+    ): Promise<SuccessResponse>;
+    async spotDeploy(
+        args: SpotDeployParameters_SetDeployerTradingFeeShare,
+        signal?: AbortSignal,
+    ): Promise<SuccessResponse>;
+    async spotDeploy(
+        args: SpotDeployParameters_UserGenesis,
+        signal?: AbortSignal,
+    ): Promise<SuccessResponse>;
+    async spotDeploy(
+        args: SpotDeployParameters,
+        signal?: AbortSignal,
+    ): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
         let action:
-            | SpotDeployRequest_RegisterToken2["action"]
-            | SpotDeployRequest_UserGenesis["action"]
             | SpotDeployRequest_Genesis["action"]
-            | SpotDeployRequest_RegisterSpot["action"]
             | SpotDeployRequest_RegisterHyperliquidity["action"]
-            | SpotDeployRequest_SetDeployerTradingFeeShare["action"];
+            | SpotDeployRequest_RegisterSpot["action"]
+            | SpotDeployRequest_RegisterToken2["action"]
+            | SpotDeployRequest_SetDeployerTradingFeeShare["action"]
+            | SpotDeployRequest_UserGenesis["action"];
         if ("registerToken2" in args) {
             action = {
                 type: "spotDeploy",
