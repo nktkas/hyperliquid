@@ -52,7 +52,7 @@ const openOrders = await client.openOrders({ user: "0x..." }); // Change to your
 import * as hl from "@nktkas/hyperliquid";
 import { privateKeyToAccount } from "viem/accounts";
 
-const wallet = privateKeyToAccount("0x..."); // Change to your private key
+const wallet = privateKeyToAccount("0x..."); // Your private key
 
 const transport = new hl.HttpTransport();
 const client = new hl.WalletClient({ wallet, transport });
@@ -264,11 +264,11 @@ class PublicClient {
     });
 
     // Market
-    allMids(args?: AllMidsParameters): Promise<AllMids>;
+    allMids(): Promise<AllMids>;
     candleSnapshot(args: CandleSnapshotParameters): Promise<Candle[]>;
     fundingHistory(args: FundingHistoryParameters): Promise<FundingHistory[]>;
     l2Book(args: L2BookParameters): Promise<Book>;
-    meta(args?: MetaParameters): Promise<PerpsMeta>;
+    meta(): Promise<PerpsMeta>;
     metaAndAssetCtxs(): Promise<PerpsMetaAndAssetCtxs>;
     perpDexs(): Promise<(PerpDex | null)[]>;
     perpsAtOpenInterestCap(): Promise<string[]>;
@@ -358,7 +358,7 @@ class WalletClient {
     cancelByCloid(args: CancelByCloidParameters): Promise<CancelResponseSuccess>;
     modify(args: ModifyParameters): Promise<SuccessResponse>;
     order(args: OrderParameters): Promise<OrderResponseSuccess>;
-    scheduleCancel(args: ScheduleCancelParameters): Promise<SuccessResponse>;
+    scheduleCancel(args?: ScheduleCancelParameters): Promise<SuccessResponse>;
     twapCancel(args: TwapCancelParameters): Promise<TwapCancelResponseSuccess>;
     twapOrder(args: TwapOrderParameters): Promise<TwapOrderResponseSuccess>;
     updateIsolatedMargin(args: UpdateIsolatedMarginParameters): Promise<SuccessResponse>;
@@ -377,6 +377,7 @@ class WalletClient {
     spotUser(args: SpotUserParameters): Promise<SuccessResponse>;
 
     // Transfers & Withdrawals
+    perpDexClassTransfer(args: PerpDexClassTransferParameters): Promise<SuccessResponse>;
     spotSend(args: SpotSendParameters): Promise<SuccessResponse>;
     subAccountSpotTransfer(args: SubAccountSpotTransferParameters): Promise<SuccessResponse>;
     subAccountTransfer(args: SubAccountTransferParameters): Promise<SuccessResponse>;
@@ -398,6 +399,13 @@ class WalletClient {
     vaultDistribute(args: VaultDistributeParameters): Promise<SuccessResponse>;
     vaultModify(args: VaultModifyParameters): Promise<SuccessResponse>;
     vaultTransfer(args: VaultTransferParameters): Promise<SuccessResponse>;
+
+    // Multi-Sign
+    multiSig(args: MultiSigParameters): Promise<BaseExchangeResponse>;
+
+    // Validator
+    cSignerAction(args: CSignerActionParameters): Promise<SuccessResponse>;
+    cValidatorAction(args: CValidatorActionParameters): Promise<SuccessResponse>;
 }
 ```
 
@@ -532,7 +540,7 @@ Useful if you want to sign a Hyperliquid transaction yourself.
 import { signL1Action } from "@nktkas/hyperliquid/signing";
 import { privateKeyToAccount } from "viem/accounts";
 
-const wallet = privateKeyToAccount("0x..."); // Change to your private key
+const wallet = privateKeyToAccount("0x..."); // Your private key
 
 const action = {
     type: "cancel",
@@ -563,7 +571,7 @@ const body = await response.json();
 import { signUserSignedAction } from "@nktkas/hyperliquid/signing";
 import { privateKeyToAccount } from "viem/accounts";
 
-const wallet = privateKeyToAccount("0x..."); // Change to your private key
+const wallet = privateKeyToAccount("0x..."); // Your private key
 
 const action = {
     type: "approveAgent",
