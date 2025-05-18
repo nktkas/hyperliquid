@@ -7,6 +7,8 @@ import type {
     CancelRequest,
     CDepositRequest,
     ClaimRewardsRequest,
+    ConvertToMultiSigUserRequest,
+    ConvertToMultiSigUserRequest_Signers,
     CreateSubAccountRequest,
     CreateVaultRequest,
     CWithdrawRequest,
@@ -133,6 +135,9 @@ export type CDepositParameters = Omit<
     CDepositRequest["action"],
     "type" | "hyperliquidChain" | "signatureChainId" | "nonce"
 >;
+
+/** Parameters for the {@linkcode WalletClient.convertToMultiSigUser} method. */
+export type ConvertToMultiSigUserParameters = NonNullable<ConvertToMultiSigUserRequest_Signers>;
 
 /** Parameters for the {@linkcode WalletClient.createSubAccount} method. */
 export type CreateSubAccountParameters = Omit<
@@ -951,6 +956,62 @@ export class WalletClient<
     }
 
     /**
+     * Convert a single-signature account to a multi-signature account.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
+     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
+     * const result = await client.convertToMultiSigUser({
+     *   authorizedUsers: ["0x...", "0x..."],
+     *   threshold: 2,
+     * });
+     * ```
+     */
+    async convertToMultiSigUser(args: ConvertToMultiSigUserParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Construct an action
+        const action: ConvertToMultiSigUserRequest["action"] = {
+            type: "convertToMultiSigUser",
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
+            signers: JSON.stringify(args),
+            nonce: await this.nonceManager(),
+        };
+
+        // Sign the action
+        const signature = await signUserSignedAction({
+            wallet: this.wallet,
+            action,
+            types: {
+                "HyperliquidTransaction:ConvertToMultiSigUser": [
+                    { name: "hyperliquidChain", type: "string" },
+                    { name: "signers", type: "string" },
+                    { name: "nonce", type: "uint64" },
+                ],
+            },
+            chainId: parseInt(action.signatureChainId, 16),
+        });
+
+        // Send a request
+        const request: ConvertToMultiSigUserRequest = { action, signature, nonce: action.nonce };
+        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
+
+        // Validate a response
+        this._validateResponse(response);
+        return response;
+    }
+
+    /**
      * Create a sub-account.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -1415,6 +1476,7 @@ export class WalletClient<
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
+     * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa
      * @example

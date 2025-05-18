@@ -205,6 +205,41 @@ export interface ClaimRewardsRequest extends BaseExchangeRequest {
 }
 
 /**
+ * Convert a single-signature account to a multi-signature account.
+ * @returns {SuccessResponse}
+ * @see null - no documentation
+ */
+export interface ConvertToMultiSigUserRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "convertToMultiSigUser";
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
+        /** Chain ID used for signing. */
+        signatureChainId: Hex;
+        /**
+         * Signers configuration.
+         *
+         * Must be {@linkcode ConvertToMultiSigUserRequest_Signers} converted to a string via `JSON.stringify(...)`.
+         */
+        signers: string;
+        /** Unique request identifier (current timestamp in ms). */
+        nonce: number;
+    };
+}
+/** Signers configuration for {@linkcode ConvertToMultiSigUserRequest}. */
+export type ConvertToMultiSigUserRequest_Signers =
+    | {
+        /** List of authorized user addresses. */
+        authorizedUsers: Hex[];
+        /** Minimum number of signatures required. */
+        threshold: number;
+    }
+    /** Convert a multi-signature account to a single-signature account. */
+    | null;
+
+/**
  * Create a sub-account.
  * @returns {CreateSubAccountResponse}
  * @see null - no documentation
