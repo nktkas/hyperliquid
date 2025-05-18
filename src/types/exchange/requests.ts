@@ -1,3 +1,4 @@
+import type { ValueMap } from "@std/msgpack/encode";
 import type { Hex } from "../../base.ts";
 import type { TIF } from "../info/orders.ts";
 
@@ -40,11 +41,9 @@ export type OrderParams = {
 /** Base structure for exchange requests. */
 export interface BaseExchangeRequest {
     /** Action to perform. */
-    action: {
+    action: ValueMap & {
         /** Type of action. */
         type: string;
-        /** Additional action parameters. */
-        [key: string]: unknown;
     };
     /** Unique request identifier (current timestamp in ms). */
     nonce: number;
@@ -207,7 +206,7 @@ export interface ClaimRewardsRequest extends BaseExchangeRequest {
 /**
  * Convert a single-signature account to a multi-signature account.
  * @returns {SuccessResponse}
- * @see null - no documentation
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig
  */
 export interface ConvertToMultiSigUserRequest extends BaseExchangeRequest {
     /** Action to be performed. */
@@ -325,6 +324,36 @@ export interface ModifyRequest extends BaseExchangeRequest {
         oid: number;
         /** New order parameters. */
         order: OrderParams;
+    };
+    /** Vault address (for vault trading). */
+    vaultAddress?: Hex;
+    /** Expiration time of the action. */
+    expiresAfter?: number;
+}
+
+/**
+ * A multi-signature request.
+ * @returns {SuccessResponse}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig
+ */
+export interface MultiSigRequest extends BaseExchangeRequest {
+    /** Action to be performed. */
+    action: {
+        /** Type of action. */
+        type: "multiSig";
+        /** Chain ID used for signing. */
+        signatureChainId: Hex;
+        /** List of signatures from authorized signers. */
+        signatures: { r: Hex; s: Hex; v: number }[];
+        /** Multi-signature payload information. */
+        payload: {
+            /** Address of the multi-signature user account. */
+            multiSigUser: Hex;
+            /** Address of the authorized user initiating the request. */
+            outerSigner: Hex;
+            /** The underlying action to be executed through multi-sig. */
+            action: BaseExchangeRequest["action"];
+        };
     };
     /** Vault address (for vault trading). */
     vaultAddress?: Hex;

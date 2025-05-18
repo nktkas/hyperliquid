@@ -14,6 +14,7 @@ import type {
     CWithdrawRequest,
     EvmUserModifyRequest,
     ModifyRequest,
+    MultiSigRequest,
     OrderRequest,
     PerpDeployRequest_RegisterAsset,
     PerpDeployRequest_SetOracle,
@@ -63,6 +64,7 @@ import {
     isAbstractViemWalletClient,
     isAbstractWindowEthereum,
     signL1Action,
+    signMultiSigAction,
     signUserSignedAction,
 } from "../signing.ts";
 
@@ -168,6 +170,16 @@ export type ModifyParameters =
     & Omit<ModifyRequest["action"], "type">
     & Partial<Pick<ModifyRequest, "vaultAddress">>
     & Partial<Pick<ModifyRequest, "expiresAfter">>;
+
+/** Parameters for the {@linkcode WalletClient.multiSig} method. */
+export type MultiSigParameters =
+    & Omit<MultiSigRequest["action"], "type" | "signatureChainId">
+    & Partial<Pick<MultiSigRequest, "vaultAddress">>
+    & Partial<Pick<MultiSigRequest, "expiresAfter">>
+    & {
+        /** Must be the same for all signers. */
+        nonce: number;
+    };
 
 /** Parameters for the {@linkcode WalletClient.order} method. */
 export type OrderParameters =
@@ -1302,6 +1314,105 @@ export class WalletClient<
     }
 
     /**
+     * A multi-signature request.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
+     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.WalletClient({ wallet, transport });
+     *
+     * const multiSigUser = "0x..."; // Multi-sig user address
+     *
+     * const nonce = Date.now();
+     * const action = { type: "scheduleCancel", time: Date.now() + 10000 };
+     *
+     * const signature = await hl.signL1Action({
+     *   wallet,
+     *   action: [multiSigUser.toLowerCase(), signer1.address.toLowerCase(), action],
+     *   nonce,
+     *   isTestnet: true,
+     * });
+     *
+     * const result = await client.multiSig({
+     *   signatures: [signature],
+     *   payload: {
+     *     multiSigUser,
+     *     outerSigner: wallet.address,
+     *     action,
+     *   },
+     *   nonce,
+     * });
+     * ```
+     * @unstable May not behave as expected and the interface may change in the future.
+     */
+    async multiSig(args: MultiSigParameters, signal?: AbortSignal): Promise<
+        | SuccessResponse
+        | CancelResponseSuccess
+        | CreateSubAccountResponse
+        | CreateVaultResponse
+        | OrderResponseSuccess
+        | TwapOrderResponseSuccess
+        | TwapCancelResponseSuccess
+    > {
+        // Destructure the parameters
+        const {
+            vaultAddress = this.defaultVaultAddress,
+            expiresAfter = await this._getDefaultExpiresAfter(),
+            nonce,
+            ...actionArgs
+        } = args;
+
+        // Construct an action
+        const hyperliquidChain = this._getHyperliquidChain();
+        const action: MultiSigRequest["action"] = {
+            type: "multiSig",
+            signatureChainId: await this._getSignatureChainId(),
+            signatures: actionArgs.signatures,
+            payload: {
+                multiSigUser: actionArgs.payload.multiSigUser.toLowerCase() as Hex,
+                outerSigner: actionArgs.payload.outerSigner.toLowerCase() as Hex,
+                action: actionArgs.payload.action,
+            },
+        };
+
+        // Sign the action
+        const signature = await signMultiSigAction({
+            wallet: this.wallet,
+            action,
+            nonce,
+            vaultAddress,
+            expiresAfter,
+            hyperliquidChain,
+            signatureChainId: action.signatureChainId,
+        });
+
+        // Send a request
+        const request: MultiSigRequest = { action, signature, nonce, vaultAddress, expiresAfter };
+        const response = await this.transport.request("exchange", request, signal) as
+            | ErrorResponse
+            | CancelResponse
+            | CreateSubAccountResponse
+            | CreateVaultResponse
+            | OrderResponse
+            | SuccessResponse
+            | TwapCancelResponse
+            | TwapOrderResponse;
+
+        // Validate a response
+        this._validateResponse(response);
+        return response;
+    }
+
+    /**
      * Place an order(s).
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -1376,7 +1487,7 @@ export class WalletClient<
             grouping: actionArgs.grouping,
             builder: actionArgs.builder
                 ? {
-                    b: actionArgs.builder.b.toLowerCase() as `0x${string}`,
+                    b: actionArgs.builder.b.toLowerCase() as Hex,
                     f: actionArgs.builder.f,
                 }
                 : actionArgs.builder,
@@ -1410,7 +1521,7 @@ export class WalletClient<
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-3-assets
-     * @untested
+     * @untested Not tested in real conditions.
      */
     async perpDeploy(args: PerpDeployParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
@@ -1435,7 +1546,7 @@ export class WalletClient<
                         ? {
                             fullName: args.registerAsset.schema.fullName,
                             collateralToken: args.registerAsset.schema.collateralToken,
-                            oracleUpdater: args.registerAsset.schema.oracleUpdater?.toLowerCase() as `0x${string}` ??
+                            oracleUpdater: args.registerAsset.schema.oracleUpdater?.toLowerCase() as Hex ??
                                 null,
                         }
                         : null,
@@ -1790,7 +1901,7 @@ export class WalletClient<
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
-     * @untested
+     * @untested Not tested in real conditions.
      */
     async spotDeploy(args: SpotDeployParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action

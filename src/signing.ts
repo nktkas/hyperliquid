@@ -232,7 +232,7 @@ function normalizeIntegersForMsgPack(obj: ValueType): ValueType {
  * import { signL1Action } from "@nktkas/hyperliquid/signing";
  * import { privateKeyToAccount } from "viem/accounts";
  *
- * const wallet = privateKeyToAccount("0x..."); // Change to your private key
+ * const wallet = privateKeyToAccount("0x..."); // Your private key
  *
  * const action = {
  *     type: "cancel",
@@ -314,7 +314,7 @@ export async function signL1Action(args: {
  * import { signUserSignedAction } from "@nktkas/hyperliquid/signing";
  * import { privateKeyToAccount } from "viem/accounts";
  *
- * const wallet = privateKeyToAccount("0x..."); // Change to your private key
+ * const wallet = privateKeyToAccount("0x..."); // Your private key
  *
  * const action = {
  *     type: "approveAgent",
@@ -368,6 +368,100 @@ export async function signUserSignedAction(args: {
 
     const signature = await abstractSignTypedData({ wallet, domain, types, message: action });
     return splitSignature(signature);
+}
+
+/**
+ * Sign a multi-signature action.
+ *
+ * Note: Signature generation depends on the order of the action keys.
+ * @param args - Arguments for signing the action.
+ * @returns The signature components r, s, and v.
+ * @example
+ * ```ts
+ * import { signL1Action, signMultiSigAction } from "@nktkas/hyperliquid/signing";
+ * import { privateKeyToAccount } from "viem/accounts";
+ *
+ * const wallet = privateKeyToAccount("0x..."); // Your private key
+ * const multiSigUser = "0x..."; // Multi-sig user address
+ *
+ * const nonce = Date.now();
+ * const action = { // Example action
+ *   type: "scheduleCancel",
+ *   time: Date.now() + 10000
+ * };
+ *
+ * // First, create signature from one of the authorized signers
+ * const signature = await signL1Action({
+ *   wallet,
+ *   action: [multiSigUser.toLowerCase(), wallet.address.toLowerCase(), action],
+ *   nonce,
+ *   isTestnet: true,
+ * });
+ *
+ * // Then use it in the multi-sig action
+ * const multiSigSignature = await signMultiSigAction({
+ *   wallet,
+ *   action: {
+ *     type: "multiSig",
+ *     signatureChainId: "0x66eee",
+ *     signatures: [signature],
+ *     payload: {
+ *       multiSigUser,
+ *       outerSigner: wallet.address,
+ *       action,
+ *     }
+ *   },
+ *   nonce,
+ *   hyperliquidChain: "Testnet",
+ *   signatureChainId: "0x66eee",
+ * });
+ * ```
+ * @unstable May not behave as expected and the interface may change in the future.
+ */
+export async function signMultiSigAction(args: {
+    /** Wallet to sign the action. */
+    wallet: AbstractWallet;
+    /** The action to be signed. */
+    action: ValueMap;
+    /** Unique request identifier (recommended current timestamp in ms). */
+    nonce: number;
+    /** Optional vault address used in the action. */
+    vaultAddress?: Hex;
+    /** Optional expiration time of the action in milliseconds since the epoch. */
+    expiresAfter?: number;
+    /** HyperLiquid network ("Mainnet" or "Testnet"). */
+    hyperliquidChain: "Mainnet" | "Testnet";
+    /** Chain ID used for signing. */
+    signatureChainId: Hex;
+}): Promise<{ r: Hex; s: Hex; v: number }> {
+    const {
+        wallet,
+        action,
+        nonce,
+        hyperliquidChain,
+        signatureChainId,
+        vaultAddress,
+        expiresAfter,
+    } = args;
+
+    const actionWithoutType = structuredClone(action);
+    delete actionWithoutType.type;
+
+    const multiSigActionHash = createL1ActionHash(actionWithoutType, nonce, vaultAddress, expiresAfter);
+    const message = { multiSigActionHash, hyperliquidChain, signatureChainId, nonce };
+
+    return await signUserSignedAction({
+        wallet,
+        action: message,
+        types: {
+            "HyperliquidTransaction:SendMultiSig": [
+                { name: "hyperliquidChain", type: "string" },
+                { name: "multiSigActionHash", type: "bytes32" },
+                { name: "nonce", type: "uint64" },
+            ],
+        },
+        chainId: parseInt(signatureChainId, 16),
+    });
 }
 
 /** Signs typed data with the provided wallet using EIP-712. */
