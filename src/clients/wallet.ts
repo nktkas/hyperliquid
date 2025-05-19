@@ -1583,7 +1583,11 @@ export class WalletClient<
         const action: MultiSigRequest["action"] = {
             type: "multiSig",
             signatureChainId: await this._getSignatureChainId(),
-            signatures: actionArgs.signatures,
+            signatures: actionArgs.signatures.map((signature) => ({
+                r: signature.r.replace(/^0x0+/, "0x").toLowerCase() as Hex,
+                s: signature.s.replace(/^0x0+/, "0x").toLowerCase() as Hex,
+                v: signature.v,
+            })),
             payload: {
                 multiSigUser: actionArgs.payload.multiSigUser.toLowerCase() as Hex,
                 outerSigner: actionArgs.payload.outerSigner.toLowerCase() as Hex,
