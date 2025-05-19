@@ -368,6 +368,7 @@ class WalletClient {
     approveAgent(args: ApproveAgentParameters): Promise<SuccessResponse>;
     approveBuilderFee(args: ApproveBuilderFeeParameters): Promise<SuccessResponse>;
     claimRewards(): Promise<SuccessResponse>;
+    convertToMultiSigUser(args: ConvertToMultiSigUserParameters): Promise<SuccessResponse>;
     createSubAccount(args: CreateSubAccountParameters): Promise<CreateSubAccountResponse>;
     evmUserModify(args: EvmUserModifyParameters): Promise<SuccessResponse>;
     registerReferrer(args: RegisterReferrerParameters): Promise<SuccessResponse>;
