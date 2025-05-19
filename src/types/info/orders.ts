@@ -154,7 +154,8 @@ export type OrderProcessingStatus =
     | "siblingFilledCanceled"
     | "delistedCanceled"
     | "liquidatedCanceled"
-    | "scheduledCancel";
+    | "scheduledCancel"
+    | "reduceOnlyRejected";
 
 /** Order with current processing status. */
 export interface OrderStatus<O extends Order | FrontendOrder> {
