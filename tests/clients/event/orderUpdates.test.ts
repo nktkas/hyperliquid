@@ -80,6 +80,7 @@ Deno.test("orderUpdates", async () => {
                 "selfTradeCanceled",
                 "siblingFilledCanceled",
                 "vaultWithdrawalCanceled",
+                "rejected",
             ],
         },
     });
