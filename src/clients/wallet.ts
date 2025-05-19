@@ -71,6 +71,7 @@ import {
     signL1Action,
     signMultiSigAction,
     signUserSignedAction,
+    type ValueMap,
 } from "../signing.ts";
 
 /** Parameters for the {@linkcode WalletClient} constructor. */
@@ -1596,9 +1597,12 @@ export class WalletClient<
         };
 
         // Sign the action
+        const actionForMultiSig = structuredClone(action) as ValueMap;
+        delete actionForMultiSig.type;
+
         const signature = await signMultiSigAction({
             wallet: this.wallet,
-            action,
+            action: actionForMultiSig,
             nonce,
             vaultAddress,
             expiresAfter,

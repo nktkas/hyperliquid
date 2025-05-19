@@ -444,11 +444,13 @@ export async function signMultiSigAction(args: {
         expiresAfter,
     } = args;
 
-    const actionWithoutType = structuredClone(action);
-    delete actionWithoutType.type;
-
-    const multiSigActionHash = createL1ActionHash(actionWithoutType, nonce, vaultAddress, expiresAfter);
-    const message = { multiSigActionHash, hyperliquidChain, signatureChainId, nonce };
+    const multiSigActionHash = createL1ActionHash(action, nonce, vaultAddress, expiresAfter);
+    const message = {
+        multiSigActionHash,
+        hyperliquidChain,
+        signatureChainId,
+        nonce,
+    };
 
     return await signUserSignedAction({
         wallet,
