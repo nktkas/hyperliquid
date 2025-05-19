@@ -2,6 +2,7 @@ import { type Hex, HyperliquidError, type IRequestTransport, type MaybePromise }
 import type {
     ApproveAgentRequest,
     ApproveBuilderFeeRequest,
+    BaseExchangeRequest,
     BatchModifyRequest,
     CancelByCloidRequest,
     CancelRequest,
@@ -626,12 +627,10 @@ export class WalletClient<
         if (action.agentName === "") delete action.agentName;
 
         // Send a request
-        const request: ApproveAgentRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce: action.nonce } satisfies ApproveAgentRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -680,12 +679,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: ApproveBuilderFeeRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce: action.nonce } satisfies ApproveBuilderFeeRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -778,12 +775,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: BatchModifyRequest = { action, signature, nonce, vaultAddress, expiresAfter };
-        const response = await this.transport.request("exchange", request, signal) as OrderResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce, vaultAddress, expiresAfter } satisfies BatchModifyRequest,
+            signal,
+        ) as OrderResponseSuccess;
     }
 
     /**
@@ -840,12 +835,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: CancelRequest = { action, signature, nonce, vaultAddress, expiresAfter };
-        const response = await this.transport.request("exchange", request, signal) as CancelResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce, vaultAddress, expiresAfter } satisfies CancelRequest,
+            signal,
+        ) as CancelResponseSuccess;
     }
 
     /**
@@ -901,12 +894,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: CancelByCloidRequest = { action, signature, nonce, vaultAddress, expiresAfter };
-        const response = await this.transport.request("exchange", request, signal) as CancelResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce, vaultAddress, expiresAfter } satisfies CancelByCloidRequest,
+            signal,
+        ) as CancelResponseSuccess;
     }
 
     /**
@@ -954,12 +945,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: CDepositRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce: action.nonce } satisfies CDepositRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -996,12 +985,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: ClaimRewardsRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce } satisfies ClaimRewardsRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -1052,12 +1039,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: ConvertToMultiSigUserRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce: action.nonce } satisfies ConvertToMultiSigUserRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -1097,14 +1082,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: CreateSubAccountRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | ErrorResponse
-            | CreateSubAccountResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce } satisfies CreateSubAccountRequest,
+            signal,
+        ) as CreateSubAccountResponse;
     }
 
     /**
@@ -1151,14 +1132,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: CreateVaultRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as
-            | ErrorResponse
-            | CreateVaultResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce } satisfies CreateVaultRequest,
+            signal,
+        ) as CreateVaultResponse;
     }
 
     /**
@@ -1211,14 +1188,12 @@ export class WalletClient<
         });
 
         // Send a request
-        const request = { action, signature, nonce, expiresAfter } as
-            | CSignerActionRequest_JailSelf
-            | CSignerActionRequest_UnjailSelf;
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce, expiresAfter } as
+                | CSignerActionRequest_JailSelf
+                | CSignerActionRequest_UnjailSelf,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -1321,15 +1296,13 @@ export class WalletClient<
         });
 
         // Send a request
-        const request = { action, signature, nonce, expiresAfter } as
-            | CValidatorActionRequest_ChangeProfile
-            | CValidatorActionRequest_Register
-            | CValidatorActionRequest_Unregister;
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce, expiresAfter } as
+                | CValidatorActionRequest_ChangeProfile
+                | CValidatorActionRequest_Register
+                | CValidatorActionRequest_Unregister,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -1377,12 +1350,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: CWithdrawRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce: action.nonce } satisfies CWithdrawRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -1422,12 +1393,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: EvmUserModifyRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce } satisfies EvmUserModifyRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -1513,12 +1482,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: ModifyRequest = { action, signature, nonce, vaultAddress, expiresAfter };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce, vaultAddress, expiresAfter } satisfies ModifyRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -1611,20 +1578,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: MultiSigRequest = { action, signature, nonce, vaultAddress, expiresAfter };
-        const response = await this.transport.request("exchange", request, signal) as
-            | ErrorResponse
-            | CancelResponse
-            | CreateSubAccountResponse
-            | CreateVaultResponse
-            | OrderResponse
-            | SuccessResponse
-            | TwapCancelResponse
-            | TwapOrderResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce, vaultAddress, expiresAfter } satisfies MultiSigRequest,
+            signal,
+        );
     }
 
     /**
@@ -1720,12 +1677,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: OrderRequest = { action, signature, nonce, vaultAddress, expiresAfter };
-        const response = await this.transport.request("exchange", request, signal) as OrderResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce, vaultAddress, expiresAfter } satisfies OrderRequest,
+            signal,
+        ) as OrderResponseSuccess;
     }
 
     /**
@@ -1788,14 +1743,12 @@ export class WalletClient<
         });
 
         // Send a request
-        const request = { action, signature, nonce } as
-            | PerpDeployRequest_RegisterAsset
-            | PerpDeployRequest_SetOracle;
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce } as
+                | PerpDeployRequest_RegisterAsset
+                | PerpDeployRequest_SetOracle,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -1851,12 +1804,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: PerpDexClassTransferRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce: action.nonce } satisfies PerpDexClassTransferRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -1896,12 +1847,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: RegisterReferrerRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce } satisfies RegisterReferrerRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -1948,12 +1897,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: ReserveRequestWeightRequest = { action, signature, nonce, expiresAfter };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce, expiresAfter } satisfies ReserveRequestWeightRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -2011,12 +1958,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: ScheduleCancelRequest = { action, signature, nonce, vaultAddress, expiresAfter };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce, vaultAddress, expiresAfter } satisfies ScheduleCancelRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -2056,12 +2001,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: SetDisplayNameRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce } satisfies SetDisplayNameRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -2101,12 +2044,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: SetReferrerRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce } satisfies SetReferrerRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -2236,18 +2177,16 @@ export class WalletClient<
         });
 
         // Send a request
-        const request = { action, signature, nonce } as
-            | SpotDeployRequest_RegisterToken2
-            | SpotDeployRequest_UserGenesis
-            | SpotDeployRequest_Genesis
-            | SpotDeployRequest_RegisterSpot
-            | SpotDeployRequest_RegisterHyperliquidity
-            | SpotDeployRequest_SetDeployerTradingFeeShare;
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce } as
+                | SpotDeployRequest_RegisterToken2
+                | SpotDeployRequest_UserGenesis
+                | SpotDeployRequest_Genesis
+                | SpotDeployRequest_RegisterSpot
+                | SpotDeployRequest_RegisterHyperliquidity
+                | SpotDeployRequest_SetDeployerTradingFeeShare,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -2301,12 +2240,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: SpotSendRequest = { action, signature, nonce: action.time };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce: action.time } satisfies SpotSendRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -2348,12 +2285,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: SpotUserRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce } satisfies SpotUserRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -2404,12 +2339,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: SubAccountSpotTransferRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce } satisfies SubAccountSpotTransferRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -2455,12 +2388,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: SubAccountTransferRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce } satisfies SubAccountTransferRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -2514,12 +2445,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: TokenDelegateRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce: action.nonce } satisfies TokenDelegateRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -2572,12 +2501,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: TwapCancelRequest = { action, signature, nonce, vaultAddress, expiresAfter };
-        const response = await this.transport.request("exchange", request, signal) as TwapCancelResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce, vaultAddress, expiresAfter } satisfies TwapCancelRequest,
+            signal,
+        ) as TwapCancelResponseSuccess;
     }
 
     /**
@@ -2640,12 +2567,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: TwapOrderRequest = { action, signature, nonce, vaultAddress, expiresAfter };
-        const response = await this.transport.request("exchange", request, signal) as TwapOrderResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce, vaultAddress, expiresAfter } satisfies TwapOrderRequest,
+            signal,
+        ) as TwapOrderResponseSuccess;
     }
 
     /**
@@ -2696,12 +2621,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: UpdateIsolatedMarginRequest = { action, signature, nonce, vaultAddress, expiresAfter };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce, vaultAddress, expiresAfter } satisfies UpdateIsolatedMarginRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -2752,12 +2675,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: UpdateLeverageRequest = { action, signature, nonce, vaultAddress, expiresAfter };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce, vaultAddress, expiresAfter } satisfies UpdateLeverageRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -2806,12 +2727,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: UsdClassTransferRequest = { action, signature, nonce: action.nonce };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce: action.nonce } satisfies UsdClassTransferRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -2860,12 +2779,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: UsdSendRequest = { action, signature, nonce: action.time };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce: action.time } satisfies UsdSendRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -2906,12 +2823,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: VaultDistributeRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce } satisfies VaultDistributeRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -2957,12 +2872,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: VaultModifyRequest = { action, signature, nonce };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce } satisfies VaultModifyRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -3015,12 +2928,10 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: VaultTransferRequest = { action, signature, nonce, expiresAfter };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
-
-        // Validate a response
-        this._validateResponse(response);
-        return response;
+        return await this._request(
+            { action, signature, nonce, expiresAfter } satisfies VaultTransferRequest,
+            signal,
+        ) as SuccessResponse;
     }
 
     /**
@@ -3069,10 +2980,40 @@ export class WalletClient<
         });
 
         // Send a request
-        const request: Withdraw3Request = { action, signature, nonce: action.time };
-        const response = await this.transport.request("exchange", request, signal) as ErrorResponse | SuccessResponse;
+        return await this._request(
+            { action, signature, nonce: action.time } satisfies Withdraw3Request,
+            signal,
+        ) as SuccessResponse;
+    }
 
-        // Validate a response
+    /** Send an API request and validate the response. */
+    protected async _request(
+        payload: {
+            action: BaseExchangeRequest["action"];
+            signature: { r: Hex; s: Hex; v: number };
+            nonce: number;
+            vaultAddress?: Hex;
+            expiresAfter?: number;
+        },
+        signal?: AbortSignal,
+    ): Promise<
+        | SuccessResponse
+        | CancelResponseSuccess
+        | CreateSubAccountResponse
+        | CreateVaultResponse
+        | OrderResponseSuccess
+        | TwapOrderResponseSuccess
+        | TwapCancelResponseSuccess
+    > {
+        const response = await this.transport.request("exchange", payload, signal) as
+            | SuccessResponse
+            | ErrorResponse
+            | CancelResponse
+            | CreateSubAccountResponse
+            | CreateVaultResponse
+            | OrderResponse
+            | TwapOrderResponse
+            | TwapCancelResponse;
         this._validateResponse(response);
         return response;
     }
