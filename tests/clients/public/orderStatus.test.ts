@@ -90,6 +90,7 @@ Deno.test("orderStatus", async () => {
                 "siblingFilledCanceled",
                 "triggered",
                 "vaultWithdrawalCanceled",
+                "reduceOnlyRejected",
             ],
         },
     });

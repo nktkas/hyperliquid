@@ -36,6 +36,7 @@ Deno.test("historicalOrders", async () => {
                 "selfTradeCanceled",
                 "siblingFilledCanceled",
                 "vaultWithdrawalCanceled",
+                "reduceOnlyRejected",
             ],
         },
     });
