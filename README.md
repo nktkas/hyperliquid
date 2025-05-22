@@ -27,11 +27,11 @@ npm i @nktkas/hyperliquid
 # deno
 deno add jsr:@nktkas/hyperliquid
 
-# pnpm >=10.9.0
-pnpm i jsr:@nktkas/hyperliquid
+# pnpm
+pnpm add @nktkas/hyperliquid
 
-# yarn >=4.9.0
-yarn add jsr:@nktkas/hyperliquid
+# yarn
+yarn add @nktkas/hyperliquid
 
 # bun
 bun i @nktkas/hyperliquid
