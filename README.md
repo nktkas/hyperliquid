@@ -267,6 +267,7 @@ class PublicClient {
     l2Book(args: L2BookParameters): Promise<Book>;
     meta(): Promise<PerpsMeta>;
     metaAndAssetCtxs(): Promise<PerpsMetaAndAssetCtxs>;
+    perpDeployAuctionStatus(): Promise<DeployAuctionStatus>;
     perpDexs(): Promise<(PerpDex | null)[]>;
     perpsAtOpenInterestCap(): Promise<string[]>;
     predictedFundings(): Promise<PredictedFunding[]>;

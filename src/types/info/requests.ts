@@ -252,6 +252,16 @@ export interface OrderStatusRequest {
 }
 
 /**
+ * Request for the status of the perpetual deploy auction.
+ * @returns {DeployAuctionStatus} Status of the perpetual deploy auction.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-information-about-the-perp-deploy-auction
+ */
+export interface PerpDeployAuctionStatusRequest {
+    /** Type of request. */
+    type: "perpDeployAuctionStatus";
+}
+
+/**
  * Request all perpetual dexs.
  * @returns {PerpDexs} Perp dexes.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-all-perpetual-dexs

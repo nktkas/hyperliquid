@@ -25,7 +25,6 @@ import type {
     PerpsMeta,
     PerpsMetaAndAssetCtxs,
     PredictedFunding,
-    SpotDeployState,
     SpotMeta,
     SpotMetaAndAssetCtxs,
     TokenDetails,
@@ -37,6 +36,7 @@ import type {
     DelegatorUpdate,
     ValidatorSummary,
 } from "../types/info/delegations.ts";
+import type { DeployAuctionStatus, SpotDeployState } from "../types/info/markets.ts";
 import type {
     Book,
     Fill,
@@ -67,6 +67,7 @@ import type {
     MetaRequest,
     OpenOrdersRequest,
     OrderStatusRequest,
+    PerpDeployAuctionStatusRequest,
     PerpDexsRequest,
     PerpsAtOpenInterestCapRequest,
     PortfolioRequest,
@@ -156,6 +157,9 @@ export type OpenOrdersParameters = Omit<OpenOrdersRequest, "type">;
 
 /** Parameters for the {@linkcode PublicClient.orderStatus} method. */
 export type OrderStatusParameters = Omit<OrderStatusRequest, "type">;
+
+/** Parameters for the {@linkcode PublicClient.perpDeployAuctionStatus} method. */
+export type PerpDeployAuctionStatusParameters = Omit<PerpDeployAuctionStatusRequest, "type">;
 
 /** Parameters for the {@linkcode PublicClient.perpDexs} method. */
 export type PerpDexsParameters = Omit<PerpDexsRequest, "type">;
@@ -766,6 +770,29 @@ export class PublicClient<
             ...args,
         };
         return this.transport.request("info", request, signal) as Promise<OrderLookup>;
+    }
+
+    /**
+     * Request for the status of the perpetual deploy auction.
+     * @param signal - An optional abort signal.
+     * @returns Status of the perpetual deploy auction.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-information-about-the-perp-deploy-auction
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const client = new hl.PublicClient({ transport });
+     *
+     * const auctionStatus = await client.perpDeployAuctionStatus();
+     * ```
+     */
+    perpDeployAuctionStatus(signal?: AbortSignal): Promise<DeployAuctionStatus> {
+        const request: PerpDeployAuctionStatusRequest = {
+            type: "perpDeployAuctionStatus",
+        };
+        return this.transport.request("info", request, signal) as Promise<DeployAuctionStatus>;
     }
 
     /**
