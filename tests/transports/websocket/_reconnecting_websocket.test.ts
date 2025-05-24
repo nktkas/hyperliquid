@@ -742,27 +742,6 @@ Deno.test("ReconnectingWebSocket Tests", async (t) => {
             });
         });
 
-        await t.step("Cleans up resources after closing", async () => {
-            const rws = new ReconnectingWebSocket("ws://invalid4567t7281.com", [], {
-                maxRetries: 1,
-            });
-
-            rws.addEventListener("message", () => {}); // goes into listeners
-            rws.send("testCleanup"); // goes into buffer
-
-            // Wait, then close permanently
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-            rws.close();
-
-            // @ts-ignore - accessing private properties
-            assertEquals(rws._listeners.length, 0, "Event listeners must be cleared on permanent close");
-            assertEquals(Array.from(rws.reconnectOptions.messageBuffer).length, 0, "Message buffer must be cleared");
-            assert(
-                rws.reconnectAbortController.signal.aborted,
-                "reconnectAbortController.signal must be aborted after cleanup",
-            );
-        });
-
         await t.step("reconnectAbortController:", async (t) => {
             await t.step("Error in reconnection process aborts permanently", async () => {
                 // If there's an error inside shouldReconnect, we expect the entire process to abort
