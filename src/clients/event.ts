@@ -1,4 +1,4 @@
-import type { ISubscriptionTransport, Subscription } from "../base.ts";
+import type { ISubscriptionTransport, Subscription } from "../transports/base.ts";
 import type {
     WsActiveAssetCtxRequest,
     WsActiveAssetDataRequest,

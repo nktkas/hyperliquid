@@ -1,4 +1,4 @@
-import type { IRequestTransport } from "../base.ts";
+import type { IRequestTransport } from "../transports/base.ts";
 import type { BlockDetailsRequest, TxDetailsRequest, UserDetailsRequest } from "../types/explorer/requests.ts";
 import type { BlockDetailsResponse, TxDetailsResponse, UserDetailsResponse } from "../types/explorer/responses.ts";
 import type {

@@ -10,56 +10,49 @@ interface HyperliquidMsg {
     data: unknown;
 }
 
+/** Response to subscribe to or unsubscribe from an event. */
+interface SubscriptionResponse {
+    /** Type of subscription operation. */
+    method: "subscribe" | "unsubscribe";
+    /** Original subscription request. */
+    subscription: unknown;
+}
+
+/** Response to post request. */
+interface PostResponse {
+    /** Unique request identifier. */
+    id: number;
+    /** Server response. */
+    response:
+        /** Response containing requested information. */
+        | {
+            /** Indicates that this is an informational response. */
+            type: "info";
+            /** Contains the information data. */
+            payload: {
+                /** Type of information being returned. */
+                type: string;
+                /** Information specific data. */
+                data: unknown;
+            };
+        }
+        /** Response containing action result. */
+        | {
+            /** Indicates that this is an action response. */
+            type: "action";
+            /** Action result. */
+            payload: BaseExchangeResponse;
+        };
+}
+
 /** Base system events and dynamic channel events for Hyperliquid WebSocket API. */
 interface HyperliquidEventMap {
-    /** Subscription created/removed event. */
-    subscriptionResponse: CustomEvent<{
-        /** Type of subscription operation. */
-        method: "subscribe" | "unsubscribe";
-        /** Original subscription request. */
-        subscription: unknown;
-    }>;
-
-    /** Response to post request event. */
-    post: CustomEvent<{
-        /** Unique request identifier. */
-        id: number;
-        /** Server response. */
-        response:
-            /** Response containing requested information. */
-            | {
-                /** Indicates that this is an informational response. */
-                type: "info";
-                /** Contains the information data. */
-                payload: {
-                    /** Type of information being returned. */
-                    type: string;
-                    /** Information specific data. */
-                    data: unknown;
-                };
-            }
-            /** Response containing action result. */
-            | {
-                /** Indicates that this is an action response. */
-                type: "action";
-                /** Action result. */
-                payload: BaseExchangeResponse;
-            };
-    }>;
-
-    /** Error response for message event. */
+    subscriptionResponse: CustomEvent<SubscriptionResponse>;
+    post: CustomEvent<PostResponse>;
     error: CustomEvent<string>;
-
-    /** Pong response event. */
     pong: CustomEvent<undefined>;
-
-    /** Block explorer update event. */
     _explorerBlock: CustomEvent<Omit<BlockDetails, "txs">[]>;
-
-    /** Transaction explorer update event. */
     _explorerTxs: CustomEvent<TxDetails[]>;
-
-    /** Subscribed channel event. */
     [key: string]: CustomEvent<unknown>;
 }
 

@@ -1,6 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 import { delay } from "@std/async/delay";
-import { type MaybePromise, TransportError } from "../../base.ts";
+import type { MaybePromise } from "../../base.ts";
+import { TransportError } from "../base.ts";
 
 /** Configuration options for the `ReconnectingWebSocket`. */
 export interface ReconnectingWebSocketOptions {
@@ -42,36 +43,22 @@ export interface ReconnectingWebSocketOptions {
 
 /** Message buffer strategy interface. */
 export interface MessageBufferStrategy {
-    /** Array of buffered messages. */
-    messages: (string | ArrayBufferLike | Blob | ArrayBufferView)[];
-    /**
-     * Add a message to the buffer.
-     * @param data - The message to buffer.
-     */
     push(data: string | ArrayBufferLike | Blob | ArrayBufferView): void;
-
-    /**
-     * Get and remove the next message from the buffer.
-     * @returns The next message or `undefined` if no more messages are available.
-     */
-    shift(): (string | ArrayBufferLike | Blob | ArrayBufferView) | undefined;
-
-    /** Clear all buffered messages. */
-    clear(): void;
+    [Symbol.iterator](): Iterator<string | ArrayBufferLike | Blob | ArrayBufferView>;
 }
 
 /** Simple FIFO (First In, First Out) buffer implementation. */
 class FIFOMessageBuffer implements MessageBufferStrategy {
-    messages: (string | ArrayBufferLike | Blob | ArrayBufferView)[] = [];
-    constructor() {}
+    queue: (string | ArrayBufferLike | Blob | ArrayBufferView)[] = [];
+
     push(data: string | ArrayBufferLike | Blob | ArrayBufferView): void {
-        this.messages.push(data);
+        this.queue.push(data);
     }
-    shift(): (string | ArrayBufferLike | Blob | ArrayBufferView) | undefined {
-        return this.messages.shift();
-    }
-    clear(): void {
-        this.messages = [];
+
+    *[Symbol.iterator](): Iterator<string | ArrayBufferLike | Blob | ArrayBufferView> {
+        while (this.queue.length > 0) {
+            yield this.queue.shift()!;
+        }
     }
 }
 
@@ -83,10 +70,11 @@ export class ReconnectingWebSocketError extends TransportError {
             | "RECONNECTION_STOPPED_BY_USER"
             | "USER_INITIATED_CLOSE"
             | "UNKNOWN_ERROR",
-        public originalError?: unknown,
+        cause?: unknown,
     ) {
         super(`Error when reconnecting WebSocket: ${code}`);
         this.name = "ReconnectingWebSocketError";
+        this.cause = cause;
     }
 }
 
@@ -95,17 +83,17 @@ export class ReconnectingWebSocketError extends TransportError {
  * Fully compatible with standard WebSocket API.
  */
 export class ReconnectingWebSocket implements WebSocket {
-    private _socket: WebSocket;
-    private _protocols?: string | string[];
-    private _listeners: {
+    protected _socket: WebSocket;
+    protected _protocols?: string | string[];
+    protected _listeners: {
         type: string;
         listener: EventListenerOrEventListenerObject;
         options?: boolean | AddEventListenerOptions;
         listenerProxy: EventListenerOrEventListenerObject;
     }[] = [];
-    private _attempt = 0;
-    public reconnectOptions: Required<ReconnectingWebSocketOptions>;
-    public readonly reconnectAbortController: AbortController = new AbortController();
+    protected _attempt = 0;
+    reconnectOptions: Required<ReconnectingWebSocketOptions>;
+    readonly reconnectAbortController: AbortController = new AbortController();
 
     constructor(url: string | URL, protocols?: string | string[], options?: ReconnectingWebSocketOptions) {
         this.reconnectOptions = {
@@ -121,7 +109,7 @@ export class ReconnectingWebSocket implements WebSocket {
         this._setupEventListeners();
     }
 
-    private _createSocket(url: string | URL, protocols?: string | string[]): WebSocket {
+    protected _createSocket(url: string | URL, protocols?: string | string[]): WebSocket {
         const socket = new WebSocket(url, protocols);
         if (this.reconnectOptions.connectionTimeout === null) return socket;
 
@@ -147,21 +135,20 @@ export class ReconnectingWebSocket implements WebSocket {
     }
 
     /** Initializes the internal event listeners for the socket. */
-    private _setupEventListeners() {
+    protected _setupEventListeners() {
         this._socket.addEventListener("open", this._open, { once: true });
         this._socket.addEventListener("close", this._close, { once: true });
     }
-    private _open = () => {
+    protected _open = () => {
         // Reset the attempt counter
         this._attempt = 0;
 
         // Send all buffered messages
-        let message: (string | ArrayBufferLike | Blob | ArrayBufferView) | undefined;
-        while ((message = this.reconnectOptions.messageBuffer.shift()) !== undefined) {
+        for (const message of this.reconnectOptions.messageBuffer) {
             this._socket.send(message);
         }
     };
-    private _close = async (event: CloseEvent) => {
+    protected _close = async (event: CloseEvent) => {
         try {
             // If the event was triggered but the socket is not closing, ignore it
             if (
@@ -216,16 +203,8 @@ export class ReconnectingWebSocket implements WebSocket {
     };
 
     /** Clean up internal resources. */
-    private _cleanup(
-        code:
-            | "RECONNECTION_LIMIT_REACHED"
-            | "RECONNECTION_STOPPED_BY_USER"
-            | "USER_INITIATED_CLOSE"
-            | "UNKNOWN_ERROR",
-        error?: unknown,
-    ) {
-        this.reconnectAbortController.abort(new ReconnectingWebSocketError(code, error));
-        this.reconnectOptions.messageBuffer.clear();
+    protected _cleanup(code: ConstructorParameters<typeof ReconnectingWebSocketError>[0], cause?: unknown) {
+        this.reconnectAbortController.abort(new ReconnectingWebSocketError(code, cause));
         this._listeners = [];
         this._socket.close();
     }

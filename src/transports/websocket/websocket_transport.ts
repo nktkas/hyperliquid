@@ -5,8 +5,8 @@ import {
     type ReconnectingWebSocketOptions,
 } from "./_reconnecting_websocket.ts";
 import { HyperliquidEventTarget } from "./_hyperliquid_event_target.ts";
-import { WebSocketRequestDispatcher, WebSocketRequestError } from "./_websocket_request_dispatcher.ts";
-import type { IRequestTransport, ISubscriptionTransport, Subscription } from "../../base.ts";
+import { WebSocketAsyncRequest, WebSocketRequestError } from "./_websocket_async_request.ts";
+import type { IRequestTransport, ISubscriptionTransport, Subscription } from "../base.ts";
 
 export { WebSocketRequestError };
 export { type MessageBufferStrategy, ReconnectingWebSocketError, type ReconnectingWebSocketOptions };
@@ -17,50 +17,47 @@ export interface WebSocketTransportOptions {
      * The WebSocket URL.
      * - Mainnet:
      *   - API: `wss://api.hyperliquid.xyz/ws`
-     *   - RPC: `wss://rpc.hyperliquid.xyz/ws`
+     *   - Explorer: `wss://rpc.hyperliquid.xyz/ws`
      * - Testnet:
      *   - API: `wss://api.hyperliquid-testnet.xyz/ws`
-     *   - RPC: `wss://rpc.hyperliquid-testnet.xyz/ws`
+     *   - Explorer: `wss://rpc.hyperliquid-testnet.xyz/ws`
      * @defaultValue `wss://api.hyperliquid.xyz/ws`
      */
     url?: string | URL;
 
     /**
-     * Request timeout in ms.
+     * Timeout for requests in ms.
      * Set to `null` to disable.
      * @defaultValue `10_000`
      */
     timeout?: number | null;
 
-    /**
-     * Keep-alive configuration.
-     * @defaultValue `{ interval: 20_000 }`
-     */
+    /** Keep-alive configuration. */
     keepAlive?: {
         /**
-         * The interval in ms to send keep-alive messages.
+         * Interval between sending ping messages in ms.
          * Set to `null` to disable.
-         * @defaultValue `20_000`
+         * @defaultValue `30_000`
          */
         interval?: number | null;
+
+        /**
+         * Timeout for the ping request in ms.
+         * Set to `null` to disable.
+         * same as {@link timeout} for requests.
+         */
+        timeout?: number | null;
     };
 
-    /**
-     * Reconnection policy configuration for closed connections.
-     */
+    /** Reconnection policy configuration for closed connections. */
     reconnect?: ReconnectingWebSocketOptions;
 }
 
 /** WebSocket implementation of the REST and Subscription transport interfaces. */
 export class WebSocketTransport implements IRequestTransport, ISubscriptionTransport, AsyncDisposable {
-    /** The interval timer ID for keep-alive messages. */
-    protected _keepAliveTimer: number | null = null;
-
-    /** The WebSocket request dispatcher instance. */
-    protected _wsRequester: WebSocketRequestDispatcher;
-
-    /** The Hyperliquid event target instance. */
+    protected _wsRequester: WebSocketAsyncRequest;
     protected _hlEvents: HyperliquidEventTarget;
+    protected _keepAliveTimeout: ReturnType<typeof setTimeout> | null = null;
 
     /**
      * Map of active subscriptions.
@@ -82,13 +79,19 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
      */
     timeout: number | null;
 
-    /** Keep-alive configuration settings. */
+    /** Keep-alive configuration. */
     readonly keepAlive: {
         /**
-         * The interval in ms to send keep-alive messages.
+         * Interval between sending ping messages in ms.
          * Set to `null` to disable.
          */
         readonly interval: number | null;
+
+        /**
+         * Timeout for the ping request in ms.
+         * Set to `null` to disable.
+         */
+        timeout?: number | null;
     };
 
     /** The WebSocket that is used for communication. */
@@ -105,27 +108,24 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
             options?.reconnect,
         );
         this._hlEvents = new HyperliquidEventTarget(this.socket);
-        this._wsRequester = new WebSocketRequestDispatcher(this.socket, this._hlEvents);
+        this._wsRequester = new WebSocketAsyncRequest(this.socket, this._hlEvents);
 
         this.timeout = options?.timeout === undefined ? 10_000 : options.timeout;
         this.keepAlive = {
-            interval: options?.keepAlive?.interval === undefined ? 20_000 : options.keepAlive.interval,
+            interval: options?.keepAlive?.interval === undefined ? 30_000 : options.keepAlive?.interval,
+            timeout: options?.keepAlive?.timeout === undefined ? this.timeout : options.keepAlive?.timeout,
         };
 
         // Initialize listeners
         this.socket.addEventListener("open", () => {
-            // Start keep-alive timer
-            if (this.keepAlive.interval && this._keepAliveTimer === null) {
-                this._keepAliveTimer = setInterval(() => {
-                    this.socket.send(JSON.stringify({ method: "ping" }));
-                }, this.keepAlive.interval);
-            }
+            // Start keep-alive handler
+            this._keepAlive();
         });
         this.socket.addEventListener("close", () => {
             // Clear keep-alive timer
-            if (this._keepAliveTimer !== null) {
-                clearInterval(this._keepAliveTimer);
-                this._keepAliveTimer = null;
+            if (this._keepAliveTimeout !== null) {
+                clearTimeout(this._keepAliveTimeout);
+                this._keepAliveTimeout = null;
             }
 
             // Clear all subscriptions
@@ -139,12 +139,14 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
 
     /**
      * Sends a request to the Hyperliquid API via WebSocket.
+     *
+     * Note: Explorer requests are not supported in the Hyperliquid WebSocket API.
+     *
      * @param endpoint - The API endpoint to send the request to (`explorer` requests are not supported).
      * @param payload - The payload to send with the request.
      * @param signal - An optional abort signal.
      * @returns A promise that resolves with parsed JSON response body.
      * @throws {WebSocketRequestError} - An error that occurs when a WebSocket request fails.
-     * @note Explorer requests are not supported in the Hyperliquid WebSocket API.
      */
     request(type: "info" | "exchange" | "explorer", payload: unknown, signal?: AbortSignal): Promise<unknown> {
         const combinedTimeoutSignal = this._getCombinedTimeoutSignal(signal);
@@ -156,11 +158,15 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
 
     /**
      * Subscribes to a Hyperliquid event channel.
+     *
+     * Sends a subscription request to the server and listens for events.
+     *
      * @param channel - The event channel to listen to.
      * @param payload - A payload to send with the subscription request.
      * @param listener - A function to call when the event is dispatched.
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @throws {WebSocketRequestError} - An error that occurs when a WebSocket request fails.
      */
     async subscribe(
         channel: string,
@@ -169,7 +175,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
         signal?: AbortSignal,
     ): Promise<Subscription> {
         // Create a unique identifier for the subscription
-        const id = WebSocketRequestDispatcher.requestToId(payload);
+        const id = WebSocketAsyncRequest.requestToId(payload);
 
         // Initialize new subscription, if it doesn't exist
         let subscription = this._subscriptions.get(id);
@@ -285,17 +291,40 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
         });
     }
 
-    /**
-     * Combines the provided abort signal with the timeout signal.
-     * @param signal An optional abort signal.
-     * @returns A combined abort signal or undefined.
-     */
+    /** Combines the provided abort signal with the timeout signal. */
     protected _getCombinedTimeoutSignal(signal?: AbortSignal): AbortSignal | undefined {
         const timeoutSignal = this.timeout ? AbortSignal.timeout(this.timeout) : undefined;
         const combinedSignal = signal && timeoutSignal
             ? AbortSignal.any([signal, timeoutSignal])
             : signal ?? timeoutSignal;
         return combinedSignal;
+    }
+
+    /**
+     * Initiate background keep the connection alive.
+     * Sends ping only when needed.
+     */
+    protected _keepAlive(): void {
+        if (this.keepAlive.interval === null || this._keepAliveTimeout) return;
+
+        const tick = async () => {
+            if (this.socket.readyState !== ReconnectingWebSocket.OPEN || !this._keepAliveTimeout) return;
+
+            // Check if the last request was sent more than the keep-alive interval ago
+            if (Date.now() - this._wsRequester.lastRequestTime >= this.keepAlive.interval!) {
+                const timeoutSignal = this.keepAlive.timeout ? AbortSignal.timeout(this.keepAlive.timeout) : undefined;
+                await this._wsRequester.request("ping", timeoutSignal)
+                    .catch(() => undefined); // Ignore errors
+            }
+
+            // Schedule the next ping
+            if (this.socket.readyState === ReconnectingWebSocket.OPEN && this._keepAliveTimeout) {
+                const nextDelay = this.keepAlive.interval! - (Date.now() - this._wsRequester.lastRequestTime);
+                this._keepAliveTimeout = setTimeout(tick, nextDelay);
+            }
+        };
+
+        this._keepAliveTimeout = setTimeout(tick, this.keepAlive.interval);
     }
 
     async [Symbol.asyncDispose](): Promise<void> {

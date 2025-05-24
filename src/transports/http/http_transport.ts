@@ -1,4 +1,5 @@
-import { type IRequestTransport, type MaybePromise, TransportError } from "../../base.ts";
+import type { MaybePromise } from "../../base.ts";
+import { type IRequestTransport, TransportError } from "../base.ts";
 
 /**
  * Error thrown when an HTTP response is deemed invalid:
@@ -29,13 +30,15 @@ export interface HttpTransportOptions {
     isTestnet?: boolean;
 
     /**
-     * Request timeout in ms.
-     * Set to `null` to disable.
+     * Request timeout in ms. Set to `null` to disable.
      * @defaultValue `10_000`
      */
     timeout?: number | null;
 
-    /** Custom server to use for API requests. */
+    /**
+     * Custom server to use for API requests.
+     * @defaultValue `https://api.hyperliquid.xyz` for mainnet and `https://api.hyperliquid-testnet.xyz` for testnet.
+     */
     server?: {
         mainnet?: { api?: string | URL; rpc?: string | URL };
         testnet?: { api?: string | URL; rpc?: string | URL };
@@ -117,7 +120,6 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
                 body: JSON.stringify(payload),
                 headers: {
                     "Accept-Encoding": "gzip, deflate, br, zstd",
-                    "Connection": "keep-alive",
                     "Content-Type": "application/json",
                 },
                 keepalive: true,
@@ -164,11 +166,7 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
     }
 }
 
-/**
- * Merges multiple `HeadersInit` objects into one.
- * @param inits - A list of `HeadersInit` objects to merge.
- * @returns A new `Headers` object that contains all headers from the input objects.
- */
+/** Merges multiple {@linkcode HeadersInit} into one {@linkcode Headers}. */
 function mergeHeadersInit(...inits: HeadersInit[]): Headers {
     if (inits.length === 0 || inits.length === 1) {
         return new Headers(inits[0] as HeadersInit | undefined);
@@ -176,19 +174,15 @@ function mergeHeadersInit(...inits: HeadersInit[]): Headers {
 
     const merged = new Headers();
     for (const headers of inits) {
-        const entries = Symbol.iterator in headers ? headers : Object.entries(headers);
-        for (const [key, value] of entries) {
+        const iterator = Symbol.iterator in headers ? headers : Object.entries(headers);
+        for (const [key, value] of iterator) {
             merged.set(key, value);
         }
     }
     return merged;
 }
 
-/**
- * Merges multiple `RequestInit` objects into one.
- * @param inits - A list of `RequestInit` objects to merge.
- * @returns A new `RequestInit` object that contains all properties from the input objects.
- */
+/** Merges multiple {@linkcode RequestInit} into one {@linkcode RequestInit}. */
 function mergeRequestInit(...inits: RequestInit[]): RequestInit {
     const merged = inits.reduce((acc, init) => ({ ...acc, ...init }), {});
 

@@ -526,7 +526,7 @@ Deno.test("ReconnectingWebSocket Tests", async (t) => {
             rws.send("HelloAfterClose2");
 
             assertEquals(
-                rws.reconnectOptions.messageBuffer.messages.length,
+                Array.from(rws.reconnectOptions.messageBuffer).length,
                 2,
                 "should be buffered while closed",
             );
@@ -550,7 +550,7 @@ Deno.test("ReconnectingWebSocket Tests", async (t) => {
 
             // And the internal buffer should be empty
             assertEquals(
-                rws.reconnectOptions.messageBuffer.messages.length,
+                Array.from(rws.reconnectOptions.messageBuffer).length,
                 0,
                 "Buffer should be cleared after replay",
             );
@@ -756,7 +756,7 @@ Deno.test("ReconnectingWebSocket Tests", async (t) => {
 
             // @ts-ignore - accessing private properties
             assertEquals(rws._listeners.length, 0, "Event listeners must be cleared on permanent close");
-            assertEquals(rws.reconnectOptions.messageBuffer.messages.length, 0, "Message buffer must be cleared");
+            assertEquals(Array.from(rws.reconnectOptions.messageBuffer).length, 0, "Message buffer must be cleared");
             assert(
                 rws.reconnectAbortController.signal.aborted,
                 "reconnectAbortController.signal must be aborted after cleanup",

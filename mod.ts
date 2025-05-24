@@ -1,5 +1,6 @@
 // Base interfaces
 export * from "./src/base.ts";
+export * from "./src/transports/base.ts";
 
 // Signing
 export type {

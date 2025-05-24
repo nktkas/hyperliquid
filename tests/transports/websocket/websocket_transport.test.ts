@@ -146,7 +146,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
         await t.step("custom keepAlive.interval", async (t) => {
             await t.step("default keepAlive.interval", async () => {
                 const transport = new WebSocketTransport();
-                assertEquals(transport.keepAlive.interval, 20_000);
+                assertEquals(transport.keepAlive.interval, 30_000);
                 await transport.close();
             });
             await t.step("custom keepAlive.interval", async () => {
@@ -386,7 +386,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
 
                 assertEquals(
                     // @ts-ignore - Accessing private properties for testing
-                    transport._wsRequester.pending.size,
+                    transport._wsRequester.queue.size,
                     1,
                     "Only 1 subscription request should be in pending, despite two listeners",
                 );
@@ -858,7 +858,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
             // Check that the timer is set
             assert(
                 // @ts-ignore - Accessing private properties for testing
-                transport._keepAliveTimer !== null,
+                transport._keepAliveTimeout !== null,
                 "Keep alive timer must be set after open",
             );
 
@@ -866,7 +866,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
             await transport.close();
             assert(
                 // @ts-ignore - Accessing private properties for testing
-                transport._keepAliveTimer === null,
+                transport._keepAliveTimeout === null,
                 "Keep alive timer must be cleared after close",
             );
         });

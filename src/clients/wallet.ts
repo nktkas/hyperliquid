@@ -1,4 +1,5 @@
-import { type Hex, HyperliquidError, type IRequestTransport, type MaybePromise } from "../base.ts";
+import { type Hex, HyperliquidError, type MaybePromise } from "../base.ts";
+import type { IRequestTransport } from "../transports/base.ts";
 import type {
     ApproveAgentRequest,
     ApproveBuilderFeeRequest,
@@ -2990,8 +2991,8 @@ export class WalletClient<
     protected async _request(
         payload: {
             action: BaseExchangeRequest["action"];
-            signature: { r: Hex; s: Hex; v: number };
-            nonce: number;
+            signature: BaseExchangeRequest["signature"];
+            nonce: BaseExchangeRequest["nonce"];
             vaultAddress?: Hex;
             expiresAfter?: number;
         },

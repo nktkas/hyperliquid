@@ -20,21 +20,23 @@ runtimes, written in TypeScript and provided with tests.
 
 ## Installation
 
+> [!NOTE]
+> While this library is in TypeScript, it can also be used in JavaScript libraries with ESM/CommonJS support.
+
+### Node.js (choose your package manager)
+
 ```
-# npm
 npm i @nktkas/hyperliquid
 
-# deno
-deno add jsr:@nktkas/hyperliquid
-
-# pnpm
 pnpm add @nktkas/hyperliquid
 
-# yarn
 yarn add @nktkas/hyperliquid
+```
 
-# bun
-bun i @nktkas/hyperliquid
+### Deno
+
+```
+deno add jsr:@nktkas/hyperliquid
 ```
 
 ## Quick Start
@@ -80,9 +82,7 @@ import * as hl from "@nktkas/hyperliquid";
 const transport = new hl.WebSocketTransport();
 const client = new hl.EventClient({ transport });
 
-// Subscribe to events
 const sub = await client.allMids((event) => {
-    // Handle the event
     console.log(event);
 });
 
@@ -96,7 +96,7 @@ await sub.unsubscribe(); // Unsubscribe from the event
 First, choose and configure your transport layer (more details in the [API Reference](#transports)):
 
 ```ts
-import * as hl from "@nktkas/hyperliquid"; // support ESM & Common.js
+import * as hl from "@nktkas/hyperliquid";
 
 // HTTP Transport
 const httpTransport = new hl.HttpTransport(); // Accepts optional parameters
@@ -112,7 +112,7 @@ Next, initialize a client with the transport layer (more details in the [API Ref
 #### Create PublicClient
 
 ```ts
-import * as hl from "@nktkas/hyperliquid"; // support ESM & Common.js
+import * as hl from "@nktkas/hyperliquid";
 
 const transport = new hl.HttpTransport(); // or WebSocketTransport
 const client = new hl.PublicClient({ transport });
@@ -121,7 +121,7 @@ const client = new hl.PublicClient({ transport });
 #### Create WalletClient
 
 ```ts
-import * as hl from "@nktkas/hyperliquid"; // support ESM & Common.js
+import * as hl from "@nktkas/hyperliquid";
 import { createWalletClient, custom } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { ethers } from "ethers";
@@ -148,7 +148,7 @@ const windowMetamaskClient = new hl.WalletClient({ wallet: window.ethereum, tran
 #### Create EventClient
 
 ```ts
-import * as hl from "@nktkas/hyperliquid"; // support ESM & Common.js
+import * as hl from "@nktkas/hyperliquid";
 
 const transport = new hl.WebSocketTransport(); // only WebSocketTransport
 const client = new hl.EventClient({ transport });
@@ -225,22 +225,19 @@ const transport = new hl.WebSocketTransport();
 const client = new hl.EventClient({ transport });
 
 // L2 Book updates
-const sub = await client.l2Book({ coin: "BTC" }, (data) => {
+await client.l2Book({ coin: "BTC" }, (data) => {
     console.log(data);
 });
-await sub.unsubscribe();
 
 // User fills
-const sub = await client.userFills({ user: "0x..." }, (data) => {
+await client.userFills({ user: "0x..." }, (data) => {
     console.log(data);
 });
-await sub.unsubscribe();
 
 // Explorer block updates
-const sub = await client.explorerBlock((data) => {
+await client.explorerBlock((data) => {
     console.log(data);
 });
-await sub.unsubscribe();
 ```
 
 ## API Reference
@@ -471,7 +468,6 @@ class HttpTransport {
     constructor(options?: {
         isTestnet?: boolean; // Whether to use testnet url (default: false)
         timeout?: number; // Request timeout in ms (default: 10_000)
-        server?: "api" | "api2" | "api-ui"; // Server URL (default: "api" = "https://api.hyperliquid.xyz")
         fetchOptions?: RequestInit; // A custom fetch options
         onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>; // A callback before request is sent
         onResponse?: (response: Response) => MaybePromise<Response | void | null | undefined>; // A callback after response is received
@@ -492,7 +488,8 @@ class WebSocketTransport {
         url?: string | URL; // WebSocket URL (default: "wss://api.hyperliquid.xyz/ws")
         timeout?: number; // Request timeout in ms (default: 10_000)
         keepAlive?: { // Keep-alive configuration
-            interval?: number; // Ping interval in ms (default: 20_000)
+            interval?: number; // Ping interval in ms (default: 30_000)
+            timeout?: number; // Pong timeout in ms (default: same as `timeout` for requests)
         };
         reconnect?: { // Reconnection policy configuration for closed connections
             maxRetries?: number; // Maximum number of reconnection attempts (default: 3)
@@ -518,20 +515,14 @@ class WebSocketTransport {
 
 ## Additional Import Points
 
-The SDK exports additional import points to access internal functions.
-
 ### `/types`
 
 The import point gives access to all Hyperliquid-related types, including the base types on which class methods are
 based.
 
-Useful if you want to get all Hyperliquid types.
-
 ### `/signing`
 
 The import point gives access to functions that generate signatures for Hyperliquid transactions.
-
-Useful if you want to sign a Hyperliquid transaction yourself.
 
 ### Examples
 

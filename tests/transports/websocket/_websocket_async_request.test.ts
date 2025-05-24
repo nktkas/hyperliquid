@@ -1,8 +1,8 @@
 import { assertEquals, assertRejects } from "jsr:@std/assert@^1.0.11";
 import {
-    WebSocketRequestDispatcher,
+    WebSocketAsyncRequest,
     WebSocketRequestError,
-} from "../../../src/transports/websocket/_websocket_request_dispatcher.ts";
+} from "../../../src/transports/websocket/_websocket_async_request.ts";
 import { HyperliquidEventTarget } from "../../../src/transports/websocket/_hyperliquid_event_target.ts";
 
 class MockWebSocket extends EventTarget implements WebSocket {
@@ -49,7 +49,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
         await t.step("basic", async () => {
             const mockSocket = new MockWebSocket();
             const hlEvents = new HyperliquidEventTarget(mockSocket);
-            const dispatcher = new WebSocketRequestDispatcher(mockSocket, hlEvents);
+            const dispatcher = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
             const promise = dispatcher.request("post", { foo: "bar" });
             // Confirm outbound message
@@ -77,7 +77,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
         await t.step("type === info", async () => {
             const mockSocket = new MockWebSocket();
             const hlEvents = new HyperliquidEventTarget(mockSocket);
-            const dispatcher = new WebSocketRequestDispatcher(mockSocket, hlEvents);
+            const dispatcher = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
             const promise = dispatcher.request("post", { test: "info" });
             const sent = JSON.parse(mockSocket.sentMessages[0]);
@@ -102,7 +102,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
         await t.step("type === action", async () => {
             const mockSocket = new MockWebSocket();
             const hlEvents = new HyperliquidEventTarget(mockSocket);
-            const dispatcher = new WebSocketRequestDispatcher(mockSocket, hlEvents);
+            const dispatcher = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
             const promise = dispatcher.request("post", { test: "action" });
             const sent = JSON.parse(mockSocket.sentMessages[0]);
@@ -128,7 +128,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
     await t.step("request() => subscribe => resolves after 'subscriptionResponse' event", async () => {
         const mockSocket = new MockWebSocket();
         const hlEvents = new HyperliquidEventTarget(mockSocket);
-        const dispatcher = new WebSocketRequestDispatcher(mockSocket, hlEvents);
+        const dispatcher = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
         const subPayload = { channel: "test-sub", param: "XYZ" };
         const promise = dispatcher.request("subscribe", subPayload);
@@ -156,7 +156,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
         await t.step("post request", async () => {
             const mockSocket = new MockWebSocket();
             const hlEvents = new HyperliquidEventTarget(mockSocket);
-            const dispatcher = new WebSocketRequestDispatcher(mockSocket, hlEvents);
+            const dispatcher = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
             const promise = dispatcher.request("post", { testErr: true });
             const sent = JSON.parse(mockSocket.sentMessages[0]);
@@ -178,7 +178,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
         await t.step("subscription request", async () => {
             const mockSocket = new MockWebSocket();
             const hlEvents = new HyperliquidEventTarget(mockSocket);
-            const dispatcher = new WebSocketRequestDispatcher(mockSocket, hlEvents);
+            const dispatcher = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
             // We'll do a "subscribe" request
             const subPayload = { channel: "test-sub-error", param: "XYZ-ERR" };
@@ -202,7 +202,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
         await t.step("unknown request", async () => {
             const mockSocket = new MockWebSocket();
             const hlEvents = new HyperliquidEventTarget(mockSocket);
-            const dispatcher = new WebSocketRequestDispatcher(mockSocket, hlEvents);
+            const dispatcher = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
             // We'll do a "subscribe" request with an "unknown" structure
             const unknownPayload = { someUnknown: "stuff" };
@@ -227,7 +227,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
     await t.step("request() => rejects pending requests when WebSocket connection closes", async () => {
         const mockSocket = new MockWebSocket();
         const hlEvents = new HyperliquidEventTarget(mockSocket);
-        const dispatcher = new WebSocketRequestDispatcher(mockSocket, hlEvents);
+        const dispatcher = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
         const p1 = dispatcher.request("post", { foo: "bar1" });
         const p2 = dispatcher.request("subscribe", { sub: "bar2" });
@@ -254,7 +254,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
         await t.step("rejects immediately if aborted before call", async () => {
             const mockSocket = new MockWebSocket();
             const hlEvents = new HyperliquidEventTarget(mockSocket);
-            const dispatcher = new WebSocketRequestDispatcher(mockSocket, hlEvents);
+            const dispatcher = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
             const controller = new AbortController();
             controller.abort(new Error("Aborted pre-emptively"));
@@ -270,7 +270,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
         await t.step("rejects if aborted after sending request", async () => {
             const mockSocket = new MockWebSocket();
             const hlEvents = new HyperliquidEventTarget(mockSocket);
-            const dispatcher = new WebSocketRequestDispatcher(mockSocket, hlEvents);
+            const dispatcher = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
             const controller = new AbortController();
             const promise = dispatcher.request("post", { foo: "bar" }, controller.signal);
@@ -308,7 +308,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
             arr: [10, "0xF00D", false],
         };
 
-        const strId = WebSocketRequestDispatcher.requestToId(complex);
+        const strId = WebSocketAsyncRequest.requestToId(complex);
         const parsed = JSON.parse(strId);
 
         // Keys should be sorted by ASCII: "Z" > "arr" > "boolVal" > "nested" > "textVal"
@@ -331,7 +331,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
     await t.step("error event with invalid JSON is ignored", async () => {
         const mockSocket = new MockWebSocket();
         const hlEvents = new HyperliquidEventTarget(mockSocket);
-        const dispatcher = new WebSocketRequestDispatcher(mockSocket, hlEvents);
+        const dispatcher = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
         const promise = dispatcher.request("post", { test: "jsonErrorIgnore" });
         const sent = JSON.parse(mockSocket.sentMessages[0]);

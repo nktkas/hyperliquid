@@ -1,6 +1,7 @@
 /**
  * This module contains functions for generating Hyperliquid transaction signatures
  * and interfaces to various wallet implementations.
+ *
  * @example
  * ```ts
  * import { signL1Action } from "@nktkas/hyperliquid/signing";
@@ -45,6 +46,7 @@
  *   chainId: parseInt(action.signatureChainId, 16),
  * });
  * ```
+ *
  * @module
  */
 
@@ -307,6 +309,7 @@ export async function signL1Action(args: {
  * Sign a user-signed action.
  *
  * Note: Signature generation depends on the order of types.
+ *
  * @param args - Arguments for signing the action.
  * @returns The signature components r, s, and v.
  * @example
@@ -374,6 +377,7 @@ export async function signUserSignedAction(args: {
  * Sign a multi-signature action.
  *
  * Note: Signature generation depends on the order of the action keys.
+ *
  * @param args - Arguments for signing the action.
  * @returns The signature components r, s, and v.
  * @example
