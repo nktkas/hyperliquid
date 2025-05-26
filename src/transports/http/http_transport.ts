@@ -105,11 +105,7 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
      * @throws {HttpRequestError} - Thrown when an HTTP response is deemed invalid.
      * @throws May throw {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch#exceptions | fetch errors}.
      */
-    async request(
-        endpoint: "info" | "exchange" | "explorer",
-        payload: unknown,
-        signal?: AbortSignal,
-    ): Promise<unknown> {
+    async request<T>(endpoint: "info" | "exchange" | "explorer", payload: unknown, signal?: AbortSignal): Promise<T> {
         // Construct a Request
         const url = new URL(
             endpoint,

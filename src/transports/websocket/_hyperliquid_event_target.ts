@@ -53,7 +53,8 @@ interface HyperliquidEventMap {
     pong: CustomEvent<undefined>;
     _explorerBlock: CustomEvent<Omit<BlockDetails, "txs">[]>;
     _explorerTxs: CustomEvent<TxDetails[]>;
-    [key: string]: CustomEvent<unknown>;
+    // deno-lint-ignore no-explicit-any
+    [key: string]: CustomEvent<any>;
 }
 
 /** Listens for WebSocket messages and sends them as Hyperliquid typed events. */

@@ -499,29 +499,13 @@ class NonceManager {
 export class WalletClient<
     T extends IRequestTransport = IRequestTransport,
     W extends AbstractWallet = AbstractWallet,
-> implements AsyncDisposable {
-    /** The transport used to connect to the Hyperliquid API. */
+> implements WalletClientParameters, AsyncDisposable {
     transport: T;
-
-    /** The `viem`, `ethers.js`, or `window.ethereum` wallet used for signing transactions. */
     wallet: W;
-
-    /** Specifies whether the client uses testnet. */
     isTestnet: boolean;
-
-    /** Sets a default vaultAddress to be used if no vaultAddress is explicitly passed to a method. */
     defaultVaultAddress?: Hex;
-
-    /** Sets a default expiresAfter to be used if no expiresAfter is explicitly passed to a method. */
     defaultExpiresAfter?: number | (() => MaybePromise<number>);
-
-    /**
-     * The network that will be used to sign transactions.
-     * Must match the network of the {@link wallet}.
-     */
     signatureChainId: Hex | (() => MaybePromise<Hex>);
-
-    /** Function to get the next nonce for signing transactions. */
     nonceManager: () => MaybePromise<number>;
 
     /**

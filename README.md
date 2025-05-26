@@ -21,7 +21,7 @@ runtimes, written in TypeScript and provided with tests.
 ## Installation
 
 > [!NOTE]
-> While this library is in TypeScript, it can also be used in JavaScript libraries with ESM/CommonJS support.
+> While this library is in TypeScript, it can also be used in JavaScript and there is support for ESM/CommonJS.
 
 ### Node.js (choose your package manager)
 

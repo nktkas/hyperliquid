@@ -37,8 +37,10 @@ export class WebSocketAsyncRequest {
     protected queue: Map<
         number | string,
         {
-            resolve: (value?: unknown) => void;
-            reject: (reason: unknown) => void;
+            // deno-lint-ignore no-explicit-any
+            resolve: (value?: any) => void;
+            // deno-lint-ignore no-explicit-any
+            reject: (reason?: any) => void;
         }
     > = new Map();
     lastRequestTime: number = 0;
@@ -112,16 +114,12 @@ export class WebSocketAsyncRequest {
      * @returns A promise that resolves with the parsed JSON response body.
      */
     async request(method: "ping", signal?: AbortSignal): Promise<void>;
-    async request(
-        method: "post" | "subscribe" | "unsubscribe",
-        payload: unknown,
-        signal?: AbortSignal,
-    ): Promise<unknown>;
-    async request(
+    async request<T>(method: "post" | "subscribe" | "unsubscribe", payload: unknown, signal?: AbortSignal): Promise<T>;
+    async request<T>(
         method: "post" | "subscribe" | "unsubscribe" | "ping",
         payload_or_signal?: unknown | AbortSignal,
         maybeSignal?: AbortSignal,
-    ): Promise<unknown> {
+    ): Promise<T> {
         const payload = payload_or_signal instanceof AbortSignal ? undefined : payload_or_signal;
         const signal = payload_or_signal instanceof AbortSignal ? payload_or_signal : maybeSignal;
 
@@ -147,7 +145,7 @@ export class WebSocketAsyncRequest {
         this.lastRequestTime = Date.now();
 
         // Wait for a response
-        const { promise, resolve, reject } = Promise.withResolvers();
+        const { promise, resolve, reject } = Promise.withResolvers<T>();
         this.queue.set(id, { resolve, reject });
 
         const onAbort = () => reject(signal?.reason);

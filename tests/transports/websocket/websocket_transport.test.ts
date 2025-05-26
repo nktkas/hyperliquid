@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertRejects } from "jsr:@std/assert@^1.0.10";
+import { assert, assertEquals, assertFalse, assertRejects } from "jsr:@std/assert@^1.0.10";
 import { WebSocketTransport } from "../../../src/transports/websocket/websocket_transport.ts";
 
 Deno.test("WebSocketTransport Tests", async (t) => {
@@ -24,7 +24,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                             }));
                         } else if (testCase === "request-timeout") {
                             // Do nothing
-                        } else if (testCase === "request-no-timeout") {
+                        } else if (testCase === "request-delay") {
                             setTimeout(() => {
                                 socket.send(JSON.stringify({
                                     channel: "post",
@@ -36,7 +36,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                                         },
                                     },
                                 }));
-                            }, 15_000);
+                            }, data.request.delay);
                         } else { // Default
                             socket.send(JSON.stringify({
                                 channel: "post",
@@ -63,7 +63,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                                         subscription: data.subscription,
                                     },
                                 }));
-                            }, 15_000);
+                            }, data.subscription.delay);
                         } else if (testCase === "subscribe-delay") {
                             setTimeout(() => {
                                 socket.send(JSON.stringify({
@@ -176,13 +176,8 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                 const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-fail" });
                 await transport.ready();
 
-                await assertRejects(
-                    async () => {
-                        await transport.request("info", { key: "value" });
-                    },
-                    Error,
-                    "Cannot complete WebSocket request:",
-                );
+                const promise = transport.request("info", { key: "value" });
+                await assertRejects(() => promise, Error, "Cannot complete WebSocket request:");
 
                 // Clean up
                 await transport.close();
@@ -194,13 +189,8 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                 await transport.ready();
 
                 const signal = AbortSignal.abort(new Error("Aborted"));
-                await assertRejects(
-                    async () => {
-                        await transport.request("info", { key: "value" }, signal);
-                    },
-                    Error,
-                    "Aborted",
-                );
+                const promise = transport.request("info", { key: "value" }, signal);
+                await assertRejects(() => promise, Error, "Aborted");
 
                 // Clean up
                 await transport.close();
@@ -214,29 +204,23 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                 });
                 await transport.ready();
 
-                await assertRejects(
-                    async () => {
-                        await transport.request("info", { key: "value" });
-                    },
-                    DOMException,
-                    "Signal timed out.",
-                );
+                const promise = transport.request("info", { key: "value" });
+                await assertRejects(() => promise, DOMException, "Signal timed out.");
 
                 // Clean up
                 await transport.close();
             });
 
             await t.step("If timeout is not set, never reject", async () => {
-                // Context: Default timeout is 10 seconds, but the server will respond after 15 seconds
-
                 // Setup
+                const defaultTimeout = new WebSocketTransport({ url: "ws://example.com" }).timeout!;
                 const transport = new WebSocketTransport({
                     url: "ws://localhost:8080/?test=request-no-timeout",
                     timeout: null,
                 });
                 await transport.ready();
 
-                await transport.request("info", { key: "value" });
+                await transport.request("info", { delay: defaultTimeout * 1.5 });
 
                 // Clean up
                 await transport.close();
@@ -266,8 +250,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                         eventReceived = true;
                     }
                 };
-                const payload = { channel: "testEvent", extra: "data" };
-                const sub = await transport.subscribe("testEvent", payload, listener);
+                const sub = await transport.subscribe("test", { channel: "test", extra: "data" }, listener);
 
                 // Check that the subscription was added
                 await new Promise((r) => setTimeout(r, 100));
@@ -278,12 +261,8 @@ Deno.test("WebSocketTransport Tests", async (t) => {
 
                 // Check that the subscription was removed
                 await new Promise((r) => setTimeout(r, 100));
-                assertEquals(
-                    // @ts-ignore - Accessing private properties for testing
-                    transport._subscriptions.has(JSON.stringify(payload)),
-                    false,
-                    "Subscription should be removed after unsubscribe",
-                );
+                // @ts-ignore - Accessing private properties for testing
+                assert(transport._subscriptions.size === 0);
 
                 // Clean up
                 await transport.close();
@@ -297,23 +276,15 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                 const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-success" });
                 await transport.ready();
 
-                const payload = { channel: "testEvent", extra: "data" };
+                const payload = { channel: "test", extra: "data" };
                 const listener = () => {};
-                await transport.subscribe("testEvent", payload, listener);
-                await transport.subscribe("testEvent", payload, listener);
+                await transport.subscribe("test", payload, listener);
+                await transport.subscribe("test", payload, listener);
 
-                assertEquals(
-                    // @ts-ignore - Accessing private properties for testing
-                    transport._subscriptions.size,
-                    1,
-                    "Only one subscription should be created",
-                );
-                assertEquals(
-                    // @ts-ignore - Accessing private properties for testing
-                    transport._subscriptions.get(JSON.stringify(payload))?.listeners.size,
-                    1,
-                    "Only one listener should be added to the subscription",
-                );
+                // @ts-ignore - Accessing private properties for testing
+                assertEquals(transport._subscriptions.size, 1);
+                // @ts-ignore - Accessing private properties for testing
+                assertEquals(transport._subscriptions.get(JSON.stringify(payload))?.listeners.size, 1);
 
                 // Clean up
                 await transport.close();
@@ -327,24 +298,16 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                 const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-success" });
                 await transport.ready();
 
-                const payload = { channel: "testEvent", extra: "data" };
+                const payload = { channel: "test", extra: "data" };
                 const listener1 = () => {};
                 const listener2 = () => {};
-                await transport.subscribe("testEvent", payload, listener1);
-                await transport.subscribe("testEvent", payload, listener2);
+                await transport.subscribe("test", payload, listener1);
+                await transport.subscribe("test", payload, listener2);
 
-                assertEquals(
-                    // @ts-ignore - Accessing private properties for testing
-                    transport._subscriptions.size,
-                    1,
-                    "Only one subscription should be created",
-                );
-                assertEquals(
-                    // @ts-ignore - Accessing private properties for testing
-                    transport._subscriptions.get(JSON.stringify(payload))?.listeners.size,
-                    2,
-                    "Both listeners should be added to the subscription",
-                );
+                // @ts-ignore - Accessing private properties for testing
+                assertEquals(transport._subscriptions.size, 1);
+                // @ts-ignore - Accessing private properties for testing
+                assertEquals(transport._subscriptions.get(JSON.stringify(payload))?.listeners.size, 2);
 
                 // Clean up
                 await transport.close();
@@ -358,12 +321,12 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                 const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-success" });
                 await transport.ready();
 
-                const payload = { channel: "testEvent", extra: "data" };
+                const payload = { channel: "test", extra: "data" };
                 const listener = () => {};
-                const sub1 = await transport.subscribe("testEvent", payload, listener);
-                const sub2 = await transport.subscribe("testEvent", payload, listener);
+                const sub1 = await transport.subscribe("test", payload, listener);
+                const sub2 = await transport.subscribe("test", payload, listener);
 
-                assertEquals(sub1.unsubscribe, sub2.unsubscribe, "Both subscriptions should be the same");
+                assertEquals(sub1.unsubscribe, sub2.unsubscribe);
 
                 // Clean up
                 await transport.close();
@@ -377,19 +340,15 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                 const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-success" });
                 await transport.ready();
 
-                const payload = { channel: "singleSubRequest", extra: "data" };
+                const payload = { channel: "test", extra: "data" };
                 const listener1 = () => {};
                 const listener2 = () => {};
 
-                transport.subscribe("singleSubRequest", payload, listener1);
-                transport.subscribe("singleSubRequest", payload, listener2);
+                transport.subscribe("test", payload, listener1);
+                transport.subscribe("test", payload, listener2);
 
-                assertEquals(
-                    // @ts-ignore - Accessing private properties for testing
-                    transport._wsRequester.queue.size,
-                    1,
-                    "Only 1 subscription request should be in pending, despite two listeners",
-                );
+                // @ts-ignore - Accessing private properties for testing
+                assertEquals(transport._wsRequester.queue.size, 1);
 
                 // Clean up
                 await transport.close();
@@ -403,23 +362,23 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                 const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-delay" });
                 await transport.ready();
 
-                const payload = { channel: "slowSub", extra: "data" };
+                const payload = { channel: "test", extra: "data" };
 
                 // First subscribe - server will respond after 5 seconds
-                const subPromise1 = transport.subscribe("slowSub", payload, () => {});
+                const subPromise1 = transport.subscribe("test", payload, () => {});
 
                 // Second subscribe - should wait for the first to complete
                 let secondCompleted = false;
-                transport.subscribe("slowSub", payload, () => {}).then(() => secondCompleted = true);
+                transport.subscribe("test", payload, () => {}).then(() => secondCompleted = true);
 
                 // If the second promise resolves before the first, the test will fail
                 await new Promise((r) => setTimeout(r, 100));
-                assertEquals(secondCompleted, false, "Second subscription should not complete yet");
+                assertFalse(secondCompleted);
 
                 // Now wait for the first subscription to complete
                 await subPromise1;
                 await new Promise((r) => setTimeout(r, 10));
-                assertEquals(secondCompleted, true, "Second subscription should complete after the first");
+                assert(secondCompleted);
 
                 // Clean up
                 await transport.close();
@@ -433,22 +392,11 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                 const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-fail" });
                 await transport.ready();
 
-                const payload = { channel: "failSub", reason: "testing" };
-                const listener = () => {};
+                const promise = transport.subscribe("test", { channel: "test", reason: "test" }, () => {});
+                await assertRejects(() => promise, Error, "Cannot complete WebSocket request:");
 
-                await assertRejects(
-                    async () => {
-                        await transport.subscribe("failSub", payload, listener);
-                    },
-                    Error,
-                    "Cannot complete WebSocket request:",
-                );
-
-                assert(
-                    // @ts-ignore - Accessing private properties for testing
-                    !transport._subscriptions.has(JSON.stringify(payload)),
-                    "Subscription should not be added to the list of subscriptions",
-                );
+                // @ts-ignore - Accessing private properties for testing
+                assert(transport._subscriptions.size === 0);
 
                 // Clean up
                 await transport.close();
@@ -461,18 +409,10 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                 const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-success" });
                 await transport.ready();
 
-                await assertRejects(
-                    async () => {
-                        await transport.subscribe(
-                            "testEvent",
-                            { channel: "testEvent", extra: "data" },
-                            () => {},
-                            AbortSignal.abort(new Error("Aborted")),
-                        );
-                    },
-                    Error,
-                    "Aborted",
-                );
+                const signal = AbortSignal.abort(new Error("Aborted"));
+                const promise = transport.subscribe("test", { channel: "test", extra: "data" }, () => {}, signal);
+                await assertRejects(() => promise, Error, "Aborted");
+
                 // Clean up
                 await transport.close();
             });
@@ -485,29 +425,23 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                 });
                 await transport.ready();
 
-                await assertRejects(
-                    async () => {
-                        await transport.subscribe("testTimeout", { channel: "testTimeout" }, () => {});
-                    },
-                    DOMException,
-                    "Signal timed out.",
-                );
+                const promise = transport.subscribe("test", { channel: "test" }, () => {});
+                await assertRejects(() => promise, DOMException, "Signal timed out.");
 
                 // Clean up
                 await transport.close();
             });
 
             await t.step("If timeout is not set, never reject", async () => {
-                // Context: Default timeout is 10 seconds, but the server will respond after 15 seconds
-
                 // Setup
+                const defaultTimeout = new WebSocketTransport({ url: "ws://example.com" }).timeout!;
                 const transport = new WebSocketTransport({
                     url: "ws://localhost:8080/?test=subscribe-no-timeout",
                     timeout: null,
                 });
                 await transport.ready();
 
-                await transport.subscribe("testNoTimeout", { channel: "testNoTimeout" }, () => {});
+                await transport.subscribe("test", { channel: "test", delay: defaultTimeout * 1.5 }, () => {});
 
                 // Clean up
                 await transport.close();
@@ -521,18 +455,11 @@ Deno.test("WebSocketTransport Tests", async (t) => {
             const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=unsubscribe-success" });
             await transport.ready();
 
-            // First, subscribe to an event
-            const payload = { channel: "testUnsub" };
-            const listener = () => {};
-            const sub = await transport.subscribe("testUnsub", payload, listener);
+            const sub = await transport.subscribe("test", { channel: "test" }, () => {});
 
-            // Unsubscribe the listener
             await sub.unsubscribe();
-            assert(
-                // @ts-ignore - Accessing private properties for testing
-                !transport._subscriptions.has(JSON.stringify(payload)),
-                "Must remove subscription after unsubscribe",
-            );
+            // @ts-ignore - Accessing private properties for testing
+            assert(transport._subscriptions.size === 0);
 
             // Clean up
             await transport.close();
@@ -543,22 +470,16 @@ Deno.test("WebSocketTransport Tests", async (t) => {
             const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=unsubscribe-success" });
             await transport.ready();
 
-            // First, subscribe to an event
-            const payload = { channel: "testUnsubMulti" };
+            const payload = { channel: "test" };
             const listener1 = () => {};
             const listener2 = () => {};
 
-            const sub1 = await transport.subscribe("testUnsubMulti", payload, listener1);
-            await transport.subscribe("testUnsubMulti", payload, listener2);
+            const sub1 = await transport.subscribe("test", payload, listener1);
+            await transport.subscribe("test", payload, listener2);
 
-            // Unsubscribe the first listener
             await sub1.unsubscribe();
-            assertEquals(
-                // @ts-ignore - Accessing private properties for testing
-                transport._subscriptions.get(JSON.stringify(payload))?.listeners.size,
-                1,
-                "Only one listener should remain",
-            );
+            // @ts-ignore - Accessing private properties for testing
+            assertEquals(transport._subscriptions.get(JSON.stringify(payload))?.listeners.size, 1);
 
             // Clean up
             await transport.close();
@@ -569,19 +490,11 @@ Deno.test("WebSocketTransport Tests", async (t) => {
             const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=unsubscribe-success" });
             await transport.ready();
 
-            // First, subscribe to an event
-            const payload = { channel: "closeSubs" };
-            const listener = () => {};
-            await transport.subscribe("closeSubs", payload, listener);
+            await transport.subscribe("test", { channel: "test" }, () => {});
 
-            // Close the transport
             await transport.close();
-            assertEquals(
-                // @ts-ignore - Accessing private properties for testing
-                transport._subscriptions.size,
-                0,
-                "All subscriptions must be cleared on close",
-            );
+            // @ts-ignore - Accessing private properties for testing
+            assertEquals(transport._subscriptions.size, 0);
         });
 
         await t.step("Reject", async (t) => {
@@ -590,19 +503,11 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                 const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=unsubscribe-success" });
                 await transport.ready();
 
-                // First, subscribe to an event
-                const payload = { channel: "testAbortUnsub" };
-                const listener = () => {};
-                const sub = await transport.subscribe("testAbortUnsub", payload, listener);
+                const sub = await transport.subscribe("test", { channel: "test" }, () => {});
 
-                // Unsubscribe the listener
-                await assertRejects(
-                    async () => {
-                        await sub.unsubscribe(AbortSignal.abort(new Error("Unsub aborted")));
-                    },
-                    Error,
-                    "Unsub aborted",
-                );
+                const signal = AbortSignal.abort(new Error("Unsub aborted"));
+                const promise = sub.unsubscribe(signal);
+                await assertRejects(() => promise, Error, "Unsub aborted");
 
                 // Clean up
                 await transport.close();
@@ -616,46 +521,10 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                 });
                 await transport.ready();
 
-                // First, subscribe to an event
-                const payload = { channel: "timeoutUnsub" };
-                const listener = () => {};
-                const sub = await transport.subscribe("timeoutUnsub", payload, listener);
+                const sub = await transport.subscribe("test", { channel: "test" }, () => {});
 
-                // Unsubscribe the listener
-                await assertRejects(
-                    async () => {
-                        await sub.unsubscribe();
-                    },
-                    DOMException,
-                    "Signal timed out.",
-                );
-
-                // Clean up
-                await transport.close();
-            });
-
-            await t.step("If timeout is not set, never reject", async () => {
-                // Context: Default timeout is 10 seconds, but the server will respond after 15 seconds
-
-                // Setup
-                const transport = new WebSocketTransport({
-                    url: "ws://localhost:8080/?test=unsubscribe-no-timeout",
-                    timeout: null,
-                });
-                await transport.ready();
-
-                // First, subscribe to an event
-                const payload = { channel: "noTimeoutUnsub" };
-                const listener = () => {};
-                const sub = await transport.subscribe("noTimeoutUnsub", payload, listener);
-
-                // Unsubscribe the listener
-                await sub.unsubscribe();
-                assert(
-                    // @ts-ignore - Accessing private properties for testing
-                    !transport._subscriptions.has(JSON.stringify(payload)),
-                    "Must remove subscription after unsubscribe",
-                );
+                const promise = sub.unsubscribe();
+                await assertRejects(() => promise, DOMException, "Signal timed out.");
 
                 // Clean up
                 await transport.close();
@@ -664,43 +533,29 @@ Deno.test("WebSocketTransport Tests", async (t) => {
     });
 
     await t.step("ready()", async (t) => {
-        await t.step("Resolve", async (t) => {
-            await t.step("Resolve as soon as the socket is open", async () => {
-                // Setup
-                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
-                await transport.ready();
-                // Clean up
-                await transport.close();
-            });
+        await t.step("Resolve immediately if the socket is already open", async () => {
+            // Setup
+            const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+            await transport.ready();
 
-            await t.step("Resolve immediately if the socket is already open", async () => {
-                // Setup
-                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
-                await transport.ready();
+            const start = performance.now();
+            await transport.ready();
+            const dur = performance.now() - start;
+            assert(dur < 20, `ready() again should resolve immediately, took ${dur}ms`);
 
-                const start = performance.now();
-                await transport.ready();
-                const dur = performance.now() - start;
-                assert(dur < 20, `ready() again should resolve immediately, took ${dur}ms`);
-
-                // Clean up
-                await transport.close();
-            });
+            // Clean up
+            await transport.close();
         });
 
-        await t.step("AbortSIgnal check", async (t) => {
+        await t.step("AbortSignal check", async (t) => {
             await t.step("Reject immediately if the signal has already been aborted", async () => {
                 // Setup
                 const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
 
                 const alreadyAborted = AbortSignal.abort(new Error("Already aborted"));
-                await assertRejects(
-                    async () => {
-                        await transport.ready(alreadyAborted);
-                    },
-                    Error,
-                    "Already aborted",
-                );
+                const promise = transport.ready(alreadyAborted);
+                await assertRejects(() => promise, Error, "Already aborted");
+
                 // Clean up
                 await transport.close();
             });
@@ -713,13 +568,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                 const promise = transport.ready(controller.signal);
                 controller.abort(new Error("Aborted later"));
 
-                await assertRejects(
-                    async () => {
-                        await promise;
-                    },
-                    Error,
-                    "Aborted later",
-                );
+                await assertRejects(() => promise, Error, "Aborted later");
 
                 // Clean up
                 await transport.close();
@@ -731,53 +580,34 @@ Deno.test("WebSocketTransport Tests", async (t) => {
             const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
 
             await transport.close();
-            await assertRejects(
-                async () => {
-                    await transport.ready();
-                },
-                Error,
-                "USER_INITIATED_CLOSE",
-            );
+
+            const promise = transport.ready();
+            await assertRejects(() => promise, Error, "USER_INITIATED_CLOSE");
         });
     });
 
     await t.step("close()", async (t) => {
-        await t.step("Resolve", async (t) => {
-            await t.step("Resolve as soon as the socket is closed", async () => {
-                // Setup
-                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
-                await transport.ready();
-                // Clean up
-                await transport.close();
-            });
+        await t.step("Resolve immediately if the socket is already closed", async () => {
+            // Setup
+            const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+            await transport.ready();
+            await transport.close();
 
-            await t.step("Resolve immediately if the socket is already closed", async () => {
-                // Setup
-                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
-                await transport.ready();
-                await transport.close();
-
-                const start = performance.now();
-                await transport.close();
-                const dur = performance.now() - start;
-                assert(dur < 20, `close() again should resolve immediately, took ${dur}ms`);
-            });
+            const start = performance.now();
+            await transport.close();
+            const dur = performance.now() - start;
+            assert(dur < 20, `close() again should resolve immediately, took ${dur}ms`);
         });
 
-        await t.step("AbortSIgnal check", async (t) => {
+        await t.step("AbortSignal check", async (t) => {
             await t.step("Reject immediately if the signal has already been aborted", async () => {
                 // Setup
                 const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
                 await transport.ready();
 
                 const aborted = AbortSignal.abort(new Error("Already aborted close"));
-                await assertRejects(
-                    async () => {
-                        await transport.close(aborted);
-                    },
-                    Error,
-                    "Already aborted close",
-                );
+                const promise = transport.close(aborted);
+                await assertRejects(() => promise, Error, "Already aborted close");
 
                 // Clean up
                 await transport.close();
@@ -792,13 +622,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                 const promise = transport.close(controller.signal);
                 controller.abort(new Error("Close aborted"));
 
-                await assertRejects(
-                    async () => {
-                        await promise;
-                    },
-                    Error,
-                    "Close aborted",
-                );
+                await assertRejects(() => promise, Error, "Close aborted");
 
                 // Clean up
                 await transport.close();
@@ -811,7 +635,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
             // Setup
             const transport = new WebSocketTransport({
                 url: "ws://localhost:8080/?test=ping",
-                keepAlive: { interval: 5000 },
+                keepAlive: { interval: 1000 },
             });
             await transport.ready();
 
@@ -855,20 +679,12 @@ Deno.test("WebSocketTransport Tests", async (t) => {
             const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=ping" });
             await transport.ready();
 
-            // Check that the timer is set
-            assert(
-                // @ts-ignore - Accessing private properties for testing
-                transport._keepAliveTimeout !== null,
-                "Keep alive timer must be set after open",
-            );
+            // @ts-ignore - Accessing private properties for testing
+            assert(transport._keepAliveTimeout !== null);
 
-            // Close the connection and check that the timer is cleared
             await transport.close();
-            assert(
-                // @ts-ignore - Accessing private properties for testing
-                transport._keepAliveTimeout === null,
-                "Keep alive timer must be cleared after close",
-            );
+            // @ts-ignore - Accessing private properties for testing
+            assert(transport._keepAliveTimeout === null);
         });
     });
 

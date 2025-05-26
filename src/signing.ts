@@ -173,14 +173,26 @@ export function createL1ActionHash(action: ValueType, nonce: number, vaultAddres
     new DataView(nonceBytes.buffer).setBigUint64(0, BigInt(nonce));
 
     // 3. Vault address
-    const vaultMarker = Uint8Array.of(vaultAddress ? 0x01 : 0x00);
-    const vaultBytes = vaultAddress ? decodeHex(vaultAddress.slice(2)) : new Uint8Array();
+    let vaultMarker: Uint8Array;
+    let vaultBytes: Uint8Array;
+    if (vaultAddress) {
+        vaultMarker = Uint8Array.of(1);
+        vaultBytes = decodeHex(vaultAddress.slice(2));
+    } else {
+        vaultMarker = new Uint8Array(1);
+        vaultBytes = new Uint8Array();
+    }
 
     // 4. Expires after
-    const expiresMarker = new Uint8Array(expiresAfter !== undefined ? 1 : 0);
-    const expiresBytes = new Uint8Array(expiresAfter !== undefined ? 8 : 0);
+    let expiresMarker: Uint8Array;
+    let expiresBytes: Uint8Array;
     if (expiresAfter !== undefined) {
+        expiresMarker = new Uint8Array(1);
+        expiresBytes = new Uint8Array(8);
         new DataView(expiresBytes.buffer).setBigUint64(0, BigInt(expiresAfter));
+    } else {
+        expiresMarker = new Uint8Array();
+        expiresBytes = new Uint8Array();
     }
 
     // Create a keccak256 hash

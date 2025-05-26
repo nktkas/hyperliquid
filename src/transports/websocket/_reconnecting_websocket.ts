@@ -139,7 +139,7 @@ export class ReconnectingWebSocket implements WebSocket {
         this._socket.addEventListener("open", this._open, { once: true });
         this._socket.addEventListener("close", this._close, { once: true });
     }
-    protected _open = () => {
+    protected _open: () => void = () => {
         // Reset the attempt counter
         this._attempt = 0;
 

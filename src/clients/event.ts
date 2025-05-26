@@ -100,8 +100,7 @@ export type EventWebData2Parameters = Omit<WsWebData2Request, "type">;
  */
 export class EventClient<
     T extends ISubscriptionTransport = ISubscriptionTransport,
-> implements AsyncDisposable {
-    /** The transport used to connect to the Hyperliquid API. */
+> implements EventClientParameters, AsyncDisposable {
     transport: T;
 
     /**
@@ -150,16 +149,11 @@ export class EventClient<
             type: "activeAssetCtx",
             coin: args.coin,
         };
-        return this.transport.subscribe(
-            channel,
-            payload,
-            (event: CustomEvent<WsActiveAssetCtx | WsActiveSpotAssetCtx>) => {
-                if (event.detail.coin === args.coin) {
-                    listener(event.detail);
-                }
-            },
-            signal,
-        );
+        return this.transport.subscribe<WsActiveAssetCtx | WsActiveSpotAssetCtx>(channel, payload, (e) => {
+            if (e.detail.coin === args.coin) {
+                listener(e.detail);
+            }
+        }, signal);
     }
 
     /**
@@ -192,16 +186,11 @@ export class EventClient<
             coin: args.coin,
             user: args.user,
         };
-        return this.transport.subscribe(
-            payload.type,
-            payload,
-            (event: CustomEvent<WsActiveAssetData>) => {
-                if (event.detail.coin === args.coin && event.detail.user === args.user.toLowerCase()) {
-                    listener(event.detail);
-                }
-            },
-            signal,
-        );
+        return this.transport.subscribe<WsActiveAssetData>(payload.type, payload, (e) => {
+            if (e.detail.coin === args.coin && e.detail.user === args.user.toLowerCase()) {
+                listener(e.detail);
+            }
+        }, signal);
     }
 
     /**
@@ -246,14 +235,9 @@ export class EventClient<
             type: "allMids",
             dex: args.dex,
         };
-        return this.transport.subscribe(
-            payload.type,
-            payload,
-            (event: CustomEvent<WsAllMids>) => {
-                listener(event.detail);
-            },
-            signal,
-        );
+        return this.transport.subscribe<WsAllMids>(payload.type, payload, (e) => {
+            listener(e.detail);
+        }, signal);
     }
 
     /**
@@ -285,16 +269,11 @@ export class EventClient<
             type: "bbo",
             coin: args.coin,
         };
-        return this.transport.subscribe(
-            payload.type,
-            payload,
-            (event: CustomEvent<WsBbo>) => {
-                if (event.detail.coin === args.coin) {
-                    listener(event.detail);
-                }
-            },
-            signal,
-        );
+        return this.transport.subscribe<WsBbo>(payload.type, payload, (e) => {
+            if (e.detail.coin === args.coin) {
+                listener(e.detail);
+            }
+        }, signal);
     }
 
     /**
@@ -327,16 +306,11 @@ export class EventClient<
             coin: args.coin,
             interval: args.interval,
         };
-        return this.transport.subscribe(
-            payload.type,
-            payload,
-            (event: CustomEvent<Candle>) => {
-                if (event.detail.s === args.coin && event.detail.i === args.interval) {
-                    listener(event.detail);
-                }
-            },
-            signal,
-        );
+        return this.transport.subscribe<Candle>(payload.type, payload, (e) => {
+            if (e.detail.s === args.coin && e.detail.i === args.interval) {
+                listener(e.detail);
+            }
+        }, signal);
     }
 
     /**
@@ -366,14 +340,9 @@ export class EventClient<
         const payload: WsExplorerBlockRequest = {
             type: "explorerBlock",
         };
-        return this.transport.subscribe(
-            "_explorerBlock", // Internal channel as it does not have its own channel
-            payload,
-            (event: CustomEvent<WsBlockDetails[]>) => {
-                listener(event.detail);
-            },
-            signal,
-        );
+        return this.transport.subscribe<WsBlockDetails[]>("_explorerBlock", payload, (e) => { // Internal channel as it does not have its own channel
+            listener(e.detail);
+        }, signal);
     }
 
     /**
@@ -403,14 +372,9 @@ export class EventClient<
         const payload: WsExplorerTxsRequest = {
             type: "explorerTxs",
         };
-        return this.transport.subscribe(
-            "_explorerTxs", // Internal channel as it does not have its own channel
-            payload,
-            (event: CustomEvent<TxDetails[]>) => {
-                listener(event.detail);
-            },
-            signal,
-        );
+        return this.transport.subscribe<TxDetails[]>("_explorerTxs", payload, (e) => { // Internal channel as it does not have its own channel
+            listener(e.detail);
+        }, signal);
     }
 
     /**
@@ -444,16 +408,11 @@ export class EventClient<
             nSigFigs: args.nSigFigs ?? null,
             mantissa: args.mantissa ?? null,
         };
-        return this.transport.subscribe(
-            payload.type,
-            payload,
-            (event: CustomEvent<Book>) => {
-                if (event.detail.coin === args.coin) {
-                    listener(event.detail);
-                }
-            },
-            signal,
-        );
+        return this.transport.subscribe<Book>(payload.type, payload, (e) => {
+            if (e.detail.coin === args.coin) {
+                listener(e.detail);
+            }
+        }, signal);
     }
 
     /**
@@ -485,14 +444,9 @@ export class EventClient<
             type: "notification",
             user: args.user,
         };
-        return this.transport.subscribe(
-            payload.type,
-            payload,
-            (event: CustomEvent<WsNotification>) => {
-                listener(event.detail);
-            },
-            signal,
-        );
+        return this.transport.subscribe<WsNotification>(payload.type, payload, (e) => {
+            listener(e.detail);
+        }, signal);
     }
 
     /**
@@ -524,14 +478,9 @@ export class EventClient<
             type: "orderUpdates",
             user: args.user,
         };
-        return this.transport.subscribe(
-            payload.type,
-            payload,
-            (event: CustomEvent<OrderStatus<Order>[]>) => {
-                listener(event.detail);
-            },
-            signal,
-        );
+        return this.transport.subscribe<OrderStatus<Order>[]>(payload.type, payload, (e) => {
+            listener(e.detail);
+        }, signal);
     }
 
     /**
@@ -563,16 +512,11 @@ export class EventClient<
             type: "trades",
             coin: args.coin,
         };
-        return this.transport.subscribe(
-            payload.type,
-            payload,
-            (event: CustomEvent<WsTrade[]>) => {
-                if (event.detail[0]?.coin === args.coin) {
-                    listener(event.detail);
-                }
-            },
-            signal,
-        );
+        return this.transport.subscribe<WsTrade[]>(payload.type, payload, (e) => {
+            if (e.detail[0]?.coin === args.coin) {
+                listener(e.detail);
+            }
+        }, signal);
     }
 
     /**
@@ -606,14 +550,9 @@ export class EventClient<
             type: "userEvents",
             user: args.user,
         };
-        return this.transport.subscribe(
-            "user",
-            payload,
-            (event: CustomEvent<WsUserEvent>) => {
-                listener(event.detail);
-            },
-            signal,
-        );
+        return this.transport.subscribe<WsUserEvent>("user", payload, (e) => {
+            listener(e.detail);
+        }, signal);
     }
 
     /**
@@ -646,16 +585,11 @@ export class EventClient<
             user: args.user,
             aggregateByTime: args.aggregateByTime ?? false,
         };
-        return this.transport.subscribe(
-            payload.type,
-            payload,
-            (event: CustomEvent<WsUserFills>) => {
-                if (event.detail.user === args.user.toLowerCase()) {
-                    listener(event.detail);
-                }
-            },
-            signal,
-        );
+        return this.transport.subscribe<WsUserFills>(payload.type, payload, (e) => {
+            if (e.detail.user === args.user.toLowerCase()) {
+                listener(e.detail);
+            }
+        }, signal);
     }
 
     /**
@@ -687,16 +621,11 @@ export class EventClient<
             type: "userFundings",
             user: args.user,
         };
-        return this.transport.subscribe(
-            payload.type,
-            payload,
-            (event: CustomEvent<WsUserFundings>) => {
-                if (event.detail.user === args.user.toLowerCase()) {
-                    listener(event.detail);
-                }
-            },
-            signal,
-        );
+        return this.transport.subscribe<WsUserFundings>(payload.type, payload, (e) => {
+            if (e.detail.user === args.user.toLowerCase()) {
+                listener(e.detail);
+            }
+        }, signal);
     }
 
     /**
@@ -728,16 +657,11 @@ export class EventClient<
             type: "userNonFundingLedgerUpdates",
             user: args.user,
         };
-        return this.transport.subscribe(
-            payload.type,
-            payload,
-            (event: CustomEvent<WsUserNonFundingLedgerUpdates>) => {
-                if (event.detail.user === args.user.toLowerCase()) {
-                    listener(event.detail);
-                }
-            },
-            signal,
-        );
+        return this.transport.subscribe<WsUserNonFundingLedgerUpdates>(payload.type, payload, (e) => {
+            if (e.detail.user === args.user.toLowerCase()) {
+                listener(e.detail);
+            }
+        }, signal);
     }
 
     /**
@@ -769,16 +693,11 @@ export class EventClient<
             type: "userTwapHistory",
             user: args.user,
         };
-        return this.transport.subscribe(
-            payload.type,
-            payload,
-            (event: CustomEvent<WsUserTwapHistory>) => {
-                if (event.detail.user === args.user.toLowerCase()) {
-                    listener(event.detail);
-                }
-            },
-            signal,
-        );
+        return this.transport.subscribe<WsUserTwapHistory>(payload.type, payload, (e) => {
+            if (e.detail.user === args.user.toLowerCase()) {
+                listener(e.detail);
+            }
+        }, signal);
     }
 
     /**
@@ -810,16 +729,11 @@ export class EventClient<
             type: "userTwapSliceFills",
             user: args.user,
         };
-        return this.transport.subscribe(
-            payload.type,
-            payload,
-            (event: CustomEvent<WsUserTwapSliceFills>) => {
-                if (event.detail.user === args.user.toLowerCase()) {
-                    listener(event.detail);
-                }
-            },
-            signal,
-        );
+        return this.transport.subscribe<WsUserTwapSliceFills>(payload.type, payload, (e) => {
+            if (e.detail.user === args.user.toLowerCase()) {
+                listener(e.detail);
+            }
+        }, signal);
     }
 
     /**
@@ -851,16 +765,11 @@ export class EventClient<
             type: "webData2",
             user: args.user,
         };
-        return this.transport.subscribe(
-            payload.type,
-            payload,
-            (event: CustomEvent<WsWebData2>) => {
-                if (event.detail.user === args.user.toLowerCase()) {
-                    listener(event.detail);
-                }
-            },
-            signal,
-        );
+        return this.transport.subscribe<WsWebData2>(payload.type, payload, (e) => {
+            if (e.detail.user === args.user.toLowerCase()) {
+                listener(e.detail);
+            }
+        }, signal);
     }
 
     async [Symbol.asyncDispose](): Promise<void> {

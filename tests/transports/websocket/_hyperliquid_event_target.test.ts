@@ -1,4 +1,4 @@
-import { assert, assertEquals } from "jsr:@std/assert@^1.0.10";
+import { assert, assertEquals, assertFalse } from "jsr:@std/assert@^1.0.10";
 import { HyperliquidEventTarget } from "../../../src/transports/websocket/_hyperliquid_event_target.ts";
 
 Deno.test("HyperliquidEventTarget Tests", async (t) => {
@@ -6,26 +6,24 @@ Deno.test("HyperliquidEventTarget Tests", async (t) => {
         const fakeWs = new EventTarget() as WebSocket;
         const eventTarget = new HyperliquidEventTarget(fakeWs);
 
-        let receivedDetail: unknown = null;
-        eventTarget.addEventListener("testChannel", (e) => {
-            receivedDetail = e.detail;
+        let receivedMsg: unknown;
+        eventTarget.addEventListener("test", (e) => {
+            receivedMsg = e.detail;
         });
 
-        const event = new MessageEvent("message", {
-            data: JSON.stringify({ channel: "testChannel", data: { foo: "bar" } }),
-        });
+        const event = new MessageEvent("message", { data: '{"channel":"test","data":{"foo":"bar"}}' });
         fakeWs.dispatchEvent(event);
 
-        assertEquals(receivedDetail, { foo: "bar" });
+        assertEquals(receivedMsg, { foo: "bar" });
     });
 
     await t.step("isExplorerBlockMsg => dispatch event '_explorerBlock'", () => {
         const fakeWs = new EventTarget() as WebSocket;
         const eventTarget = new HyperliquidEventTarget(fakeWs);
 
-        let blockDetails: unknown = null;
+        let receivedMsg: unknown;
         eventTarget.addEventListener("_explorerBlock", (e) => {
-            blockDetails = e.detail;
+            receivedMsg = e.detail;
         });
 
         const event = new MessageEvent("message", {
@@ -41,8 +39,8 @@ Deno.test("HyperliquidEventTarget Tests", async (t) => {
         });
         fakeWs.dispatchEvent(event);
 
-        assert(Array.isArray(blockDetails), "Should be an array of block details");
-        const firstBlock = blockDetails[0];
+        assert(Array.isArray(receivedMsg), "Should be an array of block details");
+        const firstBlock = receivedMsg[0];
         assertEquals(firstBlock.height, 123);
         assertEquals(firstBlock.numTxs, 42);
     });
@@ -51,9 +49,9 @@ Deno.test("HyperliquidEventTarget Tests", async (t) => {
         const fakeWs = new EventTarget() as WebSocket;
         const eventTarget = new HyperliquidEventTarget(fakeWs);
 
-        let txDetails: unknown = null;
+        let receivedMsg: unknown;
         eventTarget.addEventListener("_explorerTxs", (e) => {
-            txDetails = e.detail;
+            receivedMsg = e.detail;
         });
 
         const event = new MessageEvent("message", {
@@ -70,8 +68,8 @@ Deno.test("HyperliquidEventTarget Tests", async (t) => {
         });
         fakeWs.dispatchEvent(event);
 
-        assert(Array.isArray(txDetails), "Should be an array of transaction details");
-        const firstTx = txDetails[0];
+        assert(Array.isArray(receivedMsg), "Should be an array of transaction details");
+        const firstTx = receivedMsg[0];
         assertEquals(firstTx.block, 234);
         assertEquals(firstTx.user, "0x1234");
     });
@@ -80,15 +78,15 @@ Deno.test("HyperliquidEventTarget Tests", async (t) => {
         const fakeWs = new EventTarget() as WebSocket;
         const eventTarget = new HyperliquidEventTarget(fakeWs);
 
-        let eventTriggered = false;
+        let triggered = false;
         eventTarget.addEventListener("anything", () => {
-            eventTriggered = true;
+            triggered = true;
         });
 
         const event = new MessageEvent("message", { data: "{ invalid json ... " });
         fakeWs.dispatchEvent(event);
 
-        assertEquals(eventTriggered, false);
+        assertFalse(triggered);
     });
 
     await t.step("Unrecognized message shape => no event dispatched", () => {
@@ -100,9 +98,9 @@ Deno.test("HyperliquidEventTarget Tests", async (t) => {
             triggered = true;
         });
 
-        const event = new MessageEvent("message", { data: JSON.stringify({ foo: "bar" }) });
+        const event = new MessageEvent("message", { data: '{"foo":"bar"}' });
         fakeWs.dispatchEvent(event);
 
-        assertEquals(triggered, false);
+        assertFalse(triggered);
     });
 });

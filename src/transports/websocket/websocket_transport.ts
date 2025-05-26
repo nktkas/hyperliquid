@@ -148,7 +148,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
      * @returns A promise that resolves with parsed JSON response body.
      * @throws {WebSocketRequestError} - An error that occurs when a WebSocket request fails.
      */
-    request(type: "info" | "exchange" | "explorer", payload: unknown, signal?: AbortSignal): Promise<unknown> {
+    request<T>(type: "info" | "exchange" | "explorer", payload: unknown, signal?: AbortSignal): Promise<T> {
         const combinedTimeoutSignal = this._getCombinedTimeoutSignal(signal);
         return this._wsRequester.request("post", {
             type: type === "exchange" ? "action" : type,
@@ -168,10 +168,10 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      * @throws {WebSocketRequestError} - An error that occurs when a WebSocket request fails.
      */
-    async subscribe(
+    async subscribe<T>(
         channel: string,
         payload: unknown,
-        listener: (data: CustomEvent) => void,
+        listener: (data: CustomEvent<T>) => void,
         signal?: AbortSignal,
     ): Promise<Subscription> {
         // Create a unique identifier for the subscription

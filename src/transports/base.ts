@@ -17,11 +17,7 @@ export interface IRequestTransport extends Partial<AsyncDisposable> {
      * @param signal - An ptional abort signal.
      * @returns A promise that resolves with parsed JSON response body.
      */
-    request(
-        endpoint: "info" | "exchange" | "explorer",
-        payload: unknown,
-        signal?: AbortSignal,
-    ): Promise<unknown>;
+    request<T>(endpoint: "info" | "exchange" | "explorer", payload: unknown, signal?: AbortSignal): Promise<T>;
 }
 
 /**
@@ -38,10 +34,10 @@ export interface ISubscriptionTransport extends Partial<AsyncDisposable> {
      * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      */
-    subscribe(
+    subscribe<T>(
         channel: string,
         payload: unknown,
-        listener: (data: CustomEvent) => void,
+        listener: (data: CustomEvent<T>) => void,
         signal?: AbortSignal,
     ): Promise<Subscription>;
 }

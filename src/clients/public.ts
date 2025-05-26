@@ -239,8 +239,7 @@ export type UserDetailsParameters = Omit<UserDetailsRequest, "type">;
  */
 export class PublicClient<
     T extends IRequestTransport = IRequestTransport,
-> implements AsyncDisposable {
-    /** The transport used to connect to the Hyperliquid API. */
+> implements PublicClientParameters, AsyncDisposable {
     transport: T;
 
     /**
@@ -285,7 +284,7 @@ export class PublicClient<
             type: "allMids",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<AllMids>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -310,7 +309,7 @@ export class PublicClient<
             type: "blockDetails",
             ...args,
         };
-        return this.transport.request("explorer", request, signal) as Promise<BlockDetailsResponse>;
+        return this.transport.request("explorer", request, signal);
     }
 
     /**
@@ -339,7 +338,7 @@ export class PublicClient<
             type: "candleSnapshot",
             req: args,
         };
-        return this.transport.request("info", request, signal) as Promise<Candle[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -364,7 +363,7 @@ export class PublicClient<
             type: "clearinghouseState",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<PerpsClearinghouseState>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -389,7 +388,7 @@ export class PublicClient<
             type: "delegations",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<Delegation[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -414,7 +413,7 @@ export class PublicClient<
             type: "delegatorHistory",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<DelegatorUpdate[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -439,7 +438,7 @@ export class PublicClient<
             type: "delegatorRewards",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<DelegatorReward[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -464,7 +463,7 @@ export class PublicClient<
             type: "delegatorSummary",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<DelegatorSummary>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -489,7 +488,7 @@ export class PublicClient<
             type: "extraAgents",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<ExtraAgent[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -514,7 +513,7 @@ export class PublicClient<
             type: "frontendOpenOrders",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<FrontendOrder[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -542,7 +541,7 @@ export class PublicClient<
             type: "fundingHistory",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<FundingHistory[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -567,7 +566,7 @@ export class PublicClient<
             type: "historicalOrders",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<OrderStatus<FrontendOrder>[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -592,7 +591,7 @@ export class PublicClient<
             type: "isVip",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<boolean>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -617,7 +616,7 @@ export class PublicClient<
             type: "l2Book",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<Book>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -642,7 +641,7 @@ export class PublicClient<
             type: "legalCheck",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<LegalCheck>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -667,7 +666,7 @@ export class PublicClient<
             type: "maxBuilderFee",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<number>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -696,7 +695,7 @@ export class PublicClient<
             type: "meta",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<PerpsMeta>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -719,7 +718,7 @@ export class PublicClient<
         const request: MetaAndAssetCtxsRequest = {
             type: "metaAndAssetCtxs",
         };
-        return this.transport.request("info", request, signal) as Promise<PerpsMetaAndAssetCtxs>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -744,7 +743,7 @@ export class PublicClient<
             type: "openOrders",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<Order[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -769,7 +768,7 @@ export class PublicClient<
             type: "orderStatus",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<OrderLookup>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -792,7 +791,7 @@ export class PublicClient<
         const request: PerpDeployAuctionStatusRequest = {
             type: "perpDeployAuctionStatus",
         };
-        return this.transport.request("info", request, signal) as Promise<DeployAuctionStatus>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -815,7 +814,7 @@ export class PublicClient<
         const request: PerpDexsRequest = {
             type: "perpDexs",
         };
-        return this.transport.request("info", request, signal) as Promise<(PerpDex | null)[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -839,7 +838,7 @@ export class PublicClient<
         const request: PerpsAtOpenInterestCapRequest = {
             type: "perpsAtOpenInterestCap",
         };
-        return this.transport.request("info", request, signal) as Promise<string[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -864,7 +863,7 @@ export class PublicClient<
             type: "portfolio",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<PortfolioPeriods>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -887,7 +886,7 @@ export class PublicClient<
         const request: PredictedFundingsRequest = {
             type: "predictedFundings",
         };
-        return this.transport.request("info", request, signal) as Promise<PredictedFunding[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -912,7 +911,7 @@ export class PublicClient<
             type: "preTransferCheck",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<PreTransferCheck>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -937,7 +936,7 @@ export class PublicClient<
             type: "referral",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<Referral>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -965,7 +964,7 @@ export class PublicClient<
             type: "spotClearinghouseState",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<SpotClearinghouseState>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -990,7 +989,7 @@ export class PublicClient<
             type: "spotDeployState",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<SpotDeployState>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -1013,7 +1012,7 @@ export class PublicClient<
         const request: SpotMetaRequest = {
             type: "spotMeta",
         };
-        return this.transport.request("info", request, signal) as Promise<SpotMeta>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -1036,7 +1035,7 @@ export class PublicClient<
         const request: SpotMetaAndAssetCtxsRequest = {
             type: "spotMetaAndAssetCtxs",
         };
-        return this.transport.request("info", request, signal) as Promise<SpotMetaAndAssetCtxs>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -1061,7 +1060,7 @@ export class PublicClient<
             type: "subAccounts",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<SubAccount[] | null>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -1086,7 +1085,7 @@ export class PublicClient<
             type: "tokenDetails",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<TokenDetails>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -1111,7 +1110,7 @@ export class PublicClient<
             type: "twapHistory",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<TwapHistory[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -1136,7 +1135,7 @@ export class PublicClient<
             type: "txDetails",
             ...args,
         };
-        return this.transport.request("explorer", request, signal) as Promise<TxDetailsResponse>;
+        return this.transport.request("explorer", request, signal);
     }
 
     /**
@@ -1161,7 +1160,7 @@ export class PublicClient<
             type: "userDetails",
             ...args,
         };
-        return this.transport.request("explorer", request, signal) as Promise<UserDetailsResponse>;
+        return this.transport.request("explorer", request, signal);
     }
 
     /**
@@ -1186,7 +1185,7 @@ export class PublicClient<
             type: "userFees",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<UserFees>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -1211,7 +1210,7 @@ export class PublicClient<
             type: "userFills",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<Fill[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -1239,7 +1238,7 @@ export class PublicClient<
             type: "userFillsByTime",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<Fill[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -1267,7 +1266,7 @@ export class PublicClient<
             type: "userFunding",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<UserFundingUpdate[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -1298,7 +1297,7 @@ export class PublicClient<
             type: "userNonFundingLedgerUpdates",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<UserNonFundingLedgerUpdate[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -1323,7 +1322,7 @@ export class PublicClient<
             type: "userRateLimit",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<UserRateLimit>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -1348,7 +1347,7 @@ export class PublicClient<
             type: "userRole",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<UserRole>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -1376,7 +1375,7 @@ export class PublicClient<
             type: "userToMultiSigSigners",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<MultiSigSigners | null>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -1401,7 +1400,7 @@ export class PublicClient<
             type: "userTwapSliceFills",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<TwapSliceFill[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -1429,7 +1428,7 @@ export class PublicClient<
             type: "userTwapSliceFillsByTime",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<TwapSliceFill[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -1454,7 +1453,7 @@ export class PublicClient<
             type: "userVaultEquities",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<VaultEquity[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -1477,7 +1476,7 @@ export class PublicClient<
         const request: ValidatorSummariesRequest = {
             type: "validatorSummaries",
         };
-        return this.transport.request("info", request, signal) as Promise<ValidatorSummary[]>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -1502,7 +1501,7 @@ export class PublicClient<
             type: "vaultDetails",
             ...args,
         };
-        return this.transport.request("info", request, signal) as Promise<VaultDetails | null>;
+        return this.transport.request("info", request, signal);
     }
 
     /**
@@ -1526,7 +1525,7 @@ export class PublicClient<
         const request: VaultSummariesRequest = {
             type: "vaultSummaries",
         };
-        return this.transport.request("info", request, signal) as Promise<VaultSummary[]>;
+        return this.transport.request("info", request, signal);
     }
 
     async [Symbol.asyncDispose](): Promise<void> {
