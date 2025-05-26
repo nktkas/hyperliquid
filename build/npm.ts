@@ -82,8 +82,8 @@ try {
             },
         },
         compilerOptions: {
-            lib: ["ES2022", "DOM", "ESNext.Disposable"],
-            target: "ES2022",
+            lib: ["ESNext", "DOM"],
+            target: "Latest",
         },
     });
 
