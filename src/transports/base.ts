@@ -31,24 +31,15 @@ export interface ISubscriptionTransport extends Partial<AsyncDisposable> {
      * @param channel - The event channel to listen to.
      * @param payload - The payload to send with the subscription request.
      * @param listener - The function to call when the event is dispatched.
-     * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      */
-    subscribe<T>(
-        channel: string,
-        payload: unknown,
-        listener: (data: CustomEvent<T>) => void,
-        signal?: AbortSignal,
-    ): Promise<Subscription>;
+    subscribe<T>(channel: string, payload: unknown, listener: (data: CustomEvent<T>) => void): Promise<Subscription>;
 }
 
 /** Controls event subscription lifecycle. */
 export interface Subscription {
-    /**
-     * Unsubscribes from the event and sends an unsubscribe request to the server.
-     * @param signal - An optional abort signal for canceling the unsubscribe request.
-     */
-    unsubscribe(signal?: AbortSignal): Promise<void>;
+    /** Unsubscribes from the event and sends an unsubscribe request to the server. */
+    unsubscribe(): Promise<void>;
 }
 
 /** Base class for all transport-related errors. */

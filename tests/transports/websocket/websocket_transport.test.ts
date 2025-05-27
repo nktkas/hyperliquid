@@ -386,19 +386,6 @@ Deno.test("WebSocketTransport", async (t) => {
         );
 
         await t.step("Reject", async (t) => {
-            await t.step("Reject if AbortSignal is aborted", async () => {
-                // Setup
-                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-success" });
-                await transport.ready();
-
-                const signal = AbortSignal.abort(new Error("Aborted"));
-                const promise = transport.subscribe("test", { channel: "test", extra: "data" }, () => {}, signal);
-                await assertRejects(() => promise, Error, "Aborted");
-
-                // Clean up
-                await transport.close();
-            });
-
             await t.step("Reject after timeout expires", async () => {
                 // Setup
                 const transport = new WebSocketTransport({
@@ -480,21 +467,6 @@ Deno.test("WebSocketTransport", async (t) => {
         });
 
         await t.step("Reject", async (t) => {
-            await t.step("Reject if AbortSignal is aborted", async () => {
-                // Setup
-                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=unsubscribe-success" });
-                await transport.ready();
-
-                const sub = await transport.subscribe("test", { channel: "test" }, () => {});
-
-                const signal = AbortSignal.abort(new Error("Unsub aborted"));
-                const promise = sub.unsubscribe(signal);
-                await assertRejects(() => promise, Error, "Unsub aborted");
-
-                // Clean up
-                await transport.close();
-            });
-
             await t.step("Reject after timeout expires", async () => {
                 // Setup
                 const transport = new WebSocketTransport({

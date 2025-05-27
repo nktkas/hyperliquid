@@ -123,7 +123,6 @@ export class EventClient<
      * Subscribe to context updates for a specific perpetual asset.
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
-     * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -142,7 +141,6 @@ export class EventClient<
     activeAssetCtx(
         args: EventActiveAssetCtxParameters,
         listener: (data: WsActiveAssetCtx | WsActiveSpotAssetCtx) => void,
-        signal?: AbortSignal,
     ): Promise<Subscription> {
         const channel = args.coin.startsWith("@") ? "activeSpotAssetCtx" : "activeAssetCtx";
         const payload: WsActiveAssetCtxRequest = {
@@ -153,14 +151,13 @@ export class EventClient<
             if (e.detail.coin === args.coin) {
                 listener(e.detail);
             }
-        }, signal);
+        });
     }
 
     /**
      * Subscribe to trading data updates for a specific asset and user.
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
-     * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -179,7 +176,6 @@ export class EventClient<
     activeAssetData(
         args: EventActiveAssetDataParameters,
         listener: (data: WsActiveAssetData) => void,
-        signal?: AbortSignal,
     ): Promise<Subscription> {
         const payload: WsActiveAssetDataRequest = {
             type: "activeAssetData",
@@ -190,13 +186,12 @@ export class EventClient<
             if (e.detail.coin === args.coin && e.detail.user === args.user.toLowerCase()) {
                 listener(e.detail);
             }
-        }, signal);
+        });
     }
 
     /**
      * Subscribe to mid prices for all actively traded assets.
      * @param listener - The callback function to be called when the event is received.
-     * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -212,24 +207,17 @@ export class EventClient<
      * });
      * ```
      */
-    allMids(listener: (data: WsAllMids) => void, signal?: AbortSignal): Promise<Subscription>;
+    allMids(listener: (data: WsAllMids) => void): Promise<Subscription>;
     allMids(
         args: WsAllMidsParameters,
         listener: (data: WsAllMids) => void,
-        signal?: AbortSignal,
     ): Promise<Subscription>;
     allMids(
         args_or_listener: WsAllMidsParameters | ((data: WsAllMids) => void),
-        listener_or_signal?: ((data: WsAllMids) => void) | AbortSignal,
-        maybeSignal?: AbortSignal,
+        maybeListener?: (data: WsAllMids) => void,
     ): Promise<Subscription> {
         const args = typeof args_or_listener === "function" ? {} : args_or_listener;
-        const listener = typeof args_or_listener === "function"
-            ? args_or_listener
-            : listener_or_signal as (data: WsAllMids) => void;
-        const signal = typeof args_or_listener === "function"
-            ? listener_or_signal as AbortSignal | undefined
-            : maybeSignal;
+        const listener = typeof args_or_listener === "function" ? args_or_listener : maybeListener!;
 
         const payload: WsAllMidsRequest = {
             type: "allMids",
@@ -237,14 +225,13 @@ export class EventClient<
         };
         return this.transport.subscribe<WsAllMids>(payload.type, payload, (e) => {
             listener(e.detail);
-        }, signal);
+        });
     }
 
     /**
      * Subscribe to best bid and offer updates for a specific asset.
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
-     * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -260,11 +247,7 @@ export class EventClient<
      * });
      * ```
      */
-    bbo(
-        args: EventBboParameters,
-        listener: (data: WsBbo) => void,
-        signal?: AbortSignal,
-    ): Promise<Subscription> {
+    bbo(args: EventBboParameters, listener: (data: WsBbo) => void): Promise<Subscription> {
         const payload: WsBboRequest = {
             type: "bbo",
             coin: args.coin,
@@ -273,14 +256,13 @@ export class EventClient<
             if (e.detail.coin === args.coin) {
                 listener(e.detail);
             }
-        }, signal);
+        });
     }
 
     /**
      * Subscribe to candlestick data updates for a specific asset.
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
-     * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -296,11 +278,7 @@ export class EventClient<
      * });
      * ```
      */
-    candle(
-        args: EventCandleParameters,
-        listener: (data: Candle) => void,
-        signal?: AbortSignal,
-    ): Promise<Subscription> {
+    candle(args: EventCandleParameters, listener: (data: Candle) => void): Promise<Subscription> {
         const payload: WsCandleRequest = {
             type: "candle",
             coin: args.coin,
@@ -310,13 +288,12 @@ export class EventClient<
             if (e.detail.s === args.coin && e.detail.i === args.interval) {
                 listener(e.detail);
             }
-        }, signal);
+        });
     }
 
     /**
      * Subscribe to explorer block updates.
      * @param listener - The callback function to be called when the event is received.
-     * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      * @note Make sure the endpoint in the {@link transport} supports this method.
      *
@@ -333,22 +310,18 @@ export class EventClient<
      * });
      * ```
      */
-    explorerBlock(
-        listener: (data: WsBlockDetails[]) => void,
-        signal?: AbortSignal,
-    ): Promise<Subscription> {
+    explorerBlock(listener: (data: WsBlockDetails[]) => void): Promise<Subscription> {
         const payload: WsExplorerBlockRequest = {
             type: "explorerBlock",
         };
         return this.transport.subscribe<WsBlockDetails[]>("_explorerBlock", payload, (e) => { // Internal channel as it does not have its own channel
             listener(e.detail);
-        }, signal);
+        });
     }
 
     /**
      * Subscribe to explorer transaction updates.
      * @param listener - The callback function to be called when the event is received.
-     * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      * @note Make sure the endpoint in the {@link transport} supports this method.
      *
@@ -365,23 +338,19 @@ export class EventClient<
      * });
      * ```
      */
-    explorerTxs(
-        listener: (data: TxDetails[]) => void,
-        signal?: AbortSignal,
-    ): Promise<Subscription> {
+    explorerTxs(listener: (data: TxDetails[]) => void): Promise<Subscription> {
         const payload: WsExplorerTxsRequest = {
             type: "explorerTxs",
         };
         return this.transport.subscribe<TxDetails[]>("_explorerTxs", payload, (e) => { // Internal channel as it does not have its own channel
             listener(e.detail);
-        }, signal);
+        });
     }
 
     /**
      * Subscribe to L2 order book updates for a specific asset.
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
-     * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -397,11 +366,7 @@ export class EventClient<
      * });
      * ```
      */
-    l2Book(
-        args: EventL2BookParameters,
-        listener: (data: Book) => void,
-        signal?: AbortSignal,
-    ): Promise<Subscription> {
+    l2Book(args: EventL2BookParameters, listener: (data: Book) => void): Promise<Subscription> {
         const payload: WsL2BookRequest = {
             type: "l2Book",
             coin: args.coin,
@@ -412,14 +377,13 @@ export class EventClient<
             if (e.detail.coin === args.coin) {
                 listener(e.detail);
             }
-        }, signal);
+        });
     }
 
     /**
      * Subscribe to notification updates for a specific user.
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
-     * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -435,25 +399,20 @@ export class EventClient<
      * });
      * ```
      */
-    notification(
-        args: EventNotificationParameters,
-        listener: (data: WsNotification) => void,
-        signal?: AbortSignal,
-    ): Promise<Subscription> {
+    notification(args: EventNotificationParameters, listener: (data: WsNotification) => void): Promise<Subscription> {
         const payload: WsNotificationRequest = {
             type: "notification",
             user: args.user,
         };
         return this.transport.subscribe<WsNotification>(payload.type, payload, (e) => {
             listener(e.detail);
-        }, signal);
+        });
     }
 
     /**
      * Subscribe to order status updates for a specific user.
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
-     * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -472,7 +431,6 @@ export class EventClient<
     orderUpdates(
         args: EventOrderUpdatesParameters,
         listener: (data: OrderStatus<Order>[]) => void,
-        signal?: AbortSignal,
     ): Promise<Subscription> {
         const payload: WsOrderUpdatesRequest = {
             type: "orderUpdates",
@@ -480,14 +438,13 @@ export class EventClient<
         };
         return this.transport.subscribe<OrderStatus<Order>[]>(payload.type, payload, (e) => {
             listener(e.detail);
-        }, signal);
+        });
     }
 
     /**
      * Subscribe to real-time trade updates for a specific asset.
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
-     * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -503,11 +460,7 @@ export class EventClient<
      * });
      * ```
      */
-    trades(
-        args: EventTradesParameters,
-        listener: (data: WsTrade[]) => void,
-        signal?: AbortSignal,
-    ): Promise<Subscription> {
+    trades(args: EventTradesParameters, listener: (data: WsTrade[]) => void): Promise<Subscription> {
         const payload: WsTradesRequest = {
             type: "trades",
             coin: args.coin,
@@ -516,14 +469,13 @@ export class EventClient<
             if (e.detail[0]?.coin === args.coin) {
                 listener(e.detail);
             }
-        }, signal);
+        });
     }
 
     /**
      * Subscribe to non-order events for a specific user.
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
-     * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @note Different subscriptions cannot be distinguished from each other.
@@ -541,25 +493,20 @@ export class EventClient<
      * });
      * ```
      */
-    userEvents(
-        args: EventUserEventsParameters,
-        listener: (data: WsUserEvent) => void,
-        signal?: AbortSignal,
-    ): Promise<Subscription> {
+    userEvents(args: EventUserEventsParameters, listener: (data: WsUserEvent) => void): Promise<Subscription> {
         const payload: WsUserEventsRequest = {
             type: "userEvents",
             user: args.user,
         };
         return this.transport.subscribe<WsUserEvent>("user", payload, (e) => {
             listener(e.detail);
-        }, signal);
+        });
     }
 
     /**
      * Subscribe to trade fill updates for a specific user.
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
-     * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -575,11 +522,7 @@ export class EventClient<
      * });
      * ```
      */
-    userFills(
-        args: EventUserFillsParameters,
-        listener: (data: WsUserFills) => void,
-        signal?: AbortSignal,
-    ): Promise<Subscription> {
+    userFills(args: EventUserFillsParameters, listener: (data: WsUserFills) => void): Promise<Subscription> {
         const payload: WsUserFillsRequest = {
             type: "userFills",
             user: args.user,
@@ -589,14 +532,13 @@ export class EventClient<
             if (e.detail.user === args.user.toLowerCase()) {
                 listener(e.detail);
             }
-        }, signal);
+        });
     }
 
     /**
      * Subscribe to funding payment updates for a specific user.
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
-     * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -612,11 +554,7 @@ export class EventClient<
      * });
      * ```
      */
-    userFundings(
-        args: EventUserFundingsParameters,
-        listener: (data: WsUserFundings) => void,
-        signal?: AbortSignal,
-    ): Promise<Subscription> {
+    userFundings(args: EventUserFundingsParameters, listener: (data: WsUserFundings) => void): Promise<Subscription> {
         const payload: WsUserFundingsRequest = {
             type: "userFundings",
             user: args.user,
@@ -625,14 +563,13 @@ export class EventClient<
             if (e.detail.user === args.user.toLowerCase()) {
                 listener(e.detail);
             }
-        }, signal);
+        });
     }
 
     /**
      * Subscribe to non-funding ledger updates for a specific user.
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
-     * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -651,7 +588,6 @@ export class EventClient<
     userNonFundingLedgerUpdates(
         args: EventUserNonFundingLedgerUpdatesParameters,
         listener: (data: WsUserNonFundingLedgerUpdates) => void,
-        signal?: AbortSignal,
     ): Promise<Subscription> {
         const payload: WsUserNonFundingLedgerUpdatesRequest = {
             type: "userNonFundingLedgerUpdates",
@@ -661,14 +597,13 @@ export class EventClient<
             if (e.detail.user === args.user.toLowerCase()) {
                 listener(e.detail);
             }
-        }, signal);
+        });
     }
 
     /**
      * Subscribe to TWAP order history updates for a specific user.
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
-     * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -684,11 +619,7 @@ export class EventClient<
      * });
      * ```
      */
-    userTwapHistory(
-        args: EventUserTwapHistory,
-        listener: (data: WsUserTwapHistory) => void,
-        signal?: AbortSignal,
-    ): Promise<Subscription> {
+    userTwapHistory(args: EventUserTwapHistory, listener: (data: WsUserTwapHistory) => void): Promise<Subscription> {
         const payload: WsUserTwapHistoryRequest = {
             type: "userTwapHistory",
             user: args.user,
@@ -697,14 +628,13 @@ export class EventClient<
             if (e.detail.user === args.user.toLowerCase()) {
                 listener(e.detail);
             }
-        }, signal);
+        });
     }
 
     /**
      * Subscribe to TWAP execution updates for a specific user.
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
-     * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -723,7 +653,6 @@ export class EventClient<
     userTwapSliceFills(
         args: EventUserTwapSliceFills,
         listener: (data: WsUserTwapSliceFills) => void,
-        signal?: AbortSignal,
     ): Promise<Subscription> {
         const payload: WsUserTwapSliceFillsRequest = {
             type: "userTwapSliceFills",
@@ -733,14 +662,13 @@ export class EventClient<
             if (e.detail.user === args.user.toLowerCase()) {
                 listener(e.detail);
             }
-        }, signal);
+        });
     }
 
     /**
      * Subscribe to comprehensive user and market data updates.
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
-     * @param signal - An optional abort signal for canceling the subscription request.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -756,11 +684,7 @@ export class EventClient<
      * });
      * ```
      */
-    webData2(
-        args: EventWebData2Parameters,
-        listener: (data: WsWebData2) => void,
-        signal?: AbortSignal,
-    ): Promise<Subscription> {
+    webData2(args: EventWebData2Parameters, listener: (data: WsWebData2) => void): Promise<Subscription> {
         const payload: WsWebData2Request = {
             type: "webData2",
             user: args.user,
@@ -769,7 +693,7 @@ export class EventClient<
             if (e.detail.user === args.user.toLowerCase()) {
                 listener(e.detail);
             }
-        }, signal);
+        });
     }
 
     async [Symbol.asyncDispose](): Promise<void> {
