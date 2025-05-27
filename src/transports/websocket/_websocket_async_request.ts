@@ -35,15 +35,13 @@ export class WebSocketRequestError extends TransportError {
  */
 export class WebSocketAsyncRequest {
     protected lastId: number = 0;
-    protected queue: Map<
-        number | string,
-        {
-            // deno-lint-ignore no-explicit-any
-            resolve: (value?: any) => void;
-            // deno-lint-ignore no-explicit-any
-            reject: (reason?: any) => void;
-        }
-    > = new Map();
+    protected queue: {
+        id: number | string;
+        // deno-lint-ignore no-explicit-any
+        resolve: (value?: any) => void;
+        // deno-lint-ignore no-explicit-any
+        reject: (reason?: any) => void;
+    }[] = [];
     lastRequestTime: number = 0;
 
     /**
@@ -55,17 +53,17 @@ export class WebSocketAsyncRequest {
         // Monitor responses and match the pending request
         hlEvents.addEventListener("subscriptionResponse", (event) => {
             // Use a stringified request as an id
-            const id = WebSocketAsyncRequest.requestToId(event.detail.subscription);
-            this.queue.get(id)?.resolve(event.detail);
+            const id = WebSocketAsyncRequest.requestToId(event.detail);
+            this.queue.findLast((item) => item.id === id)?.resolve(event.detail);
         });
         hlEvents.addEventListener("post", (event) => {
             const data = event.detail.response.type === "info"
                 ? event.detail.response.payload.data
                 : event.detail.response.payload;
-            this.queue.get(event.detail.id)?.resolve(data);
+            this.queue.findLast((item) => item.id === event.detail.id)?.resolve(data);
         });
         hlEvents.addEventListener("pong", () => {
-            this.queue.get("ping")?.resolve();
+            this.queue.findLast((item) => item.id === "ping")?.resolve();
         });
         hlEvents.addEventListener("error", (event) => {
             try {
@@ -75,7 +73,7 @@ export class WebSocketAsyncRequest {
                     const parsedRequest = JSON.parse(request) as Record<string, unknown>;
                     if ("id" in parsedRequest && typeof parsedRequest.id === "number") {
                         // If a post request was sent, it is possible to get the id from the request
-                        this.queue.get(parsedRequest.id)?.reject(
+                        this.queue.findLast((item) => item.id === parsedRequest.id)?.reject(
                             new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
                         );
                     } else if (
@@ -84,14 +82,14 @@ export class WebSocketAsyncRequest {
                         parsedRequest.subscription !== null
                     ) {
                         // If a subscription/unsubscribe request was sent, use the request as an id
-                        const id = WebSocketAsyncRequest.requestToId(parsedRequest.subscription);
-                        this.queue.get(id)?.reject(
+                        const id = WebSocketAsyncRequest.requestToId(parsedRequest);
+                        this.queue.findLast((item) => item.id === id)?.reject(
                             new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
                         );
                     } else {
                         // If the request is not recognized, use the parsed request as an id
                         const id = WebSocketAsyncRequest.requestToId(parsedRequest);
-                        this.queue.get(id)?.reject(
+                        this.queue.findLast((item) => item.id === id)?.reject(
                             new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
                         );
                     }
@@ -106,7 +104,7 @@ export class WebSocketAsyncRequest {
             this.queue.forEach(({ reject }) => {
                 reject(new WebSocketRequestError("Cannot complete WebSocket request: connection is closed"));
             });
-            this.queue.clear();
+            this.queue = [];
         });
     }
 
@@ -137,8 +135,8 @@ export class WebSocketAsyncRequest {
             id = "ping";
             request = { method };
         } else {
-            id = WebSocketAsyncRequest.requestToId(payload);
             request = { method, subscription: payload };
+            id = WebSocketAsyncRequest.requestToId(request);
         }
 
         // Send the request
@@ -147,13 +145,15 @@ export class WebSocketAsyncRequest {
 
         // Wait for a response
         const { promise, resolve, reject } = Promise.withResolvers<T>();
-        this.queue.set(id, { resolve, reject });
+        this.queue.push({ id, resolve, reject });
 
         const onAbort = () => reject(signal?.reason);
         signal?.addEventListener("abort", onAbort, { once: true });
 
         return await promise.finally(() => {
-            this.queue.delete(id);
+            const index = this.queue.findLastIndex((item) => item.id === id);
+            if (index !== -1) this.queue.splice(index, 1);
+
             signal?.removeEventListener("abort", onAbort);
         });
     }

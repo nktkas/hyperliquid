@@ -330,7 +330,7 @@ Deno.test("WebSocketTransport", async (t) => {
                 transport.subscribe("test", payload, listener2);
 
                 // @ts-ignore - Accessing private properties for testing
-                assertEquals(transport._wsRequester.queue.size, 1);
+                assertEquals(transport._wsRequester.queue.length, 1);
 
                 // Clean up
                 await transport.close();
