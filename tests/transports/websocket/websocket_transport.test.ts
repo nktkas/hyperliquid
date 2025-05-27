@@ -1,7 +1,7 @@
 import { assert, assertEquals, assertFalse, assertRejects } from "jsr:@std/assert@^1.0.10";
 import { WebSocketTransport } from "../../../src/transports/websocket/websocket_transport.ts";
 
-Deno.test("WebSocketTransport Tests", async (t) => {
+Deno.test("WebSocketTransport", async (t) => {
     const server = Deno.serve(
         { port: 8080, onListen: () => {} },
         (request) => {
@@ -50,7 +50,7 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                         if (testCase === "subscribe-fail") {
                             socket.send(JSON.stringify({
                                 channel: "error",
-                                data: "Subscription failed: " + JSON.stringify(data.subscription),
+                                data: "Subscription failed: " + JSON.stringify(data),
                             }));
                         } else if (testCase === "subscribe-timeout") {
                             // Do nothing
@@ -59,29 +59,17 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                                 socket.send(JSON.stringify({
                                     channel: "subscriptionResponse",
                                     data: {
-                                        method: "subscribe",
+                                        method: data.method,
                                         subscription: data.subscription,
                                     },
                                 }));
                             }, data.subscription.delay);
                         } else if (testCase === "subscribe-delay") {
                             setTimeout(() => {
-                                socket.send(JSON.stringify({
-                                    channel: "subscriptionResponse",
-                                    data: {
-                                        method: "subscribe",
-                                        subscription: data.subscription,
-                                    },
-                                }));
+                                socket.send(JSON.stringify({ channel: "subscriptionResponse", data }));
                             }, 5000);
                         } else { // Default
-                            socket.send(JSON.stringify({
-                                channel: "subscriptionResponse",
-                                data: {
-                                    method: "subscribe",
-                                    subscription: data.subscription,
-                                },
-                            }));
+                            socket.send(JSON.stringify({ channel: "subscriptionResponse", data }));
 
                             if (data.subscription && data.subscription.channel) {
                                 socket.send(JSON.stringify({
@@ -94,18 +82,12 @@ Deno.test("WebSocketTransport Tests", async (t) => {
                         if (testCase === "unsubscribe-fail") {
                             socket.send(JSON.stringify({
                                 channel: "error",
-                                data: "Unsubscribe failed: " + JSON.stringify(data.subscription),
+                                data: "Unsubscribe failed: " + JSON.stringify(data),
                             }));
                         } else if (testCase === "unsubscribe-timeout") {
                             // Do nothing
                         } else { // Default
-                            socket.send(JSON.stringify({
-                                channel: "subscriptionResponse",
-                                data: {
-                                    method: "unsubscribe",
-                                    subscription: data.subscription,
-                                },
-                            }));
+                            socket.send(JSON.stringify({ channel: "subscriptionResponse", data }));
                         }
                     } else if (data.method === "ping") {
                         socket.send(JSON.stringify({ channel: "pong" }));

@@ -44,7 +44,7 @@ export interface WebSocketTransportOptions {
         /**
          * Timeout for the ping request in ms.
          * Set to `null` to disable.
-         * same as {@link timeout} for requests.
+         * @defaultValue same as {@link timeout} for requests.
          */
         timeout?: number | null;
     };

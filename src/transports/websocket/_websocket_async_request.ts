@@ -1,4 +1,5 @@
 import { TransportError } from "../base.ts";
+import type { ReconnectingWebSocket } from "./_reconnecting_websocket.ts";
 import type { HyperliquidEventTarget } from "./_hyperliquid_event_target.ts";
 
 interface PostRequest {
@@ -50,7 +51,7 @@ export class WebSocketAsyncRequest {
      * @param socket - WebSocket connection instance for sending requests to the Hyperliquid WebSocket API
      * @param hlEvents - Used to recognize Hyperliquid responses and match them with sent requests
      */
-    constructor(protected socket: WebSocket, hlEvents: HyperliquidEventTarget) {
+    constructor(protected socket: ReconnectingWebSocket, hlEvents: HyperliquidEventTarget) {
         // Monitor responses and match the pending request
         hlEvents.addEventListener("subscriptionResponse", (event) => {
             // Use a stringified request as an id
@@ -141,7 +142,7 @@ export class WebSocketAsyncRequest {
         }
 
         // Send the request
-        this.socket.send(JSON.stringify(request));
+        this.socket.send(JSON.stringify(request), signal);
         this.lastRequestTime = Date.now();
 
         // Wait for a response

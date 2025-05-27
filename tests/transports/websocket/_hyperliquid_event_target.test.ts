@@ -1,7 +1,7 @@
 import { assert, assertEquals, assertFalse } from "jsr:@std/assert@^1.0.10";
 import { HyperliquidEventTarget } from "../../../src/transports/websocket/_hyperliquid_event_target.ts";
 
-Deno.test("HyperliquidEventTarget Tests", async (t) => {
+Deno.test("HyperliquidEventTarget", async (t) => {
     await t.step("HyperliquidMsg => dispatch event with msg.channel name", () => {
         const fakeWs = new EventTarget() as WebSocket;
         const eventTarget = new HyperliquidEventTarget(fakeWs);

@@ -43,21 +43,26 @@ export interface ReconnectingWebSocketOptions {
 
 /** Message buffer strategy interface. */
 export interface MessageBufferStrategy {
-    push(data: string | ArrayBufferLike | Blob | ArrayBufferView): void;
+    push(data: string | ArrayBufferLike | Blob | ArrayBufferView, signal?: AbortSignal): void;
     [Symbol.iterator](): Iterator<string | ArrayBufferLike | Blob | ArrayBufferView>;
 }
 
 /** Simple FIFO (First In, First Out) buffer implementation. */
 class FIFOMessageBuffer implements MessageBufferStrategy {
-    queue: (string | ArrayBufferLike | Blob | ArrayBufferView)[] = [];
+    queue: {
+        data: string | ArrayBufferLike | Blob | ArrayBufferView;
+        signal?: AbortSignal;
+    }[] = [];
 
-    push(data: string | ArrayBufferLike | Blob | ArrayBufferView): void {
-        this.queue.push(data);
+    push(data: string | ArrayBufferLike | Blob | ArrayBufferView, signal?: AbortSignal): void {
+        this.queue.push({ data, signal });
     }
 
     *[Symbol.iterator](): Iterator<string | ArrayBufferLike | Blob | ArrayBufferView> {
         while (this.queue.length > 0) {
-            yield this.queue.shift()!;
+            const { data, signal } = this.queue.shift()!;
+            if (signal?.aborted) continue;
+            yield data;
         }
     }
 }
@@ -279,11 +284,13 @@ export class ReconnectingWebSocket implements WebSocket {
     }
 
     /**
+     * @param signal - `AbortSignal` to cancel sending a message if it was in the buffer.
      * @note If the connection is not open, the data will be buffered and sent when the connection is established.
      */
-    send(data: string | ArrayBufferLike | Blob | ArrayBufferView): void {
+    send(data: string | ArrayBufferLike | Blob | ArrayBufferView, signal?: AbortSignal): void {
+        if (signal?.aborted) return;
         if (this._socket.readyState !== ReconnectingWebSocket.OPEN && !this.reconnectAbortController.signal.aborted) {
-            this.reconnectOptions.messageBuffer.push(data);
+            this.reconnectOptions.messageBuffer.push(data, signal);
         } else {
             this._socket.send(data);
         }

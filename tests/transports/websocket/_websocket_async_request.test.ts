@@ -4,9 +4,13 @@ import {
     WebSocketRequestError,
 } from "../../../src/transports/websocket/_websocket_async_request.ts";
 import { HyperliquidEventTarget } from "../../../src/transports/websocket/_hyperliquid_event_target.ts";
+import type { ReconnectingWebSocket } from "../../../src/transports/websocket/_reconnecting_websocket.ts";
 
-class MockWebSocket extends EventTarget implements WebSocket {
-    public sentMessages: string[] = [];
+// @ts-ignore: Mocking WebSocket for testing purposes
+class MockWebSocket extends EventTarget implements ReconnectingWebSocket {
+    sentMessages: string[] = [];
+
+    readyState: number = WebSocket.CONNECTING;
 
     send(data: string): void {
         this.sentMessages.push(data);
@@ -17,36 +21,17 @@ class MockWebSocket extends EventTarget implements WebSocket {
         this.dispatchEvent(new CloseEvent("close"));
     }
 
-    binaryType: BinaryType = "blob";
-    bufferedAmount: number = 0;
-    extensions: string = "";
-    protocol: string = "";
-    readyState: number = 1;
-    url: string = "";
-    onclose: ((this: WebSocket, ev: CloseEvent) => unknown) | null = null;
-    onerror: ((this: WebSocket, ev: Event) => unknown) | null = null;
-    onmessage: ((this: WebSocket, ev: MessageEvent) => unknown) | null = null;
-    onopen: ((this: WebSocket, ev: Event) => unknown) | null = null;
-    CONNECTING = WebSocket.CONNECTING;
-    OPEN = WebSocket.OPEN;
-    CLOSING = WebSocket.CLOSING;
-    CLOSED = WebSocket.CLOSED;
-    static CONNECTING = WebSocket.CONNECTING;
-    static OPEN = WebSocket.OPEN;
-    static CLOSING = WebSocket.CLOSING;
-    static CLOSED = WebSocket.CLOSED;
-
     mockMessage(data: unknown): void {
         const event = new MessageEvent("message", { data: JSON.stringify(data) });
         this.dispatchEvent(event);
     }
 }
 
-Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
+Deno.test("WebSocketAsyncRequest", async (t) => {
     await t.step("request()", async (t) => {
         await t.step("method === post", async (t) => {
             await t.step("basic", async () => {
-                const mockSocket = new MockWebSocket();
+                const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
                 const hlEvents = new HyperliquidEventTarget(mockSocket);
                 const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
@@ -74,7 +59,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
             });
 
             await t.step("type === info", async () => {
-                const mockSocket = new MockWebSocket();
+                const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
                 const hlEvents = new HyperliquidEventTarget(mockSocket);
                 const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
@@ -95,7 +80,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
             });
 
             await t.step("type === action", async () => {
-                const mockSocket = new MockWebSocket();
+                const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
                 const hlEvents = new HyperliquidEventTarget(mockSocket);
                 const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
@@ -117,7 +102,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
         });
 
         await t.step("method === subscribe", async () => {
-            const mockSocket = new MockWebSocket();
+            const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
             const hlEvents = new HyperliquidEventTarget(mockSocket);
             const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
@@ -146,7 +131,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
 
         await t.step("rejects", async (t) => {
             await t.step("method === post", async () => {
-                const mockSocket = new MockWebSocket();
+                const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
                 const hlEvents = new HyperliquidEventTarget(mockSocket);
                 const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
@@ -167,7 +152,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
             });
 
             await t.step("method === subscription", async () => {
-                const mockSocket = new MockWebSocket();
+                const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
                 const hlEvents = new HyperliquidEventTarget(mockSocket);
                 const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
@@ -176,7 +161,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
 
                 const mockMessage = {
                     channel: "error",
-                    data: `Something failed: {"subscription":${JSON.stringify(subPayload)}}`,
+                    data: `Something failed: {"method":"subscribe","subscription":${JSON.stringify(subPayload)}}`,
                 };
                 mockSocket.mockMessage(mockMessage);
 
@@ -188,7 +173,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
             });
 
             await t.step("unknown request", async () => {
-                const mockSocket = new MockWebSocket();
+                const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
                 const hlEvents = new HyperliquidEventTarget(mockSocket);
                 const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
@@ -197,7 +182,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
 
                 const mockMessage = {
                     channel: "error",
-                    data: `Something failed: ${JSON.stringify(unknownPayload)}`,
+                    data: `Something failed: {"method":"subscribe","subscription":${JSON.stringify(unknownPayload)}}`,
                 };
                 mockSocket.mockMessage(mockMessage);
 
@@ -209,7 +194,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
             });
 
             await t.step("rejects pending requests when WebSocket connection closes", async () => {
-                const mockSocket = new MockWebSocket();
+                const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
                 const hlEvents = new HyperliquidEventTarget(mockSocket);
                 const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
@@ -225,7 +210,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
 
             await t.step("follows AbortSignal", async (t) => {
                 await t.step("rejects immediately if aborted before call", async () => {
-                    const mockSocket = new MockWebSocket();
+                    const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
                     const hlEvents = new HyperliquidEventTarget(mockSocket);
                     const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
@@ -238,7 +223,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
                 });
 
                 await t.step("rejects if aborted after sending request", async () => {
-                    const mockSocket = new MockWebSocket();
+                    const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
                     const hlEvents = new HyperliquidEventTarget(mockSocket);
                     const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
@@ -297,7 +282,7 @@ Deno.test("WebSocketRequestDispatcher Tests", async (t) => {
     });
 
     await t.step("invalid JSON messages are ignored", async () => {
-        const mockSocket = new MockWebSocket();
+        const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
         const hlEvents = new HyperliquidEventTarget(mockSocket);
         const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
