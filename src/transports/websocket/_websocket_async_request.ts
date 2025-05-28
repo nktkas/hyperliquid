@@ -69,31 +69,58 @@ export class WebSocketAsyncRequest {
             try {
                 // Error event doesn't have an id, use original request to match
                 const request = event.detail.match(/{.*}/)?.[0];
-                if (request) {
-                    const parsedRequest = JSON.parse(request) as Record<string, unknown>;
-                    if ("id" in parsedRequest && typeof parsedRequest.id === "number") {
-                        // If a post request was sent, it is possible to get the id from the request
-                        this.queue.findLast((item) => item.id === parsedRequest.id)?.reject(
-                            new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
-                        );
-                    } else if (
-                        "subscription" in parsedRequest &&
-                        typeof parsedRequest.subscription === "object" &&
-                        parsedRequest.subscription !== null
-                    ) {
-                        // If a subscription/unsubscribe request was sent, use the request as an id
-                        const id = WebSocketAsyncRequest.requestToId(parsedRequest);
-                        this.queue.findLast((item) => item.id === id)?.reject(
-                            new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
-                        );
-                    } else {
-                        // If the request is not recognized, use the parsed request as an id
-                        const id = WebSocketAsyncRequest.requestToId(parsedRequest);
-                        this.queue.findLast((item) => item.id === id)?.reject(
-                            new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
-                        );
-                    }
+                if (!request) return;
+
+                const parsedRequest = JSON.parse(request) as Record<string, unknown>;
+
+                // For `post` requests
+                if ("id" in parsedRequest && typeof parsedRequest.id === "number") {
+                    this.queue.findLast((item) => item.id === parsedRequest.id)?.reject(
+                        new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
+                    );
+                    return;
                 }
+
+                // For `subscribe` and `unsubscribe` requests
+                if (
+                    "subscription" in parsedRequest &&
+                    typeof parsedRequest.subscription === "object" && parsedRequest.subscription !== null
+                ) {
+                    const id = WebSocketAsyncRequest.requestToId(parsedRequest);
+                    this.queue.findLast((item) => item.id === id)?.reject(
+                        new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
+                    );
+                    return;
+                }
+
+                // For already/invalid subscribed requests
+                if (event.detail.startsWith("Already subscribed") || event.detail.startsWith("Invalid subscription")) {
+                    const id = WebSocketAsyncRequest.requestToId({
+                        method: "subscribe",
+                        subscription: parsedRequest,
+                    });
+                    this.queue.findLast((item) => item.id === id)?.reject(
+                        new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
+                    );
+                    return;
+                }
+                // For already unsubscribed requests
+                if (event.detail.startsWith("Already unsubscribed")) {
+                    const id = WebSocketAsyncRequest.requestToId({
+                        method: "unsubscribe",
+                        subscription: parsedRequest,
+                    });
+                    this.queue.findLast((item) => item.id === id)?.reject(
+                        new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
+                    );
+                    return;
+                }
+
+                // For unknown requests
+                const id = WebSocketAsyncRequest.requestToId(parsedRequest);
+                this.queue.findLast((item) => item.id === id)?.reject(
+                    new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
+                );
             } catch {
                 // Ignore JSON parsing errors
             }
