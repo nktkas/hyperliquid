@@ -1,10 +1,10 @@
-import { HttpTransport, PublicClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<PublicClient["fundingHistory"]>>;
+export type MethodReturnType = Awaited<ReturnType<InfoClient["fundingHistory"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -15,27 +15,27 @@ Deno.test("fundingHistory", async () => {
     // —————————— Prepare ——————————
 
     const transport = new HttpTransport({ isTestnet: true });
-    const client = new PublicClient({ transport });
+    const infoClient = new InfoClient({ transport });
 
     // —————————— Test ——————————
 
     const data = await Promise.all([
-        client.fundingHistory({
+        infoClient.fundingHistory({
             coin: "ETH",
             startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
         }),
         // Check argument 'endTime'
-        client.fundingHistory({
+        infoClient.fundingHistory({
             coin: "ETH",
             startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
             endTime: Date.now(),
         }),
-        client.fundingHistory({
+        infoClient.fundingHistory({
             coin: "ETH",
             startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
             endTime: null,
         }),
-        client.fundingHistory({
+        infoClient.fundingHistory({
             coin: "ETH",
             startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
             endTime: undefined,

@@ -1,4 +1,4 @@
-import { HttpTransport, PublicClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
@@ -33,7 +33,7 @@ const WITHOUT_CLOID = 15548036277;
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<PublicClient["orderStatus"]>>;
+export type MethodReturnType = Awaited<ReturnType<InfoClient["orderStatus"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -44,35 +44,35 @@ Deno.test("orderStatus", async () => {
     // —————————— Prepare ——————————
 
     const transport = new HttpTransport({ isTestnet: true });
-    const client = new PublicClient({ transport });
+    const infoClient = new InfoClient({ transport });
 
     // —————————— Test ——————————
 
     const data = await Promise.all([
-        client.orderStatus({ user: USER_ADDRESS, oid: 0 }),
-        client.orderStatus({ user: USER_ADDRESS, oid: SIDE_B }),
-        client.orderStatus({ user: USER_ADDRESS, oid: SIDE_A }),
-        client.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_LIMIT }),
-        client.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_STOP_MARKET }),
-        client.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_STOP_LIMIT }),
-        client.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_TAKE_PROFIT_MARKET }),
-        client.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_TAKE_PROFIT_LIMIT }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: 0 }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: SIDE_B }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: SIDE_A }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_LIMIT }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_STOP_MARKET }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_STOP_LIMIT }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_TAKE_PROFIT_MARKET }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: ORDER_TYPE_TAKE_PROFIT_LIMIT }),
 
-        client.orderStatus({ user: USER_ADDRESS, oid: TIF_NULL }),
-        client.orderStatus({ user: USER_ADDRESS, oid: TIF_GTC }),
-        client.orderStatus({ user: USER_ADDRESS, oid: TIF_ALO }),
-        client.orderStatus({ user: USER_ADDRESS, oid: TIF_IOC }),
-        client.orderStatus({ user: USER_ADDRESS, oid: TIF_FRONTEND_MARKET }),
-        client.orderStatus({ user: USER_ADDRESS, oid: TIF_LIQUIDATION_MARKET }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: TIF_NULL }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: TIF_GTC }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: TIF_ALO }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: TIF_IOC }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: TIF_FRONTEND_MARKET }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: TIF_LIQUIDATION_MARKET }),
 
-        client.orderStatus({ user: USER_ADDRESS, oid: STATUS_OPEN }),
-        client.orderStatus({ user: USER_ADDRESS, oid: STATUS_FILLED }),
-        client.orderStatus({ user: USER_ADDRESS, oid: STATUS_CANCELED }),
-        client.orderStatus({ user: USER_ADDRESS, oid: STATUS_REJECTED }),
-        client.orderStatus({ user: USER_ADDRESS, oid: STATUS_REDUCE_ONLY_CANCELED }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: STATUS_OPEN }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: STATUS_FILLED }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: STATUS_CANCELED }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: STATUS_REJECTED }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: STATUS_REDUCE_ONLY_CANCELED }),
 
-        client.orderStatus({ user: USER_ADDRESS, oid: CLOID }),
-        client.orderStatus({ user: USER_ADDRESS, oid: WITHOUT_CLOID }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: CLOID }),
+        infoClient.orderStatus({ user: USER_ADDRESS, oid: WITHOUT_CLOID }),
     ]);
 
     schemaCoverage(MethodReturnType, data, {

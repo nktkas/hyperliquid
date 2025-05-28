@@ -1,4 +1,4 @@
-import { HttpTransport, PublicClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
@@ -13,7 +13,7 @@ const REWARD_HISTORY = "0x745d208c08be6743481cdaf5984956be87ec5a3f"; // Mainnet
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<PublicClient["referral"]>>;
+export type MethodReturnType = Awaited<ReturnType<InfoClient["referral"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -23,17 +23,17 @@ Deno.test("referral", async () => {
 
     // —————————— Prepare ——————————
 
-    const client = new PublicClient({ transport: new HttpTransport({ isTestnet: true }) });
-    const mainnetClient = new PublicClient({ transport: new HttpTransport({ isTestnet: false }) });
+    const infoClient = new InfoClient({ transport: new HttpTransport({ isTestnet: true }) });
+    const mainnetClient = new InfoClient({ transport: new HttpTransport({ isTestnet: false }) });
 
     // —————————— Test ——————————
 
     const data = await Promise.all([
-        client.referral({ user: NON_REFERRED }),
-        client.referral({ user: REFERRED }),
-        client.referral({ user: STATE_READY }),
-        client.referral({ user: STATE_NEED_TO_CREATE_CODE }),
-        client.referral({ user: STATE_NEED_TO_TRADE }),
+        infoClient.referral({ user: NON_REFERRED }),
+        infoClient.referral({ user: REFERRED }),
+        infoClient.referral({ user: STATE_READY }),
+        infoClient.referral({ user: STATE_NEED_TO_CREATE_CODE }),
+        infoClient.referral({ user: STATE_NEED_TO_TRADE }),
         mainnetClient.referral({ user: REWARD_HISTORY }),
     ]);
 

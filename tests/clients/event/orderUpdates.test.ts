@@ -5,7 +5,7 @@ import { delay } from "@std/async/delay";
 import {
     type Order,
     type OrderStatus,
-    PublicClient,
+    InfoClient,
     SubscriptionClient,
     WalletClient,
     WebSocketTransport,
@@ -30,7 +30,7 @@ Deno.test("orderUpdates", async () => {
     // —————————— Prepare ——————————
 
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
-    await using publicClient = new PublicClient({ transport });
+    await using infoClient = new InfoClient({ transport });
     await using subsClient = new SubscriptionClient({ transport });
     await using walletClient = new WalletClient({
         wallet: privateKeyToAccount(PRIVATE_KEY),
@@ -60,9 +60,9 @@ Deno.test("orderUpdates", async () => {
                 },
             );
 
-            const order1Promise = createOrder(publicClient, walletClient, PERPS_ASSET, "open_filled");
-            const order2Promise = createOrder(publicClient, walletClient, PERPS_ASSET, "open_canceled");
-            const order3Promise = createOrder(publicClient, walletClient, PERPS_ASSET, "rejected");
+            const order1Promise = createOrder(infoClient, walletClient, PERPS_ASSET, "open_filled");
+            const order2Promise = createOrder(infoClient, walletClient, PERPS_ASSET, "open_canceled");
+            const order3Promise = createOrder(infoClient, walletClient, PERPS_ASSET, "rejected");
         }),
         20_000,
     );
@@ -87,12 +87,12 @@ Deno.test("orderUpdates", async () => {
 });
 
 async function createOrder(
-    publicClient: PublicClient,
+    infoClient: InfoClient,
     walletClient: WalletClient,
     asset: string,
     mode: "open_filled" | "open_canceled" | "rejected",
 ): Promise<void> {
-    const { id, universe, ctx } = await getAssetData(publicClient, asset);
+    const { id, universe, ctx } = await getAssetData(infoClient, asset);
     const pxUp = formatPrice(new BigNumber(ctx.markPx).times(1.01), universe.szDecimals);
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);

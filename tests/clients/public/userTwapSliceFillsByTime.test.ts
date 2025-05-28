@@ -1,4 +1,4 @@
-import { HttpTransport, PublicClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
@@ -8,7 +8,7 @@ const USER_ADDRESS = "0x563C175E6f11582f65D6d9E360A618699DEe14a9";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<PublicClient["userTwapSliceFillsByTime"]>>;
+export type MethodReturnType = Awaited<ReturnType<InfoClient["userTwapSliceFillsByTime"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -19,43 +19,43 @@ Deno.test("userTwapSliceFillsByTime", async () => {
     // —————————— Prepare ——————————
 
     const transport = new HttpTransport({ isTestnet: true });
-    const client = new PublicClient({ transport });
+    const infoClient = new InfoClient({ transport });
 
     // —————————— Test ——————————
 
     const data = await Promise.all([
-        client.userTwapSliceFillsByTime({
+        infoClient.userTwapSliceFillsByTime({
             user: USER_ADDRESS,
             startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
         }),
         // Check argument 'endTime'
-        client.userTwapSliceFillsByTime({
+        infoClient.userTwapSliceFillsByTime({
             user: USER_ADDRESS,
             startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
             endTime: Date.now(),
         }),
-        client.userTwapSliceFillsByTime({
+        infoClient.userTwapSliceFillsByTime({
             user: USER_ADDRESS,
             startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
             endTime: null,
         }),
-        client.userTwapSliceFillsByTime({
+        infoClient.userTwapSliceFillsByTime({
             user: USER_ADDRESS,
             startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
             endTime: undefined,
         }),
         // Check argument 'aggregateByTime'
-        client.userTwapSliceFillsByTime({
+        infoClient.userTwapSliceFillsByTime({
             user: USER_ADDRESS,
             startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
             aggregateByTime: true,
         }),
-        client.userTwapSliceFillsByTime({
+        infoClient.userTwapSliceFillsByTime({
             user: USER_ADDRESS,
             startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
             aggregateByTime: false,
         }),
-        client.userTwapSliceFillsByTime({
+        infoClient.userTwapSliceFillsByTime({
             user: USER_ADDRESS,
             startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
             aggregateByTime: undefined,

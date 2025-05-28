@@ -1,10 +1,10 @@
-import { HttpTransport, PublicClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<PublicClient["validatorSummaries"]>>;
+export type MethodReturnType = Awaited<ReturnType<InfoClient["validatorSummaries"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -15,11 +15,11 @@ Deno.test("validatorSummaries", async () => {
     // —————————— Prepare ——————————
 
     const transport = new HttpTransport({ isTestnet: true });
-    const client = new PublicClient({ transport });
+    const infoClient = new InfoClient({ transport });
 
     // —————————— Test ——————————
 
-    const data = await client.validatorSummaries();
+    const data = await infoClient.validatorSummaries();
 
     schemaCoverage(MethodReturnType, [data]);
 });

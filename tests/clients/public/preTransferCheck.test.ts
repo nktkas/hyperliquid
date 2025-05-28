@@ -1,4 +1,4 @@
-import { HttpTransport, PublicClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
@@ -8,7 +8,7 @@ const USER_ADDRESS = "0x563C175E6f11582f65D6d9E360A618699DEe14a9";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<PublicClient["preTransferCheck"]>>;
+export type MethodReturnType = Awaited<ReturnType<InfoClient["preTransferCheck"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -19,11 +19,11 @@ Deno.test("preTransferCheck", async () => {
     // —————————— Prepare ——————————
 
     const transport = new HttpTransport({ isTestnet: true });
-    const client = new PublicClient({ transport });
+    const infoClient = new InfoClient({ transport });
 
     // —————————— Test ——————————
 
-    const data = await client.preTransferCheck({ user: USER_ADDRESS, source: USER_ADDRESS });
+    const data = await infoClient.preTransferCheck({ user: USER_ADDRESS, source: USER_ADDRESS });
 
     schemaCoverage(MethodReturnType, [data]);
 });

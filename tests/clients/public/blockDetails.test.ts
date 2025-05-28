@@ -1,4 +1,4 @@
-import { HttpTransport, PublicClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
@@ -8,7 +8,7 @@ const BLOCK_HEIGHT = 300836507;
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<PublicClient["blockDetails"]>>;
+export type MethodReturnType = Awaited<ReturnType<InfoClient["blockDetails"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -19,11 +19,11 @@ Deno.test("blockDetails", async () => {
     // —————————— Prepare ——————————
 
     const transport = new HttpTransport({ isTestnet: true });
-    const client = new PublicClient({ transport });
+    const infoClient = new InfoClient({ transport });
 
     // —————————— Test ——————————
 
-    const data = await client.blockDetails({ height: BLOCK_HEIGHT });
+    const data = await infoClient.blockDetails({ height: BLOCK_HEIGHT });
 
     schemaCoverage(MethodReturnType, [data]);
 });

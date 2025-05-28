@@ -1,4 +1,4 @@
-import { HttpTransport, PublicClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
@@ -18,7 +18,7 @@ const TOKEN_ID_WITHOUT_DEPLOY_TIME = "0xc4bf3f870c0e9465323c0b6ed28096c2";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<PublicClient["tokenDetails"]>>;
+export type MethodReturnType = Awaited<ReturnType<InfoClient["tokenDetails"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -29,19 +29,19 @@ Deno.test("tokenDetails", async () => {
     // —————————— Prepare ——————————
 
     const transport = new HttpTransport({ isTestnet: true });
-    const client = new PublicClient({ transport });
+    const infoClient = new InfoClient({ transport });
 
     // —————————— Test ——————————
 
     const data = await Promise.all([
-        client.tokenDetails({ tokenId: TOKEN_ID_WITH_GENESIS }),
-        client.tokenDetails({ tokenId: TOKEN_ID_WITHOUT_GENESIS }),
-        client.tokenDetails({ tokenId: TOKEN_ID_WITH_DEPLOYER }),
-        client.tokenDetails({ tokenId: TOKEN_ID_WITHOUT_DEPLOYER }),
-        client.tokenDetails({ tokenId: TOKEN_ID_WITH_DEPLOY_GAS }),
-        client.tokenDetails({ tokenId: TOKEN_ID_WITHOUT_DEPLOY_GAS }),
-        client.tokenDetails({ tokenId: TOKEN_ID_WITH_DEPLOY_TIME }),
-        client.tokenDetails({ tokenId: TOKEN_ID_WITHOUT_DEPLOY_TIME }),
+        infoClient.tokenDetails({ tokenId: TOKEN_ID_WITH_GENESIS }),
+        infoClient.tokenDetails({ tokenId: TOKEN_ID_WITHOUT_GENESIS }),
+        infoClient.tokenDetails({ tokenId: TOKEN_ID_WITH_DEPLOYER }),
+        infoClient.tokenDetails({ tokenId: TOKEN_ID_WITHOUT_DEPLOYER }),
+        infoClient.tokenDetails({ tokenId: TOKEN_ID_WITH_DEPLOY_GAS }),
+        infoClient.tokenDetails({ tokenId: TOKEN_ID_WITHOUT_DEPLOY_GAS }),
+        infoClient.tokenDetails({ tokenId: TOKEN_ID_WITH_DEPLOY_TIME }),
+        infoClient.tokenDetails({ tokenId: TOKEN_ID_WITHOUT_DEPLOY_TIME }),
     ]);
 
     schemaCoverage(MethodReturnType, data, {

@@ -1,6 +1,6 @@
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import BigNumber from "npm:bignumber.js@^9.1.2";
-import { type Hex, HttpTransport, PublicClient, WalletClient } from "../../../mod.ts";
+import { type Hex, HttpTransport, InfoClient, WalletClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 import { formatPrice, formatSize, getAssetData, randomCloid } from "../../_utils/utils.ts";
@@ -25,9 +25,9 @@ Deno.test("cancelByCloid", async () => {
     const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
     const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
-    const publicClient = new PublicClient({ transport });
+    const infoClient = new InfoClient({ transport });
 
-    const { id, universe, ctx } = await getAssetData(publicClient, PERPS_ASSET);
+    const { id, universe, ctx } = await getAssetData(infoClient, PERPS_ASSET);
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const sz = formatSize(new BigNumber(11).div(ctx.markPx), universe.szDecimals);
 

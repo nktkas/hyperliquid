@@ -1,4 +1,4 @@
-import { HttpTransport, PublicClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
@@ -9,7 +9,7 @@ const USER_ADDRESS_WITHOUT_SUBACCOUNTS = "0x000000000000000000000000000000000000
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<PublicClient["subAccounts"]>>;
+export type MethodReturnType = Awaited<ReturnType<InfoClient["subAccounts"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -20,13 +20,13 @@ Deno.test("subAccounts", async () => {
     // —————————— Prepare ——————————
 
     const transport = new HttpTransport({ isTestnet: true });
-    const client = new PublicClient({ transport });
+    const infoClient = new InfoClient({ transport });
 
     // —————————— Test ——————————
 
     const data = await Promise.all([
-        client.subAccounts({ user: USER_ADDRESS_WITHOUT_SUBACCOUNTS }),
-        client.subAccounts({ user: USER_ADDRESS }),
+        infoClient.subAccounts({ user: USER_ADDRESS_WITHOUT_SUBACCOUNTS }),
+        infoClient.subAccounts({ user: USER_ADDRESS }),
     ]);
 
     schemaCoverage(MethodReturnType, data, {

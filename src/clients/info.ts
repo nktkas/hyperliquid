@@ -98,148 +98,148 @@ import type {
 } from "../types/info/requests.ts";
 import type { VaultDetails, VaultEquity, VaultSummary } from "../types/info/vaults.ts";
 
-/** Parameters for the {@linkcode PublicClient} constructor. */
-export interface PublicClientParameters<T extends IRequestTransport = IRequestTransport> {
+/** Parameters for the {@linkcode InfoClient} constructor. */
+export interface InfoClientParameters<T extends IRequestTransport = IRequestTransport> {
     /** The transport used to connect to the Hyperliquid API. */
     transport: T;
 }
 
-/** Parameters for the {@linkcode PublicClient.allMids} method. */
+/** Parameters for the {@linkcode InfoClient.allMids} method. */
 export type AllMidsParameters = Omit<AllMidsRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.candleSnapshot} method. */
+/** Parameters for the {@linkcode InfoClient.candleSnapshot} method. */
 export type CandleSnapshotParameters = CandleSnapshotRequest["req"];
 
-/** Parameters for the {@linkcode PublicClient.clearinghouseState} method. */
+/** Parameters for the {@linkcode InfoClient.clearinghouseState} method. */
 export type ClearinghouseStateParameters = Omit<ClearinghouseStateRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.delegations} method. */
+/** Parameters for the {@linkcode InfoClient.delegations} method. */
 export type DelegationsParameters = Omit<DelegationsRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.delegatorHistory} method. */
+/** Parameters for the {@linkcode InfoClient.delegatorHistory} method. */
 export type DelegatorHistoryParameters = Omit<DelegatorHistoryRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.delegatorRewards} method. */
+/** Parameters for the {@linkcode InfoClient.delegatorRewards} method. */
 export type DelegatorRewardsParameters = Omit<DelegatorRewardsRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.delegatorSummary} method. */
+/** Parameters for the {@linkcode InfoClient.delegatorSummary} method. */
 export type DelegatorSummaryParameters = Omit<DelegatorSummaryRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.extraAgents} method. */
+/** Parameters for the {@linkcode InfoClient.extraAgents} method. */
 export type ExtraAgentsParameters = Omit<ExtraAgentsRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.frontendOpenOrders} method. */
+/** Parameters for the {@linkcode InfoClient.frontendOpenOrders} method. */
 export type FrontendOpenOrdersParameters = Omit<FrontendOpenOrdersRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.fundingHistory} method. */
+/** Parameters for the {@linkcode InfoClient.fundingHistory} method. */
 export type FundingHistoryParameters = Omit<FundingHistoryRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.historicalOrders} method. */
+/** Parameters for the {@linkcode InfoClient.historicalOrders} method. */
 export type HistoricalOrdersParameters = Omit<HistoricalOrdersRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.isVip} method. */
+/** Parameters for the {@linkcode InfoClient.isVip} method. */
 export type IsVipParameters = Omit<IsVipRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.l2Book} method. */
+/** Parameters for the {@linkcode InfoClient.l2Book} method. */
 export type L2BookParameters = Omit<L2BookRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.legalCheck} method. */
+/** Parameters for the {@linkcode InfoClient.legalCheck} method. */
 export type LegalCheckParameters = Omit<LegalCheckRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.maxBuilderFee} method. */
+/** Parameters for the {@linkcode InfoClient.maxBuilderFee} method. */
 export type MaxBuilderFeeParameters = Omit<MaxBuilderFeeRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.meta} method. */
+/** Parameters for the {@linkcode InfoClient.meta} method. */
 export type MetaParameters = Omit<MetaRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.openOrders} method. */
+/** Parameters for the {@linkcode InfoClient.openOrders} method. */
 export type OpenOrdersParameters = Omit<OpenOrdersRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.orderStatus} method. */
+/** Parameters for the {@linkcode InfoClient.orderStatus} method. */
 export type OrderStatusParameters = Omit<OrderStatusRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.perpDeployAuctionStatus} method. */
+/** Parameters for the {@linkcode InfoClient.perpDeployAuctionStatus} method. */
 export type PerpDeployAuctionStatusParameters = Omit<PerpDeployAuctionStatusRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.perpDexs} method. */
+/** Parameters for the {@linkcode InfoClient.perpDexs} method. */
 export type PerpDexsParameters = Omit<PerpDexsRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.portfolio} method. */
+/** Parameters for the {@linkcode InfoClient.portfolio} method. */
 export type PortfolioParameters = Omit<PortfolioRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.preTransferCheck} method. */
+/** Parameters for the {@linkcode InfoClient.preTransferCheck} method. */
 export type PreTransferCheckParameters = Omit<PreTransferCheckRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.referral} method. */
+/** Parameters for the {@linkcode InfoClient.referral} method. */
 export type ReferralParameters = Omit<ReferralRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.spotClearinghouseState} method. */
+/** Parameters for the {@linkcode InfoClient.spotClearinghouseState} method. */
 export type SpotClearinghouseStateParameters = Omit<SpotClearinghouseStateRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.spotDeployState} method. */
+/** Parameters for the {@linkcode InfoClient.spotDeployState} method. */
 export type SpotDeployStateParameters = Omit<SpotDeployStateRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.subAccounts} method. */
+/** Parameters for the {@linkcode InfoClient.subAccounts} method. */
 export type SubAccountsParameters = Omit<SubAccountsRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.tokenDetails} method. */
+/** Parameters for the {@linkcode InfoClient.tokenDetails} method. */
 export type TokenDetailsParameters = Omit<TokenDetailsRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.twapHistory} method. */
+/** Parameters for the {@linkcode InfoClient.twapHistory} method. */
 export type TwapHistoryParameters = Omit<TwapHistoryRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.userFees} method. */
+/** Parameters for the {@linkcode InfoClient.userFees} method. */
 export type UserFeesParameters = Omit<UserFeesRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.userFills} method. */
+/** Parameters for the {@linkcode InfoClient.userFills} method. */
 export type UserFillsParameters = Omit<UserFillsRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.userFillsByTime} method. */
+/** Parameters for the {@linkcode InfoClient.userFillsByTime} method. */
 export type UserFillsByTimeParameters = Omit<UserFillsByTimeRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.userFunding} method. */
+/** Parameters for the {@linkcode InfoClient.userFunding} method. */
 export type UserFundingParameters = Omit<UserFundingRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.userNonFundingLedgerUpdates} method. */
+/** Parameters for the {@linkcode InfoClient.userNonFundingLedgerUpdates} method. */
 export type UserNonFundingLedgerUpdatesParameters = Omit<UserNonFundingLedgerUpdatesRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.userRateLimit} method. */
+/** Parameters for the {@linkcode InfoClient.userRateLimit} method. */
 export type UserRateLimitParameters = Omit<UserRateLimitRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.userRole} method. */
+/** Parameters for the {@linkcode InfoClient.userRole} method. */
 export type UserRoleParameters = Omit<UserRoleRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.userToMultiSigSigners} method. */
+/** Parameters for the {@linkcode InfoClient.userToMultiSigSigners} method. */
 export type UserToMultiSigSignersParameters = Omit<UserToMultiSigSignersRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.userTwapSliceFills} method. */
+/** Parameters for the {@linkcode InfoClient.userTwapSliceFills} method. */
 export type UserTwapSliceFillsParameters = Omit<UserTwapSliceFillsRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.userTwapSliceFillsByTime} method. */
+/** Parameters for the {@linkcode InfoClient.userTwapSliceFillsByTime} method. */
 export type UserTwapSliceFillsByTimeParameters = Omit<UserTwapSliceFillsByTimeRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.userVaultEquities} method. */
+/** Parameters for the {@linkcode InfoClient.userVaultEquities} method. */
 export type UserVaultEquitiesParameters = Omit<UserVaultEquitiesRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.vaultDetails} method. */
+/** Parameters for the {@linkcode InfoClient.vaultDetails} method. */
 export type VaultDetailsParameters = Omit<VaultDetailsRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.blockDetails} method. */
+/** Parameters for the {@linkcode InfoClient.blockDetails} method. */
 export type BlockDetailsParameters = Omit<BlockDetailsRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.txDetails} method. */
+/** Parameters for the {@linkcode InfoClient.txDetails} method. */
 export type TxDetailsParameters = Omit<TxDetailsRequest, "type">;
 
-/** Parameters for the {@linkcode PublicClient.userDetails} method. */
+/** Parameters for the {@linkcode InfoClient.userDetails} method. */
 export type UserDetailsParameters = Omit<UserDetailsRequest, "type">;
 
 /**
- * Public client for interacting with the Hyperliquid API.
+ * Info client for interacting with the Hyperliquid API.
  * @typeParam T The type of transport used to connect to the Hyperliquid API.
  */
-export class PublicClient<
+export class InfoClient<
     T extends IRequestTransport = IRequestTransport,
-> implements PublicClientParameters, AsyncDisposable {
+> implements InfoClientParameters, AsyncDisposable {
     transport: T;
 
     /**
@@ -251,10 +251,10 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      * ```
      */
-    constructor(args: PublicClientParameters<T>) {
+    constructor(args: InfoClientParameters<T>) {
         this.transport = args.transport;
     }
 
@@ -269,7 +269,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const allMids = await client.allMids();
      * ```
@@ -299,7 +299,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const { blockDetails } = await client.blockDetails({ height: 123 });
      * ```
@@ -324,7 +324,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const candleSnapshot = await client.candleSnapshot({
      *   coin: "ETH",
@@ -353,7 +353,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const clearinghouseState = await client.clearinghouseState({ user: "0x..." });
      * ```
@@ -378,7 +378,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const delegations = await client.delegations({ user: "0x..." });
      * ```
@@ -403,7 +403,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const delegatorHistory = await client.delegatorHistory({ user: "0x..." });
      * ```
@@ -428,7 +428,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const delegatorRewards = await client.delegatorRewards({ user: "0x..." });
      * ```
@@ -453,7 +453,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const delegatorSummary = await client.delegatorSummary({ user: "0x..." });
      * ```
@@ -478,7 +478,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const extraAgents = await client.extraAgents({ user: "0x..." });
      * ```
@@ -503,7 +503,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const frontendOpenOrders = await client.frontendOpenOrders({ user: "0x..." });
      * ```
@@ -528,7 +528,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const fundingHistory = await client.fundingHistory({
      *   coin: "ETH",
@@ -556,7 +556,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const historicalOrders = await client.historicalOrders({ user: "0x..." });
      * ```
@@ -581,7 +581,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const isVip = await client.isVip({ user: "0x..." });
      * ```
@@ -606,7 +606,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const l2Book = await client.l2Book({ coin: "ETH", nSigFigs: 2 });
      * ```
@@ -631,7 +631,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const legalCheck = await client.legalCheck({ user: "0x..." });
      * ```
@@ -656,7 +656,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const maxBuilderFee = await client.maxBuilderFee({ user: "0x...", builder: "0x..." });
      * ```
@@ -680,7 +680,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const meta = await client.meta();
      * ```
@@ -709,7 +709,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const [meta, assetCtxs] = await client.metaAndAssetCtxs();
      * ```
@@ -733,7 +733,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const openOrders = await client.openOrders({ user: "0x..." });
      * ```
@@ -758,7 +758,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const orderStatus = await client.orderStatus({ user: "0x...", oid: 12345 });
      * ```
@@ -782,7 +782,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const auctionStatus = await client.perpDeployAuctionStatus();
      * ```
@@ -805,7 +805,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const perpDexs = await client.perpDexs();
      * ```
@@ -829,7 +829,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const perpsAtOpenInterestCap = await client.perpsAtOpenInterestCap();
      * ```
@@ -853,7 +853,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const portfolio = await client.portfolio({ user: "0x..." });
      * ```
@@ -877,7 +877,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const predictedFundings = await client.predictedFundings();
      * ```
@@ -901,7 +901,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const preTransferCheck = await client.preTransferCheck({ user: "0x...", source: "0x..." });
      * ```
@@ -926,7 +926,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const referral = await client.referral({ user: "0x..." });
      * ```
@@ -951,7 +951,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const spotClearinghouseState = await client.spotClearinghouseState({ user: "0x..." });
      * ```
@@ -979,7 +979,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const spotDeployState = await client.spotDeployState({ user: "0x..." });
      * ```
@@ -1003,7 +1003,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const spotMeta = await client.spotMeta();
      * ```
@@ -1026,7 +1026,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const [spotMeta, spotAssetCtxs] = await client.spotMetaAndAssetCtxs();
      * ```
@@ -1050,7 +1050,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const subAccounts = await client.subAccounts({ user: "0x..." });
      * ```
@@ -1075,7 +1075,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const tokenDetails = await client.tokenDetails({ tokenId: "0x..." });
      * ```
@@ -1100,7 +1100,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const twapHistory = await client.twapHistory({ user: "0x..." });
      * ```
@@ -1125,7 +1125,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const { tx } = await client.txDetails({ hash: "0x..." });
      * ```
@@ -1150,7 +1150,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const { txs } = await client.userDetails({ user: "0x..." });
      * ```
@@ -1175,7 +1175,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const fees = await client.userFees({ user: "0x..." });
      * ```
@@ -1200,7 +1200,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const fills = await client.userFills({ user: "0x..." });
      * ```
@@ -1225,7 +1225,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const fills = await client.userFillsByTime({
      *   user: "0x...",
@@ -1253,7 +1253,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const funding = await client.userFunding({
      *   user: "0x...",
@@ -1281,7 +1281,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const nonFundingLedgerUpdates = await client.userNonFundingLedgerUpdates({
      *   user: "0x...",
@@ -1312,7 +1312,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const rateLimit = await client.userRateLimit({ user: "0x..." });
      * ```
@@ -1337,7 +1337,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const userRole = await client.userRole({ user: "0x..." });
      * ```
@@ -1362,7 +1362,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const multiSigSigners = await client.userToMultiSigSigners({ user: "0x..." });
      * ```
@@ -1390,7 +1390,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const twapSliceFills = await client.userTwapSliceFills({ user: "0x..." });
      * ```
@@ -1415,7 +1415,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const twapSliceFillsByTime = await client.userTwapSliceFillsByTime({
      *   user: "0x...",
@@ -1443,7 +1443,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const userVaultEquities = await client.userVaultDeposits({ user: "0x..." });
      * ```
@@ -1467,7 +1467,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const validatorSummaries = await client.validatorSummaries();
      * ```
@@ -1491,7 +1491,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const vaultDetails = await client.vaultDetails({ vaultAddress: "0x..." });
      * ```
@@ -1516,7 +1516,7 @@ export class PublicClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.PublicClient({ transport });
+     * const infoClient = new hl.InfoClient({ transport });
      *
      * const vaultSummaries = await client.vaultSummaries();
      * ```

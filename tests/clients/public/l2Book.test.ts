@@ -1,10 +1,10 @@
-import { HttpTransport, PublicClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<PublicClient["l2Book"]>>;
+export type MethodReturnType = Awaited<ReturnType<InfoClient["l2Book"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -15,24 +15,24 @@ Deno.test("l2Book", async () => {
     // —————————— Prepare ——————————
 
     const transport = new HttpTransport({ isTestnet: true });
-    const client = new PublicClient({ transport });
+    const infoClient = new InfoClient({ transport });
 
     // —————————— Test ——————————
 
     const data = await Promise.all([
-        client.l2Book({ coin: "ETH" }),
+        infoClient.l2Book({ coin: "ETH" }),
         // Check argument 'nSigFigs'
-        client.l2Book({ coin: "ETH", nSigFigs: 2 }),
-        client.l2Book({ coin: "ETH", nSigFigs: 3 }),
-        client.l2Book({ coin: "ETH", nSigFigs: 4 }),
-        client.l2Book({ coin: "ETH", nSigFigs: 5 }),
-        client.l2Book({ coin: "ETH", nSigFigs: null }),
-        client.l2Book({ coin: "ETH", nSigFigs: undefined }),
+        infoClient.l2Book({ coin: "ETH", nSigFigs: 2 }),
+        infoClient.l2Book({ coin: "ETH", nSigFigs: 3 }),
+        infoClient.l2Book({ coin: "ETH", nSigFigs: 4 }),
+        infoClient.l2Book({ coin: "ETH", nSigFigs: 5 }),
+        infoClient.l2Book({ coin: "ETH", nSigFigs: null }),
+        infoClient.l2Book({ coin: "ETH", nSigFigs: undefined }),
         // Check argument 'mantissa'
-        client.l2Book({ coin: "ETH", nSigFigs: 5, mantissa: 2 }),
-        client.l2Book({ coin: "ETH", nSigFigs: 5, mantissa: 5 }),
-        client.l2Book({ coin: "ETH", nSigFigs: 5, mantissa: null }),
-        client.l2Book({ coin: "ETH", nSigFigs: 5, mantissa: undefined }),
+        infoClient.l2Book({ coin: "ETH", nSigFigs: 5, mantissa: 2 }),
+        infoClient.l2Book({ coin: "ETH", nSigFigs: 5, mantissa: 5 }),
+        infoClient.l2Book({ coin: "ETH", nSigFigs: 5, mantissa: null }),
+        infoClient.l2Book({ coin: "ETH", nSigFigs: 5, mantissa: undefined }),
     ]);
 
     schemaCoverage(MethodReturnType, data);

@@ -1,4 +1,4 @@
-import { HttpTransport, PublicClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
@@ -12,7 +12,7 @@ const ROLE_SUB_ACCOUNT = "0x22a454d3322060475552e8f922ec0c778b8e5760";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<PublicClient["userRole"]>>;
+export type MethodReturnType = Awaited<ReturnType<InfoClient["userRole"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -23,16 +23,16 @@ Deno.test("userRole", async () => {
     // —————————— Prepare ——————————
 
     const transport = new HttpTransport({ isTestnet: true });
-    const client = new PublicClient({ transport });
+    const infoClient = new InfoClient({ transport });
 
     // —————————— Test ——————————
 
     const data = await Promise.all([
-        client.userRole({ user: ROLE_MISSING }),
-        client.userRole({ user: ROLE_USER }),
-        client.userRole({ user: ROLE_AGENT }),
-        client.userRole({ user: ROLE_VAULT }),
-        client.userRole({ user: ROLE_SUB_ACCOUNT }),
+        infoClient.userRole({ user: ROLE_MISSING }),
+        infoClient.userRole({ user: ROLE_USER }),
+        infoClient.userRole({ user: ROLE_AGENT }),
+        infoClient.userRole({ user: ROLE_VAULT }),
+        infoClient.userRole({ user: ROLE_SUB_ACCOUNT }),
     ]);
 
     schemaCoverage(MethodReturnType, data);

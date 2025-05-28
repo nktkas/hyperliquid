@@ -1,7 +1,7 @@
 import { deadline } from "jsr:@std/async@^1.0.10/deadline";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import BigNumber from "npm:bignumber.js@^9.1.2";
-import { PublicClient, SubscriptionClient, WalletClient, WebSocketTransport } from "../../../mod.ts";
+import { InfoClient, SubscriptionClient, WalletClient, WebSocketTransport } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 import { formatPrice, formatSize, getAssetData, randomCloid } from "../../_utils/utils.ts";
@@ -24,7 +24,7 @@ Deno.test("webData2", async () => {
 
     // Create clients
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws", timeout: 20_000 });
-    await using publicClient = new PublicClient({ transport });
+    await using infoClient = new InfoClient({ transport });
     await using subsClient = new SubscriptionClient({ transport });
     await using walletClient = new WalletClient({
         wallet: privateKeyToAccount(PRIVATE_KEY),
@@ -40,7 +40,7 @@ Deno.test("webData2", async () => {
         sz: sz1,
         twapSz: twapSz1,
     } = await getAssetDataExtended(
-        publicClient,
+        infoClient,
         PERPS_ASSET_1,
     );
     const {
@@ -50,7 +50,7 @@ Deno.test("webData2", async () => {
         sz: sz2,
         twapSz: twapSz2,
     } = await getAssetDataExtended(
-        publicClient,
+        infoClient,
         PERPS_ASSET_2,
     );
 
@@ -154,7 +154,7 @@ Deno.test("webData2", async () => {
         // —————————— Cleanup ——————————
 
         // Close open orders & TWAP's
-        const openOrders = await publicClient.openOrders({ user: walletClient.wallet.address });
+        const openOrders = await infoClient.openOrders({ user: walletClient.wallet.address });
         const cancels = openOrders.map((o) => ({ a: o.coin === PERPS_ASSET_1 ? id1 : id2, o: o.oid }));
         await Promise.all([
             walletClient.cancel({ cancels }),
@@ -193,14 +193,14 @@ Deno.test("webData2", async () => {
     }
 });
 
-async function getAssetDataExtended(publicClient: PublicClient, asset: string): Promise<{
+async function getAssetDataExtended(infoClient: InfoClient, asset: string): Promise<{
     id: number;
     pxUp: string;
     pxDown: string;
     sz: string;
     twapSz: string;
 }> {
-    const { id, universe, ctx } = await getAssetData(publicClient, asset);
+    const { id, universe, ctx } = await getAssetData(infoClient, asset);
     const pxUp = formatPrice(new BigNumber(ctx.markPx).times(1.01), universe.szDecimals);
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);

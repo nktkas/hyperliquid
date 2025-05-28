@@ -2,7 +2,7 @@ import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import BigNumber from "npm:bignumber.js@^9.1.2";
 import { deadline } from "jsr:@std/async@^1.0.10/deadline";
 import {
-    PublicClient,
+    InfoClient,
     SubscriptionClient,
     WalletClient,
     WebSocketTransport,
@@ -28,7 +28,7 @@ Deno.test("notification", async () => {
     // —————————— Prepare ——————————
 
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
-    await using publicClient = new PublicClient({ transport });
+    await using infoClient = new InfoClient({ transport });
     await using subsClient = new SubscriptionClient({ transport });
     await using walletClient = new WalletClient({
         wallet: privateKeyToAccount(PRIVATE_KEY),
@@ -55,7 +55,7 @@ Deno.test("notification", async () => {
                 },
             );
 
-            const twapFillPromise = openCloseTwap(publicClient, walletClient, PERPS_ASSET, true, true);
+            const twapFillPromise = openCloseTwap(infoClient, walletClient, PERPS_ASSET, true, true);
         }),
         20_000,
     );
@@ -64,13 +64,13 @@ Deno.test("notification", async () => {
 });
 
 async function openCloseTwap(
-    publicClient: PublicClient,
+    infoClient: InfoClient,
     walletClient: WalletClient,
     asset: string,
     buy: boolean,
     position: boolean,
 ): Promise<void> {
-    const { id, universe, ctx } = await getAssetData(publicClient, asset);
+    const { id, universe, ctx } = await getAssetData(infoClient, asset);
     const pxUp = formatPrice(new BigNumber(ctx.markPx).times(1.01), universe.szDecimals);
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const twapSz = formatSize(new BigNumber(55).div(ctx.markPx), universe.szDecimals);

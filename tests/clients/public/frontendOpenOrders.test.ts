@@ -1,4 +1,4 @@
-import { HttpTransport, PublicClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
@@ -8,7 +8,7 @@ const USER_ADDRESS = "0x563C175E6f11582f65D6d9E360A618699DEe14a9";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<PublicClient["frontendOpenOrders"]>>;
+export type MethodReturnType = Awaited<ReturnType<InfoClient["frontendOpenOrders"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -19,13 +19,13 @@ Deno.test("frontendOpenOrders", async () => {
     // —————————— Prepare ——————————
 
     const transport = new HttpTransport({ isTestnet: true });
-    const client = new PublicClient({ transport });
+    const infoClient = new InfoClient({ transport });
 
     // —————————— Test ——————————
 
     const data = await Promise.all([
-        client.frontendOpenOrders({ user: USER_ADDRESS }),
-        client.frontendOpenOrders({ user: USER_ADDRESS, dex: "test" }),
+        infoClient.frontendOpenOrders({ user: USER_ADDRESS }),
+        infoClient.frontendOpenOrders({ user: USER_ADDRESS, dex: "test" }),
     ]);
 
     schemaCoverage(MethodReturnType, data, {

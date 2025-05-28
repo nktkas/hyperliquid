@@ -1,4 +1,4 @@
-import type { Hex, PerpsAssetCtx, PerpsUniverse, PublicClient } from "../../mod.ts";
+import type { Hex, PerpsAssetCtx, PerpsUniverse, InfoClient } from "../../mod.ts";
 import BigNumber from "npm:bignumber.js@^9.1.2";
 import { keccak_256 } from "@noble/hashes/sha3";
 
@@ -9,7 +9,7 @@ interface AssetData {
 }
 
 /** Get asset data by name. */
-export async function getAssetData(client: PublicClient, assetName: string): Promise<AssetData> {
+export async function getAssetData(client: InfoClient, assetName: string): Promise<AssetData> {
     const data = await client.metaAndAssetCtxs();
     const id = data[0].universe.findIndex((u) => u.name === assetName);
     if (id === -1) throw new Error(`Asset "${assetName}" not found`);

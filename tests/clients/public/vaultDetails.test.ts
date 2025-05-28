@@ -1,4 +1,4 @@
-import { HttpTransport, PublicClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
@@ -12,7 +12,7 @@ const VAULT_ADDRESS_WITH_CHILD_RELATIONSHIP = "0x768484f7e2ebb675c57838366c02ae9
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<PublicClient["vaultDetails"]>>;
+export type MethodReturnType = Awaited<ReturnType<InfoClient["vaultDetails"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -23,18 +23,18 @@ Deno.test("vaultDetails", async () => {
     // —————————— Prepare ——————————
 
     const transport = new HttpTransport({ isTestnet: true });
-    const client = new PublicClient({ transport });
+    const infoClient = new InfoClient({ transport });
 
     // —————————— Test ——————————
 
     const data = await Promise.all([
-        client.vaultDetails({ vaultAddress: INVALID_VAULT_ADDRESS }),
-        client.vaultDetails({ vaultAddress: VAULT_ADDRESS_WITH_NORMAL_RELATIONSHIP }),
-        client.vaultDetails({
+        infoClient.vaultDetails({ vaultAddress: INVALID_VAULT_ADDRESS }),
+        infoClient.vaultDetails({ vaultAddress: VAULT_ADDRESS_WITH_NORMAL_RELATIONSHIP }),
+        infoClient.vaultDetails({
             vaultAddress: VAULT_ADDRESS_WITH_PARENT_RELATIONSHIP,
             user: VAULT_ADDRESS_WITH_PARENT_RELATIONSHIP_USER,
         }),
-        client.vaultDetails({ vaultAddress: VAULT_ADDRESS_WITH_CHILD_RELATIONSHIP }),
+        infoClient.vaultDetails({ vaultAddress: VAULT_ADDRESS_WITH_CHILD_RELATIONSHIP }),
     ]);
 
     schemaCoverage(MethodReturnType, data);

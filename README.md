@@ -45,9 +45,9 @@ deno add jsr:@nktkas/hyperliquid
 import * as hl from "@nktkas/hyperliquid";
 
 const transport = new hl.HttpTransport();
-const client = new hl.PublicClient({ transport });
+const infoClient = new hl.InfoClient({ transport });
 
-const openOrders = await client.openOrders({ user: "0x..." }); // Change to your address
+const openOrders = await infoClient.openOrders({ user: "0x..." }); // Change to your address
 ```
 
 ```ts
@@ -109,13 +109,13 @@ const wsTransport = new hl.WebSocketTransport(); // Accepts optional parameters
 
 Next, initialize a client with the transport layer (more details in the [API Reference](#clients)):
 
-#### Create PublicClient
+#### Create InfoClient
 
 ```ts
 import * as hl from "@nktkas/hyperliquid";
 
 const transport = new hl.HttpTransport(); // or WebSocketTransport
-const client = new hl.PublicClient({ transport });
+const infoClient = new hl.InfoClient({ transport });
 ```
 
 #### Create WalletClient
@@ -158,25 +158,25 @@ const subsClient = new hl.SubscriptionClient({ transport });
 
 Finally, use client methods to interact with the Hyperliquid API (more details in the [API Reference](#clients)):
 
-#### Example of using a public client
+#### Example of using an InfoClient
 
 ```ts
 import * as hl from "@nktkas/hyperliquid";
 
 const transport = new hl.HttpTransport();
-const client = new hl.PublicClient({ transport });
+const infoClient = new hl.InfoClient({ transport });
 
 // L2 Book
-const l2Book = await client.l2Book({ coin: "BTC" });
+const l2Book = await infoClient.l2Book({ coin: "BTC" });
 
 // Account clearinghouse state
-const clearinghouseState = await client.clearinghouseState({ user: "0x..." });
+const clearinghouseState = await infoClient.clearinghouseState({ user: "0x..." });
 
 // Open orders
-const openOrders = await client.openOrders({ user: "0x..." });
+const openOrders = await infoClient.openOrders({ user: "0x..." });
 ```
 
-#### Example of using a wallet client
+#### Example of using a WalletClient
 
 ```ts
 import * as hl from "@nktkas/hyperliquid";
@@ -216,7 +216,7 @@ const result = await client.withdraw3({
 });
 ```
 
-#### Example of using a subscription client
+#### Example of using a SubscriptionClient
 
 ```ts
 import * as hl from "@nktkas/hyperliquid";
@@ -246,16 +246,16 @@ await client.explorerBlock((data) => {
 
 A Client provides access to the Hyperliquid API endpoints.
 
-#### Public Client
+#### Info Client
 
-A Public Client which provides access to
+An Info Client which provides access to
 [Info API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint) and Explorer API, such as
 `l2Book` and `clearinghouseState`.
 
-The Public Client class sets up with a given [Transport](#transports).
+The Info Client class sets up with a given [Transport](#transports).
 
 ```ts
-class PublicClient {
+class InfoClient {
     constructor(args: {
         transport: HttpTransport | WebSocketTransport;
     });

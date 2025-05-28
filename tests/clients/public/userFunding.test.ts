@@ -1,4 +1,4 @@
-import { HttpTransport, PublicClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
@@ -8,7 +8,7 @@ const USER_ADDRESS = "0xe019d6167E7e324aEd003d94098496b6d986aB05";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<PublicClient["userFunding"]>>;
+export type MethodReturnType = Awaited<ReturnType<InfoClient["userFunding"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -19,27 +19,27 @@ Deno.test("userFunding", async () => {
     // —————————— Prepare ——————————
 
     const transport = new HttpTransport({ isTestnet: true });
-    const client = new PublicClient({ transport });
+    const infoClient = new InfoClient({ transport });
 
     // —————————— Test ——————————
 
     const data = await Promise.all([
-        client.userFunding({
+        infoClient.userFunding({
             user: USER_ADDRESS,
             startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
         }),
         // Check argument 'endTime'
-        client.userFunding({
+        infoClient.userFunding({
             user: USER_ADDRESS,
             startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
             endTime: Date.now(),
         }),
-        client.userFunding({
+        infoClient.userFunding({
             user: USER_ADDRESS,
             startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
             endTime: null,
         }),
-        client.userFunding({
+        infoClient.userFunding({
             user: USER_ADDRESS,
             startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
             endTime: undefined,

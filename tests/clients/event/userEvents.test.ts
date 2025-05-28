@@ -1,7 +1,7 @@
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import BigNumber from "npm:bignumber.js@^9.1.2";
 import { deadline } from "jsr:@std/async@^1.0.10/deadline";
-import { PublicClient, SubscriptionClient, WalletClient, WebSocketTransport, type WsUserEvent } from "../../../mod.ts";
+import { InfoClient, SubscriptionClient, WalletClient, WebSocketTransport, type WsUserEvent } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 import { formatPrice, formatSize, getAssetData, randomCloid } from "../../_utils/utils.ts";
@@ -23,7 +23,7 @@ Deno.test("userEvents", { sanitizeOps: false, sanitizeResources: false }, async 
     // —————————— Prepare ——————————
 
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
-    await using publicClient = new PublicClient({ transport });
+    await using infoClient = new InfoClient({ transport });
     await using subsClient = new SubscriptionClient({ transport });
     await using walletClient = new WalletClient({
         wallet: privateKeyToAccount(PRIVATE_KEY),
@@ -59,14 +59,14 @@ Deno.test("userEvents", { sanitizeOps: false, sanitizeResources: false }, async 
                 },
             );
 
-            const order1Promise = openCloseOrder(publicClient, walletClient, PERPS_ASSET_1, true);
-            const order2Promise = openCloseOrder(publicClient, walletClient, PERPS_ASSET_2, false);
+            const order1Promise = openCloseOrder(infoClient, walletClient, PERPS_ASSET_1, true);
+            const order2Promise = openCloseOrder(infoClient, walletClient, PERPS_ASSET_2, false);
 
-            const twap1Promise = openCloseTwap(publicClient, walletClient, PERPS_ASSET_1, true, false);
-            const twap2Promise = openCloseTwap(publicClient, walletClient, PERPS_ASSET_2, false, false);
+            const twap1Promise = openCloseTwap(infoClient, walletClient, PERPS_ASSET_1, true, false);
+            const twap2Promise = openCloseTwap(infoClient, walletClient, PERPS_ASSET_2, false, false);
 
-            const twapFill1Promise = openCloseTwap(publicClient, walletClient, PERPS_ASSET_1, true, true);
-            const twapFill2Promise = openCloseTwap(publicClient, walletClient, PERPS_ASSET_2, false, true);
+            const twapFill1Promise = openCloseTwap(infoClient, walletClient, PERPS_ASSET_1, true, true);
+            const twapFill2Promise = openCloseTwap(infoClient, walletClient, PERPS_ASSET_2, false, true);
         }),
         20_000,
     );
@@ -95,12 +95,12 @@ Deno.test("userEvents", { sanitizeOps: false, sanitizeResources: false }, async 
 });
 
 async function openCloseOrder(
-    publicClient: PublicClient,
+    infoClient: InfoClient,
     walletClient: WalletClient,
     asset: string,
     buy: boolean,
 ): Promise<void> {
-    const { id, universe, ctx } = await getAssetData(publicClient, asset);
+    const { id, universe, ctx } = await getAssetData(infoClient, asset);
     const pxUp = formatPrice(new BigNumber(ctx.markPx).times(1.01), universe.szDecimals);
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);
@@ -134,13 +134,13 @@ async function openCloseOrder(
     });
 }
 async function openCloseTwap(
-    publicClient: PublicClient,
+    infoClient: InfoClient,
     walletClient: WalletClient,
     asset: string,
     buy: boolean,
     position: boolean,
 ): Promise<void> {
-    const { id, universe, ctx } = await getAssetData(publicClient, asset);
+    const { id, universe, ctx } = await getAssetData(infoClient, asset);
     const pxUp = formatPrice(new BigNumber(ctx.markPx).times(1.01), universe.szDecimals);
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const twapSz = formatSize(new BigNumber(55).div(ctx.markPx), universe.szDecimals);

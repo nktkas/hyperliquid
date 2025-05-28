@@ -1,10 +1,10 @@
-import { HttpTransport, PublicClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<PublicClient["meta"]>>;
+export type MethodReturnType = Awaited<ReturnType<InfoClient["meta"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -15,13 +15,13 @@ Deno.test("meta", async () => {
     // —————————— Prepare ——————————
 
     const transport = new HttpTransport({ isTestnet: true });
-    const client = new PublicClient({ transport });
+    const infoClient = new InfoClient({ transport });
 
     // —————————— Test ——————————
 
     const data = await Promise.all([
-        client.meta(),
-        client.meta({ dex: "test" }),
+        infoClient.meta(),
+        infoClient.meta({ dex: "test" }),
     ]);
 
     schemaCoverage(MethodReturnType, data);

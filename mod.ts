@@ -13,7 +13,7 @@ export type {
 
 // Clients
 export * from "./src/clients/subscription.ts";
-export * from "./src/clients/public.ts";
+export * from "./src/clients/info.ts";
 export * from "./src/clients/wallet.ts";
 
 // Transports
