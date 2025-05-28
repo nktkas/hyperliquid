@@ -1,5 +1,5 @@
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
-import { HttpTransport, WalletClient } from "../../../mod.ts";
+import { HttpTransport, ExchangeClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
@@ -10,7 +10,7 @@ const VAULT_ADDRESS = "0xd0d0eb5de91f14e53312adf92cabcbbfd2b4f24f";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<WalletClient["vaultTransfer"]>>;
+export type MethodReturnType = Awaited<ReturnType<ExchangeClient["vaultTransfer"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -22,17 +22,17 @@ Deno.test("vaultTransfer", async () => {
 
     const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
-    const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
+    const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
 
     // —————————— Test ——————————
 
     // Check argument 'isDeposit' + argument 'expiresAfter'
-    const data1 = await walletClient.vaultTransfer({
+    const data1 = await exchClient.vaultTransfer({
         vaultAddress: VAULT_ADDRESS,
         isDeposit: false,
         usd: 5 * 1e6,
     });
-    const data2 = await walletClient.vaultTransfer({
+    const data2 = await exchClient.vaultTransfer({
         vaultAddress: VAULT_ADDRESS,
         isDeposit: true,
         usd: 5 * 1e6,

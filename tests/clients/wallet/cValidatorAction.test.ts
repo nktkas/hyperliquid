@@ -1,6 +1,6 @@
 import { assertRejects } from "jsr:@std/assert@^1.0.10";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
-import { ApiRequestError, HttpTransport, WalletClient } from "../../../mod.ts";
+import { ApiRequestError, HttpTransport, ExchangeClient } from "../../../mod.ts";
 
 // —————————— Constants ——————————
 
@@ -17,19 +17,19 @@ Deno.test("cValidatorAction", async () => {
 
     const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
-    const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
+    const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
 
     // —————————— Test ——————————
 
     await Promise.all([
         assertRejects(
-            () => walletClient.cValidatorAction({ changeProfile: { unjailed: false } }),
+            () => exchClient.cValidatorAction({ changeProfile: { unjailed: false } }),
             ApiRequestError,
             "Unknown validator",
         ),
         assertRejects(
             () =>
-                walletClient.cValidatorAction({
+                exchClient.cValidatorAction({
                     register: {
                         profile: {
                             node_ip: { Ip: "1.2.3.4" },
@@ -47,7 +47,7 @@ Deno.test("cValidatorAction", async () => {
             "Validator has delegations disabled",
         ),
         assertRejects(
-            () => walletClient.cValidatorAction({ unregister: null }),
+            () => exchClient.cValidatorAction({ unregister: null }),
             ApiRequestError,
             "Action disabled on this chain",
         ),

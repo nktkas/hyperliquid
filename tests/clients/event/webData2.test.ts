@@ -1,7 +1,7 @@
 import { deadline } from "jsr:@std/async@^1.0.10/deadline";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import BigNumber from "npm:bignumber.js@^9.1.2";
-import { InfoClient, SubscriptionClient, WalletClient, WebSocketTransport } from "../../../mod.ts";
+import { InfoClient, SubscriptionClient, ExchangeClient, WebSocketTransport } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 import { formatPrice, formatSize, getAssetData, randomCloid } from "../../_utils/utils.ts";
@@ -26,7 +26,7 @@ Deno.test("webData2", async () => {
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws", timeout: 20_000 });
     await using infoClient = new InfoClient({ transport });
     await using subsClient = new SubscriptionClient({ transport });
-    await using walletClient = new WalletClient({
+    await using exchClient = new ExchangeClient({
         wallet: privateKeyToAccount(PRIVATE_KEY),
         transport,
         isTestnet: true,
@@ -56,29 +56,29 @@ Deno.test("webData2", async () => {
 
     // Update leverage
     await Promise.all([
-        walletClient.updateLeverage({ asset: id1, isCross: true, leverage: 5 }),
-        walletClient.updateLeverage({ asset: id2, isCross: false, leverage: 5 }),
+        exchClient.updateLeverage({ asset: id1, isCross: true, leverage: 5 }),
+        exchClient.updateLeverage({ asset: id2, isCross: false, leverage: 5 }),
     ]);
 
     // Create orders/positions/TWAP's and set up spot dusting opt-out
     const [twap1, twap2] = await Promise.all([
         // Create TWAP orders
-        walletClient.twapOrder({ a: id1, b: true, s: twapSz1, r: false, m: 5, t: false }),
-        walletClient.twapOrder({ a: id2, b: false, s: twapSz2, r: false, m: 5, t: false }),
+        exchClient.twapOrder({ a: id1, b: true, s: twapSz1, r: false, m: 5, t: false }),
+        exchClient.twapOrder({ a: id2, b: false, s: twapSz2, r: false, m: 5, t: false }),
         // Create orders
-        walletClient.order({
+        exchClient.order({
             orders: [{ a: id1, b: true, p: pxDown1, s: sz1, r: false, t: { limit: { tif: "Gtc" } } }],
             grouping: "na",
         }),
-        walletClient.order({
+        exchClient.order({
             orders: [{ a: id1, b: false, p: pxUp1, s: sz1, r: false, t: { limit: { tif: "Gtc" } } }],
             grouping: "na",
         }),
-        walletClient.order({
+        exchClient.order({
             orders: [{ a: id1, b: false, p: pxUp1, s: sz1, r: false, t: { limit: { tif: "Alo" } }, c: randomCloid() }],
             grouping: "na",
         }),
-        walletClient.order({ // orderType = "Stop Market"
+        exchClient.order({ // orderType = "Stop Market"
             orders: [{
                 a: id1,
                 b: false,
@@ -89,7 +89,7 @@ Deno.test("webData2", async () => {
             }],
             grouping: "na",
         }),
-        walletClient.order({ // orderType = "Stop Limit"
+        exchClient.order({ // orderType = "Stop Limit"
             orders: [{
                 a: id1,
                 b: false,
@@ -101,16 +101,16 @@ Deno.test("webData2", async () => {
             grouping: "na",
         }),
         // Create positions
-        walletClient.order({
+        exchClient.order({
             orders: [{ a: id1, b: true, p: pxUp1, s: sz1, r: false, t: { limit: { tif: "Gtc" } } }],
             grouping: "na",
         }),
-        walletClient.order({
+        exchClient.order({
             orders: [{ a: id2, b: false, p: pxDown2, s: sz2, r: false, t: { limit: { tif: "Gtc" } } }],
             grouping: "na",
         }),
         // Change spot dusting opt-out
-        walletClient.spotUser({ toggleSpotDusting: { optOut: true } }),
+        exchClient.spotUser({ toggleSpotDusting: { optOut: true } }),
     ]);
 
     // —————————— Test ——————————
@@ -118,7 +118,7 @@ Deno.test("webData2", async () => {
     try {
         const data = await deadline(
             new Promise((resolve) => {
-                subsClient.webData2({ user: walletClient.wallet.address }, resolve);
+                subsClient.webData2({ user: exchClient.wallet.address }, resolve);
             }),
             10_000,
         );
@@ -154,17 +154,17 @@ Deno.test("webData2", async () => {
         // —————————— Cleanup ——————————
 
         // Close open orders & TWAP's
-        const openOrders = await infoClient.openOrders({ user: walletClient.wallet.address });
+        const openOrders = await infoClient.openOrders({ user: exchClient.wallet.address });
         const cancels = openOrders.map((o) => ({ a: o.coin === PERPS_ASSET_1 ? id1 : id2, o: o.oid }));
         await Promise.all([
-            walletClient.cancel({ cancels }),
-            walletClient.twapCancel({ a: id1, t: twap1.response.data.status.running.twapId }),
-            walletClient.twapCancel({ a: id2, t: twap2.response.data.status.running.twapId }),
+            exchClient.cancel({ cancels }),
+            exchClient.twapCancel({ a: id1, t: twap1.response.data.status.running.twapId }),
+            exchClient.twapCancel({ a: id2, t: twap2.response.data.status.running.twapId }),
         ]);
 
         // Close open positions
         await Promise.all([
-            walletClient.order({
+            exchClient.order({
                 orders: [{
                     a: id1,
                     b: false,
@@ -175,7 +175,7 @@ Deno.test("webData2", async () => {
                 }],
                 grouping: "na",
             }),
-            walletClient.order({
+            exchClient.order({
                 orders: [{
                     a: id2,
                     b: true,
@@ -189,7 +189,7 @@ Deno.test("webData2", async () => {
         ]);
 
         // Change spot dusting opt-out
-        await walletClient.spotUser({ toggleSpotDusting: { optOut: false } });
+        await exchClient.spotUser({ toggleSpotDusting: { optOut: false } });
     }
 });
 

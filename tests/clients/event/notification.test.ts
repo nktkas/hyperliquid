@@ -4,7 +4,7 @@ import { deadline } from "jsr:@std/async@^1.0.10/deadline";
 import {
     InfoClient,
     SubscriptionClient,
-    WalletClient,
+    ExchangeClient,
     WebSocketTransport,
     type WsNotification,
 } from "../../../mod.ts";
@@ -30,7 +30,7 @@ Deno.test("notification", async () => {
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
     await using infoClient = new InfoClient({ transport });
     await using subsClient = new SubscriptionClient({ transport });
-    await using walletClient = new WalletClient({
+    await using exchClient = new ExchangeClient({
         wallet: privateKeyToAccount(PRIVATE_KEY),
         transport,
         isTestnet: true,
@@ -43,7 +43,7 @@ Deno.test("notification", async () => {
         new Promise(async (resolve, reject) => {
             const events: WsNotification[] = [];
             await subsClient.notification(
-                { user: walletClient.wallet.address },
+                { user: exchClient.wallet.address },
                 async (data) => {
                     try {
                         events.push(data);
@@ -55,7 +55,7 @@ Deno.test("notification", async () => {
                 },
             );
 
-            const twapFillPromise = openCloseTwap(infoClient, walletClient, PERPS_ASSET, true, true);
+            const twapFillPromise = openCloseTwap(infoClient, exchClient, PERPS_ASSET, true, true);
         }),
         20_000,
     );
@@ -65,7 +65,7 @@ Deno.test("notification", async () => {
 
 async function openCloseTwap(
     infoClient: InfoClient,
-    walletClient: WalletClient,
+    exchClient: ExchangeClient,
     asset: string,
     buy: boolean,
     position: boolean,
@@ -75,7 +75,7 @@ async function openCloseTwap(
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const twapSz = formatSize(new BigNumber(55).div(ctx.markPx), universe.szDecimals);
 
-    const result = await walletClient.twapOrder({
+    const result = await exchClient.twapOrder({
         a: id,
         b: buy,
         s: twapSz,
@@ -87,10 +87,10 @@ async function openCloseTwap(
 
     if (position) await new Promise((resolve) => setTimeout(resolve, 3000));
 
-    await walletClient.twapCancel({ a: id, t: twapId });
+    await exchClient.twapCancel({ a: id, t: twapId });
 
     if (position) {
-        await walletClient.order({
+        await exchClient.order({
             orders: [{
                 a: id,
                 b: !buy,

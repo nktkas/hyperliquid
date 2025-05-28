@@ -1,6 +1,6 @@
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import BigNumber from "npm:bignumber.js@^9.1.2";
-import { HttpTransport, InfoClient, WalletClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient, ExchangeClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 import { formatPrice, formatSize, getAssetData, randomCloid } from "../../_utils/utils.ts";
@@ -12,7 +12,7 @@ const PERPS_ASSET = "BTC";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<WalletClient["batchModify"]>>;
+export type MethodReturnType = Awaited<ReturnType<ExchangeClient["batchModify"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -24,7 +24,7 @@ Deno.test("batchModify", async () => {
 
     const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
-    const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
+    const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
     const infoClient = new InfoClient({ transport });
 
     const { id, universe, ctx } = await getAssetData(infoClient, PERPS_ASSET);
@@ -37,9 +37,9 @@ Deno.test("batchModify", async () => {
     try {
         const data = await Promise.all([
             // Check response 'resting' + argument 'expiresAfter'
-            walletClient.batchModify({
+            exchClient.batchModify({
                 modifies: [{
-                    oid: await openOrder(walletClient, id, pxDown, sz),
+                    oid: await openOrder(exchClient, id, pxDown, sz),
                     order: {
                         a: id,
                         b: true,
@@ -52,9 +52,9 @@ Deno.test("batchModify", async () => {
                 expiresAfter: Date.now() + 1000 * 60 * 60,
             }),
             // Check response 'resting' + `cloid`
-            walletClient.batchModify({
+            exchClient.batchModify({
                 modifies: [{
-                    oid: await openOrder(walletClient, id, pxDown, sz),
+                    oid: await openOrder(exchClient, id, pxDown, sz),
                     order: {
                         a: id,
                         b: true,
@@ -67,9 +67,9 @@ Deno.test("batchModify", async () => {
                 }],
             }),
             // Check response 'filled'
-            walletClient.batchModify({
+            exchClient.batchModify({
                 modifies: [{
-                    oid: await openOrder(walletClient, id, pxDown, sz),
+                    oid: await openOrder(exchClient, id, pxDown, sz),
                     order: {
                         a: id,
                         b: true,
@@ -81,9 +81,9 @@ Deno.test("batchModify", async () => {
                 }],
             }),
             // Check response 'filled' + `cloid`
-            walletClient.batchModify({
+            exchClient.batchModify({
                 modifies: [{
-                    oid: await openOrder(walletClient, id, pxDown, sz),
+                    oid: await openOrder(exchClient, id, pxDown, sz),
                     order: {
                         a: id,
                         b: true,
@@ -96,9 +96,9 @@ Deno.test("batchModify", async () => {
                 }],
             }),
             // Check argument 't.trigger'
-            walletClient.batchModify({
+            exchClient.batchModify({
                 modifies: [{
-                    oid: await openOrder(walletClient, id, pxDown, sz),
+                    oid: await openOrder(exchClient, id, pxDown, sz),
                     order: {
                         a: id,
                         b: true,
@@ -123,9 +123,9 @@ Deno.test("batchModify", async () => {
 
         const openOrders = await infoClient.openOrders({ user: account.address });
         const cancels = openOrders.map((o) => ({ a: id, o: o.oid }));
-        await walletClient.cancel({ cancels });
+        await exchClient.cancel({ cancels });
 
-        await walletClient.order({
+        await exchClient.order({
             orders: [{
                 a: id,
                 b: false,
@@ -139,7 +139,7 @@ Deno.test("batchModify", async () => {
     }
 });
 
-async function openOrder(client: WalletClient, id: number, pxDown: string, sz: string): Promise<number> {
+async function openOrder(client: ExchangeClient, id: number, pxDown: string, sz: string): Promise<number> {
     const orderResp = await client.order({
         orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
         grouping: "na",

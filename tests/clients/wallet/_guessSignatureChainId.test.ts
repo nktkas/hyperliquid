@@ -3,7 +3,7 @@ import { privateKeyToAccount } from "npm:viem@^2.21.54/accounts";
 import { createWalletClient, http } from "npm:viem@^2.21.54";
 import { mainnet } from "npm:viem@^2.21.54/chains";
 import { ethers } from "npm:ethers@^6.13.4";
-import { HttpTransport, WalletClient } from "../../../mod.ts";
+import { HttpTransport, ExchangeClient } from "../../../mod.ts";
 
 const PRIVATE_KEY = "0x822e9959e022b78423eb653a62ea0020cd283e71a2a8133a6ff2aeffaf373cff";
 
@@ -15,11 +15,11 @@ Deno.test("_guessSignatureChainId", async (t) => {
             chain: mainnet,
         });
         const transport = new HttpTransport();
-        const walletClient = new WalletClient({ wallet, transport });
+        const exchClient = new ExchangeClient({ wallet, transport });
 
-        const signatureChainId = typeof walletClient.signatureChainId === "string"
-            ? walletClient.signatureChainId
-            : await walletClient.signatureChainId();
+        const signatureChainId = typeof exchClient.signatureChainId === "string"
+            ? exchClient.signatureChainId
+            : await exchClient.signatureChainId();
         assertEquals(signatureChainId, "0x1");
     });
 
@@ -28,11 +28,11 @@ Deno.test("_guessSignatureChainId", async (t) => {
         const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
 
         const transport = new HttpTransport();
-        const walletClient = new WalletClient({ wallet, transport });
+        const exchClient = new ExchangeClient({ wallet, transport });
 
-        const signatureChainId = typeof walletClient.signatureChainId === "string"
-            ? walletClient.signatureChainId
-            : await walletClient.signatureChainId();
+        const signatureChainId = typeof exchClient.signatureChainId === "string"
+            ? exchClient.signatureChainId
+            : await exchClient.signatureChainId();
         assertEquals(signatureChainId, "0x1");
     });
 
@@ -47,11 +47,11 @@ Deno.test("_guessSignatureChainId", async (t) => {
         };
 
         const transport = new HttpTransport();
-        const walletClient = new WalletClient({ wallet: ethereum, transport });
+        const exchClient = new ExchangeClient({ wallet: ethereum, transport });
 
-        const signatureChainId = typeof walletClient.signatureChainId === "string"
-            ? walletClient.signatureChainId
-            : await walletClient.signatureChainId();
+        const signatureChainId = typeof exchClient.signatureChainId === "string"
+            ? exchClient.signatureChainId
+            : await exchClient.signatureChainId();
         assertEquals(signatureChainId, "0x1");
     });
 
@@ -60,21 +60,21 @@ Deno.test("_guessSignatureChainId", async (t) => {
 
         await t.step("mainnet", async () => {
             const transport = new HttpTransport();
-            const walletClient = new WalletClient({ wallet: account, transport });
+            const exchClient = new ExchangeClient({ wallet: account, transport });
 
-            const signatureChainId = typeof walletClient.signatureChainId === "string"
-                ? walletClient.signatureChainId
-                : await walletClient.signatureChainId();
+            const signatureChainId = typeof exchClient.signatureChainId === "string"
+                ? exchClient.signatureChainId
+                : await exchClient.signatureChainId();
             assertEquals(signatureChainId, "0xa4b1");
         });
 
         await t.step("testnet", async () => {
             const transport = new HttpTransport();
-            const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
+            const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
 
-            const signatureChainId = typeof walletClient.signatureChainId === "string"
-                ? walletClient.signatureChainId
-                : await walletClient.signatureChainId();
+            const signatureChainId = typeof exchClient.signatureChainId === "string"
+                ? exchClient.signatureChainId
+                : await exchClient.signatureChainId();
             assertEquals(signatureChainId, "0x66eee");
         });
     });

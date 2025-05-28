@@ -1,5 +1,5 @@
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
-import { HttpTransport, WalletClient } from "../../../mod.ts";
+import { HttpTransport, ExchangeClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
@@ -10,7 +10,7 @@ const DESTINATION_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<WalletClient["usdSend"]>>;
+export type MethodReturnType = Awaited<ReturnType<ExchangeClient["usdSend"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -22,11 +22,11 @@ Deno.test("usdSend", async () => {
 
     const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
-    const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
+    const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
 
     // —————————— Test ——————————
 
-    const data = await walletClient.usdSend({ destination: DESTINATION_ADDRESS, amount: "1" });
+    const data = await exchClient.usdSend({ destination: DESTINATION_ADDRESS, amount: "1" });
 
     schemaCoverage(MethodReturnType, [data]);
 });

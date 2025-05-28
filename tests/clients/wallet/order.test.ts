@@ -1,6 +1,6 @@
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import BigNumber from "npm:bignumber.js@^9.1.2";
-import { HttpTransport, InfoClient, WalletClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient, ExchangeClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 import { formatPrice, formatSize, getAssetData, randomCloid } from "../../_utils/utils.ts";
@@ -12,7 +12,7 @@ const PERPS_ASSET = "BTC";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<WalletClient["order"]>>;
+export type MethodReturnType = Awaited<ReturnType<ExchangeClient["order"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -24,7 +24,7 @@ Deno.test("order", async () => {
 
     const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
-    const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
+    const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
     const infoClient = new InfoClient({ transport });
 
     const { id, universe, ctx } = await getAssetData(infoClient, PERPS_ASSET);
@@ -37,7 +37,7 @@ Deno.test("order", async () => {
     try {
         const data = await Promise.all([
             // Check response 'resting' + argument 'expiresAfter'
-            walletClient.order({
+            exchClient.order({
                 orders: [{
                     a: id,
                     b: true,
@@ -50,7 +50,7 @@ Deno.test("order", async () => {
                 expiresAfter: Date.now() + 1000 * 60 * 60,
             }),
             // Check response 'resting' + `cloid`
-            walletClient.order({
+            exchClient.order({
                 orders: [{
                     a: id,
                     b: true,
@@ -63,7 +63,7 @@ Deno.test("order", async () => {
                 grouping: "na",
             }),
             // Check response 'filled'
-            walletClient.order({
+            exchClient.order({
                 orders: [{
                     a: id,
                     b: true,
@@ -75,7 +75,7 @@ Deno.test("order", async () => {
                 grouping: "na",
             }),
             // Check response 'filled' + `cloid`
-            walletClient.order({
+            exchClient.order({
                 orders: [{
                     a: id,
                     b: true,
@@ -88,7 +88,7 @@ Deno.test("order", async () => {
                 grouping: "na",
             }),
             // Check argument 'builder'
-            walletClient.order({
+            exchClient.order({
                 orders: [{
                     a: id,
                     b: true,
@@ -101,7 +101,7 @@ Deno.test("order", async () => {
                 builder: { b: account.address, f: 1 },
             }),
             // Check argument 't.trigger'
-            walletClient.order({
+            exchClient.order({
                 orders: [{
                     a: id,
                     b: true,
@@ -126,9 +126,9 @@ Deno.test("order", async () => {
 
         const openOrders = await infoClient.openOrders({ user: account.address });
         const cancels = openOrders.map((o) => ({ a: id, o: o.oid }));
-        await walletClient.cancel({ cancels });
+        await exchClient.cancel({ cancels });
 
-        await walletClient.order({
+        await exchClient.order({
             orders: [{
                 a: id,
                 b: false,

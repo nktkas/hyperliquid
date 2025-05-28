@@ -1,5 +1,5 @@
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
-import { HttpTransport, WalletClient } from "../../../mod.ts";
+import { HttpTransport, ExchangeClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
@@ -9,7 +9,7 @@ const PRIVATE_KEY = Deno.args[0] as `0x${string}`;
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<WalletClient["reserveRequestWeight"]>>;
+export type MethodReturnType = Awaited<ReturnType<ExchangeClient["reserveRequestWeight"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -21,15 +21,15 @@ Deno.test("reserveRequestWeight", async () => {
 
     const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
-    const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
+    const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
 
     // —————————— Test ——————————
 
     const data = await Promise.all([
         // Check response 'success'
-        walletClient.reserveRequestWeight({ weight: 1 }),
+        exchClient.reserveRequestWeight({ weight: 1 }),
         // Check argument 'expiresAfter'
-        walletClient.reserveRequestWeight({ weight: 1, expiresAfter: Date.now() + 1000 * 60 * 60 }),
+        exchClient.reserveRequestWeight({ weight: 1, expiresAfter: Date.now() + 1000 * 60 * 60 }),
     ]);
 
     schemaCoverage(MethodReturnType, data);

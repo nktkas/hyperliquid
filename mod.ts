@@ -14,7 +14,7 @@ export type {
 // Clients
 export * from "./src/clients/subscription.ts";
 export * from "./src/clients/info.ts";
-export * from "./src/clients/wallet.ts";
+export * from "./src/clients/exchange.ts";
 
 // Transports
 export * from "./src/transports/http/http_transport.ts";

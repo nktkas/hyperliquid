@@ -1,6 +1,6 @@
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import BigNumber from "npm:bignumber.js@^9.1.2";
-import { HttpTransport, InfoClient, WalletClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient, ExchangeClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 import { formatPrice, formatSize, getAssetData } from "../../_utils/utils.ts";
@@ -12,7 +12,7 @@ const PERPS_ASSET = "BTC";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<WalletClient["cancel"]>>;
+export type MethodReturnType = Awaited<ReturnType<ExchangeClient["cancel"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -24,7 +24,7 @@ Deno.test("cancel", async () => {
 
     const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
-    const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
+    const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
     const infoClient = new InfoClient({ transport });
 
     const { id, universe, ctx } = await getAssetData(infoClient, PERPS_ASSET);
@@ -35,17 +35,17 @@ Deno.test("cancel", async () => {
 
     const data = await Promise.all([
         // Check response 'success'
-        walletClient.cancel({
+        exchClient.cancel({
             cancels: [{
                 a: id,
-                o: await openOrder(walletClient, id, pxDown, sz),
+                o: await openOrder(exchClient, id, pxDown, sz),
             }],
         }),
         // Check argument 'expiresAfter'
-        walletClient.cancel({
+        exchClient.cancel({
             cancels: [{
                 a: id,
-                o: await openOrder(walletClient, id, pxDown, sz),
+                o: await openOrder(exchClient, id, pxDown, sz),
             }],
             expiresAfter: Date.now() + 1000 * 60 * 60,
         }),
@@ -53,7 +53,7 @@ Deno.test("cancel", async () => {
     schemaCoverage(MethodReturnType, data);
 });
 
-async function openOrder(client: WalletClient, id: number, pxDown: string, sz: string): Promise<number> {
+async function openOrder(client: ExchangeClient, id: number, pxDown: string, sz: string): Promise<number> {
     await client.updateLeverage({ asset: id, isCross: true, leverage: 3 });
     const openOrderRes = await client.order({
         orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],

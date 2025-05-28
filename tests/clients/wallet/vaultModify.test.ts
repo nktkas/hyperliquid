@@ -1,5 +1,5 @@
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
-import { HttpTransport, WalletClient } from "../../../mod.ts";
+import { HttpTransport, ExchangeClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
@@ -10,7 +10,7 @@ const VAULT_ADDRESS = "0xd0d0eb5de91f14e53312adf92cabcbbfd2b4f24f";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<WalletClient["vaultModify"]>>;
+export type MethodReturnType = Awaited<ReturnType<ExchangeClient["vaultModify"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -22,35 +22,35 @@ Deno.test("vaultModify", async () => {
 
     const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
-    const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
+    const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
 
     // —————————— Test ——————————
 
     const data = await Promise.all([
         // Check without arguments
-        walletClient.vaultModify({
+        exchClient.vaultModify({
             vaultAddress: VAULT_ADDRESS,
             allowDeposits: null,
             alwaysCloseOnWithdraw: null,
         }),
         // Check argument 'allowDeposits'
-        walletClient.vaultModify({
+        exchClient.vaultModify({
             vaultAddress: VAULT_ADDRESS,
             allowDeposits: true,
             alwaysCloseOnWithdraw: null,
         }),
-        walletClient.vaultModify({
+        exchClient.vaultModify({
             vaultAddress: VAULT_ADDRESS,
             allowDeposits: false,
             alwaysCloseOnWithdraw: null,
         }),
         // Check argument 'alwaysCloseOnWithdraw'
-        walletClient.vaultModify({
+        exchClient.vaultModify({
             vaultAddress: VAULT_ADDRESS,
             allowDeposits: null,
             alwaysCloseOnWithdraw: true,
         }),
-        walletClient.vaultModify({
+        exchClient.vaultModify({
             vaultAddress: VAULT_ADDRESS,
             allowDeposits: null,
             alwaysCloseOnWithdraw: false,

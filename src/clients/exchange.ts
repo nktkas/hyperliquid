@@ -76,8 +76,8 @@ import {
     type ValueMap,
 } from "../signing.ts";
 
-/** Parameters for the {@linkcode WalletClient} constructor. */
-export interface WalletClientParameters<
+/** Parameters for the {@linkcode ExchangeClient} constructor. */
+export interface ExchangeClientParameters<
     T extends IRequestTransport = IRequestTransport,
     W extends AbstractWallet = AbstractWallet,
 > {
@@ -110,107 +110,107 @@ export interface WalletClientParameters<
     nonceManager?: () => MaybePromise<number>;
 }
 
-/** Parameters for the {@linkcode WalletClient.approveAgent} method. */
+/** Parameters for the {@linkcode ExchangeClient.approveAgent} method. */
 export type ApproveAgentParameters = Omit<
     ApproveAgentRequest["action"],
     "type" | "hyperliquidChain" | "signatureChainId" | "nonce"
 >;
 
-/** Parameters for the {@linkcode WalletClient.approveBuilderFee} method. */
+/** Parameters for the {@linkcode ExchangeClient.approveBuilderFee} method. */
 export type ApproveBuilderFeeParameters = Omit<
     ApproveBuilderFeeRequest["action"],
     "type" | "hyperliquidChain" | "signatureChainId" | "nonce"
 >;
 
-/** Parameters for the {@linkcode WalletClient.batchModify} method. */
+/** Parameters for the {@linkcode ExchangeClient.batchModify} method. */
 export type BatchModifyParameters =
     & Omit<BatchModifyRequest["action"], "type">
     & Partial<Pick<BatchModifyRequest, "vaultAddress">>
     & Partial<Pick<BatchModifyRequest, "expiresAfter">>;
 
-/** Parameters for the {@linkcode WalletClient.cancel} method. */
+/** Parameters for the {@linkcode ExchangeClient.cancel} method. */
 export type CancelParameters =
     & Omit<CancelRequest["action"], "type">
     & Partial<Pick<CancelRequest, "vaultAddress">>
     & Partial<Pick<CancelRequest, "expiresAfter">>;
 
-/** Parameters for the {@linkcode WalletClient.cancelByCloid} method. */
+/** Parameters for the {@linkcode ExchangeClient.cancelByCloid} method. */
 export type CancelByCloidParameters =
     & Omit<CancelByCloidRequest["action"], "type">
     & Partial<Pick<CancelByCloidRequest, "vaultAddress">>
     & Partial<Pick<CancelByCloidRequest, "expiresAfter">>;
 
-/** Parameters for the {@linkcode WalletClient.cDeposit} method. */
+/** Parameters for the {@linkcode ExchangeClient.cDeposit} method. */
 export type CDepositParameters = Omit<
     CDepositRequest["action"],
     "type" | "hyperliquidChain" | "signatureChainId" | "nonce"
 >;
 
-/** Parameters for the {@linkcode WalletClient.convertToMultiSigUser} method. */
+/** Parameters for the {@linkcode ExchangeClient.convertToMultiSigUser} method. */
 export type ConvertToMultiSigUserParameters = NonNullable<ConvertToMultiSigUserRequest_Signers>;
 
-/** Parameters for the {@linkcode WalletClient.createSubAccount} method. */
+/** Parameters for the {@linkcode ExchangeClient.createSubAccount} method. */
 export type CreateSubAccountParameters = Omit<
     CreateSubAccountRequest["action"],
     "type"
 >;
 
-/** Parameters for the {@linkcode WalletClient.createVault} method. */
+/** Parameters for the {@linkcode ExchangeClient.createVault} method. */
 export type CreateVaultParameters = Omit<
     CreateVaultRequest["action"],
     "type" | "nonce"
 >;
 
-/** Parameters for the {@linkcode WalletClient.cSignerAction} method. */
+/** Parameters for the {@linkcode ExchangeClient.cSignerAction} method. */
 export type CSignerActionParameters =
     | CSignerActionParameters_JailSelf
     | CSignerActionParameters_UnjailSelf;
-/** One of the parameters for the {@linkcode WalletClient.cSignerAction} method. */
+/** One of the parameters for the {@linkcode ExchangeClient.cSignerAction} method. */
 export type CSignerActionParameters_JailSelf =
     & Omit<CSignerActionRequest_JailSelf["action"], "type">
     & Partial<Pick<CSignerActionRequest_JailSelf, "expiresAfter">>;
-/** One of the parameters for the {@linkcode WalletClient.cSignerAction} method. */
+/** One of the parameters for the {@linkcode ExchangeClient.cSignerAction} method. */
 export type CSignerActionParameters_UnjailSelf =
     & Omit<CSignerActionRequest_UnjailSelf["action"], "type">
     & Partial<Pick<CSignerActionRequest_UnjailSelf, "expiresAfter">>;
 
-/** Parameters for the {@linkcode WalletClient.cValidatorAction} method. */
+/** Parameters for the {@linkcode ExchangeClient.cValidatorAction} method. */
 export type CValidatorActionParameters =
     | CValidatorActionParameters_ChangeProfile
     | CValidatorActionParameters_Register
     | CValidatorActionParameters_Unregister;
-/** One of the parameters for the {@linkcode WalletClient.cValidatorAction} method. */
+/** One of the parameters for the {@linkcode ExchangeClient.cValidatorAction} method. */
 export type CValidatorActionParameters_ChangeProfile =
     & Omit<CValidatorActionRequest_ChangeProfile["action"], "type">
     & Partial<Pick<CValidatorActionRequest_ChangeProfile, "expiresAfter">>;
-/** One of the parameters for the {@linkcode WalletClient.cValidatorAction} method. */
+/** One of the parameters for the {@linkcode ExchangeClient.cValidatorAction} method. */
 export type CValidatorActionParameters_Register =
     & Omit<CValidatorActionRequest_Register["action"], "type">
     & Partial<Pick<CValidatorActionRequest_Register, "expiresAfter">>;
-/** One of the parameters for the {@linkcode WalletClient.cValidatorAction} method. */
+/** One of the parameters for the {@linkcode ExchangeClient.cValidatorAction} method. */
 export type CValidatorActionParameters_Unregister =
     & Omit<CValidatorActionRequest_Unregister["action"], "type">
     & Partial<Pick<CValidatorActionRequest_Unregister, "expiresAfter">>;
 
-/** Parameters for the {@linkcode WalletClient.cWithdraw} method. */
+/** Parameters for the {@linkcode ExchangeClient.cWithdraw} method. */
 export type CWithdrawParameters = Omit<
     CWithdrawRequest["action"],
     "type" | "hyperliquidChain" | "signatureChainId" | "nonce"
 >;
 
-/** Parameters for the {@linkcode WalletClient.evmUserModify} method. */
+/** Parameters for the {@linkcode ExchangeClient.evmUserModify} method. */
 export type EvmUserModifyParameters = Omit<
     EvmUserModifyRequest["action"],
     "type"
 >;
 
-/** Parameters for the {@linkcode WalletClient.modify} method. */
+/** Parameters for the {@linkcode ExchangeClient.modify} method. */
 export type ModifyParameters =
     & Omit<ModifyRequest["action"], "type">
     & Partial<Pick<ModifyRequest, "vaultAddress">>
     & Partial<Pick<ModifyRequest, "expiresAfter">>;
 
-/** Parameters for the {@linkcode WalletClient.multiSig} method. */
+/** Parameters for the {@linkcode ExchangeClient.multiSig} method. */
 export type MultiSigParameters =
     & Omit<MultiSigRequest["action"], "type" | "signatureChainId">
     & Partial<Pick<MultiSigRequest, "vaultAddress">>
@@ -220,54 +220,54 @@ export type MultiSigParameters =
         nonce: number;
     };
 
-/** Parameters for the {@linkcode WalletClient.order} method. */
+/** Parameters for the {@linkcode ExchangeClient.order} method. */
 export type OrderParameters =
     & Omit<OrderRequest["action"], "type">
     & Partial<Pick<OrderRequest, "vaultAddress">>
     & Partial<Pick<OrderRequest, "expiresAfter">>;
 
-/** Parameters for the {@linkcode WalletClient.perpDeploy} method. */
+/** Parameters for the {@linkcode ExchangeClient.perpDeploy} method. */
 export type PerpDeployParameters =
     | PerpDeployParameters_RegisterAsset
     | PerpDeployParameters_SetOracle;
-/** One of the parameters for the {@linkcode WalletClient.perpDeploy} method. */
+/** One of the parameters for the {@linkcode ExchangeClient.perpDeploy} method. */
 export type PerpDeployParameters_RegisterAsset = Omit<PerpDeployRequest_RegisterAsset["action"], "type">;
-/** One of the parameters for the {@linkcode WalletClient.perpDeploy} method. */
+/** One of the parameters for the {@linkcode ExchangeClient.perpDeploy} method. */
 export type PerpDeployParameters_SetOracle = Omit<PerpDeployRequest_SetOracle["action"], "type">;
 
-/** Parameters for the {@linkcode WalletClient.perpDexClassTransfer} method. */
+/** Parameters for the {@linkcode ExchangeClient.perpDexClassTransfer} method. */
 export type PerpDexClassTransferParameters = Omit<
     PerpDexClassTransferRequest["action"],
     "type" | "hyperliquidChain" | "signatureChainId" | "nonce"
 >;
 
-/** Parameters for the {@linkcode WalletClient.registerReferrer} method. */
+/** Parameters for the {@linkcode ExchangeClient.registerReferrer} method. */
 export type RegisterReferrerParameters = Omit<RegisterReferrerRequest["action"], "type">;
 
-/** Parameters for the {@linkcode WalletClient.reserveRequestWeight} method. */
+/** Parameters for the {@linkcode ExchangeClient.reserveRequestWeight} method. */
 export type ReserveRequestWeightParameters =
     & Omit<ReserveRequestWeightRequest["action"], "type">
     & Partial<Pick<ReserveRequestWeightRequest, "expiresAfter">>;
 
-/** Parameters for the {@linkcode WalletClient.scheduleCancel} method. */
+/** Parameters for the {@linkcode ExchangeClient.scheduleCancel} method. */
 export type ScheduleCancelParameters =
     & Omit<ScheduleCancelRequest["action"], "type">
     & Partial<Pick<ScheduleCancelRequest, "vaultAddress">>
     & Partial<Pick<ScheduleCancelRequest, "expiresAfter">>;
 
-/** Parameters for the {@linkcode WalletClient.setDisplayName} method. */
+/** Parameters for the {@linkcode ExchangeClient.setDisplayName} method. */
 export type SetDisplayNameParameters = Omit<
     SetDisplayNameRequest["action"],
     "type"
 >;
 
-/** Parameters for the {@linkcode WalletClient.setReferrer} method. */
+/** Parameters for the {@linkcode ExchangeClient.setReferrer} method. */
 export type SetReferrerParameters = Omit<
     SetReferrerRequest["action"],
     "type"
 >;
 
-/** Parameters for the {@linkcode WalletClient.spotDeploy} method. */
+/** Parameters for the {@linkcode ExchangeClient.spotDeploy} method. */
 export type SpotDeployParameters =
     | SpotDeployParameters_Genesis
     | SpotDeployParameters_RegisterHyperliquidity
@@ -275,121 +275,121 @@ export type SpotDeployParameters =
     | SpotDeployParameters_RegisterToken2
     | SpotDeployParameters_SetDeployerTradingFeeShare
     | SpotDeployParameters_UserGenesis;
-/** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
+/** One of the parameters for the {@linkcode ExchangeClient.spotDeploy} method. */
 export type SpotDeployParameters_Genesis = Omit<
     SpotDeployRequest_Genesis["action"],
     "type"
 >;
-/** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
+/** One of the parameters for the {@linkcode ExchangeClient.spotDeploy} method. */
 export type SpotDeployParameters_RegisterHyperliquidity = Omit<
     SpotDeployRequest_RegisterHyperliquidity["action"],
     "type"
 >;
-/** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
+/** One of the parameters for the {@linkcode ExchangeClient.spotDeploy} method. */
 export type SpotDeployParameters_RegisterSpot = Omit<
     SpotDeployRequest_RegisterSpot["action"],
     "type"
 >;
-/** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
+/** One of the parameters for the {@linkcode ExchangeClient.spotDeploy} method. */
 export type SpotDeployParameters_RegisterToken2 = Omit<
     SpotDeployRequest_RegisterToken2["action"],
     "type"
 >;
-/** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
+/** One of the parameters for the {@linkcode ExchangeClient.spotDeploy} method. */
 export type SpotDeployParameters_SetDeployerTradingFeeShare = Omit<
     SpotDeployRequest_SetDeployerTradingFeeShare["action"],
     "type"
 >;
-/** One of the parameters for the {@linkcode WalletClient.spotDeploy} method. */
+/** One of the parameters for the {@linkcode ExchangeClient.spotDeploy} method. */
 export type SpotDeployParameters_UserGenesis = Omit<
     SpotDeployRequest_UserGenesis["action"],
     "type"
 >;
 
-/** Parameters for the {@linkcode WalletClient.spotSend} method. */
+/** Parameters for the {@linkcode ExchangeClient.spotSend} method. */
 export type SpotSendParameters = Omit<
     SpotSendRequest["action"],
     "type" | "hyperliquidChain" | "signatureChainId" | "time"
 >;
 
-/** Parameters for the {@linkcode WalletClient.spotUser} method. */
+/** Parameters for the {@linkcode ExchangeClient.spotUser} method. */
 export type SpotUserParameters = Omit<
     SpotUserRequest["action"],
     "type"
 >;
 
-/** Parameters for the {@linkcode WalletClient.subAccountSpotTransfer} method. */
+/** Parameters for the {@linkcode ExchangeClient.subAccountSpotTransfer} method. */
 export type SubAccountSpotTransferParameters = Omit<
     SubAccountSpotTransferRequest["action"],
     "type"
 >;
 
-/** Parameters for the {@linkcode WalletClient.subAccountTransfer} method. */
+/** Parameters for the {@linkcode ExchangeClient.subAccountTransfer} method. */
 export type SubAccountTransferParameters = Omit<
     SubAccountTransferRequest["action"],
     "type"
 >;
 
-/** Parameters for the {@linkcode WalletClient.tokenDelegate} method. */
+/** Parameters for the {@linkcode ExchangeClient.tokenDelegate} method. */
 export type TokenDelegateParameters = Omit<
     TokenDelegateRequest["action"],
     "type" | "hyperliquidChain" | "signatureChainId" | "nonce"
 >;
 
-/** Parameters for the {@linkcode WalletClient.twapCancel} method. */
+/** Parameters for the {@linkcode ExchangeClient.twapCancel} method. */
 export type TwapCancelParameters =
     & Omit<TwapCancelRequest["action"], "type">
     & Partial<Pick<TwapCancelRequest, "vaultAddress">>
     & Partial<Pick<TwapCancelRequest, "expiresAfter">>;
 
-/** Parameters for the {@linkcode WalletClient.twapOrder} method. */
+/** Parameters for the {@linkcode ExchangeClient.twapOrder} method. */
 export type TwapOrderParameters =
     & TwapOrderRequest["action"]["twap"]
     & Partial<Pick<TwapOrderRequest, "vaultAddress">>
     & Partial<Pick<TwapOrderRequest, "expiresAfter">>;
 
-/** Parameters for the {@linkcode WalletClient.updateIsolatedMargin} method. */
+/** Parameters for the {@linkcode ExchangeClient.updateIsolatedMargin} method. */
 export type UpdateIsolatedMarginParameters =
     & Omit<UpdateIsolatedMarginRequest["action"], "type">
     & Partial<Pick<UpdateIsolatedMarginRequest, "vaultAddress">>
     & Partial<Pick<UpdateIsolatedMarginRequest, "expiresAfter">>;
 
-/** Parameters for the {@linkcode WalletClient.updateLeverage} method. */
+/** Parameters for the {@linkcode ExchangeClient.updateLeverage} method. */
 export type UpdateLeverageParameters =
     & Omit<UpdateLeverageRequest["action"], "type">
     & Partial<Pick<UpdateLeverageRequest, "vaultAddress">>
     & Partial<Pick<UpdateLeverageRequest, "expiresAfter">>;
 
-/** Parameters for the {@linkcode WalletClient.usdClassTransfer} method. */
+/** Parameters for the {@linkcode ExchangeClient.usdClassTransfer} method. */
 export type UsdClassTransferParameters = Omit<
     UsdClassTransferRequest["action"],
     "type" | "hyperliquidChain" | "signatureChainId" | "nonce"
 >;
 
-/** Parameters for the {@linkcode WalletClient.usdSend} method. */
+/** Parameters for the {@linkcode ExchangeClient.usdSend} method. */
 export type UsdSendParameters = Omit<
     UsdSendRequest["action"],
     "type" | "hyperliquidChain" | "signatureChainId" | "time"
 >;
 
-/** Parameters for the {@linkcode WalletClient.vaultDistribute} method. */
+/** Parameters for the {@linkcode ExchangeClient.vaultDistribute} method. */
 export type VaultDistributeParameters = Omit<
     VaultDistributeRequest["action"],
     "type"
 >;
 
-/** Parameters for the {@linkcode WalletClient.vaultModify} method. */
+/** Parameters for the {@linkcode ExchangeClient.vaultModify} method. */
 export type VaultModifyParameters = Omit<
     VaultModifyRequest["action"],
     "type"
 >;
 
-/** Parameters for the {@linkcode WalletClient.vaultTransfer} method. */
+/** Parameters for the {@linkcode ExchangeClient.vaultTransfer} method. */
 export type VaultTransferParameters =
     & Omit<VaultTransferRequest["action"], "type">
     & Partial<Pick<VaultTransferRequest, "expiresAfter">>;
 
-/** Parameters for the {@linkcode WalletClient.withdraw3} method. */
+/** Parameters for the {@linkcode ExchangeClient.withdraw3} method. */
 export type Withdraw3Parameters = Omit<
     Withdraw3Request["action"],
     "type" | "hyperliquidChain" | "signatureChainId" | "time"
@@ -492,14 +492,14 @@ class NonceManager {
 }
 
 /**
- * Wallet client for interacting with the Hyperliquid API.
+ * Exchange client for interacting with the Hyperliquid API.
  * @typeParam T The transport used to connect to the Hyperliquid API.
  * @typeParam W The WalletClient/Account ([viem](https://viem.sh/docs/clients/wallet)) or Signer ([ethers.js](https://docs.ethers.io/v6/api/providers/#Signer)) used for signing transactions.
  */
-export class WalletClient<
+export class ExchangeClient<
     T extends IRequestTransport = IRequestTransport,
     W extends AbstractWallet = AbstractWallet,
-> implements WalletClientParameters, AsyncDisposable {
+> implements ExchangeClientParameters, AsyncDisposable {
     transport: T;
     wallet: W;
     isTestnet: boolean;
@@ -520,7 +520,7 @@ export class WalletClient<
      * const wallet = privateKeyToAccount("0x...");
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      * ```
      *
      * @example Private key via [ethers.js](https://docs.ethers.org/v6/api/wallet/#Wallet) or [ethers.js v5](https://docs.ethers.org/v5/api/signer/#Wallet)
@@ -531,7 +531,7 @@ export class WalletClient<
      * const wallet = new ethers.Wallet("0x...");
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      * ```
      *
      * @example External wallet (e.g. MetaMask) via [viem](https://viem.sh/docs/clients/wallet#optional-hoist-the-account)
@@ -543,7 +543,7 @@ export class WalletClient<
      * const wallet = createWalletClient({ account, transport: custom(window.ethereum) });
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      * ```
      *
      * @example External wallet (e.g. MetaMask) via `window.ethereum` directly
@@ -551,10 +551,10 @@ export class WalletClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet: window.ethereum, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet: window.ethereum, transport });
      * ```
      */
-    constructor(args: WalletClientParameters<T, W>) {
+    constructor(args: ExchangeClientParameters<T, W>) {
         this.transport = args.transport;
         this.wallet = args.wallet;
         this.isTestnet = args.isTestnet ?? false;
@@ -579,7 +579,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.approveAgent({ agentAddress: "0x...", agentName: "agentName" });
      * ```
@@ -633,7 +633,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.approveBuilderFee({ maxFeeRate: "0.01%", builder: "0x..." });
      * ```
@@ -685,7 +685,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.batchModify({
      *   modifies: [{
@@ -781,7 +781,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.cancel({
      *   cancels: [{
@@ -841,7 +841,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.cancelByCloid({
      *   cancels: [
@@ -900,7 +900,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.cDeposit({ wei: 1 * 1e8 });
      * ```
@@ -951,7 +951,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.claimRewards();
      * ```
@@ -991,7 +991,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.convertToMultiSigUser({
      *   authorizedUsers: ["0x...", "0x..."],
@@ -1045,7 +1045,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.createSubAccount({ name: "subAccountName" });
      * ```
@@ -1088,7 +1088,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.createVault({
      *   name: "VaultName",
@@ -1138,7 +1138,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * // Jail self
      * const result = await client.cSignerAction({ jailSelf: null });
@@ -1195,7 +1195,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * // Change validator profile
      * const result = await client.cValidatorAction({
@@ -1305,7 +1305,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.cWithdraw({ wei: 1 * 1e8 });
      * ```
@@ -1356,7 +1356,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.evmUserModify({ usingBigBlocks: true });
      * ```
@@ -1399,7 +1399,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.modify({
      *   oid: 123,
@@ -1488,7 +1488,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const multiSigUser = "0x..."; // Multi-sig user address
      *
@@ -1584,7 +1584,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.order({
      *   orders: [{
@@ -1751,7 +1751,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.perpDexClassTransfer({
      *   dex: "test",
@@ -1810,7 +1810,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.registerReferrer({ code: "TEST" });
      * ```
@@ -1853,7 +1853,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.reserveRequestWeight({ weight: 10 });
      * ```
@@ -1903,7 +1903,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.scheduleCancel({ time: Date.now() + 3600000 });
      * ```
@@ -1964,7 +1964,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.setDisplayName({ displayName: "My Name" });
      * ```
@@ -2007,7 +2007,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.setReferrer({ code: "TEST" });
      * ```
@@ -2189,7 +2189,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.spotSend({
      *   destination: "0x...",
@@ -2246,7 +2246,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.spotUser({ toggleSpotDusting: { optOut: false } });
      * ```
@@ -2291,7 +2291,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.subAccountSpotTransfer({
      *   subAccountUser: "0x...",
@@ -2345,7 +2345,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.subAccountTransfer({
      *   subAccountUser: "0x...",
@@ -2394,7 +2394,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.tokenDelegate({
      *   validator: "0x...",
@@ -2451,7 +2451,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.twapCancel({
      *   a: 0, // Asset index
@@ -2507,7 +2507,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.twapOrder({
      *   a: 0, // Asset index
@@ -2573,7 +2573,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.updateIsolatedMargin({ asset: 0, isBuy: true, ntli: 1 * 1e6 });
      * ```
@@ -2627,7 +2627,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.updateLeverage({ asset: 0, isCross: true, leverage: 5 });
      * ```
@@ -2681,7 +2681,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.usdClassTransfer({ amount: "1", toPerp: true });
      * ```
@@ -2733,7 +2733,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.usdSend({ destination: "0x...", amount: "1" });
      * ```
@@ -2785,7 +2785,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.vaultDistribute({ vaultAddress: "0x...", usd: 10 * 1e6 });
      * ```
@@ -2829,7 +2829,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.vaultModify({
      *   vaultAddress: "0x...",
@@ -2878,7 +2878,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.vaultTransfer({
      *   vaultAddress: "0x...",
@@ -2934,7 +2934,7 @@ export class WalletClient<
      *
      * const wallet = privateKeyToAccount("0x...");
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
-     * const client = new hl.WalletClient({ wallet, transport });
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const result = await client.withdraw3({ destination: "0x...", amount: "1" });
      * ```

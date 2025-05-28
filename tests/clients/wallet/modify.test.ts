@@ -1,6 +1,6 @@
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import BigNumber from "npm:bignumber.js@^9.1.2";
-import { HttpTransport, InfoClient, WalletClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient, ExchangeClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 import { formatPrice, formatSize, getAssetData } from "../../_utils/utils.ts";
@@ -12,7 +12,7 @@ const PERPS_ASSET = "BTC";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<WalletClient["modify"]>>;
+export type MethodReturnType = Awaited<ReturnType<ExchangeClient["modify"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -24,7 +24,7 @@ Deno.test("modify", async () => {
 
     const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
-    const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
+    const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
     const infoClient = new InfoClient({ transport });
 
     const { id, universe, ctx } = await getAssetData(infoClient, PERPS_ASSET);
@@ -36,8 +36,8 @@ Deno.test("modify", async () => {
     try {
         const data = await Promise.all([
             // Check response 'success'
-            walletClient.modify({
-                oid: await openOrder(walletClient, id, pxDown, sz),
+            exchClient.modify({
+                oid: await openOrder(exchClient, id, pxDown, sz),
                 order: {
                     a: id,
                     b: true,
@@ -48,8 +48,8 @@ Deno.test("modify", async () => {
                 },
             }),
             // Check argument 'expiresAfter'
-            walletClient.modify({
-                oid: await openOrder(walletClient, id, pxDown, sz),
+            exchClient.modify({
+                oid: await openOrder(exchClient, id, pxDown, sz),
                 order: {
                     a: id,
                     b: true,
@@ -61,8 +61,8 @@ Deno.test("modify", async () => {
                 expiresAfter: Date.now() + 1000 * 60 * 60,
             }),
             // Check argument 't.trigger'
-            walletClient.modify({
-                oid: await openOrder(walletClient, id, pxDown, sz),
+            exchClient.modify({
+                oid: await openOrder(exchClient, id, pxDown, sz),
                 order: {
                     a: id,
                     b: true,
@@ -86,11 +86,11 @@ Deno.test("modify", async () => {
 
         const openOrders = await infoClient.openOrders({ user: account.address });
         const cancels = openOrders.map((o) => ({ a: id, o: o.oid }));
-        await walletClient.cancel({ cancels });
+        await exchClient.cancel({ cancels });
     }
 });
 
-async function openOrder(client: WalletClient, id: number, pxDown: string, sz: string): Promise<number> {
+async function openOrder(client: ExchangeClient, id: number, pxDown: string, sz: string): Promise<number> {
     const openOrderRes = await client.order({
         orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
         grouping: "na",

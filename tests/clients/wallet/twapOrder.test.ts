@@ -1,6 +1,6 @@
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import BigNumber from "npm:bignumber.js@^9.1.2";
-import { HttpTransport, InfoClient, WalletClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient, ExchangeClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 import { formatSize, getAssetData } from "../../_utils/utils.ts";
@@ -12,7 +12,7 @@ const PERPS_ASSET = "BTC";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<WalletClient["twapOrder"]>>;
+export type MethodReturnType = Awaited<ReturnType<ExchangeClient["twapOrder"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -24,7 +24,7 @@ Deno.test("twapOrder", async () => {
 
     const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
-    const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
+    const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
     const infoClient = new InfoClient({ transport });
 
     const { id, universe, ctx } = await getAssetData(infoClient, PERPS_ASSET);
@@ -34,7 +34,7 @@ Deno.test("twapOrder", async () => {
 
     const data = await Promise.all([
         // Check response 'success'
-        walletClient.twapOrder({
+        exchClient.twapOrder({
             a: id,
             b: true,
             s: sz,
@@ -43,7 +43,7 @@ Deno.test("twapOrder", async () => {
             t: false,
         }),
         // Check argument 'expiresAfter'
-        walletClient.twapOrder({
+        exchClient.twapOrder({
             a: id,
             b: true,
             s: sz,
@@ -64,7 +64,7 @@ Deno.test("twapOrder", async () => {
         // —————————— Cleanup ——————————
 
         await Promise.all(data.map((d) => {
-            return walletClient.twapCancel({ a: id, t: d.response.data.status.running.twapId });
+            return exchClient.twapCancel({ a: id, t: d.response.data.status.running.twapId });
         }));
     }
 });

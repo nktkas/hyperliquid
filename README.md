@@ -57,9 +57,9 @@ import { privateKeyToAccount } from "viem/accounts";
 const wallet = privateKeyToAccount("0x..."); // Your private key
 
 const transport = new hl.HttpTransport();
-const client = new hl.WalletClient({ wallet, transport });
+const exchClient = new hl.ExchangeClient({ wallet, transport });
 
-const result = await client.order({
+const result = await exchClient.order({
     orders: [{
         a: 0, // Asset index
         b: true, // Buy order
@@ -118,7 +118,7 @@ const transport = new hl.HttpTransport(); // or WebSocketTransport
 const infoClient = new hl.InfoClient({ transport });
 ```
 
-#### Create WalletClient
+#### Create ExchangeClient
 
 ```ts
 import * as hl from "@nktkas/hyperliquid";
@@ -130,19 +130,19 @@ const transport = new hl.HttpTransport(); // or WebSocketTransport
 
 // 1. Using Viem with private key
 const viemAccount = privateKeyToAccount("0x...");
-const viemClient = new hl.WalletClient({ wallet: viemAccount, transport });
+const ExchangeClient_Viem = new hl.ExchangeClient({ wallet: viemAccount, transport });
 
 // 2. Using Ethers (or Ethers V5) with private key
 const ethersWallet = new ethers.Wallet("0x...");
-const ethersClient = new hl.WalletClient({ wallet: ethersWallet, transport });
+const ExchangeClient_Ethers = new hl.ExchangeClient({ wallet: ethersWallet, transport });
 
 // 3. Using external wallet (e.g. MetaMask) via Viem
 const [account] = await window.ethereum.request({ method: "eth_requestAccounts" });
 const externalWallet = createWalletClient({ account, transport: custom(window.ethereum) });
-const viemMetamaskClient = new hl.WalletClient({ wallet: externalWallet, transport });
+const ExchangeClient_ViemMetamask = new hl.ExchangeClient({ wallet: externalWallet, transport });
 
 // 4. Using external wallet (e.g. MetaMask) via `window.ethereum` directly
-const windowMetamaskClient = new hl.WalletClient({ wallet: window.ethereum, transport });
+const ExchangeClient_WindowMetamask = new hl.ExchangeClient({ wallet: window.ethereum, transport });
 ```
 
 #### Create SubscriptionClient
@@ -176,7 +176,7 @@ const clearinghouseState = await infoClient.clearinghouseState({ user: "0x..." }
 const openOrders = await infoClient.openOrders({ user: "0x..." });
 ```
 
-#### Example of using a WalletClient
+#### Example of using an ExchangeClient
 
 ```ts
 import * as hl from "@nktkas/hyperliquid";
@@ -184,10 +184,10 @@ import { privateKeyToAccount } from "viem/accounts";
 
 const account = privateKeyToAccount("0x...");
 const transport = new hl.HttpTransport();
-const client = new hl.WalletClient({ wallet: account, transport });
+const exchClient = new hl.ExchangeClient({ wallet: account, transport });
 
 // Place an orders
-const result = await client.order({
+const result = await exchClient.order({
     orders: [{
         a: 0,
         b: true,
@@ -204,13 +204,13 @@ const result = await client.order({
 });
 
 // Approve an agent
-const result = await client.approveAgent({
+const result = await exchClient.approveAgent({
     agentAddress: "0x...",
     agentName: "agentName",
 });
 
 // Withdraw funds
-const result = await client.withdraw3({
+const result = await exchClient.withdraw3({
     destination: account.address,
     amount: "100",
 });
@@ -324,18 +324,18 @@ class InfoClient {
 }
 ```
 
-#### Wallet Client
+#### Exchange Client
 
-A Wallet Client which provides access to
+An Exchange Client which provides access to
 [Exchange API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint), such as `order`
 and `withdraw3`.
 
-The Wallet Client class sets up with a given [Transport](#transports) and a wallet instance, which can be a
+The Exchange Client class sets up with a given [Transport](#transports) and a wallet instance, which can be a
 [viem](https://viem.sh/docs/clients/wallet), [ethers.js](https://docs.ethers.org/v6/api/providers/#Signer) or other
 wallet libraries.
 
 ```ts
-class WalletClient {
+class ExchangeClient {
     constructor(args: {
         transport: HttpTransport | WebSocketTransport;
         wallet:

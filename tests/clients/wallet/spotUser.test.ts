@@ -1,5 +1,5 @@
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
-import { HttpTransport, WalletClient } from "../../../mod.ts";
+import { HttpTransport, ExchangeClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
@@ -9,7 +9,7 @@ const PRIVATE_KEY = Deno.args[0] as `0x${string}`;
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<WalletClient["spotUser"]>>;
+export type MethodReturnType = Awaited<ReturnType<ExchangeClient["spotUser"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -21,12 +21,12 @@ Deno.test("spotUser", async () => {
 
     const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
-    const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
+    const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
 
     // —————————— Test ——————————
 
-    const data1 = await walletClient.spotUser({ toggleSpotDusting: { optOut: true } });
-    const data2 = await walletClient.spotUser({ toggleSpotDusting: { optOut: false } });
+    const data1 = await exchClient.spotUser({ toggleSpotDusting: { optOut: true } });
+    const data2 = await exchClient.spotUser({ toggleSpotDusting: { optOut: false } });
 
     schemaCoverage(MethodReturnType, [data1, data2]);
 });

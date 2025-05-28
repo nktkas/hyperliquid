@@ -1,6 +1,6 @@
 import { assertRejects } from "jsr:@std/assert@^1.0.10";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
-import { ApiRequestError, HttpTransport, WalletClient } from "../../../mod.ts";
+import { ApiRequestError, HttpTransport, ExchangeClient } from "../../../mod.ts";
 
 // —————————— Constants ——————————
 
@@ -17,18 +17,18 @@ Deno.test("cSignerAction", async () => {
 
     const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
-    const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
+    const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
 
     // —————————— Test ——————————
 
     await Promise.all([
         assertRejects(
-            () => walletClient.cSignerAction({ jailSelf: null }),
+            () => exchClient.cSignerAction({ jailSelf: null }),
             ApiRequestError,
             "Signer invalid or inactive for current epoch",
         ),
         assertRejects(
-            () => walletClient.cSignerAction({ unjailSelf: null }),
+            () => exchClient.cSignerAction({ unjailSelf: null }),
             ApiRequestError,
             "Signer invalid or inactive for current epoch",
         ),

@@ -7,7 +7,7 @@ import {
     type OrderStatus,
     InfoClient,
     SubscriptionClient,
-    WalletClient,
+    ExchangeClient,
     WebSocketTransport,
 } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
@@ -32,7 +32,7 @@ Deno.test("orderUpdates", async () => {
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
     await using infoClient = new InfoClient({ transport });
     await using subsClient = new SubscriptionClient({ transport });
-    await using walletClient = new WalletClient({
+    await using exchClient = new ExchangeClient({
         wallet: privateKeyToAccount(PRIVATE_KEY),
         transport,
         isTestnet: true,
@@ -45,7 +45,7 @@ Deno.test("orderUpdates", async () => {
         new Promise(async (resolve, reject) => {
             const events: OrderStatus<Order>[][] = [];
             await subsClient.orderUpdates(
-                { user: walletClient.wallet.address },
+                { user: exchClient.wallet.address },
                 async (data) => {
                     try {
                         events.push(data);
@@ -60,9 +60,9 @@ Deno.test("orderUpdates", async () => {
                 },
             );
 
-            const order1Promise = createOrder(infoClient, walletClient, PERPS_ASSET, "open_filled");
-            const order2Promise = createOrder(infoClient, walletClient, PERPS_ASSET, "open_canceled");
-            const order3Promise = createOrder(infoClient, walletClient, PERPS_ASSET, "rejected");
+            const order1Promise = createOrder(infoClient, exchClient, PERPS_ASSET, "open_filled");
+            const order2Promise = createOrder(infoClient, exchClient, PERPS_ASSET, "open_canceled");
+            const order3Promise = createOrder(infoClient, exchClient, PERPS_ASSET, "rejected");
         }),
         20_000,
     );
@@ -88,7 +88,7 @@ Deno.test("orderUpdates", async () => {
 
 async function createOrder(
     infoClient: InfoClient,
-    walletClient: WalletClient,
+    exchClient: ExchangeClient,
     asset: string,
     mode: "open_filled" | "open_canceled" | "rejected",
 ): Promise<void> {
@@ -98,7 +98,7 @@ async function createOrder(
     const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);
 
     if (mode === "open_filled") {
-        await walletClient.order({
+        await exchClient.order({
             orders: [{
                 a: id,
                 b: true,
@@ -111,7 +111,7 @@ async function createOrder(
             grouping: "na",
         });
 
-        await walletClient.order({
+        await exchClient.order({
             orders: [{
                 a: id,
                 b: false,
@@ -124,7 +124,7 @@ async function createOrder(
             grouping: "na",
         }).catch(() => undefined);
     } else if (mode === "open_canceled") {
-        const openOrder = await walletClient.order({
+        const openOrder = await exchClient.order({
             orders: [{
                 a: id,
                 b: true,
@@ -137,14 +137,14 @@ async function createOrder(
         });
 
         const [order] = openOrder.response.data.statuses;
-        await walletClient.cancel({
+        await exchClient.cancel({
             cancels: [{
                 a: id,
                 o: "resting" in order ? order.resting.oid : order.filled.oid,
             }],
         });
     } else if (mode === "rejected") {
-        await walletClient.order({
+        await exchClient.order({
             orders: [{
                 a: id,
                 b: false,

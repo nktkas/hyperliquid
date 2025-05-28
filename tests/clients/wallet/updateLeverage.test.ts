@@ -1,6 +1,6 @@
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import BigNumber from "npm:bignumber.js@^9.1.2";
-import { HttpTransport, InfoClient, WalletClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient, ExchangeClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 import { formatPrice, getAssetData } from "../../_utils/utils.ts";
@@ -12,7 +12,7 @@ const PERPS_ASSET = "BTC";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Awaited<ReturnType<WalletClient["updateLeverage"]>>;
+export type MethodReturnType = Awaited<ReturnType<ExchangeClient["updateLeverage"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -24,13 +24,13 @@ Deno.test("updateLeverage", async () => {
 
     const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
-    const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
+    const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
     const infoClient = new InfoClient({ transport });
 
     const { id, universe, ctx } = await getAssetData(infoClient, PERPS_ASSET);
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
 
-    await walletClient.order({
+    await exchClient.order({
         orders: [{
             a: id,
             b: false,
@@ -46,8 +46,8 @@ Deno.test("updateLeverage", async () => {
 
     const data = await Promise.all([
         // Check argument 'isCross' + argument 'expiresAfter'
-        walletClient.updateLeverage({ asset: id, isCross: true, leverage: 1 }),
-        walletClient.updateLeverage({
+        exchClient.updateLeverage({ asset: id, isCross: true, leverage: 1 }),
+        exchClient.updateLeverage({
             asset: id,
             isCross: false,
             leverage: 1,

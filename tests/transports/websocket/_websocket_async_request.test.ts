@@ -44,7 +44,7 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
                 assertEquals(typeof sent.id, "number");
                 assertEquals(sent.request.foo, "bar");
 
-                // Сheck response
+                // Check response
                 const mockMessage = {
                     channel: "post",
                     data: {

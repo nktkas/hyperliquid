@@ -1,6 +1,6 @@
 import { assertRejects } from "jsr:@std/assert@^1.0.10";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
-import { ApiRequestError, HttpTransport, WalletClient } from "../../../mod.ts";
+import { ApiRequestError, HttpTransport, ExchangeClient } from "../../../mod.ts";
 
 // —————————— Constants ——————————
 
@@ -17,7 +17,7 @@ Deno.test("spotDeploy", async () => {
 
     const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
-    const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
+    const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
 
     // —————————— Test ——————————
 
@@ -25,7 +25,7 @@ Deno.test("spotDeploy", async () => {
         // Register Token | fullName
         assertRejects( // exists
             () =>
-                walletClient.spotDeploy({
+                exchClient.spotDeploy({
                     registerToken2: {
                         spec: {
                             name: "TestToken",
@@ -40,7 +40,7 @@ Deno.test("spotDeploy", async () => {
         ),
         assertRejects( // does not exist
             () =>
-                walletClient.spotDeploy({
+                exchClient.spotDeploy({
                     registerToken2: {
                         spec: {
                             name: "TestToken",
@@ -55,7 +55,7 @@ Deno.test("spotDeploy", async () => {
         // User Genesis | blacklistUsers
         assertRejects( // exists
             () =>
-                walletClient.spotDeploy({
+                exchClient.spotDeploy({
                     userGenesis: {
                         token: 0,
                         userAndWei: [],
@@ -68,7 +68,7 @@ Deno.test("spotDeploy", async () => {
         ),
         assertRejects( // does not exist
             () =>
-                walletClient.spotDeploy({
+                exchClient.spotDeploy({
                     userGenesis: {
                         token: 0,
                         userAndWei: [],
@@ -81,7 +81,7 @@ Deno.test("spotDeploy", async () => {
         // Genesis | noHyperliquidity
         assertRejects( // exists
             () =>
-                walletClient.spotDeploy({
+                exchClient.spotDeploy({
                     genesis: {
                         token: 0,
                         maxSupply: "10000000000",
@@ -93,7 +93,7 @@ Deno.test("spotDeploy", async () => {
         ),
         assertRejects( // does not exist
             () =>
-                walletClient.spotDeploy({
+                exchClient.spotDeploy({
                     genesis: {
                         token: 0,
                         maxSupply: "10000000000",
@@ -105,7 +105,7 @@ Deno.test("spotDeploy", async () => {
         // Register Spot
         assertRejects(
             () =>
-                walletClient.spotDeploy({
+                exchClient.spotDeploy({
                     registerSpot: {
                         tokens: [0, 0],
                     },
@@ -116,7 +116,7 @@ Deno.test("spotDeploy", async () => {
         // Register Hyperliquidity | nSeededLevels
         assertRejects( // exists
             () =>
-                walletClient.spotDeploy({
+                exchClient.spotDeploy({
                     registerHyperliquidity: {
                         spot: 0,
                         startPx: "1",
@@ -130,7 +130,7 @@ Deno.test("spotDeploy", async () => {
         ),
         assertRejects( // does not exist
             () =>
-                walletClient.spotDeploy({
+                exchClient.spotDeploy({
                     registerHyperliquidity: {
                         spot: 0,
                         startPx: "1",
@@ -144,7 +144,7 @@ Deno.test("spotDeploy", async () => {
         // Set Deployer Trading Fee Share
         assertRejects(
             () =>
-                walletClient.spotDeploy({
+                exchClient.spotDeploy({
                     setDeployerTradingFeeShare: {
                         token: 0,
                         share: "0%",

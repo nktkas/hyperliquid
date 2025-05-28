@@ -1,6 +1,6 @@
 import { privateKeyToAccount } from "npm:viem@^2.21.54/accounts";
 import { assertRejects } from "jsr:@std/assert@^1.0.10";
-import { ApiRequestError, HttpTransport, WalletClient } from "../../../mod.ts";
+import { ApiRequestError, HttpTransport, ExchangeClient } from "../../../mod.ts";
 
 // —————————— Constants ——————————
 
@@ -15,13 +15,13 @@ Deno.test("_validateResponse", async (t) => {
 
     const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
-    const walletClient = new WalletClient({ wallet: account, transport, isTestnet: true });
+    const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
 
     // —————————— Test ——————————
 
     await t.step("CancelResponse", async () => {
         await assertRejects(
-            () => walletClient.cancel({ cancels: [{ a: 0, o: 0 }] }),
+            () => exchClient.cancel({ cancels: [{ a: 0, o: 0 }] }),
             ApiRequestError,
             "Cannot process API request: Order 0 failed: Order was never placed, already canceled, or filled.",
         );
@@ -29,7 +29,7 @@ Deno.test("_validateResponse", async (t) => {
 
     await t.step("ErrorResponse", async () => {
         await assertRejects(
-            () => walletClient.scheduleCancel({ time: 1 }),
+            () => exchClient.scheduleCancel({ time: 1 }),
             ApiRequestError,
             "Cannot process API request: Scheduled cancel time too early, must be at least 5 seconds from now.",
         );
@@ -38,7 +38,7 @@ Deno.test("_validateResponse", async (t) => {
     await t.step("OrderResponse", async () => {
         await assertRejects(
             () =>
-                walletClient.order({
+                exchClient.order({
                     orders: [{ a: 0, b: true, p: "0", s: "0", r: false, t: { limit: { tif: "Gtc" } } }],
                     grouping: "na",
                 }),
@@ -49,7 +49,7 @@ Deno.test("_validateResponse", async (t) => {
 
     await t.step("TwapCancelResponse", async () => {
         await assertRejects(
-            () => walletClient.twapOrder({ a: 0, b: true, s: "0", r: false, m: 5, t: false }),
+            () => exchClient.twapOrder({ a: 0, b: true, s: "0", r: false, m: 5, t: false }),
             ApiRequestError,
             "Cannot process API request: Order has zero size.",
         );
@@ -57,7 +57,7 @@ Deno.test("_validateResponse", async (t) => {
 
     await t.step("TwapOrderResponse", async () => {
         await assertRejects(
-            () => walletClient.twapOrder({ a: 0, b: true, s: "0", r: false, m: 5, t: false }),
+            () => exchClient.twapOrder({ a: 0, b: true, s: "0", r: false, m: 5, t: false }),
             ApiRequestError,
             "Cannot process API request: Order has zero size.",
         );

@@ -1,7 +1,7 @@
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import BigNumber from "npm:bignumber.js@^9.1.2";
 import { deadline } from "jsr:@std/async@^1.0.10/deadline";
-import { InfoClient, SubscriptionClient, WalletClient, WebSocketTransport, type WsUserEvent } from "../../../mod.ts";
+import { InfoClient, SubscriptionClient, ExchangeClient, WebSocketTransport, type WsUserEvent } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 import { formatPrice, formatSize, getAssetData, randomCloid } from "../../_utils/utils.ts";
@@ -25,7 +25,7 @@ Deno.test("userEvents", { sanitizeOps: false, sanitizeResources: false }, async 
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
     await using infoClient = new InfoClient({ transport });
     await using subsClient = new SubscriptionClient({ transport });
-    await using walletClient = new WalletClient({
+    await using exchClient = new ExchangeClient({
         wallet: privateKeyToAccount(PRIVATE_KEY),
         transport,
         isTestnet: true,
@@ -38,7 +38,7 @@ Deno.test("userEvents", { sanitizeOps: false, sanitizeResources: false }, async 
         new Promise(async (resolve, reject) => {
             const events: WsUserEvent[] = [];
             await subsClient.userEvents(
-                { user: walletClient.wallet.address },
+                { user: exchClient.wallet.address },
                 async (data) => {
                     try {
                         events.push(data);
@@ -59,14 +59,14 @@ Deno.test("userEvents", { sanitizeOps: false, sanitizeResources: false }, async 
                 },
             );
 
-            const order1Promise = openCloseOrder(infoClient, walletClient, PERPS_ASSET_1, true);
-            const order2Promise = openCloseOrder(infoClient, walletClient, PERPS_ASSET_2, false);
+            const order1Promise = openCloseOrder(infoClient, exchClient, PERPS_ASSET_1, true);
+            const order2Promise = openCloseOrder(infoClient, exchClient, PERPS_ASSET_2, false);
 
-            const twap1Promise = openCloseTwap(infoClient, walletClient, PERPS_ASSET_1, true, false);
-            const twap2Promise = openCloseTwap(infoClient, walletClient, PERPS_ASSET_2, false, false);
+            const twap1Promise = openCloseTwap(infoClient, exchClient, PERPS_ASSET_1, true, false);
+            const twap2Promise = openCloseTwap(infoClient, exchClient, PERPS_ASSET_2, false, false);
 
-            const twapFill1Promise = openCloseTwap(infoClient, walletClient, PERPS_ASSET_1, true, true);
-            const twapFill2Promise = openCloseTwap(infoClient, walletClient, PERPS_ASSET_2, false, true);
+            const twapFill1Promise = openCloseTwap(infoClient, exchClient, PERPS_ASSET_1, true, true);
+            const twapFill2Promise = openCloseTwap(infoClient, exchClient, PERPS_ASSET_2, false, true);
         }),
         20_000,
     );
@@ -96,7 +96,7 @@ Deno.test("userEvents", { sanitizeOps: false, sanitizeResources: false }, async 
 
 async function openCloseOrder(
     infoClient: InfoClient,
-    walletClient: WalletClient,
+    exchClient: ExchangeClient,
     asset: string,
     buy: boolean,
 ): Promise<void> {
@@ -105,7 +105,7 @@ async function openCloseOrder(
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);
 
-    await walletClient.order({
+    await exchClient.order({
         orders: [
             {
                 a: id,
@@ -120,7 +120,7 @@ async function openCloseOrder(
         grouping: "na",
     });
 
-    await walletClient.order({
+    await exchClient.order({
         orders: [{
             a: id,
             b: !buy,
@@ -135,7 +135,7 @@ async function openCloseOrder(
 }
 async function openCloseTwap(
     infoClient: InfoClient,
-    walletClient: WalletClient,
+    exchClient: ExchangeClient,
     asset: string,
     buy: boolean,
     position: boolean,
@@ -145,7 +145,7 @@ async function openCloseTwap(
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const twapSz = formatSize(new BigNumber(55).div(ctx.markPx), universe.szDecimals);
 
-    const result = await walletClient.twapOrder({
+    const result = await exchClient.twapOrder({
         a: id,
         b: buy,
         s: twapSz,
@@ -157,10 +157,10 @@ async function openCloseTwap(
 
     if (position) await new Promise((resolve) => setTimeout(resolve, 3000));
 
-    await walletClient.twapCancel({ a: id, t: twapId });
+    await exchClient.twapCancel({ a: id, t: twapId });
 
     if (position) {
-        await walletClient.order({
+        await exchClient.order({
             orders: [{
                 a: id,
                 b: !buy,
