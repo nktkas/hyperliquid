@@ -1,5 +1,5 @@
 import { deadline } from "jsr:@std/async@^1.0.10/deadline";
-import { EventClient, WebSocketTransport } from "../../../mod.ts";
+import { SubscriptionClient, WebSocketTransport } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
@@ -11,7 +11,7 @@ const COIN_2 = "NEAR";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Parameters<Parameters<EventClient["activeAssetData"]>[1]>[0];
+export type MethodReturnType = Parameters<Parameters<SubscriptionClient["activeAssetData"]>[1]>[0];
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -22,7 +22,7 @@ Deno.test("activeAssetData", async () => {
     // —————————— Prepare ——————————
 
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
-    await using client = new EventClient({ transport });
+    await using subsClient = new SubscriptionClient({ transport });
 
     // —————————— Test ——————————
 
@@ -30,13 +30,13 @@ Deno.test("activeAssetData", async () => {
         // Check argument 'leverage.type'
         deadline(
             new Promise((resolve) => {
-                client.activeAssetData({ coin: COIN_1, user: USER_ADDRESS }, resolve);
+                subsClient.activeAssetData({ coin: COIN_1, user: USER_ADDRESS }, resolve);
             }),
             10_000,
         ),
         deadline(
             new Promise((resolve) => {
-                client.activeAssetData({ coin: COIN_2, user: USER_ADDRESS }, resolve);
+                subsClient.activeAssetData({ coin: COIN_2, user: USER_ADDRESS }, resolve);
             }),
             10_000,
         ),

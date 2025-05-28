@@ -1,7 +1,7 @@
 import { deadline } from "jsr:@std/async@^1.0.10/deadline";
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import BigNumber from "npm:bignumber.js@^9.1.2";
-import { EventClient, PublicClient, WalletClient, WebSocketTransport } from "../../../mod.ts";
+import { PublicClient, SubscriptionClient, WalletClient, WebSocketTransport } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 import { formatPrice, formatSize, getAssetData, randomCloid } from "../../_utils/utils.ts";
@@ -12,7 +12,7 @@ const PERPS_ASSET_2 = "ETH";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Parameters<Parameters<EventClient["webData2"]>[1]>[0];
+export type MethodReturnType = Parameters<Parameters<SubscriptionClient["webData2"]>[1]>[0];
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -25,7 +25,7 @@ Deno.test("webData2", async () => {
     // Create clients
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws", timeout: 20_000 });
     await using publicClient = new PublicClient({ transport });
-    await using eventClient = new EventClient({ transport });
+    await using subsClient = new SubscriptionClient({ transport });
     await using walletClient = new WalletClient({
         wallet: privateKeyToAccount(PRIVATE_KEY),
         transport,
@@ -118,7 +118,7 @@ Deno.test("webData2", async () => {
     try {
         const data = await deadline(
             new Promise((resolve) => {
-                eventClient.webData2({ user: walletClient.wallet.address }, resolve);
+                subsClient.webData2({ user: walletClient.wallet.address }, resolve);
             }),
             10_000,
         );

@@ -80,9 +80,9 @@ const result = await client.order({
 import * as hl from "@nktkas/hyperliquid";
 
 const transport = new hl.WebSocketTransport();
-const client = new hl.EventClient({ transport });
+const subsClient = new hl.SubscriptionClient({ transport });
 
-const sub = await client.allMids((event) => {
+const sub = await subsClient.allMids((event) => {
     console.log(event);
 });
 
@@ -145,13 +145,13 @@ const viemMetamaskClient = new hl.WalletClient({ wallet: externalWallet, transpo
 const windowMetamaskClient = new hl.WalletClient({ wallet: window.ethereum, transport });
 ```
 
-#### Create EventClient
+#### Create SubscriptionClient
 
 ```ts
 import * as hl from "@nktkas/hyperliquid";
 
 const transport = new hl.WebSocketTransport(); // only WebSocketTransport
-const client = new hl.EventClient({ transport });
+const subsClient = new hl.SubscriptionClient({ transport });
 ```
 
 ### 3) Use Client
@@ -216,13 +216,13 @@ const result = await client.withdraw3({
 });
 ```
 
-#### Example of using an event client
+#### Example of using a subscription client
 
 ```ts
 import * as hl from "@nktkas/hyperliquid";
 
 const transport = new hl.WebSocketTransport();
-const client = new hl.EventClient({ transport });
+const subsClient = new hl.SubscriptionClient({ transport });
 
 // L2 Book updates
 await client.l2Book({ coin: "BTC" }, (data) => {
@@ -408,17 +408,17 @@ class WalletClient {
 }
 ```
 
-#### Event Client
+#### Subscription Client
 
-A Event Client which provides access to
+A Subscription Client which provides access to
 [Subscriptions API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions), such as
 real-time updates for `l2Book` and `userFills`.
 
-The Event Client class sets up with a given [WebSocket Transport](#websocket-transport).
+The Subscription Client class sets up with a given [WebSocket Transport](#websocket-transport).
 
 <!-- deno-fmt-ignore-start -->
 ```ts
-class EventClient {
+class SubscriptionClient {
     constructor(args: {
         transport: WebSocketTransport;
     });

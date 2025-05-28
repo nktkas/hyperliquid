@@ -40,67 +40,67 @@ import type { Candle } from "../types/info/assets.ts";
 import type { Book, Order, OrderStatus } from "../types/info/orders.ts";
 import type { TxDetails } from "../types/explorer/responses.ts";
 
-/** Parameters for the {@linkcode EventClient} constructor. */
-export interface EventClientParameters<T extends ISubscriptionTransport = ISubscriptionTransport> {
+/** Parameters for the {@linkcode SubscriptionClient} constructor. */
+export interface SubscriptionClientParameters<T extends ISubscriptionTransport = ISubscriptionTransport> {
     /** The transport used to connect to the Hyperliquid API. */
     transport: T;
 }
 
-/** Parameters for the {@linkcode EventClient.activeAssetCtx} method. */
+/** Parameters for the {@linkcode SubscriptionClient.activeAssetCtx} method. */
 export type EventActiveAssetCtxParameters = Omit<WsActiveAssetCtxRequest, "type">;
 
-/** Parameters for the {@linkcode EventClient.activeAssetData} method. */
+/** Parameters for the {@linkcode SubscriptionClient.activeAssetData} method. */
 export type EventActiveAssetDataParameters = Omit<WsActiveAssetDataRequest, "type">;
 
-/** Parameters for the {@linkcode EventClient.allMids} method. */
+/** Parameters for the {@linkcode SubscriptionClient.allMids} method. */
 export type WsAllMidsParameters = Omit<WsAllMidsRequest, "type">;
 
-/** Parameters for the {@linkcode EventClient.bbo} method. */
+/** Parameters for the {@linkcode SubscriptionClient.bbo} method. */
 export type EventBboParameters = Omit<WsBboRequest, "type">;
 
-/** Parameters for the {@linkcode EventClient.candle} method. */
+/** Parameters for the {@linkcode SubscriptionClient.candle} method. */
 export type EventCandleParameters = Omit<WsCandleRequest, "type">;
 
-/** Parameters for the {@linkcode EventClient.l2Book} method. */
+/** Parameters for the {@linkcode SubscriptionClient.l2Book} method. */
 export type EventL2BookParameters = Omit<WsL2BookRequest, "type">;
 
-/** Parameters for the {@linkcode EventClient.notification} method. */
+/** Parameters for the {@linkcode SubscriptionClient.notification} method. */
 export type EventNotificationParameters = Omit<WsNotificationRequest, "type">;
 
-/** Parameters for the {@linkcode EventClient.orderUpdates} method. */
+/** Parameters for the {@linkcode SubscriptionClient.orderUpdates} method. */
 export type EventOrderUpdatesParameters = Omit<WsOrderUpdatesRequest, "type">;
 
-/** Parameters for the {@linkcode EventClient.trades} method. */
+/** Parameters for the {@linkcode SubscriptionClient.trades} method. */
 export type EventTradesParameters = Omit<WsTradesRequest, "type">;
 
-/** Parameters for the {@linkcode EventClient.userEvents} method. */
+/** Parameters for the {@linkcode SubscriptionClient.userEvents} method. */
 export type EventUserEventsParameters = Omit<WsUserEventsRequest, "type">;
 
-/** Parameters for the {@linkcode EventClient.userFills} method. */
+/** Parameters for the {@linkcode SubscriptionClient.userFills} method. */
 export type EventUserFillsParameters = Omit<WsUserFillsRequest, "type">;
 
-/** Parameters for the {@linkcode EventClient.userFundings} method. */
+/** Parameters for the {@linkcode SubscriptionClient.userFundings} method. */
 export type EventUserFundingsParameters = Omit<WsUserFundingsRequest, "type">;
 
-/** Parameters for the {@linkcode EventClient.userNonFundingLedgerUpdates} method. */
+/** Parameters for the {@linkcode SubscriptionClient.userNonFundingLedgerUpdates} method. */
 export type EventUserNonFundingLedgerUpdatesParameters = Omit<WsUserNonFundingLedgerUpdatesRequest, "type">;
 
-/** Parameters for the {@linkcode EventClient.userTwapHistory} method. */
+/** Parameters for the {@linkcode SubscriptionClient.userTwapHistory} method. */
 export type EventUserTwapHistory = Omit<WsUserTwapHistoryRequest, "type">;
 
-/** Parameters for the {@linkcode EventClient.userTwapSliceFills} method. */
+/** Parameters for the {@linkcode SubscriptionClient.userTwapSliceFills} method. */
 export type EventUserTwapSliceFills = Omit<WsUserTwapSliceFillsRequest, "type">;
 
-/** Parameters for the {@linkcode EventClient.webData2} method. */
+/** Parameters for the {@linkcode SubscriptionClient.webData2} method. */
 export type EventWebData2Parameters = Omit<WsWebData2Request, "type">;
 
 /**
- * Event client for subscribing to various Hyperliquid events.
+ * Subscription client for subscribing to various Hyperliquid events.
  * @typeParam T The type of transport used to connect to the Hyperliquid Websocket API.
  */
-export class EventClient<
+export class SubscriptionClient<
     T extends ISubscriptionTransport = ISubscriptionTransport,
-> implements EventClientParameters, AsyncDisposable {
+> implements SubscriptionClientParameters, AsyncDisposable {
     transport: T;
 
     /**
@@ -112,10 +112,10 @@ export class EventClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.WebSocketTransport();
-     * const client = new hl.EventClient({ transport });
+     * const subsClient = new hl.SubscriptionClient({ transport });
      * ```
      */
-    constructor(args: EventClientParameters<T>) {
+    constructor(args: SubscriptionClientParameters<T>) {
         this.transport = args.transport;
     }
 
@@ -131,7 +131,7 @@ export class EventClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.WebSocketTransport();
-     * const client = new hl.EventClient({ transport });
+     * const subsClient = new hl.SubscriptionClient({ transport });
      *
      * const sub = await client.activeAssetCtx({ coin: "BTC" }, (data) => {
      *   console.log(data);
@@ -166,7 +166,7 @@ export class EventClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.WebSocketTransport();
-     * const client = new hl.EventClient({ transport });
+     * const subsClient = new hl.SubscriptionClient({ transport });
      *
      * const sub = await client.activeAssetData({ coin: "BTC", user: "0x..." }, (data) => {
      *   console.log(data);
@@ -200,7 +200,7 @@ export class EventClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.WebSocketTransport();
-     * const client = new hl.EventClient({ transport });
+     * const subsClient = new hl.SubscriptionClient({ transport });
      *
      * const sub = await client.allMids((data) => {
      *   console.log(data);
@@ -240,7 +240,7 @@ export class EventClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.WebSocketTransport();
-     * const client = new hl.EventClient({ transport });
+     * const subsClient = new hl.SubscriptionClient({ transport });
      *
      * const sub = await client.bbo({ coin: "BTC" }, (data) => {
      *   console.log(data);
@@ -271,7 +271,7 @@ export class EventClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.WebSocketTransport();
-     * const client = new hl.EventClient({ transport });
+     * const subsClient = new hl.SubscriptionClient({ transport });
      *
      * const sub = await client.candle({ coin: "BTC", interval: "1h" }, (data) => {
      *   console.log(data);
@@ -303,7 +303,7 @@ export class EventClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.WebSocketTransport();
-     * const client = new hl.EventClient({ transport });
+     * const subsClient = new hl.SubscriptionClient({ transport });
      *
      * const sub = await client.explorerBlock((data) => {
      *   console.log(data);
@@ -331,7 +331,7 @@ export class EventClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.WebSocketTransport();
-     * const client = new hl.EventClient({ transport });
+     * const subsClient = new hl.SubscriptionClient({ transport });
      *
      * const sub = await client.explorerTxs((data) => {
      *   console.log(data);
@@ -359,7 +359,7 @@ export class EventClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.WebSocketTransport();
-     * const client = new hl.EventClient({ transport });
+     * const subsClient = new hl.SubscriptionClient({ transport });
      *
      * const sub = await client.l2Book({ coin: "BTC" }, (data) => {
      *   console.log(data);
@@ -392,7 +392,7 @@ export class EventClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.WebSocketTransport();
-     * const client = new hl.EventClient({ transport });
+     * const subsClient = new hl.SubscriptionClient({ transport });
      *
      * const sub = await client.notification({ user: "0x..." }, (data) => {
      *   console.log(data);
@@ -421,7 +421,7 @@ export class EventClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.WebSocketTransport();
-     * const client = new hl.EventClient({ transport });
+     * const subsClient = new hl.SubscriptionClient({ transport });
      *
      * const sub = await client.orderUpdates({ user: "0x..." }, (data) => {
      *   console.log(data);
@@ -453,7 +453,7 @@ export class EventClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.WebSocketTransport();
-     * const client = new hl.EventClient({ transport });
+     * const subsClient = new hl.SubscriptionClient({ transport });
      *
      * const sub = await client.trades({ coin: "BTC" }, (data) => {
      *   console.log(data);
@@ -486,7 +486,7 @@ export class EventClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.WebSocketTransport();
-     * const client = new hl.EventClient({ transport });
+     * const subsClient = new hl.SubscriptionClient({ transport });
      *
      * const sub = await client.userEvents({ user: "0x..." }, (data) => {
      *   console.log(data);
@@ -515,7 +515,7 @@ export class EventClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.WebSocketTransport();
-     * const client = new hl.EventClient({ transport });
+     * const subsClient = new hl.SubscriptionClient({ transport });
      *
      * const sub = await client.userFills({ user: "0x..." }, (data) => {
      *   console.log(data);
@@ -547,7 +547,7 @@ export class EventClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.WebSocketTransport();
-     * const client = new hl.EventClient({ transport });
+     * const subsClient = new hl.SubscriptionClient({ transport });
      *
      * const sub = await client.userFundings({ user: "0x..." }, (data) => {
      *   console.log(data);
@@ -578,7 +578,7 @@ export class EventClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.WebSocketTransport();
-     * const client = new hl.EventClient({ transport });
+     * const subsClient = new hl.SubscriptionClient({ transport });
      *
      * const sub = await client.userNonFundingLedgerUpdates({ user: "0x..." }, (data) => {
      *   console.log(data);
@@ -612,7 +612,7 @@ export class EventClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.WebSocketTransport();
-     * const client = new hl.EventClient({ transport });
+     * const subsClient = new hl.SubscriptionClient({ transport });
      *
      * const sub = await client.userTwapHistory({ user: "0x..." }, (data) => {
      *   console.log(data);
@@ -643,7 +643,7 @@ export class EventClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.WebSocketTransport();
-     * const client = new hl.EventClient({ transport });
+     * const subsClient = new hl.SubscriptionClient({ transport });
      *
      * const sub = await client.userTwapSliceFills({ user: "0x..." }, (data) => {
      *   console.log(data);
@@ -677,7 +677,7 @@ export class EventClient<
      * import * as hl from "@nktkas/hyperliquid";
      *
      * const transport = new hl.WebSocketTransport();
-     * const client = new hl.EventClient({ transport });
+     * const subsClient = new hl.SubscriptionClient({ transport });
      *
      * const sub = await client.webData2({ user: "0x..." }, (data) => {
      *   console.log(data);

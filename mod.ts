@@ -12,7 +12,7 @@ export type {
 } from "./src/signing.ts";
 
 // Clients
-export * from "./src/clients/event.ts";
+export * from "./src/clients/subscription.ts";
 export * from "./src/clients/public.ts";
 export * from "./src/clients/wallet.ts";
 

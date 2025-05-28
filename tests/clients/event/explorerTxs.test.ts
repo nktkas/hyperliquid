@@ -1,11 +1,11 @@
 import { deadline } from "jsr:@std/async@^1.0.10/deadline";
-import { EventClient, WebSocketTransport } from "../../../mod.ts";
+import { SubscriptionClient, WebSocketTransport } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Parameters<Parameters<EventClient["explorerTxs"]>[0]>[0];
+export type MethodReturnType = Parameters<Parameters<SubscriptionClient["explorerTxs"]>[0]>[0];
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -16,13 +16,13 @@ Deno.test("explorerTxs", async () => {
     // —————————— Prepare ——————————
 
     const transport = new WebSocketTransport({ url: "wss://rpc.hyperliquid-testnet.xyz/ws" });
-    await using client = new EventClient({ transport });
+    await using subsClient = new SubscriptionClient({ transport });
 
     // —————————— Test ——————————
 
     const data = await deadline(
         new Promise((resolve) => {
-            client.explorerTxs(resolve);
+            subsClient.explorerTxs(resolve);
         }),
         10_000,
     );

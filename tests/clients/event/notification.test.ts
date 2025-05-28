@@ -1,7 +1,13 @@
 import { privateKeyToAccount } from "npm:viem@^2.21.7/accounts";
 import BigNumber from "npm:bignumber.js@^9.1.2";
 import { deadline } from "jsr:@std/async@^1.0.10/deadline";
-import { EventClient, PublicClient, WalletClient, WebSocketTransport, type WsNotification } from "../../../mod.ts";
+import {
+    PublicClient,
+    SubscriptionClient,
+    WalletClient,
+    WebSocketTransport,
+    type WsNotification,
+} from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 import { formatPrice, formatSize, getAssetData } from "../../_utils/utils.ts";
@@ -11,7 +17,7 @@ const PERPS_ASSET = "BTC";
 
 // —————————— Type schema ——————————
 
-export type MethodReturnType = Parameters<Parameters<EventClient["notification"]>[1]>[0];
+export type MethodReturnType = Parameters<Parameters<SubscriptionClient["notification"]>[1]>[0];
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
@@ -23,7 +29,7 @@ Deno.test("notification", async () => {
 
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
     await using publicClient = new PublicClient({ transport });
-    await using eventClient = new EventClient({ transport });
+    await using subsClient = new SubscriptionClient({ transport });
     await using walletClient = new WalletClient({
         wallet: privateKeyToAccount(PRIVATE_KEY),
         transport,
@@ -36,7 +42,7 @@ Deno.test("notification", async () => {
         // deno-lint-ignore no-async-promise-executor
         new Promise(async (resolve, reject) => {
             const events: WsNotification[] = [];
-            await eventClient.notification(
+            await subsClient.notification(
                 { user: walletClient.wallet.address },
                 async (data) => {
                     try {
