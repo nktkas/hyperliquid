@@ -51,6 +51,12 @@ export interface WebSocketTransportOptions {
 
     /** Reconnection policy configuration for closed connections. */
     reconnect?: ReconnectingWebSocketOptions;
+
+    /**
+     * Enable automatic event resubscription after reconnection.
+     * @defaultValue `true`
+     */
+    autoResubscribe?: boolean;
 }
 
 /** WebSocket implementation of the REST and Subscription transport interfaces. */
@@ -58,20 +64,18 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
     protected _wsRequester: WebSocketAsyncRequest;
     protected _hlEvents: HyperliquidEventTarget;
     protected _keepAliveTimeout: ReturnType<typeof setTimeout> | null = null;
-
-    /**
-     * Map of active subscriptions.
-     * - Key: Unique subscription identifier based on payload
-     * - Value: Subscription info containing the subscription request promise
-     *   and a map of listeners to their metadata (channel + unsubscribe function).
-     */
     protected _subscriptions: Map<
-        string,
+        string, // Unique identifier based on the payload
         {
-            listeners: Map<(data: CustomEvent) => void, (signal?: AbortSignal) => Promise<void>>;
-            promise: Promise<unknown>;
+            listeners: Map<
+                (data: CustomEvent) => void, // Event listener function
+                () => Promise<void> // Unsubscribe function
+            >;
+            promise: Promise<unknown>; // Subscription request promise
+            resubscribeAbortController?: AbortController; // To monitor reconnection errors
         }
     > = new Map();
+    protected _isReconnecting = false;
 
     /**
      * Request timeout in ms.
@@ -80,12 +84,12 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
     timeout: number | null;
 
     /** Keep-alive configuration. */
-    readonly keepAlive: {
+    keepAlive: {
         /**
          * Interval between sending ping messages in ms.
          * Set to `null` to disable.
          */
-        readonly interval: number | null;
+        interval: number | null;
 
         /**
          * Timeout for the ping request in ms.
@@ -93,6 +97,9 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
          */
         timeout?: number | null;
     };
+
+    /** Enable automatic resubscription after reconnection. */
+    autoResubscribe: boolean;
 
     /** The WebSocket that is used for communication. */
     readonly socket: ReconnectingWebSocket;
@@ -115,25 +122,17 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
             interval: options?.keepAlive?.interval === undefined ? 30_000 : options.keepAlive?.interval,
             timeout: options?.keepAlive?.timeout === undefined ? this.timeout : options.keepAlive?.timeout,
         };
+        this.autoResubscribe = options?.autoResubscribe ?? true;
 
         // Initialize listeners
         this.socket.addEventListener("open", () => {
-            // Start keep-alive handler
-            this._keepAlive();
+            this._keepAliveStart();
+            this._resubscribeStart();
         });
         this.socket.addEventListener("close", () => {
-            // Clear keep-alive timer
-            if (this._keepAliveTimeout !== null) {
-                clearTimeout(this._keepAliveTimeout);
-                this._keepAliveTimeout = null;
-            }
-
-            // Clear all subscriptions
-            for (const subscriptionInfo of this._subscriptions.values()) {
-                for (const [_, unsubscribe] of subscriptionInfo.listeners) {
-                    unsubscribe();
-                }
-            }
+            this._keepAliveStop();
+            this._resubscribeStop();
+            this._isReconnecting = true;
         });
     }
 
@@ -185,7 +184,11 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
             const promise = this._wsRequester.request("subscribe", payload);
 
             // Cache subscription info
-            subscription = { listeners: new Map(), promise };
+            subscription = {
+                listeners: new Map(),
+                promise,
+                resubscribeAbortController: new AbortController(),
+            };
             this._subscriptions.set(id, subscription);
         }
 
@@ -217,23 +220,13 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
         }
 
         // Wait for the initial subscription request to complete
-        await subscription.promise.catch((error) => {
-            // Remove listener and cleanup
-            this._hlEvents.removeEventListener(channel, listener);
-            const subscription = this._subscriptions.get(id);
-            subscription?.listeners.delete(listener);
-
-            // If no listeners remain, remove subscription entirely
-            if (subscription?.listeners.size === 0) {
-                this._subscriptions.delete(id);
-            }
-
-            // Rethrow the error
-            throw error;
-        });
+        await subscription.promise;
 
         // Return subscription control object
-        return { unsubscribe };
+        return {
+            unsubscribe,
+            resubscribeSignal: subscription.resubscribeAbortController?.signal,
+        };
     }
 
     /**
@@ -290,31 +283,61 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
         });
     }
 
-    /**
-     * Initiate background keep the connection alive.
-     * Sends ping only when needed.
-     */
-    protected _keepAlive(): void {
+    /** Keep the connection alive. Sends ping only when necessary. */
+    protected _keepAliveStart(): void {
         if (this.keepAlive.interval === null || this._keepAliveTimeout) return;
 
         const tick = async () => {
-            if (this.socket.readyState !== ReconnectingWebSocket.OPEN || !this._keepAliveTimeout) return;
+            if (
+                this.socket.readyState !== ReconnectingWebSocket.OPEN || !this._keepAliveTimeout ||
+                this.keepAlive.interval === null
+            ) return;
 
             // Check if the last request was sent more than the keep-alive interval ago
-            if (Date.now() - this._wsRequester.lastRequestTime >= this.keepAlive.interval!) {
+            if (Date.now() - this._wsRequester.lastRequestTime >= this.keepAlive.interval) {
                 const timeoutSignal = this.keepAlive.timeout ? AbortSignal.timeout(this.keepAlive.timeout) : undefined;
                 await this._wsRequester.request("ping", timeoutSignal)
                     .catch(() => undefined); // Ignore errors
             }
 
             // Schedule the next ping
-            if (this.socket.readyState === ReconnectingWebSocket.OPEN && this._keepAliveTimeout) {
-                const nextDelay = this.keepAlive.interval! - (Date.now() - this._wsRequester.lastRequestTime);
+            if (
+                this.socket.readyState === ReconnectingWebSocket.OPEN && this._keepAliveTimeout &&
+                this.keepAlive.interval !== null
+            ) {
+                const nextDelay = this.keepAlive.interval - (Date.now() - this._wsRequester.lastRequestTime);
                 this._keepAliveTimeout = setTimeout(tick, nextDelay);
             }
         };
 
         this._keepAliveTimeout = setTimeout(tick, this.keepAlive.interval);
+    }
+    protected _keepAliveStop(): void {
+        if (this._keepAliveTimeout !== null) {
+            clearTimeout(this._keepAliveTimeout);
+            this._keepAliveTimeout = null;
+        }
+    }
+
+    /** Resubscribe to all existing subscriptions if auto-resubscribe is enabled. */
+    protected _resubscribeStart(): void {
+        if (this.autoResubscribe && this._isReconnecting) {
+            for (const [id, subscriptionInfo] of this._subscriptions.entries()) {
+                subscriptionInfo.promise = this._wsRequester.request("subscribe", JSON.parse(id))
+                    .catch((error) => {
+                        subscriptionInfo.resubscribeAbortController?.abort(error);
+                    });
+            }
+        }
+    }
+    protected _resubscribeStop(): void {
+        if (!this.autoResubscribe || this.socket.reconnectAbortController.signal.aborted) {
+            for (const subscriptionInfo of this._subscriptions.values()) {
+                for (const [_, unsubscribe] of subscriptionInfo.listeners) {
+                    unsubscribe(); // does not cause an error if used when the connection is closed
+                }
+            }
+        }
     }
 
     async [Symbol.asyncDispose](): Promise<void> {

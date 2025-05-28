@@ -40,6 +40,8 @@ export interface ISubscriptionTransport extends Partial<AsyncDisposable> {
 export interface Subscription {
     /** Unsubscribes from the event and sends an unsubscribe request to the server. */
     unsubscribe(): Promise<void>;
+    /** Signal that aborts when resubscription fails during reconnection. */
+    resubscribeSignal?: AbortSignal;
 }
 
 /** Base class for all transport-related errors. */

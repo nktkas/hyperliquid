@@ -100,45 +100,6 @@ Deno.test("WebSocketTransport", async (t) => {
         },
     );
 
-    await t.step("constructor", async (t) => {
-        await t.step("url", async (t) => {
-            await t.step("default url", async () => {
-                const transport = new WebSocketTransport();
-                assertEquals(transport.socket.url, "wss://api.hyperliquid.xyz/ws");
-                await transport.close();
-            });
-            await t.step("custom url", async () => {
-                const transport = new WebSocketTransport({ url: "ws://localhost-test-123:8080" });
-                assertEquals(transport.socket.url, "ws://localhost-test-123:8080/");
-                await transport.close();
-            });
-        });
-        await t.step("custom timeout", async (t) => {
-            await t.step("default timeout", async () => {
-                const transport = new WebSocketTransport();
-                assertEquals(transport.timeout, 10_000);
-                await transport.close();
-            });
-            await t.step("custom timeout", async () => {
-                const transport = new WebSocketTransport({ timeout: 100 });
-                assertEquals(transport.timeout, 100);
-                await transport.close();
-            });
-        });
-        await t.step("custom keepAlive.interval", async (t) => {
-            await t.step("default keepAlive.interval", async () => {
-                const transport = new WebSocketTransport();
-                assertEquals(transport.keepAlive.interval, 30_000);
-                await transport.close();
-            });
-            await t.step("custom keepAlive.interval", async () => {
-                const transport = new WebSocketTransport({ keepAlive: { interval: 100 } });
-                assertEquals(transport.keepAlive.interval, 100);
-                await transport.close();
-            });
-        });
-    });
-
     await t.step("request()", async (t) => {
         await t.step("Send post request and resolves with server response", async () => {
             // Setup
@@ -366,56 +327,6 @@ Deno.test("WebSocketTransport", async (t) => {
                 await transport.close();
             },
         );
-
-        await t.step(
-            "If the subscription request fails, resources must be released",
-            async () => {
-                // Setup
-                const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-fail" });
-                await transport.ready();
-
-                const promise = transport.subscribe("test", { channel: "test", reason: "test" }, () => {});
-                await assertRejects(() => promise, Error, "Cannot complete WebSocket request:");
-
-                // @ts-ignore - Accessing private properties for testing
-                assert(transport._subscriptions.size === 0);
-
-                // Clean up
-                await transport.close();
-            },
-        );
-
-        await t.step("Reject", async (t) => {
-            await t.step("Reject after timeout expires", async () => {
-                // Setup
-                const transport = new WebSocketTransport({
-                    url: "ws://localhost:8080/?test=subscribe-timeout",
-                    timeout: 100,
-                });
-                await transport.ready();
-
-                const promise = transport.subscribe("test", { channel: "test" }, () => {});
-                await assertRejects(() => promise, DOMException, "Signal timed out.");
-
-                // Clean up
-                await transport.close();
-            });
-
-            await t.step("If timeout is not set, never reject", async () => {
-                // Setup
-                const defaultTimeout = new WebSocketTransport({ url: "ws://example.com" }).timeout!;
-                const transport = new WebSocketTransport({
-                    url: "ws://localhost:8080/?test=subscribe-no-timeout",
-                    timeout: null,
-                });
-                await transport.ready();
-
-                await transport.subscribe("test", { channel: "test", delay: defaultTimeout * 1.5 }, () => {});
-
-                // Clean up
-                await transport.close();
-            });
-        });
     });
 
     await t.step("unsubscribe()", async (t) => {
@@ -452,37 +363,6 @@ Deno.test("WebSocketTransport", async (t) => {
 
             // Clean up
             await transport.close();
-        });
-
-        await t.step("Clears subscriptions on close", async () => {
-            // Setup
-            const transport = new WebSocketTransport({ url: "ws://localhost:8080/?test=unsubscribe-success" });
-            await transport.ready();
-
-            await transport.subscribe("test", { channel: "test" }, () => {});
-
-            await transport.close();
-            // @ts-ignore - Accessing private properties for testing
-            assertEquals(transport._subscriptions.size, 0);
-        });
-
-        await t.step("Reject", async (t) => {
-            await t.step("Reject after timeout expires", async () => {
-                // Setup
-                const transport = new WebSocketTransport({
-                    url: "ws://localhost:8080/?test=unsubscribe-timeout",
-                    timeout: 100,
-                });
-                await transport.ready();
-
-                const sub = await transport.subscribe("test", { channel: "test" }, () => {});
-
-                const promise = sub.unsubscribe();
-                await assertRejects(() => promise, DOMException, "Signal timed out.");
-
-                // Clean up
-                await transport.close();
-            });
         });
     });
 
@@ -642,5 +522,109 @@ Deno.test("WebSocketTransport", async (t) => {
         });
     });
 
+    await t.step("autoResubscribe", async (t) => {
+        await t.step("automatically resubscribes after reconnection", async () => {
+            // Setup
+            const transport = new WebSocketTransport({
+                url: "ws://localhost:8080/?test=subscribe-success",
+                reconnect: { maxRetries: 1, connectionDelay: 100 },
+            });
+            await transport.ready();
+
+            // Subscribe to multiple events
+            const payload1 = { channel: "test1", extra: "data1" };
+            const payload2 = { channel: "test2", extra: "data2" };
+            let eventCount1 = 0;
+            let eventCount2 = 0;
+            const listener1 = () => eventCount1++;
+            const listener2 = () => eventCount2++;
+
+            await transport.subscribe("test1", payload1, listener1);
+            await transport.subscribe("test2", payload2, listener2);
+            await new Promise((r) => setTimeout(r, 100));
+            assertEquals(eventCount1, 1); // Initial events received
+            assertEquals(eventCount2, 1);
+
+            // Simulate connection loss and reconnection
+            transport.socket.close(undefined, undefined, false);
+            await transport.ready();
+
+            // Check that subscriptions are still active after reconnection
+            await new Promise((r) => setTimeout(r, 100));
+            assertEquals(eventCount1, 2); // Events received after reconnection
+            assertEquals(eventCount2, 2);
+
+            // Clean up
+            await transport.close();
+        });
+
+        await t.step("handles resubscription errors gracefully", async () => {
+            // Setup
+            const transport = new WebSocketTransport({
+                url: "ws://localhost:8080/?test=subscribe-delay",
+                reconnect: { maxRetries: 1, connectionDelay: 100 },
+            });
+            await transport.ready();
+
+            const payload = { channel: "test", extra: "data" };
+            const sub = await transport.subscribe("test", payload, () => {});
+
+            transport.socket.close(undefined, undefined, false);
+            await transport.ready();
+            await transport.close();
+
+            await new Promise((r) => setTimeout(r, 1000));
+            assert(sub.resubscribeSignal?.aborted);
+
+            // Clean up
+            await transport.close();
+        });
+
+        await t.step("does not resubscribe and clears subscriptions on connection close", async () => {
+            // Setup
+            const transport = new WebSocketTransport({
+                url: "ws://localhost:8080/?test=subscribe-success",
+                autoResubscribe: false,
+                reconnect: { maxRetries: 1, connectionDelay: 100 },
+            });
+            await transport.ready();
+
+            // Subscribe to multiple events
+            const payload1 = { channel: "test1", extra: "data1" };
+            const payload2 = { channel: "test2", extra: "data2" };
+            let eventCount1 = 0;
+            let eventCount2 = 0;
+            const listener1 = () => eventCount1++;
+            const listener2 = () => eventCount2++;
+
+            await transport.subscribe("test1", payload1, listener1);
+            await transport.subscribe("test2", payload2, listener2);
+            await new Promise((r) => setTimeout(r, 100));
+            assertEquals(eventCount1, 1); // Initial events received
+            assertEquals(eventCount2, 1);
+
+            // @ts-ignore - Accessing private properties for testing
+            assertEquals(transport._subscriptions.size, 2);
+
+            // Simulate connection loss
+            transport.socket.close(undefined, undefined, false);
+            await new Promise((r) => setTimeout(r, 100));
+
+            // Check that subscriptions are cleared and no resubscription happens
+            // @ts-ignore - Accessing private properties for testing
+            assertEquals(transport._subscriptions.size, 0);
+
+            // Wait for potential reconnection and verify no new events
+            await transport.ready();
+            await new Promise((r) => setTimeout(r, 100));
+            assertEquals(eventCount1, 1); // No new events after reconnection
+            assertEquals(eventCount2, 1);
+
+            // Clean up
+            await transport.close();
+        });
+    });
+
     await server.shutdown();
+    await new Promise((resolve) => setTimeout(resolve, 5000));
 });

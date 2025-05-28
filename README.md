@@ -473,8 +473,6 @@ class HttpTransport {
         onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>; // A callback before request is sent
         onResponse?: (response: Response) => MaybePromise<Response | void | null | undefined>; // A callback after response is received
     });
-
-    request(endpoint: "info" | "exchange" | "explorer", payload: unknown, signal?: AbortSignal): Promise<unknown>;
 }
 ```
 
@@ -499,16 +497,8 @@ class WebSocketTransport {
             shouldReconnect?: (event: CloseEvent) => boolean | Promise<boolean>; // Custom reconnection logic (default: Always reconnect)
             messageBuffer?: MessageBufferStrategy; // Message buffering strategy between reconnection (default: FIFO buffer)
         };
+        autoResubscribe?: boolean; // Whether to automatically resubscribe to events after reconnection (default: true)
     });
-
-    request(endpoint: "info" | "exchange", payload: unknown, signal?: AbortSignal): Promise<unknown>;
-    subscribe(
-        channel: string,
-        payload: unknown,
-        listener: (data: CustomEvent) => void,
-        signal?: AbortSignal,
-    ): Promise<Subscription>;
-
     ready(signal?: AbortSignal): Promise<void>;
     close(signal?: AbortSignal): Promise<void>;
 }
