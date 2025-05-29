@@ -485,6 +485,7 @@ export interface SpotTransferUpdate {
     fee: string;
     /** Fee in native token. */
     nativeTokenFee: string;
+    nonce: null;
 }
 /** Transfer update between sub-accounts. */
 export interface SubAccountTransferUpdate {

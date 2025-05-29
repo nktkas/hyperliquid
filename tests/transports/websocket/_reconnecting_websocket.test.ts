@@ -1,8 +1,8 @@
+import { assert, assertEquals, assertInstanceOf, assertIsError, assertNotEquals } from "jsr:@std/assert@1";
 import {
     ReconnectingWebSocket,
     ReconnectingWebSocketError,
 } from "../../../src/transports/websocket/_reconnecting_websocket.ts";
-import { assert, assertEquals, assertInstanceOf, assertIsError, assertNotEquals } from "jsr:@std/assert@^1.0.11";
 
 Deno.test("ReconnectingWebSocket", async (t) => {
     const server = Deno.serve(

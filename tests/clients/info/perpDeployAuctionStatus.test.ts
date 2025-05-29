@@ -1,0 +1,35 @@
+import { type Args, parseArgs } from "jsr:@std/cli@1/parse-args";
+import { HttpTransport, InfoClient } from "../../../mod.ts";
+import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
+import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
+
+// —————————— Arguments ——————————
+
+const args = parseArgs(Deno.args) as Args<{ wait?: number }>;
+
+// —————————— Type schema ——————————
+
+export type MethodReturnType = Awaited<ReturnType<InfoClient["perpDeployAuctionStatus"]>>;
+const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
+
+// —————————— Test ——————————
+
+Deno.test("perpDeployAuctionStatus", async () => {
+    if (args.wait) await new Promise((r) => setTimeout(r, args.wait));
+
+    // —————————— Prepare ——————————
+
+    const transport = new HttpTransport({ isTestnet: true });
+    const infoClient = new InfoClient({ transport });
+
+    // —————————— Test ——————————
+
+    const data = await infoClient.perpDeployAuctionStatus();
+
+    schemaCoverage(MethodReturnType, [data], {
+        ignoreTypesByPath: {
+            "#/properties/currentGas": ["string", "null"],
+            "#/properties/endGas": ["string", "null"],
+        },
+    });
+});

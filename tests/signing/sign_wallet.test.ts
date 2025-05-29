@@ -1,7 +1,7 @@
-import { assert, assertRejects } from "jsr:@std/assert@^1.0.10";
-import { privateKeyToAccount } from "npm:viem@^2.21.54/accounts";
-import { ethers } from "npm:ethers@^6.13.4";
-import { ethers as ethersV5 } from "npm:ethers@^5.7.2";
+import { assert, assertRejects } from "jsr:@std/assert@1";
+import { privateKeyToAccount } from "npm:viem@2/accounts";
+import { ethers } from "npm:ethers@6";
+import { ethers as ethersV5 } from "npm:ethers@5";
 import {
     type AbstractEthersSigner,
     type AbstractEthersV5Signer,
@@ -13,7 +13,7 @@ import {
     signUserSignedAction,
 } from "../../src/signing.ts";
 
-// —————————— Constants ——————————
+// —————————— Arguments ——————————
 
 const PRIVATE_KEY = "0x822e9959e022b78423eb653a62ea0020cd283e71a2a8133a6ff2aeffaf373cff";
 const L1_ACTION_SIGNATURE = {

@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertFalse } from "jsr:@std/assert@^1.0.10";
+import { assert, assertEquals, assertFalse } from "jsr:@std/assert@1";
 import { HyperliquidEventTarget } from "../../../src/transports/websocket/_hyperliquid_event_target.ts";
 
 Deno.test("HyperliquidEventTarget", async (t) => {

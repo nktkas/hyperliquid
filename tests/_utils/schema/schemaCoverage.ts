@@ -1,4 +1,4 @@
-import { Ajv, type SchemaObject } from "npm:ajv@^8.17.1";
+import { Ajv, type SchemaObject } from "npm:ajv@8";
 import { resolveRef, type ResolveRefOptions } from "./resolveRef.ts";
 import { resolveAllOf, type ResolveAllOfOptions } from "./resolveAllOf.ts";
 import { addStrictAdditionalProperties } from "./addStrictAdditionalProperties.ts";

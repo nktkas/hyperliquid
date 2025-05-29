@@ -1,6 +1,6 @@
 import * as TJS from "npm:typescript-json-schema@^0.65.1";
-import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
-import type { SchemaObject } from "npm:ajv@^8.17.1";
+import { fromFileUrl } from "jsr:@std/path@1/from-file-url";
+import type { SchemaObject } from "npm:ajv@8";
 
 /**
  * Generates a JSON schema for a given TypeScript type.

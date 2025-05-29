@@ -1,4 +1,4 @@
-import type { SchemaObject } from "npm:ajv@^8.17.1";
+import type { SchemaObject } from "npm:ajv@8";
 
 /**
  * Error thrown when there's a problem resolving references in a schema.

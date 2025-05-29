@@ -1,4 +1,4 @@
-import type { SchemaObject } from "npm:ajv@^8.17.1";
+import type { SchemaObject } from "npm:ajv@8";
 
 /**
  * Error thrown when incompatible schemas are found during allOf resolution.

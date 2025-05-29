@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertRejects } from "jsr:@std/assert@^1.0.11";
+import { assert, assertEquals, assertRejects } from "jsr:@std/assert@1";
 import {
     WebSocketAsyncRequest,
     WebSocketRequestError,
@@ -106,10 +106,10 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
             const hlEvents = new HyperliquidEventTarget(mockSocket);
             const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
-            const subPayload = { channel: "test-sub", param: "XYZ" };
+            const payload = { channel: "test-sub", param: "XYZ" };
 
             // Check subscription request
-            const promise = wsRequester.request("subscribe", subPayload);
+            const promise = wsRequester.request("subscribe", payload);
             assertEquals(mockSocket.sentMessages.length, 1);
 
             const sent = JSON.parse(mockSocket.sentMessages[0]);
@@ -120,77 +120,123 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
                 channel: "subscriptionResponse",
                 data: {
                     method: "subscribe",
-                    subscription: subPayload,
+                    subscription: payload,
                 },
             });
 
             const resolvedData = await promise as Record<string, unknown>;
             assertEquals(resolvedData.method, "subscribe");
-            assertEquals(resolvedData.subscription, subPayload);
+            assertEquals(resolvedData.subscription, payload);
         });
 
         await t.step("rejects", async (t) => {
-            await t.step("method === post", async () => {
-                const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
-                const hlEvents = new HyperliquidEventTarget(mockSocket);
-                const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
+            await t.step("method === post", async (t) => {
+                await t.step("request error", async () => {
+                    const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
+                    const hlEvents = new HyperliquidEventTarget(mockSocket);
+                    const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
-                const promise = wsRequester.request("post", { test: true });
-                const sent = JSON.parse(mockSocket.sentMessages[0]);
+                    const promise = wsRequester.request("post", { test: true });
+                    const sent = JSON.parse(mockSocket.sentMessages[0]);
 
-                const mockMessage = {
-                    channel: "error",
-                    data: `Something failed: {"id":${sent.id}}`,
-                };
-                mockSocket.mockMessage(mockMessage);
+                    const mockMessage = {
+                        channel: "error",
+                        data: `Something failed: {"id":${sent.id}}`,
+                    };
+                    mockSocket.mockMessage(mockMessage);
 
-                await assertRejects(
-                    () => promise,
-                    WebSocketRequestError,
-                    `Cannot complete WebSocket request: ${mockMessage.data}`,
-                );
+                    await assertRejects(
+                        () => promise,
+                        WebSocketRequestError,
+                        `Cannot complete WebSocket request: ${mockMessage.data}`,
+                    );
+                });
             });
 
-            await t.step("method === subscription", async () => {
-                const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
-                const hlEvents = new HyperliquidEventTarget(mockSocket);
-                const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
+            await t.step("method === subscription", async (t) => {
+                await t.step("subscription error", async () => {
+                    const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
+                    const hlEvents = new HyperliquidEventTarget(mockSocket);
+                    const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
-                const subPayload = { channel: "test", param: "test" };
-                const promise = wsRequester.request("subscribe", subPayload);
+                    const payload = { channel: "test", param: "test" };
+                    const promise = wsRequester.request("subscribe", payload);
 
-                const mockMessage = {
-                    channel: "error",
-                    data: `Something failed: {"method":"subscribe","subscription":${JSON.stringify(subPayload)}}`,
-                };
-                mockSocket.mockMessage(mockMessage);
+                    const mockMessage = {
+                        channel: "error",
+                        data: `Something failed: {"method":"subscribe","subscription":${JSON.stringify(payload)}}`,
+                    };
+                    mockSocket.mockMessage(mockMessage);
 
-                await assertRejects(
-                    () => promise,
-                    WebSocketRequestError,
-                    `Cannot complete WebSocket request: ${mockMessage.data}`,
-                );
-            });
+                    await assertRejects(
+                        () => promise,
+                        WebSocketRequestError,
+                        `Cannot complete WebSocket request: ${mockMessage.data}`,
+                    );
+                });
 
-            await t.step("unknown request", async () => {
-                const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
-                const hlEvents = new HyperliquidEventTarget(mockSocket);
-                const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
+                await t.step("Already subscribed", async () => {
+                    const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
+                    const hlEvents = new HyperliquidEventTarget(mockSocket);
+                    const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
-                const unknownPayload = { someUnknown: "stuff" };
-                const promise = wsRequester.request("subscribe", unknownPayload);
+                    const payload = { channel: "test", param: "test" };
+                    const promise = wsRequester.request("subscribe", payload);
 
-                const mockMessage = {
-                    channel: "error",
-                    data: `Something failed: {"method":"subscribe","subscription":${JSON.stringify(unknownPayload)}}`,
-                };
-                mockSocket.mockMessage(mockMessage);
+                    const mockMessage = {
+                        channel: "error",
+                        data: `Already subscribed: ${JSON.stringify(payload)}`,
+                    };
+                    mockSocket.mockMessage(mockMessage);
 
-                await assertRejects(
-                    () => promise,
-                    WebSocketRequestError,
-                    `Cannot complete WebSocket request: ${mockMessage.data}`,
-                );
+                    await assertRejects(
+                        () => promise,
+                        WebSocketRequestError,
+                        `Cannot complete WebSocket request: ${mockMessage.data}`,
+                    );
+                });
+
+                await t.step("Invalid subscription", async () => {
+                    const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
+                    const hlEvents = new HyperliquidEventTarget(mockSocket);
+                    const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
+
+                    const payload = { channel: "invalid", param: "test" };
+                    const promise = wsRequester.request("subscribe", payload);
+
+                    const mockMessage = {
+                        channel: "error",
+                        data: `Invalid subscription: ${JSON.stringify(payload)}`,
+                    };
+                    mockSocket.mockMessage(mockMessage);
+
+                    await assertRejects(
+                        () => promise,
+                        WebSocketRequestError,
+                        `Cannot complete WebSocket request: ${mockMessage.data}`,
+                    );
+                });
+
+                await t.step("Already unsubscribed", async () => {
+                    const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
+                    const hlEvents = new HyperliquidEventTarget(mockSocket);
+                    const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
+
+                    const payload = { channel: "test", param: "test" };
+                    const promise = wsRequester.request("unsubscribe", payload);
+
+                    const mockMessage = {
+                        channel: "error",
+                        data: `Already unsubscribed: ${JSON.stringify(payload)}`,
+                    };
+                    mockSocket.mockMessage(mockMessage);
+
+                    await assertRejects(
+                        () => promise,
+                        WebSocketRequestError,
+                        `Cannot complete WebSocket request: ${mockMessage.data}`,
+                    );
+                });
             });
 
             await t.step("rejects pending requests when WebSocket connection closes", async () => {
@@ -239,46 +285,44 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
         });
     });
 
-    await t.step("requestToId()", async (t) => {
-        await t.step("payload normalization", () => {
-            /**
-             * We'll confirm:
-             * - Hex strings like '0xABC123' become '0xabc123'
-             * - Keys get sorted in alphabetical order
-             * - Arrays remain intact
-             * - Non-hex strings, booleans, numbers, etc. remain identical
-             */
-            const complex = {
-                Z: "0xABC123",
-                boolVal: true,
-                textVal: "SOME Text Not Hex",
-                nested: {
-                    aNumber: 123,
-                    hexString: "0xFFFfFf",
-                    randomStr: "NotHex0123",
-                },
-                arr: [10, "0xF00D", false],
-            };
+    await t.step("requestToId()", () => {
+        /**
+         * We'll confirm:
+         * - Hex strings like '0xABC123' become '0xabc123'
+         * - Keys get sorted in alphabetical order
+         * - Arrays remain intact
+         * - Non-hex strings, booleans, numbers, etc. remain identical
+         */
+        const complex = {
+            Z: "0xABC123",
+            boolVal: true,
+            textVal: "SOME Text Not Hex",
+            nested: {
+                aNumber: 123,
+                hexString: "0xFFFfFf",
+                randomStr: "NotHex0123",
+            },
+            arr: [10, "0xF00D", false],
+        };
 
-            const strId = WebSocketAsyncRequest.requestToId(complex);
-            const parsed = JSON.parse(strId);
+        const strId = WebSocketAsyncRequest.requestToId(complex);
+        const parsed = JSON.parse(strId);
 
-            // Keys should be sorted by ASCII: "Z" > "arr" > "boolVal" > "nested" > "textVal"
-            assertEquals(Object.keys(parsed), ["Z", "arr", "boolVal", "nested", "textVal"]);
+        // Keys should be sorted by ASCII: "Z" > "arr" > "boolVal" > "nested" > "textVal"
+        assertEquals(Object.keys(parsed), ["Z", "arr", "boolVal", "nested", "textVal"]);
 
-            // Check hex transformations
-            assertEquals(parsed.Z, "0xabc123");
-            // The array's string element should also be lowercased if it's hex
-            assertEquals(parsed.arr[1], "0xf00d");
-            // The nested hex should also be lowercased
-            assertEquals(parsed.nested.hexString, "0xffffff");
+        // Check hex transformations
+        assertEquals(parsed.Z, "0xabc123");
+        // The array's string element should also be lowercased if it's hex
+        assertEquals(parsed.arr[1], "0xf00d");
+        // The nested hex should also be lowercased
+        assertEquals(parsed.nested.hexString, "0xffffff");
 
-            // Non-hex data is unchanged
-            assert(parsed.boolVal);
-            assertEquals(parsed.textVal, "SOME Text Not Hex");
-            assertEquals(parsed.nested.aNumber, 123);
-            assertEquals(parsed.nested.randomStr, "NotHex0123");
-        });
+        // Non-hex data is unchanged
+        assert(parsed.boolVal);
+        assertEquals(parsed.textVal, "SOME Text Not Hex");
+        assertEquals(parsed.nested.aNumber, 123);
+        assertEquals(parsed.nested.randomStr, "NotHex0123");
     });
 
     await t.step("invalid JSON messages are ignored", async () => {
