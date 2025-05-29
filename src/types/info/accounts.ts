@@ -52,6 +52,16 @@ export interface AssetPosition {
     };
 }
 
+/** Escrowed balance for a specific asset. */
+export interface EvmEscrowsBalance {
+    /** Asset symbol. */
+    coin: string;
+    /** Unique identifier for the token. */
+    token: number;
+    /** Total balance. */
+    total: string;
+}
+
 /** Extra agent details for a user. */
 export interface ExtraAgent {
     /** Extra agent address. */
@@ -234,6 +244,8 @@ export interface SpotBalance {
 export interface SpotClearinghouseState {
     /** Balance for each token. */
     balances: SpotBalance[];
+    /** Escrowed balances. */
+    evmEscrows?: EvmEscrowsBalance[];
 }
 
 /** Sub-account details for a user. */

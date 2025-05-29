@@ -41,5 +41,8 @@ Deno.test("subAccounts", async () => {
             "#/anyOf/0/items/properties/clearinghouseState/properties/assetPositions/items/properties/position/properties/liquidationPx":
                 ["string"],
         },
+        ignorePropertiesByPath: [
+            "#/anyOf/0/items/properties/spotState/properties/evmEscrows",
+        ],
     });
 });
