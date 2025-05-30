@@ -470,14 +470,8 @@ class HttpTransport {
         isTestnet?: boolean; // Whether to use testnet url (default: false)
         timeout?: number; // Request timeout in ms (default: 10_000)
         server?: { // Custom server URLs
-            mainnet?: {
-                api: string | URL;
-                rpc: string | URL;
-            };
-            testnet?: {
-                api: string | URL;
-                rpc: string | URL;
-            };
+            mainnet?: { api?: string | URL; rpc?: string | URL };
+            testnet?: { api?: string | URL; rpc?: string | URL };
         };
         fetchOptions?: RequestInit; // A custom fetch options
         onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>; // A callback before request is sent
