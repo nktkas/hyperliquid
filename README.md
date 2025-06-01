@@ -225,17 +225,17 @@ const transport = new hl.WebSocketTransport();
 const subsClient = new hl.SubscriptionClient({ transport });
 
 // L2 Book updates
-await client.l2Book({ coin: "BTC" }, (data) => {
+await subsClient.l2Book({ coin: "BTC" }, (data) => {
     console.log(data);
 });
 
 // User fills
-await client.userFills({ user: "0x..." }, (data) => {
+await subsClient.userFills({ user: "0x..." }, (data) => {
     console.log(data);
 });
 
 // Explorer block updates
-await client.explorerBlock((data) => {
+await subsClient.explorerBlock((data) => {
     console.log(data);
 });
 ```

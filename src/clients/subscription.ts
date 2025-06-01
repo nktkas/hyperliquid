@@ -133,7 +133,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await client.activeAssetCtx({ coin: "BTC" }, (data) => {
+     * const sub = await subsClient.activeAssetCtx({ coin: "BTC" }, (data) => {
      *   console.log(data);
      * });
      * ```
@@ -168,7 +168,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await client.activeAssetData({ coin: "BTC", user: "0x..." }, (data) => {
+     * const sub = await subsClient.activeAssetData({ coin: "BTC", user: "0x..." }, (data) => {
      *   console.log(data);
      * });
      * ```
@@ -202,7 +202,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await client.allMids((data) => {
+     * const sub = await subsClient.allMids((data) => {
      *   console.log(data);
      * });
      * ```
@@ -242,7 +242,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await client.bbo({ coin: "BTC" }, (data) => {
+     * const sub = await subsClient.bbo({ coin: "BTC" }, (data) => {
      *   console.log(data);
      * });
      * ```
@@ -273,7 +273,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await client.candle({ coin: "BTC", interval: "1h" }, (data) => {
+     * const sub = await subsClient.candle({ coin: "BTC", interval: "1h" }, (data) => {
      *   console.log(data);
      * });
      * ```
@@ -305,7 +305,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await client.explorerBlock((data) => {
+     * const sub = await subsClient.explorerBlock((data) => {
      *   console.log(data);
      * });
      * ```
@@ -333,7 +333,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await client.explorerTxs((data) => {
+     * const sub = await subsClient.explorerTxs((data) => {
      *   console.log(data);
      * });
      * ```
@@ -361,7 +361,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await client.l2Book({ coin: "BTC" }, (data) => {
+     * const sub = await subsClient.l2Book({ coin: "BTC" }, (data) => {
      *   console.log(data);
      * });
      * ```
@@ -394,7 +394,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await client.notification({ user: "0x..." }, (data) => {
+     * const sub = await subsClient.notification({ user: "0x..." }, (data) => {
      *   console.log(data);
      * });
      * ```
@@ -423,7 +423,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await client.orderUpdates({ user: "0x..." }, (data) => {
+     * const sub = await subsClient.orderUpdates({ user: "0x..." }, (data) => {
      *   console.log(data);
      * });
      * ```
@@ -455,7 +455,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await client.trades({ coin: "BTC" }, (data) => {
+     * const sub = await subsClient.trades({ coin: "BTC" }, (data) => {
      *   console.log(data);
      * });
      * ```
@@ -488,7 +488,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await client.userEvents({ user: "0x..." }, (data) => {
+     * const sub = await subsClient.userEvents({ user: "0x..." }, (data) => {
      *   console.log(data);
      * });
      * ```
@@ -517,7 +517,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await client.userFills({ user: "0x..." }, (data) => {
+     * const sub = await subsClient.userFills({ user: "0x..." }, (data) => {
      *   console.log(data);
      * });
      * ```
@@ -549,7 +549,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await client.userFundings({ user: "0x..." }, (data) => {
+     * const sub = await subsClient.userFundings({ user: "0x..." }, (data) => {
      *   console.log(data);
      * });
      * ```
@@ -580,7 +580,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await client.userNonFundingLedgerUpdates({ user: "0x..." }, (data) => {
+     * const sub = await subsClient.userNonFundingLedgerUpdates({ user: "0x..." }, (data) => {
      *   console.log(data);
      * });
      * ```
@@ -614,7 +614,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await client.userTwapHistory({ user: "0x..." }, (data) => {
+     * const sub = await subsClient.userTwapHistory({ user: "0x..." }, (data) => {
      *   console.log(data);
      * });
      * ```
@@ -645,7 +645,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await client.userTwapSliceFills({ user: "0x..." }, (data) => {
+     * const sub = await subsClient.userTwapSliceFills({ user: "0x..." }, (data) => {
      *   console.log(data);
      * });
      * ```
@@ -679,7 +679,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await client.webData2({ user: "0x..." }, (data) => {
+     * const sub = await subsClient.webData2({ user: "0x..." }, (data) => {
      *   console.log(data);
      * });
      * ```

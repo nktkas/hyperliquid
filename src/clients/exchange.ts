@@ -581,7 +581,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.approveAgent({ agentAddress: "0x...", agentName: "agentName" });
+     * const data = await exchClient.approveAgent({ agentAddress: "0x...", agentName: "agentName" });
      * ```
      */
     async approveAgent(args: ApproveAgentParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -635,7 +635,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.approveBuilderFee({ maxFeeRate: "0.01%", builder: "0x..." });
+     * const data = await exchClient.approveBuilderFee({ maxFeeRate: "0.01%", builder: "0x..." });
      * ```
      */
     async approveBuilderFee(args: ApproveBuilderFeeParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -687,7 +687,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.batchModify({
+     * const data = await exchClient.batchModify({
      *   modifies: [{
      *     oid: 123,
      *     order: {
@@ -783,7 +783,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.cancel({
+     * const data = await exchClient.cancel({
      *   cancels: [{
      *     a: 0, // Asset index
      *     o: 123, // Order ID
@@ -843,7 +843,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.cancelByCloid({
+     * const data = await exchClient.cancelByCloid({
      *   cancels: [
      *     { asset: 0, cloid: "0x..." },
      *   ],
@@ -902,7 +902,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.cDeposit({ wei: 1 * 1e8 });
+     * const data = await exchClient.cDeposit({ wei: 1 * 1e8 });
      * ```
      */
     async cDeposit(args: CDepositParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -953,7 +953,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.claimRewards();
+     * const data = await exchClient.claimRewards();
      * ```
      */
     async claimRewards(signal?: AbortSignal): Promise<SuccessResponse> {
@@ -993,7 +993,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.convertToMultiSigUser({
+     * const data = await exchClient.convertToMultiSigUser({
      *   authorizedUsers: ["0x...", "0x..."],
      *   threshold: 2,
      * });
@@ -1047,7 +1047,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.createSubAccount({ name: "subAccountName" });
+     * const data = await exchClient.createSubAccount({ name: "subAccountName" });
      * ```
      */
     async createSubAccount(args: CreateSubAccountParameters, signal?: AbortSignal): Promise<CreateSubAccountResponse> {
@@ -1090,7 +1090,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.createVault({
+     * const data = await exchClient.createVault({
      *   name: "VaultName",
      *   description: "This is an example of a vault description",
      *   initialUsd: 100 * 1e6,
@@ -1141,10 +1141,10 @@ export class ExchangeClient<
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * // Jail self
-     * const result = await client.cSignerAction({ jailSelf: null });
+     * const data = await exchClient.cSignerAction({ jailSelf: null });
      *
      * // Unjail self
-     * const result = await client.cSignerAction({ unjailSelf: null });
+     * const data = await exchClient.cSignerAction({ unjailSelf: null });
      * ```
      */
     async cSignerAction(args: CSignerActionParameters_JailSelf, signal?: AbortSignal): Promise<SuccessResponse>;
@@ -1198,7 +1198,7 @@ export class ExchangeClient<
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * // Change validator profile
-     * const result = await client.cValidatorAction({
+     * const data = await exchClient.cValidatorAction({
      *   changeProfile: {
      *     name: "My Validator",
      *     description: "My validator description",
@@ -1307,7 +1307,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.cWithdraw({ wei: 1 * 1e8 });
+     * const data = await exchClient.cWithdraw({ wei: 1 * 1e8 });
      * ```
      */
     async cWithdraw(args: CWithdrawParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -1358,7 +1358,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.evmUserModify({ usingBigBlocks: true });
+     * const data = await exchClient.evmUserModify({ usingBigBlocks: true });
      * ```
      */
     async evmUserModify(args: EvmUserModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -1401,7 +1401,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.modify({
+     * const data = await exchClient.modify({
      *   oid: 123,
      *   order: {
      *     a: 0, // Asset index
@@ -1502,7 +1502,7 @@ export class ExchangeClient<
      *   isTestnet: true,
      * });
      *
-     * const result = await client.multiSig({
+     * const data = await exchClient.multiSig({
      *   signatures: [signature],
      *   payload: {
      *     multiSigUser,
@@ -1586,7 +1586,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.order({
+     * const data = await exchClient.order({
      *   orders: [{
      *     a: 0, // Asset index
      *     b: true, // Buy order
@@ -1753,7 +1753,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.perpDexClassTransfer({
+     * const data = await exchClient.perpDexClassTransfer({
      *   dex: "test",
      *   token: "USDC",
      *   amount: "1",
@@ -1812,7 +1812,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.registerReferrer({ code: "TEST" });
+     * const data = await exchClient.registerReferrer({ code: "TEST" });
      * ```
      */
     async registerReferrer(args: RegisterReferrerParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -1855,7 +1855,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.reserveRequestWeight({ weight: 10 });
+     * const data = await exchClient.reserveRequestWeight({ weight: 10 });
      * ```
      */
     async reserveRequestWeight(args: ReserveRequestWeightParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -1905,7 +1905,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.scheduleCancel({ time: Date.now() + 3600000 });
+     * const data = await exchClient.scheduleCancel({ time: Date.now() + 3600000 });
      * ```
      */
     async scheduleCancel(args?: ScheduleCancelParameters, signal?: AbortSignal): Promise<SuccessResponse>;
@@ -1966,7 +1966,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.setDisplayName({ displayName: "My Name" });
+     * const data = await exchClient.setDisplayName({ displayName: "My Name" });
      * ```
      */
     async setDisplayName(args: SetDisplayNameParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -2009,7 +2009,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.setReferrer({ code: "TEST" });
+     * const data = await exchClient.setReferrer({ code: "TEST" });
      * ```
      */
     async setReferrer(args: SetReferrerParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -2191,7 +2191,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.spotSend({
+     * const data = await exchClient.spotSend({
      *   destination: "0x...",
      *   token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
      *   amount: "1",
@@ -2248,7 +2248,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.spotUser({ toggleSpotDusting: { optOut: false } });
+     * const data = await exchClient.spotUser({ toggleSpotDusting: { optOut: false } });
      * ```
      */
     async spotUser(args: SpotUserParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -2293,7 +2293,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.subAccountSpotTransfer({
+     * const data = await exchClient.subAccountSpotTransfer({
      *   subAccountUser: "0x...",
      *   isDeposit: true,
      *   token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
@@ -2347,7 +2347,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.subAccountTransfer({
+     * const data = await exchClient.subAccountTransfer({
      *   subAccountUser: "0x...",
      *   isDeposit: true,
      *   usd: 1 * 1e6,
@@ -2396,7 +2396,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.tokenDelegate({
+     * const data = await exchClient.tokenDelegate({
      *   validator: "0x...",
      *   isUndelegate: true,
      *   wei: 1 * 1e8,
@@ -2453,7 +2453,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.twapCancel({
+     * const data = await exchClient.twapCancel({
      *   a: 0, // Asset index
      *   t: 1, // TWAP ID
      * });
@@ -2509,7 +2509,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.twapOrder({
+     * const data = await exchClient.twapOrder({
      *   a: 0, // Asset index
      *   b: true, // Buy order
      *   s: "1", // Size
@@ -2575,7 +2575,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.updateIsolatedMargin({ asset: 0, isBuy: true, ntli: 1 * 1e6 });
+     * const data = await exchClient.updateIsolatedMargin({ asset: 0, isBuy: true, ntli: 1 * 1e6 });
      * ```
      */
     async updateIsolatedMargin(args: UpdateIsolatedMarginParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -2629,7 +2629,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.updateLeverage({ asset: 0, isCross: true, leverage: 5 });
+     * const data = await exchClient.updateLeverage({ asset: 0, isCross: true, leverage: 5 });
      * ```
      */
     async updateLeverage(args: UpdateLeverageParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -2683,7 +2683,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.usdClassTransfer({ amount: "1", toPerp: true });
+     * const data = await exchClient.usdClassTransfer({ amount: "1", toPerp: true });
      * ```
      */
     async usdClassTransfer(args: UsdClassTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -2735,7 +2735,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.usdSend({ destination: "0x...", amount: "1" });
+     * const data = await exchClient.usdSend({ destination: "0x...", amount: "1" });
      * ```
      */
     async usdSend(args: UsdSendParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -2787,7 +2787,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.vaultDistribute({ vaultAddress: "0x...", usd: 10 * 1e6 });
+     * const data = await exchClient.vaultDistribute({ vaultAddress: "0x...", usd: 10 * 1e6 });
      * ```
      */
     async vaultDistribute(args: VaultDistributeParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -2831,7 +2831,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.vaultModify({
+     * const data = await exchClient.vaultModify({
      *   vaultAddress: "0x...",
      *   allowDeposits: true,
      *   alwaysCloseOnWithdraw: false,
@@ -2880,7 +2880,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.vaultTransfer({
+     * const data = await exchClient.vaultTransfer({
      *   vaultAddress: "0x...",
      *   isDeposit: true,
      *   usd: 10 * 1e6,
@@ -2936,7 +2936,7 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const result = await client.withdraw3({ destination: "0x...", amount: "1" });
+     * const data = await exchClient.withdraw3({ destination: "0x...", amount: "1" });
      * ```
      */
     async withdraw3(args: Withdraw3Parameters, signal?: AbortSignal): Promise<SuccessResponse> {
