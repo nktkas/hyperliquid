@@ -1,6 +1,12 @@
 import type { IRequestTransport } from "../transports/base.ts";
 import type { BlockDetailsRequest, TxDetailsRequest, UserDetailsRequest } from "../types/explorer/requests.ts";
-import type { BlockDetailsResponse, TxDetailsResponse, UserDetailsResponse } from "../types/explorer/responses.ts";
+import type {
+    BlockDetails,
+    BlockDetailsResponse,
+    TxDetails,
+    TxDetailsResponse,
+    UserDetailsResponse,
+} from "../types/explorer/responses.ts";
 import type {
     ExtraAgent,
     LegalCheck,
@@ -304,12 +310,13 @@ export class InfoClient<
      * const data = await infoClient.blockDetails({ height: 123 });
      * ```
      */
-    blockDetails(args: BlockDetailsParameters, signal?: AbortSignal): Promise<BlockDetailsResponse> {
+    async blockDetails(args: BlockDetailsParameters, signal?: AbortSignal): Promise<BlockDetails> {
         const request: BlockDetailsRequest = {
             type: "blockDetails",
             ...args,
         };
-        return this.transport.request("explorer", request, signal);
+        const { blockDetails } = await this.transport.request<BlockDetailsResponse>("explorer", request, signal);
+        return blockDetails;
     }
 
     /**
@@ -1130,12 +1137,13 @@ export class InfoClient<
      * const data = await infoClient.txDetails({ hash: "0x..." });
      * ```
      */
-    txDetails(args: TxDetailsParameters, signal?: AbortSignal): Promise<TxDetailsResponse> {
+    async txDetails(args: TxDetailsParameters, signal?: AbortSignal): Promise<TxDetails> {
         const request: TxDetailsRequest = {
             type: "txDetails",
             ...args,
         };
-        return this.transport.request("explorer", request, signal);
+        const { tx } = await this.transport.request<TxDetailsResponse>("explorer", request, signal);
+        return tx;
     }
 
     /**
@@ -1155,12 +1163,13 @@ export class InfoClient<
      * const data = await infoClient.userDetails({ user: "0x..." });
      * ```
      */
-    userDetails(args: UserDetailsParameters, signal?: AbortSignal): Promise<UserDetailsResponse> {
+    async userDetails(args: UserDetailsParameters, signal?: AbortSignal): Promise<TxDetails[]> {
         const request: UserDetailsRequest = {
             type: "userDetails",
             ...args,
         };
-        return this.transport.request("explorer", request, signal);
+        const { txs } = await this.transport.request<UserDetailsResponse>("explorer", request, signal);
+        return txs;
     }
 
     /**
