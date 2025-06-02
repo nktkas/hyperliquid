@@ -237,8 +237,8 @@ export interface BatchModifyRequest extends BaseExchangeRequest {
         type: "batchModify";
         /** Order modifications. */
         modifies: {
-            /** Order ID. */
-            oid: number;
+            /** Order ID or CLient Order ID. */
+            oid: number | Hex;
             /** New order parameters. */
             order: OrderParams;
         }[];
@@ -449,8 +449,8 @@ export interface ModifyRequest extends BaseExchangeRequest {
     action: {
         /** Type of action. */
         type: "modify";
-        /** Order ID. */
-        oid: number;
+        /** Order ID or CLient Order ID. */
+        oid: number | Hex;
         /** New order parameters. */
         order: OrderParams;
     };

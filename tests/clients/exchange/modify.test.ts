@@ -4,7 +4,7 @@ import BigNumber from "npm:bignumber.js@9";
 import { ExchangeClient, type Hex, HttpTransport, InfoClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
-import { formatPrice, formatSize, getAssetData } from "../../_utils/utils.ts";
+import { formatPrice, formatSize, getAssetData, randomCloid } from "../../_utils/utils.ts";
 
 // —————————— Arguments ——————————
 
@@ -40,7 +40,19 @@ Deno.test("modify", async () => {
         const data = await Promise.all([
             // Check response 'success'
             exchClient.modify({
-                oid: await openOrder(exchClient, id, pxDown, sz),
+                oid: (await openOrder(exchClient, id, pxDown, sz)).oid,
+                order: {
+                    a: id,
+                    b: true,
+                    p: pxDown,
+                    s: sz,
+                    r: false,
+                    t: { limit: { tif: "Gtc" } },
+                },
+            }),
+            // Check argument `oid` as cloid
+            exchClient.modify({
+                oid: (await openOrder(exchClient, id, pxDown, sz)).cloid,
                 order: {
                     a: id,
                     b: true,
@@ -52,7 +64,7 @@ Deno.test("modify", async () => {
             }),
             // Check argument 'expiresAfter'
             exchClient.modify({
-                oid: await openOrder(exchClient, id, pxDown, sz),
+                oid: (await openOrder(exchClient, id, pxDown, sz)).oid,
                 order: {
                     a: id,
                     b: true,
@@ -65,7 +77,7 @@ Deno.test("modify", async () => {
             }),
             // Check argument 't.trigger'
             exchClient.modify({
-                oid: await openOrder(exchClient, id, pxDown, sz),
+                oid: (await openOrder(exchClient, id, pxDown, sz)).oid,
                 order: {
                     a: id,
                     b: true,
@@ -93,11 +105,28 @@ Deno.test("modify", async () => {
     }
 });
 
-async function openOrder(client: ExchangeClient, id: number, pxDown: string, sz: string): Promise<number> {
-    const openOrderRes = await client.order({
-        orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
+async function openOrder(
+    client: ExchangeClient,
+    id: number,
+    pxDown: string,
+    sz: string,
+): Promise<{ oid: number; cloid: Hex }> {
+    const cloid = randomCloid();
+    const orderResp = await client.order({
+        orders: [{
+            a: id,
+            b: true,
+            p: pxDown,
+            s: sz,
+            r: false,
+            t: { limit: { tif: "Gtc" } },
+            c: cloid,
+        }],
         grouping: "na",
     });
-    const [order] = openOrderRes.response.data.statuses;
-    return "resting" in order ? order.resting.oid : order.filled.oid;
+    const [order] = orderResp.response.data.statuses;
+    return {
+        oid: "resting" in order ? order.resting.oid : order.filled.oid,
+        cloid: "resting" in order ? order.resting.cloid! : order.filled.cloid!,
+    };
 }

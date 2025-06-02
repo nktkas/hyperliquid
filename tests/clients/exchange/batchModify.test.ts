@@ -42,7 +42,7 @@ Deno.test("batchModify", async () => {
             // Check response 'resting' + argument 'expiresAfter'
             exchClient.batchModify({
                 modifies: [{
-                    oid: await openOrder(exchClient, id, pxDown, sz),
+                    oid: (await openOrder(exchClient, id, pxDown, sz)).oid,
                     order: {
                         a: id,
                         b: true,
@@ -57,7 +57,7 @@ Deno.test("batchModify", async () => {
             // Check response 'resting' + `cloid`
             exchClient.batchModify({
                 modifies: [{
-                    oid: await openOrder(exchClient, id, pxDown, sz),
+                    oid: (await openOrder(exchClient, id, pxDown, sz)).oid,
                     order: {
                         a: id,
                         b: true,
@@ -69,10 +69,24 @@ Deno.test("batchModify", async () => {
                     },
                 }],
             }),
+            // Check response 'resting' + argument `oid` as cloid
+            exchClient.batchModify({
+                modifies: [{
+                    oid: (await openOrder(exchClient, id, pxDown, sz)).cloid,
+                    order: {
+                        a: id,
+                        b: true,
+                        p: pxDown,
+                        s: sz,
+                        r: false,
+                        t: { limit: { tif: "Gtc" } },
+                    },
+                }],
+            }),
             // Check response 'filled'
             exchClient.batchModify({
                 modifies: [{
-                    oid: await openOrder(exchClient, id, pxDown, sz),
+                    oid: (await openOrder(exchClient, id, pxDown, sz)).oid,
                     order: {
                         a: id,
                         b: true,
@@ -86,7 +100,7 @@ Deno.test("batchModify", async () => {
             // Check response 'filled' + `cloid`
             exchClient.batchModify({
                 modifies: [{
-                    oid: await openOrder(exchClient, id, pxDown, sz),
+                    oid: (await openOrder(exchClient, id, pxDown, sz)).oid,
                     order: {
                         a: id,
                         b: true,
@@ -101,7 +115,7 @@ Deno.test("batchModify", async () => {
             // Check argument 't.trigger'
             exchClient.batchModify({
                 modifies: [{
-                    oid: await openOrder(exchClient, id, pxDown, sz),
+                    oid: (await openOrder(exchClient, id, pxDown, sz)).oid,
                     order: {
                         a: id,
                         b: true,
@@ -142,11 +156,28 @@ Deno.test("batchModify", async () => {
     }
 });
 
-async function openOrder(client: ExchangeClient, id: number, pxDown: string, sz: string): Promise<number> {
+async function openOrder(
+    client: ExchangeClient,
+    id: number,
+    pxDown: string,
+    sz: string,
+): Promise<{ oid: number; cloid: Hex }> {
+    const cloid = randomCloid();
     const orderResp = await client.order({
-        orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
+        orders: [{
+            a: id,
+            b: true,
+            p: pxDown,
+            s: sz,
+            r: false,
+            t: { limit: { tif: "Gtc" } },
+            c: cloid,
+        }],
         grouping: "na",
     });
     const [order] = orderResp.response.data.statuses;
-    return "resting" in order ? order.resting.oid : order.filled.oid;
+    return {
+        oid: "resting" in order ? order.resting.oid : order.filled.oid,
+        cloid: "resting" in order ? order.resting.cloid! : order.filled.cloid!,
+    };
 }
