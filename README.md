@@ -318,9 +318,9 @@ class InfoClient {
     vaultSummaries(): Promise<VaultSummary[]>;
 
     // Explorer
-    blockDetails(args: BlockDetailsParameters): Promise<BlockDetailsResponse>;
-    txDetails(args: TxDetailsParameters): Promise<TxDetailsResponse>;
-    userDetails(args: UserDetailsParameters): Promise<UserDetailsResponse>;
+    blockDetails(args: BlockDetailsParameters): Promise<BlockDetails>;
+    txDetails(args: TxDetailsParameters): Promise<TxDetails>;
+    userDetails(args: UserDetailsParameters): Promise<TxDetails[]>;
 }
 ```
 
