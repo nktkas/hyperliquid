@@ -4,7 +4,7 @@
     "exports": {
         ".": "./mod.ts",
         "./types": "./src/types/mod.ts",
-        "./signing": "./src/signing/mod.ts"
+        "./signing": "./src/signing.ts"
     },
     "imports": {
         "@derzade/typescript-event-target": "jsr:@derzade/typescript-event-target@1.1.1",

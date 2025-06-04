@@ -70,41 +70,11 @@ import {
     isAbstractExtendedViemWalletClient,
     isAbstractViemWalletClient,
     isAbstractWindowEthereum,
+    l1ActionSorter,
     signL1Action,
     signMultiSigAction,
     signUserSignedAction,
-} from "../signing/signing.ts";
-import {
-    sortBatchModify,
-    sortCancel,
-    sortCancelByCloid,
-    sortClaimRewards,
-    sortCreateSubAccount,
-    sortCreateVault,
-    sortCSignerAction,
-    sortCValidatorAction,
-    sortEvmUserModify,
-    sortModify,
-    sortMultiSig,
-    sortOrder,
-    sortPerpDeploy,
-    sortRegisterReferrer,
-    sortReserveRequestWeight,
-    sortScheduleCancel,
-    sortSetDisplayName,
-    sortSetReferrer,
-    sortSpotDeploy,
-    sortSpotUser,
-    sortSubAccountSpotTransfer,
-    sortSubAccountTransfer,
-    sortTwapCancel,
-    sortTwapOrder,
-    sortUpdateIsolatedMargin,
-    sortUpdateLeverage,
-    sortVaultDistribute,
-    sortVaultModify,
-    sortVaultTransfer,
-} from "../signing/sortL1Action.ts";
+} from "../signing.ts";
 
 /** Parameters for the {@linkcode ExchangeClient} constructor. */
 export interface ExchangeClientParameters<
@@ -747,7 +717,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortBatchModify({ type: "batchModify", ...actionArgs });
+        const action = l1ActionSorter.batchModify({ type: "batchModify", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -801,7 +771,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortCancel({ type: "cancel", ...actionArgs });
+        const action = l1ActionSorter.cancel({ type: "cancel", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -854,7 +824,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortCancelByCloid({ type: "cancelByCloid", ...actionArgs });
+        const action = l1ActionSorter.cancelByCloid({ type: "cancelByCloid", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -947,7 +917,7 @@ export class ExchangeClient<
     async claimRewards(signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortClaimRewards({ type: "claimRewards" });
+        const action = l1ActionSorter.claimRewards({ type: "claimRewards" });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1041,7 +1011,7 @@ export class ExchangeClient<
     async createSubAccount(args: CreateSubAccountParameters, signal?: AbortSignal): Promise<CreateSubAccountResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortCreateSubAccount({ type: "createSubAccount", ...args });
+        const action = l1ActionSorter.createSubAccount({ type: "createSubAccount", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1085,7 +1055,7 @@ export class ExchangeClient<
     async createVault(args: CreateVaultParameters, signal?: AbortSignal): Promise<CreateVaultResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortCreateVault({ type: "createVault", nonce, ...args });
+        const action = l1ActionSorter.createVault({ type: "createVault", nonce, ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1137,7 +1107,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortCSignerAction({ type: "CSignerAction", ...actionArgs });
+        const action = l1ActionSorter.CSignerAction({ type: "CSignerAction", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1207,7 +1177,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortCValidatorAction({ type: "CValidatorAction", ...actionArgs });
+        const action = l1ActionSorter.CValidatorAction({ type: "CValidatorAction", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1302,7 +1272,7 @@ export class ExchangeClient<
     async evmUserModify(args: EvmUserModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortEvmUserModify({ type: "evmUserModify", ...args });
+        const action = l1ActionSorter.evmUserModify({ type: "evmUserModify", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1364,7 +1334,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortModify({ type: "modify", ...actionArgs });
+        const action = l1ActionSorter.modify({ type: "modify", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1443,7 +1413,7 @@ export class ExchangeClient<
 
         // Construct an action
         const hyperliquidChain = this._getHyperliquidChain();
-        const action = sortMultiSig({
+        const action = l1ActionSorter.multiSig({
             type: "multiSig",
             signatureChainId: await this._getSignatureChainId(),
             ...actionArgs,
@@ -1517,7 +1487,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortOrder({ type: "order", ...actionArgs });
+        const action = l1ActionSorter.order({ type: "order", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1550,7 +1520,7 @@ export class ExchangeClient<
     async perpDeploy(args: PerpDeployParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortPerpDeploy({ type: "perpDeploy", ...args });
+        const action = l1ActionSorter.perpDeploy({ type: "perpDeploy", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1651,7 +1621,7 @@ export class ExchangeClient<
     async registerReferrer(args: RegisterReferrerParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortRegisterReferrer({ type: "registerReferrer", ...args });
+        const action = l1ActionSorter.registerReferrer({ type: "registerReferrer", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1697,7 +1667,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortReserveRequestWeight({ type: "reserveRequestWeight", ...actionArgs });
+        const action = l1ActionSorter.reserveRequestWeight({ type: "reserveRequestWeight", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1753,7 +1723,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortScheduleCancel({ type: "scheduleCancel", ...actionArgs });
+        const action = l1ActionSorter.scheduleCancel({ type: "scheduleCancel", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1795,7 +1765,7 @@ export class ExchangeClient<
     async setDisplayName(args: SetDisplayNameParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortSetDisplayName({ type: "setDisplayName", ...args });
+        const action = l1ActionSorter.setDisplayName({ type: "setDisplayName", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1835,7 +1805,7 @@ export class ExchangeClient<
     async setReferrer(args: SetReferrerParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortSetReferrer({ type: "setReferrer", ...args });
+        const action = l1ActionSorter.setReferrer({ type: "setReferrer", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1891,7 +1861,7 @@ export class ExchangeClient<
     ): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortSpotDeploy({ type: "spotDeploy", ...args });
+        const action = l1ActionSorter.spotDeploy({ type: "spotDeploy", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1994,7 +1964,7 @@ export class ExchangeClient<
     async spotUser(args: SpotUserParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortSpotUser({ type: "spotUser", ...args });
+        const action = l1ActionSorter.spotUser({ type: "spotUser", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2042,7 +2012,7 @@ export class ExchangeClient<
     ): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortSubAccountSpotTransfer({ type: "subAccountSpotTransfer", ...args });
+        const action = l1ActionSorter.subAccountSpotTransfer({ type: "subAccountSpotTransfer", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2086,7 +2056,7 @@ export class ExchangeClient<
     async subAccountTransfer(args: SubAccountTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortSubAccountTransfer({ type: "subAccountTransfer", ...args });
+        const action = l1ActionSorter.subAccountTransfer({ type: "subAccountTransfer", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2193,7 +2163,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortTwapCancel({ type: "twapCancel", ...actionArgs });
+        const action = l1ActionSorter.twapCancel({ type: "twapCancel", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2249,7 +2219,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortTwapOrder({ type: "twapOrder", twap: { ...actionArgs } });
+        const action = l1ActionSorter.twapOrder({ type: "twapOrder", twap: { ...actionArgs } });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2298,7 +2268,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortUpdateIsolatedMargin({ type: "updateIsolatedMargin", ...actionArgs });
+        const action = l1ActionSorter.updateIsolatedMargin({ type: "updateIsolatedMargin", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2347,7 +2317,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortUpdateLeverage({ type: "updateLeverage", ...actionArgs });
+        const action = l1ActionSorter.updateLeverage({ type: "updateLeverage", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2493,7 +2463,7 @@ export class ExchangeClient<
     async vaultDistribute(args: VaultDistributeParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortVaultDistribute({ type: "vaultDistribute", ...args });
+        const action = l1ActionSorter.vaultDistribute({ type: "vaultDistribute", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2537,7 +2507,7 @@ export class ExchangeClient<
     async vaultModify(args: VaultModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortVaultModify({ type: "vaultModify", ...args });
+        const action = l1ActionSorter.vaultModify({ type: "vaultModify", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2587,7 +2557,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = sortVaultTransfer({ type: "vaultTransfer", ...actionArgs });
+        const action = l1ActionSorter.vaultTransfer({ type: "vaultTransfer", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2658,16 +2628,7 @@ export class ExchangeClient<
     }
 
     /** Send an API request and validate the response. */
-    protected async _request(
-        payload: {
-            action: BaseExchangeRequest["action"];
-            signature: BaseExchangeRequest["signature"];
-            nonce: BaseExchangeRequest["nonce"];
-            vaultAddress?: Hex;
-            expiresAfter?: number;
-        },
-        signal?: AbortSignal,
-    ): Promise<
+    protected async _request(payload: BaseExchangeRequest, signal?: AbortSignal): Promise<
         | SuccessResponse
         | CancelResponseSuccess
         | CreateSubAccountResponse
@@ -2676,7 +2637,7 @@ export class ExchangeClient<
         | TwapOrderResponseSuccess
         | TwapCancelResponseSuccess
     > {
-        const response = await this.transport.request("exchange", payload, signal) as
+        const response = await this.transport.request<
             | SuccessResponse
             | ErrorResponse
             | CancelResponse
@@ -2684,7 +2645,8 @@ export class ExchangeClient<
             | CreateVaultResponse
             | OrderResponse
             | TwapOrderResponse
-            | TwapCancelResponse;
+            | TwapCancelResponse
+        >("exchange", payload, signal);
         this._validateResponse(response);
         return response;
     }
