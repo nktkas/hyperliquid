@@ -1202,3 +1202,96 @@ function formatDecimal(numStr: string): string {
 
     return newFrac ? `${intPart}.${newFrac}` : intPart;
 }
+
+/** EIP-712 type definitions for user-signed actions. */
+export const userSignedActionEip712Types = {
+    approveAgent: {
+        "HyperliquidTransaction:ApproveAgent": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "agentAddress", type: "address" },
+            { name: "agentName", type: "string" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    approveBuilderFee: {
+        "HyperliquidTransaction:ApproveBuilderFee": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "maxFeeRate", type: "string" },
+            { name: "builder", type: "address" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    cDeposit: {
+        "HyperliquidTransaction:CDeposit": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "wei", type: "uint64" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    convertToMultiSigUser: {
+        "HyperliquidTransaction:ConvertToMultiSigUser": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "signers", type: "string" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    cWithdraw: {
+        "HyperliquidTransaction:CWithdraw": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "wei", type: "uint64" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    PerpDexClassTransfer: {
+        "HyperliquidTransaction:PerpDexClassTransfer": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "dex", type: "string" },
+            { name: "token", type: "string" },
+            { name: "amount", type: "string" },
+            { name: "toPerp", type: "bool" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    spotSend: {
+        "HyperliquidTransaction:SpotSend": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "destination", type: "string" },
+            { name: "token", type: "string" },
+            { name: "amount", type: "string" },
+            { name: "time", type: "uint64" },
+        ],
+    },
+    tokenDelegate: {
+        "HyperliquidTransaction:TokenDelegate": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "validator", type: "address" },
+            { name: "wei", type: "uint64" },
+            { name: "isUndelegate", type: "bool" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    usdClassTransfer: {
+        "HyperliquidTransaction:UsdClassTransfer": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "amount", type: "string" },
+            { name: "toPerp", type: "bool" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    usdSend: {
+        "HyperliquidTransaction:UsdSend": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "destination", type: "string" },
+            { name: "amount", type: "string" },
+            { name: "time", type: "uint64" },
+        ],
+    },
+    withdraw3: {
+        "HyperliquidTransaction:Withdraw": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "destination", type: "string" },
+            { name: "amount", type: "string" },
+            { name: "time", type: "uint64" },
+        ],
+    },
+};

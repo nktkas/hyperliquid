@@ -525,11 +525,11 @@ The import point gives access to functions that generate signatures for Hyperliq
 
 ```ts
 import { l1ActionSorter, signL1Action } from "@nktkas/hyperliquid/signing";
-import { privateKeyToAccount } from "viem/accounts";
+import { privateKeyToAccount } from "viem/accounts"; // or other wallet libraries
 
-const wallet = privateKeyToAccount("0x..."); // Your private key
+const wallet = privateKeyToAccount("0x..."); // your private key
 
-const action = l1ActionSorter.cancel({ // sort the action to generate the correct hash
+const action = l1ActionSorter.cancel({ // sort action to ensure proper signature
     type: "cancel",
     cancels: [
         { a: 0, o: 12345 },
@@ -555,10 +555,10 @@ const body = await response.json();
 #### Approve an agent without a client
 
 ```ts
-import { signUserSignedAction } from "@nktkas/hyperliquid/signing";
-import { privateKeyToAccount } from "viem/accounts";
+import { signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
+import { privateKeyToAccount } from "viem/accounts"; // or other wallet libraries
 
-const wallet = privateKeyToAccount("0x..."); // Your private key
+const wallet = privateKeyToAccount("0x..."); // your private key
 
 const action = {
     type: "approveAgent",
@@ -572,14 +572,7 @@ const action = {
 const signature = await signUserSignedAction({
     wallet,
     action,
-    types: {
-        "HyperliquidTransaction:ApproveAgent": [
-            { name: "hyperliquidChain", type: "string" },
-            { name: "agentAddress", type: "address" },
-            { name: "agentName", type: "string" },
-            { name: "nonce", type: "uint64" },
-        ],
-    },
+    types: userSignedActionEip712Types[action.type], // key order is important for a proper signature
     chainId: parseInt(action.signatureChainId, 16),
 });
 
