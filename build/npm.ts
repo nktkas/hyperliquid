@@ -80,6 +80,7 @@ try {
             engines: {
                 node: ">=22.4.0", // WebSocket support
             },
+            sideEffects: false,
         },
         compilerOptions: {
             lib: ["ESNext", "DOM"],
