@@ -524,17 +524,17 @@ The import point gives access to functions that generate signatures for Hyperliq
 #### Cancel an order without a client
 
 ```ts
-import { signL1Action } from "@nktkas/hyperliquid/signing";
+import { signL1Action, sortCancel } from "@nktkas/hyperliquid/signing";
 import { privateKeyToAccount } from "viem/accounts";
 
 const wallet = privateKeyToAccount("0x..."); // Your private key
 
-const action = {
+const action = sortCancel({ // sort the action to generate the correct hash
     type: "cancel",
     cancels: [
         { a: 0, o: 12345 },
     ],
-};
+});
 const nonce = Date.now();
 
 const signature = await signL1Action({

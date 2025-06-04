@@ -9,7 +9,7 @@ export type {
     AbstractExtendedViemWalletClient,
     AbstractViemWalletClient,
     AbstractWindowEthereum,
-} from "./src/signing.ts";
+} from "./src/signing/signing.ts";
 
 // Clients
 export * from "./src/clients/subscription.ts";

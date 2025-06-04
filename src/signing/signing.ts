@@ -54,10 +54,7 @@ import { keccak_256 } from "@noble/hashes/sha3";
 import { encode as encodeMsgpack, type ValueMap, type ValueType } from "@std/msgpack/encode";
 import { decodeHex, encodeHex } from "@std/encoding/hex";
 import { concat } from "@std/bytes/concat";
-import type { Hex } from "./base.ts";
-
-export type { Hex };
-export type { ValueMap, ValueType };
+import type { Hex } from "../base.ts";
 
 /** Abstract interface for a wallet that can sign typed data. */
 export type AbstractWallet =

@@ -2,7 +2,7 @@ import { type Args, parseArgs } from "jsr:@std/cli@1/parse-args";
 import { generatePrivateKey, privateKeyToAccount } from "npm:viem@2/accounts";
 import { assertRejects } from "jsr:@std/assert@1";
 import { ApiRequestError, ExchangeClient, type Hex, HttpTransport } from "../../../mod.ts";
-import { signL1Action, signUserSignedAction } from "../../../src/signing.ts";
+import { signL1Action, signUserSignedAction } from "../../../src/signing/signing.ts";
 
 // —————————— Arguments ——————————
 

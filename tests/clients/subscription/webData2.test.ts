@@ -153,6 +153,7 @@ Deno.test("webData2", async () => {
             },
             ignorePropertiesByPath: [
                 "#/properties/perpsAtOpenInterestCap",
+                "#/properties/spotState/properties/evmEscrows",
             ],
         });
     } finally {

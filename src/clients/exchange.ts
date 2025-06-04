@@ -73,8 +73,38 @@ import {
     signL1Action,
     signMultiSigAction,
     signUserSignedAction,
-    type ValueMap,
-} from "../signing.ts";
+} from "../signing/signing.ts";
+import {
+    sortBatchModify,
+    sortCancel,
+    sortCancelByCloid,
+    sortClaimRewards,
+    sortCreateSubAccount,
+    sortCreateVault,
+    sortCSignerAction,
+    sortCValidatorAction,
+    sortEvmUserModify,
+    sortModify,
+    sortMultiSig,
+    sortOrder,
+    sortPerpDeploy,
+    sortRegisterReferrer,
+    sortReserveRequestWeight,
+    sortScheduleCancel,
+    sortSetDisplayName,
+    sortSetReferrer,
+    sortSpotDeploy,
+    sortSpotUser,
+    sortSubAccountSpotTransfer,
+    sortSubAccountTransfer,
+    sortTwapCancel,
+    sortTwapOrder,
+    sortUpdateIsolatedMargin,
+    sortUpdateLeverage,
+    sortVaultDistribute,
+    sortVaultModify,
+    sortVaultTransfer,
+} from "../signing/sortL1Action.ts";
 
 /** Parameters for the {@linkcode ExchangeClient} constructor. */
 export interface ExchangeClientParameters<
@@ -717,37 +747,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: BatchModifyRequest["action"] = {
-            type: "batchModify",
-            modifies: actionArgs.modifies.map((modify) => {
-                const sortedModify = {
-                    oid: modify.oid,
-                    order: {
-                        a: modify.order.a,
-                        b: modify.order.b,
-                        p: this._formatDecimal(modify.order.p),
-                        s: this._formatDecimal(modify.order.s),
-                        r: modify.order.r,
-                        t: "limit" in modify.order.t
-                            ? {
-                                limit: {
-                                    tif: modify.order.t.limit.tif,
-                                },
-                            }
-                            : {
-                                trigger: {
-                                    isMarket: modify.order.t.trigger.isMarket,
-                                    triggerPx: this._formatDecimal(modify.order.t.trigger.triggerPx),
-                                    tpsl: modify.order.t.trigger.tpsl,
-                                },
-                            },
-                        c: modify.order.c,
-                    },
-                };
-                if (sortedModify.order.c === undefined) delete sortedModify.order.c;
-                return sortedModify;
-            }),
-        };
+        const action = sortBatchModify({ type: "batchModify", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -801,13 +801,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: CancelRequest["action"] = {
-            type: "cancel",
-            cancels: actionArgs.cancels.map((cancel) => ({
-                a: cancel.a,
-                o: cancel.o,
-            })),
-        };
+        const action = sortCancel({ type: "cancel", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -860,13 +854,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: CancelByCloidRequest["action"] = {
-            type: "cancelByCloid",
-            cancels: actionArgs.cancels.map((cancel) => ({
-                asset: cancel.asset,
-                cloid: cancel.cloid,
-            })),
-        };
+        const action = sortCancelByCloid({ type: "cancelByCloid", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -959,7 +947,7 @@ export class ExchangeClient<
     async claimRewards(signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: ClaimRewardsRequest["action"] = { type: "claimRewards" };
+        const action = sortClaimRewards({ type: "claimRewards" });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1053,10 +1041,7 @@ export class ExchangeClient<
     async createSubAccount(args: CreateSubAccountParameters, signal?: AbortSignal): Promise<CreateSubAccountResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: CreateSubAccountRequest["action"] = {
-            type: "createSubAccount",
-            name: args.name,
-        };
+        const action = sortCreateSubAccount({ type: "createSubAccount", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1100,13 +1085,7 @@ export class ExchangeClient<
     async createVault(args: CreateVaultParameters, signal?: AbortSignal): Promise<CreateVaultResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: CreateVaultRequest["action"] = {
-            type: "createVault",
-            name: args.name,
-            description: args.description,
-            initialUsd: args.initialUsd,
-            nonce,
-        };
+        const action = sortCreateVault({ type: "createVault", nonce, ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1158,10 +1137,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: CSignerActionRequest_JailSelf["action"] | CSignerActionRequest_UnjailSelf["action"] = {
-            type: "CSignerAction",
-            ...actionArgs,
-        };
+        const action = sortCSignerAction({ type: "CSignerAction", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1231,45 +1207,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        let action:
-            | CValidatorActionRequest_ChangeProfile["action"]
-            | CValidatorActionRequest_Register["action"]
-            | CValidatorActionRequest_Unregister["action"];
-        if ("changeProfile" in actionArgs) {
-            action = {
-                type: "CValidatorAction",
-                changeProfile: {
-                    node_ip: actionArgs.changeProfile.node_ip ?? null,
-                    name: actionArgs.changeProfile.name ?? null,
-                    description: actionArgs.changeProfile.description ?? null,
-                    unjailed: actionArgs.changeProfile.unjailed,
-                    disable_delegations: actionArgs.changeProfile.disable_delegations ?? null,
-                    commission_bps: actionArgs.changeProfile.commission_bps ?? null,
-                    signer: actionArgs.changeProfile.signer?.toLowerCase() as Hex ?? null,
-                },
-            };
-        } else if ("register" in actionArgs) {
-            action = {
-                type: "CValidatorAction",
-                register: {
-                    profile: {
-                        node_ip: { Ip: actionArgs.register.profile.node_ip.Ip },
-                        name: actionArgs.register.profile.name,
-                        description: actionArgs.register.profile.description,
-                        delegations_disabled: actionArgs.register.profile.delegations_disabled,
-                        commission_bps: actionArgs.register.profile.commission_bps,
-                        signer: actionArgs.register.profile.signer?.toLowerCase() as Hex,
-                    },
-                    unjailed: actionArgs.register.unjailed,
-                    initial_wei: actionArgs.register.initial_wei,
-                },
-            };
-        } else {
-            action = {
-                type: "CValidatorAction",
-                unregister: actionArgs.unregister,
-            };
-        }
+        const action = sortCValidatorAction({ type: "CValidatorAction", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1364,10 +1302,7 @@ export class ExchangeClient<
     async evmUserModify(args: EvmUserModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: EvmUserModifyRequest["action"] = {
-            type: "evmUserModify",
-            usingBigBlocks: args.usingBigBlocks,
-        };
+        const action = sortEvmUserModify({ type: "evmUserModify", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1429,32 +1364,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: ModifyRequest["action"] = {
-            type: "modify",
-            oid: actionArgs.oid,
-            order: {
-                a: actionArgs.order.a,
-                b: actionArgs.order.b,
-                p: this._formatDecimal(actionArgs.order.p),
-                s: this._formatDecimal(actionArgs.order.s),
-                r: actionArgs.order.r,
-                t: "limit" in actionArgs.order.t
-                    ? {
-                        limit: {
-                            tif: actionArgs.order.t.limit.tif,
-                        },
-                    }
-                    : {
-                        trigger: {
-                            isMarket: actionArgs.order.t.trigger.isMarket,
-                            triggerPx: this._formatDecimal(actionArgs.order.t.trigger.triggerPx),
-                            tpsl: actionArgs.order.t.trigger.tpsl,
-                        },
-                    },
-                c: actionArgs.order.c,
-            },
-        };
-        if (action.order.c === undefined) delete action.order.c;
+        const action = sortModify({ type: "modify", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1533,23 +1443,16 @@ export class ExchangeClient<
 
         // Construct an action
         const hyperliquidChain = this._getHyperliquidChain();
-        const action: MultiSigRequest["action"] = {
+        const action = sortMultiSig({
             type: "multiSig",
             signatureChainId: await this._getSignatureChainId(),
-            signatures: actionArgs.signatures.map((signature) => ({
-                r: signature.r.replace(/^0x0+/, "0x").toLowerCase() as Hex,
-                s: signature.s.replace(/^0x0+/, "0x").toLowerCase() as Hex,
-                v: signature.v,
-            })),
-            payload: {
-                multiSigUser: actionArgs.payload.multiSigUser.toLowerCase() as Hex,
-                outerSigner: actionArgs.payload.outerSigner.toLowerCase() as Hex,
-                action: actionArgs.payload.action,
-            },
-        };
+            ...actionArgs,
+        });
 
         // Sign the action
-        const actionForMultiSig = structuredClone(action) as ValueMap;
+        const actionForMultiSig = structuredClone(action) as Omit<MultiSigRequest["action"], "type"> & {
+            type?: string | undefined;
+        };
         delete actionForMultiSig.type;
 
         const signature = await signMultiSigAction({
@@ -1614,42 +1517,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: OrderRequest["action"] = {
-            type: "order",
-            orders: actionArgs.orders.map((order) => {
-                const sortedOrder = {
-                    a: order.a,
-                    b: order.b,
-                    p: this._formatDecimal(order.p),
-                    s: this._formatDecimal(order.s),
-                    r: order.r,
-                    t: "limit" in order.t
-                        ? {
-                            limit: {
-                                tif: order.t.limit.tif,
-                            },
-                        }
-                        : {
-                            trigger: {
-                                isMarket: order.t.trigger.isMarket,
-                                triggerPx: this._formatDecimal(order.t.trigger.triggerPx),
-                                tpsl: order.t.trigger.tpsl,
-                            },
-                        },
-                    c: order.c,
-                };
-                if (order.c === undefined) delete sortedOrder.c;
-                return sortedOrder;
-            }),
-            grouping: actionArgs.grouping,
-            builder: actionArgs.builder
-                ? {
-                    b: actionArgs.builder.b.toLowerCase() as Hex,
-                    f: actionArgs.builder.f,
-                }
-                : actionArgs.builder,
-        };
-        if (action.builder === undefined) delete action.builder;
+        const action = sortOrder({ type: "order", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1682,42 +1550,7 @@ export class ExchangeClient<
     async perpDeploy(args: PerpDeployParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        let action:
-            | PerpDeployRequest_RegisterAsset["action"]
-            | PerpDeployRequest_SetOracle["action"];
-        if ("registerAsset" in args) {
-            action = {
-                type: "perpDeploy",
-                registerAsset: {
-                    maxGas: args.registerAsset.maxGas ?? null,
-                    assetRequest: {
-                        coin: args.registerAsset.assetRequest.coin,
-                        szDecimals: args.registerAsset.assetRequest.szDecimals,
-                        oraclePx: args.registerAsset.assetRequest.oraclePx,
-                        marginTableId: args.registerAsset.assetRequest.marginTableId,
-                        onlyIsolated: args.registerAsset.assetRequest.onlyIsolated,
-                    },
-                    dex: args.registerAsset.dex,
-                    schema: args.registerAsset.schema
-                        ? {
-                            fullName: args.registerAsset.schema.fullName,
-                            collateralToken: args.registerAsset.schema.collateralToken,
-                            oracleUpdater: args.registerAsset.schema.oracleUpdater?.toLowerCase() as Hex ??
-                                null,
-                        }
-                        : null,
-                },
-            };
-        } else {
-            action = {
-                type: "perpDeploy",
-                setOracle: {
-                    dex: args.setOracle.dex,
-                    oraclePxs: args.setOracle.oraclePxs,
-                    markPxs: args.setOracle.markPxs,
-                },
-            };
-        }
+        const action = sortPerpDeploy({ type: "perpDeploy", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1818,10 +1651,7 @@ export class ExchangeClient<
     async registerReferrer(args: RegisterReferrerParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: RegisterReferrerRequest["action"] = {
-            type: "registerReferrer",
-            code: args.code,
-        };
+        const action = sortRegisterReferrer({ type: "registerReferrer", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1867,10 +1697,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: ReserveRequestWeightRequest["action"] = {
-            type: "reserveRequestWeight",
-            weight: actionArgs.weight,
-        };
+        const action = sortReserveRequestWeight({ type: "reserveRequestWeight", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1926,11 +1753,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: ScheduleCancelRequest["action"] = {
-            type: "scheduleCancel",
-            time: actionArgs.time,
-        };
-        if (action.time === undefined) delete action.time;
+        const action = sortScheduleCancel({ type: "scheduleCancel", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -1972,10 +1795,7 @@ export class ExchangeClient<
     async setDisplayName(args: SetDisplayNameParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: SetDisplayNameRequest["action"] = {
-            type: "setDisplayName",
-            displayName: args.displayName,
-        };
+        const action = sortSetDisplayName({ type: "setDisplayName", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2015,10 +1835,7 @@ export class ExchangeClient<
     async setReferrer(args: SetReferrerParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: SetReferrerRequest["action"] = {
-            type: "setReferrer",
-            code: args.code,
-        };
+        const action = sortSetReferrer({ type: "setReferrer", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2074,84 +1891,7 @@ export class ExchangeClient<
     ): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        let action:
-            | SpotDeployRequest_Genesis["action"]
-            | SpotDeployRequest_RegisterHyperliquidity["action"]
-            | SpotDeployRequest_RegisterSpot["action"]
-            | SpotDeployRequest_RegisterToken2["action"]
-            | SpotDeployRequest_SetDeployerTradingFeeShare["action"]
-            | SpotDeployRequest_UserGenesis["action"];
-        if ("registerToken2" in args) {
-            action = {
-                type: "spotDeploy",
-                registerToken2: {
-                    spec: {
-                        name: args.registerToken2.spec.name,
-                        szDecimals: args.registerToken2.spec.szDecimals,
-                        weiDecimals: args.registerToken2.spec.weiDecimals,
-                    },
-                    maxGas: args.registerToken2.maxGas,
-                    fullName: args.registerToken2.fullName,
-                },
-            };
-            if (action.registerToken2.fullName === undefined) {
-                delete action.registerToken2.fullName;
-            }
-        } else if ("userGenesis" in args) {
-            action = {
-                type: "spotDeploy",
-                userGenesis: {
-                    token: args.userGenesis.token,
-                    userAndWei: args.userGenesis.userAndWei,
-                    existingTokenAndWei: args.userGenesis.existingTokenAndWei,
-                    blacklistUsers: args.userGenesis.blacklistUsers,
-                },
-            };
-            if (action.userGenesis.blacklistUsers === undefined) {
-                delete action.userGenesis.blacklistUsers;
-            }
-        } else if ("genesis" in args) {
-            action = {
-                type: "spotDeploy",
-                genesis: {
-                    token: args.genesis.token,
-                    maxSupply: args.genesis.maxSupply,
-                    noHyperliquidity: args.genesis.noHyperliquidity,
-                },
-            };
-            if (action.genesis.noHyperliquidity === undefined) {
-                delete action.genesis.noHyperliquidity;
-            }
-        } else if ("registerSpot" in args) {
-            action = {
-                type: "spotDeploy",
-                registerSpot: {
-                    tokens: args.registerSpot.tokens,
-                },
-            };
-        } else if ("registerHyperliquidity" in args) {
-            action = {
-                type: "spotDeploy",
-                registerHyperliquidity: {
-                    spot: args.registerHyperliquidity.spot,
-                    startPx: args.registerHyperliquidity.startPx,
-                    orderSz: args.registerHyperliquidity.orderSz,
-                    nOrders: args.registerHyperliquidity.nOrders,
-                    nSeededLevels: args.registerHyperliquidity.nSeededLevels,
-                },
-            };
-            if (action.registerHyperliquidity.nSeededLevels === undefined) {
-                delete action.registerHyperliquidity.nSeededLevels;
-            }
-        } else {
-            action = {
-                type: "spotDeploy",
-                setDeployerTradingFeeShare: {
-                    token: args.setDeployerTradingFeeShare.token,
-                    share: args.setDeployerTradingFeeShare.share,
-                },
-            };
-        }
+        const action = sortSpotDeploy({ type: "spotDeploy", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2254,12 +1994,7 @@ export class ExchangeClient<
     async spotUser(args: SpotUserParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: SpotUserRequest["action"] = {
-            type: "spotUser",
-            toggleSpotDusting: {
-                optOut: args.toggleSpotDusting.optOut,
-            },
-        };
+        const action = sortSpotUser({ type: "spotUser", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2307,13 +2042,7 @@ export class ExchangeClient<
     ): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: SubAccountSpotTransferRequest["action"] = {
-            type: "subAccountSpotTransfer",
-            subAccountUser: args.subAccountUser,
-            isDeposit: args.isDeposit,
-            token: args.token,
-            amount: args.amount,
-        };
+        const action = sortSubAccountSpotTransfer({ type: "subAccountSpotTransfer", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2357,12 +2086,7 @@ export class ExchangeClient<
     async subAccountTransfer(args: SubAccountTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: SubAccountTransferRequest["action"] = {
-            type: "subAccountTransfer",
-            subAccountUser: args.subAccountUser,
-            isDeposit: args.isDeposit,
-            usd: args.usd,
-        };
+        const action = sortSubAccountTransfer({ type: "subAccountTransfer", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2469,11 +2193,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: TwapCancelRequest["action"] = {
-            type: "twapCancel",
-            a: actionArgs.a,
-            t: actionArgs.t,
-        };
+        const action = sortTwapCancel({ type: "twapCancel", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2529,17 +2249,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: TwapOrderRequest["action"] = {
-            type: "twapOrder",
-            twap: {
-                a: actionArgs.a,
-                b: actionArgs.b,
-                s: this._formatDecimal(actionArgs.s),
-                r: actionArgs.r,
-                m: actionArgs.m,
-                t: actionArgs.t,
-            },
-        };
+        const action = sortTwapOrder({ type: "twapOrder", twap: { ...actionArgs } });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2588,12 +2298,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: UpdateIsolatedMarginRequest["action"] = {
-            type: "updateIsolatedMargin",
-            asset: actionArgs.asset,
-            isBuy: actionArgs.isBuy,
-            ntli: actionArgs.ntli,
-        };
+        const action = sortUpdateIsolatedMargin({ type: "updateIsolatedMargin", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2642,12 +2347,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: UpdateLeverageRequest["action"] = {
-            type: "updateLeverage",
-            asset: actionArgs.asset,
-            isCross: actionArgs.isCross,
-            leverage: actionArgs.leverage,
-        };
+        const action = sortUpdateLeverage({ type: "updateLeverage", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2793,11 +2493,7 @@ export class ExchangeClient<
     async vaultDistribute(args: VaultDistributeParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: VaultDistributeRequest["action"] = {
-            type: "vaultDistribute",
-            vaultAddress: args.vaultAddress,
-            usd: args.usd,
-        };
+        const action = sortVaultDistribute({ type: "vaultDistribute", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2841,12 +2537,7 @@ export class ExchangeClient<
     async vaultModify(args: VaultModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: VaultModifyRequest["action"] = {
-            type: "vaultModify",
-            vaultAddress: args.vaultAddress,
-            allowDeposits: args.allowDeposits,
-            alwaysCloseOnWithdraw: args.alwaysCloseOnWithdraw,
-        };
+        const action = sortVaultModify({ type: "vaultModify", ...args });
 
         // Sign the action
         const signature = await signL1Action({
@@ -2896,12 +2587,7 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: VaultTransferRequest["action"] = {
-            type: "vaultTransfer",
-            vaultAddress: actionArgs.vaultAddress,
-            isDeposit: actionArgs.isDeposit,
-            usd: actionArgs.usd,
-        };
+        const action = sortVaultTransfer({ type: "vaultTransfer", ...actionArgs });
 
         // Sign the action
         const signature = await signL1Action({
@@ -3001,16 +2687,6 @@ export class ExchangeClient<
             | TwapCancelResponse;
         this._validateResponse(response);
         return response;
-    }
-
-    /** Formats a decimal number as a string, removing trailing zeros. */
-    protected _formatDecimal(numStr: string): string {
-        if (!numStr.includes(".")) return numStr;
-
-        const [intPart, fracPart] = numStr.split(".");
-        const newFrac = fracPart.replace(/0+$/, "");
-
-        return newFrac ? `${intPart}.${newFrac}` : intPart;
     }
 
     /** Guesses the chain ID based on the wallet type or the isTestnet flag. */

@@ -11,7 +11,7 @@ import {
     createL1ActionHash,
     signL1Action,
     signUserSignedAction,
-} from "../../src/signing.ts";
+} from "../../src/signing/signing.ts";
 
 // —————————— Arguments ——————————
 
