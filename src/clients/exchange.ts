@@ -65,12 +65,11 @@ import type {
 } from "../types/exchange/responses.ts";
 import {
     type AbstractWallet,
+    actionSorter,
     isAbstractEthersSigner,
     isAbstractEthersV5Signer,
-    isAbstractExtendedViemWalletClient,
     isAbstractViemWalletClient,
     isAbstractWindowEthereum,
-    l1ActionSorter,
     signL1Action,
     signMultiSigAction,
     signUserSignedAction,
@@ -442,32 +441,31 @@ export class ApiRequestError extends HyperliquidError {
             | TwapOrderResponse
             | TwapCancelResponse,
     ) {
-        let message = "Cannot process API request";
-
+        let message;
         if (response.status === "err") {
-            // For ErrorResponse
-            message += `: ${response.response}`;
+            // ErrorResponse
+            message = response.response;
         } else {
             if ("statuses" in response.response.data) {
-                // For OrderResponse, CancelResponse
+                // OrderResponse | CancelResponse
                 const errors = response.response.data.statuses.reduce<string[]>((acc, status, index) => {
                     if (typeof status === "object" && "error" in status) {
-                        acc.push(`Order ${index} failed: ${status.error}`);
+                        acc.push(`Order ${index}: ${status.error}`);
                     }
                     return acc;
                 }, []);
                 if (errors.length > 0) {
-                    message += `: ${errors.join(", ")}`;
+                    message = errors.join(", ");
                 }
             } else {
-                // For TwapOrderResponse, TwapCancelResponse
+                // TwapOrderResponse | TwapCancelResponse
                 if (typeof response.response.data.status === "object" && "error" in response.response.data.status) {
-                    message += `: ${response.response.data.status.error}`;
+                    message = response.response.data.status.error;
                 }
             }
         }
 
-        super(message);
+        super(message || "An unknown error occurred while processing an API request. See `response` for more details.");
         this.name = "ApiRequestError";
     }
 }
@@ -495,12 +493,12 @@ class NonceManager {
 /**
  * Exchange client for interacting with the Hyperliquid API.
  * @typeParam T The transport used to connect to the Hyperliquid API.
- * @typeParam W The WalletClient/Account ([viem](https://viem.sh/docs/clients/wallet)) or Signer ([ethers.js](https://docs.ethers.io/v6/api/providers/#Signer)) used for signing transactions.
- */
+ * @typeParam W The wallet used for signing transactions.
+ */ 
 export class ExchangeClient<
     T extends IRequestTransport = IRequestTransport,
     W extends AbstractWallet = AbstractWallet,
-> implements ExchangeClientParameters, AsyncDisposable {
+> implements ExchangeClientParameters<T, W>, AsyncDisposable {
     transport: T;
     wallet: W;
     isTestnet: boolean;
@@ -586,14 +584,18 @@ export class ExchangeClient<
      * ```
      */
     async approveAgent(args: ApproveAgentParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: ApproveAgentRequest["action"] = {
-            ...args,
+            ...actionArgs,
             agentName: args.agentName ?? "",
             type: "approveAgent",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
-            nonce: await this.nonceManager(),
+            nonce,
         };
 
         // Sign the action
@@ -607,9 +609,9 @@ export class ExchangeClient<
 
         // Send a request
         return await this._request(
-            { action, signature, nonce: action.nonce } satisfies ApproveAgentRequest,
+            { action, signature, nonce } satisfies ApproveAgentRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -633,13 +635,17 @@ export class ExchangeClient<
      * ```
      */
     async approveBuilderFee(args: ApproveBuilderFeeParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: ApproveBuilderFeeRequest["action"] = {
-            ...args,
+            ...actionArgs,
             type: "approveBuilderFee",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
-            nonce: await this.nonceManager(),
+            nonce,
         };
 
         // Sign the action
@@ -652,9 +658,9 @@ export class ExchangeClient<
 
         // Send a request
         return await this._request(
-            { action, signature, nonce: action.nonce } satisfies ApproveBuilderFeeRequest,
+            { action, signature, nonce } satisfies ApproveBuilderFeeRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -688,7 +694,7 @@ export class ExchangeClient<
      *           tif: "Gtc", // Good-til-cancelled
      *         },
      *       },
-     *       c: "0x...", // Optional: Client Order ID
+     *       c: "0x...", // Client Order ID (optional)
      *     },
      *   }],
      * });
@@ -704,12 +710,15 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.batchModify({ type: "batchModify", ...actionArgs });
+        const action: BatchModifyRequest["action"] = {
+            type: "batchModify",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
@@ -720,7 +729,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce, vaultAddress, expiresAfter } satisfies BatchModifyRequest,
             signal,
-        ) as OrderResponseSuccess;
+        );
     }
 
     /**
@@ -758,12 +767,15 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.cancel({ type: "cancel", ...actionArgs });
+        const action: CancelRequest["action"] = {
+            type: "cancel",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
@@ -774,7 +786,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce, vaultAddress, expiresAfter } satisfies CancelRequest,
             signal,
-        ) as CancelResponseSuccess;
+        );
     }
 
     /**
@@ -811,12 +823,15 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.cancelByCloid({ type: "cancelByCloid", ...actionArgs });
+        const action: CancelByCloidRequest["action"] = {
+            type: "cancelByCloid",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
@@ -827,7 +842,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce, vaultAddress, expiresAfter } satisfies CancelByCloidRequest,
             signal,
-        ) as CancelResponseSuccess;
+        );
     }
 
     /**
@@ -851,13 +866,17 @@ export class ExchangeClient<
      * ```
      */
     async cDeposit(args: CDepositParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: CDepositRequest["action"] = {
-            ...args,
+            ...actionArgs,
             type: "cDeposit",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
-            nonce: await this.nonceManager(),
+            nonce,
         };
 
         // Sign the action
@@ -870,9 +889,9 @@ export class ExchangeClient<
 
         // Send a request
         return await this._request(
-            { action, signature, nonce: action.nonce } satisfies CDepositRequest,
+            { action, signature, nonce } satisfies CDepositRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -898,12 +917,14 @@ export class ExchangeClient<
     async claimRewards(signal?: AbortSignal): Promise<SuccessResponse> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.claimRewards({ type: "claimRewards" });
+        const action: ClaimRewardsRequest["action"] = {
+            type: "claimRewards",
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
         });
@@ -912,11 +933,11 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce } satisfies ClaimRewardsRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
-     * Convert a single-signature account to a multi-signature account.
+     * Convert a single-signature account to a multi-signature account or vice versa.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
@@ -932,20 +953,24 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const data = await exchClient.convertToMultiSigUser({
-     *   authorizedUsers: ["0x...", "0x..."],
+     * const data = await exchClient.convertToMultiSigUser({ // convert to multi-sig user
+     *   authorizedUsers: ["0x...", "0x...", "0x..."],
      *   threshold: 2,
      * });
      * ```
      */
     async convertToMultiSigUser(args: ConvertToMultiSigUserParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: ConvertToMultiSigUserRequest["action"] = {
             type: "convertToMultiSigUser",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
-            signers: JSON.stringify(args),
-            nonce: await this.nonceManager(),
+            signers: JSON.stringify(actionArgs),
+            nonce,
         };
 
         // Sign the action
@@ -958,9 +983,9 @@ export class ExchangeClient<
 
         // Send a request
         return await this._request(
-            { action, signature, nonce: action.nonce } satisfies ConvertToMultiSigUserRequest,
+            { action, signature, nonce } satisfies ConvertToMultiSigUserRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -984,14 +1009,20 @@ export class ExchangeClient<
      * ```
      */
     async createSubAccount(args: CreateSubAccountParameters, signal?: AbortSignal): Promise<CreateSubAccountResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.createSubAccount({ type: "createSubAccount", ...args });
+        const action: CreateSubAccountRequest["action"] = {
+            type: "createSubAccount",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
         });
@@ -1000,7 +1031,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce } satisfies CreateSubAccountRequest,
             signal,
-        ) as CreateSubAccountResponse;
+        );
     }
 
     /**
@@ -1022,20 +1053,27 @@ export class ExchangeClient<
      *
      * const data = await exchClient.createVault({
      *   name: "VaultName",
-     *   description: "This is an example of a vault description",
+     *   description: "Vault description",
      *   initialUsd: 100 * 1e6,
      * });
      * ```
      */
     async createVault(args: CreateVaultParameters, signal?: AbortSignal): Promise<CreateVaultResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.createVault({ type: "createVault", nonce, ...args });
+        const action: CreateVaultRequest["action"] = {
+            type: "createVault",
+            nonce,
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
         });
@@ -1044,7 +1082,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce } satisfies CreateVaultRequest,
             signal,
-        ) as CreateVaultResponse;
+        );
     }
 
     /**
@@ -1082,12 +1120,15 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.CSignerAction({ type: "CSignerAction", ...actionArgs });
+        const action: CSignerActionRequest_JailSelf["action"] | CSignerActionRequest_UnjailSelf["action"] = {
+            type: "CSignerAction",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
             expiresAfter,
@@ -1095,11 +1136,9 @@ export class ExchangeClient<
 
         // Send a request
         return await this._request(
-            { action, signature, nonce, expiresAfter } as
-                | CSignerActionRequest_JailSelf
-                | CSignerActionRequest_UnjailSelf,
+            { action, signature, nonce, expiresAfter },
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -1122,7 +1161,7 @@ export class ExchangeClient<
      * const data = await exchClient.cValidatorAction({
      *   changeProfile: {
      *     name: "My Validator",
-     *     description: "My validator description",
+     *     description: "Validator description",
      *     unjailed: true,
      *   }
      * });
@@ -1152,12 +1191,18 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.CValidatorAction({ type: "CValidatorAction", ...actionArgs });
+        const action:
+            | CValidatorActionRequest_ChangeProfile["action"]
+            | CValidatorActionRequest_Register["action"]
+            | CValidatorActionRequest_Unregister["action"] = {
+                type: "CValidatorAction",
+                ...actionArgs,
+            };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
             expiresAfter,
@@ -1165,12 +1210,9 @@ export class ExchangeClient<
 
         // Send a request
         return await this._request(
-            { action, signature, nonce, expiresAfter } as
-                | CValidatorActionRequest_ChangeProfile
-                | CValidatorActionRequest_Register
-                | CValidatorActionRequest_Unregister,
+            { action, signature, nonce, expiresAfter },
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -1194,13 +1236,17 @@ export class ExchangeClient<
      * ```
      */
     async cWithdraw(args: CWithdrawParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: CWithdrawRequest["action"] = {
-            ...args,
+            ...actionArgs,
             type: "cWithdraw",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
-            nonce: await this.nonceManager(),
+            nonce,
         };
 
         // Sign the action
@@ -1213,9 +1259,9 @@ export class ExchangeClient<
 
         // Send a request
         return await this._request(
-            { action, signature, nonce: action.nonce } satisfies CWithdrawRequest,
+            { action, signature, nonce } satisfies CWithdrawRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -1239,14 +1285,20 @@ export class ExchangeClient<
      * ```
      */
     async evmUserModify(args: EvmUserModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.evmUserModify({ type: "evmUserModify", ...args });
+        const action: EvmUserModifyRequest["action"] = {
+            type: "evmUserModify",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
         });
@@ -1255,7 +1307,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce } satisfies EvmUserModifyRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -1288,7 +1340,7 @@ export class ExchangeClient<
      *         tif: "Gtc", // Good-til-cancelled
      *       },
      *     },
-     *     c: "0x...", // Optional: Client Order ID
+     *     c: "0x...", // Client Order ID (optional)
      *   },
      * });
      * ```
@@ -1303,12 +1355,15 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.modify({ type: "modify", ...actionArgs });
+        const action: ModifyRequest["action"] = {
+            type: "modify",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
@@ -1319,7 +1374,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce, vaultAddress, expiresAfter } satisfies ModifyRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -1361,17 +1416,17 @@ export class ExchangeClient<
      *   nonce,
      * });
      * ```
-     * @unstable May not behave as expected and the interface may change in the future.
      */
-    async multiSig(args: MultiSigParameters, signal?: AbortSignal): Promise<
-        | SuccessResponse
-        | CancelResponseSuccess
-        | CreateSubAccountResponse
-        | CreateVaultResponse
-        | OrderResponseSuccess
-        | TwapOrderResponseSuccess
-        | TwapCancelResponseSuccess
-    > {
+    async multiSig<
+        T extends
+            | SuccessResponse
+            | CancelResponseSuccess
+            | CreateSubAccountResponse
+            | CreateVaultResponse
+            | OrderResponseSuccess
+            | TwapOrderResponseSuccess
+            | TwapCancelResponseSuccess,
+    >(args: MultiSigParameters, signal?: AbortSignal): Promise<T> {
         // Destructure the parameters
         const {
             vaultAddress = this.defaultVaultAddress,
@@ -1381,17 +1436,16 @@ export class ExchangeClient<
         } = args;
 
         // Construct an action
-        const hyperliquidChain = this._getHyperliquidChain();
-        const action = l1ActionSorter.multiSig({
+        const action: MultiSigRequest["action"] = {
             type: "multiSig",
             signatureChainId: await this._getSignatureChainId(),
             ...actionArgs,
-        });
+        };
 
         // Sign the action
-        const actionForMultiSig = structuredClone(action) as Omit<MultiSigRequest["action"], "type"> & {
-            type?: string | undefined;
-        };
+        const actionForMultiSig = actionSorter[action.type](action) as
+            & Omit<MultiSigRequest["action"], "type">
+            & { type?: string | undefined };
         delete actionForMultiSig.type;
 
         const signature = await signMultiSigAction({
@@ -1400,7 +1454,7 @@ export class ExchangeClient<
             nonce,
             vaultAddress,
             expiresAfter,
-            hyperliquidChain,
+            hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: action.signatureChainId,
         });
 
@@ -1440,7 +1494,7 @@ export class ExchangeClient<
      *         tif: "Gtc", // Good-til-cancelled
      *       },
      *     },
-     *     c: "0x...", // Optional: Client Order ID
+     *     c: "0x...", // Client Order ID (optional)
      *   }],
      *   grouping: "na", // No grouping
      * });
@@ -1456,12 +1510,15 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.order({ type: "order", ...actionArgs });
+        const action: OrderRequest["action"] = {
+            type: "order",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
@@ -1472,7 +1529,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce, vaultAddress, expiresAfter } satisfies OrderRequest,
             signal,
-        ) as OrderResponseSuccess;
+        );
     }
 
     /**
@@ -1483,29 +1540,56 @@ export class ExchangeClient<
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-3-assets
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
+     *
+     * const data = await exchClient.perpDeploy({
+     *   registerAsset: {
+     *     maxGas: 1000000,
+     *     assetRequest: {
+     *       coin: "USDC",
+     *       szDecimals: 8,
+     *       oraclePx: "1",
+     *       marginTableId: 1,
+     *       onlyIsolated: false,
+     *     },
+     *     dex: "test",
+     *   },
+     * });
+     * ```
      */
     async perpDeploy(args: PerpDeployParameters_RegisterAsset, signal?: AbortSignal): Promise<SuccessResponse>;
     async perpDeploy(args: PerpDeployParameters_SetOracle, signal?: AbortSignal): Promise<SuccessResponse>;
     async perpDeploy(args: PerpDeployParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.perpDeploy({ type: "perpDeploy", ...args });
+        const action: PerpDeployRequest_RegisterAsset["action"] | PerpDeployRequest_SetOracle["action"] = {
+            type: "perpDeploy",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
         });
 
         // Send a request
         return await this._request(
-            { action, signature, nonce } as
-                | PerpDeployRequest_RegisterAsset
-                | PerpDeployRequest_SetOracle,
+            { action, signature, nonce },
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -1534,13 +1618,17 @@ export class ExchangeClient<
      * ```
      */
     async perpDexClassTransfer(args: PerpDexClassTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: PerpDexClassTransferRequest["action"] = {
-            ...args,
+            ...actionArgs,
             type: "PerpDexClassTransfer",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
-            nonce: await this.nonceManager(),
+            nonce,
         };
 
         // Sign the action
@@ -1553,9 +1641,9 @@ export class ExchangeClient<
 
         // Send a request
         return await this._request(
-            { action, signature, nonce: action.nonce } satisfies PerpDexClassTransferRequest,
+            { action, signature, nonce } satisfies PerpDexClassTransferRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -1579,14 +1667,20 @@ export class ExchangeClient<
      * ```
      */
     async registerReferrer(args: RegisterReferrerParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.registerReferrer({ type: "registerReferrer", ...args });
+        const action: RegisterReferrerRequest["action"] = {
+            type: "registerReferrer",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
         });
@@ -1595,7 +1689,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce } satisfies RegisterReferrerRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -1627,12 +1721,15 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.reserveRequestWeight({ type: "reserveRequestWeight", ...actionArgs });
+        const action: ReserveRequestWeightRequest["action"] = {
+            type: "reserveRequestWeight",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
             expiresAfter,
@@ -1642,7 +1739,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce, expiresAfter } satisfies ReserveRequestWeightRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -1683,12 +1780,15 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.scheduleCancel({ type: "scheduleCancel", ...actionArgs });
+        const action: ScheduleCancelRequest["action"] = {
+            type: "scheduleCancel",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
@@ -1699,7 +1799,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce, vaultAddress, expiresAfter } satisfies ScheduleCancelRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -1723,14 +1823,20 @@ export class ExchangeClient<
      * ```
      */
     async setDisplayName(args: SetDisplayNameParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.setDisplayName({ type: "setDisplayName", ...args });
+        const action: SetDisplayNameRequest["action"] = {
+            type: "setDisplayName",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
         });
@@ -1739,7 +1845,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce } satisfies SetDisplayNameRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -1763,14 +1869,20 @@ export class ExchangeClient<
      * ```
      */
     async setReferrer(args: SetReferrerParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.setReferrer({ type: "setReferrer", ...args });
+        const action: SetReferrerRequest["action"] = {
+            type: "setReferrer",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
         });
@@ -1779,7 +1891,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce } satisfies SetReferrerRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -1790,6 +1902,27 @@ export class ExchangeClient<
      * @throws {ApiRequestError} When the API returns an error response.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     * import { privateKeyToAccount } from "viem/accounts";
+     *
+     * const wallet = privateKeyToAccount("0x...");
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const exchClient = new hl.ExchangeClient({ wallet, transport });
+     *
+     * const data = await exchClient.spotDeploy({
+     *   registerToken2: {
+     *     spec: {
+     *       name: "USDC",
+     *       szDecimals: 8,
+     *       weiDecimals: 8,
+     *     },
+     *     maxGas: 1000000,
+     *     fullName: "USD Coin",
+     *   },
+     * });
+     * ```
      */
     async spotDeploy(
         args: SpotDeployParameters_Genesis,
@@ -1819,29 +1952,35 @@ export class ExchangeClient<
         args: SpotDeployParameters,
         signal?: AbortSignal,
     ): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.spotDeploy({ type: "spotDeploy", ...args });
+        const action:
+            | SpotDeployRequest_RegisterToken2["action"]
+            | SpotDeployRequest_UserGenesis["action"]
+            | SpotDeployRequest_Genesis["action"]
+            | SpotDeployRequest_RegisterSpot["action"]
+            | SpotDeployRequest_RegisterHyperliquidity["action"]
+            | SpotDeployRequest_SetDeployerTradingFeeShare["action"] = {
+                type: "spotDeploy",
+                ...actionArgs,
+            };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
         });
 
         // Send a request
         return await this._request(
-            { action, signature, nonce } as
-                | SpotDeployRequest_RegisterToken2
-                | SpotDeployRequest_UserGenesis
-                | SpotDeployRequest_Genesis
-                | SpotDeployRequest_RegisterSpot
-                | SpotDeployRequest_RegisterHyperliquidity
-                | SpotDeployRequest_SetDeployerTradingFeeShare,
+            { action, signature, nonce },
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -1869,13 +2008,17 @@ export class ExchangeClient<
      * ```
      */
     async spotSend(args: SpotSendParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: SpotSendRequest["action"] = {
-            ...args,
+            ...actionArgs,
             type: "spotSend",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
-            time: await this.nonceManager(),
+            time: nonce,
         };
 
         // Sign the action
@@ -1888,9 +2031,9 @@ export class ExchangeClient<
 
         // Send a request
         return await this._request(
-            { action, signature, nonce: action.time } satisfies SpotSendRequest,
+            { action, signature, nonce } satisfies SpotSendRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -1914,14 +2057,20 @@ export class ExchangeClient<
      * ```
      */
     async spotUser(args: SpotUserParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.spotUser({ type: "spotUser", ...args });
+        const action: SpotUserRequest["action"] = {
+            type: "spotUser",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
         });
@@ -1930,7 +2079,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce } satisfies SpotUserRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -1962,14 +2111,20 @@ export class ExchangeClient<
         args: SubAccountSpotTransferParameters,
         signal?: AbortSignal,
     ): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.subAccountSpotTransfer({ type: "subAccountSpotTransfer", ...args });
+        const action: SubAccountSpotTransferRequest["action"] = {
+            type: "subAccountSpotTransfer",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
         });
@@ -1978,7 +2133,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce } satisfies SubAccountSpotTransferRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -2006,14 +2161,20 @@ export class ExchangeClient<
      * ```
      */
     async subAccountTransfer(args: SubAccountTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.subAccountTransfer({ type: "subAccountTransfer", ...args });
+        const action: SubAccountTransferRequest["action"] = {
+            type: "subAccountTransfer",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
         });
@@ -2022,7 +2183,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce } satisfies SubAccountTransferRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -2050,13 +2211,17 @@ export class ExchangeClient<
      * ```
      */
     async tokenDelegate(args: TokenDelegateParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: TokenDelegateRequest["action"] = {
-            ...args,
+            ...actionArgs,
             type: "tokenDelegate",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
-            nonce: await this.nonceManager(),
+            nonce,
         };
 
         // Sign the action
@@ -2069,9 +2234,9 @@ export class ExchangeClient<
 
         // Send a request
         return await this._request(
-            { action, signature, nonce: action.nonce } satisfies TokenDelegateRequest,
+            { action, signature, nonce } satisfies TokenDelegateRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -2107,12 +2272,15 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.twapCancel({ type: "twapCancel", ...actionArgs });
+        const action: TwapCancelRequest["action"] = {
+            type: "twapCancel",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
@@ -2123,7 +2291,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce, vaultAddress, expiresAfter } satisfies TwapCancelRequest,
             signal,
-        ) as TwapCancelResponseSuccess;
+        );
     }
 
     /**
@@ -2163,12 +2331,17 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.twapOrder({ type: "twapOrder", twap: { ...actionArgs } });
+        const action: TwapOrderRequest["action"] = {
+            type: "twapOrder",
+            twap: {
+                ...actionArgs,
+            },
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
@@ -2179,7 +2352,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce, vaultAddress, expiresAfter } satisfies TwapOrderRequest,
             signal,
-        ) as TwapOrderResponseSuccess;
+        );
     }
 
     /**
@@ -2199,7 +2372,11 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const data = await exchClient.updateIsolatedMargin({ asset: 0, isBuy: true, ntli: 1 * 1e6 });
+     * const data = await exchClient.updateIsolatedMargin({
+     *   asset: 0,
+     *   isBuy: true,
+     *   ntli: 1 * 1e6,
+     * });
      * ```
      */
     async updateIsolatedMargin(args: UpdateIsolatedMarginParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -2212,12 +2389,15 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.updateIsolatedMargin({ type: "updateIsolatedMargin", ...actionArgs });
+        const action: UpdateIsolatedMarginRequest["action"] = {
+            type: "updateIsolatedMargin",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
@@ -2228,7 +2408,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce, vaultAddress, expiresAfter } satisfies UpdateIsolatedMarginRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -2248,7 +2428,11 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
-     * const data = await exchClient.updateLeverage({ asset: 0, isCross: true, leverage: 5 });
+     * const data = await exchClient.updateLeverage({
+     *   asset: 0,
+     *   isCross: true,
+     *   leverage: 5,
+     * });
      * ```
      */
     async updateLeverage(args: UpdateLeverageParameters, signal?: AbortSignal): Promise<SuccessResponse> {
@@ -2261,12 +2445,15 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.updateLeverage({ type: "updateLeverage", ...actionArgs });
+        const action: UpdateLeverageRequest["action"] = {
+            type: "updateLeverage",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
@@ -2277,7 +2464,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce, vaultAddress, expiresAfter } satisfies UpdateLeverageRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -2301,13 +2488,17 @@ export class ExchangeClient<
      * ```
      */
     async usdClassTransfer(args: UsdClassTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: UsdClassTransferRequest["action"] = {
-            ...args,
+            ...actionArgs,
             type: "usdClassTransfer",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
-            nonce: await this.nonceManager(),
+            nonce,
         };
 
         // Sign the action
@@ -2320,9 +2511,9 @@ export class ExchangeClient<
 
         // Send a request
         return await this._request(
-            { action, signature, nonce: action.nonce } satisfies UsdClassTransferRequest,
+            { action, signature, nonce } satisfies UsdClassTransferRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -2346,13 +2537,17 @@ export class ExchangeClient<
      * ```
      */
     async usdSend(args: UsdSendParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: UsdSendRequest["action"] = {
-            ...args,
+            ...actionArgs,
             type: "usdSend",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
-            time: await this.nonceManager(),
+            time: nonce,
         };
 
         // Sign the action
@@ -2365,9 +2560,9 @@ export class ExchangeClient<
 
         // Send a request
         return await this._request(
-            { action, signature, nonce: action.time } satisfies UsdSendRequest,
+            { action, signature, nonce } satisfies UsdSendRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -2391,14 +2586,20 @@ export class ExchangeClient<
      * ```
      */
     async vaultDistribute(args: VaultDistributeParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.vaultDistribute({ type: "vaultDistribute", ...args });
+        const action: VaultDistributeRequest["action"] = {
+            type: "vaultDistribute",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
         });
@@ -2407,7 +2608,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce } satisfies VaultDistributeRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -2435,14 +2636,20 @@ export class ExchangeClient<
      * ```
      */
     async vaultModify(args: VaultModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.vaultModify({ type: "vaultModify", ...args });
+        const action: VaultModifyRequest["action"] = {
+            type: "vaultModify",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
         });
@@ -2451,7 +2658,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce } satisfies VaultModifyRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -2487,12 +2694,15 @@ export class ExchangeClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action = l1ActionSorter.vaultTransfer({ type: "vaultTransfer", ...actionArgs });
+        const action: VaultTransferRequest["action"] = {
+            type: "vaultTransfer",
+            ...actionArgs,
+        };
 
         // Sign the action
         const signature = await signL1Action({
             wallet: this.wallet,
-            action,
+            action: actionSorter[action.type](action),
             nonce,
             isTestnet: this.isTestnet,
             expiresAfter,
@@ -2502,7 +2712,7 @@ export class ExchangeClient<
         return await this._request(
             { action, signature, nonce, expiresAfter } satisfies VaultTransferRequest,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /**
@@ -2526,13 +2736,17 @@ export class ExchangeClient<
      * ```
      */
     async withdraw3(args: Withdraw3Parameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        // Destructure the parameters
+        const { ...actionArgs } = args;
+
         // Construct an action
+        const nonce = await this.nonceManager();
         const action: Withdraw3Request["action"] = {
-            ...args,
+            ...actionArgs,
             type: "withdraw3",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
-            time: await this.nonceManager(),
+            time: nonce,
         };
 
         // Sign the action
@@ -2545,21 +2759,22 @@ export class ExchangeClient<
 
         // Send a request
         return await this._request(
-            { action, signature, nonce: action.time } satisfies Withdraw3Request,
+            { action, signature, nonce } satisfies Withdraw3Request,
             signal,
-        ) as SuccessResponse;
+        );
     }
 
     /** Send an API request and validate the response. */
-    protected async _request(payload: BaseExchangeRequest, signal?: AbortSignal): Promise<
-        | SuccessResponse
-        | CancelResponseSuccess
-        | CreateSubAccountResponse
-        | CreateVaultResponse
-        | OrderResponseSuccess
-        | TwapOrderResponseSuccess
-        | TwapCancelResponseSuccess
-    > {
+    protected async _request<
+        T extends
+            | SuccessResponse
+            | CancelResponseSuccess
+            | CreateSubAccountResponse
+            | CreateVaultResponse
+            | OrderResponseSuccess
+            | TwapOrderResponseSuccess
+            | TwapCancelResponseSuccess,
+    >(payload: BaseExchangeRequest, signal?: AbortSignal): Promise<T> {
         const response = await this.transport.request<
             | SuccessResponse
             | ErrorResponse
@@ -2571,13 +2786,13 @@ export class ExchangeClient<
             | TwapCancelResponse
         >("exchange", payload, signal);
         this._validateResponse(response);
-        return response;
+        return response as T;
     }
 
     /** Guesses the chain ID based on the wallet type or the isTestnet flag. */
     protected async _guessSignatureChainId(): Promise<Hex> {
         // Trying to get chain ID of the wallet
-        if (isAbstractViemWalletClient(this.wallet) || isAbstractExtendedViemWalletClient(this.wallet)) {
+        if (isAbstractViemWalletClient(this.wallet)) {
             if ("getChainId" in this.wallet && typeof this.wallet.getChainId === "function") {
                 const chainId = await this.wallet.getChainId() as number;
                 return `0x${chainId.toString(16)}`;

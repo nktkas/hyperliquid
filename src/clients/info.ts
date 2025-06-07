@@ -245,7 +245,7 @@ export type UserDetailsParameters = Omit<UserDetailsRequest, "type">;
  */
 export class InfoClient<
     T extends IRequestTransport = IRequestTransport,
-> implements InfoClientParameters, AsyncDisposable {
+> implements InfoClientParameters<T>, AsyncDisposable {
     transport: T;
 
     /**

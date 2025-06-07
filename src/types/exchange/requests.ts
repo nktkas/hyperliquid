@@ -56,6 +56,228 @@ export interface BaseExchangeRequest {
 }
 
 /**
+ * Approve an agent to sign on behalf of the master account.
+ * @returns {SuccessResponse}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet
+ */
+export interface ApproveAgentRequest extends BaseExchangeRequest {
+    action: {
+        /** Type of action. */
+        type: "approveAgent";
+        /** Chain ID used for signing. */
+        signatureChainId: Hex;
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
+        /** Agent address. */
+        agentAddress: Hex;
+        /** Agent name or undefined for unnamed agent. */
+        agentName?: string;
+        /** Unique request identifier (current timestamp in ms). */
+        nonce: number;
+    };
+    vaultAddress?: undefined;
+    expiresAfter?: undefined;
+}
+
+/**
+ * Approve a maximum fee rate for a builder.
+ * @returns {SuccessResponse}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-a-builder-fee
+ */
+export interface ApproveBuilderFeeRequest extends BaseExchangeRequest {
+    action: {
+        /** Type of action. */
+        type: "approveBuilderFee";
+        /** Chain ID used for signing. */
+        signatureChainId: Hex;
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
+        /** Max fee rate (e.g., "0.01%"). */
+        maxFeeRate: `${string}%`;
+        /** Builder address. */
+        builder: Hex;
+        /** Unique request identifier (current timestamp in ms). */
+        nonce: number;
+    };
+    vaultAddress?: undefined;
+    expiresAfter?: undefined;
+}
+
+/**
+ * Modify multiple orders.
+ * @returns {OrderResponse}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-multiple-orders
+ */
+export interface BatchModifyRequest extends BaseExchangeRequest {
+    action: {
+        /** Type of action. */
+        type: "batchModify";
+        /** Order modifications. */
+        modifies: {
+            /** Order ID or CLient Order ID. */
+            oid: number | Hex;
+            /** New order parameters. */
+            order: OrderParams;
+        }[];
+    };
+    vaultAddress?: Hex;
+    expiresAfter?: number;
+}
+
+/**
+ * Cancel order(s).
+ * @returns {CancelResponse}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s
+ */
+export interface CancelRequest extends BaseExchangeRequest {
+    action: {
+        /** Type of action. */
+        type: "cancel";
+        /** Orders to cancel. */
+        cancels: {
+            /** Asset ID. */
+            a: number;
+            /** Order ID. */
+            o: number;
+        }[];
+    };
+    vaultAddress?: Hex;
+    expiresAfter?: number;
+}
+
+/**
+ * Cancel order(s) by cloid.
+ * @returns {CancelResponse}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid
+ */
+export interface CancelByCloidRequest extends BaseExchangeRequest {
+    action: {
+        /** Type of action. */
+        type: "cancelByCloid";
+        /** Orders to cancel. */
+        cancels: {
+            /** Asset ID. */
+            asset: number;
+            /** Client Order ID. */
+            cloid: Hex;
+        }[];
+    };
+    vaultAddress?: Hex;
+    expiresAfter?: number;
+}
+
+/**
+ * Transfer native token from the user's spot account into staking for delegating to validators.
+ * @returns {SuccessResponse}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-into-staking
+ */
+export interface CDepositRequest extends BaseExchangeRequest {
+    action: {
+        /** Type of action. */
+        type: "cDeposit";
+        /** Chain ID used for signing. */
+        signatureChainId: Hex;
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
+        /** Amount of wei to deposit into staking balance (float * 1e8). */
+        wei: number;
+        /** Unique request identifier (current timestamp in ms). */
+        nonce: number;
+    };
+    vaultAddress?: undefined;
+    expiresAfter?: undefined;
+}
+
+/**
+ * Claim rewards from referral program.
+ * @returns {SuccessResponse}
+ * @see null - no documentation
+ */
+export interface ClaimRewardsRequest extends BaseExchangeRequest {
+    action: {
+        /** Type of action. */
+        type: "claimRewards";
+    };
+    vaultAddress?: undefined;
+    expiresAfter?: undefined;
+}
+
+/**
+ * Convert a single-signature account to a multi-signature account.
+ * @returns {SuccessResponse}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig
+ */
+export interface ConvertToMultiSigUserRequest extends BaseExchangeRequest {
+    action: {
+        /** Type of action. */
+        type: "convertToMultiSigUser";
+        /** Chain ID used for signing. */
+        signatureChainId: Hex;
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
+        /**
+         * Signers configuration.
+         *
+         * Must be {@linkcode ConvertToMultiSigUserRequest_Signers} converted to a string via `JSON.stringify(...)`.
+         */
+        signers: string;
+        /** Unique request identifier (current timestamp in ms). */
+        nonce: number;
+    };
+    vaultAddress?: undefined;
+    expiresAfter?: undefined;
+}
+
+/** Signers configuration for {@linkcode ConvertToMultiSigUserRequest}. */
+export type ConvertToMultiSigUserRequest_Signers =
+    | {
+        /** List of authorized user addresses. */
+        authorizedUsers: Hex[];
+        /** Minimum number of signatures required. */
+        threshold: number;
+    }
+    /** Convert a multi-signature account to a single-signature account. */
+    | null;
+
+/**
+ * Create a sub-account.
+ * @returns {CreateSubAccountResponse}
+ * @see null - no documentation
+ */
+export interface CreateSubAccountRequest extends BaseExchangeRequest {
+    action: {
+        /** Type of action. */
+        type: "createSubAccount";
+        /** Sub-account name. */
+        name: string;
+    };
+    vaultAddress?: undefined;
+    expiresAfter?: undefined;
+}
+
+/**
+ * Create a vault.
+ * @returns {CreateVaultResponse}
+ * @see null - no documentation
+ */
+export interface CreateVaultRequest extends BaseExchangeRequest {
+    action: {
+        /** Type of action. */
+        type: "createVault";
+        /** Vault name. */
+        name: string;
+        /** Vault description. */
+        description: string;
+        /** Initial balance (float * 1e6). */
+        initialUsd: number;
+        /** Unique request identifier (current timestamp in ms). */
+        nonce: number;
+    };
+    vaultAddress?: undefined;
+    expiresAfter?: undefined;
+}
+
+/**
  * Jail a signer to prevent them from signing transactions.
  * @returns {SuccessResponse}
  * @see null - no documentation
@@ -179,228 +401,6 @@ export interface CValidatorActionRequest_Unregister extends BaseExchangeRequest 
 }
 
 /**
- * Approve an agent to sign on behalf of the master account.
- * @returns {SuccessResponse}
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet
- */
-export interface ApproveAgentRequest extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "approveAgent";
-        /** HyperLiquid network. */
-        hyperliquidChain: "Mainnet" | "Testnet";
-        /** Chain ID used for signing. */
-        signatureChainId: Hex;
-        /** Unique request identifier (current timestamp in ms). */
-        nonce: number;
-        /** Agent address. */
-        agentAddress: Hex;
-        /** Agent name or undefined for unnamed agent. */
-        agentName?: string;
-    };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
-}
-
-/**
- * Approve a maximum fee rate for a builder.
- * @returns {SuccessResponse}
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-a-builder-fee
- */
-export interface ApproveBuilderFeeRequest extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "approveBuilderFee";
-        /** HyperLiquid network. */
-        hyperliquidChain: "Mainnet" | "Testnet";
-        /** Chain ID used for signing. */
-        signatureChainId: Hex;
-        /** Unique request identifier (current timestamp in ms). */
-        nonce: number;
-        /** Max fee rate (e.g., "0.01%"). */
-        maxFeeRate: `${string}%`;
-        /** Builder address. */
-        builder: Hex;
-    };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
-}
-
-/**
- * Modify multiple orders.
- * @returns {OrderResponse}
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-multiple-orders
- */
-export interface BatchModifyRequest extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "batchModify";
-        /** Order modifications. */
-        modifies: {
-            /** Order ID or CLient Order ID. */
-            oid: number | Hex;
-            /** New order parameters. */
-            order: OrderParams;
-        }[];
-    };
-    vaultAddress?: Hex;
-    expiresAfter?: number;
-}
-
-/**
- * Cancel order(s).
- * @returns {CancelResponse}
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s
- */
-export interface CancelRequest extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "cancel";
-        /** Orders to cancel. */
-        cancels: {
-            /** Asset ID. */
-            a: number;
-            /** Order ID. */
-            o: number;
-        }[];
-    };
-    vaultAddress?: Hex;
-    expiresAfter?: number;
-}
-
-/**
- * Cancel order(s) by cloid.
- * @returns {CancelResponse}
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid
- */
-export interface CancelByCloidRequest extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "cancelByCloid";
-        /** Orders to cancel. */
-        cancels: {
-            /** Asset ID. */
-            asset: number;
-            /** Client Order ID. */
-            cloid: Hex;
-        }[];
-    };
-    vaultAddress?: Hex;
-    expiresAfter?: number;
-}
-
-/**
- * Transfer native token from the user's spot account into staking for delegating to validators.
- * @returns {SuccessResponse}
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-into-staking
- */
-export interface CDepositRequest extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "cDeposit";
-        /** HyperLiquid network. */
-        hyperliquidChain: "Mainnet" | "Testnet";
-        /** Chain ID used for signing. */
-        signatureChainId: Hex;
-        /** Unique request identifier (current timestamp in ms). */
-        nonce: number;
-        /** Amount of wei to deposit into staking balance (float * 1e8). */
-        wei: number;
-    };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
-}
-
-/**
- * Claim rewards from referral program.
- * @returns {SuccessResponse}
- * @see null - no documentation
- */
-export interface ClaimRewardsRequest extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "claimRewards";
-    };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
-}
-
-/**
- * Convert a single-signature account to a multi-signature account.
- * @returns {SuccessResponse}
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig
- */
-export interface ConvertToMultiSigUserRequest extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "convertToMultiSigUser";
-        /** HyperLiquid network. */
-        hyperliquidChain: "Mainnet" | "Testnet";
-        /** Chain ID used for signing. */
-        signatureChainId: Hex;
-        /**
-         * Signers configuration.
-         *
-         * Must be {@linkcode ConvertToMultiSigUserRequest_Signers} converted to a string via `JSON.stringify(...)`.
-         */
-        signers: string;
-        /** Unique request identifier (current timestamp in ms). */
-        nonce: number;
-    };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
-}
-
-/** Signers configuration for {@linkcode ConvertToMultiSigUserRequest}. */
-export type ConvertToMultiSigUserRequest_Signers =
-    | {
-        /** List of authorized user addresses. */
-        authorizedUsers: Hex[];
-        /** Minimum number of signatures required. */
-        threshold: number;
-    }
-    /** Convert a multi-signature account to a single-signature account. */
-    | null;
-
-/**
- * Create a sub-account.
- * @returns {CreateSubAccountResponse}
- * @see null - no documentation
- */
-export interface CreateSubAccountRequest extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "createSubAccount";
-        /** Sub-account name. */
-        name: string;
-    };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
-}
-
-/**
- * Create a vault.
- * @returns {CreateVaultResponse}
- * @see null - no documentation
- */
-export interface CreateVaultRequest extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "createVault";
-        /** Vault name. */
-        name: string;
-        /** Vault description. */
-        description: string;
-        /** Initial balance (float * 1e6). */
-        initialUsd: number;
-        /** Unique request identifier (current timestamp in ms). */
-        nonce: number;
-    };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
-}
-
-/**
  * Transfer native token from staking into the user's spot account.
  * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#withdraw-from-staking
@@ -409,14 +409,14 @@ export interface CWithdrawRequest extends BaseExchangeRequest {
     action: {
         /** Type of action. */
         type: "cWithdraw";
-        /** HyperLiquid network. */
-        hyperliquidChain: "Mainnet" | "Testnet";
         /** Chain ID used for signing. */
         signatureChainId: Hex;
-        /** Unique request identifier (current timestamp in ms). */
-        nonce: number;
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
         /** Amount of wei to withdraw from staking balance (float * 1e8). */
         wei: number;
+        /** Unique request identifier (current timestamp in ms). */
+        nonce: number;
     };
     vaultAddress?: undefined;
     expiresAfter?: undefined;
@@ -515,7 +515,7 @@ export interface OrderRequest extends BaseExchangeRequest {
 
 /**
  * Deploying HIP-3 assets (Register Asset).
- * @returns {unknown}
+ * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-3-assets
  */
 export interface PerpDeployRequest_RegisterAsset extends BaseExchangeRequest {
@@ -558,7 +558,7 @@ export interface PerpDeployRequest_RegisterAsset extends BaseExchangeRequest {
 
 /**
  * Deploying HIP-3 assets (Set Oracle).
- * @returns {unknown}
+ * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-3-assets
  */
 export interface PerpDeployRequest_SetOracle extends BaseExchangeRequest {
@@ -588,12 +588,10 @@ export interface PerpDexClassTransferRequest extends BaseExchangeRequest {
     action: {
         /** Type of action. */
         type: "PerpDexClassTransfer";
-        /** HyperLiquid network. */
-        hyperliquidChain: "Mainnet" | "Testnet";
         /** Chain ID used for signing. */
         signatureChainId: Hex;
-        /** Unique request identifier (current timestamp in ms). */
-        nonce: number;
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
         /** Name of perp dex. */
         dex: string;
         /** Collateral token of the perp dex as a string. */
@@ -602,6 +600,8 @@ export interface PerpDexClassTransferRequest extends BaseExchangeRequest {
         amount: string;
         /** `true` for transferring from perp dex to spot account, `false` for transferring from spot account to perp dex. */
         toPerp: boolean;
+        /** Unique request identifier (current timestamp in ms). */
+        nonce: number;
     };
     vaultAddress?: undefined;
     expiresAfter?: undefined;
@@ -698,7 +698,7 @@ export interface SetReferrerRequest extends BaseExchangeRequest {
 
 /**
  * Deploying HIP-1 and HIP-2 assets (Genesis).
- * @returns {unknown}
+ * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
  */
 export interface SpotDeployRequest_Genesis extends BaseExchangeRequest {
@@ -721,7 +721,7 @@ export interface SpotDeployRequest_Genesis extends BaseExchangeRequest {
 
 /**
  * Deploying HIP-1 and HIP-2 assets (Register Hyperliquidity).
- * @returns {unknown}
+ * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
  */
 export interface SpotDeployRequest_RegisterHyperliquidity extends BaseExchangeRequest {
@@ -748,7 +748,7 @@ export interface SpotDeployRequest_RegisterHyperliquidity extends BaseExchangeRe
 
 /**
  * Deploying HIP-1 and HIP-2 assets (Register Spot).
- * @returns {unknown}
+ * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
  */
 export interface SpotDeployRequest_RegisterSpot extends BaseExchangeRequest {
@@ -767,7 +767,7 @@ export interface SpotDeployRequest_RegisterSpot extends BaseExchangeRequest {
 
 /**
  * Deploying HIP-1 and HIP-2 assets (Register Token).
- * @returns {unknown}
+ * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
  */
 export interface SpotDeployRequest_RegisterToken2 extends BaseExchangeRequest {
@@ -797,7 +797,7 @@ export interface SpotDeployRequest_RegisterToken2 extends BaseExchangeRequest {
 
 /**
  * Deploying HIP-1 and HIP-2 assets (Set Deployer Trading Fee Share).
- * @returns {unknown}
+ * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
  */
 export interface SpotDeployRequest_SetDeployerTradingFeeShare extends BaseExchangeRequest {
@@ -818,7 +818,7 @@ export interface SpotDeployRequest_SetDeployerTradingFeeShare extends BaseExchan
 
 /**
  * Deploying HIP-1 and HIP-2 assets (User Genesis).
- * @returns {unknown}
+ * @returns {SuccessResponse}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
  */
 export interface SpotDeployRequest_UserGenesis extends BaseExchangeRequest {
@@ -850,18 +850,18 @@ export interface SpotSendRequest extends BaseExchangeRequest {
     action: {
         /** Type of action. */
         type: "spotSend";
-        /** HyperLiquid network. */
-        hyperliquidChain: "Mainnet" | "Testnet";
         /** Chain ID used for signing. */
         signatureChainId: Hex;
-        /** Unique request identifier (current timestamp in ms). */
-        time: number;
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
         /** Destination address. */
         destination: Hex;
         /** Token identifier. */
         token: `${string}:${Hex}`;
         /** Amount to send (not in wei). */
         amount: string;
+        /** Unique request identifier (current timestamp in ms). */
+        time: number;
     };
     vaultAddress?: undefined;
     expiresAfter?: undefined;
@@ -937,18 +937,18 @@ export interface TokenDelegateRequest extends BaseExchangeRequest {
     action: {
         /** Type of action. */
         type: "tokenDelegate";
-        /** HyperLiquid network. */
-        hyperliquidChain: "Mainnet" | "Testnet";
         /** Chain ID used for signing. */
         signatureChainId: Hex;
-        /** Unique request identifier (current timestamp in ms). */
-        nonce: number;
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
         /** Validator address. */
         validator: Hex;
-        /** `true` for undelegate, `false` for delegate. */
-        isUndelegate: boolean;
         /** Amount for delegate/undelegate (float * 1e8). */
         wei: number;
+        /** `true` for undelegate, `false` for delegate. */
+        isUndelegate: boolean;
+        /** Unique request identifier (current timestamp in ms). */
+        nonce: number;
     };
     vaultAddress?: undefined;
     expiresAfter?: undefined;
@@ -1050,16 +1050,16 @@ export interface UsdClassTransferRequest extends BaseExchangeRequest {
     action: {
         /** Type of action. */
         type: "usdClassTransfer";
-        /** HyperLiquid network. */
-        hyperliquidChain: "Mainnet" | "Testnet";
         /** Chain ID used for signing. */
         signatureChainId: Hex;
-        /** Unique request identifier (current timestamp in ms). */
-        nonce: number;
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
         /** Amount to transfer (1 = 1$). */
         amount: string;
         /** `true` for Spot to Perp, `false` for Perp to Spot. */
         toPerp: boolean;
+        /** Unique request identifier (current timestamp in ms). */
+        nonce: number;
     };
     vaultAddress?: undefined;
     expiresAfter?: undefined;
@@ -1074,16 +1074,16 @@ export interface UsdSendRequest extends BaseExchangeRequest {
     action: {
         /** Type of action. */
         type: "usdSend";
-        /** HyperLiquid network. */
-        hyperliquidChain: "Mainnet" | "Testnet";
         /** Chain ID used for signing. */
         signatureChainId: Hex;
-        /** Unique request identifier (current timestamp in ms). */
-        time: number;
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
         /** Destination address. */
         destination: Hex;
         /** Amount to send (1 = 1$). */
         amount: string;
+        /** Unique request identifier (current timestamp in ms). */
+        time: number;
     };
     vaultAddress?: undefined;
     expiresAfter?: undefined;
@@ -1160,16 +1160,16 @@ export interface Withdraw3Request extends BaseExchangeRequest {
     action: {
         /** Type of action. */
         type: "withdraw3";
-        /** HyperLiquid network. */
-        hyperliquidChain: "Mainnet" | "Testnet";
         /** Chain ID used for signing. */
         signatureChainId: Hex;
-        /** Unique request identifier (current timestamp in ms). */
-        time: number;
-        /** Amount to withdraw (1 = 1$). */
-        amount: string;
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
         /** Destination address. */
         destination: Hex;
+        /** Amount to withdraw (1 = 1$). */
+        amount: string;
+        /** Unique request identifier (current timestamp in ms). */
+        time: number;
     };
     vaultAddress?: undefined;
     expiresAfter?: undefined;

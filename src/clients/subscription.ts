@@ -100,7 +100,7 @@ export type EventWebData2Parameters = Omit<WsWebData2Request, "type">;
  */
 export class SubscriptionClient<
     T extends ISubscriptionTransport = ISubscriptionTransport,
-> implements SubscriptionClientParameters, AsyncDisposable {
+> implements SubscriptionClientParameters<T>, AsyncDisposable {
     transport: T;
 
     /**
