@@ -113,7 +113,7 @@ import { privateKeyToAccount } from "viem/accounts"; // or other wallet librarie
 const multiSignAddress = "0x...";
 const signers = [
     privateKeyToAccount("0x..."), // first is leader
-    privateKeyToAccount("0x..."), // can be async functions
+    privateKeyToAccount("0x..."), // can be a custom async wallet
     // ...
     privateKeyToAccount("0x..."),
 ];
@@ -203,7 +203,7 @@ import { ethers } from "ethers";
 const multiSignAddress = "0x...";
 const signers = [
     privateKeyToAccount("0x..."), // first is leader for multi-sign transaction, must contain own address
-    { // can be a custom async function
+    { // can be a custom async wallet
         signTypedData(params: {
             domain: {
                 name: string;
