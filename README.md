@@ -21,7 +21,7 @@ runtimes, written in TypeScript and provided with tests.
 ## Installation
 
 > [!NOTE]
-> While this library is in TypeScript, it can also be used in JavaScript and there is support for ESM/CommonJS.
+> While this library is in TypeScript, it can also be used in JavaScript and supports ESM/CommonJS.
 
 ### Node.js (choose your package manager)
 
@@ -39,7 +39,18 @@ yarn add @nktkas/hyperliquid
 deno add jsr:@nktkas/hyperliquid
 ```
 
+### Web
+
+```html
+<script type="module">
+    import * as hl from "https://esm.sh/jsr/@nktkas/hyperliquid";
+    // Use hl.InfoClient, hl.ExchangeClient, etc.
+</script>
+```
+
 ## Quick Start
+
+#### Info endpoint
 
 ```ts
 import * as hl from "@nktkas/hyperliquid";
@@ -47,34 +58,38 @@ import * as hl from "@nktkas/hyperliquid";
 const transport = new hl.HttpTransport();
 const infoClient = new hl.InfoClient({ transport });
 
-const openOrders = await infoClient.openOrders({ user: "0x..." }); // Change to your address
+const openOrders = await infoClient.openOrders({ user: "0x..." });
 ```
+
+#### Exchange endpoint
 
 ```ts
 import * as hl from "@nktkas/hyperliquid";
-import { privateKeyToAccount } from "viem/accounts";
+import { privateKeyToAccount } from "viem/accounts"; // or other wallet libraries
 
-const wallet = privateKeyToAccount("0x..."); // Your private key
+const wallet = privateKeyToAccount("0x...");
 
 const transport = new hl.HttpTransport();
 const exchClient = new hl.ExchangeClient({ wallet, transport });
 
 const result = await exchClient.order({
     orders: [{
-        a: 0, // Asset index
-        b: true, // Buy order
-        p: "30000", // Price
-        s: "0.1", // Size
-        r: false, // Not reduce-only
+        a: 0,
+        b: true,
+        p: "30000",
+        s: "0.1",
+        r: false,
         t: {
             limit: {
-                tif: "Gtc", // Good-til-cancelled
+                tif: "Gtc",
             },
         },
     }],
-    grouping: "na", // No grouping orders
+    grouping: "na",
 });
 ```
+
+#### Subscription
 
 ```ts
 import * as hl from "@nktkas/hyperliquid";
@@ -86,10 +101,34 @@ const sub = await subsClient.allMids((event) => {
     console.log(event);
 });
 
-await sub.unsubscribe(); // Unsubscribe from the event
+await sub.unsubscribe(); // unsubscribe from the event
 ```
 
-## Usage
+#### Multi-Sign
+
+```ts
+import * as hl from "@nktkas/hyperliquid";
+import { privateKeyToAccount } from "viem/accounts"; // or other wallet libraries
+
+const multiSignAddress = "0x...";
+const signers = [
+    privateKeyToAccount("0x..."), // first is leader
+    privateKeyToAccount("0x..."), // can be async functions
+    // ...
+    privateKeyToAccount("0x..."),
+];
+
+const transport = new hl.HttpTransport();
+const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers }); // extends ExchangeClient
+
+const data = await multiSignClient.approveAgent({ // same API as ExchangeClient
+    agentAddress: "0x...",
+    agentName: "agentName",
+});
+```
+
+<details>
+<summary><h2>Usage</h2></summary>
 
 ### 1) Initialize Transport
 
@@ -130,19 +169,19 @@ const transport = new hl.HttpTransport(); // or WebSocketTransport
 
 // 1. Using Viem with private key
 const viemAccount = privateKeyToAccount("0x...");
-const ExchangeClient_Viem = new hl.ExchangeClient({ wallet: viemAccount, transport });
+const exchClient_viem = new hl.ExchangeClient({ wallet: viemAccount, transport });
 
 // 2. Using Ethers (or Ethers V5) with private key
 const ethersWallet = new ethers.Wallet("0x...");
-const ExchangeClient_Ethers = new hl.ExchangeClient({ wallet: ethersWallet, transport });
+const exchClient_ethers = new hl.ExchangeClient({ wallet: ethersWallet, transport });
 
 // 3. Using external wallet (e.g. MetaMask) via Viem
 const [account] = await window.ethereum.request({ method: "eth_requestAccounts" });
 const externalWallet = createWalletClient({ account, transport: custom(window.ethereum) });
-const ExchangeClient_ViemMetamask = new hl.ExchangeClient({ wallet: externalWallet, transport });
+const exchClient_viemMetamask = new hl.ExchangeClient({ wallet: externalWallet, transport });
 
-// 4. Using external wallet (e.g. MetaMask) via `window.ethereum` directly
-const ExchangeClient_WindowMetamask = new hl.ExchangeClient({ wallet: window.ethereum, transport });
+// 4. Using external wallet (e.g. MetaMask) via `window.ethereum` (EIP-1193)
+const exchClient_windowMetamask = new hl.ExchangeClient({ wallet: window.ethereum, transport });
 ```
 
 #### Create SubscriptionClient
@@ -152,6 +191,45 @@ import * as hl from "@nktkas/hyperliquid";
 
 const transport = new hl.WebSocketTransport(); // only WebSocketTransport
 const subsClient = new hl.SubscriptionClient({ transport });
+```
+
+#### Create MultiSignClient
+
+```ts
+import * as hl from "@nktkas/hyperliquid";
+import { privateKeyToAccount } from "viem/accounts";
+import { ethers } from "ethers";
+
+const multiSignAddress = "0x...";
+const signers = [
+    privateKeyToAccount("0x..."), // first is leader for multi-sign transaction, must contain own address
+    { // can be a custom async function
+        signTypedData(params: {
+            domain: {
+                name: string;
+                version: string;
+                chainId: number;
+                verifyingContract: Hex;
+            };
+            types: {
+                [key: string]: {
+                    name: string;
+                    type: string;
+                }[];
+            };
+            primaryType: string;
+            message: Record<string, unknown>;
+        }): Promise<Hex> {
+            // Custom signer logic
+            return "0x..."; // return signature
+        },
+    },
+    // ...
+    new ethers.Wallet("0x..."),
+];
+
+const transport = new hl.HttpTransport();
+const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers }); // extends ExchangeClient
 ```
 
 ### 3) Use Client
@@ -183,6 +261,7 @@ import * as hl from "@nktkas/hyperliquid";
 import { privateKeyToAccount } from "viem/accounts";
 
 const account = privateKeyToAccount("0x...");
+
 const transport = new hl.HttpTransport();
 const exchClient = new hl.ExchangeClient({ wallet: account, transport });
 
@@ -234,25 +313,69 @@ await subsClient.userFills({ user: "0x..." }, (data) => {
     console.log(data);
 });
 
-// Explorer block updates
-await subsClient.explorerBlock((data) => {
+// Candle updates
+const sub = await subsClient.candle({ coin: "BTC", interval: "1h" }, (data) => {
     console.log(data);
 });
 ```
 
-## API Reference
+#### Example of using a MultiSignClient
+
+```ts
+import * as hl from "@nktkas/hyperliquid";
+import { privateKeyToAccount } from "viem/accounts";
+
+const multiSignAddress = "0x...";
+const signers = [privateKeyToAccount("0x...")];
+
+const transport = new hl.HttpTransport();
+const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
+
+// Interaction is the same as with ExchangeClient
+
+// Place an orders
+const result = await multiSignClient.order({
+    orders: [{
+        a: 0,
+        b: true,
+        p: "30000",
+        s: "0.1",
+        r: false,
+        t: {
+            limit: {
+                tif: "Gtc",
+            },
+        },
+    }],
+    grouping: "na",
+});
+
+// Approve an agent
+const result = await multiSignClient.approveAgent({
+    agentAddress: "0x...",
+    agentName: "agentName",
+});
+
+// Withdraw funds
+const result = await multiSignClient.withdraw3({
+    destination: account.address,
+    amount: "100",
+});
+```
+
+</details>
+
+<details>
+<summary><h2>API Reference</h2></summary>
 
 ### Clients
 
-A Client provides access to the Hyperliquid API endpoints.
+A client is an interface through which you can interact with the Hyperliquid API.
 
-#### Info Client
+The client is responsible for formatting an action, creating a signature correctly, sending a request, and validating a
+response.
 
-An Info Client which provides access to
-[Info API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint) and Explorer API, such as
-`l2Book` and `clearinghouseState`.
-
-The Info Client class sets up with a given [Transport](#transports).
+#### InfoClient
 
 ```ts
 class InfoClient {
@@ -317,22 +440,14 @@ class InfoClient {
     vaultDetails(args: VaultDetailsParameters): Promise<VaultDetails | null>;
     vaultSummaries(): Promise<VaultSummary[]>;
 
-    // Explorer
+    // Explorer (RPC endpoint)
     blockDetails(args: BlockDetailsParameters): Promise<BlockDetails>;
     txDetails(args: TxDetailsParameters): Promise<TxDetails>;
     userDetails(args: UserDetailsParameters): Promise<TxDetails[]>;
 }
 ```
 
-#### Exchange Client
-
-An Exchange Client which provides access to
-[Exchange API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint), such as `order`
-and `withdraw3`.
-
-The Exchange Client class sets up with a given [Transport](#transports) and a wallet instance, which can be a
-[viem](https://viem.sh/docs/clients/wallet), [ethers.js](https://docs.ethers.org/v6/api/providers/#Signer) or other
-wallet libraries.
+#### ExchangeClient
 
 ```ts
 class ExchangeClient {
@@ -342,8 +457,7 @@ class ExchangeClient {
             | AbstractViemWalletClient // viem
             | AbstractEthersSigner // ethers
             | AbstractEthersV5Signer // ethers v5
-            | AbstractExtendedViemWalletClient // privy
-            | AbstractWindowEthereum; // window.ethereum (EIP-1193) directly
+            | AbstractWindowEthereum; // window.ethereum (EIP-1193)
         isTestnet?: boolean; // Whether to use testnet (default: false)
         defaultVaultAddress?: Hex; // Vault address used by default if not provided in method call
         signatureChainId?: Hex | (() => MaybePromise<Hex>); // Chain ID used for signing (default: trying to guess based on wallet and isTestnet)
@@ -375,7 +489,7 @@ class ExchangeClient {
     setReferrer(args: SetReferrerParameters): Promise<SuccessResponse>;
     spotUser(args: SpotUserParameters): Promise<SuccessResponse>;
 
-    // Transfers & Withdrawals
+    // Transfer
     perpDexClassTransfer(args: PerpDexClassTransferParameters): Promise<SuccessResponse>;
     spotSend(args: SpotSendParameters): Promise<SuccessResponse>;
     subAccountSpotTransfer(args: SubAccountSpotTransferParameters): Promise<SuccessResponse>;
@@ -408,13 +522,7 @@ class ExchangeClient {
 }
 ```
 
-#### Subscription Client
-
-A Subscription Client which provides access to
-[Subscriptions API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions), such as
-real-time updates for `l2Book` and `userFills`.
-
-The Subscription Client class sets up with a given [WebSocket Transport](#websocket-transport).
+#### SubscriptionClient
 
 <!-- deno-fmt-ignore-start -->
 ```ts
@@ -452,17 +560,31 @@ class SubscriptionClient {
 ```
 <!-- deno-fmt-ignore-end -->
 
+#### MultiSignClient
+
+```ts
+class MultiSignClient extends ExchangeClient {
+    constructor(
+        args:
+            & Omit<ExchangeClientParameters, "wallet"> // Instead of `wallet`, you should specify the following parameters:
+            & {
+                multiSignAddress: Hex; // Multi-signature address
+                signers: [ // Array of signers
+                    AbstractWalletWithAddress, // First signer is the leader of a multi-sign transaction
+                    ...AbstractWallet[], // Any number of additional signers
+                ];
+            },
+    );
+
+    // Same methods as ExchangeClient
+}
+```
+
 ### Transports
 
-A [Client](#clients) is instantiated with a Transport, which is the intermediary layer that is responsible for executing
-outgoing requests (ie. API calls and event listeners).
-
-There are two types of Transports in the sdk:
+Transport acts as a layer between the class and Hyperliquid servers.
 
 #### HTTP Transport
-
-A HTTP Transport that executes requests via a [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch)
-API.
 
 ```ts
 class HttpTransport {
@@ -482,19 +604,16 @@ class HttpTransport {
 
 #### WebSocket Transport
 
-A WebSocket Transport that executes requests and subscribes to events via a
-[WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) connection.
-
 ```ts
 class WebSocketTransport {
     constructor(options?: {
         url?: string | URL; // WebSocket URL (default: "wss://api.hyperliquid.xyz/ws")
         timeout?: number; // Request timeout in ms (default: 10_000)
-        keepAlive?: { // Keep-alive configuration
+        keepAlive?: {
             interval?: number; // Ping interval in ms (default: 30_000)
             timeout?: number; // Pong timeout in ms (default: same as `timeout` for requests)
         };
-        reconnect?: { // Reconnection policy configuration for closed connections
+        reconnect?: {
             maxRetries?: number; // Maximum number of reconnection attempts (default: 3)
             connectionTimeout?: number; // Connection timeout in ms (default: 10_000)
             connectionDelay?: number | ((attempt: number) => number | Promise<number>); // Delay between reconnection (default: Exponential backoff (max 10s))
@@ -508,7 +627,10 @@ class WebSocketTransport {
 }
 ```
 
-## Additional Import Points
+</details>
+
+<details>
+<summary><h2>Additional Import Points</h2></summary>
 
 ### `/types`
 
@@ -521,27 +643,27 @@ The import point gives access to functions that generate signatures for Hyperliq
 
 ### Examples
 
-#### Cancel an order without a client
+#### Cancel order yourself
 
 ```ts
-import { l1ActionSorter, signL1Action } from "@nktkas/hyperliquid/signing";
+import { actionSorter, signL1Action } from "@nktkas/hyperliquid/signing";
 import { privateKeyToAccount } from "viem/accounts"; // or other wallet libraries
 
-const wallet = privateKeyToAccount("0x..."); // your private key
+const wallet = privateKeyToAccount("0x...");
 
-const action = l1ActionSorter.cancel({ // sort action to ensure proper signature
+const action = {
     type: "cancel",
     cancels: [
         { a: 0, o: 12345 },
     ],
-});
+};
 const nonce = Date.now();
 
 const signature = await signL1Action({
     wallet,
-    action,
+    action: actionSorter[action.type](action), // key order affects signature
     nonce,
-    isTestnet: true, // Change to false for mainnet
+    isTestnet: true, // change to `false` for mainnet
 });
 
 const response = await fetch("https://api.hyperliquid-testnet.xyz/exchange", {
@@ -552,27 +674,27 @@ const response = await fetch("https://api.hyperliquid-testnet.xyz/exchange", {
 const body = await response.json();
 ```
 
-#### Approve an agent without a client
+#### Approve agent yourself
 
 ```ts
 import { signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
 import { privateKeyToAccount } from "viem/accounts"; // or other wallet libraries
 
-const wallet = privateKeyToAccount("0x..."); // your private key
+const wallet = privateKeyToAccount("0x...");
 
 const action = {
     type: "approveAgent",
-    hyperliquidChain: "Testnet", // "Mainnet" or "Testnet"
-    signatureChainId: "0x66eee",
-    nonce: Date.now(),
+    signatureChainId: "0x66eee", // must match the current wallet network
+    hyperliquidChain: "Testnet", // Mainnet | Testnet
     agentAddress: "0x...",
     agentName: "Agent",
+    nonce: Date.now(),
 };
 
 const signature = await signUserSignedAction({
     wallet,
     action,
-    types: userSignedActionEip712Types[action.type], // key order is important for a proper signature
+    types: userSignedActionEip712Types[action.type], // key order affects signature
     chainId: parseInt(action.signatureChainId, 16),
 });
 
@@ -583,3 +705,9 @@ const response = await fetch("https://api.hyperliquid-testnet.xyz/exchange", {
 });
 const body = await response.json();
 ```
+
+</details>
+
+## Contributing
+
+We appreciate your help! To contribute, please read the [contributing instructions](CONTRIBUTING.md).
