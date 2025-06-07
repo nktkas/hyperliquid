@@ -56,10 +56,14 @@ import { decodeHex, encodeHex } from "@std/encoding/hex";
 import { concat } from "@std/bytes/concat";
 import type { Hex } from "./base.ts";
 import type {
+    ApproveAgentRequest,
+    ApproveBuilderFeeRequest,
     BatchModifyRequest,
     CancelByCloidRequest,
     CancelRequest,
+    CDepositRequest,
     ClaimRewardsRequest,
+    ConvertToMultiSigUserRequest,
     CreateSubAccountRequest,
     CreateVaultRequest,
     CSignerActionRequest_JailSelf,
@@ -67,12 +71,14 @@ import type {
     CValidatorActionRequest_ChangeProfile,
     CValidatorActionRequest_Register,
     CValidatorActionRequest_Unregister,
+    CWithdrawRequest,
     EvmUserModifyRequest,
     ModifyRequest,
     MultiSigRequest,
     OrderRequest,
     PerpDeployRequest_RegisterAsset,
     PerpDeployRequest_SetOracle,
+    PerpDexClassTransferRequest,
     RegisterReferrerRequest,
     ReserveRequestWeightRequest,
     ScheduleCancelRequest,
@@ -84,16 +90,21 @@ import type {
     SpotDeployRequest_RegisterToken2,
     SpotDeployRequest_SetDeployerTradingFeeShare,
     SpotDeployRequest_UserGenesis,
+    SpotSendRequest,
     SpotUserRequest,
     SubAccountSpotTransferRequest,
     SubAccountTransferRequest,
+    TokenDelegateRequest,
     TwapCancelRequest,
     TwapOrderRequest,
     UpdateIsolatedMarginRequest,
     UpdateLeverageRequest,
+    UsdClassTransferRequest,
+    UsdSendRequest,
     VaultDistributeRequest,
     VaultModifyRequest,
     VaultTransferRequest,
+    Withdraw3Request,
 } from "./types/exchange/requests.ts";
 
 export type { Hex };
@@ -104,69 +115,10 @@ export type AbstractWallet =
     | AbstractViemWalletClient
     | AbstractEthersSigner
     | AbstractEthersV5Signer
-    | AbstractExtendedViemWalletClient
     | AbstractWindowEthereum;
 
 /** Abstract interface for a [viem wallet](https://viem.sh/docs/clients/wallet). */
 export interface AbstractViemWalletClient {
-    signTypedData(params: {
-        domain: {
-            name: string;
-            version: string;
-            chainId: number;
-            verifyingContract: Hex;
-        };
-        types: {
-            [key: string]: {
-                name: string;
-                type: string;
-            }[];
-        };
-        primaryType: string;
-        message: Record<string, unknown>;
-    }): Promise<Hex>;
-}
-
-/** Abstract interface for an [ethers.js signer](https://docs.ethers.org/v6/api/providers/#Signer). */
-export interface AbstractEthersSigner {
-    signTypedData(
-        domain: {
-            name: string;
-            version: string;
-            chainId: number;
-            verifyingContract: string;
-        },
-        types: {
-            [key: string]: {
-                name: string;
-                type: string;
-            }[];
-        },
-        value: Record<string, unknown>,
-    ): Promise<string>;
-}
-
-/** Abstract interface for an [ethers.js v5 signer](https://docs.ethers.org/v5/api/providers/#Signer). */
-export interface AbstractEthersV5Signer {
-    _signTypedData(
-        domain: {
-            name: string;
-            version: string;
-            chainId: number;
-            verifyingContract: string;
-        },
-        types: {
-            [key: string]: {
-                name: string;
-                type: string;
-            }[];
-        },
-        value: Record<string, unknown>,
-    ): Promise<string>;
-}
-
-/** Abstract interface for an extended [viem wallet](https://viem.sh/docs/clients/wallet) (e.g. privy [useSignTypedData](https://docs.privy.io/wallets/using-wallets/ethereum/sign-typed-data)). */
-export interface AbstractExtendedViemWalletClient {
     signTypedData(
         params: {
             domain: {
@@ -188,10 +140,54 @@ export interface AbstractExtendedViemWalletClient {
     ): Promise<Hex>;
 }
 
+/** Abstract interface for an [ethers.js signer](https://docs.ethers.org/v6/api/providers/#Signer). */
+export interface AbstractEthersSigner {
+    signTypedData(
+        domain: {
+            name: string;
+            version: string;
+            chainId: number;
+            verifyingContract: string;
+        },
+        types: {
+            [key: string]: {
+                name: string;
+                type: string;
+            }[];
+        },
+        value: Record<string, unknown>,
+    ): Promise<string>;
+}
+
+/** Abstract interface for an [ethers.js v5 signer](https://docs.ethers.org/v5/api/signer/). */
+export interface AbstractEthersV5Signer {
+    _signTypedData(
+        domain: {
+            name: string;
+            version: string;
+            chainId: number;
+            verifyingContract: string;
+        },
+        types: {
+            [key: string]: {
+                name: string;
+                type: string;
+            }[];
+        },
+        value: Record<string, unknown>,
+    ): Promise<string>;
+}
+
 /** Abstract interface for a [window.ethereum](https://eips.ethereum.org/EIPS/eip-1193) object. */
 export interface AbstractWindowEthereum {
     // deno-lint-ignore no-explicit-any
     request(args: { method: any; params: any }): Promise<any>;
+}
+
+export interface Signature {
+    r: Hex;
+    s: Hex;
+    v: number;
 }
 
 /**
@@ -324,7 +320,7 @@ export async function signL1Action(args: {
     vaultAddress?: Hex;
     /** Optional expiration time of the action in milliseconds since the epoch. */
     expiresAfter?: number;
-}): Promise<{ r: Hex; s: Hex; v: number }> {
+}): Promise<Signature> {
     const {
         wallet,
         action,
@@ -411,7 +407,7 @@ export async function signUserSignedAction(args: {
     types: { [key: string]: { name: string; type: string }[] };
     /** The chain ID. */
     chainId: number;
-}): Promise<{ r: Hex; s: Hex; v: number }> {
+}): Promise<Signature> {
     const { wallet, action, types, chainId } = args;
 
     const domain = {
@@ -472,7 +468,6 @@ export async function signUserSignedAction(args: {
  *   signatureChainId: "0x66eee",
  * });
  * ```
- * @unstable May not behave as expected and the interface may change in the future.
  */
 export async function signMultiSigAction(args: {
     /** Wallet to sign the action. */
@@ -489,7 +484,7 @@ export async function signMultiSigAction(args: {
     hyperliquidChain: "Mainnet" | "Testnet";
     /** Chain ID used for signing. */
     signatureChainId: Hex;
-}): Promise<{ r: Hex; s: Hex; v: number }> {
+}): Promise<Signature> {
     const {
         wallet,
         action,
@@ -540,7 +535,7 @@ async function abstractSignTypedData(args: {
     message: Record<string, unknown>;
 }): Promise<Hex> {
     const { wallet, domain, types, message } = args;
-    if (isAbstractViemWalletClient(wallet) || isAbstractExtendedViemWalletClient(wallet)) {
+    if (isAbstractViemWalletClient(wallet)) {
         return await wallet.signTypedData({
             domain,
             types: {
@@ -613,7 +608,7 @@ async function signTypedDataWithWindowEthereum(
 }
 
 /** Splits a signature hexadecimal string into its components. */
-function splitSignature(signature: Hex): { r: Hex; s: Hex; v: number } {
+function splitSignature(signature: Hex): Signature {
     const r = `0x${signature.slice(2, 66)}` as const;
     const s = `0x${signature.slice(66, 130)}` as const;
     const v = parseInt(signature.slice(130, 132), 16);
@@ -624,7 +619,7 @@ function splitSignature(signature: Hex): { r: Hex; s: Hex; v: number } {
 export function isAbstractViemWalletClient(client: unknown): client is AbstractViemWalletClient {
     return typeof client === "object" && client !== null &&
         "signTypedData" in client && typeof client.signTypedData === "function" &&
-        client.signTypedData.length === 1;
+        (client.signTypedData.length === 1 || client.signTypedData.length === 2);
 }
 
 /** Checks if the given value is an abstract ethers signer. */
@@ -641,13 +636,6 @@ export function isAbstractEthersV5Signer(client: unknown): client is AbstractEth
         client._signTypedData.length === 3;
 }
 
-/** Checks if the given value is an abstract extended viem wallet (e.g. privy `useSignTypedData`). */
-export function isAbstractExtendedViemWalletClient(client: unknown): client is AbstractViemWalletClient {
-    return typeof client === "object" && client !== null &&
-        "signTypedData" in client && typeof client.signTypedData === "function" &&
-        client.signTypedData.length === 2;
-}
-
 /** Checks if the given value is an abstract `window.ethereum` object. */
 export function isAbstractWindowEthereum(client: unknown): client is AbstractWindowEthereum {
     return typeof client === "object" && client !== null &&
@@ -655,8 +643,32 @@ export function isAbstractWindowEthereum(client: unknown): client is AbstractWin
         client.request.length >= 1;
 }
 
-/** L1 action sorter for correct signature generation. */
-export const l1ActionSorter = {
+/** Action sorter for correct signature generation. */
+export const actionSorter = {
+    /** Sorts and formats an `approveAgent` action. */
+    approveAgent: (action: ApproveAgentRequest["action"]): ApproveAgentRequest["action"] => {
+        return {
+            type: action.type,
+            signatureChainId: action.signatureChainId,
+            hyperliquidChain: action.hyperliquidChain,
+            agentAddress: action.agentAddress.toLowerCase() as Hex,
+            agentName: action.agentName,
+            nonce: action.nonce,
+        };
+    },
+
+    /** Sorts and formats an `approveBuilderFee` action. */
+    approveBuilderFee: (action: ApproveBuilderFeeRequest["action"]): ApproveBuilderFeeRequest["action"] => {
+        return {
+            type: action.type,
+            signatureChainId: action.signatureChainId,
+            hyperliquidChain: action.hyperliquidChain,
+            maxFeeRate: action.maxFeeRate,
+            builder: action.builder.toLowerCase() as Hex,
+            nonce: action.nonce,
+        };
+    },
+
     /** Sorts and formats a `batchModify` action. */
     batchModify: (action: BatchModifyRequest["action"]): BatchModifyRequest["action"] => {
         return {
@@ -714,10 +726,32 @@ export const l1ActionSorter = {
         };
     },
 
+    /** Sorts and formats a `cDeposit` action. */
+    cDeposit: (action: CDepositRequest["action"]): CDepositRequest["action"] => {
+        return {
+            type: action.type,
+            signatureChainId: action.signatureChainId,
+            hyperliquidChain: action.hyperliquidChain,
+            wei: action.wei,
+            nonce: action.nonce,
+        };
+    },
+
     /** Sorts and formats a `claimRewards` action. */
     claimRewards: (action: ClaimRewardsRequest["action"]): ClaimRewardsRequest["action"] => {
         return {
             type: action.type,
+        };
+    },
+
+    /** Sorts and formats a `convertToMultiSigUser` action. */
+    convertToMultiSigUser: (action: ConvertToMultiSigUserRequest["action"]): ConvertToMultiSigUserRequest["action"] => {
+        return {
+            type: action.type,
+            signatureChainId: action.signatureChainId,
+            hyperliquidChain: action.hyperliquidChain,
+            signers: action.signers,
+            nonce: action.nonce,
         };
     },
 
@@ -808,6 +842,17 @@ export const l1ActionSorter = {
                 unregister: action.unregister,
             };
         }
+    },
+
+    /** Sorts and formats a `cWithdraw` action. */
+    cWithdraw: (action: CWithdrawRequest["action"]): CWithdrawRequest["action"] => {
+        return {
+            type: action.type,
+            signatureChainId: action.signatureChainId,
+            hyperliquidChain: action.hyperliquidChain,
+            wei: action.wei,
+            nonce: action.nonce,
+        };
     },
 
     /** Sorts and formats an `evmUserModify` action. */
@@ -951,6 +996,20 @@ export const l1ActionSorter = {
         }
     },
 
+    /** Sorts and formats a `PerpDexClassTransfer` action. */
+    PerpDexClassTransfer: (action: PerpDexClassTransferRequest["action"]): PerpDexClassTransferRequest["action"] => {
+        return {
+            type: action.type,
+            signatureChainId: action.signatureChainId,
+            hyperliquidChain: action.hyperliquidChain,
+            dex: action.dex,
+            token: action.token,
+            amount: action.amount,
+            toPerp: action.toPerp,
+            nonce: action.nonce,
+        };
+    },
+
     /** Sorts and formats a `registerReferrer` action. */
     registerReferrer: (action: RegisterReferrerRequest["action"]): RegisterReferrerRequest["action"] => {
         return {
@@ -1086,6 +1145,19 @@ export const l1ActionSorter = {
         }
     },
 
+    /** Sorts and formats a `spotSend` action. */
+    spotSend: (action: SpotSendRequest["action"]): SpotSendRequest["action"] => {
+        return {
+            type: action.type,
+            signatureChainId: action.signatureChainId,
+            hyperliquidChain: action.hyperliquidChain,
+            destination: action.destination.toLowerCase() as Hex,
+            token: action.token,
+            amount: action.amount,
+            time: action.time,
+        };
+    },
+
     /** Sorts and formats a `spotUser` action. */
     spotUser: (action: SpotUserRequest["action"]): SpotUserRequest["action"] => {
         return {
@@ -1102,7 +1174,7 @@ export const l1ActionSorter = {
     ): SubAccountSpotTransferRequest["action"] => {
         return {
             type: action.type,
-            subAccountUser: action.subAccountUser,
+            subAccountUser: action.subAccountUser.toLowerCase() as Hex,
             isDeposit: action.isDeposit,
             token: action.token,
             amount: action.amount,
@@ -1113,9 +1185,22 @@ export const l1ActionSorter = {
     subAccountTransfer: (action: SubAccountTransferRequest["action"]): SubAccountTransferRequest["action"] => {
         return {
             type: action.type,
-            subAccountUser: action.subAccountUser,
+            subAccountUser: action.subAccountUser.toLowerCase() as Hex,
             isDeposit: action.isDeposit,
             usd: action.usd,
+        };
+    },
+
+    /** Sorts and formats a `tokenDelegate` action. */
+    tokenDelegate: (action: TokenDelegateRequest["action"]): TokenDelegateRequest["action"] => {
+        return {
+            type: action.type,
+            signatureChainId: action.signatureChainId,
+            hyperliquidChain: action.hyperliquidChain,
+            validator: action.validator.toLowerCase() as Hex,
+            wei: action.wei,
+            isUndelegate: action.isUndelegate,
+            nonce: action.nonce,
         };
     },
 
@@ -1163,6 +1248,30 @@ export const l1ActionSorter = {
         };
     },
 
+    /** Sorts and formats an `usdClassTransfer` action. */
+    usdClassTransfer: (action: UsdClassTransferRequest["action"]): UsdClassTransferRequest["action"] => {
+        return {
+            type: action.type,
+            signatureChainId: action.signatureChainId,
+            hyperliquidChain: action.hyperliquidChain,
+            amount: action.amount,
+            toPerp: action.toPerp,
+            nonce: action.nonce,
+        };
+    },
+
+    /** Sorts and formats an `usdSend` action. */
+    usdSend: (action: UsdSendRequest["action"]): UsdSendRequest["action"] => {
+        return {
+            type: action.type,
+            signatureChainId: action.signatureChainId,
+            hyperliquidChain: action.hyperliquidChain,
+            destination: action.destination.toLowerCase() as Hex,
+            amount: action.amount,
+            time: action.time,
+        };
+    },
+
     /** Sorts and formats a `vaultDistribute` action. */
     vaultDistribute: (action: VaultDistributeRequest["action"]): VaultDistributeRequest["action"] => {
         return {
@@ -1189,6 +1298,18 @@ export const l1ActionSorter = {
             vaultAddress: action.vaultAddress,
             isDeposit: action.isDeposit,
             usd: action.usd,
+        };
+    },
+
+    /** Sorts and formats a `withdraw3` action. */
+    withdraw3: (action: Withdraw3Request["action"]): Withdraw3Request["action"] => {
+        return {
+            type: action.type,
+            signatureChainId: action.signatureChainId,
+            hyperliquidChain: action.hyperliquidChain,
+            destination: action.destination.toLowerCase() as Hex,
+            amount: action.amount,
+            time: action.time,
         };
     },
 };
