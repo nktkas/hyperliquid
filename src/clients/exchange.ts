@@ -494,7 +494,7 @@ class NonceManager {
  * Exchange client for interacting with the Hyperliquid API.
  * @typeParam T The transport used to connect to the Hyperliquid API.
  * @typeParam W The wallet used for signing transactions.
- */ 
+ */
 export class ExchangeClient<
     T extends IRequestTransport = IRequestTransport,
     W extends AbstractWallet = AbstractWallet,
