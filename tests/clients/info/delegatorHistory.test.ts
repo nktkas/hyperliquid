@@ -5,7 +5,7 @@ import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Arguments ——————————
 
-const args = parseArgs(Deno.args) as Args<{ wait?: number }>;
+const args = parseArgs(Deno.args, { default: { wait: 1500 } }) as Args<{ wait?: number }>;
 
 const USER_ADDRESS = "0xedc88158266c50628a9ffbaa1db2635376577eea";
 
@@ -17,7 +17,7 @@ const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 // —————————— Test ——————————
 
 Deno.test("delegatorHistory", async () => {
-    if (args.wait) await new Promise((r) => setTimeout(r, args.wait));
+    await new Promise((r) => setTimeout(r, args.wait));
 
     // —————————— Prepare ——————————
 

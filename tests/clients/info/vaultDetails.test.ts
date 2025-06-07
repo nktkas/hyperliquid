@@ -5,7 +5,7 @@ import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Arguments ——————————
 
-const args = parseArgs(Deno.args) as Args<{ wait?: number }>;
+const args = parseArgs(Deno.args, { default: { wait: 1500 } }) as Args<{ wait?: number }>;
 
 const INVALID_VAULT_ADDRESS = "0x0000000000000000000000000000000000000000";
 const VAULT_ADDRESS_WITH_NORMAL_RELATIONSHIP = "0x1719884eb866cb12b2287399b15f7db5e7d775ea";
@@ -21,7 +21,7 @@ const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 // —————————— Test ——————————
 
 Deno.test("vaultDetails", async () => {
-    if (args.wait) await new Promise((r) => setTimeout(r, args.wait));
+    await new Promise((r) => setTimeout(r, args.wait));
 
     // —————————— Prepare ——————————
 

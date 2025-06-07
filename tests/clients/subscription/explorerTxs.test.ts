@@ -6,7 +6,7 @@ import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Arguments ——————————
 
-const args = parseArgs(Deno.args) as Args<{ wait?: number }>;
+const args = parseArgs(Deno.args, { default: { wait: 1500 } }) as Args<{ wait?: number }>;
 
 // —————————— Type schema ——————————
 
@@ -16,7 +16,7 @@ const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 // —————————— Test ——————————
 
 Deno.test("explorerTxs", async () => {
-    if (args.wait) await new Promise((r) => setTimeout(r, args.wait));
+    await new Promise((r) => setTimeout(r, args.wait));
 
     // —————————— Prepare ——————————
 

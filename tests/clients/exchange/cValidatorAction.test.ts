@@ -5,16 +5,16 @@ import { ApiRequestError, ExchangeClient, type Hex, HttpTransport } from "../../
 
 // —————————— Arguments ——————————
 
-const args = parseArgs(Deno.args, { string: ["privateKey"] }) as Args<{ wait?: number; privateKey: Hex }>;
+const args = parseArgs(Deno.args, { default: { wait: 1500 }, string: ["_"] }) as Args<{ wait: number }>;
 
-const PRIVATE_KEY = args.privateKey;
+const PRIVATE_KEY = args._[0] as Hex;
 
 // —————————— Test ——————————
 
 // NOTE: This API is difficult to test with a successful response.
 // So to prove that the method works, we will expect a specific error
-Deno.test("cValidatorAction", async () => {
-    if (args.wait) await new Promise((r) => setTimeout(r, args.wait));
+Deno.test("cValidatorAction", { ignore: !PRIVATE_KEY }, async () => {
+    await new Promise((r) => setTimeout(r, args.wait));
 
     // —————————— Prepare ——————————
 
@@ -40,7 +40,7 @@ Deno.test("cValidatorAction", async () => {
                             description: "...",
                             delegations_disabled: true,
                             commission_bps: 1,
-                            signer: account.address,
+                            signer: exchClient.wallet.address,
                         },
                         unjailed: false,
                         initial_wei: 1,

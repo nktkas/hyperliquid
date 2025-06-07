@@ -5,7 +5,7 @@ import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Arguments ——————————
 
-const args = parseArgs(Deno.args) as Args<{ wait?: number }>;
+const args = parseArgs(Deno.args, { default: { wait: 1500 } }) as Args<{ wait?: number }>;
 
 const USER_ADDRESS = "0x563C175E6f11582f65D6d9E360A618699DEe14a9";
 
@@ -17,7 +17,7 @@ const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 // —————————— Test ——————————
 
 Deno.test("userTwapSliceFillsByTime", async () => {
-    if (args.wait) await new Promise((r) => setTimeout(r, args.wait));
+    await new Promise((r) => setTimeout(r, args.wait));
 
     // —————————— Prepare ——————————
 

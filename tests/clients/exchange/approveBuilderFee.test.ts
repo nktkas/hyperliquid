@@ -6,9 +6,9 @@ import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Arguments ——————————
 
-const args = parseArgs(Deno.args, { string: ["privateKey"] }) as Args<{ wait?: number; privateKey: Hex }>;
+const args = parseArgs(Deno.args, { default: { wait: 1500 }, string: ["_"] }) as Args<{ wait: number }>;
 
-const PRIVATE_KEY = args.privateKey;
+const PRIVATE_KEY = args._[0] as Hex;
 
 // —————————— Type schema ——————————
 
@@ -17,8 +17,8 @@ const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
 
-Deno.test("approveBuilderFee", async () => {
-    if (args.wait) await new Promise((r) => setTimeout(r, args.wait));
+Deno.test("approveBuilderFee", { ignore: !PRIVATE_KEY }, async () => {
+    await new Promise((r) => setTimeout(r, args.wait));
 
     // —————————— Prepare ——————————
 
@@ -28,7 +28,10 @@ Deno.test("approveBuilderFee", async () => {
 
     // —————————— Test ——————————
 
-    const data = await exchClient.approveBuilderFee({ maxFeeRate: "0.001%", builder: account.address });
+    const data = await exchClient.approveBuilderFee({
+        maxFeeRate: "0.001%",
+        builder: exchClient.wallet.address,
+    });
 
     schemaCoverage(MethodReturnType, [data]);
 });

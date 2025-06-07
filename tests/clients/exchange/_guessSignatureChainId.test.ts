@@ -1,16 +1,14 @@
 import { assertEquals } from "jsr:@std/assert@1";
-import { privateKeyToAccount } from "npm:viem@2/accounts";
+import { generatePrivateKey, privateKeyToAccount } from "npm:viem@2/accounts";
 import { createWalletClient, http } from "npm:viem@2";
 import { mainnet } from "npm:viem@2/chains";
 import { ethers } from "npm:ethers@6";
 import { ExchangeClient, HttpTransport } from "../../../mod.ts";
 
-const PRIVATE_KEY = "0x822e9959e022b78423eb653a62ea0020cd283e71a2a8133a6ff2aeffaf373cff";
-
 Deno.test("_guessSignatureChainId", async (t) => {
     await t.step("viem", async () => {
         const wallet = createWalletClient({
-            account: privateKeyToAccount(PRIVATE_KEY),
+            account: privateKeyToAccount(generatePrivateKey()),
             transport: http("https://ethereum-rpc.publicnode.com"),
             chain: mainnet,
         });
@@ -25,7 +23,7 @@ Deno.test("_guessSignatureChainId", async (t) => {
 
     await t.step("ethers.js", async () => {
         const provider = new ethers.JsonRpcProvider("https://ethereum-rpc.publicnode.com");
-        const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
+        const wallet = new ethers.Wallet(generatePrivateKey(), provider);
 
         const transport = new HttpTransport();
         const exchClient = new ExchangeClient({ wallet, transport });
@@ -56,7 +54,7 @@ Deno.test("_guessSignatureChainId", async (t) => {
     });
 
     await t.step("default", async (t) => {
-        const account = privateKeyToAccount(PRIVATE_KEY);
+        const account = privateKeyToAccount(generatePrivateKey());
 
         await t.step("mainnet", async () => {
             const transport = new HttpTransport();

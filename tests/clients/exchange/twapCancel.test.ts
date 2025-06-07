@@ -8,9 +8,9 @@ import { formatSize, getAssetData } from "../../_utils/utils.ts";
 
 // —————————— Arguments ——————————
 
-const args = parseArgs(Deno.args, { string: ["privateKey"] }) as Args<{ wait?: number; privateKey: Hex }>;
+const args = parseArgs(Deno.args, { default: { wait: 1500 }, string: ["_"] }) as Args<{ wait: number }>;
 
-const PRIVATE_KEY = args.privateKey;
+const PRIVATE_KEY = args._[0] as Hex;
 const PERPS_ASSET = "BTC";
 
 // —————————— Type schema ——————————
@@ -20,8 +20,8 @@ const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
 
-Deno.test("twapCancel", async () => {
-    if (args.wait) await new Promise((r) => setTimeout(r, args.wait));
+Deno.test("twapCancel", { ignore: !PRIVATE_KEY }, async () => {
+    await new Promise((r) => setTimeout(r, args.wait));
 
     // —————————— Prepare ——————————
 

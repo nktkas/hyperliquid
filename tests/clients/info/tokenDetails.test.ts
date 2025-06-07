@@ -5,7 +5,7 @@ import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
 // —————————— Arguments ——————————
 
-const args = parseArgs(Deno.args) as Args<{ wait?: number }>;
+const args = parseArgs(Deno.args, { default: { wait: 1500 } }) as Args<{ wait?: number }>;
 
 const TOKEN_ID_WITH_GENESIS = "0x3d8a82efa63e86d54a1922c2afdac61e";
 const TOKEN_ID_WITHOUT_GENESIS = "0xc4bf3f870c0e9465323c0b6ed28096c2";
@@ -27,7 +27,7 @@ const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 // —————————— Test ——————————
 
 Deno.test("tokenDetails", async () => {
-    if (args.wait) await new Promise((r) => setTimeout(r, args.wait));
+    await new Promise((r) => setTimeout(r, args.wait));
 
     // —————————— Prepare ——————————
 

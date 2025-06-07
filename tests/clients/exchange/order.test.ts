@@ -8,9 +8,9 @@ import { formatPrice, formatSize, getAssetData, randomCloid } from "../../_utils
 
 // —————————— Arguments ——————————
 
-const args = parseArgs(Deno.args, { string: ["privateKey"] }) as Args<{ wait?: number; privateKey: Hex }>;
+const args = parseArgs(Deno.args, { default: { wait: 1500 }, string: ["_"] }) as Args<{ wait: number }>;
 
-const PRIVATE_KEY = args.privateKey;
+const PRIVATE_KEY = args._[0] as Hex;
 const PERPS_ASSET = "BTC";
 
 // —————————— Type schema ——————————
@@ -20,8 +20,8 @@ const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
 
-Deno.test("order", async () => {
-    if (args.wait) await new Promise((r) => setTimeout(r, args.wait));
+Deno.test("order", { ignore: !PRIVATE_KEY }, async () => {
+    await new Promise((r) => setTimeout(r, args.wait));
 
     // —————————— Prepare ——————————
 
@@ -101,7 +101,7 @@ Deno.test("order", async () => {
                     t: { limit: { tif: "Gtc" } },
                 }],
                 grouping: "na",
-                builder: { b: account.address, f: 1 },
+                builder: { b: exchClient.wallet.address, f: 1 },
             }),
             // Check argument 't.trigger'
             exchClient.order({
@@ -127,7 +127,7 @@ Deno.test("order", async () => {
     } finally {
         // —————————— Cleanup ——————————
 
-        const openOrders = await infoClient.openOrders({ user: account.address });
+        const openOrders = await infoClient.openOrders({ user: exchClient.wallet.address });
         const cancels = openOrders.map((o) => ({ a: id, o: o.oid }));
         await exchClient.cancel({ cancels });
 

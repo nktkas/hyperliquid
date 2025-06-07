@@ -5,7 +5,6 @@ import { ethers as ethersV5 } from "npm:ethers@5";
 import {
     type AbstractEthersSigner,
     type AbstractEthersV5Signer,
-    type AbstractExtendedViemWalletClient,
     type AbstractViemWalletClient,
     type AbstractWindowEthereum,
     createL1ActionHash,
@@ -294,7 +293,6 @@ Deno.test("Signature Generation Tests", async (t) => {
                                 | AbstractViemWalletClient
                                 | AbstractEthersSigner
                                 | AbstractEthersV5Signer
-                                | AbstractExtendedViemWalletClient
                                 | AbstractWindowEthereum,
                         ) => {
                             const signature = await signL1Action({
@@ -332,7 +330,6 @@ Deno.test("Signature Generation Tests", async (t) => {
                                 | AbstractViemWalletClient
                                 | AbstractEthersSigner
                                 | AbstractEthersV5Signer
-                                | AbstractExtendedViemWalletClient
                                 | AbstractWindowEthereum,
                         ) => {
                             const signature = await signL1Action({
@@ -368,7 +365,6 @@ Deno.test("Signature Generation Tests", async (t) => {
                                 | AbstractViemWalletClient
                                 | AbstractEthersSigner
                                 | AbstractEthersV5Signer
-                                | AbstractExtendedViemWalletClient
                                 | AbstractWindowEthereum,
                         ) => {
                             const signature = await signL1Action({
@@ -404,7 +400,6 @@ Deno.test("Signature Generation Tests", async (t) => {
                                 | AbstractViemWalletClient
                                 | AbstractEthersSigner
                                 | AbstractEthersV5Signer
-                                | AbstractExtendedViemWalletClient
                                 | AbstractWindowEthereum,
                         ) => {
                             const signature = await signL1Action({
@@ -447,7 +442,6 @@ Deno.test("Signature Generation Tests", async (t) => {
                                 | AbstractViemWalletClient
                                 | AbstractEthersSigner
                                 | AbstractEthersV5Signer
-                                | AbstractExtendedViemWalletClient
                                 | AbstractWindowEthereum,
                         ) => {
                             const signature = await signL1Action({
@@ -485,7 +479,6 @@ Deno.test("Signature Generation Tests", async (t) => {
                                 | AbstractViemWalletClient
                                 | AbstractEthersSigner
                                 | AbstractEthersV5Signer
-                                | AbstractExtendedViemWalletClient
                                 | AbstractWindowEthereum,
                         ) => {
                             const signature = await signL1Action({
@@ -521,7 +514,6 @@ Deno.test("Signature Generation Tests", async (t) => {
                                 | AbstractViemWalletClient
                                 | AbstractEthersSigner
                                 | AbstractEthersV5Signer
-                                | AbstractExtendedViemWalletClient
                                 | AbstractWindowEthereum,
                         ) => {
                             const signature = await signL1Action({
@@ -557,7 +549,6 @@ Deno.test("Signature Generation Tests", async (t) => {
                                 | AbstractViemWalletClient
                                 | AbstractEthersSigner
                                 | AbstractEthersV5Signer
-                                | AbstractExtendedViemWalletClient
                                 | AbstractWindowEthereum,
                         ) => {
                             const signature = await signL1Action({
@@ -603,7 +594,6 @@ Deno.test("Signature Generation Tests", async (t) => {
                     | AbstractViemWalletClient
                     | AbstractEthersSigner
                     | AbstractEthersV5Signer
-                    | AbstractExtendedViemWalletClient
                     | AbstractWindowEthereum,
             ) => {
                 const signature = await signUserSignedAction({
