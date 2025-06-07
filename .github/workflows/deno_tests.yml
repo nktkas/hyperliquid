@@ -25,7 +25,7 @@ jobs:
 
             # Run all test files in the repository and collect code coverage.
             - name: deno test + coverage
-              run: deno test -A --coverage --coverage-raw-data-only -- --wait=1500 --privateKey=${{ secrets.PRIVATE_KEY }}
+              run: deno test -A --coverage --coverage-raw-data-only -- ${{ secrets.PRIVATE_KEY }}
 
             # This generates a report from the collected coverage in `deno test --coverage`.
             - name: Create coverage report
