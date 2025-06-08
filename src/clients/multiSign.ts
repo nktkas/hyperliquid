@@ -98,7 +98,10 @@ import {
 /** Parameters for the {@linkcode MultiSignClient} constructor. */
 export interface MultiSignClientParameters<
     T extends IRequestTransport = IRequestTransport,
-    S extends [AbstractWalletWithAddress, ...AbstractWallet[]] = [AbstractWalletWithAddress, ...AbstractWallet[]],
+    S extends readonly [AbstractWalletWithAddress, ...AbstractWallet[]] = [
+        AbstractWalletWithAddress,
+        ...AbstractWallet[],
+    ],
 > extends Omit<ExchangeClientParameters<T, S[0]>, "wallet"> {
     /** The multi-signature account address. */
     multiSignAddress: Hex;
@@ -135,7 +138,10 @@ export interface AbstractEthersV5SignerWithAddress extends AbstractEthersV5Signe
  */
 export class MultiSignClient<
     T extends IRequestTransport = IRequestTransport,
-    S extends [AbstractWalletWithAddress, ...AbstractWallet[]] = [AbstractWalletWithAddress, ...AbstractWallet[]],
+    S extends readonly [AbstractWalletWithAddress, ...AbstractWallet[]] = [
+        AbstractWalletWithAddress,
+        ...AbstractWallet[],
+    ],
 > extends ExchangeClient<T, S[0]> implements MultiSignClientParameters<T, S> {
     multiSignAddress: Hex;
     signers: S;
