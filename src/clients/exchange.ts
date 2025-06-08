@@ -605,7 +605,7 @@ export class ExchangeClient<
             types: userSignedActionEip712Types[action.type],
             chainId: parseInt(action.signatureChainId, 16),
         });
-        if (action.agentName === "") delete action.agentName;
+        if (action.agentName === "") action.agentName = null;
 
         // Send a request
         return await this._request(

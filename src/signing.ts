@@ -652,7 +652,7 @@ export const actionSorter = {
             signatureChainId: action.signatureChainId,
             hyperliquidChain: action.hyperliquidChain,
             agentAddress: action.agentAddress.toLowerCase() as Hex,
-            agentName: action.agentName,
+            agentName: action.agentName ?? "",
             nonce: action.nonce,
         };
     },

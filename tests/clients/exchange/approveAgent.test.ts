@@ -32,10 +32,18 @@ Deno.test("approveAgent", { ignore: !PRIVATE_KEY }, async () => {
     const data = await Promise.all([
         exchClient.approveAgent({
             agentAddress: generateEthereumAddress(),
-            agentName: "agentName",
         }),
         exchClient.approveAgent({
             agentAddress: generateEthereumAddress(),
+            agentName: null,
+        }),
+        exchClient.approveAgent({
+            agentAddress: generateEthereumAddress(),
+            agentName: "",
+        }),
+        exchClient.approveAgent({
+            agentAddress: generateEthereumAddress(),
+            agentName: "agentName",
         }),
     ]);
 

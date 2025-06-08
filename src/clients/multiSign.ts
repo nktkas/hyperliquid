@@ -236,6 +236,7 @@ export class MultiSignClient<
         const outerSigner = await this._getWalletAddress(this.signers[0]);
 
         const signatures = await this._multiSignUserSignedAction(sortedAction, outerSigner);
+        if (sortedAction.agentName === "") sortedAction.agentName = null;
 
         // Send a multi-sig action
         return super.multiSig({

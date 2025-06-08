@@ -39,11 +39,19 @@ Deno.test("approveAgent", { ignore: !PRIVATE_KEY }, async () => {
     const data = await Promise.all([
         multiSignClient.approveAgent({
             agentAddress: generateEthereumAddress(),
+        }),
+        multiSignClient.approveAgent({
+            agentAddress: generateEthereumAddress(),
+            agentName: null,
+        }),
+        multiSignClient.approveAgent({
+            agentAddress: generateEthereumAddress(),
+            agentName: "",
+        }),
+        multiSignClient.approveAgent({
+            agentAddress: generateEthereumAddress(),
             agentName: "agentName",
         }),
-        // multiSignClient.approveAgent({ // FIXME: I don't know how to do it
-        //     agentAddress: generateEthereumAddress(),
-        // }),
     ]);
 
     schemaCoverage(MethodReturnType, data);

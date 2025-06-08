@@ -71,7 +71,7 @@ export interface ApproveAgentRequest extends BaseExchangeRequest {
         /** Agent address. */
         agentAddress: Hex;
         /** Agent name or undefined for unnamed agent. */
-        agentName?: string;
+        agentName?: string | null;
         /** Unique request identifier (current timestamp in ms). */
         nonce: number;
     };
