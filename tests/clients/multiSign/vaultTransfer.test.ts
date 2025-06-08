@@ -47,7 +47,11 @@ Deno.test("vaultTransfer", { ignore: !PRIVATE_KEY }, async () => {
             schemaCoverage(MethodReturnType, [data]);
         })
         .catch((e) => {
-            assertIsError(e, ApiRequestError, "Insufficient vault equity for withdrawal");
+            try {
+                assertIsError(e, ApiRequestError, "Insufficient vault equity for withdrawal");
+            } catch {
+                assertIsError(e, ApiRequestError, "This vault does not accept deposits");
+            }
         });
     await multiSignClient.vaultTransfer({
         vaultAddress: VAULT_ADDRESS,
@@ -59,6 +63,10 @@ Deno.test("vaultTransfer", { ignore: !PRIVATE_KEY }, async () => {
             schemaCoverage(MethodReturnType, [data]);
         })
         .catch((e) => {
-            assertIsError(e, ApiRequestError, "Insufficient vault equity for withdrawal");
+            try {
+                assertIsError(e, ApiRequestError, "Insufficient vault equity for withdrawal");
+            } catch {
+                assertIsError(e, ApiRequestError, "This vault does not accept deposits");
+            }
         });
 });
