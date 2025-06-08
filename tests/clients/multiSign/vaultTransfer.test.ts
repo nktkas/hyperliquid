@@ -47,7 +47,7 @@ Deno.test("vaultTransfer", { ignore: !PRIVATE_KEY }, async () => {
             schemaCoverage(MethodReturnType, [data]);
         })
         .catch((e) => {
-            assertIsError(e, ApiRequestError, "Cannot withdraw with zero balance in vault");
+            assertIsError(e, ApiRequestError, "Insufficient vault equity for withdrawal");
         });
     await multiSignClient.vaultTransfer({
         vaultAddress: VAULT_ADDRESS,
@@ -59,6 +59,6 @@ Deno.test("vaultTransfer", { ignore: !PRIVATE_KEY }, async () => {
             schemaCoverage(MethodReturnType, [data]);
         })
         .catch((e) => {
-            assertIsError(e, ApiRequestError, "Cannot withdraw with zero balance in vault");
+            assertIsError(e, ApiRequestError, "Insufficient vault equity for withdrawal");
         });
 });
