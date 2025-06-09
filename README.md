@@ -48,6 +48,66 @@ deno add jsr:@nktkas/hyperliquid
 </script>
 ```
 
+### React Native
+
+<details>
+<summary>For React Native, you need to import several polyfills before importing the SDK:</summary>
+
+```js
+// React Native 0.76.3
+import { Event, EventTarget } from "event-target-shim";
+
+if (!globalThis.EventTarget || !globalThis.Event) {
+    globalThis.EventTarget = EventTarget;
+    globalThis.Event = Event;
+}
+
+if (!globalThis.CustomEvent) {
+    globalThis.CustomEvent = function (type, params) {
+        params = params || {};
+        const event = new Event(type, params);
+        event.detail = params.detail || null;
+        return event;
+    };
+}
+
+if (!AbortSignal.timeout) {
+    AbortSignal.timeout = function (delay) {
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), delay);
+        return controller.signal;
+    };
+}
+
+if (!Promise.withResolvers) {
+    Promise.withResolvers = function () {
+        let resolve, reject;
+        const promise = new Promise((res, rej) => {
+            resolve = res;
+            reject = rej;
+        });
+        return { promise, resolve, reject };
+    };
+}
+
+if (!ArrayBuffer.prototype.transfer) {
+    ArrayBuffer.prototype.transfer = function (newByteLength) {
+        const length = newByteLength ?? this.byteLength;
+        const newBuffer = new ArrayBuffer(length);
+        const oldView = new Uint8Array(this);
+        const newView = new Uint8Array(newBuffer);
+
+        newView.set(oldView.subarray(0, Math.min(oldView.length, length)));
+
+        Object.defineProperty(this, "byteLength", { value: 0 });
+
+        return newBuffer;
+    };
+}
+```
+
+</details>
+
 ## Quick Start
 
 #### Info endpoint
