@@ -78,7 +78,11 @@ try {
             },
             license: "MIT",
             engines: {
-                node: ">=22.4.0", // WebSocket support
+                /**
+                 * - v22.4.0: Native WebSocket support
+                 * - v24.0.0: https://github.com/nktkas/hyperliquid/issues/34
+                 */
+                node: ">=24.0.0",
             },
             sideEffects: false,
         },
