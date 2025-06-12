@@ -615,7 +615,7 @@ class SubscriptionClient {
 
     // Explorer
     explorerBlock(listener: (data: WsBlockDetails[]) => void): Promise<Subscription>;
-    explorerTx(listener: (data: TxDetails[]) => void): Promise<Subscription>;
+    explorerTxs(listener: (data: TxDetails[]) => void): Promise<Subscription>;
 }
 ```
 <!-- deno-fmt-ignore-end -->
