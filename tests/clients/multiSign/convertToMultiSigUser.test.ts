@@ -19,7 +19,8 @@ const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 
 // —————————— Test ——————————
 
-Deno.test("convertToMultiSigUser", { ignore: !PRIVATE_KEY }, async () => {
+// FIXME: The test does not check `convertToMultiSigUser` in `MultiSignClient`
+Deno.test.ignore("convertToMultiSigUser", async () => {
     await new Promise((r) => setTimeout(r, args.wait));
 
     // —————————— Prepare ——————————

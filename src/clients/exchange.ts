@@ -147,7 +147,7 @@ export type CDepositParameters = Omit<
 >;
 
 /** Parameters for the {@linkcode ExchangeClient.convertToMultiSigUser} method. */
-export type ConvertToMultiSigUserParameters = NonNullable<ConvertToMultiSigUserRequest_Signers>;
+export type ConvertToMultiSigUserParameters = ConvertToMultiSigUserRequest_Signers;
 
 /** Parameters for the {@linkcode ExchangeClient.createSubAccount} method. */
 export type CreateSubAccountParameters = Omit<
@@ -961,7 +961,7 @@ export class ExchangeClient<
      */
     async convertToMultiSigUser(args: ConvertToMultiSigUserParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         // Destructure the parameters
-        const { ...actionArgs } = args;
+        const actionArgs = args;
 
         // Construct an action
         const nonce = await this.nonceManager();

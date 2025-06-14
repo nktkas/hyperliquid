@@ -1,6 +1,6 @@
 import { type Args, parseArgs } from "jsr:@std/cli@1/parse-args";
 import { generatePrivateKey, privateKeyToAccount } from "npm:viem@2/accounts";
-import { ExchangeClient, type Hex, HttpTransport } from "../../../mod.ts";
+import { ExchangeClient, type Hex, HttpTransport, MultiSignClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
 
@@ -30,14 +30,21 @@ Deno.test("convertToMultiSigUser", { ignore: !PRIVATE_KEY }, async () => {
     const tempPrivKey = generatePrivateKey();
     const tempAccount = privateKeyToAccount(tempPrivKey);
     const tempExchClient = new ExchangeClient({ wallet: tempAccount, transport, isTestnet: true });
+    const tempMultiSignClient = new MultiSignClient({
+        transport,
+        multiSignAddress: tempAccount.address,
+        signers: [account],
+        isTestnet: true,
+    });
     await exchClient.usdSend({ destination: tempAccount.address, amount: "2" });
 
     // —————————— Test ——————————
 
-    const data = await tempExchClient.convertToMultiSigUser({
+    const data1 = await tempExchClient.convertToMultiSigUser({
         authorizedUsers: [exchClient.wallet.address],
         threshold: 1,
     });
+    const data2 = await tempMultiSignClient.convertToMultiSigUser(null);
 
-    schemaCoverage(MethodReturnType, [data]);
+    schemaCoverage(MethodReturnType, [data1, data2]);
 });

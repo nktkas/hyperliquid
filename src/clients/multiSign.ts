@@ -689,7 +689,7 @@ export class MultiSignClient<
         ...[args, signal]: Parameters<ExchangeClient["convertToMultiSigUser"]>
     ): ReturnType<ExchangeClient["convertToMultiSigUser"]> {
         // Destructure the parameters
-        const { ...actionArgs } = args;
+        const actionArgs = args;
 
         // Construct an action
         const nonce = await this.nonceManager();
