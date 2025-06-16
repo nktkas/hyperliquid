@@ -126,7 +126,7 @@ const openOrders = await infoClient.openOrders({ user: "0x..." });
 ```ts
 import * as hl from "@nktkas/hyperliquid";
 
-const privateKey = "0x..."; // or `viem`, `ethers`, or other wallet libraries
+const privateKey = "0x..."; // or `viem`, `ethers`
 
 const transport = new hl.HttpTransport();
 const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
@@ -318,7 +318,7 @@ const openOrders = await infoClient.openOrders({ user: "0x..." });
 ```ts
 import * as hl from "@nktkas/hyperliquid";
 
-const privateKey = "0x..."; // or `viem`, `ethers`, or other wallet libraries
+const privateKey = "0x..."; // or `viem`, `ethers`
 
 const transport = new hl.HttpTransport();
 const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
@@ -707,7 +707,7 @@ The import point gives access to functions that generate signatures for Hyperliq
 ```ts
 import { actionSorter, signL1Action } from "@nktkas/hyperliquid/signing";
 
-const privateKey = "0x..."; // or `viem`, `ethers`, or other wallet libraries
+const privateKey = "0x..."; // or `viem`, `ethers`
 
 const action = {
     type: "cancel",
@@ -737,7 +737,7 @@ const body = await response.json();
 ```ts
 import { signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
 
-const privateKey = "0x..."; // or `viem`, `ethers`, or other wallet libraries
+const privateKey = "0x..."; // or `viem`, `ethers`
 
 const action = {
     type: "approveAgent",
