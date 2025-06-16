@@ -25,12 +25,11 @@ Deno.test.ignore("convertToMultiSigUser", async () => {
 
     // —————————— Prepare ——————————
 
-    const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
     const multiSignClient = new MultiSignClient({
         transport,
         multiSignAddress: MULTI_SIGN_ADDRESS,
-        signers: [account],
+        signers: [PRIVATE_KEY],
         isTestnet: true,
     });
 

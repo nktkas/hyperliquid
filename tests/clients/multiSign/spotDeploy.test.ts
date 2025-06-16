@@ -1,5 +1,4 @@
 import { type Args, parseArgs } from "jsr:@std/cli@1/parse-args";
-import { privateKeyToAccount } from "npm:viem@2/accounts";
 import { assertRejects } from "jsr:@std/assert@1";
 import { ApiRequestError, type Hex, HttpTransport } from "../../../mod.ts";
 import { MultiSignClient } from "../../../src/clients/multiSign.ts";
@@ -20,12 +19,11 @@ Deno.test("spotDeploy", { ignore: !PRIVATE_KEY }, async () => {
 
     // —————————— Prepare ——————————
 
-    const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
     const multiSignClient = new MultiSignClient({
         transport,
         multiSignAddress: MULTI_SIGN_ADDRESS,
-        signers: [account],
+        signers: [PRIVATE_KEY],
         isTestnet: true,
     });
 

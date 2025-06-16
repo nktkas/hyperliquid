@@ -1,5 +1,5 @@
 import { type Args, parseArgs } from "jsr:@std/cli@1/parse-args";
-import { privateKeyToAccount } from "npm:viem@2/accounts";
+import { privateKeyToAddress } from "npm:viem@2/accounts";
 import BigNumber from "npm:bignumber.js@9";
 import { ExchangeClient, type Hex, HttpTransport, InfoClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
@@ -25,9 +25,8 @@ Deno.test("batchModify", { ignore: !PRIVATE_KEY }, async () => {
 
     // —————————— Prepare ——————————
 
-    const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
-    const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
+    const exchClient = new ExchangeClient({ wallet: PRIVATE_KEY, transport, isTestnet: true });
     const infoClient = new InfoClient({ transport });
 
     const { id, universe, ctx } = await getAssetData(infoClient, PERPS_ASSET);
@@ -138,7 +137,7 @@ Deno.test("batchModify", { ignore: !PRIVATE_KEY }, async () => {
     } finally {
         // —————————— Cleanup ——————————
 
-        const openOrders = await infoClient.openOrders({ user: exchClient.wallet.address });
+        const openOrders = await infoClient.openOrders({ user: privateKeyToAddress(exchClient.wallet) });
         const cancels = openOrders.map((o) => ({ a: id, o: o.oid }));
         await exchClient.cancel({ cancels });
 

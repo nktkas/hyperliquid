@@ -54,11 +54,9 @@ Deno.test("_guessSignatureChainId", async (t) => {
     });
 
     await t.step("default", async (t) => {
-        const account = privateKeyToAccount(generatePrivateKey());
-
         await t.step("mainnet", async () => {
             const transport = new HttpTransport();
-            const exchClient = new ExchangeClient({ wallet: account, transport });
+            const exchClient = new ExchangeClient({ wallet: generatePrivateKey(), transport });
 
             const signatureChainId = typeof exchClient.signatureChainId === "string"
                 ? exchClient.signatureChainId
@@ -68,7 +66,7 @@ Deno.test("_guessSignatureChainId", async (t) => {
 
         await t.step("testnet", async () => {
             const transport = new HttpTransport();
-            const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
+            const exchClient = new ExchangeClient({ wallet: generatePrivateKey(), transport, isTestnet: true });
 
             const signatureChainId = typeof exchClient.signatureChainId === "string"
                 ? exchClient.signatureChainId

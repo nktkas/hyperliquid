@@ -1,5 +1,5 @@
 import { type Args, parseArgs } from "jsr:@std/cli@1/parse-args";
-import { privateKeyToAccount } from "npm:viem@2/accounts";
+import { privateKeyToAddress } from "npm:viem@2/accounts";
 import { ExchangeClient, type Hex, HttpTransport } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
@@ -22,15 +22,14 @@ Deno.test("approveBuilderFee", { ignore: !PRIVATE_KEY }, async () => {
 
     // —————————— Prepare ——————————
 
-    const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
-    const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
+    const exchClient = new ExchangeClient({ wallet: PRIVATE_KEY, transport, isTestnet: true });
 
     // —————————— Test ——————————
 
     const data = await exchClient.approveBuilderFee({
         maxFeeRate: "0.001%",
-        builder: exchClient.wallet.address,
+        builder: privateKeyToAddress(exchClient.wallet),
     });
 
     schemaCoverage(MethodReturnType, [data]);

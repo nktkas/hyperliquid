@@ -8,7 +8,7 @@ export type {
     AbstractEthersV5Signer,
     AbstractViemWalletClient,
     AbstractWindowEthereum,
-} from "./src/signing.ts";
+} from "./src/signing/mod.ts";
 
 // Clients
 export * from "./src/clients/exchange.ts";

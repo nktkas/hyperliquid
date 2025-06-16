@@ -125,12 +125,11 @@ const openOrders = await infoClient.openOrders({ user: "0x..." });
 
 ```ts
 import * as hl from "@nktkas/hyperliquid";
-import { privateKeyToAccount } from "viem/accounts"; // or other wallet libraries
 
-const wallet = privateKeyToAccount("0x...");
+const privateKey = "0x..."; // or `viem`, `ethers`, or other wallet libraries
 
 const transport = new hl.HttpTransport();
-const exchClient = new hl.ExchangeClient({ wallet, transport });
+const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
 
 const result = await exchClient.order({
     orders: [{
@@ -168,15 +167,11 @@ await sub.unsubscribe(); // unsubscribe from the event
 
 ```ts
 import * as hl from "@nktkas/hyperliquid";
-import { privateKeyToAccount } from "viem/accounts"; // or other wallet libraries
 
 const multiSignAddress = "0x...";
 const signers = [
-    privateKeyToAccount("0x..."), // first is leader
-    privateKeyToAccount("0x..."), // can be a custom async wallet
-    // ...
-    privateKeyToAccount("0x..."),
-];
+    "0x...", // Private key; or any other wallet libraries
+] as const;
 
 const transport = new hl.HttpTransport();
 const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers }); // extends ExchangeClient
@@ -227,20 +222,24 @@ import { ethers } from "ethers";
 
 const transport = new hl.HttpTransport(); // or WebSocketTransport
 
-// 1. Using Viem with private key
+// 1. Using private key
+const privateKey = "0x...";
+const exchClient_privateKey = new hl.ExchangeClient({ wallet: privateKey, transport });
+
+// 2. Using Viem with private key
 const viemAccount = privateKeyToAccount("0x...");
 const exchClient_viem = new hl.ExchangeClient({ wallet: viemAccount, transport });
 
-// 2. Using Ethers (or Ethers V5) with private key
+// 3. Using Ethers (or Ethers V5) with private key
 const ethersWallet = new ethers.Wallet("0x...");
 const exchClient_ethers = new hl.ExchangeClient({ wallet: ethersWallet, transport });
 
-// 3. Using external wallet (e.g. MetaMask) via Viem
+// 4. Using external wallet (e.g. MetaMask) via Viem
 const [account] = await window.ethereum.request({ method: "eth_requestAccounts" });
 const externalWallet = createWalletClient({ account, transport: custom(window.ethereum) });
 const exchClient_viemMetamask = new hl.ExchangeClient({ wallet: externalWallet, transport });
 
-// 4. Using external wallet (e.g. MetaMask) via `window.ethereum` (EIP-1193)
+// 5. Using external wallet (e.g. MetaMask) via `window.ethereum` (EIP-1193)
 const exchClient_windowMetamask = new hl.ExchangeClient({ wallet: window.ethereum, transport });
 ```
 
@@ -263,6 +262,7 @@ import { ethers } from "ethers";
 const multiSignAddress = "0x...";
 const signers = [
     privateKeyToAccount("0x..."), // first is leader for multi-sign transaction, must contain own address
+    new ethers.Wallet("0x..."),
     { // can be a custom async wallet
         signTypedData(params: {
             domain: {
@@ -284,8 +284,7 @@ const signers = [
             return "0x..."; // return signature
         },
     },
-    // ...
-    new ethers.Wallet("0x..."),
+    "0x...", // private key directly
 ];
 
 const transport = new hl.HttpTransport();
@@ -318,12 +317,11 @@ const openOrders = await infoClient.openOrders({ user: "0x..." });
 
 ```ts
 import * as hl from "@nktkas/hyperliquid";
-import { privateKeyToAccount } from "viem/accounts";
 
-const account = privateKeyToAccount("0x...");
+const privateKey = "0x..."; // or `viem`, `ethers`, or other wallet libraries
 
 const transport = new hl.HttpTransport();
-const exchClient = new hl.ExchangeClient({ wallet: account, transport });
+const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
 
 // Place an orders
 const result = await exchClient.order({
@@ -383,10 +381,11 @@ const sub = await subsClient.candle({ coin: "BTC", interval: "1h" }, (data) => {
 
 ```ts
 import * as hl from "@nktkas/hyperliquid";
-import { privateKeyToAccount } from "viem/accounts";
 
 const multiSignAddress = "0x...";
-const signers = [privateKeyToAccount("0x...")];
+const signers = [
+    "0x...", // Private keys
+] as const;
 
 const transport = new hl.HttpTransport();
 const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
@@ -707,9 +706,8 @@ The import point gives access to functions that generate signatures for Hyperliq
 
 ```ts
 import { actionSorter, signL1Action } from "@nktkas/hyperliquid/signing";
-import { privateKeyToAccount } from "viem/accounts"; // or other wallet libraries
 
-const wallet = privateKeyToAccount("0x...");
+const privateKey = "0x..."; // or `viem`, `ethers`, or other wallet libraries
 
 const action = {
     type: "cancel",
@@ -720,7 +718,7 @@ const action = {
 const nonce = Date.now();
 
 const signature = await signL1Action({
-    wallet,
+    wallet: privateKey,
     action: actionSorter[action.type](action), // key order affects signature
     nonce,
     isTestnet: true, // change to `false` for mainnet
@@ -738,9 +736,8 @@ const body = await response.json();
 
 ```ts
 import { signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
-import { privateKeyToAccount } from "viem/accounts"; // or other wallet libraries
 
-const wallet = privateKeyToAccount("0x...");
+const privateKey = "0x..."; // or `viem`, `ethers`, or other wallet libraries
 
 const action = {
     type: "approveAgent",
@@ -752,7 +749,7 @@ const action = {
 };
 
 const signature = await signUserSignedAction({
-    wallet,
+    wallet: privateKey,
     action,
     types: userSignedActionEip712Types[action.type], // key order affects signature
     chainId: parseInt(action.signatureChainId, 16),

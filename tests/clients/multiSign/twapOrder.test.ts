@@ -1,5 +1,4 @@
 import { type Args, parseArgs } from "jsr:@std/cli@1/parse-args";
-import { privateKeyToAccount } from "npm:viem@2/accounts";
 import BigNumber from "npm:bignumber.js@9";
 import { type Hex, HttpTransport, InfoClient } from "../../../mod.ts";
 import { MultiSignClient } from "../../../src/clients/multiSign.ts";
@@ -27,12 +26,11 @@ Deno.test("twapOrder", { ignore: !PRIVATE_KEY }, async () => {
 
     // —————————— Prepare ——————————
 
-    const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
     const multiSignClient = new MultiSignClient({
         transport,
         multiSignAddress: MULTI_SIGN_ADDRESS,
-        signers: [account],
+        signers: [PRIVATE_KEY],
         isTestnet: true,
     });
     const infoClient = new InfoClient({ transport });

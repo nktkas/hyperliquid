@@ -4,11 +4,12 @@
     "exports": {
         ".": "./mod.ts",
         "./types": "./src/types/mod.ts",
-        "./signing": "./src/signing.ts"
+        "./signing": "./src/signing/mod.ts"
     },
     "imports": {
         "@derzade/typescript-event-target": "jsr:@derzade/typescript-event-target@1.1.1",
         "@noble/hashes/sha3": "jsr:@noble/hashes@^1.8.0/sha3",
+        "@noble/secp256k1": "jsr:@noble/secp256k1@^2.3.0",
         "@std/async/delay": "jsr:@std/async@^1.0.12/delay",
         "@std/bytes/concat": "jsr:@std/bytes@^1.0.5/concat",
         "@std/encoding/hex": "jsr:@std/encoding@^1.0.9/hex",

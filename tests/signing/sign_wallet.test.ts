@@ -2,15 +2,7 @@ import { assert, assertRejects } from "jsr:@std/assert@1";
 import { privateKeyToAccount } from "npm:viem@2/accounts";
 import { ethers } from "npm:ethers@6";
 import { ethers as ethersV5 } from "npm:ethers@5";
-import {
-    type AbstractEthersSigner,
-    type AbstractEthersV5Signer,
-    type AbstractViemWalletClient,
-    type AbstractWindowEthereum,
-    createL1ActionHash,
-    signL1Action,
-    signUserSignedAction,
-} from "../../src/signing.ts";
+import { type AbstractWallet, createL1ActionHash, signL1Action, signUserSignedAction } from "../../src/signing/mod.ts";
 
 // —————————— Arguments ——————————
 
@@ -288,13 +280,7 @@ Deno.test("Signature Generation Tests", async (t) => {
             await t.step("should generate matching signatures", async (t) => {
                 await t.step("in mainnet", async (t) => {
                     await t.step("without vaultAddress + expiresAfter", async (t) => {
-                        const fn = async (
-                            wallet:
-                                | AbstractViemWalletClient
-                                | AbstractEthersSigner
-                                | AbstractEthersV5Signer
-                                | AbstractWindowEthereum,
-                        ) => {
+                        const fn = async (wallet: AbstractWallet) => {
                             const signature = await signL1Action({
                                 wallet,
                                 isTestnet: false,
@@ -318,6 +304,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                             );
                         };
 
+                        await t.step("Private Key", async () => await fn(PRIVATE_KEY));
                         await t.step("Viem", async () => await fn(viemWallet));
                         await t.step("Extended Viem", async () => await fn(extendedViemWallet));
                         await t.step("Ethers", async () => await fn(ethersWallet));
@@ -325,13 +312,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                         await t.step("window.ethereum", async () => await fn(windowEthereum));
                     });
                     await t.step("with vaultAddress", async (t) => {
-                        const fn = async (
-                            wallet:
-                                | AbstractViemWalletClient
-                                | AbstractEthersSigner
-                                | AbstractEthersV5Signer
-                                | AbstractWindowEthereum,
-                        ) => {
+                        const fn = async (wallet: AbstractWallet) => {
                             const signature = await signL1Action({
                                 wallet,
                                 isTestnet: false,
@@ -353,6 +334,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                             );
                         };
 
+                        await t.step("Private Key", async () => await fn(PRIVATE_KEY));
                         await t.step("Viem", async () => await fn(viemWallet));
                         await t.step("Extended Viem", async () => await fn(extendedViemWallet));
                         await t.step("Ethers", async () => await fn(ethersWallet));
@@ -360,13 +342,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                         await t.step("window.ethereum", async () => await fn(windowEthereum));
                     });
                     await t.step("with expiresAfter", async (t) => {
-                        const fn = async (
-                            wallet:
-                                | AbstractViemWalletClient
-                                | AbstractEthersSigner
-                                | AbstractEthersV5Signer
-                                | AbstractWindowEthereum,
-                        ) => {
+                        const fn = async (wallet: AbstractWallet) => {
                             const signature = await signL1Action({
                                 wallet,
                                 isTestnet: false,
@@ -388,6 +364,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                             );
                         };
 
+                        await t.step("Private Key", async () => await fn(PRIVATE_KEY));
                         await t.step("Viem", async () => await fn(viemWallet));
                         await t.step("Extended Viem", async () => await fn(extendedViemWallet));
                         await t.step("Ethers", async () => await fn(ethersWallet));
@@ -395,13 +372,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                         await t.step("window.ethereum", async () => await fn(windowEthereum));
                     });
                     await t.step("with vaultAddress + expiresAfter", async (t) => {
-                        const fn = async (
-                            wallet:
-                                | AbstractViemWalletClient
-                                | AbstractEthersSigner
-                                | AbstractEthersV5Signer
-                                | AbstractWindowEthereum,
-                        ) => {
+                        const fn = async (wallet: AbstractWallet) => {
                             const signature = await signL1Action({
                                 wallet,
                                 isTestnet: false,
@@ -427,6 +398,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                             );
                         };
 
+                        await t.step("Private Key", async () => await fn(PRIVATE_KEY));
                         await t.step("Viem", async () => await fn(viemWallet));
                         await t.step("Extended Viem", async () => await fn(extendedViemWallet));
                         await t.step("Ethers", async () => await fn(ethersWallet));
@@ -437,13 +409,7 @@ Deno.test("Signature Generation Tests", async (t) => {
 
                 await t.step("in testnet", async (t) => {
                     await t.step("without vaultAddress + expiresAfter", async (t) => {
-                        const fn = async (
-                            wallet:
-                                | AbstractViemWalletClient
-                                | AbstractEthersSigner
-                                | AbstractEthersV5Signer
-                                | AbstractWindowEthereum,
-                        ) => {
+                        const fn = async (wallet: AbstractWallet) => {
                             const signature = await signL1Action({
                                 wallet,
                                 isTestnet: true,
@@ -467,6 +433,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                             );
                         };
 
+                        await t.step("Private Key", async () => await fn(PRIVATE_KEY));
                         await t.step("Viem", async () => await fn(viemWallet));
                         await t.step("Extended Viem", async () => await fn(extendedViemWallet));
                         await t.step("Ethers", async () => await fn(ethersWallet));
@@ -474,13 +441,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                         await t.step("window.ethereum", async () => await fn(windowEthereum));
                     });
                     await t.step("with vaultAddress", async (t) => {
-                        const fn = async (
-                            wallet:
-                                | AbstractViemWalletClient
-                                | AbstractEthersSigner
-                                | AbstractEthersV5Signer
-                                | AbstractWindowEthereum,
-                        ) => {
+                        const fn = async (wallet: AbstractWallet) => {
                             const signature = await signL1Action({
                                 wallet,
                                 isTestnet: true,
@@ -502,6 +463,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                             );
                         };
 
+                        await t.step("Private Key", async () => await fn(PRIVATE_KEY));
                         await t.step("Viem", async () => await fn(viemWallet));
                         await t.step("Extended Viem", async () => await fn(extendedViemWallet));
                         await t.step("Ethers", async () => await fn(ethersWallet));
@@ -509,13 +471,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                         await t.step("window.ethereum", async () => await fn(windowEthereum));
                     });
                     await t.step("with expiresAfter", async (t) => {
-                        const fn = async (
-                            wallet:
-                                | AbstractViemWalletClient
-                                | AbstractEthersSigner
-                                | AbstractEthersV5Signer
-                                | AbstractWindowEthereum,
-                        ) => {
+                        const fn = async (wallet: AbstractWallet) => {
                             const signature = await signL1Action({
                                 wallet,
                                 isTestnet: true,
@@ -537,6 +493,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                             );
                         };
 
+                        await t.step("Private Key", async () => await fn(PRIVATE_KEY));
                         await t.step("Viem", async () => await fn(viemWallet));
                         await t.step("Extended Viem", async () => await fn(extendedViemWallet));
                         await t.step("Ethers", async () => await fn(ethersWallet));
@@ -544,13 +501,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                         await t.step("window.ethereum", async () => await fn(windowEthereum));
                     });
                     await t.step("with vaultAddress + expiresAfter", async (t) => {
-                        const fn = async (
-                            wallet:
-                                | AbstractViemWalletClient
-                                | AbstractEthersSigner
-                                | AbstractEthersV5Signer
-                                | AbstractWindowEthereum,
-                        ) => {
+                        const fn = async (wallet: AbstractWallet) => {
                             const signature = await signL1Action({
                                 wallet,
                                 isTestnet: true,
@@ -576,6 +527,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                             );
                         };
 
+                        await t.step("Private Key", async () => await fn(PRIVATE_KEY));
                         await t.step("Viem", async () => await fn(viemWallet));
                         await t.step("Extended Viem", async () => await fn(extendedViemWallet));
                         await t.step("Ethers", async () => await fn(ethersWallet));
@@ -589,13 +541,7 @@ Deno.test("Signature Generation Tests", async (t) => {
 
     await t.step("User-Signed Action Signatures", async (t) => {
         await t.step("should generate matching signatures", async (t) => {
-            const fn = async (
-                wallet:
-                    | AbstractViemWalletClient
-                    | AbstractEthersSigner
-                    | AbstractEthersV5Signer
-                    | AbstractWindowEthereum,
-            ) => {
+            const fn = async (wallet: AbstractWallet) => {
                 const signature = await signUserSignedAction({
                     wallet,
                     action: USER_SIGNED_ACTION_SIGNATURE.data.action,
@@ -620,6 +566,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                 );
             };
 
+            await t.step("Private Key", async () => await fn(PRIVATE_KEY));
             await t.step("Viem", async () => await fn(viemWallet));
             await t.step("Extended Viem", async () => await fn(extendedViemWallet));
             await t.step("Ethers", async () => await fn(ethersWallet));

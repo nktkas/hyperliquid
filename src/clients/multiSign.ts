@@ -1,3 +1,6 @@
+import { keccak_256 } from "@noble/hashes/sha3";
+import { getPublicKey } from "@noble/secp256k1";
+import { encodeHex } from "@std/encoding/hex";
 import type { Hex } from "../base.ts";
 import type { IRequestTransport } from "../transports/base.ts";
 import type {
@@ -63,11 +66,12 @@ import {
     isAbstractEthersV5Signer,
     isAbstractViemWalletClient,
     isAbstractWindowEthereum,
+    isValidPrivateKey,
     type Signature,
     signL1Action,
     signUserSignedAction,
     userSignedActionEip712Types,
-} from "../signing.ts";
+} from "../signing/mod.ts";
 import {
     type CancelResponseSuccess,
     type CSignerActionParameters,
@@ -111,6 +115,7 @@ export interface MultiSignClientParameters<
 
 /** Abstract interface for a wallet that can sign typed data and has wallet address. */
 export type AbstractWalletWithAddress =
+    | Hex // Private key
     | AbstractViemWalletClientWithAddress
     | AbstractEthersSignerWithAddress
     | AbstractEthersV5SignerWithAddress
@@ -158,14 +163,11 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
      * const transport = new hl.HttpTransport();
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
@@ -198,17 +200,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.approveAgent({ agentAddress: "0x...", agentName: "agentName" });
@@ -260,17 +258,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.approveBuilderFee({ maxFeeRate: "0.01%", builder: "0x..." });
@@ -320,17 +314,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.batchModify({
@@ -406,17 +396,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.cancel({
@@ -480,17 +466,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.cancelByCloid({
@@ -553,17 +535,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.cDeposit({ wei: 1 * 1e8 });
@@ -613,17 +591,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.claimRewards();
@@ -666,17 +640,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.convertToMultiSigUser({ // convert to normal user
@@ -729,17 +699,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.createSubAccount({ name: "subAccountName" });
@@ -786,17 +752,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.createVault({
@@ -848,17 +810,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * // Jail self
@@ -921,17 +879,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * // Change validator profile
@@ -1005,17 +959,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.cWithdraw({ wei: 1 * 1e8 });
@@ -1065,17 +1015,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.evmUserModify({ usingBigBlocks: true });
@@ -1122,17 +1068,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.modify({
@@ -1224,17 +1166,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.order({
@@ -1308,17 +1246,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.perpDeploy({
@@ -1386,17 +1320,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.perpDexClassTransfer({
@@ -1451,17 +1381,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.registerReferrer({ code: "TEST" });
@@ -1508,17 +1434,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.reserveRequestWeight({ weight: 10 });
@@ -1569,17 +1491,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.scheduleCancel({ time: Date.now() + 3600000 });
@@ -1649,17 +1567,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.setDisplayName({ displayName: "My Name" });
@@ -1706,17 +1620,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.setReferrer({ code: "TEST" });
@@ -1763,17 +1673,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.spotDeploy({
@@ -1861,17 +1767,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.spotSend({
@@ -1925,17 +1827,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.spotUser({ toggleSpotDusting: { optOut: false } });
@@ -1982,17 +1880,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.subAccountSpotTransfer({
@@ -2044,17 +1938,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.subAccountTransfer({
@@ -2105,17 +1995,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.tokenDelegate({
@@ -2169,17 +2055,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.twapCancel({
@@ -2241,17 +2123,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.twapOrder({
@@ -2319,17 +2197,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.updateIsolatedMargin({
@@ -2392,17 +2266,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.updateLeverage({
@@ -2465,17 +2335,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.usdClassTransfer({ amount: "1", toPerp: true });
@@ -2525,17 +2391,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.usdSend({ destination: "0x...", amount: "1" });
@@ -2585,17 +2447,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.vaultDistribute({ vaultAddress: "0x...", usd: 10 * 1e6 });
@@ -2642,17 +2500,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.vaultModify({
@@ -2703,17 +2557,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.vaultTransfer({
@@ -2768,17 +2618,13 @@ export class MultiSignClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   privateKeyToAccount("0x..."), // first is leader
-     *   privateKeyToAccount("0x..."),
-     *   // ...
-     *   privateKeyToAccount("0x..."),
-     * ];
+     *   "0x...", // Private key; or any other wallet libraries
+     * ] as const;
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.withdraw3({ destination: "0x...", amount: "1" });
@@ -2820,7 +2666,9 @@ export class MultiSignClient<
 
     /** Extracts the wallet address from different wallet types. */
     protected async _getWalletAddress(wallet: AbstractWalletWithAddress): Promise<`0x${string}`> {
-        if (isAbstractViemWalletClient(wallet)) {
+        if (isValidPrivateKey(wallet)) {
+            return privateKeyToAddress(wallet);
+        } else if (isAbstractViemWalletClient(wallet)) {
             return wallet.address;
         } else if (isAbstractEthersSigner(wallet) || isAbstractEthersV5Signer(wallet)) {
             return await wallet.getAddress() as Hex;
@@ -2890,4 +2738,19 @@ export class MultiSignClient<
             });
         }));
     }
+}
+
+/** Converts a private key to an Ethereum address. */
+function privateKeyToAddress(privateKey: string): Hex {
+    const cleanKey = privateKey.startsWith("0x") ? privateKey.slice(2) : privateKey;
+
+    const publicKey = getPublicKey(cleanKey, false);
+    const publicKeyWithoutPrefix = publicKey.slice(1);
+
+    const hash = keccak_256(publicKeyWithoutPrefix);
+
+    const addressBytes = hash.slice(-20);
+    const address = encodeHex(addressBytes);
+
+    return `0x${address}`;
 }

@@ -1,5 +1,5 @@
 import { type Args, parseArgs } from "jsr:@std/cli@1/parse-args";
-import { generatePrivateKey, privateKeyToAccount } from "npm:viem@2/accounts";
+import { generatePrivateKey, privateKeyToAddress } from "npm:viem@2/accounts";
 import { ExchangeClient, type Hex, HttpTransport, MultiSignClient } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
 import { schemaCoverage } from "../../_utils/schema/schemaCoverage.ts";
@@ -22,26 +22,23 @@ Deno.test("convertToMultiSigUser", { ignore: !PRIVATE_KEY }, async () => {
 
     // —————————— Prepare ——————————
 
-    const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
-    const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
+    const exchClient = new ExchangeClient({ wallet: PRIVATE_KEY, transport, isTestnet: true });
 
     // Preparing a temporary wallet
-    const tempPrivKey = generatePrivateKey();
-    const tempAccount = privateKeyToAccount(tempPrivKey);
-    const tempExchClient = new ExchangeClient({ wallet: tempAccount, transport, isTestnet: true });
+    const tempExchClient = new ExchangeClient({ wallet: generatePrivateKey(), transport, isTestnet: true });
     const tempMultiSignClient = new MultiSignClient({
         transport,
-        multiSignAddress: tempAccount.address,
-        signers: [account],
+        multiSignAddress: privateKeyToAddress(tempExchClient.wallet),
+        signers: [PRIVATE_KEY],
         isTestnet: true,
     });
-    await exchClient.usdSend({ destination: tempAccount.address, amount: "2" });
+    await exchClient.usdSend({ destination: privateKeyToAddress(tempExchClient.wallet), amount: "2" });
 
     // —————————— Test ——————————
 
     const data1 = await tempExchClient.convertToMultiSigUser({
-        authorizedUsers: [exchClient.wallet.address],
+        authorizedUsers: [privateKeyToAddress(exchClient.wallet)],
         threshold: 1,
     });
     const data2 = await tempMultiSignClient.convertToMultiSigUser(null);

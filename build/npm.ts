@@ -14,6 +14,10 @@ const jsrDependencies: { [specifier: `jsr:${string}`]: PackageMappedSpecifier } 
         version: "^1.8.0",
         subPath: "sha3",
     },
+    "jsr:@noble/secp256k1@^2.3.0": {
+        name: "@noble/secp256k1",
+        version: "^2.3.0",
+    },
 };
 
 const toUrl = (jsr: string) => jsr.replace("jsr:", "https://esm.sh/");
@@ -36,7 +40,7 @@ try {
         entryPoints: [
             { name: ".", path: "./mod.ts" },
             { name: "./types", path: "./src/types/mod.ts" },
-            { name: "./signing", path: "./src/signing.ts" },
+            { name: "./signing", path: "./src/signing/mod.ts" },
         ],
         outDir: "./build/npm",
         shims: {},

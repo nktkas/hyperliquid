@@ -22,9 +22,8 @@ Deno.test("setReferrer", { ignore: !PRIVATE_KEY }, async () => {
 
     // —————————— Prepare ——————————
 
-    const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
-    const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
+    const exchClient = new ExchangeClient({ wallet: PRIVATE_KEY, transport, isTestnet: true });
 
     // Preparing a temporary wallet
     const tempPrivKey = generatePrivateKey();

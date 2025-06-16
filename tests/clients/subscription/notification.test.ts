@@ -1,6 +1,6 @@
 import { type Args, parseArgs } from "jsr:@std/cli@1/parse-args";
 import { deadline } from "jsr:@std/async@1/deadline";
-import { privateKeyToAccount } from "npm:viem@2/accounts";
+import { privateKeyToAddress } from "npm:viem@2/accounts";
 import BigNumber from "npm:bignumber.js@9";
 import {
     ExchangeClient,
@@ -36,11 +36,7 @@ Deno.test("notification", { ignore: !PRIVATE_KEY }, async () => {
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
     await using infoClient = new InfoClient({ transport });
     await using subsClient = new SubscriptionClient({ transport });
-    await using exchClient = new ExchangeClient({
-        wallet: privateKeyToAccount(PRIVATE_KEY),
-        transport,
-        isTestnet: true,
-    });
+    await using exchClient = new ExchangeClient({ wallet: PRIVATE_KEY, transport, isTestnet: true });
 
     // —————————— Test ——————————
 
@@ -49,7 +45,7 @@ Deno.test("notification", { ignore: !PRIVATE_KEY }, async () => {
         new Promise(async (resolve, reject) => {
             const events: WsNotification[] = [];
             await subsClient.notification(
-                { user: exchClient.wallet.address },
+                { user: privateKeyToAddress(exchClient.wallet) },
                 async (data) => {
                     try {
                         events.push(data);

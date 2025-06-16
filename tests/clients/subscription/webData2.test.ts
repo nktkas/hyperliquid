@@ -1,6 +1,6 @@
 import { type Args, parseArgs } from "jsr:@std/cli@1/parse-args";
 import { deadline } from "jsr:@std/async@1/deadline";
-import { privateKeyToAccount } from "npm:viem@2/accounts";
+import { privateKeyToAddress } from "npm:viem@2/accounts";
 import BigNumber from "npm:bignumber.js@9";
 import { ExchangeClient, type Hex, InfoClient, SubscriptionClient, WebSocketTransport } from "../../../mod.ts";
 import { schemaGenerator } from "../../_utils/schema/schemaGenerator.ts";
@@ -31,11 +31,7 @@ Deno.test("webData2", { ignore: !PRIVATE_KEY }, async () => {
     const transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws", timeout: 20_000 });
     await using infoClient = new InfoClient({ transport });
     await using subsClient = new SubscriptionClient({ transport });
-    await using exchClient = new ExchangeClient({
-        wallet: privateKeyToAccount(PRIVATE_KEY),
-        transport,
-        isTestnet: true,
-    });
+    await using exchClient = new ExchangeClient({ wallet: PRIVATE_KEY, transport, isTestnet: true });
 
     // Get asset data
     const {
@@ -123,7 +119,7 @@ Deno.test("webData2", { ignore: !PRIVATE_KEY }, async () => {
     try {
         const data = await deadline(
             new Promise((resolve) => {
-                subsClient.webData2({ user: exchClient.wallet.address }, resolve);
+                subsClient.webData2({ user: privateKeyToAddress(exchClient.wallet) }, resolve);
             }),
             10_000,
         );
@@ -160,7 +156,7 @@ Deno.test("webData2", { ignore: !PRIVATE_KEY }, async () => {
         // —————————— Cleanup ——————————
 
         // Close open orders & TWAP's
-        const openOrders = await infoClient.openOrders({ user: exchClient.wallet.address });
+        const openOrders = await infoClient.openOrders({ user: privateKeyToAddress(exchClient.wallet) });
         const cancels = openOrders.map((o) => ({ a: o.coin === PERPS_ASSET_1 ? id1 : id2, o: o.oid }));
         await Promise.all([
             exchClient.cancel({ cancels }),

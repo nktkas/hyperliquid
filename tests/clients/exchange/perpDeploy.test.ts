@@ -1,5 +1,4 @@
 import { type Args, parseArgs } from "jsr:@std/cli@1/parse-args";
-import { privateKeyToAccount } from "npm:viem@2/accounts";
 import { assertRejects } from "jsr:@std/assert@1";
 import { ApiRequestError, ExchangeClient, type Hex, HttpTransport } from "../../../mod.ts";
 
@@ -18,9 +17,8 @@ Deno.test("perpDeploy", { ignore: !PRIVATE_KEY }, async () => {
 
     // —————————— Prepare ——————————
 
-    const account = privateKeyToAccount(PRIVATE_KEY);
     const transport = new HttpTransport({ isTestnet: true });
-    const exchClient = new ExchangeClient({ wallet: account, transport, isTestnet: true });
+    const exchClient = new ExchangeClient({ wallet: PRIVATE_KEY, transport, isTestnet: true });
 
     // —————————— Test ——————————
 
