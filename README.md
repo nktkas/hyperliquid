@@ -55,6 +55,8 @@ deno add jsr:@nktkas/hyperliquid
 
 ```js
 // React Native 0.76.3
+// Issues:
+// - signing: does not support private keys directly as an abstract wallet
 import { Event, EventTarget } from "event-target-shim";
 
 if (!globalThis.EventTarget || !globalThis.Event) {
