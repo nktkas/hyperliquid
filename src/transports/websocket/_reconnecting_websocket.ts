@@ -1,5 +1,4 @@
 // deno-lint-ignore-file no-explicit-any
-import { delay } from "@std/async/delay";
 import type { MaybePromise } from "../../base.ts";
 import { TransportError } from "../base.ts";
 
@@ -185,7 +184,7 @@ export class ReconnectingWebSocket implements WebSocket {
                 ? this.reconnectOptions.connectionDelay
                 : await this.reconnectOptions.connectionDelay(this._attempt, this.reconnectAbortController.signal);
             if (this.reconnectAbortController.signal.aborted) return;
-            await delay(reconnectDelay, { signal: this.reconnectAbortController.signal });
+            await delay(reconnectDelay, this.reconnectAbortController.signal);
 
             // Create a new WebSocket instance
             const { onclose, onerror, onmessage, onopen } = this._socket;
@@ -377,7 +376,6 @@ export class ReconnectingWebSocket implements WebSocket {
     }
 }
 
-/** Check if two event listeners are the same (just like EventTarget). */
 function listenersMatch(
     a: { type: string; listener: EventListenerOrEventListenerObject; options?: boolean | AddEventListenerOptions },
     b: { type: string; listener: EventListenerOrEventListenerObject; options?: boolean | AddEventListenerOptions },
@@ -386,4 +384,20 @@ function listenersMatch(
     const aCapture = Boolean(typeof a.options === "object" ? a.options.capture : a.options);
     const bCapture = Boolean(typeof b.options === "object" ? b.options.capture : b.options);
     return a.type === b.type && a.listener === b.listener && aCapture === bCapture;
+}
+
+function delay(ms: number, signal?: AbortSignal): Promise<void> {
+    if (signal?.aborted) return Promise.reject(signal.reason);
+    return new Promise((resolve, reject) => {
+        const onAbort = () => {
+            clearTimeout(timer);
+            reject(signal?.reason);
+        };
+        const onTimeout = () => {
+            signal?.removeEventListener("abort", onAbort);
+            resolve();
+        };
+        const timer = setTimeout(onTimeout, ms);
+        signal?.addEventListener("abort", onAbort, { once: true });
+    });
 }

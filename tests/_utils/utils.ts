@@ -1,4 +1,4 @@
-import type { Hex, InfoClient, PerpsAssetCtx, PerpsUniverse } from "../../mod.ts";
+import type { Hex, InfoClient, PerpsAssetCtx, PerpsUniverse } from "@nktkas/hyperliquid";
 import BigNumber from "npm:bignumber.js@9";
 import { keccak_256 } from "@noble/hashes/sha3";
 

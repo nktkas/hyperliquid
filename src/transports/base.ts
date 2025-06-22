@@ -46,8 +46,8 @@ export interface Subscription {
 
 /** Base class for all transport-related errors. */
 export class TransportError extends HyperliquidError {
-    constructor(message?: string) {
-        super(message);
+    constructor(message?: string, options?: ErrorOptions) {
+        super(message, options);
         this.name = "TransportError";
     }
 }

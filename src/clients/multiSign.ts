@@ -1,59 +1,7 @@
 import { keccak_256 } from "@noble/hashes/sha3";
-import { getPublicKey } from "@noble/secp256k1";
-import { encodeHex } from "@std/encoding/hex";
+import { etc, getPublicKey } from "@noble/secp256k1";
 import type { Hex } from "../base.ts";
 import type { IRequestTransport } from "../transports/base.ts";
-import type {
-    ApproveAgentRequest,
-    ApproveBuilderFeeRequest,
-    BaseExchangeRequest,
-    BatchModifyRequest,
-    CancelByCloidRequest,
-    CancelRequest,
-    CDepositRequest,
-    ClaimRewardsRequest,
-    ConvertToMultiSigUserRequest,
-    CreateSubAccountRequest,
-    CreateVaultRequest,
-    CSignerActionRequest_JailSelf,
-    CSignerActionRequest_UnjailSelf,
-    CValidatorActionRequest_ChangeProfile,
-    CValidatorActionRequest_Register,
-    CValidatorActionRequest_Unregister,
-    CWithdrawRequest,
-    EvmUserModifyRequest,
-    ModifyRequest,
-    OrderRequest,
-    PerpDeployRequest_RegisterAsset,
-    PerpDeployRequest_SetOracle,
-    PerpDexClassTransferRequest,
-    RegisterReferrerRequest,
-    ReserveRequestWeightRequest,
-    ScheduleCancelRequest,
-    SetDisplayNameRequest,
-    SetReferrerRequest,
-    SpotDeployRequest_Genesis,
-    SpotDeployRequest_RegisterHyperliquidity,
-    SpotDeployRequest_RegisterSpot,
-    SpotDeployRequest_RegisterToken2,
-    SpotDeployRequest_SetDeployerTradingFeeShare,
-    SpotDeployRequest_UserGenesis,
-    SpotSendRequest,
-    SpotUserRequest,
-    SubAccountSpotTransferRequest,
-    SubAccountTransferRequest,
-    TokenDelegateRequest,
-    TwapCancelRequest,
-    TwapOrderRequest,
-    UpdateIsolatedMarginRequest,
-    UpdateLeverageRequest,
-    UsdClassTransferRequest,
-    UsdSendRequest,
-    VaultDistributeRequest,
-    VaultModifyRequest,
-    VaultTransferRequest,
-    Withdraw3Request,
-} from "../types/exchange/requests.ts";
 import type { CreateSubAccountResponse, CreateVaultResponse, SuccessResponse } from "../types/exchange/responses.ts";
 import {
     type AbstractEthersSigner,
@@ -74,38 +22,20 @@ import {
 } from "../signing/mod.ts";
 import {
     type CancelResponseSuccess,
-    type CSignerActionParameters,
-    type CSignerActionParameters_JailSelf,
-    type CSignerActionParameters_UnjailSelf,
-    type CValidatorActionParameters,
-    type CValidatorActionParameters_ChangeProfile,
-    type CValidatorActionParameters_Register,
-    type CValidatorActionParameters_Unregister,
     ExchangeClient,
     type ExchangeClientParameters,
     type OrderResponseSuccess,
-    type PerpDeployParameters,
-    type PerpDeployParameters_RegisterAsset,
-    type PerpDeployParameters_SetOracle,
     type ScheduleCancelParameters,
-    type SpotDeployParameters,
-    type SpotDeployParameters_Genesis,
-    type SpotDeployParameters_RegisterHyperliquidity,
-    type SpotDeployParameters_RegisterSpot,
-    type SpotDeployParameters_RegisterToken2,
-    type SpotDeployParameters_SetDeployerTradingFeeShare,
-    type SpotDeployParameters_UserGenesis,
     type TwapCancelResponseSuccess,
     type TwapOrderResponseSuccess,
 } from "./exchange.ts";
 
+type Signers = [AbstractWalletWithAddress, ...AbstractWallet[]];
+
 /** Parameters for the {@linkcode MultiSignClient} constructor. */
 export interface MultiSignClientParameters<
     T extends IRequestTransport = IRequestTransport,
-    S extends readonly [AbstractWalletWithAddress, ...AbstractWallet[]] = [
-        AbstractWalletWithAddress,
-        ...AbstractWallet[],
-    ],
+    S extends Readonly<Signers> = Signers,
 > extends Omit<ExchangeClientParameters<T, S[0]>, "wallet"> {
     /** The multi-signature account address. */
     multiSignAddress: Hex;
@@ -143,10 +73,7 @@ export interface AbstractEthersV5SignerWithAddress extends AbstractEthersV5Signe
  */
 export class MultiSignClient<
     T extends IRequestTransport = IRequestTransport,
-    S extends readonly [AbstractWalletWithAddress, ...AbstractWallet[]] = [
-        AbstractWalletWithAddress,
-        ...AbstractWallet[],
-    ],
+    S extends Readonly<Signers> = Signers,
 > extends ExchangeClient<T, S[0]> implements MultiSignClientParameters<T, S> {
     multiSignAddress: Hex;
     signers: S;
@@ -191,10 +118,13 @@ export class MultiSignClient<
     }
 
     /**
+     * Approve an agent to sign on behalf of the master account.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet
      * @example
@@ -209,7 +139,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.approveAgent({ agentAddress: "0x...", agentName: "agentName" });
+     * await multiSignClient.approveAgent({ agentAddress: "0x...", agentName: "..." });
      * ```
      */
     override async approveAgent(
@@ -220,21 +150,18 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: ApproveAgentRequest["action"] = {
-            ...actionArgs,
-            agentName: args.agentName ?? "",
+        const action = actionSorter.approveAgent({
             type: "approveAgent",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
             nonce,
-        };
+            ...actionArgs,
+        });
 
         // Sign the action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignUserSignedAction(sortedAction, outerSigner);
-        if (sortedAction.agentName === "") sortedAction.agentName = null;
+        const signatures = await this._multiSignUserSignedAction({ action, outerSigner });
+        if (action.agentName === "") action.agentName = null;
 
         // Send a multi-sig action
         return super.multiSig({
@@ -242,17 +169,20 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Approve a maximum fee rate for a builder.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-a-builder-fee
      * @example
@@ -267,7 +197,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.approveBuilderFee({ maxFeeRate: "0.01%", builder: "0x..." });
+     * await multiSignClient.approveBuilderFee({ maxFeeRate: "0.01%", builder: "0x..." });
      * ```
      */
     override async approveBuilderFee(
@@ -278,19 +208,17 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: ApproveBuilderFeeRequest["action"] = {
-            ...actionArgs,
+        const action = actionSorter.approveBuilderFee({
             type: "approveBuilderFee",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
             nonce,
-        };
+            ...actionArgs,
+        });
 
         // Sign the action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignUserSignedAction(sortedAction, outerSigner);
+        const signatures = await this._multiSignUserSignedAction({ action, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -298,17 +226,20 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Modify multiple orders.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful variant of {@link OrderResponse} without error statuses.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-multiple-orders
      * @example
@@ -324,22 +255,19 @@ export class MultiSignClient<
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.batchModify({
-     *   modifies: [{
-     *     oid: 123,
-     *     order: {
-     *       a: 0, // Asset index
-     *       b: true, // Buy order
-     *       p: "31000", // New price
-     *       s: "0.2", // New size
-     *       r: false, // Not reduce-only
-     *       t: {
-     *         limit: {
-     *           tif: "Gtc", // Good-til-cancelled
-     *         },
+     *   modifies: [
+     *     {
+     *       oid: 123,
+     *       order: {
+     *         a: 0,
+     *         b: true,
+     *         p: "31000",
+     *         s: "0.2",
+     *         r: false,
+     *         t: { limit: { tif: "Gtc" } },
      *       },
-     *       c: "0x...", // Client Order ID (optional)
      *     },
-     *   }],
+     *   ],
      * });
      * ```
      */
@@ -355,22 +283,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: BatchModifyRequest["action"] = {
-            type: "batchModify",
-            ...actionArgs,
-        };
+        const action = actionSorter.batchModify({ type: "batchModify", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({
-            action: sortedAction,
-            nonce,
-            outerSigner,
-            vaultAddress,
-            expiresAfter,
-        });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner, vaultAddress, expiresAfter });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -378,7 +295,7 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
             vaultAddress,
@@ -387,10 +304,13 @@ export class MultiSignClient<
     }
 
     /**
+     * Cancel order(s).
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful variant of {@link CancelResponse} without error statuses.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s
      * @example
@@ -406,10 +326,9 @@ export class MultiSignClient<
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.cancel({
-     *   cancels: [{
-     *     a: 0, // Asset index
-     *     o: 123, // Order ID
-     *   }],
+     *   cancels: [
+     *     { a: 0, o: 123 },
+     *   ],
      * });
      * ```
      */
@@ -425,22 +344,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: CancelRequest["action"] = {
-            type: "cancel",
-            ...actionArgs,
-        };
+        const action = actionSorter.cancel({ type: "cancel", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({
-            action: sortedAction,
-            nonce,
-            outerSigner,
-            vaultAddress,
-            expiresAfter,
-        });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner, vaultAddress, expiresAfter });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -448,7 +356,7 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
             vaultAddress,
@@ -457,10 +365,13 @@ export class MultiSignClient<
     }
 
     /**
+     * Cancel order(s) by cloid.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful variant of {@link CancelResponse} without error statuses.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid
      * @example
@@ -494,22 +405,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: CancelByCloidRequest["action"] = {
-            type: "cancelByCloid",
-            ...actionArgs,
-        };
+        const action = actionSorter.cancelByCloid({ type: "cancelByCloid", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({
-            action: sortedAction,
-            nonce,
-            outerSigner,
-            vaultAddress,
-            expiresAfter,
-        });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner, vaultAddress, expiresAfter });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -517,7 +417,7 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
             vaultAddress,
@@ -526,10 +426,13 @@ export class MultiSignClient<
     }
 
     /**
+     * Transfer native token from the user's spot account into staking for delegating to validators.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-into-staking
      * @example
@@ -544,7 +447,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.cDeposit({ wei: 1 * 1e8 });
+     * await multiSignClient.cDeposit({ wei: 1 * 1e8 });
      * ```
      */
     override async cDeposit(
@@ -555,19 +458,17 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: CDepositRequest["action"] = {
-            ...actionArgs,
+        const action = actionSorter.cDeposit({
             type: "cDeposit",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
             nonce,
-        };
+            ...actionArgs,
+        });
 
         // Sign the action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignUserSignedAction(sortedAction, outerSigner);
+        const signatures = await this._multiSignUserSignedAction({ action, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -575,19 +476,22 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Claim rewards from referral program.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see null - no documentation
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -600,7 +504,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.claimRewards();
+     * await multiSignClient.claimRewards();
      * ```
      */
     override async claimRewards(
@@ -608,15 +512,11 @@ export class MultiSignClient<
     ): ReturnType<ExchangeClient["claimRewards"]> {
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: ClaimRewardsRequest["action"] = {
-            type: "claimRewards",
-        };
+        const action = actionSorter.claimRewards({ type: "claimRewards" });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({ action: sortedAction, nonce, outerSigner });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -624,17 +524,20 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Convert a single-signature account to a multi-signature account or vice versa.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig
      * @example
@@ -649,10 +552,14 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.convertToMultiSigUser({ // convert to normal user
-     *   authorizedUsers: [],
-     *   threshold: 0,
+     * // Convert to multi-sig user
+     * await multiSignClient.convertToMultiSigUser({
+     *   authorizedUsers: ["0x...", "0x...", "0x..."],
+     *   threshold: 2,
      * });
+     *
+     * // Convert to single-sig user
+     * await multiSignClient.convertToMultiSigUser(null);
      * ```
      */
     override async convertToMultiSigUser(
@@ -663,19 +570,17 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: ConvertToMultiSigUserRequest["action"] = {
+        const action = actionSorter.convertToMultiSigUser({
             type: "convertToMultiSigUser",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
             signers: JSON.stringify(actionArgs),
             nonce,
-        };
+        });
 
         // Sign the action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignUserSignedAction(sortedAction, outerSigner);
+        const signatures = await this._multiSignUserSignedAction({ action, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -683,19 +588,22 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Create a sub-account.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Response for creating a sub-account.
-     * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see null - no documentation
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -708,7 +616,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.createSubAccount({ name: "subAccountName" });
+     * const data = await multiSignClient.createSubAccount({ name: "..." });
      * ```
      */
     override async createSubAccount(
@@ -719,16 +627,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: CreateSubAccountRequest["action"] = {
-            type: "createSubAccount",
-            ...actionArgs,
-        };
+        const action = actionSorter.createSubAccount({ type: "createSubAccount", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({ action: sortedAction, nonce, outerSigner });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -736,19 +639,22 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Create a vault.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Response for creating a vault.
-     * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see null - no documentation
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -761,11 +667,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.createVault({
-     *   name: "VaultName",
-     *   description: "Vault description",
-     *   initialUsd: 100 * 1e6,
-     * });
+     * const data = await multiSignClient.createVault({ name: "...", description: "...", initialUsd: 100 * 1e6 });
      * ```
      */
     override async createVault(
@@ -776,17 +678,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: CreateVaultRequest["action"] = {
-            type: "createVault",
-            nonce,
-            ...actionArgs,
-        };
+        const action = actionSorter.createVault({ type: "createVault", nonce, ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({ action: sortedAction, nonce, outerSigner });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -794,19 +690,22 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Jail or unjail self as a validator signer.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see null - no documentation
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -820,23 +719,14 @@ export class MultiSignClient<
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * // Jail self
-     * const data = await multiSignClient.cSignerAction({ jailSelf: null });
+     * await multiSignClient.cSignerAction({ jailSelf: null });
      *
      * // Unjail self
-     * const data = await multiSignClient.cSignerAction({ unjailSelf: null });
+     * await multiSignClient.cSignerAction({ unjailSelf: null });
      * ```
      */
     override async cSignerAction(
-        args: CSignerActionParameters_JailSelf,
-        signal?: AbortSignal,
-    ): ReturnType<ExchangeClient["cSignerAction"]>;
-    override async cSignerAction(
-        args: CSignerActionParameters_UnjailSelf,
-        signal?: AbortSignal,
-    ): ReturnType<ExchangeClient["cSignerAction"]>;
-    override async cSignerAction(
-        args: CSignerActionParameters,
-        signal?: AbortSignal,
+        ...[args, signal]: Parameters<ExchangeClient["cSignerAction"]>
     ): ReturnType<ExchangeClient["cSignerAction"]> {
         // Destructure the parameters
         const {
@@ -846,16 +736,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: CSignerActionRequest_JailSelf["action"] | CSignerActionRequest_UnjailSelf["action"] = {
-            type: "CSignerAction",
-            ...actionArgs,
-        };
+        const action = actionSorter.CSignerAction({ type: "CSignerAction", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({ action: sortedAction, nonce, outerSigner, expiresAfter });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner, expiresAfter });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -863,7 +748,7 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
             expiresAfter,
@@ -871,10 +756,13 @@ export class MultiSignClient<
     }
 
     /**
+     * Action related to validator management.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @example
      * ```ts
@@ -889,30 +777,36 @@ export class MultiSignClient<
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * // Change validator profile
-     * const data = await multiSignClient.cValidatorAction({
+     * await multiSignClient.cValidatorAction({
      *   changeProfile: {
-     *     name: "My Validator",
-     *     description: "Validator description",
+     *     name: "...",
+     *     description: "...",
      *     unjailed: true,
      *   }
      * });
+     *
+     * // Register a new validator
+     * await multiSignClient.cValidatorAction({
+     *   register: {
+     *     profile: {
+     *       node_ip: { Ip: "1.2.3.4" },
+     *       name: "...",
+     *       description: "...",
+     *       delegations_disabled: true,
+     *       commission_bps: 1,
+     *       signer: "0x...",
+     *     },
+     *     unjailed: false,
+     *     initial_wei: 1,
+     *   },
+     * });
+     *
+     * // Unregister a validator
+     * await multiSignClient.cValidatorAction({ unregister: null });
      * ```
      */
     override async cValidatorAction(
-        args: CValidatorActionParameters_ChangeProfile,
-        signal?: AbortSignal,
-    ): ReturnType<ExchangeClient["cSignerAction"]>;
-    override async cValidatorAction(
-        args: CValidatorActionParameters_Register,
-        signal?: AbortSignal,
-    ): ReturnType<ExchangeClient["cSignerAction"]>;
-    override async cValidatorAction(
-        args: CValidatorActionParameters_Unregister,
-        signal?: AbortSignal,
-    ): ReturnType<ExchangeClient["cSignerAction"]>;
-    override async cValidatorAction(
-        args: CValidatorActionParameters,
-        signal?: AbortSignal,
+        ...[args, signal]: Parameters<ExchangeClient["cValidatorAction"]>
     ): ReturnType<ExchangeClient["cSignerAction"]> {
         // Destructure the parameters
         const {
@@ -922,19 +816,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action:
-            | CValidatorActionRequest_ChangeProfile["action"]
-            | CValidatorActionRequest_Register["action"]
-            | CValidatorActionRequest_Unregister["action"] = {
-                type: "CValidatorAction",
-                ...actionArgs,
-            };
+        const action = actionSorter.CValidatorAction({ type: "CValidatorAction", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({ action: sortedAction, nonce, outerSigner, expiresAfter });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner, expiresAfter });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -942,7 +828,7 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
             expiresAfter,
@@ -950,10 +836,13 @@ export class MultiSignClient<
     }
 
     /**
+     * Transfer native token from staking into the user's spot account.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#withdraw-from-staking
      * @example
@@ -968,7 +857,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.cWithdraw({ wei: 1 * 1e8 });
+     * await multiSignClient.cWithdraw({ wei: 1 * 1e8 });
      * ```
      */
     override async cWithdraw(
@@ -979,19 +868,17 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: CWithdrawRequest["action"] = {
-            ...actionArgs,
+        const action = actionSorter.cWithdraw({
             type: "cWithdraw",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
             nonce,
-        };
+            ...actionArgs,
+        });
 
         // Sign the action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignUserSignedAction(sortedAction, outerSigner);
+        const signatures = await this._multiSignUserSignedAction({ action, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -999,17 +886,20 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Configure block type for EVM transactions.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Response for creating a sub-account.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/evm/dual-block-architecture
      * @example
@@ -1035,16 +925,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: EvmUserModifyRequest["action"] = {
-            type: "evmUserModify",
-            ...actionArgs,
-        };
+        const action = actionSorter.evmUserModify({ type: "evmUserModify", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({ action: sortedAction, nonce, outerSigner });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -1052,17 +937,20 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Modify an order.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order
      * @example
@@ -1077,20 +965,16 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.modify({
+     * await multiSignClient.modify({
      *   oid: 123,
      *   order: {
-     *     a: 0, // Asset index
-     *     b: true, // Buy order
-     *     p: "31000", // New price
-     *     s: "0.2", // New size
-     *     r: false, // Not reduce-only
-     *     t: {
-     *       limit: {
-     *         tif: "Gtc", // Good-til-cancelled
-     *       },
-     *     },
-     *     c: "0x...", // Client Order ID (optional)
+     *     a: 0,
+     *     b: true,
+     *     p: "31000",
+     *     s: "0.2",
+     *     r: false,
+     *     t: { limit: { tif: "Gtc" } },
+     *     c: "0x...",
      *   },
      * });
      * ```
@@ -1107,22 +991,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: ModifyRequest["action"] = {
-            type: "modify",
-            ...actionArgs,
-        };
+        const action = actionSorter.modify({ type: "modify", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({
-            action: sortedAction,
-            nonce,
-            outerSigner,
-            vaultAddress,
-            expiresAfter,
-        });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner, vaultAddress, expiresAfter });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -1130,7 +1003,7 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
             vaultAddress,
@@ -1157,10 +1030,13 @@ export class MultiSignClient<
     }
 
     /**
+     * Place an order(s).
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful variant of {@link OrderResponse} without error statuses.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-an-order
      * @example
@@ -1176,20 +1052,18 @@ export class MultiSignClient<
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.order({
-     *   orders: [{
-     *     a: 0, // Asset index
-     *     b: true, // Buy order
-     *     p: "30000", // Price
-     *     s: "0.1", // Size
-     *     r: false, // Not reduce-only
-     *     t: {
-     *       limit: {
-     *         tif: "Gtc", // Good-til-cancelled
-     *       },
+     *   orders: [
+     *     {
+     *       a: 0,
+     *       b: true,
+     *       p: "30000",
+     *       s: "0.1",
+     *       r: false,
+     *       t: { limit: { tif: "Gtc" } },
+     *       c: "0x...",
      *     },
-     *     c: "0x...", // Client Order ID (optional)
-     *   }],
-     *   grouping: "na", // No grouping
+     *   ],
+     *   grouping: "na",
      * });
      * ```
      */
@@ -1205,22 +1079,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: OrderRequest["action"] = {
-            type: "order",
-            ...actionArgs,
-        };
+        const action = actionSorter.order({ type: "order", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({
-            action: sortedAction,
-            nonce,
-            outerSigner,
-            vaultAddress,
-            expiresAfter,
-        });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner, vaultAddress, expiresAfter });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -1228,7 +1091,7 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
             vaultAddress,
@@ -1237,10 +1100,13 @@ export class MultiSignClient<
     }
 
     /**
+     * Deploying HIP-3 assets.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-3-assets
      * @example
@@ -1255,7 +1121,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.perpDeploy({
+     * await multiSignClient.perpDeploy({
      *   registerAsset: {
      *     maxGas: 1000000,
      *     assetRequest: {
@@ -1271,32 +1137,18 @@ export class MultiSignClient<
      * ```
      */
     override async perpDeploy(
-        args: PerpDeployParameters_RegisterAsset,
-        signal?: AbortSignal,
-    ): ReturnType<ExchangeClient["perpDeploy"]>;
-    override async perpDeploy(
-        args: PerpDeployParameters_SetOracle,
-        signal?: AbortSignal,
-    ): ReturnType<ExchangeClient["perpDeploy"]>;
-    override async perpDeploy(
-        args: PerpDeployParameters,
-        signal?: AbortSignal,
+        ...[args, signal]: Parameters<ExchangeClient["perpDeploy"]>
     ): ReturnType<ExchangeClient["perpDeploy"]> {
         // Destructure the parameters
         const { ...actionArgs } = args;
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: PerpDeployRequest_RegisterAsset["action"] | PerpDeployRequest_SetOracle["action"] = {
-            type: "perpDeploy",
-            ...actionArgs,
-        };
+        const action = actionSorter.perpDeploy({ type: "perpDeploy", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({ action: sortedAction, nonce, outerSigner });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -1304,17 +1156,20 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Transfer funds between Spot account and Perp dex account.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa
      * @example
@@ -1329,12 +1184,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.perpDexClassTransfer({
-     *   dex: "test",
-     *   token: "USDC",
-     *   amount: "1",
-     *   toPerp: true,
-     * });
+     * await multiSignClient.perpDexClassTransfer({ dex: "test", token: "USDC", amount: "1", toPerp: true });
      * ```
      */
     override async perpDexClassTransfer(
@@ -1345,19 +1195,17 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: PerpDexClassTransferRequest["action"] = {
-            ...actionArgs,
+        const action = actionSorter.PerpDexClassTransfer({
             type: "PerpDexClassTransfer",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
             nonce,
-        };
+            ...actionArgs,
+        });
 
         // Sign the action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignUserSignedAction(sortedAction, outerSigner);
+        const signatures = await this._multiSignUserSignedAction({ action, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -1365,19 +1213,22 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Create a referral code.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see null - no documentation
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -1390,7 +1241,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.registerReferrer({ code: "TEST" });
+     * await multiSignClient.registerReferrer({ code: "..." });
      * ```
      */
     override async registerReferrer(
@@ -1401,16 +1252,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: RegisterReferrerRequest["action"] = {
-            type: "registerReferrer",
-            ...actionArgs,
-        };
+        const action = actionSorter.registerReferrer({ type: "registerReferrer", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({ action: sortedAction, nonce, outerSigner });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -1418,17 +1264,20 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Reserve additional rate-limited actions for a fee.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#reserve-additional-actions
      * @example
@@ -1443,7 +1292,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.reserveRequestWeight({ weight: 10 });
+     * await multiSignClient.reserveRequestWeight({ weight: 10 });
      * ```
      */
     override async reserveRequestWeight(
@@ -1457,16 +1306,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: ReserveRequestWeightRequest["action"] = {
-            type: "reserveRequestWeight",
-            ...actionArgs,
-        };
+        const action = actionSorter.reserveRequestWeight({ type: "reserveRequestWeight", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({ action: sortedAction, nonce, outerSigner, expiresAfter });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner, expiresAfter });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -1474,7 +1318,7 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
             expiresAfter,
@@ -1482,10 +1326,13 @@ export class MultiSignClient<
     }
 
     /**
+     * Schedule a cancel-all operation at a future time.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#schedule-cancel-dead-mans-switch
      * @example
@@ -1500,7 +1347,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.scheduleCancel({ time: Date.now() + 3600000 });
+     * await multiSignClient.scheduleCancel({ time: Date.now() + 10_000 });
      * ```
      */
     override async scheduleCancel(
@@ -1526,22 +1373,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: ScheduleCancelRequest["action"] = {
-            type: "scheduleCancel",
-            ...actionArgs,
-        };
+        const action = actionSorter.scheduleCancel({ type: "scheduleCancel", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({
-            action: sortedAction,
-            nonce,
-            outerSigner,
-            vaultAddress,
-            expiresAfter,
-        });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner, vaultAddress, expiresAfter });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -1549,7 +1385,7 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
             vaultAddress,
@@ -1558,12 +1394,15 @@ export class MultiSignClient<
     }
 
     /**
+     * Set the display name in the leaderboard.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see null - no documentation
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -1576,7 +1415,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.setDisplayName({ displayName: "My Name" });
+     * await multiSignClient.setDisplayName({ displayName: "..." });
      * ```
      */
     override async setDisplayName(
@@ -1587,16 +1426,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: SetDisplayNameRequest["action"] = {
-            type: "setDisplayName",
-            ...actionArgs,
-        };
+        const action = actionSorter.setDisplayName({ type: "setDisplayName", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({ action: sortedAction, nonce, outerSigner });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -1604,19 +1438,22 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Set a referral code.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see null - no documentation
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -1629,7 +1466,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.setReferrer({ code: "TEST" });
+     * await multiSignClient.setReferrer({ code: "..." });
      * ```
      */
     override async setReferrer(
@@ -1640,16 +1477,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: SetReferrerRequest["action"] = {
-            type: "setReferrer",
-            ...actionArgs,
-        };
+        const action = actionSorter.setReferrer({ type: "setReferrer", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({ action: sortedAction, nonce, outerSigner });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -1657,17 +1489,20 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Deploying HIP-1 and HIP-2 assets.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
      * @example
@@ -1682,7 +1517,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.spotDeploy({
+     * await multiSignClient.spotDeploy({
      *   registerToken2: {
      *     spec: {
      *       name: "USDC",
@@ -1696,54 +1531,18 @@ export class MultiSignClient<
      * ```
      */
     override async spotDeploy(
-        args: SpotDeployParameters_Genesis,
-        signal?: AbortSignal,
-    ): ReturnType<ExchangeClient["spotDeploy"]>;
-    override async spotDeploy(
-        args: SpotDeployParameters_RegisterHyperliquidity,
-        signal?: AbortSignal,
-    ): ReturnType<ExchangeClient["spotDeploy"]>;
-    override async spotDeploy(
-        args: SpotDeployParameters_RegisterSpot,
-        signal?: AbortSignal,
-    ): ReturnType<ExchangeClient["spotDeploy"]>;
-    override async spotDeploy(
-        args: SpotDeployParameters_RegisterToken2,
-        signal?: AbortSignal,
-    ): ReturnType<ExchangeClient["spotDeploy"]>;
-    override async spotDeploy(
-        args: SpotDeployParameters_SetDeployerTradingFeeShare,
-        signal?: AbortSignal,
-    ): ReturnType<ExchangeClient["spotDeploy"]>;
-    override async spotDeploy(
-        args: SpotDeployParameters_UserGenesis,
-        signal?: AbortSignal,
-    ): ReturnType<ExchangeClient["spotDeploy"]>;
-    override async spotDeploy(
-        args: SpotDeployParameters,
-        signal?: AbortSignal,
+        ...[args, signal]: Parameters<ExchangeClient["spotDeploy"]>
     ): ReturnType<ExchangeClient["spotDeploy"]> {
         // Destructure the parameters
         const { ...actionArgs } = args;
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action:
-            | SpotDeployRequest_RegisterToken2["action"]
-            | SpotDeployRequest_UserGenesis["action"]
-            | SpotDeployRequest_Genesis["action"]
-            | SpotDeployRequest_RegisterSpot["action"]
-            | SpotDeployRequest_RegisterHyperliquidity["action"]
-            | SpotDeployRequest_SetDeployerTradingFeeShare["action"] = {
-                type: "spotDeploy",
-                ...actionArgs,
-            };
+        const action = actionSorter.spotDeploy({ type: "spotDeploy", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({ action: sortedAction, nonce, outerSigner });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -1751,17 +1550,20 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Send spot assets to another address.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-spot-transfer
      * @example
@@ -1776,7 +1578,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.spotSend({
+     * await multiSignClient.spotSend({
      *   destination: "0x...",
      *   token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
      *   amount: "1",
@@ -1791,19 +1593,17 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: SpotSendRequest["action"] = {
-            ...actionArgs,
+        const action = actionSorter.spotSend({
             type: "spotSend",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
             time: nonce,
-        };
+            ...actionArgs,
+        });
 
         // Sign the action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignUserSignedAction(sortedAction, outerSigner);
+        const signatures = await this._multiSignUserSignedAction({ action, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -1811,19 +1611,22 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Opt Out of Spot Dusting.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see null - no documentation
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -1836,7 +1639,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.spotUser({ toggleSpotDusting: { optOut: false } });
+     * await multiSignClient.spotUser({ toggleSpotDusting: { optOut: false } });
      * ```
      */
     override async spotUser(
@@ -1847,16 +1650,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: SpotUserRequest["action"] = {
-            type: "spotUser",
-            ...actionArgs,
-        };
+        const action = actionSorter.spotUser({ type: "spotUser", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({ action: sortedAction, nonce, outerSigner });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -1864,19 +1662,22 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Transfer between sub-accounts (spot).
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see null - no documentation
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -1889,7 +1690,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.subAccountSpotTransfer({
+     * await multiSignClient.subAccountSpotTransfer({
      *   subAccountUser: "0x...",
      *   isDeposit: true,
      *   token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
@@ -1905,16 +1706,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: SubAccountSpotTransferRequest["action"] = {
-            type: "subAccountSpotTransfer",
-            ...actionArgs,
-        };
+        const action = actionSorter.subAccountSpotTransfer({ type: "subAccountSpotTransfer", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({ action: sortedAction, nonce, outerSigner });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -1922,19 +1718,22 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Transfer between sub-accounts (perpetual).
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see null - no documentation
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -1947,11 +1746,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.subAccountTransfer({
-     *   subAccountUser: "0x...",
-     *   isDeposit: true,
-     *   usd: 1 * 1e6,
-     * });
+     * await multiSignClient.subAccountTransfer({ subAccountUser: "0x...", isDeposit: true, usd: 1 * 1e6 });
      * ```
      */
     override async subAccountTransfer(
@@ -1962,16 +1757,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: SubAccountTransferRequest["action"] = {
-            type: "subAccountTransfer",
-            ...actionArgs,
-        };
+        const action = actionSorter.subAccountTransfer({ type: "subAccountTransfer", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({ action: sortedAction, nonce, outerSigner });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -1979,17 +1769,20 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Delegate or undelegate native tokens to or from a validator.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#delegate-or-undelegate-stake-from-validator
      * @example
@@ -2004,11 +1797,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.tokenDelegate({
-     *   validator: "0x...",
-     *   isUndelegate: true,
-     *   wei: 1 * 1e8,
-     * });
+     * await multiSignClient.tokenDelegate({ validator: "0x...", isUndelegate: true, wei: 1 * 1e8 });
      * ```
      */
     override async tokenDelegate(
@@ -2019,19 +1808,17 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: TokenDelegateRequest["action"] = {
-            ...actionArgs,
+        const action = actionSorter.tokenDelegate({
             type: "tokenDelegate",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
             nonce,
-        };
+            ...actionArgs,
+        });
 
         // Sign the action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignUserSignedAction(sortedAction, outerSigner);
+        const signatures = await this._multiSignUserSignedAction({ action, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -2039,17 +1826,20 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Cancel a TWAP order.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful variant of {@link TwapCancelResponse} without error status.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order
      * @example
@@ -2064,10 +1854,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.twapCancel({
-     *   a: 0, // Asset index
-     *   t: 1, // TWAP ID
-     * });
+     * const data = await multiSignClient.twapCancel({ a: 0, t: 1 });
      * ```
      */
     override async twapCancel(
@@ -2082,22 +1869,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: TwapCancelRequest["action"] = {
-            type: "twapCancel",
-            ...actionArgs,
-        };
+        const action = actionSorter.twapCancel({ type: "twapCancel", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({
-            action: sortedAction,
-            nonce,
-            outerSigner,
-            vaultAddress,
-            expiresAfter,
-        });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner, vaultAddress, expiresAfter });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -2105,7 +1881,7 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
             vaultAddress,
@@ -2114,10 +1890,13 @@ export class MultiSignClient<
     }
 
     /**
+     * Place a TWAP order.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful variant of {@link TwapOrderResponse} without error status.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-a-twap-order
      * @example
@@ -2133,12 +1912,12 @@ export class MultiSignClient<
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
      * const data = await multiSignClient.twapOrder({
-     *   a: 0, // Asset index
-     *   b: true, // Buy order
-     *   s: "1", // Size
-     *   r: false, // Not reduce-only
-     *   m: 10, // Duration in minutes
-     *   t: true, // Randomize order timing
+     *   a: 0,
+     *   b: true,
+     *   s: "1",
+     *   r: false,
+     *   m: 10,
+     *   t: true,
      * });
      * ```
      */
@@ -2154,24 +1933,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: TwapOrderRequest["action"] = {
-            type: "twapOrder",
-            twap: {
-                ...actionArgs,
-            },
-        };
+        const action = actionSorter.twapOrder({ type: "twapOrder", twap: { ...actionArgs } });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({
-            action: sortedAction,
-            nonce,
-            outerSigner,
-            vaultAddress,
-            expiresAfter,
-        });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner, vaultAddress, expiresAfter });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -2179,7 +1945,7 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
             vaultAddress,
@@ -2188,10 +1954,13 @@ export class MultiSignClient<
     }
 
     /**
+     * Add or remove margin from isolated position.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin
      * @example
@@ -2206,11 +1975,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.updateIsolatedMargin({
-     *   asset: 0,
-     *   isBuy: true,
-     *   ntli: 1 * 1e6,
-     * });
+     * await multiSignClient.updateIsolatedMargin({ asset: 0, isBuy: true, ntli: 1 * 1e6 });
      * ```
      */
     override async updateIsolatedMargin(
@@ -2225,22 +1990,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: UpdateIsolatedMarginRequest["action"] = {
-            type: "updateIsolatedMargin",
-            ...actionArgs,
-        };
+        const action = actionSorter.updateIsolatedMargin({ type: "updateIsolatedMargin", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({
-            action: sortedAction,
-            nonce,
-            outerSigner,
-            vaultAddress,
-            expiresAfter,
-        });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner, vaultAddress, expiresAfter });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -2248,7 +2002,7 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
             vaultAddress,
@@ -2257,10 +2011,13 @@ export class MultiSignClient<
     }
 
     /**
+     * Update cross or isolated leverage on a coin.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-leverage
      * @example
@@ -2275,11 +2032,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.updateLeverage({
-     *   asset: 0,
-     *   isCross: true,
-     *   leverage: 5,
-     * });
+     * await multiSignClient.updateLeverage({ asset: 0, isCross: true, leverage: 5 });
      * ```
      */
     override async updateLeverage(
@@ -2294,22 +2047,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: UpdateLeverageRequest["action"] = {
-            type: "updateLeverage",
-            ...actionArgs,
-        };
+        const action = actionSorter.updateLeverage({ type: "updateLeverage", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({
-            action: sortedAction,
-            nonce,
-            outerSigner,
-            vaultAddress,
-            expiresAfter,
-        });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner, vaultAddress, expiresAfter });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -2317,7 +2059,7 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
             vaultAddress,
@@ -2326,10 +2068,13 @@ export class MultiSignClient<
     }
 
     /**
+     * Transfer funds between Spot account and Perp account.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa
      * @example
@@ -2344,7 +2089,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.usdClassTransfer({ amount: "1", toPerp: true });
+     * await multiSignClient.usdClassTransfer({ amount: "1", toPerp: true });
      * ```
      */
     override async usdClassTransfer(
@@ -2355,19 +2100,17 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: UsdClassTransferRequest["action"] = {
-            ...actionArgs,
+        const action = actionSorter.usdClassTransfer({
             type: "usdClassTransfer",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
             nonce,
-        };
+            ...actionArgs,
+        });
 
         // Sign the action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignUserSignedAction(sortedAction, outerSigner);
+        const signatures = await this._multiSignUserSignedAction({ action, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -2375,17 +2118,20 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Send usd to another address.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-usdc-transfer
      * @example
@@ -2400,7 +2146,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.usdSend({ destination: "0x...", amount: "1" });
+     * await multiSignClient.usdSend({ destination: "0x...", amount: "1" });
      * ```
      */
     override async usdSend(
@@ -2411,19 +2157,17 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: UsdSendRequest["action"] = {
-            ...actionArgs,
+        const action = actionSorter.usdSend({
             type: "usdSend",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
             time: nonce,
-        };
+            ...actionArgs,
+        });
 
         // Sign the action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignUserSignedAction(sortedAction, outerSigner);
+        const signatures = await this._multiSignUserSignedAction({ action, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -2431,19 +2175,22 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Distribute funds from a vault between followers.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see null - no documentation
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -2456,7 +2203,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.vaultDistribute({ vaultAddress: "0x...", usd: 10 * 1e6 });
+     * await multiSignClient.vaultDistribute({ vaultAddress: "0x...", usd: 10 * 1e6 });
      * ```
      */
     override async vaultDistribute(
@@ -2467,16 +2214,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: VaultDistributeRequest["action"] = {
-            type: "vaultDistribute",
-            ...actionArgs,
-        };
+        const action = actionSorter.vaultDistribute({ type: "vaultDistribute", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({ action: sortedAction, nonce, outerSigner });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -2484,19 +2226,22 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Modify a vault's configuration.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
      *
-     * @see null - no documentation
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -2509,7 +2254,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.vaultModify({
+     * await multiSignClient.vaultModify({
      *   vaultAddress: "0x...",
      *   allowDeposits: true,
      *   alwaysCloseOnWithdraw: false,
@@ -2524,16 +2269,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: VaultModifyRequest["action"] = {
-            type: "vaultModify",
-            ...actionArgs,
-        };
+        const action = actionSorter.vaultModify({ type: "vaultModify", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({ action: sortedAction, nonce, outerSigner });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -2541,17 +2281,20 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /**
+     * Deposit or withdraw from a vault.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-a-vault
      * @example
@@ -2566,11 +2309,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.vaultTransfer({
-     *   vaultAddress: "0x...",
-     *   isDeposit: true,
-     *   usd: 10 * 1e6,
-     * });
+     * await multiSignClient.vaultTransfer({ vaultAddress: "0x...", isDeposit: true, usd: 10 * 1e6 });
      * ```
      */
     override async vaultTransfer(
@@ -2584,16 +2323,11 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: VaultTransferRequest["action"] = {
-            type: "vaultTransfer",
-            ...actionArgs,
-        };
+        const action = actionSorter.vaultTransfer({ type: "vaultTransfer", ...actionArgs });
 
         // Send a multi-sig action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignL1Action({ action: sortedAction, nonce, outerSigner, expiresAfter });
+        const signatures = await this._multiSignL1Action({ action, nonce, outerSigner, expiresAfter });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -2601,7 +2335,7 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
             expiresAfter,
@@ -2609,10 +2343,13 @@ export class MultiSignClient<
     }
 
     /**
+     * Initiate a withdrawal request.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Successful response without specific data.
-     * @throws {ApiRequestError} When the API returns an error response.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#initiate-a-withdrawal-request
      * @example
@@ -2627,7 +2364,7 @@ export class MultiSignClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const multiSignClient = new hl.MultiSignClient({ transport, multiSignAddress, signers });
      *
-     * const data = await multiSignClient.withdraw3({ destination: "0x...", amount: "1" });
+     * await multiSignClient.withdraw3({ destination: "0x...", amount: "1" });
      * ```
      */
     override async withdraw3(
@@ -2638,19 +2375,17 @@ export class MultiSignClient<
 
         // Construct an action
         const nonce = await this.nonceManager();
-        const action: Withdraw3Request["action"] = {
-            ...actionArgs,
+        const action = actionSorter.withdraw3({
             type: "withdraw3",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
             time: nonce,
-        };
+            ...actionArgs,
+        });
 
         // Sign the action
-        const sortedAction = actionSorter[action.type](action);
         const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        const signatures = await this._multiSignUserSignedAction(sortedAction, outerSigner);
+        const signatures = await this._multiSignUserSignedAction({ action, outerSigner });
 
         // Send a multi-sig action
         return super.multiSig({
@@ -2658,14 +2393,14 @@ export class MultiSignClient<
             payload: {
                 multiSigUser: this.multiSignAddress,
                 outerSigner,
-                action: sortedAction,
+                action,
             },
             nonce,
         }, signal);
     }
 
     /** Extracts the wallet address from different wallet types. */
-    protected async _getWalletAddress(wallet: AbstractWalletWithAddress): Promise<`0x${string}`> {
+    protected async _getWalletAddress(wallet: AbstractWalletWithAddress): Promise<Hex> {
         if (isValidPrivateKey(wallet)) {
             return privateKeyToAddress(wallet);
         } else if (isAbstractViemWalletClient(wallet)) {
@@ -2685,7 +2420,7 @@ export class MultiSignClient<
 
     /** Signs L1 action with all signers for multi-signature operations. */
     protected _multiSignL1Action(args: {
-        action: BaseExchangeRequest["action"];
+        action: Record<string, unknown>;
         nonce: number;
         outerSigner: Hex;
         vaultAddress?: Hex;
@@ -2705,19 +2440,16 @@ export class MultiSignClient<
     }
 
     /** Signs user-signed action with all signers for multi-signature operations. */
-    protected _multiSignUserSignedAction(
+    protected _multiSignUserSignedAction(args: {
         action:
-            & BaseExchangeRequest["action"]
+            & Record<string, unknown>
             & {
                 type: keyof typeof userSignedActionEip712Types;
-                signatureChainId: string;
-            }
-            & (
-                | { nonce: number; time?: undefined }
-                | { time: number; nonce?: undefined }
-            ),
-        outerSigner: Hex,
-    ): Promise<Signature[]> {
+                signatureChainId: Hex;
+            };
+        outerSigner: Hex;
+    }): Promise<Signature[]> {
+        const { action, outerSigner } = args;
         return Promise.all(this.signers.map((signer) => {
             const types = structuredClone(userSignedActionEip712Types[action.type]); // for safe mutation
             Object.values(types)[0].splice( // array mutation
@@ -2729,12 +2461,11 @@ export class MultiSignClient<
             return signUserSignedAction({
                 wallet: signer,
                 action: {
-                    ...action,
                     payloadMultiSigUser: this.multiSignAddress,
                     outerSigner,
+                    ...action,
                 },
                 types,
-                chainId: parseInt(action.signatureChainId, 16),
             });
         }));
     }
@@ -2742,15 +2473,15 @@ export class MultiSignClient<
 
 /** Converts a private key to an Ethereum address. */
 function privateKeyToAddress(privateKey: string): Hex {
-    const cleanKey = privateKey.startsWith("0x") ? privateKey.slice(2) : privateKey;
+    const cleanPrivKey = privateKey.startsWith("0x") ? privateKey.slice(2) : privateKey;
 
-    const publicKey = getPublicKey(cleanKey, false);
+    const publicKey = getPublicKey(cleanPrivKey, false);
     const publicKeyWithoutPrefix = publicKey.slice(1);
 
     const hash = keccak_256(publicKeyWithoutPrefix);
 
     const addressBytes = hash.slice(-20);
-    const address = encodeHex(addressBytes);
+    const address = etc.bytesToHex(addressBytes);
 
     return `0x${address}`;
 }

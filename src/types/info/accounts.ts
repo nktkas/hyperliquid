@@ -90,7 +90,7 @@ export interface MultiSigSigners {
     threshold: number;
 }
 
-/** Perpetual trading clearinghouse state summary. */
+/** Account summary for perpetual trading. */
 export interface PerpsClearinghouseState {
     /** Margin summary details. */
     marginSummary: {
@@ -240,7 +240,7 @@ export interface SpotBalance {
     entryNtl: string;
 }
 
-/** Clearinghouse state for spot tokens. */
+/** Account summary for spot trading. */
 export interface SpotClearinghouseState {
     /** Balance for each token. */
     balances: SpotBalance[];
@@ -262,7 +262,7 @@ export interface SubAccount {
     spotState: SpotClearinghouseState;
 }
 
-/** User fee details. */
+/** User fees. */
 export interface UserFees {
     /** Daily user volume metrics. */
     dailyUserVlm: {
@@ -369,7 +369,7 @@ export interface FundingUpdate {
     nSamples: number | null;
 }
 
-/** Rate limits for a user. */
+/** User's rate limits. */
 export interface UserRateLimit {
     /** Cumulative trading volume. */
     cumVlm: string;
@@ -379,7 +379,7 @@ export interface UserRateLimit {
     nRequestsCap: number;
 }
 
-/** User role details. */
+/** User's role */
 export type UserRole =
     | {
         /** Role identifier. */

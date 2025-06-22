@@ -1,6 +1,6 @@
-import { TransportError } from "../base.ts";
 import type { ReconnectingWebSocket } from "./_reconnecting_websocket.ts";
 import type { HyperliquidEventTarget } from "./_hyperliquid_event_target.ts";
+import { WebSocketRequestError } from "./websocket_transport.ts";
 
 interface PostRequest {
     method: "post";
@@ -15,18 +15,6 @@ interface SubscribeUnsubscribeRequest {
 
 interface PingRequest {
     method: "ping";
-}
-
-/**
- * Error thrown when a WebSocket request fails:
- * - When the WebSocket connection is closed
- * - When the server responds with an error message
- */
-export class WebSocketRequestError extends TransportError {
-    constructor(message: string) {
-        super(message);
-        this.name = "WebSocketRequestError";
-    }
 }
 
 /**
@@ -75,9 +63,8 @@ export class WebSocketAsyncRequest {
 
                 // For `post` requests
                 if ("id" in parsedRequest && typeof parsedRequest.id === "number") {
-                    this.queue.findLast((item) => item.id === parsedRequest.id)?.reject(
-                        new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
-                    );
+                    this.queue.findLast((item) => item.id === parsedRequest.id)
+                        ?.reject(new WebSocketRequestError(`Server error: ${event.detail}`, { cause: event.detail }));
                     return;
                 }
 
@@ -87,40 +74,36 @@ export class WebSocketAsyncRequest {
                     typeof parsedRequest.subscription === "object" && parsedRequest.subscription !== null
                 ) {
                     const id = WebSocketAsyncRequest.requestToId(parsedRequest);
-                    this.queue.findLast((item) => item.id === id)?.reject(
-                        new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
-                    );
+                    this.queue.findLast((item) => item.id === id)
+                        ?.reject(new WebSocketRequestError(`Server error: ${event.detail}`, { cause: event.detail }));
                     return;
                 }
 
-                // For already/invalid subscribed requests
+                // For `Already subscribed` and `Invalid subscription` requests
                 if (event.detail.startsWith("Already subscribed") || event.detail.startsWith("Invalid subscription")) {
                     const id = WebSocketAsyncRequest.requestToId({
                         method: "subscribe",
                         subscription: parsedRequest,
                     });
-                    this.queue.findLast((item) => item.id === id)?.reject(
-                        new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
-                    );
+                    this.queue.findLast((item) => item.id === id)
+                        ?.reject(new WebSocketRequestError(`Server error: ${event.detail}`, { cause: event.detail }));
                     return;
                 }
-                // For already unsubscribed requests
+                // For `Already unsubscribed` requests
                 if (event.detail.startsWith("Already unsubscribed")) {
                     const id = WebSocketAsyncRequest.requestToId({
                         method: "unsubscribe",
                         subscription: parsedRequest,
                     });
-                    this.queue.findLast((item) => item.id === id)?.reject(
-                        new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
-                    );
+                    this.queue.findLast((item) => item.id === id)
+                        ?.reject(new WebSocketRequestError(`Server error: ${event.detail}`, { cause: event.detail }));
                     return;
                 }
 
                 // For unknown requests
                 const id = WebSocketAsyncRequest.requestToId(parsedRequest);
-                this.queue.findLast((item) => item.id === id)?.reject(
-                    new WebSocketRequestError(`Cannot complete WebSocket request: ${event.detail}`),
-                );
+                this.queue.findLast((item) => item.id === id)
+                    ?.reject(new WebSocketRequestError(`Server error: ${event.detail}`, { cause: event.detail }));
             } catch {
                 // Ignore JSON parsing errors
             }
@@ -129,7 +112,7 @@ export class WebSocketAsyncRequest {
         // Throws all pending requests if the connection is dropped
         socket.addEventListener("close", () => {
             this.queue.forEach(({ reject }) => {
-                reject(new WebSocketRequestError("Cannot complete WebSocket request: connection is closed"));
+                reject(new WebSocketRequestError("WebSocket connection closed."));
             });
             this.queue = [];
         });

@@ -1,6 +1,9 @@
 import type { Hex } from "../../base.ts";
 
-/** Context events for a specific perpetual asset. */
+/**
+ * Context events for a specific perpetual asset.
+ * @returns {WsActiveAssetCtx | WsActiveSpotAssetCtx}
+ */
 export interface WsActiveAssetCtxRequest {
     /** Type of subscription. */
     type: "activeAssetCtx";
@@ -8,7 +11,10 @@ export interface WsActiveAssetCtxRequest {
     coin: string;
 }
 
-/** Trading data events for a specific asset and user. */
+/**
+ * Trading data events for a specific asset and user.
+ * @returns {WsActiveAssetData}
+ */
 export interface WsActiveAssetDataRequest {
     /** Type of subscription. */
     type: "activeAssetData";
@@ -18,7 +24,10 @@ export interface WsActiveAssetDataRequest {
     user: Hex;
 }
 
-/** Mid prices for all actively traded assets. */
+/**
+ * Mid prices for all actively traded assets.
+ * @returns {WsAllMids}
+ */
 export interface WsAllMidsRequest {
     /** Type of subscription. */
     type: "allMids";
@@ -26,7 +35,10 @@ export interface WsAllMidsRequest {
     dex?: string;
 }
 
-/** Best bid and offer events for a specific asset. */
+/**
+ * Best bid and offer events for a specific asset.
+ * @returns {WsBbo}
+ */
 export interface WsBboRequest {
     /** Type of subscription. */
     type: "bbo";
@@ -34,7 +46,10 @@ export interface WsBboRequest {
     coin: string;
 }
 
-/** Candlestick data events for a specific asset. */
+/**
+ * Candlestick data events for a specific asset.
+ * @returns {Candle}
+ */
 export interface WsCandleRequest {
     /** Type of subscription. */
     type: "candle";
@@ -44,19 +59,28 @@ export interface WsCandleRequest {
     interval: "1m" | "3m" | "5m" | "15m" | "30m" | "1h" | "2h" | "4h" | "8h" | "12h" | "1d" | "3d" | "1w" | "1M";
 }
 
-/** Explorer block events. */
+/**
+ * Explorer block events.
+ * @returns {WsBlockDetails[]}
+ */
 export interface WsExplorerBlockRequest {
     /** Type of subscription. */
     type: "explorerBlock";
 }
 
-/** Explorer transaction events. */
+/**
+ * Explorer transaction events.
+ * @returns {TxDetails[]}
+ */
 export interface WsExplorerTxsRequest {
     /** Type of subscription. */
     type: "explorerTxs";
 }
 
-/** L2 order book events for a specific asset. */
+/**
+ * L2 order book events for a specific asset.
+ * @returns {Book}
+ */
 export interface WsL2BookRequest {
     /** Type of subscription. */
     type: "l2Book";
@@ -68,7 +92,10 @@ export interface WsL2BookRequest {
     mantissa?: 2 | 5 | null;
 }
 
-/** Notification events for a specific user. */
+/**
+ * Notification events for a specific user.
+ * @returns {WsNotification}
+ */
 export interface WsNotificationRequest {
     /** Type of subscription. */
     type: "notification";
@@ -76,7 +103,10 @@ export interface WsNotificationRequest {
     user: Hex;
 }
 
-/** Order status events for a specific user. */
+/**
+ * Order status events for a specific user.
+ * @returns {OrderStatus<Order>[]}
+ */
 export interface WsOrderUpdatesRequest {
     /** Type of subscription. */
     type: "orderUpdates";
@@ -84,7 +114,10 @@ export interface WsOrderUpdatesRequest {
     user: Hex;
 }
 
-/** Real-time trade updates for a specific asset. */
+/**
+ * Real-time trade updates for a specific asset.
+ * @returns {WsTrade[]}
+ */
 export interface WsTradesRequest {
     /** Type of subscription. */
     type: "trades";
@@ -92,7 +125,10 @@ export interface WsTradesRequest {
     coin: string;
 }
 
-/** Non-order events for a specific user. */
+/**
+ * Non-order events for a specific user.
+ * @returns {WsUserEvent}
+ */
 export interface WsUserEventsRequest {
     /** Type of subscription. */
     type: "userEvents";
@@ -100,7 +136,10 @@ export interface WsUserEventsRequest {
     user: Hex;
 }
 
-/** Trade fill events for a specific user. */
+/**
+ * Trade fill events for a specific user.
+ * @returns {WsUserFills}
+ */
 export interface WsUserFillsRequest {
     /** Type of subscription. */
     type: "userFills";
@@ -110,7 +149,10 @@ export interface WsUserFillsRequest {
     aggregateByTime?: boolean;
 }
 
-/** Funding payment events for a specific user. */
+/**
+ * Funding payment events for a specific user.
+ * @returns {WsUserFundings}
+ */
 export interface WsUserFundingsRequest {
     /** Type of subscription. */
     type: "userFundings";
@@ -118,7 +160,10 @@ export interface WsUserFundingsRequest {
     user: Hex;
 }
 
-/** Non-funding ledger events for a specific user. */
+/**
+ * Non-funding ledger events for a specific user.
+ * @returns {WsUserNonFundingLedgerUpdates}
+ */
 export interface WsUserNonFundingLedgerUpdatesRequest {
     /** Type of subscription. */
     type: "userNonFundingLedgerUpdates";
@@ -126,7 +171,10 @@ export interface WsUserNonFundingLedgerUpdatesRequest {
     user: Hex;
 }
 
-/** TWAP order history events for a specific user. */
+/**
+ * TWAP order history events for a specific user.
+ * @returns {WsUserTwapHistory}
+ */
 export interface WsUserTwapHistoryRequest {
     /** Type of subscription. */
     type: "userTwapHistory";
@@ -134,7 +182,10 @@ export interface WsUserTwapHistoryRequest {
     user: Hex;
 }
 
-/** TWAP execution events for a specific user. */
+/**
+ * TWAP execution events for a specific user.
+ * @returns {WsUserTwapSliceFills}
+ */
 export interface WsUserTwapSliceFillsRequest {
     /** Type of subscription. */
     type: "userTwapSliceFills";
@@ -142,7 +193,10 @@ export interface WsUserTwapSliceFillsRequest {
     user: Hex;
 }
 
-/** Comprehensive user and market data events. */
+/**
+ * Comprehensive user and market data events.
+ * @returns {WsWebData2}
+ */
 export interface WsWebData2Request {
     /** Type of subscription. */
     type: "webData2";

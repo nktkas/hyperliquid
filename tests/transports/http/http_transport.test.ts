@@ -124,8 +124,8 @@ Deno.test("HttpTransport Tests", async (t) => {
         await transport.request("info", { data: "test-payload" });
     });
 
-    // 3) Error response tests
-    await t.step("Error response tests", async (t) => {
+    // 3) Error response
+    await t.step("Error response", async (t) => {
         await t.step("Non-200 status (throws HttpRequestError)", async () => {
             globalThis.fetch = async () =>
                 new Response("Server Error", {
@@ -151,14 +151,11 @@ Deno.test("HttpTransport Tests", async (t) => {
 
             const transport = new HttpTransport();
 
-            try {
-                await transport.request("info", { test: "body-unload" });
-                throw new Error("Expected HttpRequestError");
-            } catch (error) {
-                assert(error instanceof HttpRequestError, "Expected `HttpRequestError`");
-                assertEquals(error.responseBody, undefined, "Expected `responseBody` to be `undefined`");
-                assert(error.response.bodyUsed, "Expected `response.bodyUsed` to be `true`");
-            }
+            const error = await assertRejects(
+                async () => await transport.request("info", { test: "body-unload" }),
+                HttpRequestError,
+            );
+            assert(error.response!.bodyUsed, "Expected `response.bodyUsed` to be `true`");
         });
 
         await t.step("Invalid Content-Type (text/html)", async () => {
@@ -173,8 +170,7 @@ Deno.test("HttpTransport Tests", async (t) => {
         });
 
         await t.step("Body includes error type", async () => {
-            // Example of a real error:
-            // txDetails({ hash: "0x556ecab2c80c2d0124690412855269000009aec1fbc0bc9a7df2f8e786eca2e1" })
+            // Example of a real error: txDetails({ hash: "0x556ecab2c80c2d0124690412855269000009aec1fbc0bc9a7df2f8e786eca2e1" })
 
             globalThis.fetch = async () => {
                 return new Response(JSON.stringify({ type: "error", message: "test error" }), {
@@ -185,6 +181,19 @@ Deno.test("HttpTransport Tests", async (t) => {
 
             const transport = new HttpTransport();
             await assertRejects(() => transport.request("explorer", {}), HttpRequestError);
+        });
+
+        await t.step("Unknown error", async () => {
+            globalThis.fetch = async () => {
+                throw new Error("Unknown error");
+            };
+
+            const transport = new HttpTransport();
+            const error = await assertRejects(
+                () => transport.request("info", {}),
+                HttpRequestError,
+            );
+            assertIsError(error.cause, Error, "Unknown error");
         });
     });
 
@@ -296,20 +305,19 @@ Deno.test("HttpTransport Tests", async (t) => {
         });
     });
 
-    // 7) AbortSignal tests
-    await t.step("AbortSignal tests", async (t) => {
+    // 7) AbortSignal
+    await t.step("AbortSignal", async (t) => {
         await t.step("Internal timeout triggers TimeoutError", async () => {
             globalThis.fetch = originalFetch;
 
             const transport = new HttpTransport({ timeout: 1 });
-            try {
-                await transport.request("info", { type: "metaAndAssetCtxs" });
-                throw new Error("Expected request to throw an error due to timeout");
-            } catch (err) {
-                // In Deno, an aborted fetch typically throws a DOMException with name "TimeoutError"
-                assertIsError(err, DOMException);
-                assertEquals(err.name, "TimeoutError");
-            }
+            const error = await assertRejects(
+                async () => await transport.request("info", { type: "metaAndAssetCtxs" }),
+                HttpRequestError,
+            );
+            // In Deno, an aborted fetch typically throws a DOMException with name "TimeoutError"
+            assertIsError(error.cause, DOMException);
+            assertEquals(error.cause.name, "TimeoutError");
         });
 
         await t.step("User-supplied signal triggers CustomError", async () => {
@@ -320,7 +328,8 @@ Deno.test("HttpTransport Tests", async (t) => {
             const userSignal = AbortSignal.abort(new CustomError("user-supplied abort"));
             const promise = transport.request("info", { type: "meta" }, userSignal);
 
-            await assertRejects(() => promise, CustomError, "user-supplied abort");
+            const error = await assertRejects(() => promise, HttpRequestError);
+            assertIsError(error.cause, CustomError, "user-supplied abort");
         });
 
         await t.step("timeout: null disables internal timeout", async () => {

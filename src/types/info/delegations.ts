@@ -20,7 +20,7 @@ export interface DelegatorReward {
     totalAmount: string;
 }
 
-/** Summary of a user's staking. */
+/** Summary of a user's staking delegations. */
 export interface DelegatorSummary {
     /** Total amount of delegated tokens. */
     delegated: string;

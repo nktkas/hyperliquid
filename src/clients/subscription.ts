@@ -125,6 +125,8 @@ export class SubscriptionClient<
      * @param listener - The callback function to be called when the event is received.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
@@ -160,6 +162,8 @@ export class SubscriptionClient<
      * @param listener - The callback function to be called when the event is received.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
@@ -193,6 +197,8 @@ export class SubscriptionClient<
      * Subscribe to mid prices for all actively traded assets.
      * @param listener - The callback function to be called when the event is received.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     *
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
@@ -234,6 +240,8 @@ export class SubscriptionClient<
      * @param listener - The callback function to be called when the event is received.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
@@ -264,6 +272,8 @@ export class SubscriptionClient<
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     *
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
@@ -297,7 +307,9 @@ export class SubscriptionClient<
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      * @note Make sure the endpoint in the {@link transport} supports this method.
      *
-     * @see null - no documentation
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -325,7 +337,9 @@ export class SubscriptionClient<
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      * @note Make sure the endpoint in the {@link transport} supports this method.
      *
-     * @see null - no documentation
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
@@ -352,6 +366,8 @@ export class SubscriptionClient<
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     *
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
@@ -386,6 +402,8 @@ export class SubscriptionClient<
      * @param listener - The callback function to be called when the event is received.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
@@ -414,6 +432,8 @@ export class SubscriptionClient<
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     *
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
@@ -447,6 +467,8 @@ export class SubscriptionClient<
      * @param listener - The callback function to be called when the event is received.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
@@ -477,8 +499,9 @@ export class SubscriptionClient<
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
-     *
      * @note Different subscriptions cannot be distinguished from each other.
+     *
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
@@ -508,6 +531,8 @@ export class SubscriptionClient<
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     *
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
@@ -541,6 +566,8 @@ export class SubscriptionClient<
      * @param listener - The callback function to be called when the event is received.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
@@ -571,6 +598,8 @@ export class SubscriptionClient<
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     *
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
@@ -606,6 +635,8 @@ export class SubscriptionClient<
      * @param listener - The callback function to be called when the event is received.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
      * ```ts
@@ -636,6 +667,8 @@ export class SubscriptionClient<
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     *
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example
@@ -670,6 +703,8 @@ export class SubscriptionClient<
      * @param args - The parameters for the subscription.
      * @param listener - The callback function to be called when the event is received.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     *
+     * @throws {TransportError} When the transport layer throws an error.
      *
      * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
      * @example

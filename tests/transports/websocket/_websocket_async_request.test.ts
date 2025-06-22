@@ -1,10 +1,8 @@
 import { assert, assertEquals, assertRejects } from "jsr:@std/assert@1";
-import {
-    WebSocketAsyncRequest,
-    WebSocketRequestError,
-} from "../../../src/transports/websocket/_websocket_async_request.ts";
+import { WebSocketAsyncRequest } from "../../../src/transports/websocket/_websocket_async_request.ts";
 import { HyperliquidEventTarget } from "../../../src/transports/websocket/_hyperliquid_event_target.ts";
 import type { ReconnectingWebSocket } from "../../../src/transports/websocket/_reconnecting_websocket.ts";
+import { WebSocketRequestError } from "../../../src/transports/websocket/websocket_transport.ts";
 
 // @ts-ignore: Mocking WebSocket for testing purposes
 class MockWebSocket extends EventTarget implements ReconnectingWebSocket {
@@ -148,7 +146,7 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
                     await assertRejects(
                         () => promise,
                         WebSocketRequestError,
-                        `Cannot complete WebSocket request: ${mockMessage.data}`,
+                        `Server error: ${mockMessage.data}`,
                     );
                 });
             });
@@ -171,7 +169,7 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
                     await assertRejects(
                         () => promise,
                         WebSocketRequestError,
-                        `Cannot complete WebSocket request: ${mockMessage.data}`,
+                        `Server error: ${mockMessage.data}`,
                     );
                 });
 
@@ -192,7 +190,7 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
                     await assertRejects(
                         () => promise,
                         WebSocketRequestError,
-                        `Cannot complete WebSocket request: ${mockMessage.data}`,
+                        `Server error: ${mockMessage.data}`,
                     );
                 });
 
@@ -213,7 +211,7 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
                     await assertRejects(
                         () => promise,
                         WebSocketRequestError,
-                        `Cannot complete WebSocket request: ${mockMessage.data}`,
+                        `Server error: ${mockMessage.data}`,
                     );
                 });
 
@@ -234,7 +232,7 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
                     await assertRejects(
                         () => promise,
                         WebSocketRequestError,
-                        `Cannot complete WebSocket request: ${mockMessage.data}`,
+                        `Server error: ${mockMessage.data}`,
                     );
                 });
             });
@@ -250,8 +248,8 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
 
                 mockSocket.close();
 
-                await assertRejects(() => p1, WebSocketRequestError, "connection is closed");
-                await assertRejects(() => p2, WebSocketRequestError, "connection is closed");
+                await assertRejects(() => p1, WebSocketRequestError, "WebSocket connection closed.");
+                await assertRejects(() => p2, WebSocketRequestError, "WebSocket connection closed.");
             });
 
             await t.step("follows AbortSignal", async (t) => {

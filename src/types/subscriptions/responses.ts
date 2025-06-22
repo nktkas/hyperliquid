@@ -44,6 +44,8 @@ export interface WsActiveAssetData {
     maxTradeSzs: [string, string];
     /** Available to trade range [min, max]. */
     availableToTrade: [string, string];
+    /** Mark price. */
+    markPx: string;
 }
 
 /** Active spot asset context. */

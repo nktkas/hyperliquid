@@ -20,9 +20,7 @@ jobs:
                   registry-url: "https://registry.npmjs.org" # Use npm registry
 
             - name: Build package
-              run: |
-                  VERSION=$(jq -r '.version' deno.json)
-                  deno run -A ./build/npm.ts $VERSION
+              run: deno run -A ./build/npm.ts
 
             - name: Publish package
               env:

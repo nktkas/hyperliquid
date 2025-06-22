@@ -66,7 +66,7 @@ export interface FillLiquidation {
     method: "market" | "backstop";
 }
 
-/** Frontend order with additional display information. */
+/** Open order with additional display information. */
 export interface FrontendOrder extends Omit<Order, "reduceOnly" | "cloid"> {
     /** Condition for triggering the order. */
     triggerCondition: string;

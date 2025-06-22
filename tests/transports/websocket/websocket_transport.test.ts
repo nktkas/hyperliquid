@@ -1,5 +1,5 @@
-import { assert, assertEquals, assertFalse, assertRejects } from "jsr:@std/assert@1";
-import { WebSocketTransport } from "../../../src/transports/websocket/websocket_transport.ts";
+import { assert, assertEquals, assertFalse, assertIsError, assertRejects } from "jsr:@std/assert@1";
+import { WebSocketRequestError, WebSocketTransport } from "../../../src/transports/websocket/websocket_transport.ts";
 
 Deno.test("WebSocketTransport", async (t) => {
     const server = Deno.serve(
@@ -120,7 +120,7 @@ Deno.test("WebSocketTransport", async (t) => {
                 await transport.ready();
 
                 const promise = transport.request("info", { key: "value" });
-                await assertRejects(() => promise, Error, "Cannot complete WebSocket request:");
+                await assertRejects(() => promise, WebSocketRequestError, "Server error:");
 
                 // Clean up
                 await transport.close();
@@ -133,7 +133,12 @@ Deno.test("WebSocketTransport", async (t) => {
 
                 const signal = AbortSignal.abort(new Error("Aborted"));
                 const promise = transport.request("info", { key: "value" }, signal);
-                await assertRejects(() => promise, Error, "Aborted");
+                const error = await assertRejects(
+                    () => promise,
+                    WebSocketRequestError,
+                    "Unknown error while making a WebSocket request. See the `cause` for more details.",
+                );
+                assertIsError(error.cause, Error, "Aborted");
 
                 // Clean up
                 await transport.close();
@@ -148,7 +153,12 @@ Deno.test("WebSocketTransport", async (t) => {
                 await transport.ready();
 
                 const promise = transport.request("info", { key: "value" });
-                await assertRejects(() => promise, DOMException, "Signal timed out.");
+                const error = await assertRejects(
+                    () => promise,
+                    WebSocketRequestError,
+                    "Unknown error while making a WebSocket request. See the `cause` for more details.",
+                );
+                assertIsError(error.cause, DOMException, "Signal timed out.");
 
                 // Clean up
                 await transport.close();

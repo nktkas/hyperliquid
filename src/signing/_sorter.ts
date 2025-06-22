@@ -1,4 +1,4 @@
-import type { Hex } from "../base.ts";
+import type { DeepImmutable, Hex } from "../base.ts";
 import type {
     ApproveAgentRequest,
     ApproveBuilderFeeRequest,
@@ -23,6 +23,7 @@ import type {
     PerpDeployRequest_RegisterAsset,
     PerpDeployRequest_SetOracle,
     PerpDexClassTransferRequest,
+    PerpDexTransferRequest,
     RegisterReferrerRequest,
     ReserveRequestWeightRequest,
     ScheduleCancelRequest,
@@ -51,10 +52,9 @@ import type {
     Withdraw3Request,
 } from "../types/exchange/requests.ts";
 
-/** Action sorter for correct signature generation. */
+/** Action sorter and formatter for correct signature generation. */
 export const actionSorter = {
-    /** Sorts and formats an `approveAgent` action. */
-    approveAgent: (action: ApproveAgentRequest["action"]): ApproveAgentRequest["action"] => {
+    approveAgent: (action: DeepImmutable<ApproveAgentRequest["action"]>): ApproveAgentRequest["action"] => {
         return {
             type: action.type,
             signatureChainId: action.signatureChainId,
@@ -64,9 +64,9 @@ export const actionSorter = {
             nonce: action.nonce,
         };
     },
-
-    /** Sorts and formats an `approveBuilderFee` action. */
-    approveBuilderFee: (action: ApproveBuilderFeeRequest["action"]): ApproveBuilderFeeRequest["action"] => {
+    approveBuilderFee: (
+        action: DeepImmutable<ApproveBuilderFeeRequest["action"]>,
+    ): ApproveBuilderFeeRequest["action"] => {
         return {
             type: action.type,
             signatureChainId: action.signatureChainId,
@@ -76,9 +76,7 @@ export const actionSorter = {
             nonce: action.nonce,
         };
     },
-
-    /** Sorts and formats a `batchModify` action. */
-    batchModify: (action: BatchModifyRequest["action"]): BatchModifyRequest["action"] => {
+    batchModify: (action: DeepImmutable<BatchModifyRequest["action"]>): BatchModifyRequest["action"] => {
         return {
             type: action.type,
             modifies: action.modifies.map((modify) => {
@@ -111,9 +109,7 @@ export const actionSorter = {
             }),
         };
     },
-
-    /** Sorts and formats a `cancel` action. */
-    cancel: (action: CancelRequest["action"]): CancelRequest["action"] => {
+    cancel: (action: DeepImmutable<CancelRequest["action"]>): CancelRequest["action"] => {
         return {
             type: action.type,
             cancels: action.cancels.map((cancel) => ({
@@ -122,9 +118,7 @@ export const actionSorter = {
             })),
         };
     },
-
-    /** Sorts and formats a `cancelByCloid` action. */
-    cancelByCloid: (action: CancelByCloidRequest["action"]): CancelByCloidRequest["action"] => {
+    cancelByCloid: (action: DeepImmutable<CancelByCloidRequest["action"]>): CancelByCloidRequest["action"] => {
         return {
             type: action.type,
             cancels: action.cancels.map((cancel) => ({
@@ -133,9 +127,7 @@ export const actionSorter = {
             })),
         };
     },
-
-    /** Sorts and formats a `cDeposit` action. */
-    cDeposit: (action: CDepositRequest["action"]): CDepositRequest["action"] => {
+    cDeposit: (action: DeepImmutable<CDepositRequest["action"]>): CDepositRequest["action"] => {
         return {
             type: action.type,
             signatureChainId: action.signatureChainId,
@@ -144,35 +136,29 @@ export const actionSorter = {
             nonce: action.nonce,
         };
     },
-
-    /** Sorts and formats a `claimRewards` action. */
-    claimRewards: (action: ClaimRewardsRequest["action"]): ClaimRewardsRequest["action"] => {
+    claimRewards: (action: DeepImmutable<ClaimRewardsRequest["action"]>): ClaimRewardsRequest["action"] => {
         return {
             type: action.type,
         };
     },
-
-    /** Sorts and formats a `convertToMultiSigUser` action. */
-    convertToMultiSigUser: (action: ConvertToMultiSigUserRequest["action"]): ConvertToMultiSigUserRequest["action"] => {
+    convertToMultiSigUser: (
+        action: DeepImmutable<ConvertToMultiSigUserRequest["action"]>,
+    ): ConvertToMultiSigUserRequest["action"] => {
         return {
             type: action.type,
             signatureChainId: action.signatureChainId,
             hyperliquidChain: action.hyperliquidChain,
-            signers: action.signers,
+            signers: action.signers, // key order is not important
             nonce: action.nonce,
         };
     },
-
-    /** Sorts and formats a `createSubAccount` action. */
-    createSubAccount: (action: CreateSubAccountRequest["action"]): CreateSubAccountRequest["action"] => {
+    createSubAccount: (action: DeepImmutable<CreateSubAccountRequest["action"]>): CreateSubAccountRequest["action"] => {
         return {
             type: action.type,
             name: action.name,
         };
     },
-
-    /** Sorts and formats a `createVault` action. */
-    createVault: (action: CreateVaultRequest["action"]): CreateVaultRequest["action"] => {
+    createVault: (action: DeepImmutable<CreateVaultRequest["action"]>): CreateVaultRequest["action"] => {
         return {
             type: action.type,
             name: action.name,
@@ -181,12 +167,10 @@ export const actionSorter = {
             nonce: action.nonce,
         };
     },
-
-    /** Sorts and formats a `CSignerAction` action (jail/unjail). */
     CSignerAction: (
         action:
-            | CSignerActionRequest_JailSelf["action"]
-            | CSignerActionRequest_UnjailSelf["action"],
+            | DeepImmutable<CSignerActionRequest_JailSelf["action"]>
+            | DeepImmutable<CSignerActionRequest_UnjailSelf["action"]>,
     ):
         | CSignerActionRequest_JailSelf["action"]
         | CSignerActionRequest_UnjailSelf["action"] => {
@@ -202,13 +186,11 @@ export const actionSorter = {
             };
         }
     },
-
-    /** Sorts and formats a `CValidatorAction` action (register/unregister/change profile). */
     CValidatorAction: (
         action:
-            | CValidatorActionRequest_ChangeProfile["action"]
-            | CValidatorActionRequest_Register["action"]
-            | CValidatorActionRequest_Unregister["action"],
+            | DeepImmutable<CValidatorActionRequest_ChangeProfile["action"]>
+            | DeepImmutable<CValidatorActionRequest_Register["action"]>
+            | DeepImmutable<CValidatorActionRequest_Unregister["action"]>,
     ):
         | CValidatorActionRequest_ChangeProfile["action"]
         | CValidatorActionRequest_Register["action"]
@@ -251,9 +233,7 @@ export const actionSorter = {
             };
         }
     },
-
-    /** Sorts and formats a `cWithdraw` action. */
-    cWithdraw: (action: CWithdrawRequest["action"]): CWithdrawRequest["action"] => {
+    cWithdraw: (action: DeepImmutable<CWithdrawRequest["action"]>): CWithdrawRequest["action"] => {
         return {
             type: action.type,
             signatureChainId: action.signatureChainId,
@@ -262,17 +242,13 @@ export const actionSorter = {
             nonce: action.nonce,
         };
     },
-
-    /** Sorts and formats an `evmUserModify` action. */
-    evmUserModify: (action: EvmUserModifyRequest["action"]): EvmUserModifyRequest["action"] => {
+    evmUserModify: (action: DeepImmutable<EvmUserModifyRequest["action"]>): EvmUserModifyRequest["action"] => {
         return {
             type: action.type,
             usingBigBlocks: action.usingBigBlocks,
         };
     },
-
-    /** Sorts and formats a `modify` action. */
-    modify: (action: ModifyRequest["action"]): ModifyRequest["action"] => {
+    modify: (action: DeepImmutable<ModifyRequest["action"]>): ModifyRequest["action"] => {
         const sortedAction = {
             type: action.type,
             oid: action.oid,
@@ -301,9 +277,7 @@ export const actionSorter = {
         if (sortedAction.order.c === undefined) delete sortedAction.order.c;
         return sortedAction;
     },
-
-    /** Sorts and formats a `multiSig` action. */
-    multiSig: (action: MultiSigRequest["action"]): MultiSigRequest["action"] => {
+    multiSig: (action: DeepImmutable<MultiSigRequest["action"]>): MultiSigRequest["action"] => {
         return {
             type: action.type,
             signatureChainId: action.signatureChainId,
@@ -315,13 +289,11 @@ export const actionSorter = {
             payload: {
                 multiSigUser: action.payload.multiSigUser.toLowerCase() as Hex,
                 outerSigner: action.payload.outerSigner.toLowerCase() as Hex,
-                action: action.payload.action,
+                action: structuredClone(action.payload.action),
             },
         };
     },
-
-    /** Sorts and formats an `order` action. */
-    order: (action: OrderRequest["action"]): OrderRequest["action"] => {
+    order: (action: DeepImmutable<OrderRequest["action"]>): OrderRequest["action"] => {
         const sortedAction = {
             type: action.type,
             orders: action.orders.map((order) => {
@@ -360,12 +332,10 @@ export const actionSorter = {
         if (sortedAction.builder === undefined) delete sortedAction.builder;
         return sortedAction;
     },
-
-    /** Sorts and formats a `perpDeploy` action. */
     perpDeploy: (
         action:
-            | PerpDeployRequest_RegisterAsset["action"]
-            | PerpDeployRequest_SetOracle["action"],
+            | DeepImmutable<PerpDeployRequest_RegisterAsset["action"]>
+            | DeepImmutable<PerpDeployRequest_SetOracle["action"]>,
     ):
         | PerpDeployRequest_RegisterAsset["action"]
         | PerpDeployRequest_SetOracle["action"] => {
@@ -397,15 +367,15 @@ export const actionSorter = {
                 type: action.type,
                 setOracle: {
                     dex: action.setOracle.dex,
-                    oraclePxs: action.setOracle.oraclePxs,
-                    markPxs: action.setOracle.markPxs,
+                    oraclePxs: action.setOracle.oraclePxs.map((el) => [...el]),
+                    markPxs: action.setOracle.markPxs.map((el) => [...el]),
                 },
             };
         }
     },
-
-    /** Sorts and formats a `PerpDexClassTransfer` action. */
-    PerpDexClassTransfer: (action: PerpDexClassTransferRequest["action"]): PerpDexClassTransferRequest["action"] => {
+    PerpDexClassTransfer: (
+        action: DeepImmutable<PerpDexClassTransferRequest["action"]>,
+    ): PerpDexClassTransferRequest["action"] => {
         return {
             type: action.type,
             signatureChainId: action.signatureChainId,
@@ -417,25 +387,34 @@ export const actionSorter = {
             nonce: action.nonce,
         };
     },
-
-    /** Sorts and formats a `registerReferrer` action. */
-    registerReferrer: (action: RegisterReferrerRequest["action"]): RegisterReferrerRequest["action"] => {
+    PerpDexTransfer: (
+        action: DeepImmutable<PerpDexTransferRequest["action"]>,
+    ): PerpDexTransferRequest["action"] => {
+        return {
+            type: action.type,
+            signatureChainId: action.signatureChainId,
+            hyperliquidChain: action.hyperliquidChain,
+            sourceDex: action.sourceDex,
+            destinationDex: action.destinationDex,
+            amount: action.amount,
+            nonce: action.nonce,
+        };
+    },
+    registerReferrer: (action: DeepImmutable<RegisterReferrerRequest["action"]>): RegisterReferrerRequest["action"] => {
         return {
             type: action.type,
             code: action.code,
         };
     },
-
-    /** Sorts and formats a `reserveRequestWeight` action. */
-    reserveRequestWeight: (action: ReserveRequestWeightRequest["action"]): ReserveRequestWeightRequest["action"] => {
+    reserveRequestWeight: (
+        action: DeepImmutable<ReserveRequestWeightRequest["action"]>,
+    ): ReserveRequestWeightRequest["action"] => {
         return {
             type: action.type,
             weight: action.weight,
         };
     },
-
-    /** Sorts and formats a `scheduleCancel` action. */
-    scheduleCancel: (action: ScheduleCancelRequest["action"]): ScheduleCancelRequest["action"] => {
+    scheduleCancel: (action: DeepImmutable<ScheduleCancelRequest["action"]>): ScheduleCancelRequest["action"] => {
         const sortedAction = {
             type: action.type,
             time: action.time,
@@ -443,32 +422,26 @@ export const actionSorter = {
         if (sortedAction.time === undefined) delete sortedAction.time;
         return sortedAction;
     },
-
-    /** Sorts and formats a `setDisplayName` action. */
-    setDisplayName: (action: SetDisplayNameRequest["action"]): SetDisplayNameRequest["action"] => {
+    setDisplayName: (action: DeepImmutable<SetDisplayNameRequest["action"]>): SetDisplayNameRequest["action"] => {
         return {
             type: action.type,
             displayName: action.displayName,
         };
     },
-
-    /** Sorts and formats a `setReferrer` action. */
-    setReferrer: (action: SetReferrerRequest["action"]): SetReferrerRequest["action"] => {
+    setReferrer: (action: DeepImmutable<SetReferrerRequest["action"]>): SetReferrerRequest["action"] => {
         return {
             type: action.type,
             code: action.code,
         };
     },
-
-    /** Sorts and formats a `spotDeploy` action. */
     spotDeploy: (
         action:
-            | SpotDeployRequest_Genesis["action"]
-            | SpotDeployRequest_RegisterHyperliquidity["action"]
-            | SpotDeployRequest_RegisterSpot["action"]
-            | SpotDeployRequest_RegisterToken2["action"]
-            | SpotDeployRequest_SetDeployerTradingFeeShare["action"]
-            | SpotDeployRequest_UserGenesis["action"],
+            | DeepImmutable<SpotDeployRequest_Genesis["action"]>
+            | DeepImmutable<SpotDeployRequest_RegisterHyperliquidity["action"]>
+            | DeepImmutable<SpotDeployRequest_RegisterSpot["action"]>
+            | DeepImmutable<SpotDeployRequest_RegisterToken2["action"]>
+            | DeepImmutable<SpotDeployRequest_SetDeployerTradingFeeShare["action"]>
+            | DeepImmutable<SpotDeployRequest_UserGenesis["action"]>,
     ):
         | SpotDeployRequest_Genesis["action"]
         | SpotDeployRequest_RegisterHyperliquidity["action"]
@@ -508,7 +481,7 @@ export const actionSorter = {
             return {
                 type: action.type,
                 registerSpot: {
-                    tokens: action.registerSpot.tokens,
+                    tokens: [...action.registerSpot.tokens],
                 },
             };
         } else if ("registerToken2" in action) {
@@ -541,9 +514,9 @@ export const actionSorter = {
                 type: action.type,
                 userGenesis: {
                     token: action.userGenesis.token,
-                    userAndWei: action.userGenesis.userAndWei,
-                    existingTokenAndWei: action.userGenesis.existingTokenAndWei,
-                    blacklistUsers: action.userGenesis.blacklistUsers,
+                    userAndWei: action.userGenesis.userAndWei.map((el) => [...el]),
+                    existingTokenAndWei: action.userGenesis.existingTokenAndWei.map((el) => [...el]),
+                    blacklistUsers: action.userGenesis.blacklistUsers?.map((el) => [...el]),
                 },
             };
             if (sortedAction.userGenesis.blacklistUsers === undefined) {
@@ -552,9 +525,7 @@ export const actionSorter = {
             return sortedAction;
         }
     },
-
-    /** Sorts and formats a `spotSend` action. */
-    spotSend: (action: SpotSendRequest["action"]): SpotSendRequest["action"] => {
+    spotSend: (action: DeepImmutable<SpotSendRequest["action"]>): SpotSendRequest["action"] => {
         return {
             type: action.type,
             signatureChainId: action.signatureChainId,
@@ -565,9 +536,7 @@ export const actionSorter = {
             time: action.time,
         };
     },
-
-    /** Sorts and formats a `spotUser` action. */
-    spotUser: (action: SpotUserRequest["action"]): SpotUserRequest["action"] => {
+    spotUser: (action: DeepImmutable<SpotUserRequest["action"]>): SpotUserRequest["action"] => {
         return {
             type: action.type,
             toggleSpotDusting: {
@@ -575,10 +544,8 @@ export const actionSorter = {
             },
         };
     },
-
-    /** Sorts and formats a `subAccountSpotTransfer` action. */
     subAccountSpotTransfer: (
-        action: SubAccountSpotTransferRequest["action"],
+        action: DeepImmutable<SubAccountSpotTransferRequest["action"]>,
     ): SubAccountSpotTransferRequest["action"] => {
         return {
             type: action.type,
@@ -588,9 +555,9 @@ export const actionSorter = {
             amount: action.amount,
         };
     },
-
-    /** Sorts and formats a `subAccountTransfer` action. */
-    subAccountTransfer: (action: SubAccountTransferRequest["action"]): SubAccountTransferRequest["action"] => {
+    subAccountTransfer: (
+        action: DeepImmutable<SubAccountTransferRequest["action"]>,
+    ): SubAccountTransferRequest["action"] => {
         return {
             type: action.type,
             subAccountUser: action.subAccountUser.toLowerCase() as Hex,
@@ -598,9 +565,7 @@ export const actionSorter = {
             usd: action.usd,
         };
     },
-
-    /** Sorts and formats a `tokenDelegate` action. */
-    tokenDelegate: (action: TokenDelegateRequest["action"]): TokenDelegateRequest["action"] => {
+    tokenDelegate: (action: DeepImmutable<TokenDelegateRequest["action"]>): TokenDelegateRequest["action"] => {
         return {
             type: action.type,
             signatureChainId: action.signatureChainId,
@@ -611,18 +576,14 @@ export const actionSorter = {
             nonce: action.nonce,
         };
     },
-
-    /** Sorts and formats a `twapCancel` action. */
-    twapCancel: (action: TwapCancelRequest["action"]): TwapCancelRequest["action"] => {
+    twapCancel: (action: DeepImmutable<TwapCancelRequest["action"]>): TwapCancelRequest["action"] => {
         return {
             type: action.type,
             a: action.a,
             t: action.t,
         };
     },
-
-    /** Sorts and formats a `twapOrder` action. */
-    twapOrder: (action: TwapOrderRequest["action"]): TwapOrderRequest["action"] => {
+    twapOrder: (action: DeepImmutable<TwapOrderRequest["action"]>): TwapOrderRequest["action"] => {
         return {
             type: action.type,
             twap: {
@@ -635,9 +596,9 @@ export const actionSorter = {
             },
         };
     },
-
-    /** Sorts and formats an `updateIsolatedMargin` action. */
-    updateIsolatedMargin: (action: UpdateIsolatedMarginRequest["action"]): UpdateIsolatedMarginRequest["action"] => {
+    updateIsolatedMargin: (
+        action: DeepImmutable<UpdateIsolatedMarginRequest["action"]>,
+    ): UpdateIsolatedMarginRequest["action"] => {
         return {
             type: action.type,
             asset: action.asset,
@@ -645,9 +606,7 @@ export const actionSorter = {
             ntli: action.ntli,
         };
     },
-
-    /** Sorts and formats an `updateLeverage` action. */
-    updateLeverage: (action: UpdateLeverageRequest["action"]): UpdateLeverageRequest["action"] => {
+    updateLeverage: (action: DeepImmutable<UpdateLeverageRequest["action"]>): UpdateLeverageRequest["action"] => {
         return {
             type: action.type,
             asset: action.asset,
@@ -655,9 +614,7 @@ export const actionSorter = {
             leverage: action.leverage,
         };
     },
-
-    /** Sorts and formats an `usdClassTransfer` action. */
-    usdClassTransfer: (action: UsdClassTransferRequest["action"]): UsdClassTransferRequest["action"] => {
+    usdClassTransfer: (action: DeepImmutable<UsdClassTransferRequest["action"]>): UsdClassTransferRequest["action"] => {
         return {
             type: action.type,
             signatureChainId: action.signatureChainId,
@@ -667,9 +624,7 @@ export const actionSorter = {
             nonce: action.nonce,
         };
     },
-
-    /** Sorts and formats an `usdSend` action. */
-    usdSend: (action: UsdSendRequest["action"]): UsdSendRequest["action"] => {
+    usdSend: (action: DeepImmutable<UsdSendRequest["action"]>): UsdSendRequest["action"] => {
         return {
             type: action.type,
             signatureChainId: action.signatureChainId,
@@ -679,18 +634,14 @@ export const actionSorter = {
             time: action.time,
         };
     },
-
-    /** Sorts and formats a `vaultDistribute` action. */
-    vaultDistribute: (action: VaultDistributeRequest["action"]): VaultDistributeRequest["action"] => {
+    vaultDistribute: (action: DeepImmutable<VaultDistributeRequest["action"]>): VaultDistributeRequest["action"] => {
         return {
             type: action.type,
             vaultAddress: action.vaultAddress,
             usd: action.usd,
         };
     },
-
-    /** Sorts and formats a `vaultModify` action. */
-    vaultModify: (action: VaultModifyRequest["action"]): VaultModifyRequest["action"] => {
+    vaultModify: (action: DeepImmutable<VaultModifyRequest["action"]>): VaultModifyRequest["action"] => {
         return {
             type: action.type,
             vaultAddress: action.vaultAddress,
@@ -698,9 +649,7 @@ export const actionSorter = {
             alwaysCloseOnWithdraw: action.alwaysCloseOnWithdraw,
         };
     },
-
-    /** Sorts and formats a `vaultTransfer` action. */
-    vaultTransfer: (action: VaultTransferRequest["action"]): VaultTransferRequest["action"] => {
+    vaultTransfer: (action: DeepImmutable<VaultTransferRequest["action"]>): VaultTransferRequest["action"] => {
         return {
             type: action.type,
             vaultAddress: action.vaultAddress,
@@ -708,9 +657,7 @@ export const actionSorter = {
             usd: action.usd,
         };
     },
-
-    /** Sorts and formats a `withdraw3` action. */
-    withdraw3: (action: Withdraw3Request["action"]): Withdraw3Request["action"] => {
+    withdraw3: (action: DeepImmutable<Withdraw3Request["action"]>): Withdraw3Request["action"] => {
         return {
             type: action.type,
             signatureChainId: action.signatureChainId,
@@ -778,6 +725,22 @@ export const userSignedActionEip712Types = {
             { name: "token", type: "string" },
             { name: "amount", type: "string" },
             { name: "toPerp", type: "bool" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    PerpDexTransfer: {
+        "HyperliquidTransaction:PerpDexTransfer": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "sourceDex", type: "string" },
+            { name: "destinationDex", type: "string" },
+            { name: "amount", type: "string" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    multiSig: {
+        "HyperliquidTransaction:SendMultiSig": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "multiSigActionHash", type: "bytes32" },
             { name: "nonce", type: "uint64" },
         ],
     },

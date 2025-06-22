@@ -1,23 +1,26 @@
 import type { MaybePromise } from "../../base.ts";
 import { type IRequestTransport, TransportError } from "../base.ts";
 
-/**
- * Error thrown when an HTTP response is deemed invalid:
- * - Non-200 status code
- * - Unexpected content type
- */
+/** Error thrown when an HTTP request fails. */
 export class HttpRequestError extends TransportError {
-    /**
-     * Creates a new HTTP request error.
-     * @param response - The failed HTTP response.
-     * @param responseBody - The raw response body content, if available.
-     */
-    constructor(public response: Response, public responseBody?: string) {
-        let message = `HTTP request failed: status ${response.status}`;
-        if (responseBody) message += `, body "${responseBody}"`;
+    response?: Response;
+    body?: string;
 
-        super(message);
+    constructor(args?: { response?: Response; body?: string }, options?: ErrorOptions) {
+        const { response, body } = args ?? {};
+
+        let message: string;
+        if (response) {
+            message = `${response.status} ${response.statusText}`.trim();
+            if (body) message += ` - ${body}`;
+        } else {
+            message = "Unknown error while making an HTTP request. See the `cause` for more details.";
+        }
+
+        super(message, options);
         this.name = "HttpRequestError";
+        this.response = response;
+        this.body = body;
     }
 }
 
@@ -102,63 +105,68 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
      * @param payload - The payload to send with the request.
      * @param signal - An optional abort signal.
      * @returns A promise that resolves with parsed JSON response body.
-     * @throws {HttpRequestError} - Thrown when an HTTP response is deemed invalid.
-     * @throws May throw {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch#exceptions | fetch errors}.
+     *
+     * @throws {HttpRequestError} Thrown when the HTTP request fails.
      */
     async request<T>(endpoint: "info" | "exchange" | "explorer", payload: unknown, signal?: AbortSignal): Promise<T> {
-        // Construct a Request
-        const url = new URL(
-            endpoint,
-            this.server[this.isTestnet ? "testnet" : "mainnet"][endpoint === "explorer" ? "rpc" : "api"],
-        );
-        const init = mergeRequestInit(
-            {
-                body: JSON.stringify(payload),
-                headers: {
-                    "Accept-Encoding": "gzip, deflate, br, zstd",
-                    "Content-Type": "application/json",
+        try {
+            // Construct a Request
+            const url = new URL(
+                endpoint,
+                this.server[this.isTestnet ? "testnet" : "mainnet"][endpoint === "explorer" ? "rpc" : "api"],
+            );
+            const init = mergeRequestInit(
+                {
+                    body: JSON.stringify(payload),
+                    headers: {
+                        "Accept-Encoding": "gzip, deflate, br, zstd",
+                        "Content-Type": "application/json",
+                    },
+                    keepalive: true,
+                    method: "POST",
+                    signal: this.timeout ? AbortSignal.timeout(this.timeout) : undefined,
                 },
-                keepalive: true,
-                method: "POST",
-                signal: this.timeout ? AbortSignal.timeout(this.timeout) : undefined,
-            },
-            this.fetchOptions,
-            { signal },
-        );
-        let request = new Request(url, init);
+                this.fetchOptions,
+                { signal },
+            );
+            let request = new Request(url, init);
 
-        // Call the onRequest callback, if provided
-        if (this.onRequest) {
-            const customRequest = await this.onRequest(request);
-            if (customRequest instanceof Request) request = customRequest;
+            // Call the onRequest callback, if provided
+            if (this.onRequest) {
+                const customRequest = await this.onRequest(request);
+                if (customRequest instanceof Request) request = customRequest;
+            }
+
+            // Send the Request and wait for a Response
+            let response = await fetch(request);
+
+            // Call the onResponse callback, if provided
+            if (this.onResponse) {
+                const customResponse = await this.onResponse(response);
+                if (customResponse instanceof Response) response = customResponse;
+            }
+
+            // Validate the Response
+            if (!response.ok || !response.headers.get("Content-Type")?.includes("application/json")) {
+                // Unload the response body to prevent memory leaks
+                const body = await response.text().catch(() => undefined);
+                throw new HttpRequestError({ response, body });
+            }
+
+            // Parse the response body
+            const body = await response.json();
+
+            // Check if the response is an error
+            if (body?.type === "error") {
+                throw new HttpRequestError({ response, body: body?.message });
+            }
+
+            // Return the response body
+            return body;
+        } catch (error) {
+            if (error instanceof HttpRequestError) throw error; // Re-throw known errors
+            throw new HttpRequestError(undefined, { cause: error });
         }
-
-        // Send the Request and wait for a Response
-        let response = await fetch(request);
-
-        // Call the onResponse callback, if provided
-        if (this.onResponse) {
-            const customResponse = await this.onResponse(response);
-            if (customResponse instanceof Response) response = customResponse;
-        }
-
-        // Validate the Response
-        if (!response.ok || !response.headers.get("Content-Type")?.includes("application/json")) {
-            // Unload the response body to prevent memory leaks
-            const body = await response.text().catch(() => undefined);
-            throw new HttpRequestError(response, body);
-        }
-
-        // Parse the response body
-        const body = await response.json();
-
-        // Check if the response is an error
-        if (body?.type === "error") {
-            throw new HttpRequestError(response, body?.message);
-        }
-
-        // Return the response body
-        return body;
     }
 }
 
