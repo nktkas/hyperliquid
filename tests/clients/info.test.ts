@@ -6,7 +6,7 @@ import { schemaCoverage } from "../_utils/schema/schemaCoverage.ts";
 
 // —————————— Arguments ——————————
 
-const cliArgs = parseArgs(Deno.args, { default: { wait: 2000 } }) as Args<{
+const cliArgs = parseArgs(Deno.args, { default: { wait: 2500 } }) as Args<{
     /** Delay to avoid rate limits */
     wait?: number;
 }>;
