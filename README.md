@@ -53,43 +53,43 @@ deno add jsr:@nktkas/hyperliquid
 <summary>For React Native, you need to import polyfills before importing the SDK:</summary>
 
 ```js
-// React Native 0.76.3
+// React Native 0.76.3 / Expo v52
 // Issues:
-// - signing: does not support private keys directly as an abstract wallet
+// - signing: does not support private keys directly, use viem or ethers
 
-import { Event, EventTarget } from 'event-target-shim';
+import { Event, EventTarget } from "event-target-shim";
 
 if (!globalThis.EventTarget || !globalThis.Event) {
-  globalThis.EventTarget = EventTarget;
-  globalThis.Event = Event;
+    globalThis.EventTarget = EventTarget;
+    globalThis.Event = Event;
 }
 
 if (!globalThis.CustomEvent) {
-  globalThis.CustomEvent = function (type, params) {
-    params = params || {};
-    const event = new Event(type, params);
-    event.detail = params.detail || null;
-    return event;
-  };
+    globalThis.CustomEvent = function (type, params) {
+        params = params || {};
+        const event = new Event(type, params);
+        event.detail = params.detail || null;
+        return event;
+    };
 }
 
 if (!AbortSignal.timeout) {
-  AbortSignal.timeout = function (delay) {
-    const controller = new AbortController();
-    setTimeout(() => controller.abort(), delay);
-    return controller.signal;
-  };
+    AbortSignal.timeout = function (delay) {
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), delay);
+        return controller.signal;
+    };
 }
 
 if (!Promise.withResolvers) {
-  Promise.withResolvers = function () {
-    let resolve, reject;
-    const promise = new Promise((res, rej) => {
-      resolve = res;
-      reject = rej;
-    });
-    return { promise, resolve, reject };
-  };
+    Promise.withResolvers = function () {
+        let resolve, reject;
+        const promise = new Promise((res, rej) => {
+            resolve = res;
+            reject = rej;
+        });
+        return { promise, resolve, reject };
+    };
 }
 ```
 
@@ -503,8 +503,8 @@ class ExchangeClient {
             | AbstractWindowEthereum; // window.ethereum (EIP-1193)
         isTestnet?: boolean; // Whether to use testnet (default: false)
         defaultVaultAddress?: Hex; // Vault address used by default if not provided in method call
-        signatureChainId?: Hex | (() => MaybePromise<Hex>); // Chain ID used for signing (default: trying to guess based on wallet and isTestnet)
-        nonceManager?: () => MaybePromise<number>; // Function to get the next nonce (default: auto-incrementing Date.now())
+        signatureChainId?: Hex | (() => MaybePromise<Hex>); // Chain ID used for signing (default: trying to guess based on wallet and `isTestnet`)
+        nonceManager?: () => MaybePromise<number>; // Function to get the next nonce (default: auto-incrementing `Date.now()`)
     });
 
     // Order
@@ -748,6 +748,26 @@ const response = await fetch("https://api.hyperliquid.xyz/exchange", {
 });
 const body = await response.json();
 ```
+
+## FAQ
+
+### How to execute an L1 action via an external wallet (e.g. MetaMask)?
+
+Hyperliquid requires chain `1337` for L1 actions (open order, change leverage, etc.). There are two ways to execute an
+L1 action through an external wallet:
+
+- (recommended) Create an
+  [Agent Wallet](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/nonces-and-api-wallets#api-wallets)
+  and execute all L1 actions through it
+- Change the user's chain to `1337`, however, the user will sign unreadable data
+
+### How to create a market order?
+
+Hyperliquid doesn't have traditional market orders, but you can achieve market-like execution by placing limit orders
+with `tif: "Ioc"` and prices that guarantee immediate execution:
+
+- For buys: set limit price >= current best ask
+- For sells: set limit price <= current best bid
 
 ## Contributing
 
