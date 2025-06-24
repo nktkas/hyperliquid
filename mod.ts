@@ -25,7 +25,7 @@ export type * from "./src/types/exchange/responses.ts";
 export type * from "./src/types/explorer/responses.ts";
 export type * from "./src/types/info/accounts.ts";
 export type * from "./src/types/info/assets.ts";
-export type * from "./src/types/info/delegations.ts";
+export type * from "./src/types/info/validators.ts";
 export type * from "./src/types/info/markets.ts";
 export type * from "./src/types/info/orders.ts";
 export type * from "./src/types/info/vaults.ts";

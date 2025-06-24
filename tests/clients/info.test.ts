@@ -6,7 +6,7 @@ import { schemaCoverage } from "../_utils/schema/schemaCoverage.ts";
 
 // —————————— Arguments ——————————
 
-const cliArgs = parseArgs(Deno.args, { default: { wait: 2500 } }) as Args<{
+const cliArgs = parseArgs(Deno.args, { default: { wait: 3000 } }) as Args<{
     /** Delay to avoid rate limits */
     wait?: number;
 }>;
@@ -20,14 +20,19 @@ const METHODS_TO_TEST = [ // controls which tests to run
     "delegatorHistory",
     "delegatorRewards",
     "delegatorSummary",
+    "exchangeStatus",
     "extraAgents",
     "frontendOpenOrders",
     "fundingHistory",
     "historicalOrders",
     "isVip",
     "l2Book",
+    "leadingVaults",
     "legalCheck",
+    "liquidatable",
+    "marginTable",
     "maxBuilderFee",
+    "maxMarketOrderNtls",
     "meta",
     "metaAndAssetCtxs",
     "openOrders",
@@ -59,6 +64,7 @@ const METHODS_TO_TEST = [ // controls which tests to run
     "userTwapSliceFills",
     "userTwapSliceFillsByTime",
     "userVaultEquities",
+    "validatorL1Votes",
     "validatorSummaries",
     "vaultDetails",
     "vaultSummaries",
@@ -196,6 +202,15 @@ run(
     { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" } as const,
 );
 
+export type MethodReturnType_exchangeStatus = Awaited<ReturnType<InfoClient["exchangeStatus"]>>;
+run(
+    "exchangeStatus",
+    async (types) => {
+        const data = await infoClient.exchangeStatus();
+        schemaCoverage(types, [data]);
+    },
+);
+
 export type MethodReturnType_extraAgents = Awaited<ReturnType<InfoClient["extraAgents"]>>;
 run(
     "extraAgents",
@@ -311,6 +326,16 @@ run(
     },
 );
 
+export type MethodReturnType_leadingVaults = Awaited<ReturnType<InfoClient["leadingVaults"]>>;
+run(
+    "leadingVaults",
+    async (types, { user }) => {
+        const data = await infoClient.leadingVaults({ user });
+        schemaCoverage(types, [data]);
+    },
+    { user: "0xe019d6167E7e324aEd003d94098496b6d986aB05" } as const,
+);
+
 export type MethodReturnType_legalCheck = Awaited<ReturnType<InfoClient["legalCheck"]>>;
 run(
     "legalCheck",
@@ -319,6 +344,24 @@ run(
         schemaCoverage(types, [data]);
     },
     { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" } as const,
+);
+
+export type MethodReturnType_liquidatable = Awaited<ReturnType<InfoClient["liquidatable"]>>;
+run(
+    "liquidatable",
+    async (types) => {
+        const data = await infoClient.liquidatable();
+        schemaCoverage(types, [data], { ignoreEmptyArrayPaths: ["#"] });
+    },
+);
+
+export type MethodReturnType_marginTable = Awaited<ReturnType<InfoClient["marginTable"]>>;
+run(
+    "marginTable",
+    async (types) => {
+        const data = await infoClient.marginTable({ id: 1 });
+        schemaCoverage(types, [data]);
+    },
 );
 
 export type MethodReturnType_maxBuilderFee = Awaited<ReturnType<InfoClient["maxBuilderFee"]>>;
@@ -332,6 +375,15 @@ run(
         user: "0xe019d6167E7e324aEd003d94098496b6d986aB05",
         builder: "0xe019d6167E7e324aEd003d94098496b6d986aB05",
     } as const,
+);
+
+export type MethodReturnType_maxMarketOrderNtls = Awaited<ReturnType<InfoClient["maxMarketOrderNtls"]>>;
+run(
+    "maxMarketOrderNtls",
+    async (types) => {
+        const data = await infoClient.maxMarketOrderNtls();
+        schemaCoverage(types, [data]);
+    },
 );
 
 export type MethodReturnType_meta = Awaited<ReturnType<InfoClient["meta"]>>;
@@ -955,6 +1007,15 @@ run(
         schemaCoverage(types, [data]);
     },
     { user: "0xe019d6167E7e324aEd003d94098496b6d986aB05" } as const,
+);
+
+export type MethodReturnType_validatorL1Votes = Awaited<ReturnType<InfoClient["validatorL1Votes"]>>;
+run(
+    "validatorL1Votes",
+    async (types) => {
+        const data = await infoClient.validatorL1Votes();
+        schemaCoverage(types, [data], { ignoreEmptyArrayPaths: ["#"] });
+    },
 );
 
 export type MethodReturnType_validatorSummaries = Awaited<ReturnType<InfoClient["validatorSummaries"]>>;

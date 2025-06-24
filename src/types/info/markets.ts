@@ -14,6 +14,13 @@ export interface DeployAuctionStatus {
     startTimeSeconds: number;
 }
 
+/** Exchange system status information. */
+export interface ExchangeStatus {
+    /** Server time (in ms since epoch). */
+    time: number;
+    specialStatuses: unknown | null;
+}
+
 /** Deploy state for spot tokens. */
 export interface SpotDeployState {
     /** Array of deploy states for tokens. */

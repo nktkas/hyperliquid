@@ -101,3 +101,11 @@ export interface VaultSummary {
     /** Creation timestamp. */
     createTimeMillis: number;
 }
+
+/** Vault that a user is leading. */
+export interface VaultLeading {
+    /** Vault address. */
+    address: Hex;
+    /** Vault name. */
+    name: string;
+}

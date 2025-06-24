@@ -87,6 +87,15 @@ export interface DelegatorSummaryRequest {
 }
 
 /**
+ * Request exchange status information.
+ * @returns {ExchangeStatus}
+ */
+export interface ExchangeStatusRequest {
+    /** Type of request. */
+    type: "exchangeStatus";
+}
+
+/**
  * Request user's extra agents.
  * @returns {ExtraAgent[]}
  */
@@ -126,7 +135,7 @@ export interface FundingHistoryRequest {
 }
 
 /**
- * Request user historical orders.
+ * Request user's historical orders.
  * @returns {OrderStatus<FrontendOrder>[]}
  */
 export interface HistoricalOrdersRequest {
@@ -163,6 +172,17 @@ export interface L2BookRequest {
 }
 
 /**
+ * Request leading vaults for a user.
+ * @returns {VaultLeading[]}
+ */
+export interface LeadingVaultsRequest {
+    /** Type of request. */
+    type: "leadingVaults";
+    /** User's address. */
+    user: Hex;
+}
+
+/**
  * Request legal verification status of a user.
  * @returns {LegalCheck}
  */
@@ -171,6 +191,26 @@ export interface LegalCheckRequest {
     type: "legalCheck";
     /** User's address. */
     user: Hex;
+}
+
+/**
+ * Request liquidatable (unknown).
+ * @returns {unknown[]}
+ */
+export interface LiquidatableRequest {
+    /** Type of request. */
+    type: "liquidatable";
+}
+
+/**
+ * Request margin table data.
+ * @returns {MarginTable}
+ */
+export interface MarginTableRequest {
+    /** Type of request. */
+    type: "marginTable";
+    /** Unique identifier for the margin requirements table. */
+    id: number;
 }
 
 /**
@@ -187,12 +227,12 @@ export interface MaxBuilderFeeRequest {
 }
 
 /**
- * Request metadata and asset contexts.
- * @returns {PerpsMetaAndAssetCtxs}
+ * Request maximum market order notionals.
+ * @returns {[number, string][]}
  */
-export interface MetaAndAssetCtxsRequest {
+export interface MaxMarketOrderNtlsRequest {
     /** Type of request. */
-    type: "metaAndAssetCtxs";
+    type: "maxMarketOrderNtls";
 }
 
 /**
@@ -204,6 +244,15 @@ export interface MetaRequest {
     type: "meta";
     /** Name of perp dex. */
     dex?: string;
+}
+
+/**
+ * Request metadata and asset contexts.
+ * @returns {PerpsMetaAndAssetCtxs}
+ */
+export interface MetaAndAssetCtxsRequest {
+    /** Type of request. */
+    type: "metaAndAssetCtxs";
 }
 
 /**
@@ -328,21 +377,21 @@ export interface SpotDeployStateRequest {
 }
 
 /**
- * Request spot metadata and asset contexts.
- * @returns {SpotMetaAndAssetCtxs}
- */
-export interface SpotMetaAndAssetCtxsRequest {
-    /** Type of request. */
-    type: "spotMetaAndAssetCtxs";
-}
-
-/**
  * Request spot trading metadata.
  * @returns {SpotMeta}
  */
 export interface SpotMetaRequest {
     /** Type of request. */
     type: "spotMeta";
+}
+
+/**
+ * Request spot metadata and asset contexts.
+ * @returns {SpotMetaAndAssetCtxs}
+ */
+export interface SpotMetaAndAssetCtxsRequest {
+    /** Type of request. */
+    type: "spotMetaAndAssetCtxs";
 }
 
 /**
@@ -390,6 +439,19 @@ export interface UserFeesRequest {
 }
 
 /**
+ * Request user fills.
+ * @returns {Fill[]}
+ */
+export interface UserFillsRequest {
+    /** Type of request. */
+    type: "userFills";
+    /** User's address. */
+    user: Hex;
+    /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
+    aggregateByTime?: boolean;
+}
+
+/**
  * Request user fills by time.
  * @returns {Fill[]}
  */
@@ -402,19 +464,6 @@ export interface UserFillsByTimeRequest {
     startTime: number;
     /** End time (in ms since epoch). */
     endTime?: number | null;
-    /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
-    aggregateByTime?: boolean;
-}
-
-/**
- * Request user fills.
- * @returns {Fill[]}
- */
-export interface UserFillsRequest {
-    /** Type of request. */
-    type: "userFills";
-    /** User's address. */
-    user: Hex;
     /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
     aggregateByTime?: boolean;
 }
@@ -483,6 +532,17 @@ export interface UserToMultiSigSignersRequest {
 }
 
 /**
+ * Request user TWAP slice fills.
+ * @returns {TwapSliceFill[]}
+ */
+export interface UserTwapSliceFillsRequest {
+    /** Type of request. */
+    type: "userTwapSliceFills";
+    /** User's address. */
+    user: Hex;
+}
+
+/**
  * Request user TWAP slice fills by time.
  * @returns {TwapSliceFill[]}
  */
@@ -500,17 +560,6 @@ export interface UserTwapSliceFillsByTimeRequest {
 }
 
 /**
- * Request user TWAP slice fills.
- * @returns {TwapSliceFill[]}
- */
-export interface UserTwapSliceFillsRequest {
-    /** Type of request. */
-    type: "userTwapSliceFills";
-    /** User's address. */
-    user: Hex;
-}
-
-/**
  * Request user vault deposits.
  * @returns {VaultEquity[]}
  */
@@ -519,6 +568,15 @@ export interface UserVaultEquitiesRequest {
     type: "userVaultEquities";
     /** User's address. */
     user: Hex;
+}
+
+/**
+ * Request validator L1 votes.
+ * @returns {unknown[]}
+ */
+export interface ValidatorL1VotesRequest {
+    /** Type of request. */
+    type: "validatorL1Votes";
 }
 
 /**

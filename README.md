@@ -430,6 +430,9 @@ class InfoClient {
     candleSnapshot(args: CandleSnapshotParameters): Promise<Candle[]>;
     fundingHistory(args: FundingHistoryParameters): Promise<FundingHistory[]>;
     l2Book(args: L2BookParameters): Promise<Book>;
+    liquidatable(): Promise<unknown[]>;
+    marginTable(args: MarginTableParameters): Promise<MarginTable>;
+    maxMarketOrderNtls(): Promise<[number, string][]>;
     meta(): Promise<PerpsMeta>;
     metaAndAssetCtxs(): Promise<PerpsMetaAndAssetCtxs>;
     perpDeployAuctionStatus(): Promise<DeployAuctionStatus>;
@@ -470,17 +473,22 @@ class InfoClient {
     userTwapSliceFills(args: UserTwapSliceFillsParameters): Promise<TwapSliceFill[]>;
     userTwapSliceFillsByTime(args: UserTwapSliceFillsByTimeParameters): Promise<TwapSliceFill[]>;
 
-    // Staking
+    // Validator
     delegations(args: DelegationsParameters): Promise<Delegation[]>;
     delegatorHistory(args: DelegatorHistoryParameters): Promise<DelegatorUpdate[]>;
     delegatorRewards(args: DelegatorRewardsParameters): Promise<DelegatorReward[]>;
     delegatorSummary(args: DelegatorSummaryParameters): Promise<DelegatorSummary>;
+    validatorL1Votes(): Promise<unknown[]>;
     validatorSummaries(): Promise<ValidatorSummary[]>;
 
     // Vault
+    leadingVaults(args: LeadingVaultsParameters): Promise<VaultLeading[]>;
     userVaultEquities(args: UserVaultEquitiesParameters): Promise<VaultEquity[]>;
     vaultDetails(args: VaultDetailsParameters): Promise<VaultDetails | null>;
     vaultSummaries(): Promise<VaultSummary[]>;
+
+    // Server
+    exchangeStatus(): Promise<ExchangeStatus>;
 
     // Explorer (RPC endpoint)
     blockDetails(args: BlockDetailsParameters): Promise<BlockDetails>;
@@ -523,7 +531,6 @@ class ExchangeClient {
     approveAgent(args: ApproveAgentParameters): Promise<SuccessResponse>;
     approveBuilderFee(args: ApproveBuilderFeeParameters): Promise<SuccessResponse>;
     claimRewards(): Promise<SuccessResponse>;
-    convertToMultiSigUser(args: ConvertToMultiSigUserParameters): Promise<SuccessResponse>;
     createSubAccount(args: CreateSubAccountParameters): Promise<CreateSubAccountResponse>;
     evmUserModify(args: EvmUserModifyParameters): Promise<SuccessResponse>;
     registerReferrer(args: RegisterReferrerParameters): Promise<SuccessResponse>;
@@ -558,6 +565,7 @@ class ExchangeClient {
     vaultTransfer(args: VaultTransferParameters): Promise<SuccessResponse>;
 
     // Multi-Sign
+    convertToMultiSigUser(args: ConvertToMultiSigUserParameters): Promise<SuccessResponse>;
     multiSig(args: MultiSigParameters): Promise<BaseExchangeResponse>;
 
     // Validator

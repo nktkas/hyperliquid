@@ -27,6 +27,7 @@ import type {
     AllMids,
     Candle,
     FundingHistory,
+    MarginTable,
     PerpDex,
     PerpsMeta,
     PerpsMetaAndAssetCtxs,
@@ -41,8 +42,8 @@ import type {
     DelegatorSummary,
     DelegatorUpdate,
     ValidatorSummary,
-} from "../types/info/delegations.ts";
-import type { DeployAuctionStatus, SpotDeployState } from "../types/info/markets.ts";
+} from "../types/info/validators.ts";
+import type { DeployAuctionStatus, ExchangeStatus, SpotDeployState } from "../types/info/markets.ts";
 import type {
     Book,
     Fill,
@@ -61,14 +62,19 @@ import type {
     DelegatorHistoryRequest,
     DelegatorRewardsRequest,
     DelegatorSummaryRequest,
+    ExchangeStatusRequest,
     ExtraAgentsRequest,
     FrontendOpenOrdersRequest,
     FundingHistoryRequest,
     HistoricalOrdersRequest,
     IsVipRequest,
     L2BookRequest,
+    LeadingVaultsRequest,
     LegalCheckRequest,
+    LiquidatableRequest,
+    MarginTableRequest,
     MaxBuilderFeeRequest,
+    MaxMarketOrderNtlsRequest,
     MetaAndAssetCtxsRequest,
     MetaRequest,
     OpenOrdersRequest,
@@ -98,11 +104,12 @@ import type {
     UserTwapSliceFillsByTimeRequest,
     UserTwapSliceFillsRequest,
     UserVaultEquitiesRequest,
+    ValidatorL1VotesRequest,
     ValidatorSummariesRequest,
     VaultDetailsRequest,
     VaultSummariesRequest,
 } from "../types/info/requests.ts";
-import type { VaultDetails, VaultEquity, VaultSummary } from "../types/info/vaults.ts";
+import type { VaultDetails, VaultEquity, VaultLeading, VaultSummary } from "../types/info/vaults.ts";
 
 /** Parameters for the {@linkcode InfoClient} constructor. */
 export interface InfoClientParameters<T extends IRequestTransport = IRequestTransport> {
@@ -152,8 +159,14 @@ export type IsVipParameters = Omit<IsVipRequest, "type">;
 /** Parameters for the {@linkcode InfoClient.l2Book} method. */
 export type L2BookParameters = Omit<L2BookRequest, "type">;
 
+/** Parameters for the {@linkcode InfoClient.leadingVaults} method. */
+export type LeadingVaultsParameters = Omit<LeadingVaultsRequest, "type">;
+
 /** Parameters for the {@linkcode InfoClient.legalCheck} method. */
 export type LegalCheckParameters = Omit<LegalCheckRequest, "type">;
+
+/** Parameters for the {@linkcode InfoClient.marginTable} method. */
+export type MarginTableParameters = Omit<MarginTableRequest, "type">;
 
 /** Parameters for the {@linkcode InfoClient.maxBuilderFee} method. */
 export type MaxBuilderFeeParameters = Omit<MaxBuilderFeeRequest, "type">;
@@ -260,6 +273,7 @@ export class InfoClient<
 
     /**
      * Request mid coin prices.
+     * @param args - An optional parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Mapping of coin symbols to mid prices.
      *
@@ -484,6 +498,31 @@ export class InfoClient<
     }
 
     /**
+     * Request exchange status information.
+     * @param signal - An optional abort signal.
+     * @returns Exchange system status information.
+     *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-summary
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const infoClient = new hl.InfoClient({ transport });
+     *
+     * const data = await infoClient.exchangeStatus();
+     * ```
+     */
+    exchangeStatus(signal?: AbortSignal): Promise<ExchangeStatus> {
+        const request: ExchangeStatusRequest = {
+            type: "exchangeStatus",
+        };
+        return this.transport.request("info", request, signal);
+    }
+
+    /**
      * Request user's extra agents.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -649,6 +688,33 @@ export class InfoClient<
     }
 
     /**
+     * Request leading vaults for a user.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns
+     *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const infoClient = new hl.InfoClient({ transport });
+     *
+     * const data = await infoClient.leadingVaults({ user: "0x..." });
+     * ```
+     */
+    leadingVaults(args: LeadingVaultsParameters, signal?: AbortSignal): Promise<VaultLeading[]> {
+        const request: LeadingVaultsRequest = {
+            type: "leadingVaults",
+            ...args,
+        };
+        return this.transport.request("info", request, signal);
+    }
+
+    /**
      * Request legal verification status of a user.
      * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
@@ -670,6 +736,58 @@ export class InfoClient<
     legalCheck(args: LegalCheckParameters, signal?: AbortSignal): Promise<LegalCheck> {
         const request: LegalCheckRequest = {
             type: "legalCheck",
+            ...args,
+        };
+        return this.transport.request("info", request, signal);
+    }
+
+    /**
+     * Request liquidatable (unknown).
+     * @param signal - An optional abort signal.
+     * @returns
+     *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-summary
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const infoClient = new hl.InfoClient({ transport });
+     *
+     * const data = await infoClient.liquidatable();
+     * ```
+     */
+    liquidatable(signal?: AbortSignal): Promise<unknown[]> {
+        const request: LiquidatableRequest = {
+            type: "liquidatable",
+        };
+        return this.transport.request("info", request, signal);
+    }
+
+    /**
+     * Request margin table data.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Margin requirements table with multiple tiers.
+     *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-summary
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const infoClient = new hl.InfoClient({ transport });
+     *
+     * const data = await infoClient.marginTable({ id: 1 });
+     * ```
+     */
+    marginTable(args: MarginTableParameters, signal?: AbortSignal): Promise<MarginTable> {
+        const request: MarginTableRequest = {
+            type: "marginTable",
             ...args,
         };
         return this.transport.request("info", request, signal);
@@ -703,7 +821,33 @@ export class InfoClient<
     }
 
     /**
+     * Request maximum market order notionals.
+     * @param signal - An optional abort signal.
+     * @returns
+     *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-summary
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const infoClient = new hl.InfoClient({ transport });
+     *
+     * const data = await infoClient.maxMarketOrderNtls();
+     * ```
+     */
+    maxMarketOrderNtls(signal?: AbortSignal): Promise<[number, string][]> {
+        const request: MaxMarketOrderNtlsRequest = {
+            type: "maxMarketOrderNtls",
+        };
+        return this.transport.request("info", request, signal);
+    }
+
+    /**
      * Request trading metadata.
+     * @param args - An optional parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Metadata for perpetual assets.
      *
@@ -864,7 +1008,6 @@ export class InfoClient<
 
     /**
      * Request perpetuals at open interest cap.
-     * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Array of perpetuals at open interest caps.
      *
@@ -1554,8 +1697,33 @@ export class InfoClient<
     }
 
     /**
+     * Request validator L1 votes.
+     * @param signal - An optional abort signal.
+     * @returns
+     *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-summary
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const infoClient = new hl.InfoClient({ transport });
+     *
+     * const data = await infoClient.validatorL1Votes();
+     * ```
+     */
+    validatorL1Votes(signal?: AbortSignal): Promise<unknown[]> {
+        const request: ValidatorL1VotesRequest = {
+            type: "validatorL1Votes",
+        };
+        return this.transport.request("info", request, signal);
+    }
+
+    /**
      * Request validator summaries.
-     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
      * @returns Array of validator summaries.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1607,7 +1775,6 @@ export class InfoClient<
 
     /**
      * Request a list of vaults less than 2 hours old.
-     * @param args - The parameters for the request.
      * @param signal - An optional abort signal.
      * @returns Array of vault summaries.
      *

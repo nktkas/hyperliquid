@@ -17,7 +17,7 @@ import { formatPrice, formatSize, getAssetData, randomCloid } from "../_utils/ut
 
 // —————————— Arguments ——————————
 
-const cliArgs = parseArgs(Deno.args, { default: { wait: 2500 }, string: ["_"] }) as Args<{
+const cliArgs = parseArgs(Deno.args, { default: { wait: 3000 }, string: ["_"] }) as Args<{
     /** Delay to avoid rate limits */
     wait: number;
 }>;
