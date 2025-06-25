@@ -64,7 +64,7 @@ const METHODS_TO_TEST = [ // controls which tests to run
     "vaultModify",
     "vaultTransfer",
     "withdraw3",
-    "_guessSignatureChainId.test",
+    "_guessSignatureChainId",
     "_validateResponse",
 ];
 const SKIP_METHODS_FOR_MULTISIGN = [ // FIXME: enable tests for `multisign` mode
@@ -114,11 +114,15 @@ run(
     async (types, mode) => {
         const client = mode === "normal" ? exchClient : multiSignClient;
 
-        const data = await client.approveAgent({
+        const data1 = await client.approveAgent({
             agentAddress: generateEthereumAddress(),
             agentName: "agentName",
         });
-        schemaCoverage(types, [data]);
+        await new Promise((r) => setTimeout(r, 5000)); // to avoid error: User has pending agent removal
+        const data2 = await client.approveAgent({
+            agentAddress: generateEthereumAddress(),
+        });
+        schemaCoverage(types, [data1, data2]);
     },
 );
 
@@ -1890,116 +1894,158 @@ run(
 );
 
 Deno.test("_guessSignatureChainId", async (t) => {
-    await t.step("viem", async () => {
-        const wallet = createWalletClient({
-            account: privateKeyToAccount(generatePrivateKey()),
-            transport: http("https://ethereum-rpc.publicnode.com"),
-            chain: mainnet,
-        });
-        const exchClient = new ExchangeClient({ wallet, transport: new HttpTransport() });
-
-        const signatureChainId = typeof exchClient.signatureChainId === "string"
-            ? exchClient.signatureChainId
-            : await exchClient.signatureChainId();
-        assertEquals(signatureChainId, "0x1");
-    });
-
-    await t.step("ethers.js", async () => {
-        const provider = new ethers.JsonRpcProvider("https://ethereum-rpc.publicnode.com");
-        const wallet = new ethers.Wallet(generatePrivateKey(), provider);
-
-        const exchClient = new ExchangeClient({ wallet, transport: new HttpTransport() });
-
-        const signatureChainId = typeof exchClient.signatureChainId === "string"
-            ? exchClient.signatureChainId
-            : await exchClient.signatureChainId();
-        assertEquals(signatureChainId, "0x1");
-    });
-
-    await t.step("window.ethereum", async () => {
-        const ethereum = { // Mock window.ethereum
-            // deno-lint-ignore require-await
-            request: async ({ method }: { method: string }) => {
-                if (method === "eth_chainId") {
-                    return ["0x1"];
-                }
-            },
-        };
-
-        const transport = new HttpTransport();
-        const exchClient = new ExchangeClient({ wallet: ethereum, transport });
-
-        const signatureChainId = typeof exchClient.signatureChainId === "string"
-            ? exchClient.signatureChainId
-            : await exchClient.signatureChainId();
-        assertEquals(signatureChainId, "0x1");
-    });
-
-    await t.step("default", async (t) => {
-        await t.step("mainnet", async () => {
-            const transport = new HttpTransport();
-            const exchClient = new ExchangeClient({ wallet: generatePrivateKey(), transport });
+    await t.step({
+        name: "viem",
+        fn: async () => {
+            const wallet = createWalletClient({
+                account: privateKeyToAccount(generatePrivateKey()),
+                transport: http("https://ethereum-rpc.publicnode.com"),
+                chain: mainnet,
+            });
+            const exchClient = new ExchangeClient({ wallet, transport: new HttpTransport() });
 
             const signatureChainId = typeof exchClient.signatureChainId === "string"
                 ? exchClient.signatureChainId
                 : await exchClient.signatureChainId();
-            assertEquals(signatureChainId, "0xa4b1");
-        });
+            assertEquals(signatureChainId, "0x1");
+        },
+        ignore: !METHODS_TO_TEST.includes("_guessSignatureChainId"),
+    });
 
-        await t.step("testnet", async () => {
-            const transport = new HttpTransport();
-            const exchClient = new ExchangeClient({ wallet: generatePrivateKey(), transport, isTestnet: true });
+    await t.step({
+        name: "viem",
+        fn: async () => {},
+        ignore: !METHODS_TO_TEST.includes("_guessSignatureChainId"),
+    });
+
+    await t.step({
+        name: "ethers",
+        fn: async () => {
+            const provider = new ethers.JsonRpcProvider("https://ethereum-rpc.publicnode.com");
+            const wallet = new ethers.Wallet(generatePrivateKey(), provider);
+
+            const exchClient = new ExchangeClient({ wallet, transport: new HttpTransport() });
 
             const signatureChainId = typeof exchClient.signatureChainId === "string"
                 ? exchClient.signatureChainId
                 : await exchClient.signatureChainId();
-            assertEquals(signatureChainId, "0x66eee");
-        });
+            assertEquals(signatureChainId, "0x1");
+        },
+        ignore: !METHODS_TO_TEST.includes("_guessSignatureChainId"),
+    });
+
+    await t.step({
+        name: "window.ethereum",
+        fn: async () => {
+            const ethereum = { // Mock window.ethereum
+                // deno-lint-ignore require-await
+                request: async ({ method }: { method: string }) => {
+                    if (method === "eth_chainId") {
+                        return ["0x1"];
+                    }
+                },
+            };
+
+            const transport = new HttpTransport();
+            const exchClient = new ExchangeClient({ wallet: ethereum, transport });
+
+            const signatureChainId = typeof exchClient.signatureChainId === "string"
+                ? exchClient.signatureChainId
+                : await exchClient.signatureChainId();
+            assertEquals(signatureChainId, "0x1");
+        },
+        ignore: !METHODS_TO_TEST.includes("_guessSignatureChainId"),
+    });
+
+    await t.step({
+        name: "default",
+        fn: async (t) => {
+            await t.step("mainnet", async () => {
+                const transport = new HttpTransport();
+                const exchClient = new ExchangeClient({ wallet: generatePrivateKey(), transport });
+
+                const signatureChainId = typeof exchClient.signatureChainId === "string"
+                    ? exchClient.signatureChainId
+                    : await exchClient.signatureChainId();
+                assertEquals(signatureChainId, "0xa4b1");
+            });
+
+            await t.step("testnet", async () => {
+                const transport = new HttpTransport();
+                const exchClient = new ExchangeClient({ wallet: generatePrivateKey(), transport, isTestnet: true });
+
+                const signatureChainId = typeof exchClient.signatureChainId === "string"
+                    ? exchClient.signatureChainId
+                    : await exchClient.signatureChainId();
+                assertEquals(signatureChainId, "0x66eee");
+            });
+        },
+        ignore: !METHODS_TO_TEST.includes("_guessSignatureChainId"),
     });
 });
 
 Deno.test("_validateResponse", { ignore: !PRIVATE_KEY }, async (t) => {
-    await t.step("CancelResponse", async () => {
-        await assertRejects(
-            () => exchClient.cancel({ cancels: [{ a: 0, o: 0 }] }),
-            ApiRequestError,
-            "Order 0: Order was never placed, already canceled, or filled. asset=0",
-        );
+    await t.step({
+        name: "CancelResponse",
+        fn: async () => {
+            await assertRejects(
+                () => exchClient.cancel({ cancels: [{ a: 0, o: 0 }] }),
+                ApiRequestError,
+                "Order 0: Order was never placed, already canceled, or filled. asset=0",
+            );
+        },
+        ignore: !METHODS_TO_TEST.includes("_validateResponse"),
     });
 
-    await t.step("ErrorResponse", async () => {
-        await assertRejects(
-            () => exchClient.scheduleCancel({ time: 1 }),
-            ApiRequestError,
-            "Scheduled cancel time too early, must be at least 5 seconds from now.",
-        );
+    await t.step({
+        name: "ErrorResponse",
+        fn: async () => {
+            await assertRejects(
+                () => exchClient.scheduleCancel({ time: 1 }),
+                ApiRequestError,
+                "Scheduled cancel time too early, must be at least 5 seconds from now.",
+            );
+        },
+        ignore: !METHODS_TO_TEST.includes("_validateResponse"),
     });
 
-    await t.step("OrderResponse", async () => {
-        await assertRejects(
-            () =>
-                exchClient.order({
-                    orders: [{ a: 0, b: true, p: "0", s: "0", r: false, t: { limit: { tif: "Gtc" } } }],
-                    grouping: "na",
-                }),
-            ApiRequestError,
-            "Order 0: Order has zero size.",
-        );
+    await t.step({
+        name: "OrderResponse",
+        fn: async () => {
+            await assertRejects(
+                () =>
+                    exchClient.order({
+                        orders: [{ a: 0, b: true, p: "0", s: "0", r: false, t: { limit: { tif: "Gtc" } } }],
+                        grouping: "na",
+                    }),
+                ApiRequestError,
+                "Order 0: Order has zero size.",
+            );
+        },
+        ignore: !METHODS_TO_TEST.includes("_validateResponse"),
     });
 
-    await t.step("TwapCancelResponse", async () => {
-        await assertRejects(
-            () => exchClient.twapOrder({ a: 0, b: true, s: "0", r: false, m: 5, t: false }),
-            ApiRequestError,
-            "Order has zero size.",
-        );
+    await t.step({
+        name: "TwapCancelResponse",
+        fn: async () => {
+            await assertRejects(
+                () => exchClient.twapOrder({ a: 0, b: true, s: "0", r: false, m: 5, t: false }),
+                ApiRequestError,
+                "Order has zero size.",
+            );
+        },
+        ignore: !METHODS_TO_TEST.includes("_validateResponse"),
     });
 
-    await t.step("TwapOrderResponse", async () => {
-        await assertRejects(
-            () => exchClient.twapOrder({ a: 0, b: true, s: "0", r: false, m: 5, t: false }),
-            ApiRequestError,
-            "Order has zero size.",
-        );
+    await t.step({
+        name: "TwapOrderResponse",
+        fn: async () => {
+            await assertRejects(
+                () => exchClient.twapOrder({ a: 0, b: true, s: "0", r: false, m: 5, t: false }),
+                ApiRequestError,
+                "Order has zero size.",
+            );
+        },
+        ignore: !METHODS_TO_TEST.includes("_validateResponse"),
     });
 });
