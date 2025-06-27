@@ -777,6 +777,13 @@ with `tif: "Ioc"` and prices that guarantee immediate execution:
 - For buys: set limit price >= current best ask
 - For sells: set limit price <= current best bid
 
+### How to use the [Agent Wallet](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/nonces-and-api-wallets#api-wallets) / [Vault](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#subaccounts-and-vaults) / [Sub-Account](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#subaccounts-and-vaults) in `ExchangeClient`?
+
+**Agent Wallet**: Use agent's private key in constructor instead of master account's private key.
+
+**Vault and Sub-Account**: Pass vault or sub-account address via `vaultAddress` parameter to methods or set
+`defaultVaultAddress` in constructor.
+
 ## Contributing
 
 We appreciate your help! To contribute, please read the [contributing instructions](CONTRIBUTING.md).

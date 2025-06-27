@@ -92,8 +92,16 @@ function encodeType(primaryType: string, types: Types): string {
     const deps = findTypeDependencies(primaryType, types);
     const sortedDeps = [primaryType, ...deps.filter((d) => d !== primaryType).sort()];
     return sortedDeps
-        .map((type) => `${type}(${types[type].map((field) => `${field.type} ${field.name}`).join(",")})`)
+        .map((type) =>
+            `${type}(${types[type].map((field) => `${resolveTypeAlias(field.type)} ${field.name}`).join(",")})`
+        )
         .join("");
+}
+
+function resolveTypeAlias(type: string): string {
+    if (type === "uint") return "uint256";
+    if (type === "int") return "int256";
+    return type;
 }
 
 function findTypeDependencies(primaryType: string, types: Types, found = new Set<string>()): string[] {
@@ -101,7 +109,7 @@ function findTypeDependencies(primaryType: string, types: Types, found = new Set
     found.add(primaryType);
 
     for (const field of types[primaryType]) {
-        const baseType = field.type.replace(/\[\d*\]$/, "");
+        const baseType = field.type.replace(/\[.*?\]/g, "");
         if (types[baseType]) {
             findTypeDependencies(baseType, types, found);
         }

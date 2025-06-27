@@ -485,7 +485,12 @@ run(
     async (types, mode) => {
         const client = mode === "normal" ? exchClient : multiSignClient;
 
-        await client.createVault({ name: "", description: "", initialUsd: 50 * 1e6 })
+        await client.createVault({
+            name: "",
+            description: "",
+            initialUsd: 50 * 1e6,
+            nonce: Date.now(),
+        })
             .then((data) => {
                 schemaCoverage(types, [data]);
             })
@@ -1552,12 +1557,14 @@ run(
 
         async function createTWAP(client: ExchangeClient, id: number, sz: string): Promise<number> {
             const twapOrderResult = await client.twapOrder({
-                a: id,
-                b: true,
-                s: sz,
-                r: false,
-                m: 5,
-                t: false,
+                twap: {
+                    a: id,
+                    b: true,
+                    s: sz,
+                    r: false,
+                    m: 5,
+                    t: false,
+                },
             });
             const twapId = twapOrderResult.response.data.status.running.twapId;
             return twapId;
@@ -1602,21 +1609,25 @@ run(
         const data = await Promise.all([
             // Check response 'success'
             client.twapOrder({
-                a: id,
-                b: true,
-                s: sz,
-                r: false,
-                m: 5,
-                t: false,
+                twap: {
+                    a: id,
+                    b: true,
+                    s: sz,
+                    r: false,
+                    m: 5,
+                    t: false,
+                },
             }),
             // Check argument 'expiresAfter'
             client.twapOrder({
-                a: id,
-                b: true,
-                s: sz,
-                r: false,
-                m: 5,
-                t: false,
+                twap: {
+                    a: id,
+                    b: true,
+                    s: sz,
+                    r: false,
+                    m: 5,
+                    t: false,
+                },
                 expiresAfter: Date.now() + 1000 * 60 * 60,
             }),
         ]);
@@ -2029,7 +2040,17 @@ Deno.test("_validateResponse", { ignore: !PRIVATE_KEY }, async (t) => {
         name: "TwapCancelResponse",
         fn: async () => {
             await assertRejects(
-                () => exchClient.twapOrder({ a: 0, b: true, s: "0", r: false, m: 5, t: false }),
+                () =>
+                    exchClient.twapOrder({
+                        twap: {
+                            a: 0,
+                            b: true,
+                            s: "0",
+                            r: false,
+                            m: 5,
+                            t: false,
+                        },
+                    }),
                 ApiRequestError,
                 "Order has zero size.",
             );
@@ -2041,7 +2062,17 @@ Deno.test("_validateResponse", { ignore: !PRIVATE_KEY }, async (t) => {
         name: "TwapOrderResponse",
         fn: async () => {
             await assertRejects(
-                () => exchClient.twapOrder({ a: 0, b: true, s: "0", r: false, m: 5, t: false }),
+                () =>
+                    exchClient.twapOrder({
+                        twap: {
+                            a: 0,
+                            b: true,
+                            s: "0",
+                            r: false,
+                            m: 5,
+                            t: false,
+                        },
+                    }),
                 ApiRequestError,
                 "Order has zero size.",
             );

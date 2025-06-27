@@ -354,12 +354,14 @@ run(
             const twapSz = formatSize(new BigNumber(55).div(ctx.markPx), universe.szDecimals);
 
             const result = await exchClient.twapOrder({
-                a: id,
-                b: buy,
-                s: twapSz,
-                r: false,
-                m: 5,
-                t: false,
+                twap: {
+                    a: id,
+                    b: buy,
+                    s: twapSz,
+                    r: false,
+                    m: 5,
+                    t: false,
+                },
             });
             const twapId = result.response.data.status.running.twapId;
 
@@ -621,12 +623,14 @@ run(
             const twapSz = formatSize(new BigNumber(55).div(ctx.markPx), universe.szDecimals);
 
             const result = await exchClient.twapOrder({
-                a: id,
-                b: buy,
-                s: twapSz,
-                r: false,
-                m: 5,
-                t: false,
+                twap: {
+                    a: id,
+                    b: buy,
+                    s: twapSz,
+                    r: false,
+                    m: 5,
+                    t: false,
+                },
             });
             const twapId = result.response.data.status.running.twapId;
 
@@ -877,8 +881,26 @@ run(
         // Create orders/positions/TWAP's and set up spot dusting opt-out
         const [twap1, twap2] = await Promise.all([
             // Create TWAP orders
-            exchClient.twapOrder({ a: id1, b: true, s: twapSz1, r: false, m: 5, t: false }),
-            exchClient.twapOrder({ a: id2, b: false, s: twapSz2, r: false, m: 5, t: false }),
+            exchClient.twapOrder({
+                twap: {
+                    a: id1,
+                    b: true,
+                    s: twapSz1,
+                    r: false,
+                    m: 5,
+                    t: false,
+                },
+            }),
+            exchClient.twapOrder({
+                twap: {
+                    a: id2,
+                    b: false,
+                    s: twapSz2,
+                    r: false,
+                    m: 5,
+                    t: false,
+                },
+            }),
             // Create orders
             exchClient.order({
                 orders: [{ a: id1, b: true, p: pxDown1, s: sz1, r: false, t: { limit: { tif: "Gtc" } } }],
