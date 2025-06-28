@@ -37,6 +37,7 @@ import type {
     SpotDeployRequest_UserGenesis,
     SpotSendRequest,
     SpotUserRequest,
+    SubAccountModifyRequest,
     SubAccountSpotTransferRequest,
     SubAccountTransferRequest,
     TokenDelegateRequest,
@@ -542,6 +543,13 @@ export const actionSorter = {
             toggleSpotDusting: {
                 optOut: action.toggleSpotDusting.optOut,
             },
+        };
+    },
+    subAccountModify: (action: DeepImmutable<SubAccountModifyRequest["action"]>): SubAccountModifyRequest["action"] => {
+        return {
+            type: action.type,
+            subAccountUser: action.subAccountUser.toLowerCase() as Hex,
+            name: action.name,
         };
     },
     subAccountSpotTransfer: (

@@ -537,6 +537,7 @@ class ExchangeClient {
     reserveRequestWeight(args: ReserveRequestWeightParameters): Promise<SuccessResponse>;
     setDisplayName(args: SetDisplayNameParameters): Promise<SuccessResponse>;
     setReferrer(args: SetReferrerParameters): Promise<SuccessResponse>;
+    subAccountModify(args: SubAccountModifyParameters): Promise<SuccessResponse>;
     spotUser(args: SpotUserParameters): Promise<SuccessResponse>;
 
     // Transfer

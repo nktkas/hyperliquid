@@ -38,6 +38,7 @@ import type {
     SpotDeployRequest_UserGenesis,
     SpotSendRequest,
     SpotUserRequest,
+    SubAccountModifyRequest,
     SubAccountSpotTransferRequest,
     SubAccountTransferRequest,
     TokenDelegateRequest,
@@ -217,6 +218,9 @@ export type SpotSendParameters = ExtractRequestParameters<SpotSendRequest>;
 
 /** Parameters for the {@linkcode ExchangeClient.spotUser} method. */
 export type SpotUserParameters = ExtractRequestParameters<SpotUserRequest>;
+
+/** Parameters for the {@linkcode ExchangeClient.subAccountModify} method. */
+export type SubAccountModifyParameters = ExtractRequestParameters<SubAccountModifyRequest>;
 
 /** Parameters for the {@linkcode ExchangeClient.subAccountSpotTransfer} method. */
 export type SubAccountSpotTransferParameters = ExtractRequestParameters<SubAccountSpotTransferRequest>;
@@ -1452,6 +1456,37 @@ export class ExchangeClient<
                 hyperliquidChain: this._getHyperliquidChain(),
                 signatureChainId: await this._getSignatureChainId(),
                 time: await this.nonceManager(),
+                ...actionArgs,
+            },
+        }, signal);
+    }
+
+    /**
+     * Modify a sub-account's.
+     * @param args - The parameters for the request.
+     * @param signal - An optional abort signal.
+     * @returns Successful response without specific data.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+     * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
+     *
+     * await exchClient.subAccountModify({ subAccountUser: "0x...", name: "..."  });
+     * ```
+     */
+    subAccountModify(args: SubAccountModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
+        const { ...actionArgs } = args;
+        return this._executeAction({
+            action: {
+                type: "subAccountModify",
                 ...actionArgs,
             },
         }, signal);

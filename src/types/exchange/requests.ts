@@ -878,6 +878,23 @@ export interface SpotUserRequest extends BaseExchangeRequest {
 }
 
 /**
+ * Modify a sub-account's.
+ * @returns {SuccessResponse}
+ */
+export interface SubAccountModifyRequest extends BaseExchangeRequest {
+    action: {
+        /** Type of action. */
+        type: "subAccountModify";
+        /** Sub-account address to modify. */
+        subAccountUser: Hex;
+        /** New sub-account name. */
+        name: string;
+    };
+    vaultAddress?: undefined;
+    expiresAfter?: undefined;
+}
+
+/**
  * Transfer between sub-accounts (spot).
  * @returns {SuccessResponse}
  */
