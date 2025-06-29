@@ -150,7 +150,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
      *
      * @param endpoint - The API endpoint to send the request to (`explorer` requests are not supported).
      * @param payload - The payload to send with the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns A promise that resolves with parsed JSON response body.
      *
      * @throws {WebSocketRequestError} - An error that occurs when a WebSocket request fails.
@@ -268,7 +268,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
 
     /**
      * Waits until the WebSocket connection is ready.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns A promise that resolves when the connection is ready.
      */
     ready(signal?: AbortSignal): Promise<void> {
@@ -296,7 +296,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
 
     /**
      * Closes the WebSocket connection and waits until it is fully closed.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns A promise that resolves when the connection is fully closed.
      */
     close(signal?: AbortSignal): Promise<void> {

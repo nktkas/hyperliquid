@@ -428,7 +428,7 @@ export class ExchangeClient<
     /**
      * Approve an agent to sign on behalf of the master account.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -462,7 +462,7 @@ export class ExchangeClient<
     /**
      * Approve a maximum fee rate for a builder.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -499,7 +499,7 @@ export class ExchangeClient<
     /**
      * Modify multiple orders.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful variant of {@link OrderResponse} without error statuses.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -546,7 +546,7 @@ export class ExchangeClient<
     /**
      * Cancel order(s).
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful variant of {@link CancelResponse} without error statuses.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -583,7 +583,7 @@ export class ExchangeClient<
     /**
      * Cancel order(s) by cloid.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful variant of {@link CancelResponse} without error statuses.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -620,7 +620,7 @@ export class ExchangeClient<
     /**
      * Transfer native token from the user's spot account into staking for delegating to validators.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -654,7 +654,7 @@ export class ExchangeClient<
     /**
      * Claim rewards from referral program.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -683,7 +683,7 @@ export class ExchangeClient<
     /**
      * Convert a single-signature account to a multi-signature account or vice versa.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -724,7 +724,7 @@ export class ExchangeClient<
     /**
      * Create a sub-account.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Response for creating a sub-account.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -755,7 +755,7 @@ export class ExchangeClient<
     /**
      * Create a vault.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Response for creating a vault.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -791,7 +791,7 @@ export class ExchangeClient<
     /**
      * Jail or unjail self as a validator signer.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -827,7 +827,7 @@ export class ExchangeClient<
     /**
      * Action related to validator management.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -885,7 +885,7 @@ export class ExchangeClient<
     /**
      * Transfer native token from staking into the user's spot account.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -919,7 +919,7 @@ export class ExchangeClient<
     /**
      * Configure block type for EVM transactions.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Response for creating a sub-account.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -950,7 +950,7 @@ export class ExchangeClient<
     /**
      * Modify an order.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -994,7 +994,7 @@ export class ExchangeClient<
     /**
      * A multi-signature request.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Any successful response.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1063,7 +1063,7 @@ export class ExchangeClient<
     /**
      * Place an order(s).
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful variant of {@link OrderResponse} without error statuses.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1109,7 +1109,7 @@ export class ExchangeClient<
     /**
      * Deploying HIP-3 assets.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1152,7 +1152,7 @@ export class ExchangeClient<
     /**
      * Transfer funds between Spot account and Perp dex account.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1186,7 +1186,7 @@ export class ExchangeClient<
     /**
      * Transfer collateral tokens between different perp dexes for the same user.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1220,7 +1220,7 @@ export class ExchangeClient<
     /**
      * Create a referral code.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1251,7 +1251,7 @@ export class ExchangeClient<
     /**
      * Reserve additional rate-limited actions for a fee.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1283,7 +1283,7 @@ export class ExchangeClient<
     /**
      * Schedule a cancel-all operation at a future time.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1323,7 +1323,7 @@ export class ExchangeClient<
     /**
      * Set the display name in the leaderboard.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1354,7 +1354,7 @@ export class ExchangeClient<
     /**
      * Set a referral code.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1385,7 +1385,7 @@ export class ExchangeClient<
     /**
      * Deploying HIP-1 and HIP-2 assets.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1426,7 +1426,7 @@ export class ExchangeClient<
     /**
      * Send spot assets to another address.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1464,7 +1464,7 @@ export class ExchangeClient<
     /**
      * Modify a sub-account's.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1495,7 +1495,7 @@ export class ExchangeClient<
     /**
      * Opt Out of Spot Dusting.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1526,7 +1526,7 @@ export class ExchangeClient<
     /**
      * Transfer between sub-accounts (spot).
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1562,7 +1562,7 @@ export class ExchangeClient<
     /**
      * Transfer between sub-accounts (perpetual).
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1593,7 +1593,7 @@ export class ExchangeClient<
     /**
      * Delegate or undelegate native tokens to or from a validator.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1627,7 +1627,7 @@ export class ExchangeClient<
     /**
      * Cancel a TWAP order.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful variant of {@link TwapCancelResponse} without error status.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1660,7 +1660,7 @@ export class ExchangeClient<
     /**
      * Place a TWAP order.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful variant of {@link TwapOrderResponse} without error status.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1702,7 +1702,7 @@ export class ExchangeClient<
     /**
      * Add or remove margin from isolated position.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1735,7 +1735,7 @@ export class ExchangeClient<
     /**
      * Update cross or isolated leverage on a coin.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1768,7 +1768,7 @@ export class ExchangeClient<
     /**
      * Transfer funds between Spot account and Perp account.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1802,7 +1802,7 @@ export class ExchangeClient<
     /**
      * Send usd to another address.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1836,7 +1836,7 @@ export class ExchangeClient<
     /**
      * Distribute funds from a vault between followers.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1867,7 +1867,7 @@ export class ExchangeClient<
     /**
      * Modify a vault's configuration.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1902,7 +1902,7 @@ export class ExchangeClient<
     /**
      * Deposit or withdraw from a vault.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1934,7 +1934,7 @@ export class ExchangeClient<
     /**
      * Initiate a withdrawal request.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.

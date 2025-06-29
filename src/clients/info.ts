@@ -274,7 +274,7 @@ export class InfoClient<
     /**
      * Request mid coin prices.
      * @param args - An optional parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Mapping of coin symbols to mid prices.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -306,7 +306,7 @@ export class InfoClient<
     /**
      * Block details by block height.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Block details.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -334,7 +334,7 @@ export class InfoClient<
     /**
      * Request candlestick snapshots.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of candlestick data points.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -365,7 +365,7 @@ export class InfoClient<
     /**
      * Request clearinghouse state.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Account summary for perpetual trading.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -392,7 +392,7 @@ export class InfoClient<
     /**
      * Request user staking delegations.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of user's delegations to validators.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -419,7 +419,7 @@ export class InfoClient<
     /**
      * Request user staking history.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of user's staking updates.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -446,7 +446,7 @@ export class InfoClient<
     /**
      * Request user staking rewards.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of user's staking rewards.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -473,7 +473,7 @@ export class InfoClient<
     /**
      * Request user staking summary.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Summary of a user's staking delegations.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -499,7 +499,7 @@ export class InfoClient<
 
     /**
      * Request exchange status information.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Exchange system status information.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -525,7 +525,7 @@ export class InfoClient<
     /**
      * Request user's extra agents.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns User's extra agents.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -552,7 +552,7 @@ export class InfoClient<
     /**
      * Request frontend open orders.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of open orders with additional frontend information.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -579,7 +579,7 @@ export class InfoClient<
     /**
      * Request funding history.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of historical funding rate data for an asset.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -609,7 +609,7 @@ export class InfoClient<
     /**
      * Request user's historical orders.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of user's historical orders.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -636,7 +636,7 @@ export class InfoClient<
     /**
      * Request to check if a user is a VIP.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Boolean indicating user's VIP status.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -663,7 +663,7 @@ export class InfoClient<
     /**
      * Request L2 order book.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns L2 order book snapshot.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -690,7 +690,7 @@ export class InfoClient<
     /**
      * Request leading vaults for a user.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -717,7 +717,7 @@ export class InfoClient<
     /**
      * Request legal verification status of a user.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Legal verification status for a user.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -743,7 +743,7 @@ export class InfoClient<
 
     /**
      * Request liquidatable (unknown).
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -769,7 +769,7 @@ export class InfoClient<
     /**
      * Request margin table data.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Margin requirements table with multiple tiers.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -796,7 +796,7 @@ export class InfoClient<
     /**
      * Request builder fee approval.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Maximum builder fee approval.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -822,7 +822,7 @@ export class InfoClient<
 
     /**
      * Request maximum market order notionals.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -848,7 +848,7 @@ export class InfoClient<
     /**
      * Request trading metadata.
      * @param args - An optional parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Metadata for perpetual assets.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -879,7 +879,7 @@ export class InfoClient<
 
     /**
      * Request metadata and asset contexts.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Metadata and context for perpetual assets.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -905,7 +905,7 @@ export class InfoClient<
     /**
      * Request open orders.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of open order.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -932,7 +932,7 @@ export class InfoClient<
     /**
      * Request order status.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Result of an order status lookup.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -958,7 +958,7 @@ export class InfoClient<
 
     /**
      * Request for the status of the perpetual deploy auction.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Status of the perpetual deploy auction.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -983,7 +983,7 @@ export class InfoClient<
 
     /**
      * Request all perpetual dexs.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of perpetual dexes (null is main dex).
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1008,7 +1008,7 @@ export class InfoClient<
 
     /**
      * Request perpetuals at open interest cap.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of perpetuals at open interest caps.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1034,7 +1034,7 @@ export class InfoClient<
     /**
      * Request user portfolio.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Portfolio metrics grouped by time periods.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1060,7 +1060,7 @@ export class InfoClient<
 
     /**
      * Request predicted funding rates.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of predicted funding rates.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1086,7 +1086,7 @@ export class InfoClient<
     /**
      * Request user's existence check before transfer.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Pre-transfer user existence check result.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1113,7 +1113,7 @@ export class InfoClient<
     /**
      * Request user referral.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Referral information for a user.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1140,7 +1140,7 @@ export class InfoClient<
     /**
      * Request spot clearinghouse state.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Account summary for spot trading.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1170,7 +1170,7 @@ export class InfoClient<
     /**
      * Request spot deploy state.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Deploy state for spot tokens.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1196,7 +1196,7 @@ export class InfoClient<
 
     /**
      * Request spot trading metadata.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Metadata for spot assets.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1221,7 +1221,7 @@ export class InfoClient<
 
     /**
      * Request spot metadata and asset contexts.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Metadata and context for spot assets.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1247,7 +1247,7 @@ export class InfoClient<
     /**
      * Request user sub-accounts.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of user sub-account or null if the user does not have any sub-accounts.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1274,7 +1274,7 @@ export class InfoClient<
     /**
      * Request token details.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Details of a token.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1301,7 +1301,7 @@ export class InfoClient<
     /**
      * Request twap history of a user.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of user's TWAP history.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1328,7 +1328,7 @@ export class InfoClient<
     /**
      * Request transaction details by transaction hash.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Transaction details.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1356,7 +1356,7 @@ export class InfoClient<
     /**
      * Request user details by user's address.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns User details.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1384,7 +1384,7 @@ export class InfoClient<
     /**
      * Request user fees.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns User fees.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1411,7 +1411,7 @@ export class InfoClient<
     /**
      * Request user fills.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of user's trade fill.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1438,7 +1438,7 @@ export class InfoClient<
     /**
      * Request user fills by time.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of user's trade fill.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1468,7 +1468,7 @@ export class InfoClient<
     /**
      * Request user funding.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of user's funding ledger update.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1498,7 +1498,7 @@ export class InfoClient<
     /**
      * Request user non-funding ledger updates.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of user's non-funding ledger update.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1531,7 +1531,7 @@ export class InfoClient<
     /**
      * Request user rate limits.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns User's rate limits.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1558,7 +1558,7 @@ export class InfoClient<
     /**
      * Request user role.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns User's role.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1585,7 +1585,7 @@ export class InfoClient<
     /**
      * Request multi-sig signers for a user.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Multi-sig signers for a user or null if the user does not have any multi-sig signers.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1615,7 +1615,7 @@ export class InfoClient<
     /**
      * Request user twap slice fills.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of user's twap slice fill.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1642,7 +1642,7 @@ export class InfoClient<
     /**
      * Request user twap slice fills by time.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of user's twap slice fill.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1672,7 +1672,7 @@ export class InfoClient<
     /**
      * Request user vault deposits.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of user's vault deposits.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1698,7 +1698,7 @@ export class InfoClient<
 
     /**
      * Request validator L1 votes.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1723,7 +1723,7 @@ export class InfoClient<
 
     /**
      * Request validator summaries.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of validator summaries.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1749,7 +1749,7 @@ export class InfoClient<
     /**
      * Request details of a vault.
      * @param args - The parameters for the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Details of a vault or null if the vault does not exist.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -1775,7 +1775,7 @@ export class InfoClient<
 
     /**
      * Request a list of vaults less than 2 hours old.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns Array of vault summaries.
      *
      * @throws {TransportError} When the transport layer throws an error.

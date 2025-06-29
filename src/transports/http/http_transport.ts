@@ -103,7 +103,7 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
      * Sends a request to the Hyperliquid API via fetch.
      * @param endpoint - The API endpoint to send the request to.
      * @param payload - The payload to send with the request.
-     * @param signal - An optional abort signal.
+     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns A promise that resolves with parsed JSON response body.
      *
      * @throws {HttpRequestError} Thrown when the HTTP request fails.
