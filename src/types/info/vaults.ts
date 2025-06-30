@@ -44,7 +44,10 @@ export interface VaultDetails {
 export interface VaultEquity {
     /** Vault address. */
     vaultAddress: Hex;
-    /** User's deposited equity. */
+    /**
+     * User's deposited equity.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     equity: string;
     /** Timestamp when the user can withdraw their equity. */
     lockedUntilTimestamp: number;
@@ -54,11 +57,20 @@ export interface VaultEquity {
 export interface VaultFollowerState {
     /** Follower address. */
     user: Hex;
-    /** Follower's vault equity. */
+    /**
+     * Follower's vault equity.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     vaultEquity: string;
-    /** Current profit and loss. */
+    /**
+     * Current profit and loss.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
     pnl: string;
-    /** All-time profit and loss. */
+    /**
+     * All-time profit and loss.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
     allTimePnl: string;
     /** Subscription duration in days. */
     daysFollowing: number;
@@ -92,7 +104,10 @@ export interface VaultSummary {
     vaultAddress: Hex;
     /** Leader address. */
     leader: Hex;
-    /** Total value locked. */
+    /**
+     * Total value locked.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     tvl: string;
     /** Vault closure status. */
     isClosed: boolean;

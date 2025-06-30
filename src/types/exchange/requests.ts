@@ -7,9 +7,15 @@ export type OrderParams = {
     a: number;
     /** Position side (`true` for long, `false` for short). */
     b: boolean;
-    /** Price. */
+    /**
+     * Price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     p: string;
-    /** Size (in base currency units). */
+    /**
+     * Size (in base currency units).
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     s: string;
     /** Is reduce-only? */
     r: boolean;
@@ -27,7 +33,10 @@ export type OrderParams = {
             trigger: {
                 /** Is market order? */
                 isMarket: boolean;
-                /** Trigger price. */
+                /**
+                 * Trigger price.
+                 * @pattern ^[0-9]+(\.[0-9]+)?$
+                 */
                 triggerPx: string;
                 /** Indicates whether it is take profit or stop loss. */
                 tpsl: "tp" | "sl";
@@ -513,7 +522,10 @@ export interface PerpDeployRequest_RegisterAsset extends BaseExchangeRequest {
                 coin: string;
                 /** Number of decimal places for size. */
                 szDecimals: number;
-                /** Initial oracle price for the asset. */
+                /**
+                 * Initial oracle price for the asset.
+                 * @pattern ^[0-9]+(\.[0-9]+)?$
+                 */
                 oraclePx: string;
                 /** Margin table identifier for risk management. */
                 marginTableId: number;
@@ -575,7 +587,10 @@ export interface PerpDexClassTransferRequest extends BaseExchangeRequest {
         dex: string;
         /** Collateral token of the perp dex as a string. */
         token: string;
-        /** Amount of collateral token to transfer (1 = 1$). */
+        /**
+         * Amount of collateral token to transfer (1 = 1$).
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         amount: string;
         /** `true` for transferring from perp dex to spot account, `false` for transferring from spot account to perp dex. */
         toPerp: boolean;
@@ -602,7 +617,10 @@ export interface PerpDexTransferRequest extends BaseExchangeRequest {
         sourceDex: string;
         /** Destination perp dex name (empty string for main dex). */
         destinationDex: string;
-        /** Amount to transfer (1 = 1$). */
+        /**
+         * Amount to transfer (1 = 1$).
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         amount: string;
         /** Unique request identifier (current timestamp in ms). */
         nonce: number;
@@ -707,7 +725,10 @@ export interface SpotDeployRequest_Genesis extends BaseExchangeRequest {
         genesis: {
             /** Token identifier. */
             token: number;
-            /** Maximum token supply. */
+            /**
+             * Maximum token supply.
+             * @pattern ^[0-9]+(\.[0-9]+)?$
+             */
             maxSupply: string;
             /** Set hyperliquidity balance to 0. */
             noHyperliquidity?: true;
@@ -729,9 +750,15 @@ export interface SpotDeployRequest_RegisterHyperliquidity extends BaseExchangeRe
         registerHyperliquidity: {
             /** Spot index (distinct from base token index). */
             spot: number;
-            /** Starting price for liquidity seeding. */
+            /**
+             * Starting price for liquidity seeding.
+             * @pattern ^[0-9]+(\.[0-9]+)?$
+             */
             startPx: string;
-            /** Order size as a float (not in wei). */
+            /**
+             * Order size as a float (not in wei).
+             * @pattern ^[0-9]+(\.[0-9]+)?$
+             */
             orderSz: string;
             /** Total number of orders to place. */
             nOrders: number;
@@ -802,7 +829,7 @@ export interface SpotDeployRequest_SetDeployerTradingFeeShare extends BaseExchan
         setDeployerTradingFeeShare: {
             /** Token identifier. */
             token: number;
-            /**  The deployer trading fee share. Range: ["0%", "100%"]. */
+            /** The deployer trading fee share. Range: ["0%", "100%"]. */
             share: `${string}%`;
         };
     };
@@ -850,7 +877,10 @@ export interface SpotSendRequest extends BaseExchangeRequest {
         destination: Hex;
         /** Token identifier. */
         token: `${string}:${Hex}`;
-        /** Amount to send (not in wei). */
+        /**
+         * Amount to send (not in wei).
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         amount: string;
         /** Unique request identifier (current timestamp in ms). */
         time: number;
@@ -908,7 +938,10 @@ export interface SubAccountSpotTransferRequest extends BaseExchangeRequest {
         isDeposit: boolean;
         /** Token identifier. */
         token: `${string}:${Hex}`;
-        /** Amount to send (not in wei). */
+        /**
+         * Amount to send (not in wei).
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         amount: string;
     };
     vaultAddress?: undefined;
@@ -990,7 +1023,10 @@ export interface TwapOrderRequest extends BaseExchangeRequest {
             a: number;
             /** Position side (`true` for long, `false` for short). */
             b: boolean;
-            /** Size (in base currency units). */
+            /**
+             * Size (in base currency units).
+             * @pattern ^[0-9]+(\.[0-9]+)?$
+             */
             s: string;
             /** Is reduce-only? */
             r: boolean;
@@ -1054,7 +1090,10 @@ export interface UsdClassTransferRequest extends BaseExchangeRequest {
         signatureChainId: Hex;
         /** HyperLiquid network. */
         hyperliquidChain: "Mainnet" | "Testnet";
-        /** Amount to transfer (1 = 1$). */
+        /**
+         * Amount to transfer (1 = 1$).
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         amount: string;
         /** `true` for Spot to Perp, `false` for Perp to Spot. */
         toPerp: boolean;
@@ -1079,7 +1118,10 @@ export interface UsdSendRequest extends BaseExchangeRequest {
         hyperliquidChain: "Mainnet" | "Testnet";
         /** Destination address. */
         destination: Hex;
-        /** Amount to send (1 = 1$). */
+        /**
+         * Amount to send (1 = 1$).
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         amount: string;
         /** Unique request identifier (current timestamp in ms). */
         time: number;
@@ -1161,7 +1203,10 @@ export interface Withdraw3Request extends BaseExchangeRequest {
         hyperliquidChain: "Mainnet" | "Testnet";
         /** Destination address. */
         destination: Hex;
-        /** Amount to withdraw (1 = 1$). */
+        /**
+         * Amount to withdraw (1 = 1$).
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         amount: string;
         /** Unique request identifier (current timestamp in ms). */
         time: number;

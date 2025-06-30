@@ -4,7 +4,10 @@ import type { Hex } from "../../base.ts";
 export interface Delegation {
     /** Validator address. */
     validator: Hex;
-    /** Amount of tokens delegated to the validator. */
+    /**
+     * Amount of tokens delegated to the validator.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     amount: string;
     /** Locked until timestamp (in ms since epoch). */
     lockedUntilTimestamp: number;
@@ -16,17 +19,29 @@ export interface DelegatorReward {
     time: number;
     /** Source of the reward. */
     source: "delegation" | "commission";
-    /** Total reward amount. */
+    /**
+     * Total reward amount.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     totalAmount: string;
 }
 
 /** Summary of a user's staking delegations. */
 export interface DelegatorSummary {
-    /** Total amount of delegated tokens. */
+    /**
+     * Total amount of delegated tokens.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     delegated: string;
-    /** Total amount of undelegated tokens. */
+    /**
+     * Total amount of undelegated tokens.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     undelegated: string;
-    /** Total amount of tokens pending withdrawal. */
+    /**
+     * Total amount of tokens pending withdrawal.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     totalPendingWithdrawal: string;
     /** Number of pending withdrawals. */
     nPendingWithdrawals: number;
@@ -48,7 +63,10 @@ export interface DelegatorUpdateDelegate {
     delegate: {
         /** Address of the validator receiving or losing delegation. */
         validator: Hex;
-        /** Amount of tokens being delegated or undelegated. */
+        /**
+         * Amount of tokens being delegated or undelegated.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         amount: string;
         /** Whether this is an undelegation operation. */
         isUndelegate: boolean;
@@ -59,7 +77,10 @@ export interface DelegatorUpdateDelegate {
 export interface DelegatorUpdateDeposit {
     /** Deposit details. */
     cDeposit: {
-        /** Amount of tokens being deposited. */
+        /**
+         * Amount of tokens being deposited.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         amount: string;
     };
 }
@@ -68,7 +89,10 @@ export interface DelegatorUpdateDeposit {
 export interface DelegatorUpdateWithdrawal {
     /** Withdrawal details. */
     withdrawal: {
-        /** Amount of tokens being withdrawn. */
+        /**
+         * Amount of tokens being withdrawn.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         amount: string;
         /** Phase of the withdrawal process. */
         phase: "initiated" | "finalized";
@@ -79,7 +103,10 @@ export interface DelegatorUpdateWithdrawal {
 export interface ValidatorStats {
     /** Fraction of time the validator was online. */
     uptimeFraction: string;
-    /** Predicted annual percentage rate of returns. */
+    /**
+     * Predicted annual percentage rate of returns.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     predictedApr: string;
     /** Number of samples used for statistics calculation. */
     nSamples: number;
@@ -105,7 +132,10 @@ export interface ValidatorSummary {
     unjailableAfter: number | null;
     /** Whether the validator is currently active. */
     isActive: boolean;
-    /** Commission rate charged by the validator. */
+    /**
+     * Commission rate charged by the validator.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     commission: string;
     /** Performance statistics over different time periods. */
     stats: [

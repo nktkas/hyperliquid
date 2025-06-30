@@ -12,9 +12,15 @@ export interface Book {
 
 /** Order book level. */
 export interface BookLevel {
-    /** Price. */
+    /**
+     * Price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     px: string;
-    /** Total size. */
+    /**
+     * Total size.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     sz: string;
     /** Number of individual orders. */
     n: number;
@@ -24,19 +30,31 @@ export interface BookLevel {
 export interface Fill {
     /** Asset symbol. */
     coin: string;
-    /** Price. */
+    /**
+     * Price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     px: string;
-    /** Size. */
+    /**
+     * Size.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     sz: string;
     /** Order side ("B" = Bid/Buy, "A" = Ask/Sell). */
     side: "B" | "A";
     /** Timestamp when the trade occurred (in ms since epoch). */
     time: number;
-    /** Start position size. */
+    /**
+     * Start position size.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
     startPosition: string;
     /** Direction indicator for frontend display. */
     dir: string;
-    /** Realized PnL. */
+    /**
+     * Realized PnL.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
     closedPnl: string;
     /** L1 transaction hash. */
     hash: Hex;
@@ -44,7 +62,10 @@ export interface Fill {
     oid: number;
     /** Indicates if the fill was a taker order. */
     crossed: boolean;
-    /** Fee charged or rebate received (negative indicates rebate). */
+    /**
+     * Fee charged or rebate received (negative indicates rebate).
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
     fee: string;
     /** Unique transaction identifier for a partial fill of an order. */
     tid: number;
@@ -60,7 +81,10 @@ export interface Fill {
 export interface FillLiquidation {
     /** Address of the liquidated user. */
     liquidatedUser: Hex;
-    /** Mark price at the time of liquidation. */
+    /**
+     * Mark price at the time of liquidation.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     markPx: string;
     /** Liquidation method. */
     method: "market" | "backstop";
@@ -72,7 +96,10 @@ export interface FrontendOrder extends Omit<Order, "reduceOnly" | "cloid"> {
     triggerCondition: string;
     /** Indicates if the order is a trigger order. */
     isTrigger: boolean;
-    /** Trigger price. */
+    /**
+     * Trigger price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     triggerPx: string;
     /** Child orders associated with this order. */
     children: FrontendOrder[];
@@ -94,15 +121,24 @@ export interface Order {
     coin: string;
     /** Order side ("B" = Bid/Buy, "A" = Ask/Sell). */
     side: "B" | "A";
-    /** Limit price. */
+    /**
+     * Limit price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     limitPx: string;
-    /** Size. */
+    /**
+     * Size.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     sz: string;
     /** Order ID. */
     oid: number;
     /** Timestamp when the order was placed (in ms since epoch). */
     timestamp: number;
-    /** Original size at order placement. */
+    /**
+     * Original size at order placement.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     origSz: string;
     /** Client Order ID. */
     cloid?: Hex;
@@ -218,9 +254,15 @@ export interface TwapSliceFill {
 export interface TwapState {
     /** Asset symbol. */
     coin: string;
-    /** Executed notional value. */
+    /**
+     * Executed notional value.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     executedNtl: string;
-    /** Executed size. */
+    /**
+     * Executed size.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     executedSz: string;
     /** Duration in minutes. */
     minutes: number;
@@ -230,7 +272,10 @@ export interface TwapState {
     reduceOnly: boolean;
     /** Order side ("B" = Bid/Buy, "A" = Ask/Sell). */
     side: "B" | "A";
-    /** Order size. */
+    /**
+     * Order size.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     sz: string;
     /** Start time of the TWAP order (in ms since epoch). */
     timestamp: number;

@@ -31,7 +31,10 @@ export interface WsActiveAssetData {
             type: "isolated";
             /** Leverage value used. */
             value: number;
-            /** Amount of USD used (1 = 1$). */
+            /**
+             * Amount of USD used (1 = 1$).
+             * @pattern ^[0-9]+(\.[0-9]+)?$
+             */
             rawUsd: string;
         }
         | {
@@ -40,11 +43,14 @@ export interface WsActiveAssetData {
             /** Leverage value used. */
             value: number;
         };
-    /** Maximum trade size range [min, max]. */
+    /**  Maximum trade size range [min, max]. */
     maxTradeSzs: [string, string];
     /** Available to trade range [min, max]. */
     availableToTrade: [string, string];
-    /** Mark price. */
+    /**
+     * Mark price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     markPx: string;
 }
 
@@ -87,9 +93,15 @@ export interface WsTrade {
     coin: string;
     /** Trade side ("B" = Bid/Buy, "A" = Ask/Sell). */
     side: "B" | "A";
-    /** Trade price. */
+    /**
+     * Trade price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     px: string;
-    /** Trade size. */
+    /**
+     * Trade size.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     sz: string;
     /** Trade timestamp (in ms since epoch). */
     time: number;
@@ -132,9 +144,15 @@ export interface WsUserEventLiquidation {
         liquidator: Hex;
         /** Address of the liquidated user. */
         liquidated_user: Hex;
-        /** Notional position size that was liquidated. */
+        /**
+         * Notional position size that was liquidated.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         liquidated_ntl_pos: string;
-        /** Account value at time of liquidation. */
+        /**
+         * Account value at time of liquidation.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         liquidated_account_value: string;
     };
 }
@@ -223,7 +241,10 @@ export interface WsWebData2 {
         /** Name of the vault. */
         name: string;
     }[];
-    /** Total equity in vaults. */
+    /**
+     * Total equity in vaults.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     totalVaultEquity: string;
     /** User's open orders with frontend information. */
     openOrders: FrontendOrder[];
@@ -231,7 +252,10 @@ export interface WsWebData2 {
     agentAddress: Hex | null;
     /** Timestamp until which the agent is valid. */
     agentValidUntil: number | null;
-    /** Cumulative ledger value. */
+    /**
+     * Cumulative ledger value.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     cumLedger: string;
     /** Metadata for perpetual assets. */
     meta: PerpsMeta;

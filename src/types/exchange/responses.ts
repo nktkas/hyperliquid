@@ -95,9 +95,15 @@ export interface OrderResponse extends BaseExchangeResponse {
                 | {
                     /** Filled order status. */
                     filled: {
-                        /** Total size filled. */
+                        /**
+                         * Total size filled.
+                         * @pattern ^[0-9]+(\.[0-9]+)?$
+                         */
                         totalSz: string;
-                        /** Average price of fill. */
+                        /**
+                         * Average price of fill.
+                         * @pattern ^[0-9]+(\.[0-9]+)?$
+                         */
                         avgPx: string;
                         /** Order ID. */
                         oid: number;

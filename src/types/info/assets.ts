@@ -2,7 +2,10 @@ import type { Hex } from "../../base.ts";
 
 /** Mapping of coin symbols to mid prices. */
 export interface AllMids {
-    /** Mid prices mapped by coin symbol. */
+    /**
+     * Mid prices mapped by coin symbol.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     [coin: string]: string;
 }
 
@@ -14,17 +17,32 @@ export interface Candle {
     T: number;
     /** Asset symbol. */
     s: string;
-    /** Candle interval (e.g., "1m", "5m", "1h", etc.). */
-    i: string;
-    /** Opening price. */
+    /** Candle interval. */
+    i: "1m" | "3m" | "5m" | "15m" | "30m" | "1h" | "2h" | "4h" | "8h" | "12h" | "1d" | "3d" | "1w" | "1M";
+    /**
+     * Opening price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     o: string;
-    /** Closing price. */
+    /**
+     * Closing price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     c: string;
-    /** Highest price. */
+    /**
+     * Highest price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     h: string;
-    /** Lowest price. */
+    /**
+     * Lowest price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     l: string;
-    /** Total volume traded in base currency. */
+    /**
+     * Total volume traded in base currency.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     v: string;
     /** Number of trades executed. */
     n: number;
@@ -34,9 +52,15 @@ export interface Candle {
 export interface FundingHistory {
     /** Asset symbol. */
     coin: string;
-    /** Funding rate. */
+    /**
+     * Funding rate.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
     fundingRate: string;
-    /** Premium price. */
+    /**
+     * Premium price.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
     premium: string;
     /** Funding record timestamp (ms since epoch). */
     time: number;
@@ -67,7 +91,10 @@ export interface MarginTable {
 
 /** Individual tier in a margin requirements table. */
 export interface MarginTier {
-    /** Lower position size boundary for this tier. */
+    /**
+     * Lower position size boundary for this tier.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     lowerBound: string;
     /** Maximum allowed leverage for this tier. */
     maxLeverage: number;
@@ -75,17 +102,32 @@ export interface MarginTier {
 
 /** Context for a perpetual asset. */
 export interface PerpsAssetCtx extends SharedAssetCtx {
-    /** Funding rate. */
+    /**
+     * Funding rate.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
     funding: string;
-    /** Total open interest. */
+    /**
+     * Total open interest.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     openInterest: string;
-    /** Premium price. */
+    /**
+     * Premium price.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
     premium: string | null;
-    /** Oracle price. */
+    /**
+     * Oracle price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     oraclePx: string;
     /** Array of impact prices. */
     impactPxs: string[] | null;
-    /** Daily volume in base currency. */
+    /**
+     * Daily volume in base currency.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     dayBaseVlm: string;
 }
 
@@ -135,7 +177,10 @@ export type PredictedFunding = [
         string,
         /** Predicted funding data. */
         {
-            /** Predicted funding rate. */
+            /**
+             * Predicted funding rate.
+             * @pattern ^-?[0-9]+(\.[0-9]+)?$
+             */
             fundingRate: string;
             /** Next funding time (ms since epoch). */
             nextFundingTime: number;
@@ -147,25 +192,46 @@ export type PredictedFunding = [
 
 /** Shared context for assets. */
 export interface SharedAssetCtx {
-    /** Previous day's closing price. */
+    /**
+     * Previous day's closing price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     prevDayPx: string;
-    /** Daily notional volume. */
+    /**
+     * Daily notional volume.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     dayNtlVlm: string;
-    /** Mark price. */
+    /**
+     * Mark price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     markPx: string;
-    /** Mid price. */
+    /**
+     * Mid price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     midPx: string | null;
 }
 
 /** Context for a spot asset. */
 export interface SpotAssetCtx extends SharedAssetCtx {
-    /** Circulating supply. */
+    /**
+     * Circulating supply.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     circulatingSupply: string;
     /** Asset symbol. */
     coin: string;
-    /** Total supply. */
+    /**
+     * Total supply.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     totalSupply: string;
-    /** Daily volume in base currency. */
+    /**
+     * Daily volume in base currency.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     dayBaseVlm: string;
 }
 
@@ -212,7 +278,10 @@ export interface SpotToken {
     } | null;
     /** Full display name of the token. */
     fullName: string | null;
-    /** Deployer trading fee share for the token. */
+    /**
+     * Deployer trading fee share for the token.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     deployerTradingFeeShare: string;
 }
 
@@ -236,21 +305,39 @@ export interface SpotUniverse {
 export interface TokenDetails {
     /** Name of the token. */
     name: string;
-    /** Maximum supply of the token. */
+    /**
+     * Maximum supply of the token.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     maxSupply: string;
-    /** Total supply of the token. */
+    /**
+     * Total supply of the token.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     totalSupply: string;
-    /** Circulating supply of the token. */
+    /**
+     * Circulating supply of the token.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     circulatingSupply: string;
     /** Decimal places for the minimum tradable unit. */
     szDecimals: number;
     /** Decimal places for the token's smallest unit. */
     weiDecimals: number;
-    /** Mid price of the token. */
+    /**
+     * Mid price of the token.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     midPx: string;
-    /** Mark price of the token. */
+    /**
+     * Mark price of the token.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     markPx: string;
-    /** Previous day's price of the token. */
+    /**
+     * Previous day's price of the token.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     prevDayPx: string;
     /** Genesis data for the token. */
     genesis: {
@@ -263,14 +350,23 @@ export interface TokenDetails {
     } | null;
     /** Deployer address. */
     deployer: Hex | null;
-    /** Gas used during token deployment. */
+    /**
+     * Gas used during token deployment.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     deployGas: string | null;
     /** Deployment time. */
     deployTime: string | null;
-    /** Seeded USDC amount for the token. */
+    /**
+     * Seeded USDC amount for the token.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     seededUsdc: string;
     /** Non-circulating user balances of the token. */
     nonCirculatingUserBalances: [Hex, string][];
-    /** Future emissions amount. */
+    /**
+     * Future emissions amount.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     futureEmissions: string;
 }

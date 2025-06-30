@@ -2,13 +2,22 @@ import type { Hex } from "../../base.ts";
 
 /** Status of the deploy auction. */
 export interface DeployAuctionStatus {
-    /** Current gas. */
+    /**
+     * Current gas.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     currentGas: string | null;
     /** Duration in seconds. */
     durationSeconds: number;
-    /** Ending gas. */
+    /**
+     * Ending gas.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     endGas: string | null;
-    /** Starting gas. */
+    /**
+     * Starting gas.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     startGas: string;
     /** Auction start time (seconds since epoch). */
     startTimeSeconds: number;
@@ -38,15 +47,27 @@ export interface SpotDeployState {
         };
         /** Full name of the token. */
         fullName: string | null;
-        /** Deployer trading fee share for the token. */
+        /**
+         * Deployer trading fee share for the token.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         deployerTradingFeeShare: string;
         /** Spot indices for the token. */
         spots: number[];
-        /** Maximum supply of the token. */
+        /**
+         * Maximum supply of the token.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         maxSupply: string | null;
-        /** Hyperliquidity genesis balance of the token. */
+        /**
+         * Hyperliquidity genesis balance of the token.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         hyperliquidityGenesisBalance: string;
-        /** Total genesis balance (in wei) for the token. */
+        /**
+         * Total genesis balance (in wei) for the token.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         totalGenesisBalanceWei: string;
         /** User genesis balances for the token. */
         userGenesisBalances: [Hex, string][];

@@ -8,7 +8,10 @@ export interface AssetPosition {
     position: {
         /** Asset symbol. */
         coin: string;
-        /** Signed position size. */
+        /**
+         * Signed position size.
+         * @pattern ^-?[0-9]+(\.[0-9]+)?$
+         */
         szi: string;
         /** Leverage details. */
         leverage:
@@ -26,27 +29,54 @@ export interface AssetPosition {
                 /** Leverage value used. */
                 value: number;
             };
-        /** Average entry price. */
+        /**
+         * Average entry price.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         entryPx: string;
-        /** Position value. */
+        /**
+         * Position value.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         positionValue: string;
-        /** Unrealized profit and loss. */
+        /**
+         * Unrealized profit and loss.
+         * @pattern ^-?[0-9]+(\.[0-9]+)?$
+         */
         unrealizedPnl: string;
-        /** Return on equity. */
+        /**
+         * Return on equity.
+         * @pattern ^-?[0-9]+(\.[0-9]+)?$
+         */
         returnOnEquity: string;
-        /** Liquidation price. */
+        /**
+         * Liquidation price.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         liquidationPx: string | null;
-        /** Margin used. */
+        /**
+         * Margin used.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         marginUsed: string;
         /** Maximum allowed leverage. */
         maxLeverage: number;
         /** Cumulative funding details. */
         cumFunding: {
-            /** Total funding paid or received since account opening. */
+            /**
+             * Total funding paid or received since account opening.
+             * @pattern ^-?[0-9]+(\.[0-9]+)?$
+             */
             allTime: string;
-            /** Funding accumulated since the position was opened. */
+            /**
+             * Funding accumulated since the position was opened.
+             * @pattern ^-?[0-9]+(\.[0-9]+)?$
+             */
             sinceOpen: string;
-            /** Funding accumulated since the last change in position size. */
+            /**
+             * Funding accumulated since the last change in position size.
+             * @pattern ^-?[0-9]+(\.[0-9]+)?$
+             */
             sinceChange: string;
         };
     };
@@ -58,7 +88,10 @@ export interface EvmEscrowsBalance {
     coin: string;
     /** Unique identifier for the token. */
     token: number;
-    /** Total balance. */
+    /**
+     * Total balance.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     total: string;
 }
 
@@ -94,29 +127,59 @@ export interface MultiSigSigners {
 export interface PerpsClearinghouseState {
     /** Margin summary details. */
     marginSummary: {
-        /** Total account value. */
+        /**
+         * Total account value.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         accountValue: string;
-        /** Total notional position value. */
+        /**
+         * Total notional position value.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         totalNtlPos: string;
-        /** Total raw USD value. */
+        /**
+         * Total raw USD value.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         totalRawUsd: string;
-        /** Total margin used. */
+        /**
+         * Total margin used.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         totalMarginUsed: string;
     };
     /** Cross-margin summary details. */
     crossMarginSummary: {
-        /** Total account value. */
+        /**
+         * Total account value.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         accountValue: string;
-        /** Total notional position value. */
+        /**
+         * Total notional position value.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         totalNtlPos: string;
-        /** Total raw USD value. */
+        /**
+         * Total raw USD value.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         totalRawUsd: string;
-        /** Total margin used. */
+        /**
+         * Total margin used.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         totalMarginUsed: string;
     };
-    /** Maintenance margin used for cross-margin positions. */
+    /**
+     * Maintenance margin used for cross-margin positions.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     crossMaintenanceMarginUsed: string;
-    /** Amount available for withdrawal. */
+    /**
+     * Amount available for withdrawal.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     withdrawable: string;
     /** List of asset positions. */
     assetPositions: AssetPosition[];
@@ -130,7 +193,10 @@ export interface Portfolio {
     accountValueHistory: [number, string][];
     /** History entries for profit and loss as [timestamp, value]. */
     pnlHistory: [number, string][];
-    /** Volume metric for the portfolio. */
+    /**
+     * Volume metric for the portfolio.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     vlm: string;
 }
 
@@ -148,7 +214,10 @@ export type PortfolioPeriods = [
 
 /** Pre-transfer user existence check result. */
 export interface PreTransferCheck {
-    /** Activation fee. */
+    /**
+     * Activation fee.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     fee: string;
     /** Whether the user is sanctioned. */
     isSanctioned: boolean;
@@ -168,13 +237,25 @@ export interface Referral {
         code: string;
     } | null;
 
-    /** Cumulative traded volume. */
+    /**
+     * Cumulative traded volume.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     cumVlm: string;
-    /** Rewards earned but not yet claimed. */
+    /**
+     * Rewards earned but not yet claimed.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     unclaimedRewards: string;
-    /** Rewards that have been claimed. */
+    /**
+     * Rewards that have been claimed.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     claimedRewards: string;
-    /** Builder reward amount. */
+    /**
+     * Builder reward amount.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     builderRewards: string;
     /** Current state of the referrer. */
     referrerState:
@@ -187,16 +268,25 @@ export interface Referral {
                 code: string;
                 /** Summary of each referral state. */
                 referralStates: {
-                    /** Cumulative traded volume. */
+                    /**
+                     * Cumulative traded volume.
+                     * @pattern ^[0-9]+(\.[0-9]+)?$
+                     */
                     cumVlm: string;
-                    /** Total fees rewarded to the referred user since referral. */
+                    /**
+                     * Total fees rewarded to the referred user since referral.
+                     * @pattern ^[0-9]+(\.[0-9]+)?$
+                     */
                     cumRewardedFeesSinceReferred: string;
-                    /** Total fees rewarded to the referrer from referred trades. */
+                    /**
+                     * Total fees rewarded to the referrer from referred trades.
+                     * @pattern ^[0-9]+(\.[0-9]+)?$
+                     */
                     cumFeesRewardedToReferrer: string;
                     /** Timestamp when the referred user joined (in ms since epoch). */
                     timeJoined: number;
                     /** Address of the referred user. */
-                    user: string;
+                    user: Hex;
                 }[];
             };
         }
@@ -209,17 +299,29 @@ export interface Referral {
             stage: "needToTrade";
             /** Required trading volume details for activation. */
             data: {
-                /** Required trading volume. */
+                /**
+                 * Required trading volume.
+                 * @pattern ^[0-9]+(\.[0-9]+)?$
+                 */
                 required: string;
             };
         };
     /** History of referral rewards. */
     rewardHistory: {
-        /** Amount of earned rewards. */
+        /**
+         * Amount of earned rewards.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         earned: string;
-        /** Traded volume at the time of reward. */
+        /**
+         * Traded volume at the time of reward.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         vlm: string;
-        /** Traded volume via referrals. */
+        /**
+         * Traded volume via referrals.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         referralVlm: string;
         /** Timestamp when the reward was earned (in ms since epoch). */
         time: number;
@@ -232,11 +334,20 @@ export interface SpotBalance {
     coin: string;
     /** Unique identifier for the token. */
     token: number;
-    /** Total balance. */
+    /**
+     * Total balance.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     total: string;
-    /** Amount on hold. */
+    /**
+     * Amount on hold.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     hold: string;
-    /** Entry notional value. */
+    /**
+     * Entry notional value.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     entryNtl: string;
 }
 
@@ -268,78 +379,153 @@ export interface UserFees {
     dailyUserVlm: {
         /** Date in YYYY-M-D format. */
         date: `${number}-${number}-${number}`;
-        /** User cross-trade volume. */
+        /**
+         * User cross-trade volume.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         userCross: string;
-        /** User add-liquidity volume. */
+        /**
+         * User add-liquidity volume.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         userAdd: string;
-        /** Exchange total volume. */
+        /**
+         * Exchange total volume.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         exchange: string;
     }[];
     /** Fee schedule information. */
     feeSchedule: {
-        /** Cross-trade fee rate. */
+        /**
+         * Cross-trade fee rate.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         cross: string;
-        /** Add-liquidity fee rate. */
+        /**
+         * Add-liquidity fee rate.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         add: string;
-        /** Spot cross-trade fee rate. */
+        /**
+         * Spot cross-trade fee rate.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         spotCross: string;
-        /** Spot add-liquidity fee rate. */
+        /**
+         * Spot add-liquidity fee rate.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         spotAdd: string;
         /** Fee tiers details. */
         tiers: {
             /** VIP fee tier information. */
             vip: {
-                /** Notional volume cutoff. */
+                /**
+                 * Notional volume cutoff.
+                 * @pattern ^[0-9]+(\.[0-9]+)?$
+                 */
                 ntlCutoff: string;
-                /** Cross-trade fee rate. */
+                /**
+                 * Cross-trade fee rate.
+                 * @pattern ^[0-9]+(\.[0-9]+)?$
+                 */
                 cross: string;
-                /** Add-liquidity fee rate. */
+                /**
+                 * Add-liquidity fee rate.
+                 * @pattern ^[0-9]+(\.[0-9]+)?$
+                 */
                 add: string;
-                /** Spot cross-trade fee rate. */
+                /**
+                 * Spot cross-trade fee rate.
+                 * @pattern ^[0-9]+(\.[0-9]+)?$
+                 */
                 spotCross: string;
-                /** Spot add-liquidity fee rate. */
+                /**
+                 * Spot add-liquidity fee rate.
+                 * @pattern ^[0-9]+(\.[0-9]+)?$
+                 */
                 spotAdd: string;
             }[];
             /** Market maker fee tier information. */
             mm: {
-                /** Maker fraction cutoff. */
+                /**
+                 * Maker fraction cutoff.
+                 * @pattern ^[0-9]+(\.[0-9]+)?$
+                 */
                 makerFractionCutoff: string;
-                /** Add-liquidity fee rate. */
+                /**
+                 * Add-liquidity fee rate.
+                 * @pattern ^-?[0-9]+(\.[0-9]+)?$
+                 */
                 add: string;
             }[];
         };
-        /** Referral discount rate. */
+        /**
+         * Referral discount rate.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         referralDiscount: string;
         /** Staking discount tiers details. */
         stakingDiscountTiers: {
-            /** Basis points of maximum supply. */
+            /**
+             * Basis points of maximum supply.
+             * @pattern ^[0-9]+(\.[0-9]+)?$
+             */
             bpsOfMaxSupply: string;
-            /** Discount rate applied. */
+            /**
+             * Discount rate applied.
+             * @pattern ^[0-9]+(\.[0-9]+)?$
+             */
             discount: string;
         }[];
     };
-    /** User cross-trade rate. */
+    /**
+     * User cross-trade rate.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     userCrossRate: string;
-    /** User add-liquidity rate. */
+    /**
+     * User add-liquidity rate.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     userAddRate: string;
-    /** User spot cross-trade rate. */
+    /**
+     * User spot cross-trade rate.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     userSpotCrossRate: string;
-    /** User spot add-liquidity rate. */
+    /**
+     * User spot add-liquidity rate.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     userSpotAddRate: string;
-    /** Active referral discount rate. */
+    /**
+     * Active referral discount rate.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     activeReferralDiscount: string;
     /** Trial details. */
     trial: unknown | null;
-    /** Fee trial reward amount. */
+    /**
+     * Fee trial reward amount.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     feeTrialReward: string;
     /** Timestamp when next trial becomes available. */
     nextTrialAvailableTimestamp: unknown | null;
     stakingLink: unknown | null;
     /** Active staking discount details. */
     activeStakingDiscount: {
-        /** Basis points of maximum supply. */
+        /**
+         * Basis points of maximum supply.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         bpsOfMaxSupply: string;
-        /** Discount rate applied. */
+        /**
+         * Discount rate applied.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
         discount: string;
     };
 }
@@ -359,11 +545,20 @@ export interface FundingUpdate {
     type: "funding";
     /** Asset symbol. */
     coin: string;
-    /** Amount transferred in USDC. */
+    /**
+     * Amount transferred in USDC.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
     usdc: string;
-    /** Signed position size. */
+    /**
+     * Signed position size.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
     szi: string;
-    /** Applied funding rate. */
+    /**
+     * Applied funding rate.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
     fundingRate: string;
     /** Number of samples. */
     nSamples: number | null;
@@ -371,7 +566,10 @@ export interface FundingUpdate {
 
 /** User's rate limits. */
 export interface UserRateLimit {
-    /** Cumulative trading volume. */
+    /**
+     * Cumulative trading volume.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     cumVlm: string;
     /** Number of API requests used. */
     nRequestsUsed: number;
@@ -429,7 +627,10 @@ export interface UserNonFundingLedgerUpdate {
 export interface AccountClassTransferUpdate {
     /** Update type. */
     type: "accountClassTransfer";
-    /** Amount transferred in USDC. */
+    /**
+     * Amount transferred in USDC.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     usdc: string;
     /** Indicates if the transfer is to the perpetual account. */
     toPerp: boolean;
@@ -438,29 +639,44 @@ export interface AccountClassTransferUpdate {
 export interface DepositUpdate {
     /** Update type. */
     type: "deposit";
-    /** Amount deposited in USDC. */
+    /**
+     * Amount deposited in USDC.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     usdc: string;
 }
 /** Internal transfer between accounts. */
 export interface InternalTransferUpdate {
     /** Update type. */
     type: "internalTransfer";
-    /** Amount transferred in USDC. */
+    /**
+     * Amount transferred in USDC.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     usdc: string;
     /** Initiator's address. */
     user: Hex;
     /** Destination address. */
     destination: Hex;
-    /** Transfer fee. */
+    /**
+     * Transfer fee.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     fee: string;
 }
 /** Liquidation event update. */
 export interface LiquidationUpdate {
     /** Update type. */
     type: "liquidation";
-    /** Total notional value of liquidated positions. */
+    /**
+     * Total notional value of liquidated positions.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     liquidatedNtlPos: string;
-    /** Account value at liquidation time. */
+    /**
+     * Account value at liquidation time.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     accountValue: string;
     /** Leverage type for liquidated positions. */
     leverageType: "Cross" | "Isolated";
@@ -468,7 +684,10 @@ export interface LiquidationUpdate {
     liquidatedPositions: {
         /** Asset symbol of the liquidated position. */
         coin: string;
-        /** Signed position size liquidated. */
+        /**
+         * Signed position size liquidated.
+         * @pattern ^-?[0-9]+(\.[0-9]+)?$
+         */
         szi: string;
     }[];
 }
@@ -476,7 +695,10 @@ export interface LiquidationUpdate {
 export interface RewardsClaimUpdate {
     /** Update type. */
     type: "rewardsClaim";
-    /** Amount of rewards claimed. */
+    /**
+     * Amount of rewards claimed.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     amount: string;
 }
 /** Spot transfer update between accounts. */
@@ -485,17 +707,29 @@ export interface SpotTransferUpdate {
     type: "spotTransfer";
     /** Token symbol. */
     token: string;
-    /** Amount transferred. */
+    /**
+     * Amount transferred.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     amount: string;
-    /** Equivalent USDC value. */
+    /**
+     * Equivalent USDC value.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     usdcValue: string;
     /** Initiator's address. */
     user: Hex;
     /** Destination address. */
     destination: Hex;
-    /** Transfer fee. */
+    /**
+     * Transfer fee.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     fee: string;
-    /** Fee in native token. */
+    /**
+     * Fee in native token.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     nativeTokenFee: string;
     nonce: null;
 }
@@ -503,7 +737,10 @@ export interface SpotTransferUpdate {
 export interface SubAccountTransferUpdate {
     /** Update type. */
     type: "subAccountTransfer";
-    /** Amount transferred in USDC. */
+    /**
+     * Amount transferred in USDC.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     usdc: string;
     /** Initiator's address. */
     user: Hex;
@@ -516,9 +753,15 @@ export interface VaultCreateUpdate {
     type: "vaultCreate";
     /** Address of the created vault. */
     vault: Hex;
-    /** Initial allocated amount in USDC. */
+    /**
+     * Initial allocated amount in USDC.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     usdc: string;
-    /** Vault creation fee. */
+    /**
+     * Vault creation fee.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     fee: string;
 }
 /** Vault deposit update. */
@@ -527,7 +770,10 @@ export interface VaultDepositUpdate {
     type: "vaultDeposit";
     /** Address of the target vault. */
     vault: Hex;
-    /** Amount deposited in USDC. */
+    /**
+     * Amount deposited in USDC.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     usdc: string;
 }
 /** Vault distribution update. */
@@ -536,7 +782,10 @@ export interface VaultDistributionUpdate {
     type: "vaultDistribution";
     /** Address of the vault distributing funds. */
     vault: Hex;
-    /** Amount distributed in USDC. */
+    /**
+     * Amount distributed in USDC.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     usdc: string;
 }
 /** Vault withdrawal event update. */
@@ -547,25 +796,46 @@ export interface VaultWithdrawUpdate {
     vault: Hex;
     /** Address of the user withdrawing funds. */
     user: Hex;
-    /** Withdrawal request amount in USD. */
+    /**
+     * Withdrawal request amount in USD.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     requestedUsd: string;
-    /** Withdrawal commission fee. */
+    /**
+     * Withdrawal commission fee.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     commission: string;
-    /** Closing cost associated with positions. */
+    /**
+     * Closing cost associated with positions.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     closingCost: string;
-    /** Basis value for withdrawal calculation. */
+    /**
+     * Basis value for withdrawal calculation.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     basis: string;
-    /** Net withdrawn amount in USD after fees and costs. */
+    /**
+     * Net withdrawn amount in USD after fees and costs.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     netWithdrawnUsd: string;
 }
 /** Withdrawal update from an account. */
 export interface WithdrawUpdate {
     /** Update type. */
     type: "withdraw";
-    /** Amount withdrawn in USDC. */
+    /**
+     * Amount withdrawn in USDC.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     usdc: string;
     /** Unique nonce for the withdrawal request. */
     nonce: number;
-    /** Withdrawal fee. */
+    /**
+     * Withdrawal fee.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     fee: string;
 }

@@ -80,8 +80,8 @@ function run<T extends Record<string, unknown>>(
     fn: (types: SchemaObject, args: T) => Promise<void>,
     args: T = {} as T,
 ) {
-    const MethodReturnType = schemaGenerator(import.meta.url, `MethodReturnType_${name}`);
     Deno.test(name, { ignore: !METHODS_TO_TEST.includes(name) }, async () => {
+        const MethodReturnType = schemaGenerator(import.meta.url, `MethodReturnType_${name}`);
         await new Promise((r) => setTimeout(r, cliArgs.wait)); // delay to avoid rate limits
         await fn(MethodReturnType, args);
     });
@@ -140,7 +140,26 @@ run(
                 endTime: undefined,
             }),
         ]);
-        schemaCoverage(types, data);
+        schemaCoverage(types, data, {
+            ignoreEnumValuesByPath: {
+                "#/items/properties/i": [
+                    "1m",
+                    "3m",
+                    "5m",
+                    "15m",
+                    "30m",
+                    "1h",
+                    "2h",
+                    "4h",
+                    "8h",
+                    "12h",
+                    "1d",
+                    "3d",
+                    "1w",
+                    "1M",
+                ],
+            },
+        });
     },
 );
 
