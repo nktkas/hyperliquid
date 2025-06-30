@@ -1,4 +1,4 @@
-import { type DeepImmutable, type Hex, HyperliquidError, type MaybePromise } from "../base.ts";
+import { type Hex, HyperliquidError, type MaybePromise } from "../base.ts";
 import type { IRequestTransport } from "../transports/base.ts";
 import type {
     ApproveAgentRequest,
@@ -446,7 +446,7 @@ export class ExchangeClient<
      * await exchClient.approveAgent({ agentAddress: "0x...", agentName: "..." });
      * ```
      */
-    async approveAgent(args: DeepImmutable<ApproveAgentParameters>, signal?: AbortSignal): Promise<SuccessResponse> {
+    async approveAgent(args: ApproveAgentParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         const { ...actionArgs } = args;
         return this._executeAction({
             action: {
@@ -480,10 +480,7 @@ export class ExchangeClient<
      * await exchClient.approveBuilderFee({ maxFeeRate: "0.01%", builder: "0x..." });
      * ```
      */
-    async approveBuilderFee(
-        args: DeepImmutable<ApproveBuilderFeeParameters>,
-        signal?: AbortSignal,
-    ): Promise<SuccessResponse> {
+    async approveBuilderFee(args: ApproveBuilderFeeParameters, signal?: AbortSignal): Promise<SuccessResponse> {
         const { ...actionArgs } = args;
         return this._executeAction({
             action: {
@@ -531,7 +528,7 @@ export class ExchangeClient<
      * });
      * ```
      */
-    async batchModify(args: DeepImmutable<BatchModifyParameters>, signal?: AbortSignal): Promise<OrderResponseSuccess> {
+    async batchModify(args: BatchModifyParameters, signal?: AbortSignal): Promise<OrderResponseSuccess> {
         const { vaultAddress, expiresAfter, ...actionArgs } = args;
         return this._executeAction({
             action: {
