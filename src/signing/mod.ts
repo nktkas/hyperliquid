@@ -6,7 +6,7 @@
  * ```ts
  * import { actionSorter, signL1Action } from "@nktkas/hyperliquid/signing";
  *
- * const privateKey = "0x..."; // or `viem`, `ethers`
+ * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
  *
  * const nonce = Date.now();
  * const action = {
@@ -27,7 +27,7 @@
  * ```ts
  * import { signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
  *
- * const privateKey = "0x..."; // or `viem`, `ethers`
+ * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
  *
  * const action = {
  *     type: "approveAgent",
@@ -193,7 +193,7 @@ function toUint64Bytes(n: bigint | number | string): Uint8Array {
  * ```ts
  * import { actionSorter, signL1Action } from "@nktkas/hyperliquid/signing";
  *
- * const privateKey = "0x..."; // or `viem`, `ethers`
+ * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
  *
  * const nonce = Date.now();
  * const action = {
@@ -272,7 +272,7 @@ export async function signL1Action(args: {
  * ```ts
  * import { signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
  *
- * const privateKey = "0x..."; // or `viem`, `ethers`
+ * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
  *
  * const action = {
  *     type: "approveAgent",

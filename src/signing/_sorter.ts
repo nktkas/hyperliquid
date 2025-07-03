@@ -10,18 +10,14 @@ import type {
     ConvertToMultiSigUserRequest,
     CreateSubAccountRequest,
     CreateVaultRequest,
-    CSignerActionRequest_JailSelf,
-    CSignerActionRequest_UnjailSelf,
-    CValidatorActionRequest_ChangeProfile,
-    CValidatorActionRequest_Register,
-    CValidatorActionRequest_Unregister,
+    CSignerActionRequest,
+    CValidatorActionRequest,
     CWithdrawRequest,
     EvmUserModifyRequest,
     ModifyRequest,
     MultiSigRequest,
     OrderRequest,
-    PerpDeployRequest_RegisterAsset,
-    PerpDeployRequest_SetOracle,
+    PerpDeployRequest,
     PerpDexClassTransferRequest,
     PerpDexTransferRequest,
     RegisterReferrerRequest,
@@ -29,12 +25,7 @@ import type {
     ScheduleCancelRequest,
     SetDisplayNameRequest,
     SetReferrerRequest,
-    SpotDeployRequest_Genesis,
-    SpotDeployRequest_RegisterHyperliquidity,
-    SpotDeployRequest_RegisterSpot,
-    SpotDeployRequest_RegisterToken2,
-    SpotDeployRequest_SetDeployerTradingFeeShare,
-    SpotDeployRequest_UserGenesis,
+    SpotDeployRequest,
     SpotSendRequest,
     SpotUserRequest,
     SubAccountModifyRequest,
@@ -173,13 +164,7 @@ export const actionSorter = {
             nonce: action.nonce,
         };
     },
-    CSignerAction: (
-        action:
-            | DeepImmutable<CSignerActionRequest_JailSelf["action"]>
-            | DeepImmutable<CSignerActionRequest_UnjailSelf["action"]>,
-    ):
-        | CSignerActionRequest_JailSelf["action"]
-        | CSignerActionRequest_UnjailSelf["action"] => {
+    CSignerAction: (action: DeepImmutable<CSignerActionRequest["action"]>): CSignerActionRequest["action"] => {
         if ("jailSelf" in action) {
             return {
                 type: action.type,
@@ -192,15 +177,7 @@ export const actionSorter = {
             };
         }
     },
-    CValidatorAction: (
-        action:
-            | DeepImmutable<CValidatorActionRequest_ChangeProfile["action"]>
-            | DeepImmutable<CValidatorActionRequest_Register["action"]>
-            | DeepImmutable<CValidatorActionRequest_Unregister["action"]>,
-    ):
-        | CValidatorActionRequest_ChangeProfile["action"]
-        | CValidatorActionRequest_Register["action"]
-        | CValidatorActionRequest_Unregister["action"] => {
+    CValidatorAction: (action: DeepImmutable<CValidatorActionRequest["action"]>): CValidatorActionRequest["action"] => {
         if ("changeProfile" in action) {
             return {
                 type: action.type,
@@ -338,13 +315,7 @@ export const actionSorter = {
         if (sortedAction.builder === undefined) delete sortedAction.builder;
         return sortedAction;
     },
-    perpDeploy: (
-        action:
-            | DeepImmutable<PerpDeployRequest_RegisterAsset["action"]>
-            | DeepImmutable<PerpDeployRequest_SetOracle["action"]>,
-    ):
-        | PerpDeployRequest_RegisterAsset["action"]
-        | PerpDeployRequest_SetOracle["action"] => {
+    perpDeploy: (action: DeepImmutable<PerpDeployRequest["action"]>): PerpDeployRequest["action"] => {
         if ("registerAsset" in action) {
             return {
                 type: action.type,
@@ -393,9 +364,7 @@ export const actionSorter = {
             nonce: action.nonce,
         };
     },
-    PerpDexTransfer: (
-        action: DeepImmutable<PerpDexTransferRequest["action"]>,
-    ): PerpDexTransferRequest["action"] => {
+    PerpDexTransfer: (action: DeepImmutable<PerpDexTransferRequest["action"]>): PerpDexTransferRequest["action"] => {
         return {
             type: action.type,
             signatureChainId: action.signatureChainId,
@@ -440,23 +409,9 @@ export const actionSorter = {
             code: action.code,
         };
     },
-    spotDeploy: (
-        action:
-            | DeepImmutable<SpotDeployRequest_Genesis["action"]>
-            | DeepImmutable<SpotDeployRequest_RegisterHyperliquidity["action"]>
-            | DeepImmutable<SpotDeployRequest_RegisterSpot["action"]>
-            | DeepImmutable<SpotDeployRequest_RegisterToken2["action"]>
-            | DeepImmutable<SpotDeployRequest_SetDeployerTradingFeeShare["action"]>
-            | DeepImmutable<SpotDeployRequest_UserGenesis["action"]>,
-    ):
-        | SpotDeployRequest_Genesis["action"]
-        | SpotDeployRequest_RegisterHyperliquidity["action"]
-        | SpotDeployRequest_RegisterSpot["action"]
-        | SpotDeployRequest_RegisterToken2["action"]
-        | SpotDeployRequest_SetDeployerTradingFeeShare["action"]
-        | SpotDeployRequest_UserGenesis["action"] => {
+    spotDeploy: (action: DeepImmutable<SpotDeployRequest["action"]>): SpotDeployRequest["action"] => {
         if ("genesis" in action) {
-            const sortedAction: SpotDeployRequest_Genesis["action"] = {
+            const sortedAction = {
                 type: action.type,
                 genesis: {
                     token: action.genesis.token,
@@ -469,7 +424,7 @@ export const actionSorter = {
             }
             return sortedAction;
         } else if ("registerHyperliquidity" in action) {
-            const sortedAction: SpotDeployRequest_RegisterHyperliquidity["action"] = {
+            const sortedAction = {
                 type: action.type,
                 registerHyperliquidity: {
                     spot: action.registerHyperliquidity.spot,
@@ -491,7 +446,7 @@ export const actionSorter = {
                 },
             };
         } else if ("registerToken2" in action) {
-            const sortedAction: SpotDeployRequest_RegisterToken2["action"] = {
+            const sortedAction = {
                 type: action.type,
                 registerToken2: {
                     spec: {
@@ -515,14 +470,19 @@ export const actionSorter = {
                     share: action.setDeployerTradingFeeShare.share,
                 },
             };
-        } else { // "userGenesis" in action
-            const sortedAction: SpotDeployRequest_UserGenesis["action"] = {
+        } else {
+            const sortedAction = {
                 type: action.type,
                 userGenesis: {
                     token: action.userGenesis.token,
-                    userAndWei: action.userGenesis.userAndWei.map((el) => [...el]),
-                    existingTokenAndWei: action.userGenesis.existingTokenAndWei.map((el) => [...el]),
-                    blacklistUsers: action.userGenesis.blacklistUsers?.map((el) => [...el]),
+                    userAndWei: action.userGenesis.userAndWei.map((el) => [...el]) as [string, string][],
+                    existingTokenAndWei: action.userGenesis.existingTokenAndWei.map((el) => [...el]) as [
+                        number,
+                        string,
+                    ][],
+                    blacklistUsers: action.userGenesis.blacklistUsers?.map((el) => [...el]) as
+                        | [string, boolean][]
+                        | undefined,
                 },
             };
             if (sortedAction.userGenesis.blacklistUsers === undefined) {

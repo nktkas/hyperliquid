@@ -43,7 +43,7 @@ export type OrderParams = {
             };
         };
     /** Client Order ID. */
-    c?: Hex | null;
+    c?: Hex;
 };
 
 /** Base structure for exchange requests. */
@@ -279,119 +279,99 @@ export interface CreateVaultRequest extends BaseExchangeRequest {
 }
 
 /**
- * Jail a signer to prevent them from signing transactions.
+ * Perform an action on a signer:
+ * - Jail to prevent them from signing transactions.
+ * - Unjail to allow them to sign transactions again.
  * @returns {SuccessResponse}
  */
-export interface CSignerActionRequest_JailSelf extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "CSignerAction";
-        /** Jail the signer. */
-        jailSelf: null;
-    };
-    vaultAddress?: undefined;
-    expiresAfter?: number;
-}
-
-/**
- * Unjail a signer to allow them to sign transactions again.
- * @returns {SuccessResponse}
- */
-export interface CSignerActionRequest_UnjailSelf extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "CSignerAction";
-        /** Unjail the signer. */
-        unjailSelf: null;
-    };
-    vaultAddress?: undefined;
-    expiresAfter?: number;
-}
-
-/**
- * Change a validator's profile information.
- * @returns {SuccessResponse}
- */
-export interface CValidatorActionRequest_ChangeProfile extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "CValidatorAction";
-        /** Profile changes to apply. */
-        changeProfile: {
-            /** Validator node IP address. */
-            node_ip?:
-                | {
-                    /** IP address. */
-                    Ip: string;
-                }
-                | null;
-            /** Validator name. */
-            name?: string | null;
-            /** Validator description. */
-            description?: string | null;
-            /** Validator jail status. */
-            unjailed: boolean;
-            /** Enable or disable delegations. */
-            disable_delegations?: boolean | null;
-            /** Commission rate in basis points (1 = 0.0001%). */
-            commission_bps?: number | null;
-            /** Signer address. */
-            signer?: Hex | null;
+export interface CSignerActionRequest extends BaseExchangeRequest {
+    action:
+        | {
+            /** Type of action. */
+            type: "CSignerAction";
+            /** Jail the signer. */
+            jailSelf: null;
+        }
+        | {
+            /** Type of action. */
+            type: "CSignerAction";
+            /** Unjail the signer. */
+            unjailSelf: null;
         };
-    };
     vaultAddress?: undefined;
     expiresAfter?: number;
 }
 
 /**
- * Register a new validator.
+ * Perform an action on a validator:
+ * - Change profile information.
+ * - Register a new validator.
+ * - Unregister an existing validator.
  * @returns {SuccessResponse}
  */
-export interface CValidatorActionRequest_Register extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "CValidatorAction";
-        /** Registration parameters. */
-        register: {
-            /** Validator profile information. */
-            profile: {
+export interface CValidatorActionRequest extends BaseExchangeRequest {
+    action:
+        | {
+            /** Type of action. */
+            type: "CValidatorAction";
+            /** Profile changes to apply. */
+            changeProfile: {
                 /** Validator node IP address. */
-                node_ip: {
-                    /** IP address. */
-                    Ip: string;
-                };
+                node_ip:
+                    | {
+                        /** IP address. */
+                        Ip: string;
+                    }
+                    | null;
                 /** Validator name. */
-                name: string;
+                name: string | null;
                 /** Validator description. */
-                description: string;
-                /** Whether delegations are disabled. */
-                delegations_disabled: boolean;
+                description: string | null;
+                /** Validator jail status. */
+                unjailed: boolean;
+                /** Enable or disable delegations. */
+                disable_delegations: boolean | null;
                 /** Commission rate in basis points (1 = 0.0001%). */
-                commission_bps: number;
+                commission_bps: number | null;
                 /** Signer address. */
-                signer: Hex;
+                signer: Hex | null;
             };
-            /** Initial jail status. */
-            unjailed: boolean;
-            /** Initial stake amount in wei. */
-            initial_wei: number;
+        }
+        | {
+            /** Type of action. */
+            type: "CValidatorAction";
+            /** Registration parameters. */
+            register: {
+                /** Validator profile information. */
+                profile: {
+                    /** Validator node IP address. */
+                    node_ip: {
+                        /** IP address. */
+                        Ip: string;
+                    };
+                    /** Validator name. */
+                    name: string;
+                    /** Validator description. */
+                    description: string;
+                    /** Whether delegations are disabled. */
+                    delegations_disabled: boolean;
+                    /** Commission rate in basis points (1 = 0.0001%). */
+                    commission_bps: number;
+                    /** Signer address. */
+                    signer: Hex;
+                };
+                /** Initial jail status. */
+                unjailed: boolean;
+                /** Initial stake amount in wei. */
+                initial_wei: number;
+            };
+        }
+        | {
+            /** Type of action. */
+            type: "CValidatorAction";
+            /** Unregister the validator. */
+            unregister: null;
         };
-    };
-    vaultAddress?: undefined;
-    expiresAfter?: number;
-}
-
-/**
- * Unregister an existing validator.
- * @returns {SuccessResponse}
- */
-export interface CValidatorActionRequest_Unregister extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "CValidatorAction";
-        /** Unregister the validator. */
-        unregister: null;
-    };
     vaultAddress?: undefined;
     expiresAfter?: number;
 }
@@ -505,68 +485,62 @@ export interface OrderRequest extends BaseExchangeRequest {
 }
 
 /**
- * Deploying HIP-3 assets (Register Asset).
+ * Deploying HIP-3 assets:
+ * - Register Asset
+ * - Set Oracle
  * @returns {SuccessResponse}
  */
-export interface PerpDeployRequest_RegisterAsset extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "perpDeploy";
-        /** Parameters for registering a new perpetual asset. */
-        registerAsset: {
-            /** Max gas in native token wei. If not provided, then uses current deploy auction price. */
-            maxGas?: number | null;
-            /** Contains new asset listing parameters. */
-            assetRequest: {
-                /** Coin symbol for the new asset. */
-                coin: string;
-                /** Number of decimal places for size. */
-                szDecimals: number;
-                /**
-                 * Initial oracle price for the asset.
-                 * @pattern ^[0-9]+(\.[0-9]+)?$
-                 */
-                oraclePx: string;
-                /** Margin table identifier for risk management. */
-                marginTableId: number;
-                /** Whether the asset can only be traded with isolated margin. */
-                onlyIsolated: boolean;
+export interface PerpDeployRequest extends BaseExchangeRequest {
+    action:
+        | {
+            /** Type of action. */
+            type: "perpDeploy";
+            /** Parameters for registering a new perpetual asset. */
+            registerAsset: {
+                /** Max gas in native token wei. If not provided, then uses current deploy auction price. */
+                maxGas: number | null;
+                /** Contains new asset listing parameters. */
+                assetRequest: {
+                    /** Coin symbol for the new asset. */
+                    coin: string;
+                    /** Number of decimal places for size. */
+                    szDecimals: number;
+                    /**
+                     * Initial oracle price for the asset.
+                     * @pattern ^[0-9]+(\.[0-9]+)?$
+                     */
+                    oraclePx: string;
+                    /** Margin table identifier for risk management. */
+                    marginTableId: number;
+                    /** Whether the asset can only be traded with isolated margin. */
+                    onlyIsolated: boolean;
+                };
+                /** Name of the perp dex (<= 6 characters). */
+                dex: string;
+                /** Contains new perp dex parameters. */
+                schema: {
+                    /** Full name of the perp dex. */
+                    fullName: string;
+                    /** Collateral token index. */
+                    collateralToken: number;
+                    /** User to update oracles. If not provided, then deployer is assumed to be oracle updater. */
+                    oracleUpdater: Hex | null;
+                } | null;
             };
-            /** Name of the perp dex (<= 6 characters). */
-            dex: string;
-            /** Contains new perp dex parameters. */
-            schema?: {
-                /** Full name of the perp dex. */
-                fullName: string;
-                /** Collateral token index. */
-                collateralToken: number;
-                /** User to update oracles. If not provided, then deployer is assumed to be oracle updater. */
-                oracleUpdater?: Hex | null;
-            } | null;
+        }
+        | {
+            /** Type of action. */
+            type: "perpDeploy";
+            /** Parameters for setting oracle and mark prices for assets. */
+            setOracle: {
+                /** Name of the perp dex (<= 6 characters). */
+                dex: string;
+                /** A list (sorted by key) of asset and oracle prices. */
+                oraclePxs: [string, string][];
+                /** A list (sorted by key) of asset and mark prices. */
+                markPxs: [string, string][];
+            };
         };
-    };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
-}
-
-/**
- * Deploying HIP-3 assets (Set Oracle).
- * @returns {SuccessResponse}
- */
-export interface PerpDeployRequest_SetOracle extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "perpDeploy";
-        /** Parameters for setting oracle and mark prices for assets. */
-        setOracle: {
-            /** Name of the perp dex (<= 6 characters). */
-            dex: string;
-            /** A list (sorted by key) of asset and oracle prices. */
-            oraclePxs: [string, string][];
-            /** A list (sorted by key) of asset and mark prices. */
-            markPxs: [string, string][];
-        };
-    };
     vaultAddress?: undefined;
     expiresAfter?: undefined;
 }
@@ -714,149 +688,111 @@ export interface SetReferrerRequest extends BaseExchangeRequest {
 }
 
 /**
- * Deploying HIP-1 and HIP-2 assets (Genesis).
+ * Deploying HIP-1 and HIP-2 assets:
+ * - Genesis
+ * - Register Hyperliquidity
+ * - Register Spot
+ * - Register Token2
+ * - Set Deployer Trading Fee Share
+ * - User Genesis
  * @returns {SuccessResponse}
  */
-export interface SpotDeployRequest_Genesis extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "spotDeploy";
-        /** Genesis parameters. */
-        genesis: {
-            /** Token identifier. */
-            token: number;
-            /**
-             * Maximum token supply.
-             * @pattern ^[0-9]+(\.[0-9]+)?$
-             */
-            maxSupply: string;
-            /** Set hyperliquidity balance to 0. */
-            noHyperliquidity?: true;
-        };
-    };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
-}
-
-/**
- * Deploying HIP-1 and HIP-2 assets (Register Hyperliquidity).
- * @returns {SuccessResponse}
- */
-export interface SpotDeployRequest_RegisterHyperliquidity extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "spotDeploy";
-        /** Register hyperliquidity parameters. */
-        registerHyperliquidity: {
-            /** Spot index (distinct from base token index). */
-            spot: number;
-            /**
-             * Starting price for liquidity seeding.
-             * @pattern ^[0-9]+(\.[0-9]+)?$
-             */
-            startPx: string;
-            /**
-             * Order size as a float (not in wei).
-             * @pattern ^[0-9]+(\.[0-9]+)?$
-             */
-            orderSz: string;
-            /** Total number of orders to place. */
-            nOrders: number;
-            /** Number of levels to seed with USDC. */
-            nSeededLevels?: number;
-        };
-    };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
-}
-
-/**
- * Deploying HIP-1 and HIP-2 assets (Register Spot).
- * @returns {SuccessResponse}
- */
-export interface SpotDeployRequest_RegisterSpot extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "spotDeploy";
-        /** Register spot parameters. */
-        registerSpot: {
-            /** Tuple containing base and quote token indices. */
-            tokens: [number, number];
-        };
-    };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
-}
-
-/**
- * Deploying HIP-1 and HIP-2 assets (Register Token).
- * @returns {SuccessResponse}
- */
-export interface SpotDeployRequest_RegisterToken2 extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "spotDeploy";
-        /** Register token parameters. */
-        registerToken2: {
-            /** Token specifications. */
-            spec: {
-                /** Token name. */
-                name: string;
-                /** Number of decimals for token size. */
-                szDecimals: number;
-                /** Number of decimals for token amounts in wei. */
-                weiDecimals: number;
+export interface SpotDeployRequest extends BaseExchangeRequest {
+    action:
+        | {
+            /** Type of action. */
+            type: "spotDeploy";
+            /** Genesis parameters. */
+            genesis: {
+                /** Token identifier. */
+                token: number;
+                /**
+                 * Maximum token supply.
+                 * @pattern ^[0-9]+(\.[0-9]+)?$
+                 */
+                maxSupply: string;
+                /** Set hyperliquidity balance to 0. */
+                noHyperliquidity?: true;
             };
-            /** Maximum gas allowed for registration. */
-            maxGas: number;
-            /** Optional full token name. */
-            fullName?: string;
+        }
+        | {
+            /** Type of action. */
+            type: "spotDeploy";
+            /** Register hyperliquidity parameters. */
+            registerHyperliquidity: {
+                /** Spot index (distinct from base token index). */
+                spot: number;
+                /**
+                 * Starting price for liquidity seeding.
+                 * @pattern ^[0-9]+(\.[0-9]+)?$
+                 */
+                startPx: string;
+                /**
+                 * Order size as a float (not in wei).
+                 * @pattern ^[0-9]+(\.[0-9]+)?$
+                 */
+                orderSz: string;
+                /** Total number of orders to place. */
+                nOrders: number;
+                /** Number of levels to seed with USDC. */
+                nSeededLevels?: number;
+            };
+        }
+        | {
+            /** Type of action. */
+            type: "spotDeploy";
+            /** Register spot parameters. */
+            registerSpot: {
+                /** Tuple containing base and quote token indices. */
+                tokens: [number, number];
+            };
+        }
+        | {
+            /** Type of action. */
+            type: "spotDeploy";
+            /** Register token parameters. */
+            registerToken2: {
+                /** Token specifications. */
+                spec: {
+                    /** Token name. */
+                    name: string;
+                    /** Number of decimals for token size. */
+                    szDecimals: number;
+                    /** Number of decimals for token amounts in wei. */
+                    weiDecimals: number;
+                };
+                /** Maximum gas allowed for registration. */
+                maxGas: number;
+                /** Optional full token name. */
+                fullName?: string;
+            };
+        }
+        | {
+            /** Type of action. */
+            type: "spotDeploy";
+            /** Set deployer trading fee share parameters. */
+            setDeployerTradingFeeShare: {
+                /** Token identifier. */
+                token: number;
+                /** The deployer trading fee share. Range: ["0%", "100%"]. */
+                share: `${string}%`;
+            };
+        }
+        | {
+            /** Type of action. */
+            type: "spotDeploy";
+            /** User genesis parameters. */
+            userGenesis: {
+                /** Token identifier. */
+                token: number;
+                /** Array of tuples: [user address, genesis amount in wei]. */
+                userAndWei: [string, string][];
+                /** Array of tuples: [existing token identifier, genesis amount in wei]. */
+                existingTokenAndWei: [number, string][];
+                /** Array of tuples: [user address, blacklist status] (`true` for blacklist, `false` to remove existing blacklisted user). */
+                blacklistUsers?: [string, boolean][];
+            };
         };
-    };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
-}
-
-/**
- * Deploying HIP-1 and HIP-2 assets (Set Deployer Trading Fee Share).
- * @returns {SuccessResponse}
- */
-export interface SpotDeployRequest_SetDeployerTradingFeeShare extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "spotDeploy";
-        /** Set deployer trading fee share parameters. */
-        setDeployerTradingFeeShare: {
-            /** Token identifier. */
-            token: number;
-            /** The deployer trading fee share. Range: ["0%", "100%"]. */
-            share: `${string}%`;
-        };
-    };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
-}
-
-/**
- * Deploying HIP-1 and HIP-2 assets (User Genesis).
- * @returns {SuccessResponse}
- */
-export interface SpotDeployRequest_UserGenesis extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "spotDeploy";
-        /** User genesis parameters. */
-        userGenesis: {
-            /** Token identifier. */
-            token: number;
-            /** Array of tuples: [user address, genesis amount in wei]. */
-            userAndWei: [string, string][];
-            /** Array of tuples: [existing token identifier, genesis amount in wei]. */
-            existingTokenAndWei: [number, string][];
-            /** Array of tuples: [user address, blacklist status] (`true` for blacklist, `false` to remove existing blacklisted user). */
-            blacklistUsers?: [string, boolean][];
-        };
-    };
     vaultAddress?: undefined;
     expiresAfter?: undefined;
 }

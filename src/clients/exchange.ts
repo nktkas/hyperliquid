@@ -3,26 +3,28 @@ import type { IRequestTransport } from "../transports/base.ts";
 import type {
     ApproveAgentRequest,
     ApproveBuilderFeeRequest,
-    BaseExchangeRequest,
     BatchModifyRequest,
     CancelByCloidRequest,
     CancelRequest,
+    CancelResponse,
     CDepositRequest,
+    ClaimRewardsRequest,
+    ConvertToMultiSigUserRequest,
     ConvertToMultiSigUserRequest_Signers,
     CreateSubAccountRequest,
+    CreateSubAccountResponse,
     CreateVaultRequest,
-    CSignerActionRequest_JailSelf,
-    CSignerActionRequest_UnjailSelf,
-    CValidatorActionRequest_ChangeProfile,
-    CValidatorActionRequest_Register,
-    CValidatorActionRequest_Unregister,
+    CreateVaultResponse,
+    CSignerActionRequest,
+    CValidatorActionRequest,
     CWithdrawRequest,
+    ErrorResponse,
     EvmUserModifyRequest,
     ModifyRequest,
     MultiSigRequest,
     OrderRequest,
-    PerpDeployRequest_RegisterAsset,
-    PerpDeployRequest_SetOracle,
+    OrderResponse,
+    PerpDeployRequest,
     PerpDexClassTransferRequest,
     PerpDexTransferRequest,
     RegisterReferrerRequest,
@@ -30,20 +32,18 @@ import type {
     ScheduleCancelRequest,
     SetDisplayNameRequest,
     SetReferrerRequest,
-    SpotDeployRequest_Genesis,
-    SpotDeployRequest_RegisterHyperliquidity,
-    SpotDeployRequest_RegisterSpot,
-    SpotDeployRequest_RegisterToken2,
-    SpotDeployRequest_SetDeployerTradingFeeShare,
-    SpotDeployRequest_UserGenesis,
+    SpotDeployRequest,
     SpotSendRequest,
     SpotUserRequest,
     SubAccountModifyRequest,
     SubAccountSpotTransferRequest,
     SubAccountTransferRequest,
+    SuccessResponse,
     TokenDelegateRequest,
     TwapCancelRequest,
+    TwapCancelResponse,
     TwapOrderRequest,
+    TwapOrderResponse,
     UpdateIsolatedMarginRequest,
     UpdateLeverageRequest,
     UsdClassTransferRequest,
@@ -52,17 +52,7 @@ import type {
     VaultModifyRequest,
     VaultTransferRequest,
     Withdraw3Request,
-} from "../types/exchange/requests.ts";
-import type {
-    CancelResponse,
-    CreateSubAccountResponse,
-    CreateVaultResponse,
-    ErrorResponse,
-    OrderResponse,
-    SuccessResponse,
-    TwapCancelResponse,
-    TwapOrderResponse,
-} from "../types/exchange/responses.ts";
+} from "../types/mod.ts";
 import {
     type AbstractWallet,
     actionSorter,
@@ -111,155 +101,189 @@ export interface ExchangeClientParameters<
     nonceManager?: () => MaybePromise<number>;
 }
 
-type ExtractRequestParameters<T extends BaseExchangeRequest> =
-    & (T["action"] extends { signatureChainId: unknown }
-        ? Omit<T["action"], "type" | "signatureChainId" | "hyperliquidChain" | "nonce" | "time"> // user-signed actions
-        : Omit<T["action"], "type">) // L1 actions
-    // deno-lint-ignore ban-types
-    & (T["vaultAddress"] extends undefined ? {} : Pick<T, "vaultAddress">)
-    // deno-lint-ignore ban-types
-    & (T["expiresAfter"] extends undefined ? {} : Pick<T, "expiresAfter">);
+// deno-lint-ignore no-explicit-any
+type DistributiveOmit<T, K extends keyof any> = T extends unknown ? Omit<T, K> : never;
+type ExtractRequestAction<T extends { action: unknown }> = T["action"] extends { signatureChainId: unknown }
+    ? DistributiveOmit<T["action"], "type" | "signatureChainId" | "hyperliquidChain" | "nonce" | "time"> // user-signed actions
+    : DistributiveOmit<T["action"], "type">; // L1 actions
+/** Action parameters for the {@linkcode ExchangeClient.approveAgent} method. */
+export type ApproveAgentParameters = ExtractRequestAction<ApproveAgentRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.approveBuilderFee} method. */
+export type ApproveBuilderFeeParameters = ExtractRequestAction<ApproveBuilderFeeRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.batchModify} method. */
+export type BatchModifyParameters = ExtractRequestAction<BatchModifyRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.cancel} method. */
+export type CancelParameters = ExtractRequestAction<CancelRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.cancelByCloid} method. */
+export type CancelByCloidParameters = ExtractRequestAction<CancelByCloidRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.cDeposit} method. */
+export type CDepositParameters = ExtractRequestAction<CDepositRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.convertToMultiSigUser} method. */
+export type ConvertToMultiSigUserParameters = ConvertToMultiSigUserRequest_Signers;
+/** Action parameters for the {@linkcode ExchangeClient.createSubAccount} method. */
+export type CreateSubAccountParameters = ExtractRequestAction<CreateSubAccountRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.createVault} method. */
+export type CreateVaultParameters = ExtractRequestAction<CreateVaultRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.cSignerAction} method. */
+export type CSignerActionParameters = ExtractRequestAction<CSignerActionRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.cValidatorAction} method. */
+export type CValidatorActionParameters = ExtractRequestAction<CValidatorActionRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.cWithdraw} method. */
+export type CWithdrawParameters = ExtractRequestAction<CWithdrawRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.evmUserModify} method. */
+export type EvmUserModifyParameters = ExtractRequestAction<EvmUserModifyRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.modify} method. */
+export type ModifyParameters = ExtractRequestAction<ModifyRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.multiSig} method. */
+export type MultiSigParameters = ExtractRequestAction<MultiSigRequest> & Pick<MultiSigRequest, "nonce">;
+/** Action parameters for the {@linkcode ExchangeClient.order} method. */
+export type OrderParameters = ExtractRequestAction<OrderRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.perpDeploy} method. */
+export type PerpDeployParameters = ExtractRequestAction<PerpDeployRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.perpDexClassTransfer} method. */
+export type PerpDexClassTransferParameters = ExtractRequestAction<PerpDexClassTransferRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.perpDexTransfer} method. */
+export type PerpDexTransferParameters = ExtractRequestAction<PerpDexTransferRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.registerReferrer} method. */
+export type RegisterReferrerParameters = ExtractRequestAction<RegisterReferrerRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.reserveRequestWeight} method. */
+export type ReserveRequestWeightParameters = ExtractRequestAction<ReserveRequestWeightRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.scheduleCancel} method. */
+export type ScheduleCancelParameters = ExtractRequestAction<ScheduleCancelRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.setDisplayName} method. */
+export type SetDisplayNameParameters = ExtractRequestAction<SetDisplayNameRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.setReferrer} method. */
+export type SetReferrerParameters = ExtractRequestAction<SetReferrerRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.spotDeploy} method. */
+export type SpotDeployParameters = ExtractRequestAction<SpotDeployRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.spotSend} method. */
+export type SpotSendParameters = ExtractRequestAction<SpotSendRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.spotUser} method. */
+export type SpotUserParameters = ExtractRequestAction<SpotUserRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.subAccountModify} method. */
+export type SubAccountModifyParameters = ExtractRequestAction<SubAccountModifyRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.subAccountSpotTransfer} method. */
+export type SubAccountSpotTransferParameters = ExtractRequestAction<SubAccountSpotTransferRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.subAccountTransfer} method. */
+export type SubAccountTransferParameters = ExtractRequestAction<SubAccountTransferRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.tokenDelegate} method. */
+export type TokenDelegateParameters = ExtractRequestAction<TokenDelegateRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.twapCancel} method. */
+export type TwapCancelParameters = ExtractRequestAction<TwapCancelRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.twapOrder} method. */
+export type TwapOrderParameters = ExtractRequestAction<TwapOrderRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.updateIsolatedMargin} method. */
+export type UpdateIsolatedMarginParameters = ExtractRequestAction<UpdateIsolatedMarginRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.updateLeverage} method. */
+export type UpdateLeverageParameters = ExtractRequestAction<UpdateLeverageRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.usdClassTransfer} method. */
+export type UsdClassTransferParameters = ExtractRequestAction<UsdClassTransferRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.usdSend} method. */
+export type UsdSendParameters = ExtractRequestAction<UsdSendRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.vaultDistribute} method. */
+export type VaultDistributeParameters = ExtractRequestAction<VaultDistributeRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.vaultModify} method. */
+export type VaultModifyParameters = ExtractRequestAction<VaultModifyRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.vaultTransfer} method. */
+export type VaultTransferParameters = ExtractRequestAction<VaultTransferRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.withdraw3} method. */
+export type Withdraw3Parameters = ExtractRequestAction<Withdraw3Request>;
 
-/** Parameters for the {@linkcode ExchangeClient.approveAgent} method. */
-export type ApproveAgentParameters = ExtractRequestParameters<ApproveAgentRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.approveBuilderFee} method. */
-export type ApproveBuilderFeeParameters = ExtractRequestParameters<ApproveBuilderFeeRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.batchModify} method. */
-export type BatchModifyParameters = ExtractRequestParameters<BatchModifyRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.cancel} method. */
-export type CancelParameters = ExtractRequestParameters<CancelRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.cancelByCloid} method. */
-export type CancelByCloidParameters = ExtractRequestParameters<CancelByCloidRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.cDeposit} method. */
-export type CDepositParameters = ExtractRequestParameters<CDepositRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.convertToMultiSigUser} method. */
-export type ConvertToMultiSigUserParameters = ConvertToMultiSigUserRequest_Signers; // Special case: more convenient to work with an object than with a string
-
-/** Parameters for the {@linkcode ExchangeClient.createSubAccount} method. */
-export type CreateSubAccountParameters = ExtractRequestParameters<CreateSubAccountRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.createVault} method. */
-export type CreateVaultParameters = ExtractRequestParameters<CreateVaultRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.cSignerAction} method. */
-export type CSignerActionParameters =
-    | ExtractRequestParameters<CSignerActionRequest_JailSelf>
-    | ExtractRequestParameters<CSignerActionRequest_UnjailSelf>;
-
-/** Parameters for the {@linkcode ExchangeClient.cValidatorAction} method. */
-export type CValidatorActionParameters =
-    | ExtractRequestParameters<CValidatorActionRequest_ChangeProfile>
-    | ExtractRequestParameters<CValidatorActionRequest_Register>
-    | ExtractRequestParameters<CValidatorActionRequest_Unregister>;
-
-/** Parameters for the {@linkcode ExchangeClient.cWithdraw} method. */
-export type CWithdrawParameters = ExtractRequestParameters<CWithdrawRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.evmUserModify} method. */
-export type EvmUserModifyParameters = ExtractRequestParameters<EvmUserModifyRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.modify} method. */
-export type ModifyParameters = ExtractRequestParameters<ModifyRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.multiSig} method. */
-export type MultiSigParameters =
-    & ExtractRequestParameters<MultiSigRequest>
-    & {
-        /** Must be the same for all signers. */
-        nonce: number; // Special case: nonce must be same for all signers
-    };
-
-/** Parameters for the {@linkcode ExchangeClient.order} method. */
-export type OrderParameters = ExtractRequestParameters<OrderRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.perpDeploy} method. */
-export type PerpDeployParameters =
-    | ExtractRequestParameters<PerpDeployRequest_RegisterAsset>
-    | ExtractRequestParameters<PerpDeployRequest_SetOracle>;
-
-/** Parameters for the {@linkcode ExchangeClient.perpDexClassTransfer} method. */
-export type PerpDexClassTransferParameters = ExtractRequestParameters<PerpDexClassTransferRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.perpDexTransfer} method. */
-export type PerpDexTransferParameters = ExtractRequestParameters<PerpDexTransferRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.registerReferrer} method. */
-export type RegisterReferrerParameters = ExtractRequestParameters<RegisterReferrerRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.reserveRequestWeight} method. */
-export type ReserveRequestWeightParameters = ExtractRequestParameters<ReserveRequestWeightRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.scheduleCancel} method. */
-export type ScheduleCancelParameters = ExtractRequestParameters<ScheduleCancelRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.setDisplayName} method. */
-export type SetDisplayNameParameters = ExtractRequestParameters<SetDisplayNameRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.setReferrer} method. */
-export type SetReferrerParameters = ExtractRequestParameters<SetReferrerRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.spotDeploy} method. */
-export type SpotDeployParameters =
-    | ExtractRequestParameters<SpotDeployRequest_Genesis>
-    | ExtractRequestParameters<SpotDeployRequest_RegisterHyperliquidity>
-    | ExtractRequestParameters<SpotDeployRequest_RegisterSpot>
-    | ExtractRequestParameters<SpotDeployRequest_RegisterToken2>
-    | ExtractRequestParameters<SpotDeployRequest_SetDeployerTradingFeeShare>
-    | ExtractRequestParameters<SpotDeployRequest_UserGenesis>;
-
-/** Parameters for the {@linkcode ExchangeClient.spotSend} method. */
-export type SpotSendParameters = ExtractRequestParameters<SpotSendRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.spotUser} method. */
-export type SpotUserParameters = ExtractRequestParameters<SpotUserRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.subAccountModify} method. */
-export type SubAccountModifyParameters = ExtractRequestParameters<SubAccountModifyRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.subAccountSpotTransfer} method. */
-export type SubAccountSpotTransferParameters = ExtractRequestParameters<SubAccountSpotTransferRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.subAccountTransfer} method. */
-export type SubAccountTransferParameters = ExtractRequestParameters<SubAccountTransferRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.tokenDelegate} method. */
-export type TokenDelegateParameters = ExtractRequestParameters<TokenDelegateRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.twapCancel} method. */
-export type TwapCancelParameters = ExtractRequestParameters<TwapCancelRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.twapOrder} method. */
-export type TwapOrderParameters = ExtractRequestParameters<TwapOrderRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.updateIsolatedMargin} method. */
-export type UpdateIsolatedMarginParameters = ExtractRequestParameters<UpdateIsolatedMarginRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.updateLeverage} method. */
-export type UpdateLeverageParameters = ExtractRequestParameters<UpdateLeverageRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.usdClassTransfer} method. */
-export type UsdClassTransferParameters = ExtractRequestParameters<UsdClassTransferRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.usdSend} method. */
-export type UsdSendParameters = ExtractRequestParameters<UsdSendRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.vaultDistribute} method. */
-export type VaultDistributeParameters = ExtractRequestParameters<VaultDistributeRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.vaultModify} method. */
-export type VaultModifyParameters = ExtractRequestParameters<VaultModifyRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.vaultTransfer} method. */
-export type VaultTransferParameters = ExtractRequestParameters<VaultTransferRequest>;
-
-/** Parameters for the {@linkcode ExchangeClient.withdraw3} method. */
-export type Withdraw3Parameters = ExtractRequestParameters<Withdraw3Request>;
+interface BaseRequestOptions {
+    /**
+     * An [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * If this option is set, the request can be canceled by calling [`abort()`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort)
+     * on the corresponding [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController).
+     */
+    signal?: AbortSignal;
+}
+type ExtractRequestOptions<T extends { vaultAddress?: unknown; expiresAfter?: unknown }> =
+    & (T["vaultAddress"] extends undefined ? BaseRequestOptions : BaseRequestOptions & Pick<T, "vaultAddress">)
+    & (T["expiresAfter"] extends undefined ? BaseRequestOptions : BaseRequestOptions & Pick<T, "expiresAfter">);
+/** Request options for the {@linkcode ExchangeClient.approveAgent} method. */
+export type ApproveAgentOptions = ExtractRequestOptions<ApproveAgentRequest>;
+/** Request options for the {@linkcode ExchangeClient.approveBuilderFee} method. */
+export type ApproveBuilderFeeOptions = ExtractRequestOptions<ApproveBuilderFeeRequest>;
+/** Request options for the {@linkcode ExchangeClient.batchModify} method. */
+export type BatchModifyOptions = ExtractRequestOptions<BatchModifyRequest>;
+/** Request options for the {@linkcode ExchangeClient.cancel} method. */
+export type CancelOptions = ExtractRequestOptions<CancelRequest>;
+/** Request options for the {@linkcode ExchangeClient.cancelByCloid} method. */
+export type CancelByCloidOptions = ExtractRequestOptions<CancelByCloidRequest>;
+/** Request options for the {@linkcode ExchangeClient.cDeposit} method. */
+export type CDepositOptions = ExtractRequestOptions<CDepositRequest>;
+/** Request options for the {@linkcode ExchangeClient.claimRewards} method. */
+export type ClaimRewardsOptions = ExtractRequestOptions<ClaimRewardsRequest>;
+/** Request options for the {@linkcode ExchangeClient.convertToMultiSigUser} method. */
+export type ConvertToMultiSigUserOptions = ExtractRequestOptions<ConvertToMultiSigUserRequest>;
+/** Request options for the {@linkcode ExchangeClient.createSubAccount} method. */
+export type CreateSubAccountOptions = ExtractRequestOptions<CreateSubAccountRequest>;
+/** Request options for the {@linkcode ExchangeClient.createVault} method. */
+export type CreateVaultOptions = ExtractRequestOptions<CreateVaultRequest>;
+/** Request options for the {@linkcode ExchangeClient.cSignerAction} method. */
+export type CSignerActionOptions = ExtractRequestOptions<CSignerActionRequest>;
+/** Request options for the {@linkcode ExchangeClient.cValidatorAction} method. */
+export type CValidatorActionOptions = ExtractRequestOptions<CValidatorActionRequest>;
+/** Request options for the {@linkcode ExchangeClient.cWithdraw} method. */
+export type CWithdrawOptions = ExtractRequestOptions<CWithdrawRequest>;
+/** Request options for the {@linkcode ExchangeClient.evmUserModify} method. */
+export type EvmUserModifyOptions = ExtractRequestOptions<EvmUserModifyRequest>;
+/** Request options for the {@linkcode ExchangeClient.modify} method. */
+export type ModifyOptions = ExtractRequestOptions<ModifyRequest>;
+/** Request options for the {@linkcode ExchangeClient.multiSig} method. */
+export type MultiSigOptions = ExtractRequestOptions<MultiSigRequest>;
+/** Request options for the {@linkcode ExchangeClient.order} method. */
+export type OrderOptions = ExtractRequestOptions<OrderRequest>;
+/** Request options for the {@linkcode ExchangeClient.perpDeploy} method. */
+export type PerpDeployOptions = ExtractRequestOptions<PerpDeployRequest>;
+/** Request options for the {@linkcode ExchangeClient.perpDexClassTransfer} method. */
+export type PerpDexClassTransferOptions = ExtractRequestOptions<PerpDexClassTransferRequest>;
+/** Request options for the {@linkcode ExchangeClient.perpDexTransfer} method. */
+export type PerpDexTransferOptions = ExtractRequestOptions<PerpDexTransferRequest>;
+/** Request options for the {@linkcode ExchangeClient.registerReferrer} method. */
+export type RegisterReferrerOptions = ExtractRequestOptions<RegisterReferrerRequest>;
+/** Request options for the {@linkcode ExchangeClient.reserveRequestWeight} method. */
+export type ReserveRequestWeightOptions = ExtractRequestOptions<ReserveRequestWeightRequest>;
+/** Request options for the {@linkcode ExchangeClient.scheduleCancel} method. */
+export type ScheduleCancelOptions = ExtractRequestOptions<ScheduleCancelRequest>;
+/** Request options for the {@linkcode ExchangeClient.setDisplayName} method. */
+export type SetDisplayNameOptions = ExtractRequestOptions<SetDisplayNameRequest>;
+/** Request options for the {@linkcode ExchangeClient.setReferrer} method. */
+export type SetReferrerOptions = ExtractRequestOptions<SetReferrerRequest>;
+/** Request options for the {@linkcode ExchangeClient.spotDeploy} method. */
+export type SpotDeployOptions = ExtractRequestOptions<SpotDeployRequest>;
+/** Request options for the {@linkcode ExchangeClient.spotSend} method. */
+export type SpotSendOptions = ExtractRequestOptions<SpotSendRequest>;
+/** Request options for the {@linkcode ExchangeClient.spotUser} method. */
+export type SpotUserOptions = ExtractRequestOptions<SpotUserRequest>;
+/** Request options for the {@linkcode ExchangeClient.subAccountModify} method. */
+export type SubAccountModifyOptions = ExtractRequestOptions<SubAccountModifyRequest>;
+/** Request options for the {@linkcode ExchangeClient.subAccountSpotTransfer} method. */
+export type SubAccountSpotTransferOptions = ExtractRequestOptions<SubAccountSpotTransferRequest>;
+/** Request options for the {@linkcode ExchangeClient.subAccountTransfer} method. */
+export type SubAccountTransferOptions = ExtractRequestOptions<SubAccountTransferRequest>;
+/** Request options for the {@linkcode ExchangeClient.tokenDelegate} method. */
+export type TokenDelegateOptions = ExtractRequestOptions<TokenDelegateRequest>;
+/** Request options for the {@linkcode ExchangeClient.twapCancel} method. */
+export type TwapCancelOptions = ExtractRequestOptions<TwapCancelRequest>;
+/** Request options for the {@linkcode ExchangeClient.twapOrder} method. */
+export type TwapOrderOptions = ExtractRequestOptions<TwapOrderRequest>;
+/** Request options for the {@linkcode ExchangeClient.updateIsolatedMargin} method. */
+export type UpdateIsolatedMarginOptions = ExtractRequestOptions<UpdateIsolatedMarginRequest>;
+/** Request options for the {@linkcode ExchangeClient.updateLeverage} method. */
+export type UpdateLeverageOptions = ExtractRequestOptions<UpdateLeverageRequest>;
+/** Request options for the {@linkcode ExchangeClient.usdClassTransfer} method. */
+export type UsdClassTransferOptions = ExtractRequestOptions<UsdClassTransferRequest>;
+/** Request options for the {@linkcode ExchangeClient.usdSend} method. */
+export type UsdSendOptions = ExtractRequestOptions<UsdSendRequest>;
+/** Request options for the {@linkcode ExchangeClient.vaultDistribute} method. */
+export type VaultDistributeOptions = ExtractRequestOptions<VaultDistributeRequest>;
+/** Request options for the {@linkcode ExchangeClient.vaultModify} method. */
+export type VaultModifyOptions = ExtractRequestOptions<VaultModifyRequest>;
+/** Request options for the {@linkcode ExchangeClient.vaultTransfer} method. */
+export type VaultTransferOptions = ExtractRequestOptions<VaultTransferRequest>;
+/** Request options for the {@linkcode ExchangeClient.withdraw3} method. */
+export type Withdraw3Options = ExtractRequestOptions<Withdraw3Request>;
 
 type ExtractSuccessResponse<T> = T extends { response: { data: { statuses: (infer U)[] } } } ? T & { // multiple statuses
         response: { data: { statuses: Exclude<U, { error: string }>[] } };
@@ -268,16 +292,12 @@ type ExtractSuccessResponse<T> = T extends { response: { data: { statuses: (infe
             response: { data: { status: Exclude<S, { error: string }> } };
         }
     : never; // unknown response
-
 /** Successful variant of {@linkcode CancelResponse} without errors. */
 export type CancelResponseSuccess = ExtractSuccessResponse<CancelResponse>;
-
 /** Successful variant of {@linkcode OrderResponse} without errors. */
 export type OrderResponseSuccess = ExtractSuccessResponse<OrderResponse>;
-
 /** Successful variant of {@linkcode TwapCancelResponse} without errors. */
 export type TwapCancelResponseSuccess = ExtractSuccessResponse<TwapCancelResponse>;
-
 /** Successful variant of {@linkcode TwapOrderResponse} without errors. */
 export type TwapOrderResponseSuccess = ExtractSuccessResponse<TwapOrderResponse>;
 
@@ -427,8 +447,8 @@ export class ExchangeClient<
 
     /**
      * Approve an agent to sign on behalf of the master account.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -439,30 +459,32 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.approveAgent({ agentAddress: "0x...", agentName: "..." });
      * ```
      */
-    async approveAgent(args: ApproveAgentParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    async approveAgent(
+        params: ApproveAgentParameters,
+        opts?: ApproveAgentOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "approveAgent",
                 hyperliquidChain: this._getHyperliquidChain(),
                 signatureChainId: await this._getSignatureChainId(),
                 nonce: await this.nonceManager(),
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Approve a maximum fee rate for a builder.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -473,30 +495,32 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.approveBuilderFee({ maxFeeRate: "0.01%", builder: "0x..." });
      * ```
      */
-    async approveBuilderFee(args: ApproveBuilderFeeParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    async approveBuilderFee(
+        params: ApproveBuilderFeeParameters,
+        opts?: ApproveBuilderFeeOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "approveBuilderFee",
                 hyperliquidChain: this._getHyperliquidChain(),
                 signatureChainId: await this._getSignatureChainId(),
                 nonce: await this.nonceManager(),
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Modify multiple orders.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful variant of {@link OrderResponse} without error statuses.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -507,7 +531,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -528,22 +552,24 @@ export class ExchangeClient<
      * });
      * ```
      */
-    async batchModify(args: BatchModifyParameters, signal?: AbortSignal): Promise<OrderResponseSuccess> {
-        const { vaultAddress, expiresAfter, ...actionArgs } = args;
+    async batchModify(
+        params: BatchModifyParameters,
+        opts?: BatchModifyOptions,
+    ): Promise<OrderResponseSuccess> {
         return this._executeAction({
             action: {
                 type: "batchModify",
-                ...actionArgs,
+                ...params,
             },
-            vaultAddress: vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, signal);
+            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
+        }, opts?.signal);
     }
 
     /**
      * Cancel order(s).
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful variant of {@link CancelResponse} without error statuses.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -554,7 +580,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -565,22 +591,24 @@ export class ExchangeClient<
      * });
      * ```
      */
-    async cancel(args: CancelParameters, signal?: AbortSignal): Promise<CancelResponseSuccess> {
-        const { vaultAddress, expiresAfter, ...actionArgs } = args;
+    async cancel(
+        params: CancelParameters,
+        opts?: CancelOptions,
+    ): Promise<CancelResponseSuccess> {
         return this._executeAction({
             action: {
                 type: "cancel",
-                ...actionArgs,
+                ...params,
             },
-            vaultAddress: vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, signal);
+            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
+        }, opts?.signal);
     }
 
     /**
      * Cancel order(s) by cloid.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful variant of {@link CancelResponse} without error statuses.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -591,7 +619,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -602,22 +630,24 @@ export class ExchangeClient<
      * });
      * ```
      */
-    async cancelByCloid(args: CancelByCloidParameters, signal?: AbortSignal): Promise<CancelResponseSuccess> {
-        const { vaultAddress, expiresAfter, ...actionArgs } = args;
+    async cancelByCloid(
+        params: CancelByCloidParameters,
+        opts?: CancelByCloidOptions,
+    ): Promise<CancelResponseSuccess> {
         return this._executeAction({
             action: {
                 type: "cancelByCloid",
-                ...actionArgs,
+                ...params,
             },
-            vaultAddress: vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, signal);
+            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
+        }, opts?.signal);
     }
 
     /**
      * Transfer native token from the user's spot account into staking for delegating to validators.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -628,30 +658,31 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.cDeposit({ wei: 1 * 1e8 });
      * ```
      */
-    async cDeposit(args: CDepositParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    async cDeposit(
+        params: CDepositParameters,
+        opts?: CDepositOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "cDeposit",
                 hyperliquidChain: this._getHyperliquidChain(),
                 signatureChainId: await this._getSignatureChainId(),
                 nonce: await this.nonceManager(),
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Claim rewards from referral program.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -662,25 +693,27 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.claimRewards();
      * ```
      */
-    claimRewards(signal?: AbortSignal): Promise<SuccessResponse> {
+    claimRewards(
+        opts?: ClaimRewardsOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "claimRewards",
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Convert a single-signature account to a multi-signature account or vice versa.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -691,7 +724,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -705,23 +738,25 @@ export class ExchangeClient<
      * await exchClient.convertToMultiSigUser(null);
      * ```
      */
-    async convertToMultiSigUser(args: ConvertToMultiSigUserParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const actionArgs = args;
+    async convertToMultiSigUser(
+        params: ConvertToMultiSigUserRequest_Signers,
+        opts?: ConvertToMultiSigUserOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "convertToMultiSigUser",
                 hyperliquidChain: this._getHyperliquidChain(),
                 signatureChainId: await this._getSignatureChainId(),
                 nonce: await this.nonceManager(),
-                signers: JSON.stringify(actionArgs),
+                signers: JSON.stringify(params),
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Create a sub-account.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Response for creating a sub-account.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -732,27 +767,29 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * const data = await exchClient.createSubAccount({ name: "..." });
      * ```
      */
-    createSubAccount(args: CreateSubAccountParameters, signal?: AbortSignal): Promise<CreateSubAccountResponse> {
-        const { ...actionArgs } = args;
+    createSubAccount(
+        params: CreateSubAccountParameters,
+        opts?: CreateSubAccountOptions,
+    ): Promise<CreateSubAccountResponse> {
         return this._executeAction({
             action: {
                 type: "createSubAccount",
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Create a vault.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Response for creating a vault.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -763,7 +800,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -775,20 +812,22 @@ export class ExchangeClient<
      * });
      * ```
      */
-    createVault(args: CreateVaultParameters, signal?: AbortSignal): Promise<CreateVaultResponse> {
-        const { ...actionArgs } = args;
+    createVault(
+        params: CreateVaultParameters,
+        opts?: CreateVaultOptions,
+    ): Promise<CreateVaultResponse> {
         return this._executeAction({
             action: {
                 type: "createVault",
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Jail or unjail self as a validator signer.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -799,7 +838,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -810,21 +849,23 @@ export class ExchangeClient<
      * await exchClient.cSignerAction({ unjailSelf: null });
      * ```
      */
-    async cSignerAction(args: CSignerActionParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { expiresAfter, ...actionArgs } = args;
+    async cSignerAction(
+        params: CSignerActionParameters,
+        opts?: CSignerActionOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "CSignerAction",
-                ...actionArgs,
+                ...params,
             },
-            expiresAfter: expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, signal);
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
+        }, opts?.signal);
     }
 
     /**
      * Action related to validator management.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -835,17 +876,21 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * // Change validator profile
      * await exchClient.cValidatorAction({
      *   changeProfile: {
+     *     node_ip: { Ip: "1.2.3.4" },
      *     name: "...",
      *     description: "...",
      *     unjailed: true,
-     *   }
+     *     disable_delegations: false,
+     *     commission_bps: null,
+     *     signer: null,
+     *   },
      * });
      *
      * // Register a new validator
@@ -868,21 +913,23 @@ export class ExchangeClient<
      * await exchClient.cValidatorAction({ unregister: null });
      * ```
      */
-    async cValidatorAction(args: CValidatorActionParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { expiresAfter, ...actionArgs } = args;
+    async cValidatorAction(
+        params: CValidatorActionParameters,
+        opts?: CValidatorActionOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "CValidatorAction",
-                ...actionArgs,
+                ...params,
             },
-            expiresAfter: expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, signal);
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
+        }, opts?.signal);
     }
 
     /**
      * Transfer native token from staking into the user's spot account.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -893,30 +940,32 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.cWithdraw({ wei: 1 * 1e8 });
      * ```
      */
-    async cWithdraw(args: CWithdrawParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    async cWithdraw(
+        params: CWithdrawParameters,
+        opts?: CWithdrawOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "cWithdraw",
                 hyperliquidChain: this._getHyperliquidChain(),
                 signatureChainId: await this._getSignatureChainId(),
                 nonce: await this.nonceManager(),
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Configure block type for EVM transactions.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Response for creating a sub-account.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -927,27 +976,29 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * const data = await exchClient.evmUserModify({ usingBigBlocks: true });
      * ```
      */
-    evmUserModify(args: EvmUserModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    evmUserModify(
+        params: EvmUserModifyParameters,
+        opts?: EvmUserModifyOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "evmUserModify",
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Modify an order.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -958,7 +1009,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -976,22 +1027,24 @@ export class ExchangeClient<
      * });
      * ```
      */
-    async modify(args: ModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { vaultAddress, expiresAfter, ...actionArgs } = args;
+    async modify(
+        params: ModifyParameters,
+        opts?: ModifyOptions,
+    ): Promise<OrderResponseSuccess> {
         return this._executeAction({
             action: {
                 type: "modify",
-                ...actionArgs,
+                ...params,
             },
-            vaultAddress: vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, signal);
+            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
+        }, opts?.signal);
     }
 
     /**
      * A multi-signature request.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Any successful response.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1043,24 +1096,26 @@ export class ExchangeClient<
             | OrderResponseSuccess
             | TwapOrderResponseSuccess
             | TwapCancelResponseSuccess,
-    >(args: MultiSigParameters, signal?: AbortSignal): Promise<T> {
-        const { vaultAddress, expiresAfter, nonce, ...actionArgs } = args;
+    >(
+        params: MultiSigParameters,
+        opts?: MultiSigOptions,
+    ): Promise<T> {
         return this._executeAction({
             action: {
                 type: "multiSig",
                 signatureChainId: await this._getSignatureChainId(),
-                ...actionArgs,
+                ...params,
             },
-            vaultAddress: vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: expiresAfter ?? await this._getDefaultExpiresAfter(),
-            multiSigNonce: nonce,
-        }, signal);
+            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
+            multiSigNonce: params?.nonce,
+        }, opts?.signal);
     }
 
     /**
      * Place an order(s).
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful variant of {@link OrderResponse} without error statuses.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1071,7 +1126,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1091,22 +1146,24 @@ export class ExchangeClient<
      * });
      * ```
      */
-    async order(args: OrderParameters, signal?: AbortSignal): Promise<OrderResponseSuccess> {
-        const { vaultAddress, expiresAfter, ...actionArgs } = args;
+    async order(
+        params: OrderParameters,
+        opts?: OrderOptions,
+    ): Promise<OrderResponseSuccess> {
         return this._executeAction({
             action: {
                 type: "order",
-                ...actionArgs,
+                ...params,
             },
-            vaultAddress: vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, signal);
+            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
+        }, opts?.signal);
     }
 
     /**
      * Deploying HIP-3 assets.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1117,7 +1174,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1132,24 +1189,27 @@ export class ExchangeClient<
      *       onlyIsolated: false,
      *     },
      *     dex: "test",
+     *     schema: null,
      *   },
      * });
      * ```
      */
-    perpDeploy(args: PerpDeployParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    perpDeploy(
+        params: PerpDeployParameters,
+        opts?: PerpDeployOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "perpDeploy",
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Transfer funds between Spot account and Perp dex account.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1160,30 +1220,32 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.perpDexClassTransfer({ dex: "test", token: "USDC", amount: "1", toPerp: true });
      * ```
      */
-    async perpDexClassTransfer(args: PerpDexClassTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    async perpDexClassTransfer(
+        params: PerpDexClassTransferParameters,
+        opts?: PerpDexClassTransferOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "PerpDexClassTransfer",
                 hyperliquidChain: this._getHyperliquidChain(),
                 signatureChainId: await this._getSignatureChainId(),
                 nonce: await this.nonceManager(),
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Transfer collateral tokens between different perp dexes for the same user.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1194,30 +1256,32 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.perpDexTransfer({ sourceDex: "", destinationDex: "test", amount: "1" });
      * ```
      */
-    async perpDexTransfer(args: PerpDexTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    async perpDexTransfer(
+        params: PerpDexTransferParameters,
+        opts?: PerpDexTransferOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "PerpDexTransfer",
                 hyperliquidChain: this._getHyperliquidChain(),
                 signatureChainId: await this._getSignatureChainId(),
                 nonce: await this.nonceManager(),
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Create a referral code.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1228,27 +1292,29 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.registerReferrer({ code: "..." });
      * ```
      */
-    registerReferrer(args: RegisterReferrerParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    registerReferrer(
+        params: RegisterReferrerParameters,
+        opts?: RegisterReferrerOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "registerReferrer",
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Reserve additional rate-limited actions for a fee.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1259,28 +1325,30 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.reserveRequestWeight({ weight: 10 });
      * ```
      */
-    async reserveRequestWeight(args: ReserveRequestWeightParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { expiresAfter, ...actionArgs } = args;
+    async reserveRequestWeight(
+        params: ReserveRequestWeightParameters,
+        opts?: ReserveRequestWeightOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "reserveRequestWeight",
-                ...actionArgs,
+                ...params,
             },
-            expiresAfter: expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, signal);
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
+        }, opts?.signal);
     }
 
     /**
      * Schedule a cancel-all operation at a future time.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - An optional action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1291,36 +1359,38 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.scheduleCancel({ time: Date.now() + 10_000 });
      * ```
      */
-    async scheduleCancel(args?: ScheduleCancelParameters, signal?: AbortSignal): Promise<SuccessResponse>;
-    async scheduleCancel(signal?: AbortSignal): Promise<SuccessResponse>;
+    async scheduleCancel(params?: ScheduleCancelParameters, opts?: ScheduleCancelOptions): Promise<SuccessResponse>;
+    async scheduleCancel(opts?: ScheduleCancelOptions): Promise<SuccessResponse>;
     async scheduleCancel(
-        args_or_signal?: ScheduleCancelParameters | AbortSignal,
-        maybeSignal?: AbortSignal,
+        params_or_opts?:
+            | ScheduleCancelParameters
+            | ScheduleCancelOptions,
+        maybeOpts?: ScheduleCancelOptions,
     ): Promise<SuccessResponse> {
-        const args = args_or_signal instanceof AbortSignal ? {} : args_or_signal ?? {};
-        const signal = args_or_signal instanceof AbortSignal ? args_or_signal : maybeSignal;
-        const { vaultAddress, expiresAfter, ...actionArgs } = args;
+        const isFirstArgParams = params_or_opts && "time" in params_or_opts;
+        const params = isFirstArgParams ? params_or_opts : {};
+        const opts = isFirstArgParams ? maybeOpts : params_or_opts as ScheduleCancelOptions;
         return this._executeAction({
             action: {
                 type: "scheduleCancel",
-                ...actionArgs,
+                ...params,
             },
-            vaultAddress: vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, signal);
+            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
+        }, opts?.signal);
     }
 
     /**
      * Set the display name in the leaderboard.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1331,27 +1401,29 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.setDisplayName({ displayName: "..." });
      * ```
      */
-    setDisplayName(args: SetDisplayNameParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    setDisplayName(
+        params: SetDisplayNameParameters,
+        opts?: SetDisplayNameOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "setDisplayName",
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Set a referral code.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1362,27 +1434,29 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.setReferrer({ code: "..." });
      * ```
      */
-    setReferrer(args: SetReferrerParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    setReferrer(
+        params: RegisterReferrerParameters,
+        opts?: RegisterReferrerOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "setReferrer",
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Deploying HIP-1 and HIP-2 assets.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1393,7 +1467,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1410,20 +1484,22 @@ export class ExchangeClient<
      * });
      * ```
      */
-    spotDeploy(args: SpotDeployParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    spotDeploy(
+        params: SpotDeployParameters,
+        opts?: SpotDeployOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "spotDeploy",
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Send spot assets to another address.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1434,7 +1510,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1445,23 +1521,25 @@ export class ExchangeClient<
      * });
      * ```
      */
-    async spotSend(args: SpotSendParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    async spotSend(
+        params: SpotSendParameters,
+        opts?: SpotSendOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "spotSend",
                 hyperliquidChain: this._getHyperliquidChain(),
                 signatureChainId: await this._getSignatureChainId(),
                 time: await this.nonceManager(),
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Modify a sub-account's.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1472,27 +1550,29 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.subAccountModify({ subAccountUser: "0x...", name: "..."  });
      * ```
      */
-    subAccountModify(args: SubAccountModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    subAccountModify(
+        params: SubAccountModifyParameters,
+        opts?: SubAccountModifyOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "subAccountModify",
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Opt Out of Spot Dusting.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1503,27 +1583,29 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.spotUser({ toggleSpotDusting: { optOut: false } });
      * ```
      */
-    spotUser(args: SpotUserParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    spotUser(
+        params: SpotUserParameters,
+        opts?: SpotUserOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "spotUser",
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Transfer between sub-accounts (spot).
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1534,7 +1616,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1546,20 +1628,22 @@ export class ExchangeClient<
      * });
      * ```
      */
-    subAccountSpotTransfer(args: SubAccountSpotTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    subAccountSpotTransfer(
+        params: SubAccountSpotTransferParameters,
+        opts?: SubAccountSpotTransferOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "subAccountSpotTransfer",
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Transfer between sub-accounts (perpetual).
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1570,27 +1654,29 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.subAccountTransfer({ subAccountUser: "0x...", isDeposit: true, usd: 1 * 1e6 });
      * ```
      */
-    subAccountTransfer(args: SubAccountTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    subAccountTransfer(
+        params: SubAccountTransferParameters,
+        opts?: SubAccountTransferOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "subAccountTransfer",
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Delegate or undelegate native tokens to or from a validator.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1601,30 +1687,32 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.tokenDelegate({ validator: "0x...", isUndelegate: true, wei: 1 * 1e8 });
      * ```
      */
-    async tokenDelegate(args: TokenDelegateParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    async tokenDelegate(
+        params: TokenDelegateParameters,
+        opts?: TokenDelegateOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "tokenDelegate",
                 hyperliquidChain: this._getHyperliquidChain(),
                 signatureChainId: await this._getSignatureChainId(),
                 nonce: await this.nonceManager(),
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Cancel a TWAP order.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful variant of {@link TwapCancelResponse} without error status.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1635,29 +1723,31 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * const data = await exchClient.twapCancel({ a: 0, t: 1 });
      * ```
      */
-    async twapCancel(args: TwapCancelParameters, signal?: AbortSignal): Promise<TwapCancelResponseSuccess> {
-        const { vaultAddress, expiresAfter, ...actionArgs } = args;
+    async twapCancel(
+        params: TwapCancelParameters,
+        opts?: TwapCancelOptions,
+    ): Promise<TwapCancelResponseSuccess> {
         return this._executeAction({
             action: {
                 type: "twapCancel",
-                ...actionArgs,
+                ...params,
             },
-            vaultAddress: vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, signal);
+            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
+        }, opts?.signal);
     }
 
     /**
      * Place a TWAP order.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful variant of {@link TwapOrderResponse} without error status.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1668,7 +1758,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1684,22 +1774,24 @@ export class ExchangeClient<
      * });
      * ```
      */
-    async twapOrder(args: TwapOrderParameters, signal?: AbortSignal): Promise<TwapOrderResponseSuccess> {
-        const { vaultAddress, expiresAfter, ...actionArgs } = args;
+    async twapOrder(
+        params: TwapOrderParameters,
+        opts?: TwapOrderOptions,
+    ): Promise<TwapOrderResponseSuccess> {
         return this._executeAction({
             action: {
                 type: "twapOrder",
-                ...actionArgs,
+                ...params,
             },
-            vaultAddress: vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, signal);
+            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
+        }, opts?.signal);
     }
 
     /**
      * Add or remove margin from isolated position.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1710,29 +1802,31 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.updateIsolatedMargin({ asset: 0, isBuy: true, ntli: 1 * 1e6 });
      * ```
      */
-    async updateIsolatedMargin(args: UpdateIsolatedMarginParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { vaultAddress, expiresAfter, ...actionArgs } = args;
+    async updateIsolatedMargin(
+        params: UpdateIsolatedMarginParameters,
+        opts?: UpdateIsolatedMarginOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "updateIsolatedMargin",
-                ...actionArgs,
+                ...params,
             },
-            vaultAddress: vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, signal);
+            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
+        }, opts?.signal);
     }
 
     /**
      * Update cross or isolated leverage on a coin.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1743,29 +1837,31 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.updateLeverage({ asset: 0, isCross: true, leverage: 5 });
      * ```
      */
-    async updateLeverage(args: UpdateLeverageParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { vaultAddress, expiresAfter, ...actionArgs } = args;
+    async updateLeverage(
+        params: UpdateLeverageParameters,
+        opts?: UpdateLeverageOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "updateLeverage",
-                ...actionArgs,
+                ...params,
             },
-            vaultAddress: vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, signal);
+            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
+        }, opts?.signal);
     }
 
     /**
      * Transfer funds between Spot account and Perp account.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1776,30 +1872,32 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.usdClassTransfer({ amount: "1", toPerp: true });
      * ```
      */
-    async usdClassTransfer(args: UsdClassTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    async usdClassTransfer(
+        params: UsdClassTransferParameters,
+        opts?: UsdClassTransferOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "usdClassTransfer",
                 hyperliquidChain: this._getHyperliquidChain(),
                 signatureChainId: await this._getSignatureChainId(),
                 nonce: await this.nonceManager(),
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Send usd to another address.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1810,30 +1908,32 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.usdSend({ destination: "0x...", amount: "1" });
      * ```
      */
-    async usdSend(args: UsdSendParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    async usdSend(
+        params: UsdSendParameters,
+        opts?: UsdSendOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "usdSend",
                 hyperliquidChain: this._getHyperliquidChain(),
                 signatureChainId: await this._getSignatureChainId(),
                 time: await this.nonceManager(),
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Distribute funds from a vault between followers.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1844,27 +1944,29 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.vaultDistribute({ vaultAddress: "0x...", usd: 10 * 1e6 });
      * ```
      */
-    vaultDistribute(args: VaultDistributeParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    vaultDistribute(
+        params: VaultDistributeParameters,
+        opts?: VaultDistributeOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "vaultDistribute",
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Modify a vault's configuration.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1875,7 +1977,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1886,20 +1988,22 @@ export class ExchangeClient<
      * });
      * ```
      */
-    vaultModify(args: VaultModifyParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    vaultModify(
+        params: VaultModifyParameters,
+        opts?: VaultModifyOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "vaultModify",
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     /**
      * Deposit or withdraw from a vault.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1910,28 +2014,30 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.vaultTransfer({ vaultAddress: "0x...", isDeposit: true, usd: 10 * 1e6 });
      * ```
      */
-    async vaultTransfer(args: VaultTransferParameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { expiresAfter, ...actionArgs } = args;
+    async vaultTransfer(
+        params: VaultTransferParameters,
+        opts?: VaultTransferOptions,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "vaultTransfer",
-                ...actionArgs,
+                ...params,
             },
-            expiresAfter: expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, signal);
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
+        }, opts?.signal);
     }
 
     /**
      * Initiate a withdrawal request.
-     * @param args - The parameters for the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
      * @returns Successful response without specific data.
      *
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
@@ -1942,24 +2048,26 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.withdraw3({ destination: "0x...", amount: "1" });
      * ```
      */
-    async withdraw3(args: Withdraw3Parameters, signal?: AbortSignal): Promise<SuccessResponse> {
-        const { ...actionArgs } = args;
+    async withdraw3(
+        params: Withdraw3Parameters,
+        opts?: Withdraw3Options,
+    ): Promise<SuccessResponse> {
         return this._executeAction({
             action: {
                 type: "withdraw3",
                 hyperliquidChain: this._getHyperliquidChain(),
                 signatureChainId: await this._getSignatureChainId(),
                 time: await this.nonceManager(),
-                ...actionArgs,
+                ...params,
             },
-        }, signal);
+        }, opts?.signal);
     }
 
     protected async _executeAction<

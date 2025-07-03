@@ -2,7 +2,15 @@ import { keccak_256 } from "@noble/hashes/sha3";
 import { etc, getPublicKey } from "@noble/secp256k1";
 import type { Hex } from "../base.ts";
 import type { IRequestTransport } from "../transports/base.ts";
-import type { CreateSubAccountResponse, CreateVaultResponse, SuccessResponse } from "../types/exchange/responses.ts";
+import type { CreateSubAccountResponse, CreateVaultResponse, SuccessResponse } from "../types/mod.ts";
+import {
+    type CancelResponseSuccess,
+    ExchangeClient,
+    type ExchangeClientParameters,
+    type OrderResponseSuccess,
+    type TwapCancelResponseSuccess,
+    type TwapOrderResponseSuccess,
+} from "./exchange.ts";
 import {
     type AbstractEthersSigner,
     type AbstractEthersV5Signer,
@@ -20,14 +28,6 @@ import {
     signUserSignedAction,
     userSignedActionEip712Types,
 } from "../signing/mod.ts";
-import {
-    type CancelResponseSuccess,
-    ExchangeClient,
-    type ExchangeClientParameters,
-    type OrderResponseSuccess,
-    type TwapCancelResponseSuccess,
-    type TwapOrderResponseSuccess,
-} from "./exchange.ts";
 
 type Signers = [AbstractWalletWithAddress, ...AbstractWallet[]];
 
@@ -49,17 +49,14 @@ export type AbstractWalletWithAddress =
     | AbstractEthersSignerWithAddress
     | AbstractEthersV5SignerWithAddress
     | AbstractWindowEthereum;
-
 /** Abstract interface for a [viem wallet](https://viem.sh/docs/clients/wallet) with wallet address. */
 export interface AbstractViemWalletClientWithAddress extends AbstractViemWalletClient {
     address: Hex;
 }
-
 /** Abstract interface for an [ethers.js signer](https://docs.ethers.org/v6/api/providers/#Signer) with wallet address. */
 export interface AbstractEthersSignerWithAddress extends AbstractEthersSigner {
     getAddress(): Promise<string>;
 }
-
 /** Abstract interface for an [ethers.js v5 signer](https://docs.ethers.org/v5/api/signer/) with wallet address. */
 export interface AbstractEthersV5SignerWithAddress extends AbstractEthersV5Signer {
     getAddress(): Promise<string>;
@@ -194,17 +191,18 @@ export class MultiSignClient<
         }
 
         // Send a multi-signature action
-        return await super.multiSig({
-            signatures,
-            payload: {
-                multiSigUser: this.multiSignAddress,
-                outerSigner,
-                action: sortedAction,
+        return await super.multiSig(
+            {
+                signatures,
+                payload: {
+                    multiSigUser: this.multiSignAddress,
+                    outerSigner,
+                    action: sortedAction,
+                },
+                nonce,
             },
-            nonce,
-            vaultAddress,
-            expiresAfter,
-        }, signal);
+            { signal, vaultAddress, expiresAfter },
+        );
     }
 
     /** Extracts the wallet address from different wallet types. */

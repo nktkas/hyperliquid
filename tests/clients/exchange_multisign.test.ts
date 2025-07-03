@@ -184,20 +184,22 @@ run(
         try {
             const data = await Promise.all([
                 // Check response 'resting' + argument 'expiresAfter'
-                client.batchModify({
-                    modifies: [{
-                        oid: (await openOrder(client, id, pxDown, sz)).oid,
-                        order: {
-                            a: id,
-                            b: true,
-                            p: pxDown,
-                            s: sz,
-                            r: false,
-                            t: { limit: { tif: "Gtc" } },
-                        },
-                    }],
-                    expiresAfter: Date.now() + 1000 * 60 * 60,
-                }),
+                client.batchModify(
+                    {
+                        modifies: [{
+                            oid: (await openOrder(client, id, pxDown, sz)).oid,
+                            order: {
+                                a: id,
+                                b: true,
+                                p: pxDown,
+                                s: sz,
+                                r: false,
+                                t: { limit: { tif: "Gtc" } },
+                            },
+                        }],
+                    },
+                    { expiresAfter: Date.now() + 1000 * 60 * 60 },
+                ),
                 // Check response 'resting' + `cloid`
                 client.batchModify({
                     modifies: [{
@@ -336,13 +338,15 @@ run(
                 }],
             }),
             // Check argument 'expiresAfter'
-            client.cancel({
-                cancels: [{
-                    a: id,
-                    o: await openOrder(client, id, pxDown, sz),
-                }],
-                expiresAfter: Date.now() + 1000 * 60 * 60,
-            }),
+            client.cancel(
+                {
+                    cancels: [{
+                        a: id,
+                        o: await openOrder(client, id, pxDown, sz),
+                    }],
+                },
+                { expiresAfter: Date.now() + 1000 * 60 * 60 },
+            ),
         ]);
         schemaCoverage(types, data);
     },
@@ -390,13 +394,15 @@ run(
                 }],
             }),
             // Check argument 'expiresAfter'
-            client.cancelByCloid({
-                cancels: [{
-                    asset: id,
-                    cloid: await openOrder(client, id, pxDown, sz),
-                }],
-                expiresAfter: Date.now() + 1000 * 60 * 60,
-            }),
+            client.cancelByCloid(
+                {
+                    cancels: [{
+                        asset: id,
+                        cloid: await openOrder(client, id, pxDown, sz),
+                    }],
+                },
+                { expiresAfter: Date.now() + 1000 * 60 * 60 },
+            ),
         ]);
         schemaCoverage(types, data);
     },
@@ -532,7 +538,18 @@ run(
 
         await Promise.all([
             assertRejects(
-                () => client.cValidatorAction({ changeProfile: { unjailed: false } }),
+                () =>
+                    client.cValidatorAction({
+                        changeProfile: {
+                            node_ip: { Ip: "1.2.3.4" },
+                            name: "...",
+                            description: "...",
+                            unjailed: false,
+                            disable_delegations: false,
+                            commission_bps: null,
+                            signer: null,
+                        },
+                    }),
                 ApiRequestError,
                 "Unknown validator",
             ),
@@ -657,18 +674,20 @@ run(
                     },
                 }),
                 // Check argument 'expiresAfter'
-                client.modify({
-                    oid: (await openOrder(client, id, pxDown, sz)).oid,
-                    order: {
-                        a: id,
-                        b: true,
-                        p: pxDown,
-                        s: sz,
-                        r: false,
-                        t: { limit: { tif: "Gtc" } },
+                client.modify(
+                    {
+                        oid: (await openOrder(client, id, pxDown, sz)).oid,
+                        order: {
+                            a: id,
+                            b: true,
+                            p: pxDown,
+                            s: sz,
+                            r: false,
+                            t: { limit: { tif: "Gtc" } },
+                        },
                     },
-                    expiresAfter: Date.now() + 1000 * 60 * 60,
-                }),
+                    { expiresAfter: Date.now() + 1000 * 60 * 60 },
+                ),
                 // Check argument 't.trigger'
                 client.modify({
                     oid: (await openOrder(client, id, pxDown, sz)).oid,
@@ -1004,18 +1023,20 @@ run(
         try {
             const data = await Promise.allSettled([
                 // Check response 'resting' + argument 'expiresAfter'
-                client.order({
-                    orders: [{
-                        a: id,
-                        b: true,
-                        p: pxDown,
-                        s: sz,
-                        r: false,
-                        t: { limit: { tif: "Gtc" } },
-                    }],
-                    grouping: "na",
-                    expiresAfter: Date.now() + 1000 * 60 * 60,
-                }),
+                client.order(
+                    {
+                        orders: [{
+                            a: id,
+                            b: true,
+                            p: pxDown,
+                            s: sz,
+                            r: false,
+                            t: { limit: { tif: "Gtc" } },
+                        }],
+                        grouping: "na",
+                    },
+                    { expiresAfter: Date.now() + 1000 * 60 * 60 },
+                ),
                 // Check response 'resting' + `cloid`
                 client.order({
                     orders: [{
@@ -1131,7 +1152,7 @@ run(
         const client = mode === "normal" ? exchClient : multiSignClient;
 
         await Promise.all([
-            // Register Asset | maxGas
+            // Register Asset
             assertRejects( // exists
                 () =>
                     client.perpDeploy({
@@ -1145,23 +1166,7 @@ run(
                                 onlyIsolated: true,
                             },
                             dex: "test",
-                        },
-                    }),
-                ApiRequestError,
-                "Error deploying perp:",
-            ),
-            assertRejects( // does not exist
-                () =>
-                    client.perpDeploy({
-                        registerAsset: {
-                            assetRequest: {
-                                coin: "1",
-                                szDecimals: 1,
-                                oraclePx: "1",
-                                marginTableId: 1,
-                                onlyIsolated: true,
-                            },
-                            dex: "test",
+                            schema: null,
                         },
                     }),
                 ApiRequestError,
@@ -1242,7 +1247,10 @@ run(
             // Check response 'success'
             client.reserveRequestWeight({ weight: 1 }),
             // Check argument 'expiresAfter'
-            client.reserveRequestWeight({ weight: 1, expiresAfter: Date.now() + 1000 * 60 * 60 }),
+            client.reserveRequestWeight(
+                { weight: 1 },
+                { expiresAfter: Date.now() + 1000 * 60 * 60 },
+            ),
         ]);
         schemaCoverage(types, data);
     },
@@ -1606,11 +1614,13 @@ run(
                 t: await createTWAP(client, id, sz),
             }),
             // Check argument 'expiresAfter'
-            client.twapCancel({
-                a: id,
-                t: await createTWAP(client, id, sz),
-                expiresAfter: Date.now() + 1000 * 60 * 60,
-            }),
+            client.twapCancel(
+                {
+                    a: id,
+                    t: await createTWAP(client, id, sz),
+                },
+                { expiresAfter: Date.now() + 1000 * 60 * 60 },
+            ),
         ]);
         schemaCoverage(types, data);
     },
@@ -1643,17 +1653,19 @@ run(
                 },
             }),
             // Check argument 'expiresAfter'
-            client.twapOrder({
-                twap: {
-                    a: id,
-                    b: true,
-                    s: sz,
-                    r: false,
-                    m: 5,
-                    t: false,
+            client.twapOrder(
+                {
+                    twap: {
+                        a: id,
+                        b: true,
+                        s: sz,
+                        r: false,
+                        m: 5,
+                        t: false,
+                    },
                 },
-                expiresAfter: Date.now() + 1000 * 60 * 60,
-            }),
+                { expiresAfter: Date.now() + 1000 * 60 * 60 },
+            ),
         ]);
 
         try {
@@ -1717,12 +1729,14 @@ run(
             const data = await Promise.all([
                 // Check argument 'isBuy' + argument 'expiresAfter'
                 client.updateIsolatedMargin({ asset: id, isBuy: true, ntli: 1 }),
-                client.updateIsolatedMargin({
-                    asset: id,
-                    isBuy: false,
-                    ntli: 1,
-                    expiresAfter: Date.now() + 1000 * 60 * 60,
-                }),
+                client.updateIsolatedMargin(
+                    {
+                        asset: id,
+                        isBuy: false,
+                        ntli: 1,
+                    },
+                    { expiresAfter: Date.now() + 1000 * 60 * 60 },
+                ),
             ]);
             schemaCoverage(types, data);
         } finally {
@@ -1772,12 +1786,14 @@ run(
         const data = await Promise.all([
             // Check argument 'isCross' + argument 'expiresAfter'
             client.updateLeverage({ asset: id, isCross: true, leverage: 1 }),
-            client.updateLeverage({
-                asset: id,
-                isCross: false,
-                leverage: 1,
-                expiresAfter: Date.now() + 1000 * 60 * 60,
-            }),
+            client.updateLeverage(
+                {
+                    asset: id,
+                    isCross: false,
+                    leverage: 1,
+                },
+                { expiresAfter: Date.now() + 1000 * 60 * 60 },
+            ),
         ]);
         schemaCoverage(types, data);
     },
@@ -1890,12 +1906,14 @@ run(
                 isDeposit: false,
                 usd: 5 * 1e6,
             }),
-            client.vaultTransfer({
-                vaultAddress,
-                isDeposit: true,
-                usd: 5 * 1e6,
-                expiresAfter: Date.now() + 1000 * 60 * 60,
-            }),
+            client.vaultTransfer(
+                {
+                    vaultAddress,
+                    isDeposit: true,
+                    usd: 5 * 1e6,
+                },
+                { expiresAfter: Date.now() + 1000 * 60 * 60 },
+            ),
         ]);
         if (data.some((d) => d.status === "rejected")) {
             data

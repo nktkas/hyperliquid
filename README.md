@@ -55,7 +55,7 @@ deno add jsr:@nktkas/hyperliquid
 ```js
 // React Native 0.76.3 / Expo v52
 // Issues:
-// - signing: does not support private keys directly, use viem or ethers
+// - signing: does not support private keys directly, use `viem` or `ethers`
 
 import { Event, EventTarget } from "event-target-shim";
 
@@ -113,7 +113,7 @@ const openOrders = await infoClient.openOrders({ user: "0x..." });
 ```ts
 import * as hl from "@nktkas/hyperliquid";
 
-const privateKey = "0x..."; // or `viem`, `ethers`
+const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
 
 const transport = new hl.HttpTransport();
 const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
@@ -304,7 +304,7 @@ const openOrders = await infoClient.openOrders({ user: "0x..." });
 ```ts
 import * as hl from "@nktkas/hyperliquid";
 
-const privateKey = "0x..."; // or `viem`, `ethers`
+const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
 
 const transport = new hl.HttpTransport();
 const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
@@ -702,7 +702,7 @@ The import point gives access to functions that generate signatures for Hyperliq
 ```ts
 import { actionSorter, signL1Action } from "@nktkas/hyperliquid/signing";
 
-const privateKey = "0x..."; // or `viem`, `ethers`
+const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
 
 const nonce = Date.now();
 const action = {
@@ -732,7 +732,7 @@ const body = await response.json();
 ```ts
 import { signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
 
-const privateKey = "0x..."; // or `viem`, `ethers`
+const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
 
 const action = {
     type: "approveAgent",

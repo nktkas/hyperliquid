@@ -1,44 +1,44 @@
 import type { ISubscriptionTransport, Subscription } from "../transports/base.ts";
 import type {
+    Book,
+    Candle,
+    Order,
+    OrderStatus,
+    TxDetails,
+    WsActiveAssetCtx,
     WsActiveAssetCtxRequest,
+    WsActiveAssetData,
     WsActiveAssetDataRequest,
+    WsActiveSpotAssetCtx,
+    WsAllMids,
     WsAllMidsRequest,
+    WsBbo,
     WsBboRequest,
+    WsBlockDetails,
     WsCandleRequest,
     WsExplorerBlockRequest,
     WsExplorerTxsRequest,
     WsL2BookRequest,
+    WsNotification,
     WsNotificationRequest,
     WsOrderUpdatesRequest,
-    WsTradesRequest,
-    WsUserEventsRequest,
-    WsUserFillsRequest,
-    WsUserFundingsRequest,
-    WsUserNonFundingLedgerUpdatesRequest,
-    WsUserTwapHistoryRequest,
-    WsUserTwapSliceFillsRequest,
-    WsWebData2Request,
-} from "../types/subscriptions/requests.ts";
-import type {
-    WsActiveAssetCtx,
-    WsActiveAssetData,
-    WsActiveSpotAssetCtx,
-    WsAllMids,
-    WsBbo,
-    WsBlockDetails,
-    WsNotification,
     WsTrade,
+    WsTradesRequest,
     WsUserEvent,
+    WsUserEventsRequest,
     WsUserFills,
+    WsUserFillsRequest,
     WsUserFundings,
+    WsUserFundingsRequest,
     WsUserNonFundingLedgerUpdates,
+    WsUserNonFundingLedgerUpdatesRequest,
     WsUserTwapHistory,
+    WsUserTwapHistoryRequest,
     WsUserTwapSliceFills,
+    WsUserTwapSliceFillsRequest,
     WsWebData2,
-} from "../types/subscriptions/responses.ts";
-import type { Candle } from "../types/info/assets.ts";
-import type { Book, Order, OrderStatus } from "../types/info/orders.ts";
-import type { TxDetails } from "../types/explorer/responses.ts";
+    WsWebData2Request,
+} from "../types/mod.ts";
 
 /** Parameters for the {@linkcode SubscriptionClient} constructor. */
 export interface SubscriptionClientParameters<T extends ISubscriptionTransport = ISubscriptionTransport> {
@@ -46,52 +46,37 @@ export interface SubscriptionClientParameters<T extends ISubscriptionTransport =
     transport: T;
 }
 
-/** Parameters for the {@linkcode SubscriptionClient.activeAssetCtx} method. */
+/** Subscription parameters for the {@linkcode SubscriptionClient.activeAssetCtx} method. */
 export type EventActiveAssetCtxParameters = Omit<WsActiveAssetCtxRequest, "type">;
-
-/** Parameters for the {@linkcode SubscriptionClient.activeAssetData} method. */
+/** Subscription parameters for the {@linkcode SubscriptionClient.activeAssetData} method. */
 export type EventActiveAssetDataParameters = Omit<WsActiveAssetDataRequest, "type">;
-
-/** Parameters for the {@linkcode SubscriptionClient.allMids} method. */
+/** Subscription parameters for the {@linkcode SubscriptionClient.allMids} method. */
 export type WsAllMidsParameters = Omit<WsAllMidsRequest, "type">;
-
-/** Parameters for the {@linkcode SubscriptionClient.bbo} method. */
+/** Subscription parameters for the {@linkcode SubscriptionClient.bbo} method. */
 export type EventBboParameters = Omit<WsBboRequest, "type">;
-
-/** Parameters for the {@linkcode SubscriptionClient.candle} method. */
+/** Subscription parameters for the {@linkcode SubscriptionClient.candle} method. */
 export type EventCandleParameters = Omit<WsCandleRequest, "type">;
-
-/** Parameters for the {@linkcode SubscriptionClient.l2Book} method. */
+/** Subscription parameters for the {@linkcode SubscriptionClient.l2Book} method. */
 export type EventL2BookParameters = Omit<WsL2BookRequest, "type">;
-
-/** Parameters for the {@linkcode SubscriptionClient.notification} method. */
+/** Subscription parameters for the {@linkcode SubscriptionClient.notification} method. */
 export type EventNotificationParameters = Omit<WsNotificationRequest, "type">;
-
-/** Parameters for the {@linkcode SubscriptionClient.orderUpdates} method. */
+/** Subscription parameters for the {@linkcode SubscriptionClient.orderUpdates} method. */
 export type EventOrderUpdatesParameters = Omit<WsOrderUpdatesRequest, "type">;
-
-/** Parameters for the {@linkcode SubscriptionClient.trades} method. */
+/** Subscription parameters for the {@linkcode SubscriptionClient.trades} method. */
 export type EventTradesParameters = Omit<WsTradesRequest, "type">;
-
-/** Parameters for the {@linkcode SubscriptionClient.userEvents} method. */
+/** Subscription parameters for the {@linkcode SubscriptionClient.userEvents} method. */
 export type EventUserEventsParameters = Omit<WsUserEventsRequest, "type">;
-
-/** Parameters for the {@linkcode SubscriptionClient.userFills} method. */
+/** Subscription parameters for the {@linkcode SubscriptionClient.userFills} method. */
 export type EventUserFillsParameters = Omit<WsUserFillsRequest, "type">;
-
-/** Parameters for the {@linkcode SubscriptionClient.userFundings} method. */
+/** Subscription parameters for the {@linkcode SubscriptionClient.userFundings} method. */
 export type EventUserFundingsParameters = Omit<WsUserFundingsRequest, "type">;
-
-/** Parameters for the {@linkcode SubscriptionClient.userNonFundingLedgerUpdates} method. */
+/** Subscription parameters for the {@linkcode SubscriptionClient.userNonFundingLedgerUpdates} method. */
 export type EventUserNonFundingLedgerUpdatesParameters = Omit<WsUserNonFundingLedgerUpdatesRequest, "type">;
-
-/** Parameters for the {@linkcode SubscriptionClient.userTwapHistory} method. */
+/** Subscription parameters for the {@linkcode SubscriptionClient.userTwapHistory} method. */
 export type EventUserTwapHistory = Omit<WsUserTwapHistoryRequest, "type">;
-
-/** Parameters for the {@linkcode SubscriptionClient.userTwapSliceFills} method. */
+/** Subscription parameters for the {@linkcode SubscriptionClient.userTwapSliceFills} method. */
 export type EventUserTwapSliceFills = Omit<WsUserTwapSliceFillsRequest, "type">;
-
-/** Parameters for the {@linkcode SubscriptionClient.webData2} method. */
+/** Subscription parameters for the {@linkcode SubscriptionClient.webData2} method. */
 export type EventWebData2Parameters = Omit<WsWebData2Request, "type">;
 
 /**
@@ -121,9 +106,9 @@ export class SubscriptionClient<
 
     /**
      * Subscribe to context updates for a specific perpetual asset.
-     * @param args - The parameters for the subscription.
-     * @param listener - The callback function to be called when the event is received.
-     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @param params - Subscription-specific parameters.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @throws {TransportError} When the transport layer throws an error.
      *
@@ -141,16 +126,16 @@ export class SubscriptionClient<
      * ```
      */
     activeAssetCtx(
-        args: EventActiveAssetCtxParameters,
+        params: EventActiveAssetCtxParameters,
         listener: (data: WsActiveAssetCtx | WsActiveSpotAssetCtx) => void,
     ): Promise<Subscription> {
-        const channel = args.coin.startsWith("@") ? "activeSpotAssetCtx" : "activeAssetCtx";
+        const channel = params.coin.startsWith("@") ? "activeSpotAssetCtx" : "activeAssetCtx";
         const payload: WsActiveAssetCtxRequest = {
             type: "activeAssetCtx",
-            coin: args.coin,
+            coin: params.coin,
         };
         return this.transport.subscribe<WsActiveAssetCtx | WsActiveSpotAssetCtx>(channel, payload, (e) => {
-            if (e.detail.coin === args.coin) {
+            if (e.detail.coin === params.coin) {
                 listener(e.detail);
             }
         });
@@ -158,9 +143,9 @@ export class SubscriptionClient<
 
     /**
      * Subscribe to trading data updates for a specific asset and user.
-     * @param args - The parameters for the subscription.
-     * @param listener - The callback function to be called when the event is received.
-     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @param params - Subscription-specific parameters.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @throws {TransportError} When the transport layer throws an error.
      *
@@ -178,16 +163,16 @@ export class SubscriptionClient<
      * ```
      */
     activeAssetData(
-        args: EventActiveAssetDataParameters,
+        params: EventActiveAssetDataParameters,
         listener: (data: WsActiveAssetData) => void,
     ): Promise<Subscription> {
         const payload: WsActiveAssetDataRequest = {
             type: "activeAssetData",
-            coin: args.coin,
-            user: args.user,
+            coin: params.coin,
+            user: params.user,
         };
         return this.transport.subscribe<WsActiveAssetData>(payload.type, payload, (e) => {
-            if (e.detail.coin === args.coin && e.detail.user === args.user.toLowerCase()) {
+            if (e.detail.coin === params.coin && e.detail.user === params.user.toLowerCase()) {
                 listener(e.detail);
             }
         });
@@ -195,8 +180,9 @@ export class SubscriptionClient<
 
     /**
      * Subscribe to mid prices for all actively traded assets.
-     * @param listener - The callback function to be called when the event is received.
-     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @param params - An optional subscription-specific parameters.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @throws {TransportError} When the transport layer throws an error.
      *
@@ -214,20 +200,17 @@ export class SubscriptionClient<
      * ```
      */
     allMids(listener: (data: WsAllMids) => void): Promise<Subscription>;
+    allMids(params: WsAllMidsParameters, listener: (data: WsAllMids) => void): Promise<Subscription>;
     allMids(
-        args: WsAllMidsParameters,
-        listener: (data: WsAllMids) => void,
-    ): Promise<Subscription>;
-    allMids(
-        args_or_listener: WsAllMidsParameters | ((data: WsAllMids) => void),
+        params_or_listener: WsAllMidsParameters | ((data: WsAllMids) => void),
         maybeListener?: (data: WsAllMids) => void,
     ): Promise<Subscription> {
-        const args = typeof args_or_listener === "function" ? {} : args_or_listener;
-        const listener = typeof args_or_listener === "function" ? args_or_listener : maybeListener!;
+        const params = typeof params_or_listener === "function" ? {} : params_or_listener;
+        const listener = typeof params_or_listener === "function" ? params_or_listener : maybeListener!;
 
         const payload: WsAllMidsRequest = {
             type: "allMids",
-            dex: args.dex,
+            dex: params.dex,
         };
         return this.transport.subscribe<WsAllMids>(payload.type, payload, (e) => {
             listener(e.detail);
@@ -236,9 +219,9 @@ export class SubscriptionClient<
 
     /**
      * Subscribe to best bid and offer updates for a specific asset.
-     * @param args - The parameters for the subscription.
-     * @param listener - The callback function to be called when the event is received.
-     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @param params - Subscription-specific parameters.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @throws {TransportError} When the transport layer throws an error.
      *
@@ -255,13 +238,13 @@ export class SubscriptionClient<
      * });
      * ```
      */
-    bbo(args: EventBboParameters, listener: (data: WsBbo) => void): Promise<Subscription> {
+    bbo(params: EventBboParameters, listener: (data: WsBbo) => void): Promise<Subscription> {
         const payload: WsBboRequest = {
             type: "bbo",
-            coin: args.coin,
+            coin: params.coin,
         };
         return this.transport.subscribe<WsBbo>(payload.type, payload, (e) => {
-            if (e.detail.coin === args.coin) {
+            if (e.detail.coin === params.coin) {
                 listener(e.detail);
             }
         });
@@ -269,9 +252,9 @@ export class SubscriptionClient<
 
     /**
      * Subscribe to candlestick data updates for a specific asset.
-     * @param args - The parameters for the subscription.
-     * @param listener - The callback function to be called when the event is received.
-     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @param params - Subscription-specific parameters.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @throws {TransportError} When the transport layer throws an error.
      *
@@ -288,14 +271,14 @@ export class SubscriptionClient<
      * });
      * ```
      */
-    candle(args: EventCandleParameters, listener: (data: Candle) => void): Promise<Subscription> {
+    candle(params: EventCandleParameters, listener: (data: Candle) => void): Promise<Subscription> {
         const payload: WsCandleRequest = {
             type: "candle",
-            coin: args.coin,
-            interval: args.interval,
+            coin: params.coin,
+            interval: params.interval,
         };
         return this.transport.subscribe<Candle>(payload.type, payload, (e) => {
-            if (e.detail.s === args.coin && e.detail.i === args.interval) {
+            if (e.detail.s === params.coin && e.detail.i === params.interval) {
                 listener(e.detail);
             }
         });
@@ -303,8 +286,8 @@ export class SubscriptionClient<
 
     /**
      * Subscribe to explorer block updates.
-     * @param listener - The callback function to be called when the event is received.
-     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      * @note Make sure the endpoint in the {@link transport} supports this method.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -333,8 +316,8 @@ export class SubscriptionClient<
 
     /**
      * Subscribe to explorer transaction updates.
-     * @param listener - The callback function to be called when the event is received.
-     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      * @note Make sure the endpoint in the {@link transport} supports this method.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -363,9 +346,9 @@ export class SubscriptionClient<
 
     /**
      * Subscribe to L2 order book updates for a specific asset.
-     * @param args - The parameters for the subscription.
-     * @param listener - The callback function to be called when the event is received.
-     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @param params - Subscription-specific parameters.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @throws {TransportError} When the transport layer throws an error.
      *
@@ -382,15 +365,15 @@ export class SubscriptionClient<
      * });
      * ```
      */
-    l2Book(args: EventL2BookParameters, listener: (data: Book) => void): Promise<Subscription> {
+    l2Book(params: EventL2BookParameters, listener: (data: Book) => void): Promise<Subscription> {
         const payload: WsL2BookRequest = {
             type: "l2Book",
-            coin: args.coin,
-            nSigFigs: args.nSigFigs ?? null,
-            mantissa: args.mantissa ?? null,
+            coin: params.coin,
+            nSigFigs: params.nSigFigs ?? null,
+            mantissa: params.mantissa ?? null,
         };
         return this.transport.subscribe<Book>(payload.type, payload, (e) => {
-            if (e.detail.coin === args.coin) {
+            if (e.detail.coin === params.coin) {
                 listener(e.detail);
             }
         });
@@ -398,9 +381,9 @@ export class SubscriptionClient<
 
     /**
      * Subscribe to notification updates for a specific user.
-     * @param args - The parameters for the subscription.
-     * @param listener - The callback function to be called when the event is received.
-     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @param params - Subscription-specific parameters.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @throws {TransportError} When the transport layer throws an error.
      *
@@ -417,10 +400,10 @@ export class SubscriptionClient<
      * });
      * ```
      */
-    notification(args: EventNotificationParameters, listener: (data: WsNotification) => void): Promise<Subscription> {
+    notification(params: EventNotificationParameters, listener: (data: WsNotification) => void): Promise<Subscription> {
         const payload: WsNotificationRequest = {
             type: "notification",
-            user: args.user,
+            user: params.user,
         };
         return this.transport.subscribe<WsNotification>(payload.type, payload, (e) => {
             listener(e.detail);
@@ -429,9 +412,9 @@ export class SubscriptionClient<
 
     /**
      * Subscribe to order status updates for a specific user.
-     * @param args - The parameters for the subscription.
-     * @param listener - The callback function to be called when the event is received.
-     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @param params - Subscription-specific parameters.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @throws {TransportError} When the transport layer throws an error.
      *
@@ -449,12 +432,12 @@ export class SubscriptionClient<
      * ```
      */
     orderUpdates(
-        args: EventOrderUpdatesParameters,
+        params: EventOrderUpdatesParameters,
         listener: (data: OrderStatus<Order>[]) => void,
     ): Promise<Subscription> {
         const payload: WsOrderUpdatesRequest = {
             type: "orderUpdates",
-            user: args.user,
+            user: params.user,
         };
         return this.transport.subscribe<OrderStatus<Order>[]>(payload.type, payload, (e) => {
             listener(e.detail);
@@ -463,9 +446,9 @@ export class SubscriptionClient<
 
     /**
      * Subscribe to real-time trade updates for a specific asset.
-     * @param args - The parameters for the subscription.
-     * @param listener - The callback function to be called when the event is received.
-     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @param params - Subscription-specific parameters.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @throws {TransportError} When the transport layer throws an error.
      *
@@ -482,13 +465,13 @@ export class SubscriptionClient<
      * });
      * ```
      */
-    trades(args: EventTradesParameters, listener: (data: WsTrade[]) => void): Promise<Subscription> {
+    trades(params: EventTradesParameters, listener: (data: WsTrade[]) => void): Promise<Subscription> {
         const payload: WsTradesRequest = {
             type: "trades",
-            coin: args.coin,
+            coin: params.coin,
         };
         return this.transport.subscribe<WsTrade[]>(payload.type, payload, (e) => {
-            if (e.detail[0]?.coin === args.coin) {
+            if (e.detail[0]?.coin === params.coin) {
                 listener(e.detail);
             }
         });
@@ -496,9 +479,9 @@ export class SubscriptionClient<
 
     /**
      * Subscribe to non-order events for a specific user.
-     * @param args - The parameters for the subscription.
-     * @param listener - The callback function to be called when the event is received.
-     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @param params - Subscription-specific parameters.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      * @note Different subscriptions cannot be distinguished from each other.
      *
      * @throws {TransportError} When the transport layer throws an error.
@@ -516,10 +499,10 @@ export class SubscriptionClient<
      * });
      * ```
      */
-    userEvents(args: EventUserEventsParameters, listener: (data: WsUserEvent) => void): Promise<Subscription> {
+    userEvents(params: EventUserEventsParameters, listener: (data: WsUserEvent) => void): Promise<Subscription> {
         const payload: WsUserEventsRequest = {
             type: "userEvents",
-            user: args.user,
+            user: params.user,
         };
         return this.transport.subscribe<WsUserEvent>("user", payload, (e) => {
             listener(e.detail);
@@ -528,9 +511,9 @@ export class SubscriptionClient<
 
     /**
      * Subscribe to trade fill updates for a specific user.
-     * @param args - The parameters for the subscription.
-     * @param listener - The callback function to be called when the event is received.
-     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @param params - Subscription-specific parameters.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @throws {TransportError} When the transport layer throws an error.
      *
@@ -547,14 +530,14 @@ export class SubscriptionClient<
      * });
      * ```
      */
-    userFills(args: EventUserFillsParameters, listener: (data: WsUserFills) => void): Promise<Subscription> {
+    userFills(params: EventUserFillsParameters, listener: (data: WsUserFills) => void): Promise<Subscription> {
         const payload: WsUserFillsRequest = {
             type: "userFills",
-            user: args.user,
-            aggregateByTime: args.aggregateByTime ?? false,
+            user: params.user,
+            aggregateByTime: params.aggregateByTime ?? false,
         };
         return this.transport.subscribe<WsUserFills>(payload.type, payload, (e) => {
-            if (e.detail.user === args.user.toLowerCase()) {
+            if (e.detail.user === params.user.toLowerCase()) {
                 listener(e.detail);
             }
         });
@@ -562,9 +545,9 @@ export class SubscriptionClient<
 
     /**
      * Subscribe to funding payment updates for a specific user.
-     * @param args - The parameters for the subscription.
-     * @param listener - The callback function to be called when the event is received.
-     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @param params - Subscription-specific parameters.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @throws {TransportError} When the transport layer throws an error.
      *
@@ -581,13 +564,13 @@ export class SubscriptionClient<
      * });
      * ```
      */
-    userFundings(args: EventUserFundingsParameters, listener: (data: WsUserFundings) => void): Promise<Subscription> {
+    userFundings(params: EventUserFundingsParameters, listener: (data: WsUserFundings) => void): Promise<Subscription> {
         const payload: WsUserFundingsRequest = {
             type: "userFundings",
-            user: args.user,
+            user: params.user,
         };
         return this.transport.subscribe<WsUserFundings>(payload.type, payload, (e) => {
-            if (e.detail.user === args.user.toLowerCase()) {
+            if (e.detail.user === params.user.toLowerCase()) {
                 listener(e.detail);
             }
         });
@@ -595,9 +578,9 @@ export class SubscriptionClient<
 
     /**
      * Subscribe to non-funding ledger updates for a specific user.
-     * @param args - The parameters for the subscription.
-     * @param listener - The callback function to be called when the event is received.
-     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @param params - Subscription-specific parameters.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @throws {TransportError} When the transport layer throws an error.
      *
@@ -615,15 +598,15 @@ export class SubscriptionClient<
      * ```
      */
     userNonFundingLedgerUpdates(
-        args: EventUserNonFundingLedgerUpdatesParameters,
+        params: EventUserNonFundingLedgerUpdatesParameters,
         listener: (data: WsUserNonFundingLedgerUpdates) => void,
     ): Promise<Subscription> {
         const payload: WsUserNonFundingLedgerUpdatesRequest = {
             type: "userNonFundingLedgerUpdates",
-            user: args.user,
+            user: params.user,
         };
         return this.transport.subscribe<WsUserNonFundingLedgerUpdates>(payload.type, payload, (e) => {
-            if (e.detail.user === args.user.toLowerCase()) {
+            if (e.detail.user === params.user.toLowerCase()) {
                 listener(e.detail);
             }
         });
@@ -631,9 +614,9 @@ export class SubscriptionClient<
 
     /**
      * Subscribe to TWAP order history updates for a specific user.
-     * @param args - The parameters for the subscription.
-     * @param listener - The callback function to be called when the event is received.
-     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @param params - Subscription-specific parameters.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @throws {TransportError} When the transport layer throws an error.
      *
@@ -650,13 +633,13 @@ export class SubscriptionClient<
      * });
      * ```
      */
-    userTwapHistory(args: EventUserTwapHistory, listener: (data: WsUserTwapHistory) => void): Promise<Subscription> {
+    userTwapHistory(params: EventUserTwapHistory, listener: (data: WsUserTwapHistory) => void): Promise<Subscription> {
         const payload: WsUserTwapHistoryRequest = {
             type: "userTwapHistory",
-            user: args.user,
+            user: params.user,
         };
         return this.transport.subscribe<WsUserTwapHistory>(payload.type, payload, (e) => {
-            if (e.detail.user === args.user.toLowerCase()) {
+            if (e.detail.user === params.user.toLowerCase()) {
                 listener(e.detail);
             }
         });
@@ -664,9 +647,9 @@ export class SubscriptionClient<
 
     /**
      * Subscribe to TWAP execution updates for a specific user.
-     * @param args - The parameters for the subscription.
-     * @param listener - The callback function to be called when the event is received.
-     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @param params - Subscription-specific parameters.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @throws {TransportError} When the transport layer throws an error.
      *
@@ -684,15 +667,15 @@ export class SubscriptionClient<
      * ```
      */
     userTwapSliceFills(
-        args: EventUserTwapSliceFills,
+        params: EventUserTwapSliceFills,
         listener: (data: WsUserTwapSliceFills) => void,
     ): Promise<Subscription> {
         const payload: WsUserTwapSliceFillsRequest = {
             type: "userTwapSliceFills",
-            user: args.user,
+            user: params.user,
         };
         return this.transport.subscribe<WsUserTwapSliceFills>(payload.type, payload, (e) => {
-            if (e.detail.user === args.user.toLowerCase()) {
+            if (e.detail.user === params.user.toLowerCase()) {
                 listener(e.detail);
             }
         });
@@ -700,9 +683,9 @@ export class SubscriptionClient<
 
     /**
      * Subscribe to comprehensive user and market data updates.
-     * @param args - The parameters for the subscription.
-     * @param listener - The callback function to be called when the event is received.
-     * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     * @param params - Subscription-specific parameters.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
      *
      * @throws {TransportError} When the transport layer throws an error.
      *
@@ -719,13 +702,13 @@ export class SubscriptionClient<
      * });
      * ```
      */
-    webData2(args: EventWebData2Parameters, listener: (data: WsWebData2) => void): Promise<Subscription> {
+    webData2(params: EventWebData2Parameters, listener: (data: WsWebData2) => void): Promise<Subscription> {
         const payload: WsWebData2Request = {
             type: "webData2",
-            user: args.user,
+            user: params.user,
         };
         return this.transport.subscribe<WsWebData2>(payload.type, payload, (e) => {
-            if (e.detail.user === args.user.toLowerCase()) {
+            if (e.detail.user === params.user.toLowerCase()) {
                 listener(e.detail);
             }
         });
