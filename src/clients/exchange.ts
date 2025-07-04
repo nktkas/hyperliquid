@@ -25,8 +25,6 @@ import type {
     OrderRequest,
     OrderResponse,
     PerpDeployRequest,
-    PerpDexClassTransferRequest,
-    PerpDexTransferRequest,
     RegisterReferrerRequest,
     ReserveRequestWeightRequest,
     ScheduleCancelRequest,
@@ -140,10 +138,6 @@ export type MultiSigParameters = ExtractRequestAction<MultiSigRequest> & Pick<Mu
 export type OrderParameters = ExtractRequestAction<OrderRequest>;
 /** Action parameters for the {@linkcode ExchangeClient.perpDeploy} method. */
 export type PerpDeployParameters = ExtractRequestAction<PerpDeployRequest>;
-/** Action parameters for the {@linkcode ExchangeClient.perpDexClassTransfer} method. */
-export type PerpDexClassTransferParameters = ExtractRequestAction<PerpDexClassTransferRequest>;
-/** Action parameters for the {@linkcode ExchangeClient.perpDexTransfer} method. */
-export type PerpDexTransferParameters = ExtractRequestAction<PerpDexTransferRequest>;
 /** Action parameters for the {@linkcode ExchangeClient.registerReferrer} method. */
 export type RegisterReferrerParameters = ExtractRequestAction<RegisterReferrerRequest>;
 /** Action parameters for the {@linkcode ExchangeClient.reserveRequestWeight} method. */
@@ -236,10 +230,6 @@ export type MultiSigOptions = ExtractRequestOptions<MultiSigRequest>;
 export type OrderOptions = ExtractRequestOptions<OrderRequest>;
 /** Request options for the {@linkcode ExchangeClient.perpDeploy} method. */
 export type PerpDeployOptions = ExtractRequestOptions<PerpDeployRequest>;
-/** Request options for the {@linkcode ExchangeClient.perpDexClassTransfer} method. */
-export type PerpDexClassTransferOptions = ExtractRequestOptions<PerpDexClassTransferRequest>;
-/** Request options for the {@linkcode ExchangeClient.perpDexTransfer} method. */
-export type PerpDexTransferOptions = ExtractRequestOptions<PerpDexTransferRequest>;
 /** Request options for the {@linkcode ExchangeClient.registerReferrer} method. */
 export type RegisterReferrerOptions = ExtractRequestOptions<RegisterReferrerRequest>;
 /** Request options for the {@linkcode ExchangeClient.reserveRequestWeight} method. */
@@ -1201,78 +1191,6 @@ export class ExchangeClient<
         return this._executeAction({
             action: {
                 type: "perpDeploy",
-                ...params,
-            },
-        }, opts?.signal);
-    }
-
-    /**
-     * Transfer funds between Spot account and Perp dex account.
-     * @param params - Action-specific parameters.
-     * @param opts - Request execution options.
-     * @returns Successful response without specific data.
-     *
-     * @throws {ApiRequestError} When the API returns an unsuccessful response.
-     * @throws {TransportError} When the transport layer throws an error.
-     *
-     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa
-     * @example
-     * ```ts
-     * import * as hl from "@nktkas/hyperliquid";
-     *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
-     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
-     * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
-     *
-     * await exchClient.perpDexClassTransfer({ dex: "test", token: "USDC", amount: "1", toPerp: true });
-     * ```
-     */
-    async perpDexClassTransfer(
-        params: PerpDexClassTransferParameters,
-        opts?: PerpDexClassTransferOptions,
-    ): Promise<SuccessResponse> {
-        return this._executeAction({
-            action: {
-                type: "PerpDexClassTransfer",
-                hyperliquidChain: this._getHyperliquidChain(),
-                signatureChainId: await this._getSignatureChainId(),
-                nonce: await this.nonceManager(),
-                ...params,
-            },
-        }, opts?.signal);
-    }
-
-    /**
-     * Transfer collateral tokens between different perp dexes for the same user.
-     * @param params - Action-specific parameters.
-     * @param opts - Request execution options.
-     * @returns Successful response without specific data.
-     *
-     * @throws {ApiRequestError} When the API returns an unsuccessful response.
-     * @throws {TransportError} When the transport layer throws an error.
-     *
-     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-perp-account-to-perp-account-for-builder-deployed-dex
-     * @example
-     * ```ts
-     * import * as hl from "@nktkas/hyperliquid";
-     *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
-     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
-     * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
-     *
-     * await exchClient.perpDexTransfer({ sourceDex: "", destinationDex: "test", amount: "1" });
-     * ```
-     */
-    async perpDexTransfer(
-        params: PerpDexTransferParameters,
-        opts?: PerpDexTransferOptions,
-    ): Promise<SuccessResponse> {
-        return this._executeAction({
-            action: {
-                type: "PerpDexTransfer",
-                hyperliquidChain: this._getHyperliquidChain(),
-                signatureChainId: await this._getSignatureChainId(),
-                nonce: await this.nonceManager(),
                 ...params,
             },
         }, opts?.signal);

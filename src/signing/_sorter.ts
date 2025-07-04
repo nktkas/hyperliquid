@@ -18,8 +18,6 @@ import type {
     MultiSigRequest,
     OrderRequest,
     PerpDeployRequest,
-    PerpDexClassTransferRequest,
-    PerpDexTransferRequest,
     RegisterReferrerRequest,
     ReserveRequestWeightRequest,
     ScheduleCancelRequest,
@@ -350,31 +348,6 @@ export const actionSorter = {
             };
         }
     },
-    PerpDexClassTransfer: (
-        action: DeepImmutable<PerpDexClassTransferRequest["action"]>,
-    ): PerpDexClassTransferRequest["action"] => {
-        return {
-            type: action.type,
-            signatureChainId: action.signatureChainId,
-            hyperliquidChain: action.hyperliquidChain,
-            dex: action.dex,
-            token: action.token,
-            amount: action.amount,
-            toPerp: action.toPerp,
-            nonce: action.nonce,
-        };
-    },
-    PerpDexTransfer: (action: DeepImmutable<PerpDexTransferRequest["action"]>): PerpDexTransferRequest["action"] => {
-        return {
-            type: action.type,
-            signatureChainId: action.signatureChainId,
-            hyperliquidChain: action.hyperliquidChain,
-            sourceDex: action.sourceDex,
-            destinationDex: action.destinationDex,
-            amount: action.amount,
-            nonce: action.nonce,
-        };
-    },
     registerReferrer: (action: DeepImmutable<RegisterReferrerRequest["action"]>): RegisterReferrerRequest["action"] => {
         return {
             type: action.type,
@@ -688,25 +661,6 @@ export const userSignedActionEip712Types = {
         "HyperliquidTransaction:CWithdraw": [
             { name: "hyperliquidChain", type: "string" },
             { name: "wei", type: "uint64" },
-            { name: "nonce", type: "uint64" },
-        ],
-    },
-    PerpDexClassTransfer: {
-        "HyperliquidTransaction:PerpDexClassTransfer": [
-            { name: "hyperliquidChain", type: "string" },
-            { name: "dex", type: "string" },
-            { name: "token", type: "string" },
-            { name: "amount", type: "string" },
-            { name: "toPerp", type: "bool" },
-            { name: "nonce", type: "uint64" },
-        ],
-    },
-    PerpDexTransfer: {
-        "HyperliquidTransaction:PerpDexTransfer": [
-            { name: "hyperliquidChain", type: "string" },
-            { name: "sourceDex", type: "string" },
-            { name: "destinationDex", type: "string" },
-            { name: "amount", type: "string" },
             { name: "nonce", type: "uint64" },
         ],
     },

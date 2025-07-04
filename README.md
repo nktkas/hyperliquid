@@ -541,8 +541,6 @@ class ExchangeClient {
     spotUser(args: SpotUserParameters): Promise<SuccessResponse>;
 
     // Transfer
-    perpDexClassTransfer(args: PerpDexClassTransferParameters): Promise<SuccessResponse>;
-    perpDexTransfer(args: PerpDexTransferParameters): Promise<SuccessResponse>;
     spotSend(args: SpotSendParameters): Promise<SuccessResponse>;
     subAccountSpotTransfer(args: SubAccountSpotTransferParameters): Promise<SuccessResponse>;
     subAccountTransfer(args: SubAccountTransferParameters): Promise<SuccessResponse>;

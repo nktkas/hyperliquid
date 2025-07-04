@@ -546,64 +546,6 @@ export interface PerpDeployRequest extends BaseExchangeRequest {
 }
 
 /**
- * Transfer funds between Spot account and Perp dex account.
- * @returns {SuccessResponse}
- */
-export interface PerpDexClassTransferRequest extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "PerpDexClassTransfer";
-        /** Chain ID used for signing. */
-        signatureChainId: Hex;
-        /** HyperLiquid network. */
-        hyperliquidChain: "Mainnet" | "Testnet";
-        /** Name of perp dex. */
-        dex: string;
-        /** Collateral token of the perp dex as a string. */
-        token: string;
-        /**
-         * Amount of collateral token to transfer (1 = 1$).
-         * @pattern ^[0-9]+(\.[0-9]+)?$
-         */
-        amount: string;
-        /** `true` for transferring from perp dex to spot account, `false` for transferring from spot account to perp dex. */
-        toPerp: boolean;
-        /** Unique request identifier (current timestamp in ms). */
-        nonce: number;
-    };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
-}
-
-/**
- * Transfer collateral tokens between different perp dexes for the same user.
- * @returns {SuccessResponse}
- */
-export interface PerpDexTransferRequest extends BaseExchangeRequest {
-    action: {
-        /** Type of action. */
-        type: "PerpDexTransfer";
-        /** Chain ID used for signing. */
-        signatureChainId: Hex;
-        /** HyperLiquid network. */
-        hyperliquidChain: "Mainnet" | "Testnet";
-        /** Source perp dex name (empty string for main dex). */
-        sourceDex: string;
-        /** Destination perp dex name (empty string for main dex). */
-        destinationDex: string;
-        /**
-         * Amount to transfer (1 = 1$).
-         * @pattern ^[0-9]+(\.[0-9]+)?$
-         */
-        amount: string;
-        /** Unique request identifier (current timestamp in ms). */
-        nonce: number;
-    };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
-}
-
-/**
  * Create a referral code.
  * @returns {SuccessResponse}
  */

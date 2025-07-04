@@ -42,8 +42,6 @@ const METHODS_TO_TEST = [ // controls which tests to run
     "multiSig",
     "order",
     "perpDeploy",
-    // "perpDexClassTransfer", // FIXME: error `422 Unprocessable Entity - Failed to deserialize the JSON body into the target type`; Unknown changes from Hyperliquid
-    // "perpDexTransfer", // FIXME: error `422 Unprocessable Entity - Failed to deserialize the JSON body into the target type`; Unknown changes from Hyperliquid
     "registerReferrer",
     "reserveRequestWeight",
     "scheduleCancel",
@@ -1186,34 +1184,6 @@ run(
                 "Error deploying perp:",
             ),
         ]);
-    },
-);
-
-export type MethodReturnType_perpDexClassTransfer = Awaited<ReturnType<ExchangeClient["perpDexClassTransfer"]>>;
-run(
-    "perpDexClassTransfer",
-    async (types, mode) => {
-        const client = mode === "normal" ? exchClient : multiSignClient;
-
-        const data = await Promise.all([
-            client.perpDexClassTransfer({ dex: "test", token: "USDC", amount: "1", toPerp: true }),
-            client.perpDexClassTransfer({ dex: "test", token: "USDC", amount: "1", toPerp: false }),
-        ]);
-        schemaCoverage(types, data);
-    },
-);
-
-export type MethodReturnType_perpDexTransfer = Awaited<ReturnType<ExchangeClient["perpDexTransfer"]>>;
-run(
-    "perpDexTransfer",
-    async (types, mode) => {
-        const client = mode === "normal" ? exchClient : multiSignClient;
-
-        const data = await Promise.all([
-            client.perpDexTransfer({ sourceDex: "", destinationDex: "test", amount: "1" }),
-            client.perpDexTransfer({ sourceDex: "test", destinationDex: "", amount: "1" }),
-        ]);
-        schemaCoverage(types, data);
     },
 );
 
