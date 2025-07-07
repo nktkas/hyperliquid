@@ -54,11 +54,7 @@ import type {
 import {
     type AbstractWallet,
     actionSorter,
-    isAbstractEthersSigner,
-    isAbstractEthersV5Signer,
-    isAbstractViemWalletClient,
-    isAbstractWindowEthereum,
-    type Signature,
+    getWalletChainId,
     signL1Action,
     signMultiSigAction,
     signUserSignedAction,
@@ -431,7 +427,7 @@ export class ExchangeClient<
         this.isTestnet = args.isTestnet ?? false;
         this.defaultVaultAddress = args.defaultVaultAddress;
         this.defaultExpiresAfter = args.defaultExpiresAfter;
-        this.signatureChainId = args.signatureChainId ?? this._guessSignatureChainId;
+        this.signatureChainId = args.signatureChainId ?? (() => getWalletChainId(this.wallet, this.isTestnet));
         this.nonceManager = args.nonceManager ?? new NonceManager().getNonce;
     }
 
@@ -460,7 +456,7 @@ export class ExchangeClient<
         params: ApproveAgentParameters,
         opts?: ApproveAgentOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeUserSignedAction({
             action: {
                 type: "approveAgent",
                 hyperliquidChain: this._getHyperliquidChain(),
@@ -496,7 +492,7 @@ export class ExchangeClient<
         params: ApproveBuilderFeeParameters,
         opts?: ApproveBuilderFeeOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeUserSignedAction({
             action: {
                 type: "approveBuilderFee",
                 hyperliquidChain: this._getHyperliquidChain(),
@@ -546,7 +542,7 @@ export class ExchangeClient<
         params: BatchModifyParameters,
         opts?: BatchModifyOptions,
     ): Promise<OrderResponseSuccess> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "batchModify",
                 ...params,
@@ -585,7 +581,7 @@ export class ExchangeClient<
         params: CancelParameters,
         opts?: CancelOptions,
     ): Promise<CancelResponseSuccess> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "cancel",
                 ...params,
@@ -624,7 +620,7 @@ export class ExchangeClient<
         params: CancelByCloidParameters,
         opts?: CancelByCloidOptions,
     ): Promise<CancelResponseSuccess> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "cancelByCloid",
                 ...params,
@@ -659,7 +655,7 @@ export class ExchangeClient<
         params: CDepositParameters,
         opts?: CDepositOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeUserSignedAction({
             action: {
                 type: "cDeposit",
                 hyperliquidChain: this._getHyperliquidChain(),
@@ -690,13 +686,14 @@ export class ExchangeClient<
      * await exchClient.claimRewards();
      * ```
      */
-    claimRewards(
+    async claimRewards(
         opts?: ClaimRewardsOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "claimRewards",
             },
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
         }, opts?.signal);
     }
 
@@ -732,7 +729,7 @@ export class ExchangeClient<
         params: ConvertToMultiSigUserRequest_Signers,
         opts?: ConvertToMultiSigUserOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeUserSignedAction({
             action: {
                 type: "convertToMultiSigUser",
                 hyperliquidChain: this._getHyperliquidChain(),
@@ -764,15 +761,16 @@ export class ExchangeClient<
      * const data = await exchClient.createSubAccount({ name: "..." });
      * ```
      */
-    createSubAccount(
+    async createSubAccount(
         params: CreateSubAccountParameters,
         opts?: CreateSubAccountOptions,
     ): Promise<CreateSubAccountResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "createSubAccount",
                 ...params,
             },
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
         }, opts?.signal);
     }
 
@@ -802,15 +800,16 @@ export class ExchangeClient<
      * });
      * ```
      */
-    createVault(
+    async createVault(
         params: CreateVaultParameters,
         opts?: CreateVaultOptions,
     ): Promise<CreateVaultResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "createVault",
                 ...params,
             },
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
         }, opts?.signal);
     }
 
@@ -843,7 +842,7 @@ export class ExchangeClient<
         params: CSignerActionParameters,
         opts?: CSignerActionOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "CSignerAction",
                 ...params,
@@ -907,7 +906,7 @@ export class ExchangeClient<
         params: CValidatorActionParameters,
         opts?: CValidatorActionOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "CValidatorAction",
                 ...params,
@@ -941,7 +940,7 @@ export class ExchangeClient<
         params: CWithdrawParameters,
         opts?: CWithdrawOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeUserSignedAction({
             action: {
                 type: "cWithdraw",
                 hyperliquidChain: this._getHyperliquidChain(),
@@ -973,15 +972,16 @@ export class ExchangeClient<
      * const data = await exchClient.evmUserModify({ usingBigBlocks: true });
      * ```
      */
-    evmUserModify(
+    async evmUserModify(
         params: EvmUserModifyParameters,
         opts?: EvmUserModifyOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "evmUserModify",
                 ...params,
             },
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
         }, opts?.signal);
     }
 
@@ -1020,8 +1020,8 @@ export class ExchangeClient<
     async modify(
         params: ModifyParameters,
         opts?: ModifyOptions,
-    ): Promise<OrderResponseSuccess> {
-        return this._executeAction({
+    ): Promise<SuccessResponse> {
+        return await this._executeL1Action({
             action: {
                 type: "modify",
                 ...params,
@@ -1066,6 +1066,26 @@ export class ExchangeClient<
      *   nonce,
      * });
      *
+     * // or User-Signed action
+     * // const signature = await signUserSignedAction({
+     * //   wallet: signer1,
+     * //   action: {
+     * //     ...action,
+     * //     payloadMultiSigUser: multiSigUser.wallet.address,
+     * //     outerSigner: signer1.address,
+     * //   },
+     * //   types: {
+     * //     "HyperliquidTransaction:UsdSend": [
+     * //       { name: "hyperliquidChain", type: "string" },
+     * //       { name: "payloadMultiSigUser", type: "address" },
+     * //       { name: "outerSigner", type: "address" },
+     * //       { name: "destination", type: "string" },
+     * //       { name: "amount", type: "string" },
+     * //       { name: "time", type: "uint64" },
+     * //     ],
+     * //   },
+     * // });
+     *
      * const data = await exchClient.multiSig({
      *   signatures: [signature],
      *   payload: {
@@ -1090,7 +1110,7 @@ export class ExchangeClient<
         params: MultiSigParameters,
         opts?: MultiSigOptions,
     ): Promise<T> {
-        return this._executeAction({
+        return await this._executeMultiSigAction({
             action: {
                 type: "multiSig",
                 signatureChainId: await this._getSignatureChainId(),
@@ -1098,7 +1118,7 @@ export class ExchangeClient<
             },
             vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
             expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-            multiSigNonce: params?.nonce,
+            nonce: params?.nonce,
         }, opts?.signal);
     }
 
@@ -1140,7 +1160,7 @@ export class ExchangeClient<
         params: OrderParameters,
         opts?: OrderOptions,
     ): Promise<OrderResponseSuccess> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "order",
                 ...params,
@@ -1184,15 +1204,16 @@ export class ExchangeClient<
      * });
      * ```
      */
-    perpDeploy(
+    async perpDeploy(
         params: PerpDeployParameters,
         opts?: PerpDeployOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "perpDeploy",
                 ...params,
             },
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
         }, opts?.signal);
     }
 
@@ -1217,15 +1238,16 @@ export class ExchangeClient<
      * await exchClient.registerReferrer({ code: "..." });
      * ```
      */
-    registerReferrer(
+    async registerReferrer(
         params: RegisterReferrerParameters,
         opts?: RegisterReferrerOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "registerReferrer",
                 ...params,
             },
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
         }, opts?.signal);
     }
 
@@ -1254,7 +1276,7 @@ export class ExchangeClient<
         params: ReserveRequestWeightParameters,
         opts?: ReserveRequestWeightOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "reserveRequestWeight",
                 ...params,
@@ -1295,7 +1317,7 @@ export class ExchangeClient<
         const isFirstArgParams = params_or_opts && "time" in params_or_opts;
         const params = isFirstArgParams ? params_or_opts : {};
         const opts = isFirstArgParams ? maybeOpts : params_or_opts as ScheduleCancelOptions;
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "scheduleCancel",
                 ...params,
@@ -1326,15 +1348,16 @@ export class ExchangeClient<
      * await exchClient.setDisplayName({ displayName: "..." });
      * ```
      */
-    setDisplayName(
+    async setDisplayName(
         params: SetDisplayNameParameters,
         opts?: SetDisplayNameOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "setDisplayName",
                 ...params,
             },
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
         }, opts?.signal);
     }
 
@@ -1359,15 +1382,16 @@ export class ExchangeClient<
      * await exchClient.setReferrer({ code: "..." });
      * ```
      */
-    setReferrer(
-        params: RegisterReferrerParameters,
-        opts?: RegisterReferrerOptions,
+    async setReferrer(
+        params: SetReferrerParameters,
+        opts?: SetReferrerOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "setReferrer",
                 ...params,
             },
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
         }, opts?.signal);
     }
 
@@ -1402,15 +1426,16 @@ export class ExchangeClient<
      * });
      * ```
      */
-    spotDeploy(
+    async spotDeploy(
         params: SpotDeployParameters,
         opts?: SpotDeployOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "spotDeploy",
                 ...params,
             },
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
         }, opts?.signal);
     }
 
@@ -1443,7 +1468,7 @@ export class ExchangeClient<
         params: SpotSendParameters,
         opts?: SpotSendOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeUserSignedAction({
             action: {
                 type: "spotSend",
                 hyperliquidChain: this._getHyperliquidChain(),
@@ -1475,15 +1500,16 @@ export class ExchangeClient<
      * await exchClient.subAccountModify({ subAccountUser: "0x...", name: "..."  });
      * ```
      */
-    subAccountModify(
+    async subAccountModify(
         params: SubAccountModifyParameters,
         opts?: SubAccountModifyOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "subAccountModify",
                 ...params,
             },
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
         }, opts?.signal);
     }
 
@@ -1508,15 +1534,16 @@ export class ExchangeClient<
      * await exchClient.spotUser({ toggleSpotDusting: { optOut: false } });
      * ```
      */
-    spotUser(
+    async spotUser(
         params: SpotUserParameters,
         opts?: SpotUserOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "spotUser",
                 ...params,
             },
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
         }, opts?.signal);
     }
 
@@ -1546,15 +1573,16 @@ export class ExchangeClient<
      * });
      * ```
      */
-    subAccountSpotTransfer(
+    async subAccountSpotTransfer(
         params: SubAccountSpotTransferParameters,
         opts?: SubAccountSpotTransferOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "subAccountSpotTransfer",
                 ...params,
             },
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
         }, opts?.signal);
     }
 
@@ -1579,15 +1607,16 @@ export class ExchangeClient<
      * await exchClient.subAccountTransfer({ subAccountUser: "0x...", isDeposit: true, usd: 1 * 1e6 });
      * ```
      */
-    subAccountTransfer(
+    async subAccountTransfer(
         params: SubAccountTransferParameters,
         opts?: SubAccountTransferOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "subAccountTransfer",
                 ...params,
             },
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
         }, opts?.signal);
     }
 
@@ -1616,7 +1645,7 @@ export class ExchangeClient<
         params: TokenDelegateParameters,
         opts?: TokenDelegateOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeUserSignedAction({
             action: {
                 type: "tokenDelegate",
                 hyperliquidChain: this._getHyperliquidChain(),
@@ -1652,7 +1681,7 @@ export class ExchangeClient<
         params: TwapCancelParameters,
         opts?: TwapCancelOptions,
     ): Promise<TwapCancelResponseSuccess> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "twapCancel",
                 ...params,
@@ -1696,7 +1725,7 @@ export class ExchangeClient<
         params: TwapOrderParameters,
         opts?: TwapOrderOptions,
     ): Promise<TwapOrderResponseSuccess> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "twapOrder",
                 ...params,
@@ -1731,7 +1760,7 @@ export class ExchangeClient<
         params: UpdateIsolatedMarginParameters,
         opts?: UpdateIsolatedMarginOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "updateIsolatedMargin",
                 ...params,
@@ -1766,7 +1795,7 @@ export class ExchangeClient<
         params: UpdateLeverageParameters,
         opts?: UpdateLeverageOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "updateLeverage",
                 ...params,
@@ -1801,7 +1830,7 @@ export class ExchangeClient<
         params: UsdClassTransferParameters,
         opts?: UsdClassTransferOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeUserSignedAction({
             action: {
                 type: "usdClassTransfer",
                 hyperliquidChain: this._getHyperliquidChain(),
@@ -1837,7 +1866,7 @@ export class ExchangeClient<
         params: UsdSendParameters,
         opts?: UsdSendOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeUserSignedAction({
             action: {
                 type: "usdSend",
                 hyperliquidChain: this._getHyperliquidChain(),
@@ -1869,15 +1898,16 @@ export class ExchangeClient<
      * await exchClient.vaultDistribute({ vaultAddress: "0x...", usd: 10 * 1e6 });
      * ```
      */
-    vaultDistribute(
+    async vaultDistribute(
         params: VaultDistributeParameters,
         opts?: VaultDistributeOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "vaultDistribute",
                 ...params,
             },
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
         }, opts?.signal);
     }
 
@@ -1906,15 +1936,16 @@ export class ExchangeClient<
      * });
      * ```
      */
-    vaultModify(
+    async vaultModify(
         params: VaultModifyParameters,
         opts?: VaultModifyOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "vaultModify",
                 ...params,
             },
+            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
         }, opts?.signal);
     }
 
@@ -1943,7 +1974,7 @@ export class ExchangeClient<
         params: VaultTransferParameters,
         opts?: VaultTransferOptions,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeL1Action({
             action: {
                 type: "vaultTransfer",
                 ...params,
@@ -1977,7 +2008,7 @@ export class ExchangeClient<
         params: Withdraw3Parameters,
         opts?: Withdraw3Options,
     ): Promise<SuccessResponse> {
-        return this._executeAction({
+        return await this._executeUserSignedAction({
             action: {
                 type: "withdraw3",
                 hyperliquidChain: this._getHyperliquidChain(),
@@ -1988,7 +2019,7 @@ export class ExchangeClient<
         }, opts?.signal);
     }
 
-    protected async _executeAction<
+    protected async _executeL1Action<
         T extends
             | SuccessResponse
             | CancelResponseSuccess
@@ -1998,65 +2029,35 @@ export class ExchangeClient<
             | TwapOrderResponseSuccess
             | TwapCancelResponseSuccess,
     >(
-        args: {
-            action: Parameters<typeof actionSorter[keyof typeof actionSorter]>[0];
+        request: {
+            action: {
+                type: string;
+                [key: string]: unknown;
+            };
             vaultAddress?: Hex;
-            expiresAfter?: number;
-            multiSigNonce?: number;
+            expiresAfter: number | undefined;
         },
         signal?: AbortSignal,
     ): Promise<T> {
-        const { action, vaultAddress, expiresAfter, multiSigNonce } = args;
+        let { action, vaultAddress, expiresAfter } = request;
+        // @ts-ignore - for test
+        action = actionSorter[action.type](action);
 
-        // Sign an action
-
-        // deno-lint-ignore no-explicit-any
-        const sortedAction = actionSorter[action.type](action as any); // TypeScript cannot infer a type from a dynamic function call
-
-        let nonce: number;
-        if (sortedAction.type === "multiSig") { // Multi-signature action
-            nonce = multiSigNonce!;
-        } else if ("signatureChainId" in sortedAction) { // User-signed action
-            nonce = "nonce" in sortedAction ? sortedAction.nonce : sortedAction.time;
-        } else { // L1 action
-            nonce = await this.nonceManager();
-        }
-
-        let signature: Signature;
-        if (sortedAction.type === "multiSig") { // Multi-signature action
-            // deno-lint-ignore no-explicit-any
-            const actionWithoutType = structuredClone<any>(sortedAction);
-            delete actionWithoutType.type;
-            signature = await signMultiSigAction({
-                wallet: this.wallet,
-                action: actionWithoutType,
-                nonce,
-                isTestnet: this.isTestnet,
-                vaultAddress,
-                expiresAfter,
-            });
-        } else if ("signatureChainId" in sortedAction) { // User-signed action
-            signature = await signUserSignedAction({
-                wallet: this.wallet,
-                action: sortedAction,
-                types: userSignedActionEip712Types[sortedAction.type],
-            });
-            if ("agentName" in sortedAction && sortedAction.agentName === "") sortedAction.agentName = null;
-        } else { // L1 action
-            signature = await signL1Action({
-                wallet: this.wallet,
-                action: sortedAction,
-                nonce,
-                isTestnet: this.isTestnet,
-                vaultAddress,
-                expiresAfter,
-            });
-        }
+        // Sign an L1 action
+        const nonce = await this.nonceManager();
+        const signature = await signL1Action({
+            wallet: this.wallet,
+            action,
+            nonce,
+            isTestnet: this.isTestnet,
+            vaultAddress,
+            expiresAfter,
+        });
 
         // Send a request
         const response = await this.transport.request(
             "exchange",
-            { action: sortedAction, signature, nonce, vaultAddress, expiresAfter },
+            { action, signature, nonce, vaultAddress, expiresAfter },
             signal,
         ) as
             | SuccessResponse
@@ -2071,30 +2072,117 @@ export class ExchangeClient<
         return response;
     }
 
-    /** Guesses the chain ID based on the wallet type or the isTestnet flag. */
-    protected async _guessSignatureChainId(): Promise<Hex> {
-        // Trying to get chain ID of the wallet
-        if (isAbstractViemWalletClient(this.wallet)) {
-            if ("getChainId" in this.wallet && typeof this.wallet.getChainId === "function") {
-                const chainId = await this.wallet.getChainId() as number;
-                return `0x${chainId.toString(16)}`;
-            }
-        } else if (isAbstractEthersSigner(this.wallet) || isAbstractEthersV5Signer(this.wallet)) {
-            if (
-                "provider" in this.wallet &&
-                typeof this.wallet.provider === "object" && this.wallet.provider !== null &&
-                "getNetwork" in this.wallet.provider &&
-                typeof this.wallet.provider.getNetwork === "function"
-            ) {
-                const network = await this.wallet.provider.getNetwork() as { chainId: number | bigint };
-                return `0x${network.chainId.toString(16)}`;
-            }
-        } else if (isAbstractWindowEthereum(this.wallet)) {
-            const [chainId] = await this.wallet.request({ method: "eth_chainId", params: [] }) as Hex[];
-            return chainId;
-        }
-        // Attempt to guess chain ID based on isTestnet
-        return this.isTestnet ? "0x66eee" : "0xa4b1";
+    protected async _executeUserSignedAction<
+        T extends
+            | SuccessResponse
+            | CancelResponseSuccess
+            | CreateSubAccountResponse
+            | CreateVaultResponse
+            | OrderResponseSuccess
+            | TwapOrderResponseSuccess
+            | TwapCancelResponseSuccess,
+    >(
+        request: {
+            action:
+                & {
+                    type: keyof typeof userSignedActionEip712Types;
+                    signatureChainId: Hex;
+                    [key: string]: unknown;
+                }
+                & (
+                    | { nonce: number; time?: undefined }
+                    | { time: number; nonce?: undefined }
+                );
+        },
+        signal?: AbortSignal,
+    ): Promise<T> {
+        let { action } = request;
+        // @ts-ignore - for test
+        action = actionSorter[action.type](action);
+
+        // Sign a user-signed action
+        const nonce = action.nonce ?? action.time;
+
+        if (action.type === "approveAgent" && !action.agentName) action.agentName = ""; // Special case for approveAgent
+        const signature = await signUserSignedAction({
+            wallet: this.wallet,
+            action,
+            types: userSignedActionEip712Types[action.type],
+        });
+        if (action.type === "approveAgent" && action.agentName === "") action.agentName = null; // Special case for approveAgent
+
+        // Send a request
+        const response = await this.transport.request(
+            "exchange",
+            { action, signature, nonce },
+            signal,
+        ) as
+            | SuccessResponse
+            | ErrorResponse
+            | CancelResponse
+            | CreateSubAccountResponse
+            | CreateVaultResponse
+            | OrderResponse
+            | TwapOrderResponse
+            | TwapCancelResponse;
+        this._validateResponse<T>(response);
+        return response;
+    }
+
+    protected async _executeMultiSigAction<
+        T extends
+            | SuccessResponse
+            | CancelResponseSuccess
+            | CreateSubAccountResponse
+            | CreateVaultResponse
+            | OrderResponseSuccess
+            | TwapOrderResponseSuccess
+            | TwapCancelResponseSuccess,
+    >(
+        request: {
+            action: {
+                type: "multiSig";
+                [key: string]: unknown;
+            };
+            vaultAddress?: Hex;
+            expiresAfter?: number;
+            nonce: number;
+        },
+        signal?: AbortSignal,
+    ): Promise<T> {
+        let { action, vaultAddress, expiresAfter, nonce } = request;
+        // @ts-ignore - for test
+        action = actionSorter[action.type](action);
+
+        // Sign a multi-signature action
+        // deno-lint-ignore no-explicit-any
+        const actionWithoutType = structuredClone<any>(action);
+        delete actionWithoutType.type;
+        const signature = await signMultiSigAction({
+            wallet: this.wallet,
+            action: actionWithoutType,
+            nonce,
+            isTestnet: this.isTestnet,
+            vaultAddress,
+            expiresAfter,
+        });
+
+        // Send a request
+        const response = await this.transport.request(
+            "exchange",
+            { action, signature, nonce, vaultAddress, expiresAfter },
+            signal,
+        ) as
+            | SuccessResponse
+            | ErrorResponse
+            | CancelResponse
+            | CreateSubAccountResponse
+            | CreateVaultResponse
+            | OrderResponse
+            | TwapOrderResponse
+            | TwapCancelResponse;
+        this._validateResponse<T>(response);
+        return response;
     }
 
     /** Get the default expiration time for an action. */

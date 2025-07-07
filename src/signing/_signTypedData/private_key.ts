@@ -1,7 +1,6 @@
+import type { Hex } from "../../base.ts";
 import { keccak_256 } from "@noble/hashes/sha3";
 import { etc, signAsync, utils } from "@noble/secp256k1";
-
-type Hex = `0x${string}`;
 
 interface Types {
     [type: string]: {
@@ -123,10 +122,10 @@ function encodeValue(type: string, value: unknown, types: Types): Uint8Array {
         // Extract type info: base type and optional length
         const [, baseType, len] = arrayMatch;
         if (!Array.isArray(value)) {
-            throw new Error(`Expected array for ${type}, got ${typeof value}`);
+            throw new Error(`Expected array for ${type}. Received: ${typeof value}`);
         }
         if (len && value.length !== +len) {
-            throw new Error(`Invalid length for ${type}: expected ${len}, got ${value.length}`);
+            throw new Error(`Invalid length for ${type}: expected ${len}. Received: ${value.length}`);
         }
 
         // Encode each element in the array and hash them together
@@ -145,7 +144,9 @@ function encodeValue(type: string, value: unknown, types: Types): Uint8Array {
 
     if (type === "address") {
         const bytes = etc.hexToBytes(cleanHex(value as string));
-        if (bytes.length !== 20) throw new Error("address must be 20 bytes");
+        if (bytes.length !== 20) {
+            throw new Error(`Address must be 20 bytes.`);
+        }
         const padded = new Uint8Array(32);
         padded.set(bytes, 12);
         return padded;
@@ -154,9 +155,10 @@ function encodeValue(type: string, value: unknown, types: Types): Uint8Array {
     if (type.startsWith("uint") || type.startsWith("int")) {
         // Extract type info: uint/int and bit size
         const isUint = type.startsWith("uint");
-        const bits = parseInt(type.slice(isUint ? 4 : 3) || "256");
+        const bitsStr = type.slice(isUint ? 4 : 3);
+        const bits = parseInt(bitsStr || "256");
         if (bits > 256 || bits % 8 !== 0) {
-            throw new Error(`Unsupported bit size for ${type}: ${bits}`);
+            throw new Error(`Invalid ${isUint ? "uint" : "int"} size: ${bitsStr}. Must be 8-256 in steps of 8`);
         }
 
         // Apply Two's complement for specified bit size
@@ -183,11 +185,15 @@ function encodeValue(type: string, value: unknown, types: Types): Uint8Array {
     if (bytesMatch) {
         // Extract type info: bytes size
         const size = parseInt(bytesMatch[1]);
-        if (size === 0 || size > 32) throw new Error(`Unsupported bytes size: ${size}`);
+        if (size === 0 || size > 32) {
+            throw new Error(`bytesN size must be 1-32. Received: ${size}`);
+        }
 
         // Convert hex to bytes
         const bytes = etc.hexToBytes(cleanHex(value as string));
-        if (bytes.length !== size) throw new Error(`Invalid length for ${type}: expected ${size}, got ${bytes.length}`);
+        if (bytes.length !== size) {
+            throw new Error(`${type} requires exactly ${size} bytes. Received: ${bytes.length} from '${value}'`);
+        }
 
         // Pad to 32 bytes
         const padded = new Uint8Array(32);
@@ -195,7 +201,7 @@ function encodeValue(type: string, value: unknown, types: Types): Uint8Array {
         return padded;
     }
 
-    throw new Error(`Unsupported type: ${type}`);
+    throw new Error(`Unsupported type: '${type}'.`);
 }
 
 function cleanHex(hex: string): string {

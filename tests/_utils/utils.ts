@@ -1,15 +1,12 @@
 import type { Hex, InfoClient, PerpsAssetCtx, PerpsUniverse } from "@nktkas/hyperliquid";
 import BigNumber from "npm:bignumber.js@9";
-import { keccak_256 } from "@noble/hashes/sha3";
 
-interface AssetData {
+/** Get asset data by name. */
+export async function getAssetData(client: InfoClient, assetName: string): Promise<{
     id: number;
     universe: PerpsUniverse;
     ctx: PerpsAssetCtx;
-}
-
-/** Get asset data by name. */
-export async function getAssetData(client: InfoClient, assetName: string): Promise<AssetData> {
+}> {
     const data = await client.metaAndAssetCtxs();
     const id = data[0].universe.findIndex((u) => u.name === assetName);
     if (id === -1) throw new Error(`Asset "${assetName}" not found`);
@@ -21,30 +18,6 @@ export async function getAssetData(client: InfoClient, assetName: string): Promi
 /** Generate a random Client Order ID. */
 export function randomCloid(): Hex {
     return `0x${Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
-}
-
-/** Generate an Ethereum address. */
-export function generateEthereumAddress(): Hex {
-    // Step 1: Generate a random 20-byte hex string
-    const address = Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
-
-    // Step 2: Generate the checksum
-    const hashBytes = keccak_256(address.toLowerCase());
-    const hashHex = Array.from(hashBytes).map((byte) => byte.toString(16).padStart(2, "0")).join("");
-
-    // Step 3: Apply the checksum
-    let checksumAddress = "";
-    for (let i = 0; i < address.length; i++) {
-        const char = address[i];
-        const hashChar = hashHex[i];
-        if (parseInt(hashChar, 16) >= 8) {
-            checksumAddress += char.toUpperCase();
-        } else {
-            checksumAddress += char.toLowerCase();
-        }
-    }
-
-    return `0x${checksumAddress}`;
 }
 
 /**
@@ -69,8 +42,7 @@ export function formatPrice(
 
     return priceBN
         .precision(5, roundingMode)
-        .toFixed(maxAllowedDecimals, roundingMode)
-        .replace(/\.?0+$/, ""); // Remove trailing zeros
+        .toFixed(maxAllowedDecimals, roundingMode);
 }
 
 /**
@@ -88,4 +60,16 @@ export function formatSize(
     return new BigNumber(size)
         .toFixed(szDecimals, roundingMode)
         .replace(/\.?0+$/, ""); // Remove trailing zeros
+}
+
+export function anyFnSuccess<T>(functions: (() => T)[]): T {
+    const errors: Error[] = [];
+    for (const fn of functions) {
+        try {
+            return fn();
+        } catch (error) {
+            errors.push(error instanceof Error ? error : new Error(String(error)));
+        }
+    }
+    throw new AggregateError(errors, "All functions failed");
 }

@@ -1,7 +1,7 @@
 import { Ajv, type SchemaObject } from "npm:ajv@8";
-import { resolveRef, type ResolveRefOptions } from "./resolveRef.ts";
-import { resolveAllOf, type ResolveAllOfOptions } from "./resolveAllOf.ts";
-import { addStrictAdditionalProperties } from "./addStrictAdditionalProperties.ts";
+import { resolveRef, type ResolveRefOptions } from "./_resolveRef.ts";
+import { resolveAllOf, type ResolveAllOfOptions } from "./_resolveAllOf.ts";
+import { addStrictAdditionalProperties } from "./_addStrictAdditionalProperties.ts";
 
 export type IssueType =
     | "BRANCH_UNCOVERED"

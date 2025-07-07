@@ -343,7 +343,7 @@ export const actionSorter = {
                 setOracle: {
                     dex: action.setOracle.dex,
                     oraclePxs: action.setOracle.oraclePxs.map((el) => [...el]),
-                    markPxs: action.setOracle.markPxs.map((el) => [...el]),
+                    markPxs: action.setOracle.markPxs.map((el) => el.map((el2) => [...el2])),
                 },
             };
         }

@@ -130,10 +130,7 @@ export class SubscriptionClient<
         listener: (data: WsActiveAssetCtx | WsActiveSpotAssetCtx) => void,
     ): Promise<Subscription> {
         const channel = params.coin.startsWith("@") ? "activeSpotAssetCtx" : "activeAssetCtx";
-        const payload: WsActiveAssetCtxRequest = {
-            type: "activeAssetCtx",
-            coin: params.coin,
-        };
+        const payload = { type: "activeAssetCtx", ...params } satisfies WsActiveAssetCtxRequest;
         return this.transport.subscribe<WsActiveAssetCtx | WsActiveSpotAssetCtx>(channel, payload, (e) => {
             if (e.detail.coin === params.coin) {
                 listener(e.detail);
@@ -166,11 +163,7 @@ export class SubscriptionClient<
         params: EventActiveAssetDataParameters,
         listener: (data: WsActiveAssetData) => void,
     ): Promise<Subscription> {
-        const payload: WsActiveAssetDataRequest = {
-            type: "activeAssetData",
-            coin: params.coin,
-            user: params.user,
-        };
+        const payload = { type: "activeAssetData", ...params } satisfies WsActiveAssetDataRequest;
         return this.transport.subscribe<WsActiveAssetData>(payload.type, payload, (e) => {
             if (e.detail.coin === params.coin && e.detail.user === params.user.toLowerCase()) {
                 listener(e.detail);
@@ -208,10 +201,7 @@ export class SubscriptionClient<
         const params = typeof params_or_listener === "function" ? {} : params_or_listener;
         const listener = typeof params_or_listener === "function" ? params_or_listener : maybeListener!;
 
-        const payload: WsAllMidsRequest = {
-            type: "allMids",
-            dex: params.dex,
-        };
+        const payload = { type: "allMids", ...params } satisfies WsAllMidsRequest;
         return this.transport.subscribe<WsAllMids>(payload.type, payload, (e) => {
             listener(e.detail);
         });
@@ -239,10 +229,7 @@ export class SubscriptionClient<
      * ```
      */
     bbo(params: EventBboParameters, listener: (data: WsBbo) => void): Promise<Subscription> {
-        const payload: WsBboRequest = {
-            type: "bbo",
-            coin: params.coin,
-        };
+        const payload = { type: "bbo", ...params } satisfies WsBboRequest;
         return this.transport.subscribe<WsBbo>(payload.type, payload, (e) => {
             if (e.detail.coin === params.coin) {
                 listener(e.detail);
@@ -272,11 +259,7 @@ export class SubscriptionClient<
      * ```
      */
     candle(params: EventCandleParameters, listener: (data: Candle) => void): Promise<Subscription> {
-        const payload: WsCandleRequest = {
-            type: "candle",
-            coin: params.coin,
-            interval: params.interval,
-        };
+        const payload = { type: "candle", ...params } satisfies WsCandleRequest;
         return this.transport.subscribe<Candle>(payload.type, payload, (e) => {
             if (e.detail.s === params.coin && e.detail.i === params.interval) {
                 listener(e.detail);
@@ -306,9 +289,7 @@ export class SubscriptionClient<
      * ```
      */
     explorerBlock(listener: (data: WsBlockDetails[]) => void): Promise<Subscription> {
-        const payload: WsExplorerBlockRequest = {
-            type: "explorerBlock",
-        };
+        const payload = { type: "explorerBlock" } satisfies WsExplorerBlockRequest;
         return this.transport.subscribe<WsBlockDetails[]>("_explorerBlock", payload, (e) => { // Internal channel as it does not have its own channel
             listener(e.detail);
         });
@@ -336,9 +317,7 @@ export class SubscriptionClient<
      * ```
      */
     explorerTxs(listener: (data: TxDetails[]) => void): Promise<Subscription> {
-        const payload: WsExplorerTxsRequest = {
-            type: "explorerTxs",
-        };
+        const payload = { type: "explorerTxs" } satisfies WsExplorerTxsRequest;
         return this.transport.subscribe<TxDetails[]>("_explorerTxs", payload, (e) => { // Internal channel as it does not have its own channel
             listener(e.detail);
         });
@@ -366,12 +345,12 @@ export class SubscriptionClient<
      * ```
      */
     l2Book(params: EventL2BookParameters, listener: (data: Book) => void): Promise<Subscription> {
-        const payload: WsL2BookRequest = {
+        const payload = {
             type: "l2Book",
-            coin: params.coin,
             nSigFigs: params.nSigFigs ?? null,
             mantissa: params.mantissa ?? null,
-        };
+            ...params,
+        } satisfies WsL2BookRequest;
         return this.transport.subscribe<Book>(payload.type, payload, (e) => {
             if (e.detail.coin === params.coin) {
                 listener(e.detail);
@@ -401,10 +380,7 @@ export class SubscriptionClient<
      * ```
      */
     notification(params: EventNotificationParameters, listener: (data: WsNotification) => void): Promise<Subscription> {
-        const payload: WsNotificationRequest = {
-            type: "notification",
-            user: params.user,
-        };
+        const payload = { type: "notification", user: params.user } satisfies WsNotificationRequest;
         return this.transport.subscribe<WsNotification>(payload.type, payload, (e) => {
             listener(e.detail);
         });
@@ -435,10 +411,7 @@ export class SubscriptionClient<
         params: EventOrderUpdatesParameters,
         listener: (data: OrderStatus<Order>[]) => void,
     ): Promise<Subscription> {
-        const payload: WsOrderUpdatesRequest = {
-            type: "orderUpdates",
-            user: params.user,
-        };
+        const payload = { type: "orderUpdates", ...params } satisfies WsOrderUpdatesRequest;
         return this.transport.subscribe<OrderStatus<Order>[]>(payload.type, payload, (e) => {
             listener(e.detail);
         });
@@ -466,10 +439,7 @@ export class SubscriptionClient<
      * ```
      */
     trades(params: EventTradesParameters, listener: (data: WsTrade[]) => void): Promise<Subscription> {
-        const payload: WsTradesRequest = {
-            type: "trades",
-            coin: params.coin,
-        };
+        const payload = { type: "trades", ...params } satisfies WsTradesRequest;
         return this.transport.subscribe<WsTrade[]>(payload.type, payload, (e) => {
             if (e.detail[0]?.coin === params.coin) {
                 listener(e.detail);
@@ -500,10 +470,7 @@ export class SubscriptionClient<
      * ```
      */
     userEvents(params: EventUserEventsParameters, listener: (data: WsUserEvent) => void): Promise<Subscription> {
-        const payload: WsUserEventsRequest = {
-            type: "userEvents",
-            user: params.user,
-        };
+        const payload = { type: "userEvents", ...params } satisfies WsUserEventsRequest;
         return this.transport.subscribe<WsUserEvent>("user", payload, (e) => {
             listener(e.detail);
         });
@@ -531,11 +498,11 @@ export class SubscriptionClient<
      * ```
      */
     userFills(params: EventUserFillsParameters, listener: (data: WsUserFills) => void): Promise<Subscription> {
-        const payload: WsUserFillsRequest = {
+        const payload = {
             type: "userFills",
-            user: params.user,
             aggregateByTime: params.aggregateByTime ?? false,
-        };
+            ...params,
+        } satisfies WsUserFillsRequest;
         return this.transport.subscribe<WsUserFills>(payload.type, payload, (e) => {
             if (e.detail.user === params.user.toLowerCase()) {
                 listener(e.detail);
@@ -565,10 +532,7 @@ export class SubscriptionClient<
      * ```
      */
     userFundings(params: EventUserFundingsParameters, listener: (data: WsUserFundings) => void): Promise<Subscription> {
-        const payload: WsUserFundingsRequest = {
-            type: "userFundings",
-            user: params.user,
-        };
+        const payload = { type: "userFundings", ...params } satisfies WsUserFundingsRequest;
         return this.transport.subscribe<WsUserFundings>(payload.type, payload, (e) => {
             if (e.detail.user === params.user.toLowerCase()) {
                 listener(e.detail);
@@ -601,10 +565,10 @@ export class SubscriptionClient<
         params: EventUserNonFundingLedgerUpdatesParameters,
         listener: (data: WsUserNonFundingLedgerUpdates) => void,
     ): Promise<Subscription> {
-        const payload: WsUserNonFundingLedgerUpdatesRequest = {
+        const payload = {
             type: "userNonFundingLedgerUpdates",
-            user: params.user,
-        };
+            ...params,
+        } satisfies WsUserNonFundingLedgerUpdatesRequest;
         return this.transport.subscribe<WsUserNonFundingLedgerUpdates>(payload.type, payload, (e) => {
             if (e.detail.user === params.user.toLowerCase()) {
                 listener(e.detail);
@@ -634,10 +598,7 @@ export class SubscriptionClient<
      * ```
      */
     userTwapHistory(params: EventUserTwapHistory, listener: (data: WsUserTwapHistory) => void): Promise<Subscription> {
-        const payload: WsUserTwapHistoryRequest = {
-            type: "userTwapHistory",
-            user: params.user,
-        };
+        const payload = { type: "userTwapHistory", ...params } satisfies WsUserTwapHistoryRequest;
         return this.transport.subscribe<WsUserTwapHistory>(payload.type, payload, (e) => {
             if (e.detail.user === params.user.toLowerCase()) {
                 listener(e.detail);
@@ -670,10 +631,7 @@ export class SubscriptionClient<
         params: EventUserTwapSliceFills,
         listener: (data: WsUserTwapSliceFills) => void,
     ): Promise<Subscription> {
-        const payload: WsUserTwapSliceFillsRequest = {
-            type: "userTwapSliceFills",
-            user: params.user,
-        };
+        const payload = { type: "userTwapSliceFills", ...params } satisfies WsUserTwapSliceFillsRequest;
         return this.transport.subscribe<WsUserTwapSliceFills>(payload.type, payload, (e) => {
             if (e.detail.user === params.user.toLowerCase()) {
                 listener(e.detail);
@@ -703,10 +661,7 @@ export class SubscriptionClient<
      * ```
      */
     webData2(params: EventWebData2Parameters, listener: (data: WsWebData2) => void): Promise<Subscription> {
-        const payload: WsWebData2Request = {
-            type: "webData2",
-            user: params.user,
-        };
+        const payload = { type: "webData2", ...params } satisfies WsWebData2Request;
         return this.transport.subscribe<WsWebData2>(payload.type, payload, (e) => {
             if (e.detail.user === params.user.toLowerCase()) {
                 listener(e.detail);

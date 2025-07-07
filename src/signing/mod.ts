@@ -29,13 +29,14 @@
  *
  * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
  *
+ * const nonce = Date.now();
  * const action = {
  *     type: "approveAgent",
  *     signatureChainId: "0x66eee",
  *     hyperliquidChain: "Mainnet",
  *     agentAddress: "0x...",
  *     agentName: "Agent",
- *     nonce: Date.now(),
+ *     nonce,
  * } as const;
  *
  * const signature = await signUserSignedAction({
@@ -66,6 +67,26 @@
  *     nonce,
  * });
  *
+ * // or User-Signed action
+ * // const signature = await signUserSignedAction({
+ * //   wallet: signer1,
+ * //   action: {
+ * //     ...action,
+ * //     payloadMultiSigUser: multiSigUser.wallet.address,
+ * //     outerSigner: signer1.address,
+ * //   },
+ * //   types: {
+ * //     "HyperliquidTransaction:UsdSend": [
+ * //       { name: "hyperliquidChain", type: "string" },
+ * //       { name: "payloadMultiSigUser", type: "address" },
+ * //       { name: "outerSigner", type: "address" },
+ * //       { name: "destination", type: "string" },
+ * //       { name: "amount", type: "string" },
+ * //       { name: "time", type: "uint64" },
+ * //     ],
+ * //   },
+ * // });
+ *
  * // Then use signatures in the multi-sig action
  * const multiSigSignature = await signMultiSigAction({
  *     wallet,
@@ -86,7 +107,7 @@
  */
 
 import { keccak_256 } from "@noble/hashes/sha3";
-import { etc } from "@noble/secp256k1";
+import { etc, getPublicKey } from "@noble/secp256k1";
 import { encode as encodeMsgpack } from "@msgpack/msgpack";
 import type { Hex } from "../base.ts";
 import {
@@ -274,13 +295,14 @@ export async function signL1Action(args: {
  *
  * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
  *
+ * const nonce = Date.now();
  * const action = {
  *     type: "approveAgent",
  *     signatureChainId: "0x66eee",
  *     hyperliquidChain: "Mainnet",
  *     agentAddress: "0x...",
  *     agentName: "Agent",
- *     nonce: Date.now(),
+ *     nonce,
  * } as const;
  *
  * const signature = await signUserSignedAction({
@@ -293,7 +315,7 @@ export async function signL1Action(args: {
  * const response = await fetch("https://api.hyperliquid.xyz/exchange", {
  *     method: "POST",
  *     headers: { "Content-Type": "application/json" },
- *     body: JSON.stringify({ action, signature, nonce: action.nonce }),
+ *     body: JSON.stringify({ action, signature, nonce }),
  * });
  * const body = await response.json();
  * ```
@@ -351,6 +373,26 @@ export async function signUserSignedAction(args: {
  *     action: [multiSigUser.toLowerCase(), wallet.address.toLowerCase(), actionSorter[action.type](action)],
  *     nonce,
  * });
+ *
+ * // or User-Signed action
+ * // const signature = await signUserSignedAction({
+ * //   wallet: signer1,
+ * //   action: {
+ * //     ...action,
+ * //     payloadMultiSigUser: multiSigUser.wallet.address,
+ * //     outerSigner: signer1.address,
+ * //   },
+ * //   types: {
+ * //     "HyperliquidTransaction:UsdSend": [
+ * //       { name: "hyperliquidChain", type: "string" },
+ * //       { name: "payloadMultiSigUser", type: "address" },
+ * //       { name: "outerSigner", type: "address" },
+ * //       { name: "destination", type: "string" },
+ * //       { name: "amount", type: "string" },
+ * //       { name: "time", type: "uint64" },
+ * //     ],
+ * //   },
+ * // });
  *
  * // Then use signatures in the multi-sig action
  * const multiSigSignature = await signMultiSigAction({
@@ -420,4 +462,69 @@ export async function signMultiSigAction(args: {
         primaryType: "HyperliquidTransaction:SendMultiSig",
         message,
     });
+}
+
+// —————————— Helper Functions ——————————
+
+/** Get the chain ID of the wallet or return a default based on the testnet flag. */
+export async function getWalletChainId(wallet: AbstractWallet, isTestnet: boolean): Promise<Hex> {
+    // Try to get chain id from wallet
+    if (isAbstractViemWalletClient(wallet)) {
+        if ("getChainId" in wallet && typeof wallet.getChainId === "function") {
+            const chainId = await wallet.getChainId() as number;
+            return `0x${chainId.toString(16)}`;
+        }
+    } else if (isAbstractEthersSigner(wallet) || isAbstractEthersV5Signer(wallet)) {
+        if (
+            "provider" in wallet &&
+            typeof wallet.provider === "object" && wallet.provider !== null &&
+            "getNetwork" in wallet.provider &&
+            typeof wallet.provider.getNetwork === "function"
+        ) {
+            const network = await wallet.provider.getNetwork() as { chainId: number | bigint };
+            return `0x${network.chainId.toString(16)}`;
+        }
+    } else if (isAbstractWindowEthereum(wallet)) {
+        const [chainId] = await wallet.request({ method: "eth_chainId", params: [] }) as Hex[];
+        return chainId;
+    }
+    // Return default chain id based on testnet flag
+    return isTestnet ? "0x66eee" : "0xa4b1";
+}
+
+/** Get the wallet address from various wallet types. */
+export async function getWalletAddress(wallet: AbstractWallet): Promise<Hex> {
+    if (isValidPrivateKey(wallet)) {
+        return privateKeyToAddress(wallet);
+    } else if (isAbstractViemWalletClient(wallet) && wallet.address) {
+        return wallet.address;
+    } else if ((isAbstractEthersSigner(wallet) || isAbstractEthersV5Signer(wallet)) && wallet.getAddress) {
+        return await wallet.getAddress() as Hex;
+    } else if (isAbstractWindowEthereum(wallet)) {
+        return await getWindowEthereumAddress(wallet);
+    } else {
+        throw new Error("Unsupported wallet for getting address");
+    }
+}
+
+function privateKeyToAddress(privateKey: string): Hex {
+    const cleanPrivKey = privateKey.startsWith("0x") ? privateKey.slice(2) : privateKey;
+
+    const publicKey = getPublicKey(cleanPrivKey, false);
+    const publicKeyWithoutPrefix = publicKey.slice(1);
+
+    const hash = keccak_256(publicKeyWithoutPrefix);
+
+    const addressBytes = hash.slice(-20);
+    const address = etc.bytesToHex(addressBytes);
+
+    return `0x${address}`;
+}
+
+async function getWindowEthereumAddress(ethereum: AbstractWindowEthereum): Promise<Hex> {
+    const accounts = await ethereum.request({ method: "eth_requestAccounts", params: [] });
+    if (!Array.isArray(accounts) || accounts.length === 0) {
+        throw new Error("No Ethereum accounts available");
+    }
+    return accounts[0] as Hex;
 }

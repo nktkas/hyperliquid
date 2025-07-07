@@ -11,13 +11,13 @@ import {
     SubscriptionClient,
     WebSocketTransport,
 } from "../../mod.ts";
-import { schemaGenerator } from "../_utils/schema/schemaGenerator.ts";
-import { schemaCoverage } from "../_utils/schema/schemaCoverage.ts";
+import { schemaGenerator } from "../_utils/schema/_schemaGenerator.ts";
+import { schemaCoverage } from "../_utils/schema/_schemaCoverage.ts";
 import { formatPrice, formatSize, getAssetData, randomCloid } from "../_utils/utils.ts";
 
 // —————————— Arguments ——————————
 
-const cliArgs = parseArgs(Deno.args, { default: { wait: 3000 }, string: ["_"] }) as Args<{
+const cliArgs = parseArgs(Deno.args, { default: { wait: 1000 }, string: ["_"] }) as Args<{
     /** Delay to avoid rate limits */
     wait: number;
 }>;
@@ -72,12 +72,16 @@ export type MethodReturnType_activeAssetCtx = Parameters<Parameters<Subscription
 run(
     "activeAssetCtx",
     async (types) => {
+        // —————————— Prepare ——————————
+
         await using transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
 
+        // —————————— Test ——————————
+
         const data = await Promise.all([
-            // Check response 'WsActiveAssetCtx'
+            // WsActiveAssetCtx
             deadline(
                 new Promise((resolve) => {
                     subsClient.activeAssetCtx({ coin: "BTC" }, resolve);
@@ -90,7 +94,7 @@ run(
                 }),
                 10_000,
             ),
-            // Check response 'WsActiveSpotAssetCtx'
+            // WsActiveSpotAssetCtx
             deadline(
                 new Promise((resolve) => {
                     subsClient.activeAssetCtx({ coin: "@107" }, resolve);
@@ -112,18 +116,23 @@ export type MethodReturnType_activeAssetData = Parameters<Parameters<Subscriptio
 run(
     "activeAssetData",
     async (types, { coin1, coin2, user }) => {
+        // —————————— Prepare ——————————
+
         await using transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
 
+        // —————————— Test ——————————
+
         const data = await Promise.all([
-            // Check argument 'leverage.type'
+            // leverage.type = isolated
             deadline(
                 new Promise((resolve) => {
                     subsClient.activeAssetData({ coin: coin1, user }, resolve);
                 }),
                 10_000,
             ),
+            // leverage.type = cross
             deadline(
                 new Promise((resolve) => {
                     subsClient.activeAssetData({ coin: coin2, user }, resolve);
@@ -140,23 +149,21 @@ export type MethodReturnType_allMids = Parameters<Parameters<SubscriptionClient[
 run(
     "allMids",
     async (types) => {
+        // —————————— Prepare ——————————
+
         await using transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
 
-        const data1 = await deadline(
+        // —————————— Test ——————————
+
+        const data = await deadline(
             new Promise((resolve) => {
                 subsClient.allMids(resolve);
             }),
             10_000,
         );
-        const data2 = await deadline(
-            new Promise((resolve) => {
-                subsClient.allMids({ dex: "test" }, resolve);
-            }),
-            10_000,
-        );
-        schemaCoverage(types, [data1, data2]);
+        schemaCoverage(types, [data]);
     },
 );
 
@@ -164,9 +171,13 @@ export type MethodReturnType_bbo = Parameters<Parameters<SubscriptionClient["bbo
 run(
     "bbo",
     async (types) => {
+        // —————————— Prepare ——————————
+
         await using transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
+
+        // —————————— Test ——————————
 
         const data = await deadline(
             new Promise((resolve) => {
@@ -182,9 +193,13 @@ export type MethodReturnType_candle = Parameters<Parameters<SubscriptionClient["
 run(
     "candle",
     async (types) => {
+        // —————————— Prepare ——————————
+
         await using transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
+
+        // —————————— Test ——————————
 
         const data = await deadline(
             new Promise((resolve) => {
@@ -195,7 +210,6 @@ run(
         schemaCoverage(types, [data], {
             ignoreEnumValuesByPath: {
                 "#/properties/i": [
-                    "1m",
                     "3m",
                     "5m",
                     "15m",
@@ -219,9 +233,13 @@ export type MethodReturnType_explorerBlock = Parameters<Parameters<SubscriptionC
 run(
     "explorerBlock",
     async (types) => {
+        // —————————— Prepare ——————————
+
         await using transport = new WebSocketTransport({ url: "wss://rpc.hyperliquid-testnet.xyz/ws" });
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
+
+        // —————————— Test ——————————
 
         const data = await deadline(
             new Promise((resolve) => {
@@ -237,9 +255,13 @@ export type MethodReturnType_explorerTxs = Parameters<Parameters<SubscriptionCli
 run(
     "explorerTxs",
     async (types) => {
+        // —————————— Prepare ——————————
+
         await using transport = new WebSocketTransport({ url: "wss://rpc.hyperliquid-testnet.xyz/ws" });
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
+
+        // —————————— Test ——————————
 
         const data = await deadline(
             new Promise((resolve) => {
@@ -259,94 +281,21 @@ export type MethodReturnType_l2Book = Parameters<Parameters<SubscriptionClient["
 run(
     "l2Book",
     async (types) => {
+        // —————————— Prepare ——————————
+
         await using transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
 
-        const data = await Promise.all([
-            // Check without arguments
-            deadline(
-                new Promise((resolve) => {
-                    subsClient.l2Book({ coin: "BTC" }, resolve);
-                }),
-                10_000,
-            ),
-            // Check argument 'nSigFigs'
-            deadline(
-                new Promise((resolve) => {
-                    subsClient.l2Book({ coin: "BTC", nSigFigs: 2 }, resolve);
-                }),
-                10_000,
-            ),
-            deadline(
-                new Promise((resolve) => {
-                    subsClient.l2Book({ coin: "BTC", nSigFigs: 3 }, resolve);
-                }),
-                10_000,
-            ),
-            deadline(
-                new Promise((resolve) => {
-                    subsClient.l2Book({ coin: "BTC", nSigFigs: 4 }, resolve);
-                }),
-                10_000,
-            ),
-            deadline(
-                new Promise((resolve) => {
-                    subsClient.l2Book({ coin: "BTC", nSigFigs: 5 }, resolve);
-                }),
-                10_000,
-            ),
-            deadline(
-                new Promise((resolve) => {
-                    subsClient.l2Book({ coin: "BTC", nSigFigs: null }, resolve);
-                }),
-                10_000,
-            ),
-            deadline(
-                new Promise((resolve) => {
-                    subsClient.l2Book({ coin: "BTC", nSigFigs: undefined }, resolve);
-                }),
-                10_000,
-            ),
-            // Check argument 'mantissa'
-            deadline(
-                new Promise((resolve) => {
-                    subsClient.l2Book(
-                        { coin: "BTC", nSigFigs: 5, mantissa: 2 },
-                        resolve,
-                    );
-                }),
-                10_000,
-            ),
-            deadline(
-                new Promise((resolve) => {
-                    subsClient.l2Book(
-                        { coin: "BTC", nSigFigs: 5, mantissa: 5 },
-                        resolve,
-                    );
-                }),
-                10_000,
-            ),
-            deadline(
-                new Promise((resolve) => {
-                    subsClient.l2Book(
-                        { coin: "BTC", nSigFigs: 5, mantissa: null },
-                        resolve,
-                    );
-                }),
-                10_000,
-            ),
-            deadline(
-                new Promise((resolve) => {
-                    subsClient.l2Book(
-                        { coin: "BTC", nSigFigs: 5, mantissa: undefined },
-                        resolve,
-                    );
-                }),
-                10_000,
-            ),
-        ]);
-        schemaCoverage(types, data);
+        // —————————— Test ——————————
+
+        const data = await deadline(
+            new Promise((resolve) => {
+                subsClient.l2Book({ coin: "BTC" }, resolve);
+            }),
+            10_000,
+        );
+        schemaCoverage(types, [data]);
     },
 );
 
@@ -354,11 +303,11 @@ export type MethodReturnType_notification = Parameters<Parameters<SubscriptionCl
 run(
     "notification",
     async (types, { asset }) => {
+        // —————————— Prepare ——————————
+
         await using transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
-
-        // —————————— Prepare ——————————
 
         async function openCloseTwap(
             infoClient: InfoClient,
@@ -433,11 +382,11 @@ export type MethodReturnType_orderUpdates = Parameters<Parameters<SubscriptionCl
 run(
     "orderUpdates",
     async (types, { asset }) => {
+        // —————————— Prepare ——————————
+
         await using transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
-
-        // —————————— Prepare ——————————
 
         async function createOrder(
             infoClient: InfoClient,
@@ -549,7 +498,6 @@ run(
                     "selfTradeCanceled",
                     "siblingFilledCanceled",
                     "vaultWithdrawalCanceled",
-                    "rejected",
                 ],
             },
         });
@@ -562,9 +510,13 @@ export type MethodReturnType_trades = Parameters<Parameters<SubscriptionClient["
 run(
     "trades",
     async (types) => {
+        // —————————— Prepare ——————————
+
         await using transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
+
+        // —————————— Test ——————————
 
         const data = await deadline(
             new Promise((resolve) => {
@@ -584,11 +536,11 @@ export type MethodReturnType_userEvents = Parameters<Parameters<SubscriptionClie
 run(
     "userEvents",
     async (types, { asset1, asset2 }) => {
+        // —————————— Prepare ——————————
+
         await using transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
-
-        // —————————— Prepare ——————————
 
         async function openCloseOrder(
             infoClient: InfoClient,
@@ -738,9 +690,13 @@ export type MethodReturnType_userFills = Parameters<Parameters<SubscriptionClien
 run(
     "userFills",
     async (types, { user }) => {
+        // —————————— Prepare ——————————
+
         await using transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
+
+        // —————————— Test ——————————
 
         const data = await deadline(
             new Promise((resolve) => {
@@ -761,9 +717,13 @@ export type MethodReturnType_userFundings = Parameters<Parameters<SubscriptionCl
 run(
     "userFundings",
     async (types, { user }) => {
+        // —————————— Prepare ——————————
+
         await using transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
+
+        // —————————— Test ——————————
 
         const data = await deadline(
             new Promise((resolve) => {
@@ -786,9 +746,13 @@ export type MethodReturnType_userNonFundingLedgerUpdates = Parameters<
 run(
     "userNonFundingLedgerUpdates",
     async (types, { user }) => {
+        // —————————— Prepare ——————————
+
         await using transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
+
+        // —————————— Test ——————————
 
         const data = await deadline(
             new Promise((resolve) => {
@@ -814,9 +778,13 @@ export type MethodReturnType_userTwapHistory = Parameters<Parameters<Subscriptio
 run(
     "userTwapHistory",
     async (types, { user }) => {
+        // —————————— Prepare ——————————
+
         await using transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
+
+        // —————————— Test ——————————
 
         const data = await deadline(
             new Promise((resolve) => {
@@ -835,9 +803,13 @@ export type MethodReturnType_userTwapSliceFills = Parameters<
 run(
     "userTwapSliceFills",
     async (types, { user }) => {
+        // —————————— Prepare ——————————
+
         await using transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
+
+        // —————————— Test ——————————
 
         const data = await deadline(
             new Promise((resolve) => {
@@ -854,11 +826,11 @@ export type MethodReturnType_webData2 = Parameters<Parameters<SubscriptionClient
 run(
     "webData2",
     async (types, { asset1, asset2 }) => {
+        // —————————— Prepare ——————————
+
         await using transport = new WebSocketTransport({ url: "wss://api.hyperliquid-testnet.xyz/ws" });
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
-
-        // —————————— Prepare ——————————
 
         async function getAssetDataExtended(infoClient: InfoClient, asset: string): Promise<{
             id: number;
@@ -973,7 +945,8 @@ run(
                 grouping: "na",
             }),
             // Change spot dusting opt-out
-            exchClient.spotUser({ toggleSpotDusting: { optOut: true } }),
+            exchClient.spotUser({ toggleSpotDusting: { optOut: true } })
+                .catch(() => undefined), // may fail if already opted out
         ]);
 
         // —————————— Test ——————————

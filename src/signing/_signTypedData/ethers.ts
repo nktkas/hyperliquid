@@ -1,5 +1,6 @@
 /** Abstract interface for an [ethers.js signer](https://docs.ethers.org/v6/api/providers/#Signer). */
 export interface AbstractEthersSigner {
+    getAddress?(): Promise<string>;
     signTypedData(
         domain: {
             name: string;
@@ -19,6 +20,7 @@ export interface AbstractEthersSigner {
 
 /** Abstract interface for an [ethers.js v5 signer](https://docs.ethers.org/v5/api/signer/). */
 export interface AbstractEthersV5Signer {
+    getAddress?(): Promise<string>;
     _signTypedData(
         domain: {
             name: string;

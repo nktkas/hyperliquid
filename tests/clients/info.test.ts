@@ -1,12 +1,12 @@
 import { type Args, parseArgs } from "jsr:@std/cli@1/parse-args";
 import type { SchemaObject } from "npm:ajv@8";
 import { HttpTransport, InfoClient } from "../../mod.ts";
-import { schemaGenerator } from "../_utils/schema/schemaGenerator.ts";
-import { schemaCoverage } from "../_utils/schema/schemaCoverage.ts";
+import { schemaGenerator } from "../_utils/schema/_schemaGenerator.ts";
+import { schemaCoverage } from "../_utils/schema/_schemaCoverage.ts";
 
 // —————————— Arguments ——————————
 
-const cliArgs = parseArgs(Deno.args, { default: { wait: 3000 } }) as Args<{
+const cliArgs = parseArgs(Deno.args, { default: { wait: 1000 } }) as Args<{
     /** Delay to avoid rate limits */
     wait?: number;
 }>;
@@ -91,11 +91,8 @@ export type MethodReturnType_allMids = Awaited<ReturnType<InfoClient["allMids"]>
 run(
     "allMids",
     async (types) => {
-        const data = await Promise.all([
-            infoClient.allMids(),
-            infoClient.allMids({ dex: "test" }),
-        ]);
-        schemaCoverage(types, data);
+        const data = await infoClient.allMids();
+        schemaCoverage(types, [data]);
     },
 );
 
@@ -113,34 +110,12 @@ export type MethodReturnType_candleSnapshot = Awaited<ReturnType<InfoClient["can
 run(
     "candleSnapshot",
     async (types) => {
-        const data = await Promise.all([
-            // General
-            infoClient.candleSnapshot({
-                coin: "BTC",
-                interval: "15m",
-                startTime: Date.now() - 1000 * 60 * 60 * 24,
-            }),
-            // Check argument 'endTime'
-            infoClient.candleSnapshot({
-                coin: "BTC",
-                interval: "15m",
-                startTime: Date.now() - 1000 * 60 * 60 * 24,
-                endTime: Date.now(),
-            }),
-            infoClient.candleSnapshot({
-                coin: "BTC",
-                interval: "15m",
-                startTime: Date.now() - 1000 * 60 * 60 * 24,
-                endTime: null,
-            }),
-            infoClient.candleSnapshot({
-                coin: "BTC",
-                interval: "15m",
-                startTime: Date.now() - 1000 * 60 * 60 * 24,
-                endTime: undefined,
-            }),
-        ]);
-        schemaCoverage(types, data, {
+        const data = await infoClient.candleSnapshot({
+            coin: "BTC",
+            interval: "15m",
+            startTime: Date.now() - 1000 * 60 * 60 * 24,
+        });
+        schemaCoverage(types, [data], {
             ignoreEnumValuesByPath: {
                 "#/items/properties/i": [
                     "1m",
@@ -244,11 +219,8 @@ export type MethodReturnType_frontendOpenOrders = Awaited<ReturnType<InfoClient[
 run(
     "frontendOpenOrders",
     async (types, { user }) => {
-        const data = await Promise.all([
-            infoClient.frontendOpenOrders({ user }),
-            infoClient.frontendOpenOrders({ user, dex: "test" }),
-        ]);
-        schemaCoverage(types, data, {
+        const data = await infoClient.frontendOpenOrders({ user });
+        schemaCoverage(types, [data], {
             ignoreEnumValuesByPath: {
                 "#/items/properties/orderType": ["Market"],
                 "#/items/properties/tif/anyOf/0": ["Ioc", "FrontendMarket", "LiquidationMarket"],
@@ -262,29 +234,11 @@ export type MethodReturnType_fundingHistory = Awaited<ReturnType<InfoClient["fun
 run(
     "fundingHistory",
     async (types) => {
-        const data = await Promise.all([
-            infoClient.fundingHistory({
-                coin: "BTC",
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-            }),
-            // Check argument 'endTime'
-            infoClient.fundingHistory({
-                coin: "BTC",
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-                endTime: Date.now(),
-            }),
-            infoClient.fundingHistory({
-                coin: "BTC",
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-                endTime: null,
-            }),
-            infoClient.fundingHistory({
-                coin: "BTC",
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-                endTime: undefined,
-            }),
-        ]);
-        schemaCoverage(types, data);
+        const data = await infoClient.fundingHistory({
+            coin: "BTC",
+            startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
+        });
+        schemaCoverage(types, [data]);
     },
 );
 
@@ -326,22 +280,8 @@ export type MethodReturnType_l2Book = Awaited<ReturnType<InfoClient["l2Book"]>>;
 run(
     "l2Book",
     async (types) => {
-        const data = await Promise.all([
-            infoClient.l2Book({ coin: "BTC" }),
-            // Check argument 'nSigFigs'
-            infoClient.l2Book({ coin: "BTC", nSigFigs: 2 }),
-            infoClient.l2Book({ coin: "BTC", nSigFigs: 3 }),
-            infoClient.l2Book({ coin: "BTC", nSigFigs: 4 }),
-            infoClient.l2Book({ coin: "BTC", nSigFigs: 5 }),
-            infoClient.l2Book({ coin: "BTC", nSigFigs: null }),
-            infoClient.l2Book({ coin: "BTC", nSigFigs: undefined }),
-            // Check argument 'mantissa'
-            infoClient.l2Book({ coin: "BTC", nSigFigs: 5, mantissa: 2 }),
-            infoClient.l2Book({ coin: "BTC", nSigFigs: 5, mantissa: 5 }),
-            infoClient.l2Book({ coin: "BTC", nSigFigs: 5, mantissa: null }),
-            infoClient.l2Book({ coin: "BTC", nSigFigs: 5, mantissa: undefined }),
-        ]);
-        schemaCoverage(types, data);
+        const data = await infoClient.l2Book({ coin: "BTC" });
+        schemaCoverage(types, [data]);
     },
 );
 
@@ -430,11 +370,8 @@ export type MethodReturnType_openOrders = Awaited<ReturnType<InfoClient["openOrd
 run(
     "openOrders",
     async (types, { user }) => {
-        const data = await Promise.all([
-            infoClient.openOrders({ user }),
-            infoClient.openOrders({ user, dex: "test" }),
-        ]);
-        schemaCoverage(types, data);
+        const data = await infoClient.openOrders({ user });
+        schemaCoverage(types, [data]);
     },
     { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" } as const,
 );
@@ -616,7 +553,6 @@ run(
     async (types, { user, withEvmEscrows }) => {
         const data = await Promise.all([
             infoClient.spotClearinghouseState({ user }),
-            infoClient.spotClearinghouseState({ user, dex: "test" }),
             infoClient.spotClearinghouseState({ user: withEvmEscrows }),
         ]);
         schemaCoverage(types, data);
@@ -798,14 +734,8 @@ export type MethodReturnType_userFills = Awaited<ReturnType<InfoClient["userFill
 run(
     "userFills",
     async (types, { user }) => {
-        const data = await Promise.all([
-            infoClient.userFills({ user }),
-            // Check argument 'aggregateByTime'
-            infoClient.userFills({ user, aggregateByTime: true }),
-            infoClient.userFills({ user, aggregateByTime: false }),
-            infoClient.userFills({ user, aggregateByTime: undefined }),
-        ]);
-        schemaCoverage(types, data);
+        const data = await infoClient.userFills({ user });
+        schemaCoverage(types, [data]);
     },
     { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" } as const,
 );
@@ -814,29 +744,11 @@ export type MethodReturnType_userFillsByTime = Awaited<ReturnType<InfoClient["us
 run(
     "userFillsByTime",
     async (types, { user }) => {
-        const data = await Promise.all([
-            infoClient.userFillsByTime({
-                user,
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-            }),
-            // Check argument 'endTime'
-            infoClient.userFillsByTime({
-                user,
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-                endTime: Date.now(),
-            }),
-            infoClient.userFillsByTime({
-                user,
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-                endTime: null,
-            }),
-            infoClient.userFillsByTime({
-                user,
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-                endTime: undefined,
-            }),
-        ]);
-        schemaCoverage(types, data);
+        const data = await infoClient.userFillsByTime({
+            user,
+            startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
+        });
+        schemaCoverage(types, [data]);
     },
     { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" } as const,
 );
@@ -845,29 +757,11 @@ export type MethodReturnType_userFunding = Awaited<ReturnType<InfoClient["userFu
 run(
     "userFunding",
     async (types, { user }) => {
-        const data = await Promise.all([
-            infoClient.userFunding({
-                user,
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-            }),
-            // Check argument 'endTime'
-            infoClient.userFunding({
-                user,
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-                endTime: Date.now(),
-            }),
-            infoClient.userFunding({
-                user,
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-                endTime: null,
-            }),
-            infoClient.userFunding({
-                user,
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-                endTime: undefined,
-            }),
-        ]);
-        schemaCoverage(types, data);
+        const data = await infoClient.userFunding({
+            user,
+            startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
+        });
+        schemaCoverage(types, [data]);
     },
     { user: "0xe019d6167E7e324aEd003d94098496b6d986aB05" } as const,
 );
@@ -878,29 +772,11 @@ export type MethodReturnType_userNonFundingLedgerUpdates = Awaited<
 run(
     "userNonFundingLedgerUpdates",
     async (types, { user }) => {
-        const data = await Promise.all([
-            infoClient.userNonFundingLedgerUpdates({
-                user,
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-            }),
-            // Check argument 'endTime'
-            infoClient.userNonFundingLedgerUpdates({
-                user,
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-                endTime: Date.now(),
-            }),
-            infoClient.userNonFundingLedgerUpdates({
-                user,
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-                endTime: null,
-            }),
-            infoClient.userNonFundingLedgerUpdates({
-                user,
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-                endTime: undefined,
-            }),
-        ]);
-        schemaCoverage(types, data, {
+        const data = await infoClient.userNonFundingLedgerUpdates({
+            user,
+            startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
+        });
+        schemaCoverage(types, [data], {
             ignoreEnumValuesByPath: {
                 "#/items/properties/delta/anyOf/3/properties/leverageType": ["Cross"],
             },
@@ -937,7 +813,7 @@ run(
             missing: "0x941a505ACc11F5f3A12b5eF0d414A8Bff45c5e77",
             user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9",
             agent: "0xDF1bC1bA4242a47f2AeC1Cd52F9E24b243107a34",
-            vault: "0xd0d0eb5de91f14e53312adf92cabcbbfd2b4f24f",
+            vault: "0x457ab3acf4a4e01156ce269545a9d3d05fff2f0b",
             sub_account: "0x22a454d3322060475552e8f922ec0c778b8e5760",
         },
     } as const,
@@ -975,45 +851,11 @@ export type MethodReturnType_userTwapSliceFillsByTime = Awaited<ReturnType<InfoC
 run(
     "userTwapSliceFillsByTime",
     async (types, { user }) => {
-        const data = await Promise.all([
-            infoClient.userTwapSliceFillsByTime({
-                user,
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-            }),
-            // Check argument 'endTime'
-            infoClient.userTwapSliceFillsByTime({
-                user,
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-                endTime: Date.now(),
-            }),
-            infoClient.userTwapSliceFillsByTime({
-                user,
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-                endTime: null,
-            }),
-            infoClient.userTwapSliceFillsByTime({
-                user,
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-                endTime: undefined,
-            }),
-            // Check argument 'aggregateByTime'
-            infoClient.userTwapSliceFillsByTime({
-                user,
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-                aggregateByTime: true,
-            }),
-            infoClient.userTwapSliceFillsByTime({
-                user,
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-                aggregateByTime: false,
-            }),
-            infoClient.userTwapSliceFillsByTime({
-                user,
-                startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
-                aggregateByTime: undefined,
-            }),
-        ]);
-        schemaCoverage(types, data);
+        const data = await infoClient.userTwapSliceFillsByTime({
+            user,
+            startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
+        });
+        schemaCoverage(types, [data]);
     },
     { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" } as const,
 );

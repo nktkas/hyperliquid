@@ -203,7 +203,7 @@ export interface ClaimRewardsRequest extends BaseExchangeRequest {
         type: "claimRewards";
     };
     vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    expiresAfter?: number;
 }
 
 /**
@@ -254,7 +254,7 @@ export interface CreateSubAccountRequest extends BaseExchangeRequest {
         name: string;
     };
     vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    expiresAfter?: number;
 }
 
 /**
@@ -275,7 +275,7 @@ export interface CreateVaultRequest extends BaseExchangeRequest {
         nonce: number;
     };
     vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    expiresAfter?: number;
 }
 
 /**
@@ -409,7 +409,7 @@ export interface EvmUserModifyRequest extends BaseExchangeRequest {
         usingBigBlocks: boolean;
     };
     vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    expiresAfter?: number;
 }
 
 /**
@@ -537,12 +537,12 @@ export interface PerpDeployRequest extends BaseExchangeRequest {
                 dex: string;
                 /** A list (sorted by key) of asset and oracle prices. */
                 oraclePxs: [string, string][];
-                /** A list (sorted by key) of asset and mark prices. */
-                markPxs: [string, string][];
+                /** An outer list of inner lists (inner list sorted by key) of asset and mark prices. */
+                markPxs: [string, string][][];
             };
         };
     vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    expiresAfter?: number;
 }
 
 /**
@@ -557,7 +557,7 @@ export interface RegisterReferrerRequest extends BaseExchangeRequest {
         code: string;
     };
     vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    expiresAfter?: number;
 }
 
 /**
@@ -611,7 +611,7 @@ export interface SetDisplayNameRequest extends BaseExchangeRequest {
         displayName: string;
     };
     vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    expiresAfter?: number;
 }
 
 /**
@@ -626,7 +626,7 @@ export interface SetReferrerRequest extends BaseExchangeRequest {
         code: string;
     };
     vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    expiresAfter?: number;
 }
 
 /**
@@ -736,7 +736,7 @@ export interface SpotDeployRequest extends BaseExchangeRequest {
             };
         };
     vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    expiresAfter?: number;
 }
 
 /**
@@ -782,7 +782,7 @@ export interface SpotUserRequest extends BaseExchangeRequest {
         };
     };
     vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    expiresAfter?: number;
 }
 
 /**
@@ -799,7 +799,7 @@ export interface SubAccountModifyRequest extends BaseExchangeRequest {
         name: string;
     };
     vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    expiresAfter?: number;
 }
 
 /**
@@ -823,7 +823,7 @@ export interface SubAccountSpotTransferRequest extends BaseExchangeRequest {
         amount: string;
     };
     vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    expiresAfter?: number;
 }
 
 /**
@@ -842,7 +842,7 @@ export interface SubAccountTransferRequest extends BaseExchangeRequest {
         usd: number;
     };
     vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    expiresAfter?: number;
 }
 
 /**
@@ -1026,7 +1026,7 @@ export interface VaultDistributeRequest extends BaseExchangeRequest {
         usd: number;
     };
     vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    expiresAfter?: number;
 }
 
 /**
@@ -1045,7 +1045,7 @@ export interface VaultModifyRequest extends BaseExchangeRequest {
         alwaysCloseOnWithdraw: boolean | null;
     };
     vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    expiresAfter?: number;
 }
 
 /**

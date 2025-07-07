@@ -3,7 +3,6 @@ import { Wallet } from "npm:ethers@6";
 import { assertEquals } from "jsr:@std/assert@1";
 
 const PRIVATE_KEY = "0x720fdd809048d0104b0b82ae70642b5dcfd5fd6870eeefc9c882004ab35573ae";
-
 const ethersWallet = new Wallet(PRIVATE_KEY);
 
 async function assertSignTypedData(args: {

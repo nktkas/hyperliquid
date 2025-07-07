@@ -251,10 +251,7 @@ export class InfoClient<
         const params = params_or_signal instanceof AbortSignal ? {} : params_or_signal;
         const signal = params_or_signal instanceof AbortSignal ? params_or_signal : maybeSignal;
 
-        const request: AllMidsRequest = {
-            type: "allMids",
-            ...params,
-        };
+        const request = { type: "allMids", ...params } satisfies AllMidsRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -278,10 +275,7 @@ export class InfoClient<
      * ```
      */
     async blockDetails(params: BlockDetailsParameters, signal?: AbortSignal): Promise<BlockDetails> {
-        const request: BlockDetailsRequest = {
-            type: "blockDetails",
-            ...params,
-        };
+        const request = { type: "blockDetails", ...params } satisfies BlockDetailsRequest;
         const { blockDetails } = await this.transport.request<BlockDetailsResponse>("explorer", request, signal);
         return blockDetails;
     }
@@ -310,10 +304,7 @@ export class InfoClient<
      * ```
      */
     candleSnapshot(params: CandleSnapshotParameters, signal?: AbortSignal): Promise<Candle[]> {
-        const request: CandleSnapshotRequest = {
-            type: "candleSnapshot",
-            req: params,
-        };
+        const request = { type: "candleSnapshot", req: params } satisfies CandleSnapshotRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -337,10 +328,7 @@ export class InfoClient<
      * ```
      */
     clearinghouseState(params: ClearinghouseStateParameters, signal?: AbortSignal): Promise<PerpsClearinghouseState> {
-        const request: ClearinghouseStateRequest = {
-            type: "clearinghouseState",
-            ...params,
-        };
+        const request = { type: "clearinghouseState", ...params } satisfies ClearinghouseStateRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -364,10 +352,7 @@ export class InfoClient<
      * ```
      */
     delegations(params: DelegationsParameters, signal?: AbortSignal): Promise<Delegation[]> {
-        const request: DelegationsRequest = {
-            type: "delegations",
-            ...params,
-        };
+        const request = { type: "delegations", ...params } satisfies DelegationsRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -391,10 +376,7 @@ export class InfoClient<
      * ```
      */
     delegatorHistory(params: DelegatorHistoryParameters, signal?: AbortSignal): Promise<DelegatorUpdate[]> {
-        const request: DelegatorHistoryRequest = {
-            type: "delegatorHistory",
-            ...params,
-        };
+        const request = { type: "delegatorHistory", ...params } satisfies DelegatorHistoryRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -418,10 +400,7 @@ export class InfoClient<
      * ```
      */
     delegatorRewards(params: DelegatorRewardsParameters, signal?: AbortSignal): Promise<DelegatorReward[]> {
-        const request: DelegatorRewardsRequest = {
-            type: "delegatorRewards",
-            ...params,
-        };
+        const request = { type: "delegatorRewards", ...params } satisfies DelegatorRewardsRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -445,10 +424,7 @@ export class InfoClient<
      * ```
      */
     delegatorSummary(params: DelegatorSummaryParameters, signal?: AbortSignal): Promise<DelegatorSummary> {
-        const request: DelegatorSummaryRequest = {
-            type: "delegatorSummary",
-            ...params,
-        };
+        const request = { type: "delegatorSummary", ...params } satisfies DelegatorSummaryRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -471,9 +447,7 @@ export class InfoClient<
      * ```
      */
     exchangeStatus(signal?: AbortSignal): Promise<ExchangeStatus> {
-        const request: ExchangeStatusRequest = {
-            type: "exchangeStatus",
-        };
+        const request = { type: "exchangeStatus" } satisfies ExchangeStatusRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -497,10 +471,7 @@ export class InfoClient<
      * ```
      */
     extraAgents(params: ExtraAgentsParameters, signal?: AbortSignal): Promise<ExtraAgent[]> {
-        const request: ExtraAgentsRequest = {
-            type: "extraAgents",
-            ...params,
-        };
+        const request = { type: "extraAgents", ...params } satisfies ExtraAgentsRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -524,10 +495,7 @@ export class InfoClient<
      * ```
      */
     frontendOpenOrders(params: FrontendOpenOrdersParameters, signal?: AbortSignal): Promise<FrontendOrder[]> {
-        const request: FrontendOpenOrdersRequest = {
-            type: "frontendOpenOrders",
-            ...params,
-        };
+        const request = { type: "frontendOpenOrders", ...params } satisfies FrontendOpenOrdersRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -554,10 +522,7 @@ export class InfoClient<
      * ```
      */
     fundingHistory(params: FundingHistoryParameters, signal?: AbortSignal): Promise<FundingHistory[]> {
-        const request: FundingHistoryRequest = {
-            type: "fundingHistory",
-            ...params,
-        };
+        const request = { type: "fundingHistory", ...params } satisfies FundingHistoryRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -581,10 +546,7 @@ export class InfoClient<
      * ```
      */
     historicalOrders(params: HistoricalOrdersParameters, signal?: AbortSignal): Promise<OrderStatus<FrontendOrder>[]> {
-        const request: HistoricalOrdersRequest = {
-            type: "historicalOrders",
-            ...params,
-        };
+        const request = { type: "historicalOrders", ...params } satisfies HistoricalOrdersRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -608,10 +570,7 @@ export class InfoClient<
      * ```
      */
     isVip(params: IsVipParameters, signal?: AbortSignal): Promise<boolean> {
-        const request: IsVipRequest = {
-            type: "isVip",
-            ...params,
-        };
+        const request = { type: "isVip", ...params } satisfies IsVipRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -635,10 +594,7 @@ export class InfoClient<
      * ```
      */
     l2Book(params: L2BookParameters, signal?: AbortSignal): Promise<Book> {
-        const request: L2BookRequest = {
-            type: "l2Book",
-            ...params,
-        };
+        const request = { type: "l2Book", ...params } satisfies L2BookRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -662,10 +618,7 @@ export class InfoClient<
      * ```
      */
     leadingVaults(params: LeadingVaultsParameters, signal?: AbortSignal): Promise<VaultLeading[]> {
-        const request: LeadingVaultsRequest = {
-            type: "leadingVaults",
-            ...params,
-        };
+        const request = { type: "leadingVaults", ...params } satisfies LeadingVaultsRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -689,10 +642,7 @@ export class InfoClient<
      * ```
      */
     legalCheck(params: LegalCheckParameters, signal?: AbortSignal): Promise<LegalCheck> {
-        const request: LegalCheckRequest = {
-            type: "legalCheck",
-            ...params,
-        };
+        const request = { type: "legalCheck", ...params } satisfies LegalCheckRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -715,9 +665,7 @@ export class InfoClient<
      * ```
      */
     liquidatable(signal?: AbortSignal): Promise<unknown[]> {
-        const request: LiquidatableRequest = {
-            type: "liquidatable",
-        };
+        const request = { type: "liquidatable" } satisfies LiquidatableRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -741,10 +689,7 @@ export class InfoClient<
      * ```
      */
     marginTable(params: MarginTableParameters, signal?: AbortSignal): Promise<MarginTable> {
-        const request: MarginTableRequest = {
-            type: "marginTable",
-            ...params,
-        };
+        const request = { type: "marginTable", ...params } satisfies MarginTableRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -768,10 +713,7 @@ export class InfoClient<
      * ```
      */
     maxBuilderFee(params: MaxBuilderFeeParameters, signal?: AbortSignal): Promise<number> {
-        const request: MaxBuilderFeeRequest = {
-            type: "maxBuilderFee",
-            ...params,
-        };
+        const request = { type: "maxBuilderFee", ...params } satisfies MaxBuilderFeeRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -794,9 +736,7 @@ export class InfoClient<
      * ```
      */
     maxMarketOrderNtls(signal?: AbortSignal): Promise<[number, string][]> {
-        const request: MaxMarketOrderNtlsRequest = {
-            type: "maxMarketOrderNtls",
-        };
+        const request = { type: "maxMarketOrderNtls" } satisfies MaxMarketOrderNtlsRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -825,10 +765,7 @@ export class InfoClient<
         const params = params_or_signal instanceof AbortSignal ? {} : params_or_signal;
         const signal = params_or_signal instanceof AbortSignal ? params_or_signal : maybeSignal;
 
-        const request: MetaRequest = {
-            type: "meta",
-            ...params,
-        };
+        const request = { type: "meta", ...params } satisfies MetaRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -851,9 +788,7 @@ export class InfoClient<
      * ```
      */
     metaAndAssetCtxs(signal?: AbortSignal): Promise<PerpsMetaAndAssetCtxs> {
-        const request: MetaAndAssetCtxsRequest = {
-            type: "metaAndAssetCtxs",
-        };
+        const request = { type: "metaAndAssetCtxs" } satisfies MetaAndAssetCtxsRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -877,10 +812,7 @@ export class InfoClient<
      * ```
      */
     openOrders(params: OpenOrdersParameters, signal?: AbortSignal): Promise<Order[]> {
-        const request: OpenOrdersRequest = {
-            type: "openOrders",
-            ...params,
-        };
+        const request = { type: "openOrders", ...params } satisfies OpenOrdersRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -904,10 +836,7 @@ export class InfoClient<
      * ```
      */
     orderStatus(params: OrderStatusParameters, signal?: AbortSignal): Promise<OrderLookup> {
-        const request: OrderStatusRequest = {
-            type: "orderStatus",
-            ...params,
-        };
+        const request = { type: "orderStatus", ...params } satisfies OrderStatusRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -930,9 +859,7 @@ export class InfoClient<
      * ```
      */
     perpDeployAuctionStatus(signal?: AbortSignal): Promise<DeployAuctionStatus> {
-        const request: PerpDeployAuctionStatusRequest = {
-            type: "perpDeployAuctionStatus",
-        };
+        const request = { type: "perpDeployAuctionStatus" } satisfies PerpDeployAuctionStatusRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -955,9 +882,7 @@ export class InfoClient<
      * ```
      */
     perpDexs(signal?: AbortSignal): Promise<(PerpDex | null)[]> {
-        const request: PerpDexsRequest = {
-            type: "perpDexs",
-        };
+        const request = { type: "perpDexs" } satisfies PerpDexsRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -980,9 +905,7 @@ export class InfoClient<
      * ```
      */
     perpsAtOpenInterestCap(signal?: AbortSignal): Promise<string[]> {
-        const request: PerpsAtOpenInterestCapRequest = {
-            type: "perpsAtOpenInterestCap",
-        };
+        const request = { type: "perpsAtOpenInterestCap" } satisfies PerpsAtOpenInterestCapRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1006,10 +929,7 @@ export class InfoClient<
      * ```
      */
     portfolio(params: PortfolioParameters, signal?: AbortSignal): Promise<PortfolioPeriods> {
-        const request: PortfolioRequest = {
-            type: "portfolio",
-            ...params,
-        };
+        const request = { type: "portfolio", ...params } satisfies PortfolioRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1032,9 +952,7 @@ export class InfoClient<
      * ```
      */
     predictedFundings(signal?: AbortSignal): Promise<PredictedFunding[]> {
-        const request: PredictedFundingsRequest = {
-            type: "predictedFundings",
-        };
+        const request = { type: "predictedFundings" } satisfies PredictedFundingsRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1058,10 +976,7 @@ export class InfoClient<
      * ```
      */
     preTransferCheck(params: PreTransferCheckParameters, signal?: AbortSignal): Promise<PreTransferCheck> {
-        const request: PreTransferCheckRequest = {
-            type: "preTransferCheck",
-            ...params,
-        };
+        const request = { type: "preTransferCheck", ...params } satisfies PreTransferCheckRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1085,10 +1000,7 @@ export class InfoClient<
      * ```
      */
     referral(params: ReferralParameters, signal?: AbortSignal): Promise<Referral> {
-        const request: ReferralRequest = {
-            type: "referral",
-            ...params,
-        };
+        const request = { type: "referral", ...params } satisfies ReferralRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1115,10 +1027,7 @@ export class InfoClient<
         params: SpotClearinghouseStateParameters,
         signal?: AbortSignal,
     ): Promise<SpotClearinghouseState> {
-        const request: SpotClearinghouseStateRequest = {
-            type: "spotClearinghouseState",
-            ...params,
-        };
+        const request = { type: "spotClearinghouseState", ...params } satisfies SpotClearinghouseStateRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1142,10 +1051,7 @@ export class InfoClient<
      * ```
      */
     spotDeployState(params: SpotDeployStateParameters, signal?: AbortSignal): Promise<SpotDeployState> {
-        const request: SpotDeployStateRequest = {
-            type: "spotDeployState",
-            ...params,
-        };
+        const request = { type: "spotDeployState", ...params } satisfies SpotDeployStateRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1168,9 +1074,7 @@ export class InfoClient<
      * ```
      */
     spotMeta(signal?: AbortSignal): Promise<SpotMeta> {
-        const request: SpotMetaRequest = {
-            type: "spotMeta",
-        };
+        const request = { type: "spotMeta" } satisfies SpotMetaRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1193,9 +1097,7 @@ export class InfoClient<
      * ```
      */
     spotMetaAndAssetCtxs(signal?: AbortSignal): Promise<SpotMetaAndAssetCtxs> {
-        const request: SpotMetaAndAssetCtxsRequest = {
-            type: "spotMetaAndAssetCtxs",
-        };
+        const request = { type: "spotMetaAndAssetCtxs" } satisfies SpotMetaAndAssetCtxsRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1219,10 +1121,7 @@ export class InfoClient<
      * ```
      */
     subAccounts(params: SubAccountsParameters, signal?: AbortSignal): Promise<SubAccount[] | null> {
-        const request: SubAccountsRequest = {
-            type: "subAccounts",
-            ...params,
-        };
+        const request = { type: "subAccounts", ...params } satisfies SubAccountsRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1246,10 +1145,7 @@ export class InfoClient<
      * ```
      */
     tokenDetails(params: TokenDetailsParameters, signal?: AbortSignal): Promise<TokenDetails> {
-        const request: TokenDetailsRequest = {
-            type: "tokenDetails",
-            ...params,
-        };
+        const request = { type: "tokenDetails", ...params } satisfies TokenDetailsRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1273,10 +1169,7 @@ export class InfoClient<
      * ```
      */
     twapHistory(params: TwapHistoryParameters, signal?: AbortSignal): Promise<TwapHistory[]> {
-        const request: TwapHistoryRequest = {
-            type: "twapHistory",
-            ...params,
-        };
+        const request = { type: "twapHistory", ...params } satisfies TwapHistoryRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1300,10 +1193,7 @@ export class InfoClient<
      * ```
      */
     async txDetails(params: TxDetailsParameters, signal?: AbortSignal): Promise<TxDetails> {
-        const request: TxDetailsRequest = {
-            type: "txDetails",
-            ...params,
-        };
+        const request = { type: "txDetails", ...params } satisfies TxDetailsRequest;
         const { tx } = await this.transport.request<TxDetailsResponse>("explorer", request, signal);
         return tx;
     }
@@ -1328,10 +1218,7 @@ export class InfoClient<
      * ```
      */
     async userDetails(params: UserDetailsParameters, signal?: AbortSignal): Promise<TxDetails[]> {
-        const request: UserDetailsRequest = {
-            type: "userDetails",
-            ...params,
-        };
+        const request = { type: "userDetails", ...params } satisfies UserDetailsRequest;
         const { txs } = await this.transport.request<UserDetailsResponse>("explorer", request, signal);
         return txs;
     }
@@ -1356,10 +1243,7 @@ export class InfoClient<
      * ```
      */
     userFees(params: UserFeesParameters, signal?: AbortSignal): Promise<UserFees> {
-        const request: UserFeesRequest = {
-            type: "userFees",
-            ...params,
-        };
+        const request = { type: "userFees", ...params } satisfies UserFeesRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1383,10 +1267,7 @@ export class InfoClient<
      * ```
      */
     userFills(params: UserFillsParameters, signal?: AbortSignal): Promise<Fill[]> {
-        const request: UserFillsRequest = {
-            type: "userFills",
-            ...params,
-        };
+        const request = { type: "userFills", ...params } satisfies UserFillsRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1413,10 +1294,7 @@ export class InfoClient<
      * ```
      */
     userFillsByTime(params: UserFillsByTimeParameters, signal?: AbortSignal): Promise<Fill[]> {
-        const request: UserFillsByTimeRequest = {
-            type: "userFillsByTime",
-            ...params,
-        };
+        const request = { type: "userFillsByTime", ...params } satisfies UserFillsByTimeRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1443,10 +1321,7 @@ export class InfoClient<
      * ```
      */
     userFunding(params: UserFundingParameters, signal?: AbortSignal): Promise<UserFundingUpdate[]> {
-        const request: UserFundingRequest = {
-            type: "userFunding",
-            ...params,
-        };
+        const request = { type: "userFunding", ...params } satisfies UserFundingRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1476,10 +1351,7 @@ export class InfoClient<
         params: UserNonFundingLedgerUpdatesParameters,
         signal?: AbortSignal,
     ): Promise<UserNonFundingLedgerUpdate[]> {
-        const request: UserNonFundingLedgerUpdatesRequest = {
-            type: "userNonFundingLedgerUpdates",
-            ...params,
-        };
+        const request = { type: "userNonFundingLedgerUpdates", ...params } satisfies UserNonFundingLedgerUpdatesRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1503,10 +1375,7 @@ export class InfoClient<
      * ```
      */
     userRateLimit(params: UserRateLimitParameters, signal?: AbortSignal): Promise<UserRateLimit> {
-        const request: UserRateLimitRequest = {
-            type: "userRateLimit",
-            ...params,
-        };
+        const request = { type: "userRateLimit", ...params } satisfies UserRateLimitRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1530,10 +1399,7 @@ export class InfoClient<
      * ```
      */
     userRole(params: UserRoleParameters, signal?: AbortSignal): Promise<UserRole> {
-        const request: UserRoleRequest = {
-            type: "userRole",
-            ...params,
-        };
+        const request = { type: "userRole", ...params } satisfies UserRoleRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1560,10 +1426,7 @@ export class InfoClient<
         params: UserToMultiSigSignersParameters,
         signal?: AbortSignal,
     ): Promise<MultiSigSigners | null> {
-        const request: UserToMultiSigSignersRequest = {
-            type: "userToMultiSigSigners",
-            ...params,
-        };
+        const request = { type: "userToMultiSigSigners", ...params } satisfies UserToMultiSigSignersRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1587,10 +1450,7 @@ export class InfoClient<
      * ```
      */
     userTwapSliceFills(params: UserTwapSliceFillsParameters, signal?: AbortSignal): Promise<TwapSliceFill[]> {
-        const request: UserTwapSliceFillsRequest = {
-            type: "userTwapSliceFills",
-            ...params,
-        };
+        const request = { type: "userTwapSliceFills", ...params } satisfies UserTwapSliceFillsRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1620,10 +1480,7 @@ export class InfoClient<
         params: UserTwapSliceFillsByTimeParameters,
         signal?: AbortSignal,
     ): Promise<TwapSliceFill[]> {
-        const request: UserTwapSliceFillsByTimeRequest = {
-            type: "userTwapSliceFillsByTime",
-            ...params,
-        };
+        const request = { type: "userTwapSliceFillsByTime", ...params } satisfies UserTwapSliceFillsByTimeRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1647,10 +1504,7 @@ export class InfoClient<
      * ```
      */
     userVaultEquities(params: UserVaultEquitiesParameters, signal?: AbortSignal): Promise<VaultEquity[]> {
-        const request: UserVaultEquitiesRequest = {
-            type: "userVaultEquities",
-            ...params,
-        };
+        const request = { type: "userVaultEquities", ...params } satisfies UserVaultEquitiesRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1673,9 +1527,7 @@ export class InfoClient<
      * ```
      */
     validatorL1Votes(signal?: AbortSignal): Promise<unknown[]> {
-        const request: ValidatorL1VotesRequest = {
-            type: "validatorL1Votes",
-        };
+        const request = { type: "validatorL1Votes" } satisfies ValidatorL1VotesRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1698,9 +1550,7 @@ export class InfoClient<
      * ```
      */
     validatorSummaries(signal?: AbortSignal): Promise<ValidatorSummary[]> {
-        const request: ValidatorSummariesRequest = {
-            type: "validatorSummaries",
-        };
+        const request = { type: "validatorSummaries" } satisfies ValidatorSummariesRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1724,10 +1574,7 @@ export class InfoClient<
      * ```
      */
     vaultDetails(params: VaultDetailsParameters, signal?: AbortSignal): Promise<VaultDetails | null> {
-        const request: VaultDetailsRequest = {
-            type: "vaultDetails",
-            ...params,
-        };
+        const request = { type: "vaultDetails", ...params } satisfies VaultDetailsRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1750,9 +1597,7 @@ export class InfoClient<
      * ```
      */
     vaultSummaries(signal?: AbortSignal): Promise<VaultSummary[]> {
-        const request: VaultSummariesRequest = {
-            type: "vaultSummaries",
-        };
+        const request = { type: "vaultSummaries" } satisfies VaultSummariesRequest;
         return this.transport.request("info", request, signal);
     }
 

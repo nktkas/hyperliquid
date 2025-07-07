@@ -2,6 +2,7 @@ import type { Hex } from "../../base.ts";
 
 /** Abstract interface for a [viem wallet](https://viem.sh/docs/clients/wallet). */
 export interface AbstractViemWalletClient {
+    address?: Hex;
     signTypedData(
         params: {
             domain: {

@@ -1,5 +1,3 @@
-import { keccak_256 } from "@noble/hashes/sha3";
-import { etc, getPublicKey } from "@noble/secp256k1";
 import type { Hex } from "../base.ts";
 import type { IRequestTransport } from "../transports/base.ts";
 import type { CreateSubAccountResponse, CreateVaultResponse, SuccessResponse } from "../types/mod.ts";
@@ -18,12 +16,7 @@ import {
     type AbstractWallet,
     type AbstractWindowEthereum,
     actionSorter,
-    isAbstractEthersSigner,
-    isAbstractEthersV5Signer,
-    isAbstractViemWalletClient,
-    isAbstractWindowEthereum,
-    isValidPrivateKey,
-    type Signature,
+    getWalletAddress,
     signL1Action,
     signUserSignedAction,
     userSignedActionEip712Types,
@@ -45,22 +38,10 @@ export interface MultiSignClientParameters<
 /** Abstract interface for a wallet that can sign typed data and has wallet address. */
 export type AbstractWalletWithAddress =
     | Hex // Private key
-    | AbstractViemWalletClientWithAddress
-    | AbstractEthersSignerWithAddress
-    | AbstractEthersV5SignerWithAddress
+    | Required<AbstractViemWalletClient>
+    | Required<AbstractEthersSigner>
+    | Required<AbstractEthersV5Signer>
     | AbstractWindowEthereum;
-/** Abstract interface for a [viem wallet](https://viem.sh/docs/clients/wallet) with wallet address. */
-export interface AbstractViemWalletClientWithAddress extends AbstractViemWalletClient {
-    address: Hex;
-}
-/** Abstract interface for an [ethers.js signer](https://docs.ethers.org/v6/api/providers/#Signer) with wallet address. */
-export interface AbstractEthersSignerWithAddress extends AbstractEthersSigner {
-    getAddress(): Promise<string>;
-}
-/** Abstract interface for an [ethers.js v5 signer](https://docs.ethers.org/v5/api/signer/) with wallet address. */
-export interface AbstractEthersV5SignerWithAddress extends AbstractEthersV5Signer {
-    getAddress(): Promise<string>;
-}
 
 /**
  * Multi-signature exchange client for interacting with the Hyperliquid API.
@@ -113,7 +94,7 @@ export class MultiSignClient<
         });
     }
 
-    protected override async _executeAction<
+    protected override async _executeL1Action<
         T extends
             | SuccessResponse
             | CancelResponseSuccess
@@ -123,81 +104,42 @@ export class MultiSignClient<
             | TwapOrderResponseSuccess
             | TwapCancelResponseSuccess,
     >(
-        args: {
-            action: Parameters<typeof actionSorter[keyof typeof actionSorter]>[0];
+        request: {
+            action: {
+                type: string;
+                [key: string]: unknown;
+            };
             vaultAddress?: Hex;
-            expiresAfter?: number;
-            multiSigNonce?: number;
+            expiresAfter: number | undefined;
         },
         signal?: AbortSignal,
     ): Promise<T> {
-        const { action, vaultAddress, expiresAfter, multiSigNonce } = args;
+        let { action, vaultAddress, expiresAfter } = request;
+        // @ts-ignore - for test
+        action = actionSorter[action.type](action);
 
-        if (action.type === "multiSig") { // Multi-signature action
-            return await super._executeAction({
-                action,
+        // Sign an L1 action
+        const nonce = await this.nonceManager();
+        const outerSigner = await getWalletAddress(this.signers[0]);
+        const signatures = await Promise.all(this.signers.map(async (signer) => {
+            return await signL1Action({
+                wallet: signer,
+                action: [this.multiSignAddress.toLowerCase(), outerSigner.toLowerCase(), action],
+                nonce,
+                isTestnet: this.isTestnet,
                 vaultAddress,
                 expiresAfter,
-                multiSigNonce,
-            }, signal);
-        }
+            });
+        }));
 
-        // Sign an action
-
-        // deno-lint-ignore no-explicit-any
-        const sortedAction = actionSorter[action.type](action as any); // TypeScript cannot infer a type from a dynamic function call
-
-        let nonce: number;
-        if ("signatureChainId" in sortedAction) { // User-signed action
-            nonce = "nonce" in sortedAction ? sortedAction.nonce : sortedAction.time;
-        } else { // L1 action
-            nonce = await this.nonceManager();
-        }
-
-        const outerSigner = await this._getWalletAddress(this.signers[0]);
-
-        let signatures: Signature[];
-        if ("signatureChainId" in sortedAction) { // User-signed action
-            signatures = await Promise.all(this.signers.map(async (signer) => {
-                const types = structuredClone(userSignedActionEip712Types[sortedAction.type]); // for safe mutation
-                Object.values(types)[0].splice( // array mutation
-                    1, // after `hyperliquidChain`
-                    0, // do not remove any elements
-                    { name: "payloadMultiSigUser", type: "address" },
-                    { name: "outerSigner", type: "address" },
-                );
-                return await signUserSignedAction({
-                    wallet: signer,
-                    action: {
-                        payloadMultiSigUser: this.multiSignAddress,
-                        outerSigner,
-                        ...sortedAction,
-                    },
-                    types,
-                });
-            }));
-            if ("agentName" in sortedAction && sortedAction.agentName === "") sortedAction.agentName = null;
-        } else { // L1 action
-            signatures = await Promise.all(this.signers.map(async (signer) => {
-                return await signL1Action({
-                    wallet: signer,
-                    action: [this.multiSignAddress.toLowerCase(), outerSigner.toLowerCase(), sortedAction],
-                    nonce,
-                    isTestnet: this.isTestnet,
-                    vaultAddress,
-                    expiresAfter,
-                });
-            }));
-        }
-
-        // Send a multi-signature action
+        // Send a request via multi-sign action
         return await super.multiSig(
             {
                 signatures,
                 payload: {
                     multiSigUser: this.multiSignAddress,
                     outerSigner,
-                    action: sortedAction,
+                    action,
                 },
                 nonce,
             },
@@ -205,40 +147,94 @@ export class MultiSignClient<
         );
     }
 
-    /** Extracts the wallet address from different wallet types. */
-    protected async _getWalletAddress(wallet: AbstractWalletWithAddress): Promise<Hex> {
-        if (isValidPrivateKey(wallet)) {
-            return privateKeyToAddress(wallet);
-        } else if (isAbstractViemWalletClient(wallet)) {
-            return wallet.address;
-        } else if (isAbstractEthersSigner(wallet) || isAbstractEthersV5Signer(wallet)) {
-            return await wallet.getAddress() as Hex;
-        } else if (isAbstractWindowEthereum(wallet)) {
-            return await getWindowEthereumAddress(wallet);
-        } else {
-            throw new Error("Unsupported wallet for getting address");
-        }
+    protected override async _executeUserSignedAction<
+        T extends
+            | SuccessResponse
+            | CancelResponseSuccess
+            | CreateSubAccountResponse
+            | CreateVaultResponse
+            | OrderResponseSuccess
+            | TwapOrderResponseSuccess
+            | TwapCancelResponseSuccess,
+    >(
+        request: {
+            action:
+                & {
+                    type: keyof typeof userSignedActionEip712Types;
+                    signatureChainId: Hex;
+                    [key: string]: unknown;
+                }
+                & (
+                    | { nonce: number; time?: undefined }
+                    | { time: number; nonce?: undefined }
+                );
+        },
+        signal?: AbortSignal,
+    ): Promise<T> {
+        let { action } = request;
+        // @ts-ignore - for test
+        action = actionSorter[action.type](action);
+
+        // Sign a user-signed action
+        const outerSigner = await getWalletAddress(this.signers[0]);
+
+        if (action.type === "approveAgent" && !action.agentName) action.agentName = ""; // Special case for approveAgent
+        const signatures = await Promise.all(this.signers.map(async (signer) => {
+            const types = structuredClone(userSignedActionEip712Types[action.type]); // for safe mutation
+            Object.values(types)[0].splice( // array mutation
+                1, // after `hyperliquidChain`
+                0, // do not remove any elements
+                { name: "payloadMultiSigUser", type: "address" },
+                { name: "outerSigner", type: "address" },
+            );
+            return await signUserSignedAction({
+                wallet: signer,
+                action: {
+                    payloadMultiSigUser: this.multiSignAddress,
+                    outerSigner,
+                    ...action,
+                },
+                types,
+            });
+        }));
+        if (action.type === "approveAgent" && action.agentName === "") action.agentName = null; // Special case for approveAgent
+
+        // Send a request via multi-sign action
+        return await super.multiSig(
+            {
+                signatures,
+                payload: {
+                    multiSigUser: this.multiSignAddress,
+                    outerSigner,
+                    action,
+                },
+                nonce: action.nonce ?? action.time,
+            },
+            { signal },
+        );
     }
-}
 
-function privateKeyToAddress(privateKey: string): Hex {
-    const cleanPrivKey = privateKey.startsWith("0x") ? privateKey.slice(2) : privateKey;
-
-    const publicKey = getPublicKey(cleanPrivKey, false);
-    const publicKeyWithoutPrefix = publicKey.slice(1);
-
-    const hash = keccak_256(publicKeyWithoutPrefix);
-
-    const addressBytes = hash.slice(-20);
-    const address = etc.bytesToHex(addressBytes);
-
-    return `0x${address}`;
-}
-
-async function getWindowEthereumAddress(ethereum: AbstractWindowEthereum): Promise<Hex> {
-    const accounts = await ethereum.request({ method: "eth_requestAccounts", params: [] });
-    if (!Array.isArray(accounts) || accounts.length === 0) {
-        throw new Error("No Ethereum accounts available");
+    protected override _executeMultiSigAction<
+        T extends
+            | SuccessResponse
+            | CancelResponseSuccess
+            | CreateSubAccountResponse
+            | CreateVaultResponse
+            | OrderResponseSuccess
+            | TwapOrderResponseSuccess
+            | TwapCancelResponseSuccess,
+    >(
+        request: {
+            action: {
+                type: "multiSig";
+                [key: string]: unknown;
+            };
+            vaultAddress?: Hex;
+            expiresAfter?: number;
+            nonce: number;
+        },
+        signal?: AbortSignal,
+    ): Promise<T> {
+        return super._executeMultiSigAction(request, signal);
     }
-    return accounts[0] as Hex;
 }
