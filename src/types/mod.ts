@@ -22,7 +22,7 @@
  * @module
  */
 
-export type { Hex } from "../base.ts";
+export type Hex = `0x${string}`;
 
 export type * from "./exchange/requests.ts";
 export type * from "./exchange/responses.ts";

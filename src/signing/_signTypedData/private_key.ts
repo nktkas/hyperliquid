@@ -1,6 +1,5 @@
-import type { Hex } from "../../base.ts";
 import { keccak_256 } from "@noble/hashes/sha3";
-import { etc, signAsync, utils } from "@noble/secp256k1";
+import { etc, getPublicKey, signAsync, utils } from "@noble/secp256k1";
 
 interface Types {
     [type: string]: {
@@ -12,9 +11,9 @@ interface Types {
 interface Domain extends Record<string, unknown> {
     name?: string;
     version?: string;
-    chainId?: number | string | bigint | Hex;
-    verifyingContract?: Hex;
-    salt?: Hex;
+    chainId?: number | string | bigint | `0x${string}`;
+    verifyingContract?: `0x${string}`;
+    salt?: `0x${string}`;
 }
 
 /** Signs typed data with a private key. */
@@ -24,7 +23,7 @@ export async function signTypedData(args: {
     types: Types;
     primaryType: string;
     message: Record<string, unknown>;
-}): Promise<Hex> {
+}): Promise<`0x${string}`> {
     const {
         privateKey,
         domain = {},
@@ -162,7 +161,7 @@ function encodeValue(type: string, value: unknown, types: Types): Uint8Array {
         }
 
         // Apply Two's complement for specified bit size
-        const bigIntValue = BigInt(value as number | string | bigint | Hex);
+        const bigIntValue = BigInt(value as number | string | bigint | `0x${string}`);
         const resizedValue = isUint ? BigInt.asUintN(bits, bigIntValue) : BigInt.asIntN(bits, bigIntValue);
 
         // Convert to 32-byte big-endian
@@ -212,4 +211,19 @@ function cleanHex(hex: string): string {
 export function isValidPrivateKey(privateKey: unknown): privateKey is string {
     if (typeof privateKey !== "string") return false;
     return utils.isValidPrivateKey(cleanHex(privateKey));
+}
+
+/** Converts a private key to an Ethereum address. */
+export function privateKeyToAddress(privateKey: string): `0x${string}` {
+    const cleanPrivKey = privateKey.startsWith("0x") ? privateKey.slice(2) : privateKey;
+
+    const publicKey = getPublicKey(cleanPrivKey, false);
+    const publicKeyWithoutPrefix = publicKey.slice(1);
+
+    const hash = keccak_256(publicKeyWithoutPrefix);
+
+    const addressBytes = hash.slice(-20);
+    const address = etc.bytesToHex(addressBytes);
+
+    return `0x${address}`;
 }

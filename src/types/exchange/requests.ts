@@ -1,5 +1,15 @@
-import type { Hex } from "../../base.ts";
+import type { Hex } from "../mod.ts";
 import type { TIF } from "../info/orders.ts";
+
+/** ECDSA signature components for Ethereum typed data. */
+export interface Signature {
+    /** First 32-byte component of ECDSA signature. */
+    r: Hex;
+    /** Second 32-byte component of ECDSA signature. */
+    s: Hex;
+    /** Recovery identifier. */
+    v: 27 | 28;
+}
 
 /** Order parameters. */
 export type OrderParams = {
@@ -46,31 +56,12 @@ export type OrderParams = {
     c?: Hex;
 };
 
-/** Base structure for exchange requests. */
-export interface BaseExchangeRequest {
-    /** Action to perform. */
-    action: {
-        /** Type of action. */
-        type: string;
-        /** Additional parameters. */
-        // deno-lint-ignore no-explicit-any
-        [key: string]: any;
-    };
-    /** Unique request identifier (current timestamp in ms). */
-    nonce: number;
-    /** Cryptographic signature. */
-    signature: { r: Hex; s: Hex; v: number };
-    /** Vault address (for vault trading). */
-    vaultAddress?: Hex;
-    /** Expiration time of the action. */
-    expiresAfter?: number;
-}
-
 /**
  * Approve an agent to sign on behalf of the master account.
  * @returns {SuccessResponse}
  */
-export interface ApproveAgentRequest extends BaseExchangeRequest {
+export interface ApproveAgentRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "approveAgent";
@@ -80,20 +71,23 @@ export interface ApproveAgentRequest extends BaseExchangeRequest {
         hyperliquidChain: "Mainnet" | "Testnet";
         /** Agent address. */
         agentAddress: Hex;
-        /** Agent name or undefined for unnamed agent. */
-        agentName?: string | null;
+        /** Agent name or null for unnamed agent. */
+        agentName: string | null;
         /** Unique request identifier (current timestamp in ms). */
         nonce: number;
     };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
 }
 
 /**
  * Approve a maximum fee rate for a builder.
  * @returns {SuccessResponse}
  */
-export interface ApproveBuilderFeeRequest extends BaseExchangeRequest {
+export interface ApproveBuilderFeeRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "approveBuilderFee";
@@ -108,27 +102,36 @@ export interface ApproveBuilderFeeRequest extends BaseExchangeRequest {
         /** Unique request identifier (current timestamp in ms). */
         nonce: number;
     };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
 }
 
 /**
  * Modify multiple orders.
  * @returns {OrderResponse}
  */
-export interface BatchModifyRequest extends BaseExchangeRequest {
+export interface BatchModifyRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "batchModify";
         /** Order modifications. */
         modifies: {
-            /** Order ID or CLient Order ID. */
+            /** Order ID or Client Order ID. */
             oid: number | Hex;
             /** New order parameters. */
             order: OrderParams;
         }[];
     };
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -136,7 +139,8 @@ export interface BatchModifyRequest extends BaseExchangeRequest {
  * Cancel order(s).
  * @returns {CancelResponse}
  */
-export interface CancelRequest extends BaseExchangeRequest {
+export interface CancelRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "cancel";
@@ -148,7 +152,13 @@ export interface CancelRequest extends BaseExchangeRequest {
             o: number;
         }[];
     };
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -156,7 +166,8 @@ export interface CancelRequest extends BaseExchangeRequest {
  * Cancel order(s) by cloid.
  * @returns {CancelResponse}
  */
-export interface CancelByCloidRequest extends BaseExchangeRequest {
+export interface CancelByCloidRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "cancelByCloid";
@@ -168,15 +179,22 @@ export interface CancelByCloidRequest extends BaseExchangeRequest {
             cloid: Hex;
         }[];
     };
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
 /**
- * Transfer native token from the user's spot account into staking for delegating to validators.
+ * Transfer native token from the user spot account into staking for delegating to validators.
  * @returns {SuccessResponse}
  */
-export interface CDepositRequest extends BaseExchangeRequest {
+export interface CDepositRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "cDeposit";
@@ -189,20 +207,27 @@ export interface CDepositRequest extends BaseExchangeRequest {
         /** Unique request identifier (current timestamp in ms). */
         nonce: number;
     };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
 }
 
 /**
  * Claim rewards from referral program.
  * @returns {SuccessResponse}
  */
-export interface ClaimRewardsRequest extends BaseExchangeRequest {
+export interface ClaimRewardsRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "claimRewards";
     };
-    vaultAddress?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -210,7 +235,8 @@ export interface ClaimRewardsRequest extends BaseExchangeRequest {
  * Convert a single-signature account to a multi-signature account.
  * @returns {SuccessResponse}
  */
-export interface ConvertToMultiSigUserRequest extends BaseExchangeRequest {
+export interface ConvertToMultiSigUserRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "convertToMultiSigUser";
@@ -221,18 +247,42 @@ export interface ConvertToMultiSigUserRequest extends BaseExchangeRequest {
         /**
          * Signers configuration.
          *
-         * Must be {@linkcode ConvertToMultiSigUserRequest_Signers} converted to a string via `JSON.stringify(...)`.
+         * Must be {@linkcode ConvertToMultiSigUserRequestSigners} converted to a string via `JSON.stringify(...)`.
          */
         signers: string;
         /** Unique request identifier (current timestamp in ms). */
         nonce: number;
     };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
 }
-
+/**
+ * Convert a single-signature account to a multi-signature account (without JSON.stringify).
+ * @returns {SuccessResponse}
+ */
+export interface ConvertToMultiSigUserRequestWithoutStringify {
+    /** Action to perform. */
+    action: {
+        /** Type of action. */
+        type: "convertToMultiSigUser";
+        /** Chain ID used for signing. */
+        signatureChainId: Hex;
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
+        /** Signers configuration. */
+        signers: ConvertToMultiSigUserRequestSigners;
+        /** Unique request identifier (current timestamp in ms). */
+        nonce: number;
+    };
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+}
 /** Signers configuration for {@linkcode ConvertToMultiSigUserRequest}. */
-export type ConvertToMultiSigUserRequest_Signers =
+export type ConvertToMultiSigUserRequestSigners =
     | {
         /** List of authorized user addresses. */
         authorizedUsers: Hex[];
@@ -246,14 +296,19 @@ export type ConvertToMultiSigUserRequest_Signers =
  * Create a sub-account.
  * @returns {CreateSubAccountResponse}
  */
-export interface CreateSubAccountRequest extends BaseExchangeRequest {
+export interface CreateSubAccountRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "createSubAccount";
         /** Sub-account name. */
         name: string;
     };
-    vaultAddress?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -261,7 +316,8 @@ export interface CreateSubAccountRequest extends BaseExchangeRequest {
  * Create a vault.
  * @returns {CreateVaultResponse}
  */
-export interface CreateVaultRequest extends BaseExchangeRequest {
+export interface CreateVaultRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "createVault";
@@ -274,7 +330,11 @@ export interface CreateVaultRequest extends BaseExchangeRequest {
         /** Unique request identifier (current timestamp in ms). */
         nonce: number;
     };
-    vaultAddress?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -284,7 +344,8 @@ export interface CreateVaultRequest extends BaseExchangeRequest {
  * - Unjail to allow them to sign transactions again.
  * @returns {SuccessResponse}
  */
-export interface CSignerActionRequest extends BaseExchangeRequest {
+export interface CSignerActionRequest {
+    /** Action to perform. */
     action:
         | {
             /** Type of action. */
@@ -298,7 +359,11 @@ export interface CSignerActionRequest extends BaseExchangeRequest {
             /** Unjail the signer. */
             unjailSelf: null;
         };
-    vaultAddress?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -309,7 +374,8 @@ export interface CSignerActionRequest extends BaseExchangeRequest {
  * - Unregister an existing validator.
  * @returns {SuccessResponse}
  */
-export interface CValidatorActionRequest extends BaseExchangeRequest {
+export interface CValidatorActionRequest {
+    /** Action to perform. */
     action:
         | {
             /** Type of action. */
@@ -372,15 +438,20 @@ export interface CValidatorActionRequest extends BaseExchangeRequest {
             /** Unregister the validator. */
             unregister: null;
         };
-    vaultAddress?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
 /**
- * Transfer native token from staking into the user's spot account.
+ * Transfer native token from staking into the user spot account.
  * @returns {SuccessResponse}
  */
-export interface CWithdrawRequest extends BaseExchangeRequest {
+export interface CWithdrawRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "cWithdraw";
@@ -393,22 +464,29 @@ export interface CWithdrawRequest extends BaseExchangeRequest {
         /** Unique request identifier (current timestamp in ms). */
         nonce: number;
     };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
 }
 
 /**
  * Configure block type for EVM transactions.
  * @returns {SuccessResponse}
  */
-export interface EvmUserModifyRequest extends BaseExchangeRequest {
+export interface EvmUserModifyRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "evmUserModify";
         /** `true` for large blocks, `false` for small blocks. */
         usingBigBlocks: boolean;
     };
-    vaultAddress?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -416,16 +494,23 @@ export interface EvmUserModifyRequest extends BaseExchangeRequest {
  * Modify an order.
  * @returns {SuccessResponse}
  */
-export interface ModifyRequest extends BaseExchangeRequest {
+export interface ModifyRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "modify";
-        /** Order ID or CLient Order ID. */
+        /** Order ID or Client Order ID. */
         oid: number | Hex;
         /** New order parameters. */
         order: OrderParams;
     };
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -433,14 +518,15 @@ export interface ModifyRequest extends BaseExchangeRequest {
  * A multi-signature request.
  * @returns {SuccessResponse}
  */
-export interface MultiSigRequest extends BaseExchangeRequest {
+export interface MultiSigRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "multiSig";
         /** Chain ID used for signing. */
         signatureChainId: Hex;
         /** List of signatures from authorized signers. */
-        signatures: { r: Hex; s: Hex; v: number }[];
+        signatures: Signature[];
         /** Multi-signature payload information. */
         payload: {
             /** Address of the multi-signature user account. */
@@ -448,10 +534,59 @@ export interface MultiSigRequest extends BaseExchangeRequest {
             /** Address of the authorized user initiating the request. */
             outerSigner: Hex;
             /** The underlying action to be executed through multi-sig. */
-            action: BaseExchangeRequest["action"];
+            action:
+                | ApproveAgentRequest["action"]
+                | ApproveBuilderFeeRequest["action"]
+                | BatchModifyRequest["action"]
+                | CancelRequest["action"]
+                | CancelByCloidRequest["action"]
+                | CDepositRequest["action"]
+                | ClaimRewardsRequest["action"]
+                | (
+                    | ConvertToMultiSigUserRequest["action"]
+                    | ConvertToMultiSigUserRequestWithoutStringify["action"]
+                )
+                | CreateSubAccountRequest["action"]
+                | CreateVaultRequest["action"]
+                | CSignerActionRequest["action"]
+                | CValidatorActionRequest["action"]
+                | CWithdrawRequest["action"]
+                | EvmUserModifyRequest["action"]
+                | ModifyRequest["action"]
+                | MultiSigRequest["action"]
+                | OrderRequest["action"]
+                | PerpDeployRequest["action"]
+                | RegisterReferrerRequest["action"]
+                | ReserveRequestWeightRequest["action"]
+                | ScheduleCancelRequest["action"]
+                | SetDisplayNameRequest["action"]
+                | SetReferrerRequest["action"]
+                | SpotDeployRequest["action"]
+                | SpotSendRequest["action"]
+                | SpotUserRequest["action"]
+                | SubAccountModifyRequest["action"]
+                | SubAccountSpotTransferRequest["action"]
+                | SubAccountTransferRequest["action"]
+                | TokenDelegateRequest["action"]
+                | TwapCancelRequest["action"]
+                | TwapOrderRequest["action"]
+                | UpdateIsolatedMarginRequest["action"]
+                | UpdateLeverageRequest["action"]
+                | UsdClassTransferRequest["action"]
+                | UsdSendRequest["action"]
+                | VaultDistributeRequest["action"]
+                | VaultModifyRequest["action"]
+                | VaultTransferRequest["action"]
+                | Withdraw3Request["action"];
         };
     };
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -459,7 +594,8 @@ export interface MultiSigRequest extends BaseExchangeRequest {
  * Place an order(s).
  * @returns {OrderResponse}
  */
-export interface OrderRequest extends BaseExchangeRequest {
+export interface OrderRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "order";
@@ -480,7 +616,13 @@ export interface OrderRequest extends BaseExchangeRequest {
             f: number;
         };
     };
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -490,7 +632,8 @@ export interface OrderRequest extends BaseExchangeRequest {
  * - Set Oracle
  * @returns {SuccessResponse}
  */
-export interface PerpDeployRequest extends BaseExchangeRequest {
+export interface PerpDeployRequest {
+    /** Action to perform. */
     action:
         | {
             /** Type of action. */
@@ -515,17 +658,19 @@ export interface PerpDeployRequest extends BaseExchangeRequest {
                     /** Whether the asset can only be traded with isolated margin. */
                     onlyIsolated: boolean;
                 };
-                /** Name of the perp dex (<= 6 characters). */
+                /** Name of the dex. */
                 dex: string;
-                /** Contains new perp dex parameters. */
-                schema: {
-                    /** Full name of the perp dex. */
-                    fullName: string;
-                    /** Collateral token index. */
-                    collateralToken: number;
-                    /** User to update oracles. If not provided, then deployer is assumed to be oracle updater. */
-                    oracleUpdater: Hex | null;
-                } | null;
+                /** Contains new dex parameters. */
+                schema:
+                    | {
+                        /** Full name of the dex. */
+                        fullName: string;
+                        /** Collateral token index. */
+                        collateralToken: number;
+                        /** User to update oracles. If not provided, then deployer is assumed to be oracle updater. */
+                        oracleUpdater: Hex | null;
+                    }
+                    | null;
             };
         }
         | {
@@ -533,7 +678,7 @@ export interface PerpDeployRequest extends BaseExchangeRequest {
             type: "perpDeploy";
             /** Parameters for setting oracle and mark prices for assets. */
             setOracle: {
-                /** Name of the perp dex (<= 6 characters). */
+                /** Name of the dex. */
                 dex: string;
                 /** A list (sorted by key) of asset and oracle prices. */
                 oraclePxs: [string, string][];
@@ -541,7 +686,11 @@ export interface PerpDeployRequest extends BaseExchangeRequest {
                 markPxs: [string, string][][];
             };
         };
-    vaultAddress?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -549,14 +698,19 @@ export interface PerpDeployRequest extends BaseExchangeRequest {
  * Create a referral code.
  * @returns {SuccessResponse}
  */
-export interface RegisterReferrerRequest extends BaseExchangeRequest {
+export interface RegisterReferrerRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "registerReferrer";
         /** Referral code to create. */
         code: string;
     };
-    vaultAddress?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -564,14 +718,19 @@ export interface RegisterReferrerRequest extends BaseExchangeRequest {
  * Reserve additional rate-limited actions for a fee.
  * @returns {SuccessResponse}
  */
-export interface ReserveRequestWeightRequest extends BaseExchangeRequest {
+export interface ReserveRequestWeightRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "reserveRequestWeight";
         /** Amount of request weight to reserve. */
         weight: number;
     };
-    vaultAddress?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -579,7 +738,8 @@ export interface ReserveRequestWeightRequest extends BaseExchangeRequest {
  * Schedule a cancel-all operation at a future time.
  * @returns {SuccessResponse}
  */
-export interface ScheduleCancelRequest extends BaseExchangeRequest {
+export interface ScheduleCancelRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "scheduleCancel";
@@ -591,7 +751,13 @@ export interface ScheduleCancelRequest extends BaseExchangeRequest {
          */
         time?: number;
     };
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -599,7 +765,8 @@ export interface ScheduleCancelRequest extends BaseExchangeRequest {
  * Set the display name in the leaderboard.
  * @returns {SuccessResponse}
  */
-export interface SetDisplayNameRequest extends BaseExchangeRequest {
+export interface SetDisplayNameRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "setDisplayName";
@@ -610,7 +777,11 @@ export interface SetDisplayNameRequest extends BaseExchangeRequest {
          */
         displayName: string;
     };
-    vaultAddress?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -618,14 +789,19 @@ export interface SetDisplayNameRequest extends BaseExchangeRequest {
  * Set a referral code.
  * @returns {SuccessResponse}
  */
-export interface SetReferrerRequest extends BaseExchangeRequest {
+export interface SetReferrerRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "setReferrer";
         /** Referral code. */
         code: string;
     };
-    vaultAddress?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -639,7 +815,8 @@ export interface SetReferrerRequest extends BaseExchangeRequest {
  * - User Genesis
  * @returns {SuccessResponse}
  */
-export interface SpotDeployRequest extends BaseExchangeRequest {
+export interface SpotDeployRequest {
+    /** Action to perform. */
     action:
         | {
             /** Type of action. */
@@ -716,7 +893,7 @@ export interface SpotDeployRequest extends BaseExchangeRequest {
             setDeployerTradingFeeShare: {
                 /** Token identifier. */
                 token: number;
-                /** The deployer trading fee share. Range: ["0%", "100%"]. */
+                /** The deployer trading fee share. Range is 0% to 100%. */
                 share: `${string}%`;
             };
         }
@@ -728,14 +905,18 @@ export interface SpotDeployRequest extends BaseExchangeRequest {
                 /** Token identifier. */
                 token: number;
                 /** Array of tuples: [user address, genesis amount in wei]. */
-                userAndWei: [string, string][];
+                userAndWei: [Hex, string][];
                 /** Array of tuples: [existing token identifier, genesis amount in wei]. */
                 existingTokenAndWei: [number, string][];
                 /** Array of tuples: [user address, blacklist status] (`true` for blacklist, `false` to remove existing blacklisted user). */
-                blacklistUsers?: [string, boolean][];
+                blacklistUsers?: [Hex, boolean][];
             };
         };
-    vaultAddress?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -743,7 +924,8 @@ export interface SpotDeployRequest extends BaseExchangeRequest {
  * Send spot assets to another address.
  * @returns {SuccessResponse}
  */
-export interface SpotSendRequest extends BaseExchangeRequest {
+export interface SpotSendRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "spotSend";
@@ -763,15 +945,18 @@ export interface SpotSendRequest extends BaseExchangeRequest {
         /** Unique request identifier (current timestamp in ms). */
         time: number;
     };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
 }
 
 /**
  * Opt Out of Spot Dusting.
  * @returns {SuccessResponse}
  */
-export interface SpotUserRequest extends BaseExchangeRequest {
+export interface SpotUserRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "spotUser";
@@ -781,15 +966,20 @@ export interface SpotUserRequest extends BaseExchangeRequest {
             optOut: boolean;
         };
     };
-    vaultAddress?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
 /**
- * Modify a sub-account's.
+ * Modify a sub-account.
  * @returns {SuccessResponse}
  */
-export interface SubAccountModifyRequest extends BaseExchangeRequest {
+export interface SubAccountModifyRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "subAccountModify";
@@ -798,7 +988,11 @@ export interface SubAccountModifyRequest extends BaseExchangeRequest {
         /** New sub-account name. */
         name: string;
     };
-    vaultAddress?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -806,7 +1000,8 @@ export interface SubAccountModifyRequest extends BaseExchangeRequest {
  * Transfer between sub-accounts (spot).
  * @returns {SuccessResponse}
  */
-export interface SubAccountSpotTransferRequest extends BaseExchangeRequest {
+export interface SubAccountSpotTransferRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "subAccountSpotTransfer";
@@ -822,7 +1017,11 @@ export interface SubAccountSpotTransferRequest extends BaseExchangeRequest {
          */
         amount: string;
     };
-    vaultAddress?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -830,7 +1029,8 @@ export interface SubAccountSpotTransferRequest extends BaseExchangeRequest {
  * Transfer between sub-accounts (perpetual).
  * @returns {SuccessResponse}
  */
-export interface SubAccountTransferRequest extends BaseExchangeRequest {
+export interface SubAccountTransferRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "subAccountTransfer";
@@ -841,7 +1041,11 @@ export interface SubAccountTransferRequest extends BaseExchangeRequest {
         /** Amount to transfer (float * 1e6). */
         usd: number;
     };
-    vaultAddress?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -849,7 +1053,8 @@ export interface SubAccountTransferRequest extends BaseExchangeRequest {
  * Delegate or undelegate native tokens to or from a validator.
  * @returns {SuccessResponse}
  */
-export interface TokenDelegateRequest extends BaseExchangeRequest {
+export interface TokenDelegateRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "tokenDelegate";
@@ -866,15 +1071,18 @@ export interface TokenDelegateRequest extends BaseExchangeRequest {
         /** Unique request identifier (current timestamp in ms). */
         nonce: number;
     };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
 }
 
 /**
  * Cancel a TWAP order.
  * @returns {TwapCancelResponse}
  */
-export interface TwapCancelRequest extends BaseExchangeRequest {
+export interface TwapCancelRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "twapCancel";
@@ -883,7 +1091,13 @@ export interface TwapCancelRequest extends BaseExchangeRequest {
         /** Twap ID. */
         t: number;
     };
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -891,7 +1105,8 @@ export interface TwapCancelRequest extends BaseExchangeRequest {
  * Place a TWAP order.
  * @returns {TwapOrderResponse}
  */
-export interface TwapOrderRequest extends BaseExchangeRequest {
+export interface TwapOrderRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "twapOrder";
@@ -914,7 +1129,13 @@ export interface TwapOrderRequest extends BaseExchangeRequest {
             t: boolean;
         };
     };
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -922,7 +1143,8 @@ export interface TwapOrderRequest extends BaseExchangeRequest {
  * Add or remove margin from isolated position.
  * @returns {SuccessResponse}
  */
-export interface UpdateIsolatedMarginRequest extends BaseExchangeRequest {
+export interface UpdateIsolatedMarginRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "updateIsolatedMargin";
@@ -933,7 +1155,13 @@ export interface UpdateIsolatedMarginRequest extends BaseExchangeRequest {
         /** Amount to adjust (float * 1e6). */
         ntli: number;
     };
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -941,7 +1169,8 @@ export interface UpdateIsolatedMarginRequest extends BaseExchangeRequest {
  * Update cross or isolated leverage on a coin.
  * @returns {SuccessResponse}
  */
-export interface UpdateLeverageRequest extends BaseExchangeRequest {
+export interface UpdateLeverageRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "updateLeverage";
@@ -952,7 +1181,13 @@ export interface UpdateLeverageRequest extends BaseExchangeRequest {
         /** New leverage value. */
         leverage: number;
     };
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -960,7 +1195,8 @@ export interface UpdateLeverageRequest extends BaseExchangeRequest {
  * Transfer funds between Spot account and Perp account.
  * @returns {SuccessResponse}
  */
-export interface UsdClassTransferRequest extends BaseExchangeRequest {
+export interface UsdClassTransferRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "usdClassTransfer";
@@ -978,15 +1214,18 @@ export interface UsdClassTransferRequest extends BaseExchangeRequest {
         /** Unique request identifier (current timestamp in ms). */
         nonce: number;
     };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
 }
 
 /**
  * Send usd to another address.
  * @returns {SuccessResponse}
  */
-export interface UsdSendRequest extends BaseExchangeRequest {
+export interface UsdSendRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "usdSend";
@@ -1004,15 +1243,18 @@ export interface UsdSendRequest extends BaseExchangeRequest {
         /** Unique request identifier (current timestamp in ms). */
         time: number;
     };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
 }
 
 /**
  * Distribute funds from a vault between followers.
  * @returns {SuccessResponse}
  */
-export interface VaultDistributeRequest extends BaseExchangeRequest {
+export interface VaultDistributeRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "vaultDistribute";
@@ -1025,15 +1267,20 @@ export interface VaultDistributeRequest extends BaseExchangeRequest {
          */
         usd: number;
     };
-    vaultAddress?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Vault address (for vault trading). */
     expiresAfter?: number;
 }
 
 /**
- * Modify a vault's configuration.
+ * Modify a vault configuration.
  * @returns {SuccessResponse}
  */
-export interface VaultModifyRequest extends BaseExchangeRequest {
+export interface VaultModifyRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "vaultModify";
@@ -1044,7 +1291,11 @@ export interface VaultModifyRequest extends BaseExchangeRequest {
         /** Always close positions on withdrawal. */
         alwaysCloseOnWithdraw: boolean | null;
     };
-    vaultAddress?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -1052,7 +1303,8 @@ export interface VaultModifyRequest extends BaseExchangeRequest {
  * Deposit or withdraw from a vault.
  * @returns {SuccessResponse}
  */
-export interface VaultTransferRequest extends BaseExchangeRequest {
+export interface VaultTransferRequest {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "vaultTransfer";
@@ -1063,7 +1315,11 @@ export interface VaultTransferRequest extends BaseExchangeRequest {
         /** Amount for deposit/withdrawal (float * 1e6). */
         usd: number;
     };
-    vaultAddress?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
+    /** Expiration time of the action. */
     expiresAfter?: number;
 }
 
@@ -1071,7 +1327,8 @@ export interface VaultTransferRequest extends BaseExchangeRequest {
  * Initiate a withdrawal request.
  * @returns {SuccessResponse}
  */
-export interface Withdraw3Request extends BaseExchangeRequest {
+export interface Withdraw3Request {
+    /** Action to perform. */
     action: {
         /** Type of action. */
         type: "withdraw3";
@@ -1089,6 +1346,8 @@ export interface Withdraw3Request extends BaseExchangeRequest {
         /** Unique request identifier (current timestamp in ms). */
         time: number;
     };
-    vaultAddress?: undefined;
-    expiresAfter?: undefined;
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
 }

@@ -1,4 +1,4 @@
-import type { Hex } from "../../base.ts";
+import type { Hex } from "../mod.ts";
 
 /** L2 order book snapshot. */
 export interface Book {
@@ -167,7 +167,7 @@ export type OrderLookup =
  * - `triggered`: Order triggered and awaiting execution.
  * - `rejected`: Order rejected by the system.
  * - `marginCanceled`: Order canceled due to insufficient margin.
- * - `vaultWithdrawalCanceled`: Canceled due to a user's withdrawal from vault.
+ * - `vaultWithdrawalCanceled`: Canceled due to a user withdrawal from vault.
  * - `openInterestCapCanceled`: Canceled due to order being too aggressive when open interest was at cap.
  * - `selfTradeCanceled`: Canceled due to self-trade prevention.
  * - `reduceOnlyCanceled`: Canceled reduced-only order that does not reduce position.

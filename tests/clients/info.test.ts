@@ -222,7 +222,7 @@ run(
         const data = await infoClient.frontendOpenOrders({ user });
         schemaCoverage(types, [data], {
             ignoreEnumValuesByPath: {
-                "#/items/properties/orderType": ["Market"],
+                "#/items/properties/orderType": ["Market", "Take Profit Market", "Take Profit Limit"],
                 "#/items/properties/tif/anyOf/0": ["Ioc", "FrontendMarket", "LiquidationMarket"],
             },
         });

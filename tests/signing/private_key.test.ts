@@ -595,10 +595,6 @@ Deno.test("reference_types", async (t) => {
                 });
             });
         });
-
-        // recursive types are not allowed.
-        // await t.step("recursive", async () => {
-        // });
     });
 });
 

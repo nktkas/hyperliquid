@@ -1,4 +1,4 @@
-import type { Hex } from "../../base.ts";
+import type { Hex } from "../mod.ts";
 
 /** User delegation to a validator. */
 export interface Delegation {
@@ -26,7 +26,7 @@ export interface DelegatorReward {
     totalAmount: string;
 }
 
-/** Summary of a user's staking delegations. */
+/** Summary of a user staking delegations. */
 export interface DelegatorSummary {
     /**
      * Total amount of delegated tokens.
@@ -112,11 +112,11 @@ export interface ValidatorStats {
     nSamples: number;
 }
 
-/** Summary of a validator's status and performance. */
+/** Summary of a validator status and performance. */
 export interface ValidatorSummary {
     /** Address of the validator. */
     validator: Hex;
-    /** Address of the validator's signer. */
+    /** Address of the validator signer. */
     signer: Hex;
     /** Name of the validator. */
     name: string;

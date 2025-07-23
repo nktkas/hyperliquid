@@ -1,15 +1,13 @@
-import type { Hex } from "../../base.ts";
-
 /** Abstract interface for a [viem wallet](https://viem.sh/docs/clients/wallet). */
 export interface AbstractViemWalletClient {
-    address?: Hex;
+    address?: `0x${string}`;
     signTypedData(
         params: {
             domain: {
                 name: string;
                 version: string;
                 chainId: number;
-                verifyingContract: Hex;
+                verifyingContract: `0x${string}`;
             };
             types: {
                 [key: string]: {
@@ -21,7 +19,7 @@ export interface AbstractViemWalletClient {
             message: Record<string, unknown>;
         },
         options?: unknown,
-    ): Promise<Hex>;
+    ): Promise<`0x${string}`>;
 }
 
 /** Checks if the given value is an abstract viem wallet. */

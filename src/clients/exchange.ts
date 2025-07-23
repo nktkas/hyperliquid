@@ -1,4 +1,4 @@
-import { type Hex, HyperliquidError, type MaybePromise } from "../base.ts";
+import { HyperliquidError } from "../base.ts";
 import type { IRequestTransport } from "../transports/base.ts";
 import type {
     ApproveAgentRequest,
@@ -7,10 +7,11 @@ import type {
     CancelByCloidRequest,
     CancelRequest,
     CancelResponse,
+    CancelSuccessResponse,
     CDepositRequest,
     ClaimRewardsRequest,
     ConvertToMultiSigUserRequest,
-    ConvertToMultiSigUserRequest_Signers,
+    ConvertToMultiSigUserRequestWithoutStringify,
     CreateSubAccountRequest,
     CreateSubAccountResponse,
     CreateVaultRequest,
@@ -20,10 +21,12 @@ import type {
     CWithdrawRequest,
     ErrorResponse,
     EvmUserModifyRequest,
+    Hex,
     ModifyRequest,
     MultiSigRequest,
     OrderRequest,
     OrderResponse,
+    OrderSuccessResponse,
     PerpDeployRequest,
     RegisterReferrerRequest,
     ReserveRequestWeightRequest,
@@ -40,8 +43,10 @@ import type {
     TokenDelegateRequest,
     TwapCancelRequest,
     TwapCancelResponse,
+    TwapCancelSuccessResponse,
     TwapOrderRequest,
     TwapOrderResponse,
+    TwapOrderSuccessResponse,
     UpdateIsolatedMarginRequest,
     UpdateLeverageRequest,
     UsdClassTransferRequest,
@@ -61,6 +66,13 @@ import {
     userSignedActionEip712Types,
 } from "../signing/mod.ts";
 
+type MaybePromise<T> = T | Promise<T>;
+
+/** @see https://github.com/microsoft/TypeScript/issues/13923#issuecomment-2191862501 */
+type DeepImmutable<T> = {
+    readonly [K in keyof T]: DeepImmutable<T[K]>;
+};
+
 /** Parameters for the {@linkcode ExchangeClient} constructor. */
 export interface ExchangeClientParameters<
     T extends IRequestTransport = IRequestTransport,
@@ -68,7 +80,7 @@ export interface ExchangeClientParameters<
 > {
     /** The transport used to connect to the Hyperliquid API. */
     transport: T;
-    /** The `viem`, `ethers.js`, or `window.ethereum` wallet used for signing transactions. */
+    /** The viem or ethers.js wallet used for signing transactions. */
     wallet: W;
     /**
      * Specifies whether the client uses testnet.
@@ -97,7 +109,8 @@ export interface ExchangeClientParameters<
 
 // deno-lint-ignore no-explicit-any
 type DistributiveOmit<T, K extends keyof any> = T extends unknown ? Omit<T, K> : never;
-type ExtractRequestAction<T extends { action: unknown }> = T["action"] extends { signatureChainId: unknown }
+type ExtractRequestAction<T extends { action: Record<string, unknown> }> = T["action"] extends
+    { signatureChainId: unknown }
     ? DistributiveOmit<T["action"], "type" | "signatureChainId" | "hyperliquidChain" | "nonce" | "time"> // user-signed actions
     : DistributiveOmit<T["action"], "type">; // L1 actions
 /** Action parameters for the {@linkcode ExchangeClient.approveAgent} method. */
@@ -113,7 +126,7 @@ export type CancelByCloidParameters = ExtractRequestAction<CancelByCloidRequest>
 /** Action parameters for the {@linkcode ExchangeClient.cDeposit} method. */
 export type CDepositParameters = ExtractRequestAction<CDepositRequest>;
 /** Action parameters for the {@linkcode ExchangeClient.convertToMultiSigUser} method. */
-export type ConvertToMultiSigUserParameters = ConvertToMultiSigUserRequest_Signers;
+export type ConvertToMultiSigUserParameters = ExtractRequestAction<ConvertToMultiSigUserRequestWithoutStringify>;
 /** Action parameters for the {@linkcode ExchangeClient.createSubAccount} method. */
 export type CreateSubAccountParameters = ExtractRequestAction<CreateSubAccountRequest>;
 /** Action parameters for the {@linkcode ExchangeClient.createVault} method. */
@@ -187,9 +200,9 @@ interface BaseRequestOptions {
      */
     signal?: AbortSignal;
 }
-type ExtractRequestOptions<T extends { vaultAddress?: unknown; expiresAfter?: unknown }> =
-    & (T["vaultAddress"] extends undefined ? BaseRequestOptions : BaseRequestOptions & Pick<T, "vaultAddress">)
-    & (T["expiresAfter"] extends undefined ? BaseRequestOptions : BaseRequestOptions & Pick<T, "expiresAfter">);
+type ExtractRequestOptions<T extends { action: Record<string, unknown> }> =
+    & BaseRequestOptions
+    & Omit<T, "action" | "nonce" | "signature">;
 /** Request options for the {@linkcode ExchangeClient.approveAgent} method. */
 export type ApproveAgentOptions = ExtractRequestOptions<ApproveAgentRequest>;
 /** Request options for the {@linkcode ExchangeClient.approveBuilderFee} method. */
@@ -271,23 +284,7 @@ export type VaultTransferOptions = ExtractRequestOptions<VaultTransferRequest>;
 /** Request options for the {@linkcode ExchangeClient.withdraw3} method. */
 export type Withdraw3Options = ExtractRequestOptions<Withdraw3Request>;
 
-type ExtractSuccessResponse<T> = T extends { response: { data: { statuses: (infer U)[] } } } ? T & { // multiple statuses
-        response: { data: { statuses: Exclude<U, { error: string }>[] } };
-    }
-    : T extends { response: { data: { status: infer S } } } ? T & { // single status
-            response: { data: { status: Exclude<S, { error: string }> } };
-        }
-    : never; // unknown response
-/** Successful variant of {@linkcode CancelResponse} without errors. */
-export type CancelResponseSuccess = ExtractSuccessResponse<CancelResponse>;
-/** Successful variant of {@linkcode OrderResponse} without errors. */
-export type OrderResponseSuccess = ExtractSuccessResponse<OrderResponse>;
-/** Successful variant of {@linkcode TwapCancelResponse} without errors. */
-export type TwapCancelResponseSuccess = ExtractSuccessResponse<TwapCancelResponse>;
-/** Successful variant of {@linkcode TwapOrderResponse} without errors. */
-export type TwapOrderResponseSuccess = ExtractSuccessResponse<TwapOrderResponse>;
-
-/** Error thrown when the API returns an error response. */
+/** Custom error class for API request errors. */
 export class ApiRequestError extends HyperliquidError {
     constructor(
         public response:
@@ -411,15 +408,6 @@ export class ExchangeClient<
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      * ```
-     *
-     * @example External wallet (e.g. MetaMask) via [`window.ethereum`](https://eips.ethereum.org/EIPS/eip-1193)
-     * ```ts
-     * import * as hl from "@nktkas/hyperliquid";
-     *
-     * const ethereum = (window as any).ethereum;
-     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
-     * const exchClient = new hl.ExchangeClient({ wallet: ethereum, transport });
-     * ```
      */
     constructor(args: ExchangeClientParameters<T, W>) {
         this.transport = args.transport;
@@ -445,7 +433,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -453,18 +441,17 @@ export class ExchangeClient<
      * ```
      */
     async approveAgent(
-        params: ApproveAgentParameters,
+        params: DeepImmutable<ApproveAgentParameters>,
         opts?: ApproveAgentOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeUserSignedAction({
-            action: {
-                type: "approveAgent",
-                hyperliquidChain: this._getHyperliquidChain(),
-                signatureChainId: await this._getSignatureChainId(),
-                nonce: await this.nonceManager(),
-                ...params,
-            },
-        }, opts?.signal);
+        const action = actionSorter.approveAgent({
+            type: "approveAgent",
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
+            nonce: await this.nonceManager(),
+            ...params,
+        });
+        return await this._executeUserSignedAction({ action }, opts?.signal);
     }
 
     /**
@@ -481,7 +468,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -489,18 +476,17 @@ export class ExchangeClient<
      * ```
      */
     async approveBuilderFee(
-        params: ApproveBuilderFeeParameters,
+        params: DeepImmutable<ApproveBuilderFeeParameters>,
         opts?: ApproveBuilderFeeOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeUserSignedAction({
-            action: {
-                type: "approveBuilderFee",
-                hyperliquidChain: this._getHyperliquidChain(),
-                signatureChainId: await this._getSignatureChainId(),
-                nonce: await this.nonceManager(),
-                ...params,
-            },
-        }, opts?.signal);
+        const action = actionSorter.approveBuilderFee({
+            type: "approveBuilderFee",
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
+            nonce: await this.nonceManager(),
+            ...params,
+        });
+        return await this._executeUserSignedAction({ action }, opts?.signal);
     }
 
     /**
@@ -517,7 +503,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -539,17 +525,16 @@ export class ExchangeClient<
      * ```
      */
     async batchModify(
-        params: BatchModifyParameters,
+        params: DeepImmutable<BatchModifyParameters>,
         opts?: BatchModifyOptions,
-    ): Promise<OrderResponseSuccess> {
-        return await this._executeL1Action({
-            action: {
-                type: "batchModify",
-                ...params,
-            },
-            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+    ): Promise<OrderSuccessResponse> {
+        const action = actionSorter.batchModify({
+            type: "batchModify",
+            ...params,
+        });
+        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -566,7 +551,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -578,17 +563,16 @@ export class ExchangeClient<
      * ```
      */
     async cancel(
-        params: CancelParameters,
+        params: DeepImmutable<CancelParameters>,
         opts?: CancelOptions,
-    ): Promise<CancelResponseSuccess> {
-        return await this._executeL1Action({
-            action: {
-                type: "cancel",
-                ...params,
-            },
-            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+    ): Promise<CancelSuccessResponse> {
+        const action = actionSorter.cancel({
+            type: "cancel",
+            ...params,
+        });
+        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -605,7 +589,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -617,17 +601,16 @@ export class ExchangeClient<
      * ```
      */
     async cancelByCloid(
-        params: CancelByCloidParameters,
+        params: DeepImmutable<CancelByCloidParameters>,
         opts?: CancelByCloidOptions,
-    ): Promise<CancelResponseSuccess> {
-        return await this._executeL1Action({
-            action: {
-                type: "cancelByCloid",
-                ...params,
-            },
-            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+    ): Promise<CancelSuccessResponse> {
+        const action = actionSorter.cancelByCloid({
+            type: "cancelByCloid",
+            ...params,
+        });
+        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -644,7 +627,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -652,18 +635,17 @@ export class ExchangeClient<
      * ```
      */
     async cDeposit(
-        params: CDepositParameters,
+        params: DeepImmutable<CDepositParameters>,
         opts?: CDepositOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeUserSignedAction({
-            action: {
-                type: "cDeposit",
-                hyperliquidChain: this._getHyperliquidChain(),
-                signatureChainId: await this._getSignatureChainId(),
-                nonce: await this.nonceManager(),
-                ...params,
-            },
-        }, opts?.signal);
+        const action = actionSorter.cDeposit({
+            type: "cDeposit",
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
+            nonce: await this.nonceManager(),
+            ...params,
+        });
+        return await this._executeUserSignedAction({ action }, opts?.signal);
     }
 
     /**
@@ -679,7 +661,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -689,12 +671,11 @@ export class ExchangeClient<
     async claimRewards(
         opts?: ClaimRewardsOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "claimRewards",
-            },
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.claimRewards({
+            type: "claimRewards",
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -711,33 +692,34 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * // Convert to multi-sig user
      * await exchClient.convertToMultiSigUser({
-     *   authorizedUsers: ["0x...", "0x...", "0x..."],
-     *   threshold: 2,
+     *   signers: {
+     *     authorizedUsers: ["0x...", "0x...", "0x..."],
+     *     threshold: 2,
+     *   },
      * });
      *
      * // Convert to single-sig user
-     * await exchClient.convertToMultiSigUser(null);
+     * await exchClient.convertToMultiSigUser({ signers: null });
      * ```
      */
     async convertToMultiSigUser(
-        params: ConvertToMultiSigUserRequest_Signers,
+        params: DeepImmutable<ConvertToMultiSigUserParameters>,
         opts?: ConvertToMultiSigUserOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeUserSignedAction({
-            action: {
-                type: "convertToMultiSigUser",
-                hyperliquidChain: this._getHyperliquidChain(),
-                signatureChainId: await this._getSignatureChainId(),
-                nonce: await this.nonceManager(),
-                signers: JSON.stringify(params),
-            },
-        }, opts?.signal);
+        const action = actionSorter.convertToMultiSigUser({
+            type: "convertToMultiSigUser",
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
+            nonce: await this.nonceManager(),
+            ...params,
+        });
+        return await this._executeUserSignedAction({ action }, opts?.signal);
     }
 
     /**
@@ -754,7 +736,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -762,16 +744,15 @@ export class ExchangeClient<
      * ```
      */
     async createSubAccount(
-        params: CreateSubAccountParameters,
+        params: DeepImmutable<CreateSubAccountParameters>,
         opts?: CreateSubAccountOptions,
     ): Promise<CreateSubAccountResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "createSubAccount",
-                ...params,
-            },
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.createSubAccount({
+            type: "createSubAccount",
+            ...params,
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -788,7 +769,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -801,16 +782,15 @@ export class ExchangeClient<
      * ```
      */
     async createVault(
-        params: CreateVaultParameters,
+        params: DeepImmutable<CreateVaultParameters>,
         opts?: CreateVaultOptions,
     ): Promise<CreateVaultResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "createVault",
-                ...params,
-            },
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.createVault({
+            type: "createVault",
+            ...params,
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -827,7 +807,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -839,16 +819,15 @@ export class ExchangeClient<
      * ```
      */
     async cSignerAction(
-        params: CSignerActionParameters,
+        params: DeepImmutable<CSignerActionParameters>,
         opts?: CSignerActionOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "CSignerAction",
-                ...params,
-            },
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.CSignerAction({
+            type: "CSignerAction",
+            ...params,
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -865,7 +844,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -903,16 +882,15 @@ export class ExchangeClient<
      * ```
      */
     async cValidatorAction(
-        params: CValidatorActionParameters,
+        params: DeepImmutable<CValidatorActionParameters>,
         opts?: CValidatorActionOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "CValidatorAction",
-                ...params,
-            },
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.CValidatorAction({
+            type: "CValidatorAction",
+            ...params,
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -929,7 +907,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -937,18 +915,17 @@ export class ExchangeClient<
      * ```
      */
     async cWithdraw(
-        params: CWithdrawParameters,
+        params: DeepImmutable<CWithdrawParameters>,
         opts?: CWithdrawOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeUserSignedAction({
-            action: {
-                type: "cWithdraw",
-                hyperliquidChain: this._getHyperliquidChain(),
-                signatureChainId: await this._getSignatureChainId(),
-                nonce: await this.nonceManager(),
-                ...params,
-            },
-        }, opts?.signal);
+        const action = actionSorter.cWithdraw({
+            type: "cWithdraw",
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
+            nonce: await this.nonceManager(),
+            ...params,
+        });
+        return await this._executeUserSignedAction({ action }, opts?.signal);
     }
 
     /**
@@ -965,7 +942,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -973,16 +950,15 @@ export class ExchangeClient<
      * ```
      */
     async evmUserModify(
-        params: EvmUserModifyParameters,
+        params: DeepImmutable<EvmUserModifyParameters>,
         opts?: EvmUserModifyOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "evmUserModify",
-                ...params,
-            },
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.evmUserModify({
+            type: "evmUserModify",
+            ...params,
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -999,7 +975,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1018,17 +994,16 @@ export class ExchangeClient<
      * ```
      */
     async modify(
-        params: ModifyParameters,
+        params: DeepImmutable<ModifyParameters>,
         opts?: ModifyOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "modify",
-                ...params,
-            },
-            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.modify({
+            type: "modify",
+            ...params,
+        });
+        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -1054,40 +1029,36 @@ export class ExchangeClient<
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const nonce = Date.now();
-     * const action = {
+     * const action = actionSorter.scheduleCancel({
      *   type: "scheduleCancel",
      *   time: Date.now() + 10000,
-     * } as const;
-     *
-     * // Create the required number of signatures
-     * const signature = await signL1Action({
-     *   wallet,
-     *   action: [multiSigUser.toLowerCase(), wallet.address.toLowerCase(), actionSorter[action.type](action)],
-     *   nonce,
      * });
      *
-     * // or User-Signed action
-     * // const signature = await signUserSignedAction({
-     * //   wallet: signer1,
-     * //   action: {
-     * //     ...action,
-     * //     payloadMultiSigUser: multiSigUser.wallet.address,
-     * //     outerSigner: signer1.address,
-     * //   },
-     * //   types: {
-     * //     "HyperliquidTransaction:UsdSend": [
-     * //       { name: "hyperliquidChain", type: "string" },
-     * //       { name: "payloadMultiSigUser", type: "address" },
-     * //       { name: "outerSigner", type: "address" },
-     * //       { name: "destination", type: "string" },
-     * //       { name: "amount", type: "string" },
-     * //       { name: "time", type: "uint64" },
-     * //     ],
-     * //   },
-     * // });
+     * // Create the required number of signatures
+     * const signatures = await Promise.all(["0x...", "0x..."].map(async (signerPrivKey) => {
+     *   return await signL1Action({
+     *     wallet: signerPrivKey as `0x${string}`,
+     *     action: [multiSigUser.toLowerCase(), wallet.address.toLowerCase(), action],
+     *     nonce,
+     *   });
+     * }));
      *
+     * // or user-signed action
+     * // const signatures = await Promise.all(["0x...", "0x..."].map(async (signerPrivKey) => {
+     * //   return await signUserSignedAction({
+     * //     wallet: signerPrivKey as `0x${string}`,
+     * //     action: {
+     * //       ...action,
+     * //       payloadMultiSigUser: multiSigUser,
+     * //       outerSigner: wallet.address,
+     * //     },
+     * //     types: userSignedActionEip712Types[action.type],
+     * //   });
+     * // }));
+     *
+     * // Then use signatures in the `multiSig` action
      * const data = await exchClient.multiSig({
-     *   signatures: [signature],
+     *   signatures,
      *   payload: {
      *     multiSigUser,
      *     outerSigner: wallet.address,
@@ -1100,26 +1071,26 @@ export class ExchangeClient<
     async multiSig<
         T extends
             | SuccessResponse
-            | CancelResponseSuccess
+            | CancelSuccessResponse
             | CreateSubAccountResponse
             | CreateVaultResponse
-            | OrderResponseSuccess
-            | TwapOrderResponseSuccess
-            | TwapCancelResponseSuccess,
+            | OrderSuccessResponse
+            | TwapOrderSuccessResponse
+            | TwapCancelSuccessResponse,
     >(
-        params: MultiSigParameters,
+        params_and_nonce: DeepImmutable<MultiSigParameters>,
         opts?: MultiSigOptions,
     ): Promise<T> {
-        return await this._executeMultiSigAction({
-            action: {
-                type: "multiSig",
-                signatureChainId: await this._getSignatureChainId(),
-                ...params,
-            },
-            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-            nonce: params?.nonce,
-        }, opts?.signal);
+        const { nonce, ...params } = params_and_nonce;
+
+        const action = actionSorter.multiSig({
+            type: "multiSig",
+            signatureChainId: await this._getSignatureChainId(),
+            ...params,
+        });
+        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeMultiSigAction({ action, vaultAddress, expiresAfter, nonce }, opts?.signal);
     }
 
     /**
@@ -1136,7 +1107,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1157,17 +1128,16 @@ export class ExchangeClient<
      * ```
      */
     async order(
-        params: OrderParameters,
+        params: DeepImmutable<OrderParameters>,
         opts?: OrderOptions,
-    ): Promise<OrderResponseSuccess> {
-        return await this._executeL1Action({
-            action: {
-                type: "order",
-                ...params,
-            },
-            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+    ): Promise<OrderSuccessResponse> {
+        const action = actionSorter.order({
+            type: "order",
+            ...params,
+        });
+        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -1184,7 +1154,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1205,16 +1175,15 @@ export class ExchangeClient<
      * ```
      */
     async perpDeploy(
-        params: PerpDeployParameters,
+        params: DeepImmutable<PerpDeployParameters>,
         opts?: PerpDeployOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "perpDeploy",
-                ...params,
-            },
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.perpDeploy({
+            type: "perpDeploy",
+            ...params,
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -1231,7 +1200,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1239,16 +1208,15 @@ export class ExchangeClient<
      * ```
      */
     async registerReferrer(
-        params: RegisterReferrerParameters,
+        params: DeepImmutable<RegisterReferrerParameters>,
         opts?: RegisterReferrerOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "registerReferrer",
-                ...params,
-            },
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.registerReferrer({
+            type: "registerReferrer",
+            ...params,
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -1265,7 +1233,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1273,16 +1241,15 @@ export class ExchangeClient<
      * ```
      */
     async reserveRequestWeight(
-        params: ReserveRequestWeightParameters,
+        params: DeepImmutable<ReserveRequestWeightParameters>,
         opts?: ReserveRequestWeightOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "reserveRequestWeight",
-                ...params,
-            },
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.reserveRequestWeight({
+            type: "reserveRequestWeight",
+            ...params,
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -1299,32 +1266,35 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
      * await exchClient.scheduleCancel({ time: Date.now() + 10_000 });
      * ```
      */
-    async scheduleCancel(params?: ScheduleCancelParameters, opts?: ScheduleCancelOptions): Promise<SuccessResponse>;
+    async scheduleCancel(
+        params?: DeepImmutable<ScheduleCancelParameters>,
+        opts?: ScheduleCancelOptions,
+    ): Promise<SuccessResponse>;
     async scheduleCancel(opts?: ScheduleCancelOptions): Promise<SuccessResponse>;
     async scheduleCancel(
         params_or_opts?:
-            | ScheduleCancelParameters
+            | DeepImmutable<ScheduleCancelParameters>
             | ScheduleCancelOptions,
         maybeOpts?: ScheduleCancelOptions,
     ): Promise<SuccessResponse> {
         const isFirstArgParams = params_or_opts && "time" in params_or_opts;
         const params = isFirstArgParams ? params_or_opts : {};
         const opts = isFirstArgParams ? maybeOpts : params_or_opts as ScheduleCancelOptions;
-        return await this._executeL1Action({
-            action: {
-                type: "scheduleCancel",
-                ...params,
-            },
-            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+
+        const action = actionSorter.scheduleCancel({
+            type: "scheduleCancel",
+            ...params,
+        });
+        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -1341,7 +1311,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1349,16 +1319,15 @@ export class ExchangeClient<
      * ```
      */
     async setDisplayName(
-        params: SetDisplayNameParameters,
+        params: DeepImmutable<SetDisplayNameParameters>,
         opts?: SetDisplayNameOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "setDisplayName",
-                ...params,
-            },
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.setDisplayName({
+            type: "setDisplayName",
+            ...params,
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -1375,7 +1344,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1383,16 +1352,15 @@ export class ExchangeClient<
      * ```
      */
     async setReferrer(
-        params: SetReferrerParameters,
+        params: DeepImmutable<SetReferrerParameters>,
         opts?: SetReferrerOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "setReferrer",
-                ...params,
-            },
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.setReferrer({
+            type: "setReferrer",
+            ...params,
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -1409,7 +1377,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1427,16 +1395,15 @@ export class ExchangeClient<
      * ```
      */
     async spotDeploy(
-        params: SpotDeployParameters,
+        params: DeepImmutable<SpotDeployParameters>,
         opts?: SpotDeployOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "spotDeploy",
-                ...params,
-            },
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.spotDeploy({
+            type: "spotDeploy",
+            ...params,
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -1453,7 +1420,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1465,18 +1432,17 @@ export class ExchangeClient<
      * ```
      */
     async spotSend(
-        params: SpotSendParameters,
+        params: DeepImmutable<SpotSendParameters>,
         opts?: SpotSendOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeUserSignedAction({
-            action: {
-                type: "spotSend",
-                hyperliquidChain: this._getHyperliquidChain(),
-                signatureChainId: await this._getSignatureChainId(),
-                time: await this.nonceManager(),
-                ...params,
-            },
-        }, opts?.signal);
+        const action = actionSorter.spotSend({
+            type: "spotSend",
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
+            time: await this.nonceManager(),
+            ...params,
+        });
+        return await this._executeUserSignedAction({ action }, opts?.signal);
     }
 
     /**
@@ -1493,7 +1459,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1501,16 +1467,15 @@ export class ExchangeClient<
      * ```
      */
     async subAccountModify(
-        params: SubAccountModifyParameters,
+        params: DeepImmutable<SubAccountModifyParameters>,
         opts?: SubAccountModifyOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "subAccountModify",
-                ...params,
-            },
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.subAccountModify({
+            type: "subAccountModify",
+            ...params,
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -1527,7 +1492,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1535,16 +1500,15 @@ export class ExchangeClient<
      * ```
      */
     async spotUser(
-        params: SpotUserParameters,
+        params: DeepImmutable<SpotUserParameters>,
         opts?: SpotUserOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "spotUser",
-                ...params,
-            },
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.spotUser({
+            type: "spotUser",
+            ...params,
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -1561,7 +1525,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1574,16 +1538,15 @@ export class ExchangeClient<
      * ```
      */
     async subAccountSpotTransfer(
-        params: SubAccountSpotTransferParameters,
+        params: DeepImmutable<SubAccountSpotTransferParameters>,
         opts?: SubAccountSpotTransferOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "subAccountSpotTransfer",
-                ...params,
-            },
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.subAccountSpotTransfer({
+            type: "subAccountSpotTransfer",
+            ...params,
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -1600,7 +1563,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1608,16 +1571,15 @@ export class ExchangeClient<
      * ```
      */
     async subAccountTransfer(
-        params: SubAccountTransferParameters,
+        params: DeepImmutable<SubAccountTransferParameters>,
         opts?: SubAccountTransferOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "subAccountTransfer",
-                ...params,
-            },
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.subAccountTransfer({
+            type: "subAccountTransfer",
+            ...params,
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -1634,7 +1596,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1642,18 +1604,17 @@ export class ExchangeClient<
      * ```
      */
     async tokenDelegate(
-        params: TokenDelegateParameters,
+        params: DeepImmutable<TokenDelegateParameters>,
         opts?: TokenDelegateOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeUserSignedAction({
-            action: {
-                type: "tokenDelegate",
-                hyperliquidChain: this._getHyperliquidChain(),
-                signatureChainId: await this._getSignatureChainId(),
-                nonce: await this.nonceManager(),
-                ...params,
-            },
-        }, opts?.signal);
+        const action = actionSorter.tokenDelegate({
+            type: "tokenDelegate",
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
+            nonce: await this.nonceManager(),
+            ...params,
+        });
+        return await this._executeUserSignedAction({ action }, opts?.signal);
     }
 
     /**
@@ -1670,7 +1631,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1678,17 +1639,16 @@ export class ExchangeClient<
      * ```
      */
     async twapCancel(
-        params: TwapCancelParameters,
+        params: DeepImmutable<TwapCancelParameters>,
         opts?: TwapCancelOptions,
-    ): Promise<TwapCancelResponseSuccess> {
-        return await this._executeL1Action({
-            action: {
-                type: "twapCancel",
-                ...params,
-            },
-            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+    ): Promise<TwapCancelSuccessResponse> {
+        const action = actionSorter.twapCancel({
+            type: "twapCancel",
+            ...params,
+        });
+        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -1705,7 +1665,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1722,17 +1682,16 @@ export class ExchangeClient<
      * ```
      */
     async twapOrder(
-        params: TwapOrderParameters,
+        params: DeepImmutable<TwapOrderParameters>,
         opts?: TwapOrderOptions,
-    ): Promise<TwapOrderResponseSuccess> {
-        return await this._executeL1Action({
-            action: {
-                type: "twapOrder",
-                ...params,
-            },
-            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+    ): Promise<TwapOrderSuccessResponse> {
+        const action = actionSorter.twapOrder({
+            type: "twapOrder",
+            ...params,
+        });
+        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -1749,7 +1708,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1757,17 +1716,16 @@ export class ExchangeClient<
      * ```
      */
     async updateIsolatedMargin(
-        params: UpdateIsolatedMarginParameters,
+        params: DeepImmutable<UpdateIsolatedMarginParameters>,
         opts?: UpdateIsolatedMarginOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "updateIsolatedMargin",
-                ...params,
-            },
-            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.updateIsolatedMargin({
+            type: "updateIsolatedMargin",
+            ...params,
+        });
+        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -1784,7 +1742,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1792,17 +1750,16 @@ export class ExchangeClient<
      * ```
      */
     async updateLeverage(
-        params: UpdateLeverageParameters,
+        params: DeepImmutable<UpdateLeverageParameters>,
         opts?: UpdateLeverageOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "updateLeverage",
-                ...params,
-            },
-            vaultAddress: opts?.vaultAddress ?? this.defaultVaultAddress,
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.updateLeverage({
+            type: "updateLeverage",
+            ...params,
+        });
+        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -1819,7 +1776,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1827,18 +1784,17 @@ export class ExchangeClient<
      * ```
      */
     async usdClassTransfer(
-        params: UsdClassTransferParameters,
+        params: DeepImmutable<UsdClassTransferParameters>,
         opts?: UsdClassTransferOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeUserSignedAction({
-            action: {
-                type: "usdClassTransfer",
-                hyperliquidChain: this._getHyperliquidChain(),
-                signatureChainId: await this._getSignatureChainId(),
-                nonce: await this.nonceManager(),
-                ...params,
-            },
-        }, opts?.signal);
+        const action = actionSorter.usdClassTransfer({
+            type: "usdClassTransfer",
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
+            nonce: await this.nonceManager(),
+            ...params,
+        });
+        return await this._executeUserSignedAction({ action }, opts?.signal);
     }
 
     /**
@@ -1855,7 +1811,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1863,18 +1819,17 @@ export class ExchangeClient<
      * ```
      */
     async usdSend(
-        params: UsdSendParameters,
+        params: DeepImmutable<UsdSendParameters>,
         opts?: UsdSendOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeUserSignedAction({
-            action: {
-                type: "usdSend",
-                hyperliquidChain: this._getHyperliquidChain(),
-                signatureChainId: await this._getSignatureChainId(),
-                time: await this.nonceManager(),
-                ...params,
-            },
-        }, opts?.signal);
+        const action = actionSorter.usdSend({
+            type: "usdSend",
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
+            time: await this.nonceManager(),
+            ...params,
+        });
+        return await this._executeUserSignedAction({ action }, opts?.signal);
     }
 
     /**
@@ -1891,7 +1846,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1899,16 +1854,15 @@ export class ExchangeClient<
      * ```
      */
     async vaultDistribute(
-        params: VaultDistributeParameters,
+        params: DeepImmutable<VaultDistributeParameters>,
         opts?: VaultDistributeOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "vaultDistribute",
-                ...params,
-            },
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.vaultDistribute({
+            type: "vaultDistribute",
+            ...params,
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -1925,7 +1879,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1937,16 +1891,15 @@ export class ExchangeClient<
      * ```
      */
     async vaultModify(
-        params: VaultModifyParameters,
+        params: DeepImmutable<VaultModifyParameters>,
         opts?: VaultModifyOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "vaultModify",
-                ...params,
-            },
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.vaultModify({
+            type: "vaultModify",
+            ...params,
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -1963,7 +1916,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1971,16 +1924,15 @@ export class ExchangeClient<
      * ```
      */
     async vaultTransfer(
-        params: VaultTransferParameters,
+        params: DeepImmutable<VaultTransferParameters>,
         opts?: VaultTransferOptions,
     ): Promise<SuccessResponse> {
-        return await this._executeL1Action({
-            action: {
-                type: "vaultTransfer",
-                ...params,
-            },
-            expiresAfter: opts?.expiresAfter ?? await this._getDefaultExpiresAfter(),
-        }, opts?.signal);
+        const action = actionSorter.vaultTransfer({
+            type: "vaultTransfer",
+            ...params,
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
     /**
@@ -1997,7 +1949,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+     * const privateKey = "0x..."; // or `viem`, `ethers`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -2005,43 +1957,41 @@ export class ExchangeClient<
      * ```
      */
     async withdraw3(
-        params: Withdraw3Parameters,
+        params: DeepImmutable<Withdraw3Parameters>,
         opts?: Withdraw3Options,
     ): Promise<SuccessResponse> {
-        return await this._executeUserSignedAction({
-            action: {
-                type: "withdraw3",
-                hyperliquidChain: this._getHyperliquidChain(),
-                signatureChainId: await this._getSignatureChainId(),
-                time: await this.nonceManager(),
-                ...params,
-            },
-        }, opts?.signal);
+        const action = actionSorter.withdraw3({
+            type: "withdraw3",
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
+            time: await this.nonceManager(),
+            ...params,
+        });
+        return await this._executeUserSignedAction({ action }, opts?.signal);
     }
 
     protected async _executeL1Action<
         T extends
             | SuccessResponse
-            | CancelResponseSuccess
+            | CancelSuccessResponse
             | CreateSubAccountResponse
             | CreateVaultResponse
-            | OrderResponseSuccess
-            | TwapOrderResponseSuccess
-            | TwapCancelResponseSuccess,
+            | OrderSuccessResponse
+            | TwapOrderSuccessResponse
+            | TwapCancelSuccessResponse,
     >(
         request: {
-            action: {
-                type: string;
-                [key: string]: unknown;
-            };
+            action: Parameters<
+                typeof actionSorter[
+                    Exclude<keyof typeof actionSorter, keyof typeof userSignedActionEip712Types>
+                ]
+            >[0];
             vaultAddress?: Hex;
             expiresAfter: number | undefined;
         },
         signal?: AbortSignal,
     ): Promise<T> {
-        let { action, vaultAddress, expiresAfter } = request;
-        // @ts-ignore - for test
-        action = actionSorter[action.type](action);
+        const { action, vaultAddress, expiresAfter } = request;
 
         // Sign an L1 action
         const nonce = await this.nonceManager();
@@ -2075,41 +2025,31 @@ export class ExchangeClient<
     protected async _executeUserSignedAction<
         T extends
             | SuccessResponse
-            | CancelResponseSuccess
+            | CancelSuccessResponse
             | CreateSubAccountResponse
             | CreateVaultResponse
-            | OrderResponseSuccess
-            | TwapOrderResponseSuccess
-            | TwapCancelResponseSuccess,
+            | OrderSuccessResponse
+            | TwapOrderSuccessResponse
+            | TwapCancelSuccessResponse,
     >(
         request: {
-            action:
-                & {
-                    type: keyof typeof userSignedActionEip712Types;
-                    signatureChainId: Hex;
-                    [key: string]: unknown;
-                }
-                & (
-                    | { nonce: number; time?: undefined }
-                    | { time: number; nonce?: undefined }
-                );
+            action: Parameters<
+                typeof actionSorter[
+                    Exclude<Extract<keyof typeof actionSorter, keyof typeof userSignedActionEip712Types>, "multiSig">
+                ]
+            >[0];
         },
         signal?: AbortSignal,
     ): Promise<T> {
-        let { action } = request;
-        // @ts-ignore - for test
-        action = actionSorter[action.type](action);
+        const { action } = request;
 
         // Sign a user-signed action
-        const nonce = action.nonce ?? action.time;
-
-        if (action.type === "approveAgent" && !action.agentName) action.agentName = ""; // Special case for approveAgent
+        const nonce = "nonce" in action ? action.nonce : action.time;
         const signature = await signUserSignedAction({
             wallet: this.wallet,
             action,
             types: userSignedActionEip712Types[action.type],
         });
-        if (action.type === "approveAgent" && action.agentName === "") action.agentName = null; // Special case for approveAgent
 
         // Send a request
         const response = await this.transport.request(
@@ -2132,35 +2072,27 @@ export class ExchangeClient<
     protected async _executeMultiSigAction<
         T extends
             | SuccessResponse
-            | CancelResponseSuccess
+            | CancelSuccessResponse
             | CreateSubAccountResponse
             | CreateVaultResponse
-            | OrderResponseSuccess
-            | TwapOrderResponseSuccess
-            | TwapCancelResponseSuccess,
+            | OrderSuccessResponse
+            | TwapOrderSuccessResponse
+            | TwapCancelSuccessResponse,
     >(
         request: {
-            action: {
-                type: "multiSig";
-                [key: string]: unknown;
-            };
+            action: Parameters<typeof actionSorter["multiSig"]>[0];
+            nonce: number;
             vaultAddress?: Hex;
             expiresAfter?: number;
-            nonce: number;
         },
         signal?: AbortSignal,
     ): Promise<T> {
-        let { action, vaultAddress, expiresAfter, nonce } = request;
-        // @ts-ignore - for test
-        action = actionSorter[action.type](action);
+        const { action, nonce, vaultAddress, expiresAfter } = request;
 
         // Sign a multi-signature action
-        // deno-lint-ignore no-explicit-any
-        const actionWithoutType = structuredClone<any>(action);
-        delete actionWithoutType.type;
         const signature = await signMultiSigAction({
             wallet: this.wallet,
-            action: actionWithoutType,
+            action,
             nonce,
             isTestnet: this.isTestnet,
             vaultAddress,
@@ -2185,33 +2117,29 @@ export class ExchangeClient<
         return response;
     }
 
-    /** Get the default expiration time for an action. */
     protected async _getDefaultExpiresAfter(): Promise<number | undefined> {
         return typeof this.defaultExpiresAfter === "number"
             ? this.defaultExpiresAfter
             : await this.defaultExpiresAfter?.();
     }
 
-    /** Get the signature chain ID for the wallet. */
     protected async _getSignatureChainId(): Promise<Hex> {
         return typeof this.signatureChainId === "string" ? this.signatureChainId : await this.signatureChainId();
     }
 
-    /** Get the Hyperliquid chain based on the isTestnet flag. */
     protected _getHyperliquidChain(): "Mainnet" | "Testnet" {
         return this.isTestnet ? "Testnet" : "Mainnet";
     }
 
-    /** Validate a response from the API. */
     protected _validateResponse<
         T extends
             | SuccessResponse
-            | CancelResponseSuccess
+            | CancelSuccessResponse
             | CreateSubAccountResponse
             | CreateVaultResponse
-            | OrderResponseSuccess
-            | TwapOrderResponseSuccess
-            | TwapCancelResponseSuccess,
+            | OrderSuccessResponse
+            | TwapOrderSuccessResponse
+            | TwapCancelSuccessResponse,
     >(
         response:
             | SuccessResponse

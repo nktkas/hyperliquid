@@ -40,6 +40,11 @@ import type {
     WsWebData2Request,
 } from "../types/mod.ts";
 
+/** @see https://github.com/microsoft/TypeScript/issues/13923#issuecomment-2191862501 */
+type DeepImmutable<T> = {
+    readonly [K in keyof T]: DeepImmutable<T[K]>;
+};
+
 /** Parameters for the {@linkcode SubscriptionClient} constructor. */
 export interface SubscriptionClientParameters<T extends ISubscriptionTransport = ISubscriptionTransport> {
     /** The transport used to connect to the Hyperliquid API. */
@@ -126,7 +131,7 @@ export class SubscriptionClient<
      * ```
      */
     activeAssetCtx(
-        params: EventActiveAssetCtxParameters,
+        params: DeepImmutable<EventActiveAssetCtxParameters>,
         listener: (data: WsActiveAssetCtx | WsActiveSpotAssetCtx) => void,
     ): Promise<Subscription> {
         const channel = params.coin.startsWith("@") ? "activeSpotAssetCtx" : "activeAssetCtx";
@@ -160,7 +165,7 @@ export class SubscriptionClient<
      * ```
      */
     activeAssetData(
-        params: EventActiveAssetDataParameters,
+        params: DeepImmutable<EventActiveAssetDataParameters>,
         listener: (data: WsActiveAssetData) => void,
     ): Promise<Subscription> {
         const payload = { type: "activeAssetData", ...params } satisfies WsActiveAssetDataRequest;
@@ -193,9 +198,9 @@ export class SubscriptionClient<
      * ```
      */
     allMids(listener: (data: WsAllMids) => void): Promise<Subscription>;
-    allMids(params: WsAllMidsParameters, listener: (data: WsAllMids) => void): Promise<Subscription>;
+    allMids(params: DeepImmutable<WsAllMidsParameters>, listener: (data: WsAllMids) => void): Promise<Subscription>;
     allMids(
-        params_or_listener: WsAllMidsParameters | ((data: WsAllMids) => void),
+        params_or_listener: DeepImmutable<WsAllMidsParameters> | ((data: WsAllMids) => void),
         maybeListener?: (data: WsAllMids) => void,
     ): Promise<Subscription> {
         const params = typeof params_or_listener === "function" ? {} : params_or_listener;
@@ -228,7 +233,10 @@ export class SubscriptionClient<
      * });
      * ```
      */
-    bbo(params: EventBboParameters, listener: (data: WsBbo) => void): Promise<Subscription> {
+    bbo(
+        params: DeepImmutable<EventBboParameters>,
+        listener: (data: WsBbo) => void,
+    ): Promise<Subscription> {
         const payload = { type: "bbo", ...params } satisfies WsBboRequest;
         return this.transport.subscribe<WsBbo>(payload.type, payload, (e) => {
             if (e.detail.coin === params.coin) {
@@ -258,7 +266,10 @@ export class SubscriptionClient<
      * });
      * ```
      */
-    candle(params: EventCandleParameters, listener: (data: Candle) => void): Promise<Subscription> {
+    candle(
+        params: DeepImmutable<EventCandleParameters>,
+        listener: (data: Candle) => void,
+    ): Promise<Subscription> {
         const payload = { type: "candle", ...params } satisfies WsCandleRequest;
         return this.transport.subscribe<Candle>(payload.type, payload, (e) => {
             if (e.detail.s === params.coin && e.detail.i === params.interval) {
@@ -344,7 +355,10 @@ export class SubscriptionClient<
      * });
      * ```
      */
-    l2Book(params: EventL2BookParameters, listener: (data: Book) => void): Promise<Subscription> {
+    l2Book(
+        params: DeepImmutable<EventL2BookParameters>,
+        listener: (data: Book) => void,
+    ): Promise<Subscription> {
         const payload = {
             type: "l2Book",
             nSigFigs: params.nSigFigs ?? null,
@@ -379,8 +393,11 @@ export class SubscriptionClient<
      * });
      * ```
      */
-    notification(params: EventNotificationParameters, listener: (data: WsNotification) => void): Promise<Subscription> {
-        const payload = { type: "notification", user: params.user } satisfies WsNotificationRequest;
+    notification(
+        params: DeepImmutable<EventNotificationParameters>,
+        listener: (data: WsNotification) => void,
+    ): Promise<Subscription> {
+        const payload = { type: "notification", ...params } satisfies WsNotificationRequest;
         return this.transport.subscribe<WsNotification>(payload.type, payload, (e) => {
             listener(e.detail);
         });
@@ -408,7 +425,7 @@ export class SubscriptionClient<
      * ```
      */
     orderUpdates(
-        params: EventOrderUpdatesParameters,
+        params: DeepImmutable<EventOrderUpdatesParameters>,
         listener: (data: OrderStatus<Order>[]) => void,
     ): Promise<Subscription> {
         const payload = { type: "orderUpdates", ...params } satisfies WsOrderUpdatesRequest;
@@ -438,7 +455,10 @@ export class SubscriptionClient<
      * });
      * ```
      */
-    trades(params: EventTradesParameters, listener: (data: WsTrade[]) => void): Promise<Subscription> {
+    trades(
+        params: DeepImmutable<EventTradesParameters>,
+        listener: (data: WsTrade[]) => void,
+    ): Promise<Subscription> {
         const payload = { type: "trades", ...params } satisfies WsTradesRequest;
         return this.transport.subscribe<WsTrade[]>(payload.type, payload, (e) => {
             if (e.detail[0]?.coin === params.coin) {
@@ -469,7 +489,10 @@ export class SubscriptionClient<
      * });
      * ```
      */
-    userEvents(params: EventUserEventsParameters, listener: (data: WsUserEvent) => void): Promise<Subscription> {
+    userEvents(
+        params: DeepImmutable<EventUserEventsParameters>,
+        listener: (data: WsUserEvent) => void,
+    ): Promise<Subscription> {
         const payload = { type: "userEvents", ...params } satisfies WsUserEventsRequest;
         return this.transport.subscribe<WsUserEvent>("user", payload, (e) => {
             listener(e.detail);
@@ -497,7 +520,10 @@ export class SubscriptionClient<
      * });
      * ```
      */
-    userFills(params: EventUserFillsParameters, listener: (data: WsUserFills) => void): Promise<Subscription> {
+    userFills(
+        params: DeepImmutable<EventUserFillsParameters>,
+        listener: (data: WsUserFills) => void,
+    ): Promise<Subscription> {
         const payload = {
             type: "userFills",
             aggregateByTime: params.aggregateByTime ?? false,
@@ -531,7 +557,10 @@ export class SubscriptionClient<
      * });
      * ```
      */
-    userFundings(params: EventUserFundingsParameters, listener: (data: WsUserFundings) => void): Promise<Subscription> {
+    userFundings(
+        params: DeepImmutable<EventUserFundingsParameters>,
+        listener: (data: WsUserFundings) => void,
+    ): Promise<Subscription> {
         const payload = { type: "userFundings", ...params } satisfies WsUserFundingsRequest;
         return this.transport.subscribe<WsUserFundings>(payload.type, payload, (e) => {
             if (e.detail.user === params.user.toLowerCase()) {
@@ -562,7 +591,7 @@ export class SubscriptionClient<
      * ```
      */
     userNonFundingLedgerUpdates(
-        params: EventUserNonFundingLedgerUpdatesParameters,
+        params: DeepImmutable<EventUserNonFundingLedgerUpdatesParameters>,
         listener: (data: WsUserNonFundingLedgerUpdates) => void,
     ): Promise<Subscription> {
         const payload = {
@@ -597,7 +626,10 @@ export class SubscriptionClient<
      * });
      * ```
      */
-    userTwapHistory(params: EventUserTwapHistory, listener: (data: WsUserTwapHistory) => void): Promise<Subscription> {
+    userTwapHistory(
+        params: DeepImmutable<EventUserTwapHistory>,
+        listener: (data: WsUserTwapHistory) => void,
+    ): Promise<Subscription> {
         const payload = { type: "userTwapHistory", ...params } satisfies WsUserTwapHistoryRequest;
         return this.transport.subscribe<WsUserTwapHistory>(payload.type, payload, (e) => {
             if (e.detail.user === params.user.toLowerCase()) {
@@ -628,10 +660,10 @@ export class SubscriptionClient<
      * ```
      */
     userTwapSliceFills(
-        params: EventUserTwapSliceFills,
+        params: DeepImmutable<EventUserTwapSliceFills>,
         listener: (data: WsUserTwapSliceFills) => void,
     ): Promise<Subscription> {
-        const payload = { type: "userTwapSliceFills", ...params } satisfies WsUserTwapSliceFillsRequest;
+        const payload = { type: "userTwapSliceFills", ...params } as WsUserTwapSliceFillsRequest;
         return this.transport.subscribe<WsUserTwapSliceFills>(payload.type, payload, (e) => {
             if (e.detail.user === params.user.toLowerCase()) {
                 listener(e.detail);
@@ -660,7 +692,10 @@ export class SubscriptionClient<
      * });
      * ```
      */
-    webData2(params: EventWebData2Parameters, listener: (data: WsWebData2) => void): Promise<Subscription> {
+    webData2(
+        params: DeepImmutable<EventWebData2Parameters>,
+        listener: (data: WsWebData2) => void,
+    ): Promise<Subscription> {
         const payload = { type: "webData2", ...params } satisfies WsWebData2Request;
         return this.transport.subscribe<WsWebData2>(payload.type, payload, (e) => {
             if (e.detail.user === params.user.toLowerCase()) {

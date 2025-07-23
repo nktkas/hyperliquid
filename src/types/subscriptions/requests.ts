@@ -1,4 +1,4 @@
-import type { Hex } from "../../base.ts";
+import type { Hex } from "../mod.ts";
 
 /**
  * Context events for a specific perpetual asset.
@@ -31,7 +31,7 @@ export interface WsActiveAssetDataRequest {
 export interface WsAllMidsRequest {
     /** Type of subscription. */
     type: "allMids";
-    /** Name of perp dex. */
+    /** DEX name (empty string for main dex). */
     dex?: string;
 }
 
@@ -99,7 +99,7 @@ export interface WsL2BookRequest {
 export interface WsNotificationRequest {
     /** Type of subscription. */
     type: "notification";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -110,7 +110,7 @@ export interface WsNotificationRequest {
 export interface WsOrderUpdatesRequest {
     /** Type of subscription. */
     type: "orderUpdates";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -132,7 +132,7 @@ export interface WsTradesRequest {
 export interface WsUserEventsRequest {
     /** Type of subscription. */
     type: "userEvents";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -143,9 +143,9 @@ export interface WsUserEventsRequest {
 export interface WsUserFillsRequest {
     /** Type of subscription. */
     type: "userFills";
-    /** User's address. */
+    /** User address. */
     user: Hex;
-    /** Whether to aggregate fills by time. */
+    /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
     aggregateByTime?: boolean;
 }
 
@@ -156,7 +156,7 @@ export interface WsUserFillsRequest {
 export interface WsUserFundingsRequest {
     /** Type of subscription. */
     type: "userFundings";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -167,7 +167,7 @@ export interface WsUserFundingsRequest {
 export interface WsUserNonFundingLedgerUpdatesRequest {
     /** Type of subscription. */
     type: "userNonFundingLedgerUpdates";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -178,7 +178,7 @@ export interface WsUserNonFundingLedgerUpdatesRequest {
 export interface WsUserTwapHistoryRequest {
     /** Type of subscription. */
     type: "userTwapHistory";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -189,7 +189,7 @@ export interface WsUserTwapHistoryRequest {
 export interface WsUserTwapSliceFillsRequest {
     /** Type of subscription. */
     type: "userTwapSliceFills";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -200,6 +200,6 @@ export interface WsUserTwapSliceFillsRequest {
 export interface WsWebData2Request {
     /** Type of subscription. */
     type: "webData2";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }

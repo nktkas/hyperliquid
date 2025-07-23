@@ -1,4 +1,4 @@
-import type { Hex } from "../../base.ts";
+import type { Hex } from "../mod.ts";
 
 /** Status of the deploy auction. */
 export interface DeployAuctionStatus {

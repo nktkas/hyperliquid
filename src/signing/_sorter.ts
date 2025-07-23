@@ -1,4 +1,3 @@
-import type { Hex } from "../base.ts";
 import type {
     ApproveAgentRequest,
     ApproveBuilderFeeRequest,
@@ -8,6 +7,7 @@ import type {
     CDepositRequest,
     ClaimRewardsRequest,
     ConvertToMultiSigUserRequest,
+    ConvertToMultiSigUserRequestWithoutStringify,
     CreateSubAccountRequest,
     CreateVaultRequest,
     CSignerActionRequest,
@@ -40,9 +40,9 @@ import type {
     VaultModifyRequest,
     VaultTransferRequest,
     Withdraw3Request,
-} from "../types/exchange/requests.ts";
+} from "../types/mod.ts";
 
-// https://github.com/microsoft/TypeScript/issues/13923#issuecomment-2191862501
+/** @see https://github.com/microsoft/TypeScript/issues/13923#issuecomment-2191862501 */
 type DeepImmutable<T> = {
     readonly [K in keyof T]: DeepImmutable<T[K]>;
 };
@@ -54,8 +54,8 @@ export const actionSorter = {
             type: action.type,
             signatureChainId: action.signatureChainId,
             hyperliquidChain: action.hyperliquidChain,
-            agentAddress: action.agentAddress.toLowerCase() as Hex,
-            agentName: action.agentName ?? "",
+            agentAddress: action.agentAddress.toLowerCase() as `0x${string}`,
+            agentName: action.agentName,
             nonce: action.nonce,
         };
     },
@@ -67,7 +67,7 @@ export const actionSorter = {
             signatureChainId: action.signatureChainId,
             hyperliquidChain: action.hyperliquidChain,
             maxFeeRate: action.maxFeeRate,
-            builder: action.builder.toLowerCase() as Hex,
+            builder: action.builder.toLowerCase() as `0x${string}`,
             nonce: action.nonce,
         };
     },
@@ -137,13 +137,16 @@ export const actionSorter = {
         };
     },
     convertToMultiSigUser: (
-        action: DeepImmutable<ConvertToMultiSigUserRequest["action"]>,
+        action: DeepImmutable<
+            | ConvertToMultiSigUserRequest["action"]
+            | ConvertToMultiSigUserRequestWithoutStringify["action"]
+        >,
     ): ConvertToMultiSigUserRequest["action"] => {
         return {
             type: action.type,
             signatureChainId: action.signatureChainId,
             hyperliquidChain: action.hyperliquidChain,
-            signers: action.signers, // key order is not important
+            signers: typeof action.signers === "string" ? action.signers : JSON.stringify(action.signers),
             nonce: action.nonce,
         };
     },
@@ -180,13 +183,13 @@ export const actionSorter = {
             return {
                 type: action.type,
                 changeProfile: {
-                    node_ip: action.changeProfile.node_ip ?? null,
-                    name: action.changeProfile.name ?? null,
-                    description: action.changeProfile.description ?? null,
+                    node_ip: action.changeProfile.node_ip,
+                    name: action.changeProfile.name,
+                    description: action.changeProfile.description,
                     unjailed: action.changeProfile.unjailed,
-                    disable_delegations: action.changeProfile.disable_delegations ?? null,
-                    commission_bps: action.changeProfile.commission_bps ?? null,
-                    signer: action.changeProfile.signer?.toLowerCase() as Hex | undefined ?? null,
+                    disable_delegations: action.changeProfile.disable_delegations,
+                    commission_bps: action.changeProfile.commission_bps,
+                    signer: action.changeProfile.signer?.toLowerCase() as `0x${string}` | null,
                 },
             };
         } else if ("register" in action) {
@@ -201,13 +204,13 @@ export const actionSorter = {
                         description: action.register.profile.description,
                         delegations_disabled: action.register.profile.delegations_disabled,
                         commission_bps: action.register.profile.commission_bps,
-                        signer: action.register.profile.signer.toLowerCase() as Hex,
+                        signer: action.register.profile.signer.toLowerCase() as `0x${string}`,
                     },
                     unjailed: action.register.unjailed,
                     initial_wei: action.register.initial_wei,
                 },
             };
-        } else { // "unregister" in action
+        } else {
             return {
                 type: action.type,
                 unregister: action.unregister,
@@ -263,14 +266,17 @@ export const actionSorter = {
             type: action.type,
             signatureChainId: action.signatureChainId,
             signatures: action.signatures.map((signature) => ({
-                r: signature.r.replace(/^0x0+/, "0x").toLowerCase() as Hex,
-                s: signature.s.replace(/^0x0+/, "0x").toLowerCase() as Hex,
+                r: signature.r.replace(/^0x0+/, "0x").toLowerCase() as `0x${string}`,
+                s: signature.s.replace(/^0x0+/, "0x").toLowerCase() as `0x${string}`,
                 v: signature.v,
             })),
             payload: {
-                multiSigUser: action.payload.multiSigUser.toLowerCase() as Hex,
-                outerSigner: action.payload.outerSigner.toLowerCase() as Hex,
-                action: structuredClone(action.payload.action),
+                multiSigUser: action.payload.multiSigUser.toLowerCase() as `0x${string}`,
+                outerSigner: action.payload.outerSigner.toLowerCase() as `0x${string}`,
+                action: actionSorter[action.payload.action.type](
+                    // @ts-ignore - TypeScript cannot infer the type correctly
+                    action.payload.action,
+                ),
             },
         };
     },
@@ -305,7 +311,7 @@ export const actionSorter = {
             grouping: action.grouping,
             builder: action.builder
                 ? {
-                    b: action.builder.b.toLowerCase() as Hex,
+                    b: action.builder.b.toLowerCase() as `0x${string}`,
                     f: action.builder.f,
                 }
                 : action.builder,
@@ -318,7 +324,7 @@ export const actionSorter = {
             return {
                 type: action.type,
                 registerAsset: {
-                    maxGas: action.registerAsset.maxGas ?? null,
+                    maxGas: action.registerAsset.maxGas,
                     assetRequest: {
                         coin: action.registerAsset.assetRequest.coin,
                         szDecimals: action.registerAsset.assetRequest.szDecimals,
@@ -331,10 +337,11 @@ export const actionSorter = {
                         ? {
                             fullName: action.registerAsset.schema.fullName,
                             collateralToken: action.registerAsset.schema.collateralToken,
-                            oracleUpdater:
-                                action.registerAsset.schema.oracleUpdater?.toLowerCase() as Hex | undefined ?? null,
+                            oracleUpdater: action.registerAsset.schema.oracleUpdater?.toLowerCase() as
+                                | `0x${string}`
+                                | null,
                         }
-                        : null,
+                        : action.registerAsset.schema,
                 },
             };
         } else {
@@ -392,9 +399,7 @@ export const actionSorter = {
                     noHyperliquidity: action.genesis.noHyperliquidity,
                 },
             };
-            if (sortedAction.genesis.noHyperliquidity === undefined) {
-                delete sortedAction.genesis.noHyperliquidity;
-            }
+            if (sortedAction.genesis.noHyperliquidity === undefined) delete sortedAction.genesis.noHyperliquidity;
             return sortedAction;
         } else if ("registerHyperliquidity" in action) {
             const sortedAction = {
@@ -431,9 +436,7 @@ export const actionSorter = {
                     fullName: action.registerToken2.fullName,
                 },
             };
-            if (sortedAction.registerToken2.fullName === undefined) {
-                delete sortedAction.registerToken2.fullName;
-            }
+            if (sortedAction.registerToken2.fullName === undefined) delete sortedAction.registerToken2.fullName;
             return sortedAction;
         } else if ("setDeployerTradingFeeShare" in action) {
             return {
@@ -448,19 +451,12 @@ export const actionSorter = {
                 type: action.type,
                 userGenesis: {
                     token: action.userGenesis.token,
-                    userAndWei: action.userGenesis.userAndWei.map((el) => [...el]) as [string, string][],
-                    existingTokenAndWei: action.userGenesis.existingTokenAndWei.map((el) => [...el]) as [
-                        number,
-                        string,
-                    ][],
-                    blacklistUsers: action.userGenesis.blacklistUsers?.map((el) => [...el]) as
-                        | [string, boolean][]
-                        | undefined,
+                    userAndWei: action.userGenesis.userAndWei.map<[`0x${string}`, string]>((el) => [...el]),
+                    existingTokenAndWei: action.userGenesis.existingTokenAndWei.map<[number, string]>((el) => [...el]),
+                    blacklistUsers: action.userGenesis.blacklistUsers?.map<[`0x${string}`, boolean]>((el) => [...el]),
                 },
             };
-            if (sortedAction.userGenesis.blacklistUsers === undefined) {
-                delete sortedAction.userGenesis.blacklistUsers;
-            }
+            if (sortedAction.userGenesis.blacklistUsers === undefined) delete sortedAction.userGenesis.blacklistUsers;
             return sortedAction;
         }
     },
@@ -469,7 +465,7 @@ export const actionSorter = {
             type: action.type,
             signatureChainId: action.signatureChainId,
             hyperliquidChain: action.hyperliquidChain,
-            destination: action.destination.toLowerCase() as Hex,
+            destination: action.destination.toLowerCase() as `0x${string}`,
             token: action.token,
             amount: action.amount,
             time: action.time,
@@ -486,7 +482,7 @@ export const actionSorter = {
     subAccountModify: (action: DeepImmutable<SubAccountModifyRequest["action"]>): SubAccountModifyRequest["action"] => {
         return {
             type: action.type,
-            subAccountUser: action.subAccountUser.toLowerCase() as Hex,
+            subAccountUser: action.subAccountUser.toLowerCase() as `0x${string}`,
             name: action.name,
         };
     },
@@ -495,7 +491,7 @@ export const actionSorter = {
     ): SubAccountSpotTransferRequest["action"] => {
         return {
             type: action.type,
-            subAccountUser: action.subAccountUser.toLowerCase() as Hex,
+            subAccountUser: action.subAccountUser.toLowerCase() as `0x${string}`,
             isDeposit: action.isDeposit,
             token: action.token,
             amount: action.amount,
@@ -506,7 +502,7 @@ export const actionSorter = {
     ): SubAccountTransferRequest["action"] => {
         return {
             type: action.type,
-            subAccountUser: action.subAccountUser.toLowerCase() as Hex,
+            subAccountUser: action.subAccountUser.toLowerCase() as `0x${string}`,
             isDeposit: action.isDeposit,
             usd: action.usd,
         };
@@ -516,7 +512,7 @@ export const actionSorter = {
             type: action.type,
             signatureChainId: action.signatureChainId,
             hyperliquidChain: action.hyperliquidChain,
-            validator: action.validator.toLowerCase() as Hex,
+            validator: action.validator.toLowerCase() as `0x${string}`,
             wei: action.wei,
             isUndelegate: action.isUndelegate,
             nonce: action.nonce,
@@ -575,7 +571,7 @@ export const actionSorter = {
             type: action.type,
             signatureChainId: action.signatureChainId,
             hyperliquidChain: action.hyperliquidChain,
-            destination: action.destination.toLowerCase() as Hex,
+            destination: action.destination.toLowerCase() as `0x${string}`,
             amount: action.amount,
             time: action.time,
         };
@@ -608,7 +604,7 @@ export const actionSorter = {
             type: action.type,
             signatureChainId: action.signatureChainId,
             hyperliquidChain: action.hyperliquidChain,
-            destination: action.destination.toLowerCase() as Hex,
+            destination: action.destination.toLowerCase() as `0x${string}`,
             amount: action.amount,
             time: action.time,
         };

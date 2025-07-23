@@ -2,8 +2,8 @@ import { type Args, parseArgs } from "jsr:@std/cli@1/parse-args";
 import { generatePrivateKey, privateKeyToAccount, privateKeyToAddress } from "npm:viem@2/accounts";
 import BigNumber from "npm:bignumber.js@9";
 import { assertEquals, assertIsError, assertRejects } from "jsr:@std/assert@1";
-import { ApiRequestError, ExchangeClient, type Hex, HttpTransport, InfoClient, MultiSignClient } from "../../mod.ts";
-import { signL1Action, signUserSignedAction } from "../../src/signing/mod.ts";
+import { ApiRequestError, ExchangeClient, HttpTransport, InfoClient, MultiSignClient } from "../../mod.ts";
+import { signL1Action, signUserSignedAction, userSignedActionEip712Types } from "../../src/signing/mod.ts";
 import { schemaCoverage, SchemaCoverageError, schemaGenerator } from "../_utils/schema/mod.ts";
 import { anyFnSuccess, formatPrice, formatSize, getAssetData, randomCloid } from "../_utils/utils.ts";
 
@@ -14,7 +14,7 @@ const cliArgs = parseArgs(Deno.args, { default: { wait: 1000 }, string: ["_"] })
     wait: number;
 }>;
 
-const PRIVATE_KEY = cliArgs._[0] as Hex; // must be sole signer for a multi-sign account
+const PRIVATE_KEY = cliArgs._[0] as `0x${string}`; // must be sole signer for a multi-sign account
 const VAULT_ADDRESS = "0x457ab3acf4a4e01156ce269545a9d3d05fff2f0b"; // replace with your vault address
 const SUB_ACCOUNT_ADDRESS = "0xcb3f0bd249a89e45e86a44bcfc7113e4ffe84cd1"; // replace with your sub-account address
 const MULTI_SIGN_ADDRESS = "0x9150749C4cec13Dc7c1555D0d664F08d4d81Be83"; // replace with your multi-sign address
@@ -84,7 +84,10 @@ function run<Args extends Record<string, unknown>>(
     name: string,
     fn: (
         types: Record<string, unknown>,
-        client: ExchangeClient | MultiSignClient,
+        exchange: {
+            client: ExchangeClient | MultiSignClient;
+            address: `0x${string}`;
+        },
         args: Args,
         t: Deno.TestContext,
     ) => Promise<void>,
@@ -101,7 +104,17 @@ function run<Args extends Record<string, unknown>>(
                     ignore: mode === "multisign" && SKIP_METHODS_FOR_MULTISIGN.includes(name),
                     fn: async (t) => {
                         await new Promise((r) => setTimeout(r, cliArgs.wait)); // delay to avoid rate limits
-                        await fn(MethodReturnType, mode === "normal" ? exchClient : multiSignClient, args, t);
+                        await fn(
+                            MethodReturnType,
+                            {
+                                client: mode === "normal" ? exchClient : multiSignClient,
+                                address: mode === "normal"
+                                    ? privateKeyToAddress(exchClient.wallet)
+                                    : multiSignClient.multiSignAddress,
+                            },
+                            args,
+                            t,
+                        );
                     },
                 });
             }
@@ -112,7 +125,7 @@ function run<Args extends Record<string, unknown>>(
 export type MethodReturnType_approveAgent = Awaited<ReturnType<ExchangeClient["approveAgent"]>>;
 run(
     "approveAgent",
-    async (types, client, _, t) => {
+    async (types, { client }, _, t) => {
         await t.step("with 'agentName'", async () => {
             const data = await client.approveAgent({
                 agentAddress: privateKeyToAddress(generatePrivateKey()),
@@ -126,6 +139,7 @@ run(
         await t.step("without 'agentName'", async () => {
             const data = await client.approveAgent({
                 agentAddress: privateKeyToAddress(generatePrivateKey()),
+                agentName: null,
             });
             schemaCoverage(types, [data]);
         });
@@ -135,7 +149,7 @@ run(
 export type MethodReturnType_approveBuilderFee = Awaited<ReturnType<ExchangeClient["approveBuilderFee"]>>;
 run(
     "approveBuilderFee",
-    async (types, client, { builder }) => {
+    async (types, { client }, { builder }) => {
         const data = await client.approveBuilderFee({ maxFeeRate: "0.001%", builder });
         schemaCoverage(types, [data]);
     },
@@ -145,7 +159,7 @@ run(
 export type MethodReturnType_batchModify = Awaited<ReturnType<ExchangeClient["batchModify"]>>;
 run(
     "batchModify",
-    async (types, client, { asset }) => {
+    async (types, { client, address }, { asset }) => {
         // —————————— Prepare ——————————
 
         async function openOrder(client: ExchangeClient, id: number, pxDown: string, sz: string) {
@@ -241,11 +255,7 @@ run(
         } finally {
             // —————————— Cleanup ——————————
 
-            const openOrders = await infoClient.openOrders({
-                user: client instanceof MultiSignClient
-                    ? multiSignClient.multiSignAddress
-                    : privateKeyToAddress(exchClient.wallet),
-            });
+            const openOrders = await infoClient.openOrders({ user: address });
             const cancels = openOrders.map((o) => ({ a: id, o: o.oid }));
             await client.cancel({ cancels });
             await client.order({
@@ -267,7 +277,7 @@ run(
 export type MethodReturnType_cancel = Awaited<ReturnType<ExchangeClient["cancel"]>>;
 run(
     "cancel",
-    async (types, client, { asset }) => {
+    async (types, { client }, { asset }) => {
         // —————————— Prepare ——————————
 
         async function openOrder(client: ExchangeClient, id: number, pxDown: string, sz: string) {
@@ -311,7 +321,7 @@ run(
 export type MethodReturnType_cancelByCloid = Awaited<ReturnType<ExchangeClient["cancelByCloid"]>>;
 run(
     "cancelByCloid",
-    async (types, client, { asset }) => {
+    async (types, { client }, { asset }) => {
         // —————————— Prepare ——————————
 
         async function openOrder(client: ExchangeClient, id: number, pxDown: string, sz: string) {
@@ -356,7 +366,7 @@ run(
 export type MethodReturnType_cDeposit = Awaited<ReturnType<ExchangeClient["cDeposit"]>>;
 run(
     "cDeposit",
-    async (types, client) => {
+    async (types, { client }) => {
         const data = await client.cDeposit({ wei: 1 });
         schemaCoverage(types, [data]);
     },
@@ -365,7 +375,7 @@ run(
 export type MethodReturnType_claimRewards = Awaited<ReturnType<ExchangeClient["claimRewards"]>>;
 run(
     "claimRewards",
-    async (types, client) => {
+    async (types, { client }) => {
         await client.claimRewards()
             .then((data) => {
                 schemaCoverage(types, [data]);
@@ -380,7 +390,7 @@ run(
 export type MethodReturnType_convertToMultiSigUser = Awaited<ReturnType<ExchangeClient["convertToMultiSigUser"]>>;
 run(
     "convertToMultiSigUser",
-    async (types, client, _, t) => {
+    async (types, { client, address }, _, t) => {
         // —————————— Prepare ——————————
 
         const tempExchClient = new ExchangeClient({ wallet: generatePrivateKey(), transport, isTestnet: true });
@@ -396,18 +406,16 @@ run(
 
         await t.step("to multi-sign", async () => {
             const data = await tempExchClient.convertToMultiSigUser({
-                authorizedUsers: [
-                    client instanceof MultiSignClient
-                        ? multiSignClient.multiSignAddress
-                        : privateKeyToAddress(exchClient.wallet),
-                ],
-                threshold: 1,
+                signers: {
+                    authorizedUsers: [address],
+                    threshold: 1,
+                },
             });
             schemaCoverage(types, [data]);
         });
 
         await t.step("to single-sign", async () => {
-            const data = await tempMultiSignClient.convertToMultiSigUser(null);
+            const data = await tempMultiSignClient.convertToMultiSigUser({ signers: null });
             schemaCoverage(types, [data]);
         });
     },
@@ -416,7 +424,7 @@ run(
 export type MethodReturnType_createSubAccount = Awaited<ReturnType<ExchangeClient["createSubAccount"]>>;
 run(
     "createSubAccount",
-    async (types, client) => {
+    async (types, { client }) => {
         await client.createSubAccount({ name: String(Date.now()) })
             .then((data) => {
                 schemaCoverage(types, [data]);
@@ -434,7 +442,7 @@ run(
 export type MethodReturnType_createVault = Awaited<ReturnType<ExchangeClient["createVault"]>>;
 run(
     "createVault",
-    async (types, client) => {
+    async (types, { client }) => {
         await client.createVault({
             name: "test",
             description: "1234567890",
@@ -454,7 +462,7 @@ run(
 export type MethodReturnType_cSignerAction = Awaited<ReturnType<ExchangeClient["cSignerAction"]>>;
 run(
     "cSignerAction",
-    async (_types, client, _, t) => {
+    async (_types, { client }, _, t) => {
         await t.step("jailSelf", async () => {
             await assertRejects(
                 () => client.cSignerAction({ jailSelf: null }),
@@ -476,7 +484,7 @@ run(
 export type MethodReturnType_cValidatorAction = Awaited<ReturnType<ExchangeClient["cValidatorAction"]>>;
 run(
     "cValidatorAction",
-    async (_types, client, _, t) => {
+    async (_types, { client }, _, t) => {
         await t.step("changeProfile", async () => {
             await assertRejects(
                 () =>
@@ -531,7 +539,7 @@ run(
 export type MethodReturnType_cWithdraw = Awaited<ReturnType<ExchangeClient["cWithdraw"]>>;
 run(
     "cWithdraw",
-    async (types, client) => {
+    async (types, { client }) => {
         const data = await client.cWithdraw({ wei: 1 });
         schemaCoverage(types, [data]);
     },
@@ -540,7 +548,7 @@ run(
 export type MethodReturnType_evmUserModify = Awaited<ReturnType<ExchangeClient["evmUserModify"]>>;
 run(
     "evmUserModify",
-    async (types, client) => {
+    async (types, { client }) => {
         const data = await client.evmUserModify({ usingBigBlocks: true });
         schemaCoverage(types, [data]);
     },
@@ -549,7 +557,7 @@ run(
 export type MethodReturnType_modify = Awaited<ReturnType<ExchangeClient["modify"]>>;
 run(
     "modify",
-    async (types, client, { asset }) => {
+    async (types, { client, address }, { asset }) => {
         // —————————— Prepare ——————————
 
         async function openOrder(client: ExchangeClient, id: number, pxDown: string, sz: string) {
@@ -595,11 +603,7 @@ run(
         } finally {
             // —————————— Cleanup ——————————
 
-            const openOrders = await infoClient.openOrders({
-                user: client instanceof MultiSignClient
-                    ? multiSignClient.multiSignAddress
-                    : privateKeyToAddress(exchClient.wallet),
-            });
+            const openOrders = await infoClient.openOrders({ user: address });
             const cancels = openOrders.map((o) => ({ a: id, o: o.oid }));
             await client.cancel({ cancels });
         }
@@ -627,13 +631,18 @@ run(
             await exchClient.usdSend({ destination: multiSigUser.wallet.address, amount: "2" });
             await exchClient.usdSend({ destination: signer2.address, amount: "2" });
             await multiSigUser.convertToMultiSigUser({
-                authorizedUsers: [signer1.address, signer2.address],
-                threshold: 2,
+                signers: {
+                    authorizedUsers: [signer1.address, signer2.address],
+                    threshold: 2,
+                },
             });
 
             // Action
             const nonce = Date.now();
-            const action = { type: "scheduleCancel", time: Date.now() + 10000 };
+            const action = {
+                type: "scheduleCancel",
+                time: Date.now() + 10000,
+            } as const;
 
             // Signatures
             const signature1 = await signL1Action({
@@ -692,8 +701,10 @@ run(
             await exchClient.usdSend({ destination: signer2.address, amount: "2" });
 
             await multiSigUser.convertToMultiSigUser({
-                authorizedUsers: [signer1.address, signer2.address],
-                threshold: 2,
+                signers: {
+                    authorizedUsers: [signer1.address, signer2.address],
+                    threshold: 2,
+                },
             });
 
             // Action
@@ -715,16 +726,7 @@ run(
                     payloadMultiSigUser: multiSigUser.wallet.address,
                     outerSigner: signer1.address,
                 },
-                types: {
-                    "HyperliquidTransaction:UsdSend": [
-                        { name: "hyperliquidChain", type: "string" },
-                        { name: "payloadMultiSigUser", type: "address" },
-                        { name: "outerSigner", type: "address" },
-                        { name: "destination", type: "string" },
-                        { name: "amount", type: "string" },
-                        { name: "time", type: "uint64" },
-                    ],
-                },
+                types: userSignedActionEip712Types[action.type],
             });
             const signature2 = await signUserSignedAction({
                 wallet: signer2,
@@ -733,16 +735,7 @@ run(
                     payloadMultiSigUser: multiSigUser.wallet.address,
                     outerSigner: signer1.address,
                 },
-                types: {
-                    "HyperliquidTransaction:UsdSend": [
-                        { name: "hyperliquidChain", type: "string" },
-                        { name: "payloadMultiSigUser", type: "address" },
-                        { name: "outerSigner", type: "address" },
-                        { name: "destination", type: "string" },
-                        { name: "amount", type: "string" },
-                        { name: "time", type: "uint64" },
-                    ],
-                },
+                types: userSignedActionEip712Types[action.type],
             });
 
             // —————————— Test ——————————
@@ -768,7 +761,7 @@ run(
 export type MethodReturnType_order = Awaited<ReturnType<ExchangeClient["order"]>>;
 run(
     "order",
-    async (types, client, { asset }) => {
+    async (types, { client, address }, { asset }) => {
         // —————————— Prepare ——————————
 
         const { id, universe, ctx } = await getAssetData(infoClient, asset);
@@ -835,11 +828,7 @@ run(
         } finally {
             // —————————— Cleanup ——————————
 
-            const openOrders = await infoClient.openOrders({
-                user: client instanceof MultiSignClient
-                    ? multiSignClient.multiSignAddress
-                    : privateKeyToAddress(exchClient.wallet),
-            });
+            const openOrders = await infoClient.openOrders({ user: address });
             const cancels = openOrders.map((o) => ({ a: id, o: o.oid }));
             await client.cancel({ cancels });
             await client.order({
@@ -861,7 +850,7 @@ run(
 export type MethodReturnType_perpDeploy = Awaited<ReturnType<ExchangeClient["perpDeploy"]>>;
 run(
     "perpDeploy",
-    async (_types, client, _, t) => {
+    async (_types, { client }, _, t) => {
         await t.step("registerAsset", async () => {
             await assertRejects(
                 () =>
@@ -903,7 +892,7 @@ run(
 export type MethodReturnType_registerReferrer = Awaited<ReturnType<ExchangeClient["registerReferrer"]>>;
 run(
     "registerReferrer",
-    async (types, client) => {
+    async (types, { client }) => {
         await client.registerReferrer({ code: "TEST" })
             .then((data) => {
                 schemaCoverage(types, [data]);
@@ -926,7 +915,7 @@ run(
 export type MethodReturnType_reserveRequestWeight = Awaited<ReturnType<ExchangeClient["reserveRequestWeight"]>>;
 run(
     "reserveRequestWeight",
-    async (types, client) => {
+    async (types, { client }) => {
         const data = await client.reserveRequestWeight({ weight: 1 });
         schemaCoverage(types, [data]);
     },
@@ -935,7 +924,7 @@ run(
 export type MethodReturnType_scheduleCancel = Awaited<ReturnType<ExchangeClient["scheduleCancel"]>>;
 run(
     "scheduleCancel",
-    async (types, client) => {
+    async (types, { client }) => {
         await client.scheduleCancel({ time: Date.now() + 10000 })
             .then((data) => {
                 schemaCoverage(types, [data]);
@@ -950,7 +939,7 @@ run(
 export type MethodReturnType_setDisplayName = Awaited<ReturnType<ExchangeClient["setDisplayName"]>>;
 run(
     "setDisplayName",
-    async (types, client) => {
+    async (types, { client }) => {
         const data = await client.setDisplayName({ displayName: "" });
         schemaCoverage(types, [data]);
     },
@@ -959,7 +948,7 @@ run(
 export type MethodReturnType_setReferrer = Awaited<ReturnType<ExchangeClient["setReferrer"]>>;
 run(
     "setReferrer",
-    async (types, client) => {
+    async (types, { client }) => {
         await client.setReferrer({ code: "TEST" })
             .then((data) => {
                 schemaCoverage(types, [data]);
@@ -977,7 +966,7 @@ run(
 export type MethodReturnType_spotDeploy = Awaited<ReturnType<ExchangeClient["spotDeploy"]>>;
 run(
     "spotDeploy",
-    async (_types, client, _, t) => {
+    async (_types, { client }, _, t) => {
         await t.step("registerToken2", async () => {
             await assertRejects(
                 () =>
@@ -1071,7 +1060,7 @@ run(
 export type MethodReturnType_spotSend = Awaited<ReturnType<ExchangeClient["spotSend"]>>;
 run(
     "spotSend",
-    async (types, client) => {
+    async (types, { client }) => {
         const data = await client.spotSend({
             destination: "0x0000000000000000000000000000000000000001",
             token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
@@ -1084,7 +1073,7 @@ run(
 export type MethodReturnType_subAccountModify = Awaited<ReturnType<ExchangeClient["subAccountModify"]>>;
 run(
     "subAccountModify",
-    async (types, client, { subAccountUser }) => {
+    async (types, { client }, { subAccountUser }) => {
         await client.subAccountModify({ subAccountUser, name: String(Date.now()) })
             .then((data) => {
                 schemaCoverage(types, [data]);
@@ -1100,7 +1089,7 @@ run(
 export type MethodReturnType_spotUser = Awaited<ReturnType<ExchangeClient["spotUser"]>>;
 run(
     "spotUser",
-    async (types, client) => {
+    async (types, { client }) => {
         await client.spotUser({ toggleSpotDusting: { optOut: true } })
             .then((data) => {
                 schemaCoverage(types, [data]);
@@ -1115,7 +1104,7 @@ run(
 export type MethodReturnType_subAccountSpotTransfer = Awaited<ReturnType<ExchangeClient["subAccountSpotTransfer"]>>;
 run(
     "subAccountSpotTransfer",
-    async (types, client, { subAccountUser }) => {
+    async (types, { client }, { subAccountUser }) => {
         await client.subAccountSpotTransfer({
             subAccountUser,
             isDeposit: true,
@@ -1136,7 +1125,7 @@ run(
 export type MethodReturnType_subAccountTransfer = Awaited<ReturnType<ExchangeClient["subAccountTransfer"]>>;
 run(
     "subAccountTransfer",
-    async (types, client, { subAccountUser }) => {
+    async (types, { client }, { subAccountUser }) => {
         await client.subAccountTransfer({ subAccountUser, isDeposit: true, usd: 1 })
             .then((data) => {
                 schemaCoverage(types, [data]);
@@ -1152,7 +1141,7 @@ run(
 export type MethodReturnType_tokenDelegate = Awaited<ReturnType<ExchangeClient["tokenDelegate"]>>;
 run(
     "tokenDelegate",
-    async (types, client, { validator }) => {
+    async (types, { client }, { validator }) => {
         const data = await client.tokenDelegate({ validator, wei: 1, isUndelegate: true });
         schemaCoverage(types, [data]);
     },
@@ -1162,7 +1151,7 @@ run(
 export type MethodReturnType_twapCancel = Awaited<ReturnType<ExchangeClient["twapCancel"]>>;
 run(
     "twapCancel",
-    async (types, client, { asset }) => {
+    async (types, { client }, { asset }) => {
         // —————————— Prepare ——————————
 
         async function createTWAP(client: ExchangeClient, id: number, sz: string) {
@@ -1194,7 +1183,7 @@ run(
 export type MethodReturnType_twapOrder = Awaited<ReturnType<ExchangeClient["twapOrder"]>>;
 run(
     "twapOrder",
-    async (types, client, { asset }) => {
+    async (types, { client }, { asset }) => {
         // —————————— Prepare ——————————
 
         const { id, universe, ctx } = await getAssetData(infoClient, asset);
@@ -1228,7 +1217,7 @@ run(
 export type MethodReturnType_updateIsolatedMargin = Awaited<ReturnType<ExchangeClient["updateIsolatedMargin"]>>;
 run(
     "updateIsolatedMargin",
-    async (types, client, { asset }) => {
+    async (types, { client }, { asset }) => {
         // —————————— Prepare ——————————
 
         const { id, universe, ctx } = await getAssetData(infoClient, asset);
@@ -1276,7 +1265,7 @@ run(
 export type MethodReturnType_updateLeverage = Awaited<ReturnType<ExchangeClient["updateLeverage"]>>;
 run(
     "updateLeverage",
-    async (types, client, { asset }) => {
+    async (types, { client }, { asset }) => {
         // —————————— Prepare ——————————
 
         const { id } = await getAssetData(infoClient, asset);
@@ -1292,7 +1281,7 @@ run(
 export type MethodReturnType_usdClassTransfer = Awaited<ReturnType<ExchangeClient["usdClassTransfer"]>>;
 run(
     "usdClassTransfer",
-    async (types, client) => {
+    async (types, { client }) => {
         const data = await client.usdClassTransfer({ amount: "1", toPerp: false });
         schemaCoverage(types, [data]);
     },
@@ -1301,7 +1290,7 @@ run(
 export type MethodReturnType_usdSend = Awaited<ReturnType<ExchangeClient["usdSend"]>>;
 run(
     "usdSend",
-    async (types, client) => {
+    async (types, { client }) => {
         const data = await client.usdSend({ destination: "0x0000000000000000000000000000000000000001", amount: "1" });
         schemaCoverage(types, [data]);
     },
@@ -1310,7 +1299,7 @@ run(
 export type MethodReturnType_vaultDistribute = Awaited<ReturnType<ExchangeClient["vaultDistribute"]>>;
 run(
     "vaultDistribute",
-    async (types, client, { vaultAddress }) => {
+    async (types, { client }, { vaultAddress }) => {
         await client.vaultDistribute({ vaultAddress, usd: 1 * 1e6 })
             .then((data) => {
                 schemaCoverage(types, [data]);
@@ -1329,7 +1318,7 @@ run(
 export type MethodReturnType_vaultModify = Awaited<ReturnType<ExchangeClient["vaultModify"]>>;
 run(
     "vaultModify",
-    async (types, client, { vaultAddress }) => {
+    async (types, { client }, { vaultAddress }) => {
         await client.vaultModify({ vaultAddress, allowDeposits: null, alwaysCloseOnWithdraw: null })
             .then((data) => {
                 schemaCoverage(types, [data]);
@@ -1345,7 +1334,7 @@ run(
 export type MethodReturnType_vaultTransfer = Awaited<ReturnType<ExchangeClient["vaultTransfer"]>>;
 run(
     "vaultTransfer",
-    async (types, client, { vaultAddress }) => {
+    async (types, { client }, { vaultAddress }) => {
         await client.vaultTransfer({ vaultAddress, isDeposit: false, usd: 5 * 1e6 })
             .then((data) => {
                 schemaCoverage(types, [data]);
@@ -1361,13 +1350,8 @@ run(
 export type MethodReturnType_withdraw3 = Awaited<ReturnType<ExchangeClient["withdraw3"]>>;
 run(
     "withdraw3",
-    async (types, client) => {
-        const data = await client.withdraw3({
-            amount: "2",
-            destination: client instanceof MultiSignClient
-                ? multiSignClient.multiSignAddress
-                : privateKeyToAddress(exchClient.wallet),
-        });
+    async (types, { client, address }) => {
+        const data = await client.withdraw3({ amount: "2", destination: address });
         schemaCoverage(types, [data]);
     },
 );
@@ -1407,29 +1391,6 @@ Deno.test("_guessSignatureChainId", async (t) => {
             const wallet = new ethers.Wallet(generatePrivateKey(), provider);
 
             const exchClient = new ExchangeClient({ wallet, transport: new HttpTransport() });
-
-            const signatureChainId = typeof exchClient.signatureChainId === "string"
-                ? exchClient.signatureChainId
-                : await exchClient.signatureChainId();
-            assertEquals(signatureChainId, "0x1");
-        },
-        ignore: !METHODS_TO_TEST.includes("_guessSignatureChainId"),
-    });
-
-    await t.step({
-        name: "window.ethereum",
-        fn: async () => {
-            const ethereum = { // Mock window.ethereum
-                // deno-lint-ignore require-await
-                request: async ({ method }: { method: string }) => {
-                    if (method === "eth_chainId") {
-                        return ["0x1"];
-                    }
-                },
-            };
-
-            const transport = new HttpTransport();
-            const exchClient = new ExchangeClient({ wallet: ethereum, transport });
 
             const signatureChainId = typeof exchClient.signatureChainId === "string"
                 ? exchClient.signatureChainId

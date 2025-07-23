@@ -1,4 +1,4 @@
-import type { Hex } from "../../base.ts";
+import type { Hex } from "../mod.ts";
 
 /** Transaction details. */
 export interface TxDetails {

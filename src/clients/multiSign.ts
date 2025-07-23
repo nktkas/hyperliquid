@@ -1,26 +1,25 @@
-import type { Hex } from "../base.ts";
 import type { IRequestTransport } from "../transports/base.ts";
-import type { CreateSubAccountResponse, CreateVaultResponse, SuccessResponse } from "../types/mod.ts";
-import {
-    type CancelResponseSuccess,
-    ExchangeClient,
-    type ExchangeClientParameters,
-    type OrderResponseSuccess,
-    type TwapCancelResponseSuccess,
-    type TwapOrderResponseSuccess,
-} from "./exchange.ts";
+import type {
+    CancelSuccessResponse,
+    CreateSubAccountResponse,
+    CreateVaultResponse,
+    Hex,
+    OrderSuccessResponse,
+    SuccessResponse,
+    TwapCancelSuccessResponse,
+    TwapOrderSuccessResponse,
+} from "../types/mod.ts";
+import { ExchangeClient, type ExchangeClientParameters } from "./exchange.ts";
 import {
     type AbstractEthersSigner,
     type AbstractEthersV5Signer,
     type AbstractViemWalletClient,
     type AbstractWallet,
-    type AbstractWindowEthereum,
-    actionSorter,
     getWalletAddress,
     signL1Action,
     signUserSignedAction,
-    userSignedActionEip712Types,
 } from "../signing/mod.ts";
+import { type actionSorter, userSignedActionEip712Types } from "../signing/mod.ts";
 
 type Signers = [AbstractWalletWithAddress, ...AbstractWallet[]];
 
@@ -40,8 +39,7 @@ export type AbstractWalletWithAddress =
     | Hex // Private key
     | Required<AbstractViemWalletClient>
     | Required<AbstractEthersSigner>
-    | Required<AbstractEthersV5Signer>
-    | AbstractWindowEthereum;
+    | Required<AbstractEthersV5Signer>;
 
 /**
  * Multi-signature exchange client for interacting with the Hyperliquid API.
@@ -70,7 +68,7 @@ export class MultiSignClient<
      *
      * const multiSignAddress = "0x...";
      * const signers = [
-     *   "0x...", // Private key; or any other wallet libraries
+     *   "0x...", // private key; or any other wallet libraries
      * ] as const;
      *
      * const transport = new hl.HttpTransport();
@@ -97,26 +95,25 @@ export class MultiSignClient<
     protected override async _executeL1Action<
         T extends
             | SuccessResponse
-            | CancelResponseSuccess
+            | CancelSuccessResponse
             | CreateSubAccountResponse
             | CreateVaultResponse
-            | OrderResponseSuccess
-            | TwapOrderResponseSuccess
-            | TwapCancelResponseSuccess,
+            | OrderSuccessResponse
+            | TwapOrderSuccessResponse
+            | TwapCancelSuccessResponse,
     >(
         request: {
-            action: {
-                type: string;
-                [key: string]: unknown;
-            };
+            action: Parameters<
+                typeof actionSorter[
+                    Exclude<keyof typeof actionSorter, keyof typeof userSignedActionEip712Types>
+                ]
+            >[0];
             vaultAddress?: Hex;
             expiresAfter: number | undefined;
         },
         signal?: AbortSignal,
     ): Promise<T> {
-        let { action, vaultAddress, expiresAfter } = request;
-        // @ts-ignore - for test
-        action = actionSorter[action.type](action);
+        const { action, vaultAddress, expiresAfter } = request;
 
         // Sign an L1 action
         const nonce = await this.nonceManager();
@@ -150,43 +147,28 @@ export class MultiSignClient<
     protected override async _executeUserSignedAction<
         T extends
             | SuccessResponse
-            | CancelResponseSuccess
+            | CancelSuccessResponse
             | CreateSubAccountResponse
             | CreateVaultResponse
-            | OrderResponseSuccess
-            | TwapOrderResponseSuccess
-            | TwapCancelResponseSuccess,
+            | OrderSuccessResponse
+            | TwapOrderSuccessResponse
+            | TwapCancelSuccessResponse,
     >(
         request: {
-            action:
-                & {
-                    type: keyof typeof userSignedActionEip712Types;
-                    signatureChainId: Hex;
-                    [key: string]: unknown;
-                }
-                & (
-                    | { nonce: number; time?: undefined }
-                    | { time: number; nonce?: undefined }
-                );
+            action: Parameters<
+                typeof actionSorter[
+                    Exclude<Extract<keyof typeof actionSorter, keyof typeof userSignedActionEip712Types>, "multiSig">
+                ]
+            >[0];
         },
         signal?: AbortSignal,
     ): Promise<T> {
-        let { action } = request;
-        // @ts-ignore - for test
-        action = actionSorter[action.type](action);
+        const { action } = request;
 
         // Sign a user-signed action
+        const nonce = "nonce" in action ? action.nonce : action.time;
         const outerSigner = await getWalletAddress(this.signers[0]);
-
-        if (action.type === "approveAgent" && !action.agentName) action.agentName = ""; // Special case for approveAgent
         const signatures = await Promise.all(this.signers.map(async (signer) => {
-            const types = structuredClone(userSignedActionEip712Types[action.type]); // for safe mutation
-            Object.values(types)[0].splice( // array mutation
-                1, // after `hyperliquidChain`
-                0, // do not remove any elements
-                { name: "payloadMultiSigUser", type: "address" },
-                { name: "outerSigner", type: "address" },
-            );
             return await signUserSignedAction({
                 wallet: signer,
                 action: {
@@ -194,10 +176,9 @@ export class MultiSignClient<
                     outerSigner,
                     ...action,
                 },
-                types,
+                types: userSignedActionEip712Types[action.type],
             });
         }));
-        if (action.type === "approveAgent" && action.agentName === "") action.agentName = null; // Special case for approveAgent
 
         // Send a request via multi-sign action
         return await super.multiSig(
@@ -208,33 +189,9 @@ export class MultiSignClient<
                     outerSigner,
                     action,
                 },
-                nonce: action.nonce ?? action.time,
+                nonce,
             },
             { signal },
         );
-    }
-
-    protected override _executeMultiSigAction<
-        T extends
-            | SuccessResponse
-            | CancelResponseSuccess
-            | CreateSubAccountResponse
-            | CreateVaultResponse
-            | OrderResponseSuccess
-            | TwapOrderResponseSuccess
-            | TwapCancelResponseSuccess,
-    >(
-        request: {
-            action: {
-                type: "multiSig";
-                [key: string]: unknown;
-            };
-            vaultAddress?: Hex;
-            expiresAfter?: number;
-            nonce: number;
-        },
-        signal?: AbortSignal,
-    ): Promise<T> {
-        return super._executeMultiSigAction(request, signal);
     }
 }

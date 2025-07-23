@@ -1,4 +1,4 @@
-import type { Hex } from "../../base.ts";
+import type { Hex } from "../mod.ts";
 
 /**
  * Block details by block height.
@@ -23,12 +23,12 @@ export interface TxDetailsRequest {
 }
 
 /**
- * Request user details by user's address.
+ * Request user details by user address.
  * @returns {UserDetailsResponse}
  */
 export interface UserDetailsRequest {
     /** Type of request. */
     type: "userDetails";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }

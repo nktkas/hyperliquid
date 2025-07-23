@@ -25,7 +25,7 @@ jobs:
 
             # Check the code/docs for type errors
             - name: deno check
-              run: deno check --doc .
+              run: deno check --doc
 
             # Run all test files in the repository and collect code coverage.
             - name: deno test + coverage

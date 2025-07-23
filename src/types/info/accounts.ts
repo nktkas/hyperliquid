@@ -1,4 +1,4 @@
-import type { Hex } from "../../base.ts";
+import type { Hex } from "../mod.ts";
 
 /** Position for a specific asset. */
 export interface AssetPosition {
@@ -107,7 +107,7 @@ export interface ExtraAgent {
 
 /** Legal verification status for a user. */
 export interface LegalCheck {
-    /** Whether the user's IP address is allowed. */
+    /** Whether the user IP address is allowed. */
     ipAllowed: boolean;
     /** Whether the user has accepted the terms of service. */
     acceptedTerms: boolean;
@@ -266,6 +266,8 @@ export interface Referral {
             data: {
                 /** Assigned referral code. */
                 code: string;
+                /** Total number of referrals. */
+                nReferrals: number;
                 /** Summary of each referral state. */
                 referralStates: {
                     /**
@@ -564,7 +566,7 @@ export interface FundingUpdate {
     nSamples: number | null;
 }
 
-/** User's rate limits. */
+/** User rate limits. */
 export interface UserRateLimit {
     /**
      * Cumulative trading volume.
@@ -577,7 +579,7 @@ export interface UserRateLimit {
     nRequestsCap: number;
 }
 
-/** User's role */
+/** User role */
 export type UserRole =
     | {
         /** Role identifier. */
@@ -654,7 +656,7 @@ export interface InternalTransferUpdate {
      * @pattern ^[0-9]+(\.[0-9]+)?$
      */
     usdc: string;
-    /** Initiator's address. */
+    /** Initiator address. */
     user: Hex;
     /** Destination address. */
     destination: Hex;
@@ -717,7 +719,7 @@ export interface SpotTransferUpdate {
      * @pattern ^[0-9]+(\.[0-9]+)?$
      */
     usdcValue: string;
-    /** Initiator's address. */
+    /** Initiator address. */
     user: Hex;
     /** Destination address. */
     destination: Hex;
@@ -742,7 +744,7 @@ export interface SubAccountTransferUpdate {
      * @pattern ^[0-9]+(\.[0-9]+)?$
      */
     usdc: string;
-    /** Initiator's address. */
+    /** Initiator address. */
     user: Hex;
     /** Destination address. */
     destination: Hex;

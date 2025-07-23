@@ -3,14 +3,7 @@ import { deadline } from "jsr:@std/async@1/deadline";
 import type { SchemaObject } from "npm:ajv@8";
 import { privateKeyToAddress } from "npm:viem@2/accounts";
 import BigNumber from "npm:bignumber.js@9";
-import {
-    ExchangeClient,
-    type Hex,
-    HttpTransport,
-    InfoClient,
-    SubscriptionClient,
-    WebSocketTransport,
-} from "../../mod.ts";
+import { ExchangeClient, HttpTransport, InfoClient, SubscriptionClient, WebSocketTransport } from "../../mod.ts";
 import { schemaGenerator } from "../_utils/schema/_schemaGenerator.ts";
 import { schemaCoverage } from "../_utils/schema/_schemaCoverage.ts";
 import { formatPrice, formatSize, getAssetData, randomCloid } from "../_utils/utils.ts";
@@ -22,7 +15,7 @@ const cliArgs = parseArgs(Deno.args, { default: { wait: 1000 }, string: ["_"] })
     wait: number;
 }>;
 
-const PRIVATE_KEY = cliArgs._[0] as Hex; // must be sole signer for a multi-sign account
+const PRIVATE_KEY = cliArgs._[0] as `0x${string}`; // must be sole signer for a multi-sign account
 
 const METHODS_TO_TEST = [ // controls which tests to run
     "activeAssetCtx",
@@ -498,6 +491,7 @@ run(
                     "selfTradeCanceled",
                     "siblingFilledCanceled",
                     "vaultWithdrawalCanceled",
+                    "rejected",
                 ],
             },
         });

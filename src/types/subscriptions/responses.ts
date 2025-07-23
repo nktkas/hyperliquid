@@ -1,4 +1,4 @@
-import type { Hex } from "../../base.ts";
+import type { Hex } from "../mod.ts";
 import type { BlockDetails } from "../explorer/responses.ts";
 import type {
     FundingUpdate,
@@ -20,7 +20,7 @@ export interface WsActiveAssetCtx {
 
 /** Active asset trading data. */
 export interface WsActiveAssetData {
-    /** User's address. */
+    /** User address. */
     user: Hex;
     /** Asset symbol (e.g., BTC). */
     coin: string;
@@ -81,7 +81,7 @@ export interface WsBbo {
 /** Block details. */
 export type WsBlockDetails = Omit<BlockDetails, "txs">;
 
-/** User's notifications. */
+/** User notifications. */
 export interface WsNotification {
     /** Notification content. */
     notification: string;
@@ -113,7 +113,7 @@ export interface WsTrade {
     users: [Hex, Hex];
 }
 
-/** User's event. */
+/** User event. */
 export type WsUserEvent =
     | WsUserEventFill
     | WsUserEventFunding
@@ -122,19 +122,19 @@ export type WsUserEvent =
     | WsUserEventTwapHistory
     | WsUserEventTwapSliceFills;
 
-/** User's fill event. */
+/** User fill event. */
 export interface WsUserEventFill {
     /** Array of trade fills. */
     fills: Fill[];
 }
 
-/** User's funding event. */
+/** User funding event. */
 export interface WsUserEventFunding {
     /** Funding update details. */
     funding: Omit<FundingUpdate, "type">;
 }
 
-/** User's liquidation event. */
+/** User liquidation event. */
 export interface WsUserEventLiquidation {
     /** Liquidation event details. */
     liquidation: {
@@ -168,21 +168,21 @@ export interface WsUserEventNonUserCancel {
     }[];
 }
 
-/** User's TWAP history event. */
+/** User TWAP history event. */
 export interface WsUserEventTwapHistory {
     /** Array of historical TWAP fills. */
     twapHistory: TwapHistory[];
 }
 
-/** User's TWAP slice fills event. */
+/** User TWAP slice fills event. */
 export interface WsUserEventTwapSliceFills {
     /** Array of TWAP slice fills. */
     twapSliceFills: TwapSliceFill[];
 }
 
-/** User's fills. */
+/** User fills. */
 export interface WsUserFills {
-    /** User's address. */
+    /** User address. */
     user: Hex;
     /** Array of fill events. */
     fills: Fill[];
@@ -190,9 +190,9 @@ export interface WsUserFills {
     isSnapshot?: true;
 }
 
-/** User's fundings. */
+/** User fundings. */
 export interface WsUserFundings {
-    /** User's address. */
+    /** User address. */
     user: Hex;
     /** Array of funding events. */
     fundings: (Omit<FundingUpdate, "type"> & Pick<UserFundingUpdate, "time">)[];
@@ -200,9 +200,9 @@ export interface WsUserFundings {
     isSnapshot?: true;
 }
 
-/** User's non-funding ledger updates. */
+/** User non-funding ledger updates. */
 export interface WsUserNonFundingLedgerUpdates {
-    /** User's address. */
+    /** User address. */
     user: Hex;
     /** Array of non-funding ledger updates. */
     nonFundingLedgerUpdates: UserNonFundingLedgerUpdate[];
@@ -210,9 +210,9 @@ export interface WsUserNonFundingLedgerUpdates {
     isSnapshot?: true;
 }
 
-/** User's TWAP history. */
+/** User TWAP history. */
 export interface WsUserTwapHistory {
-    /** User's address. */
+    /** User address. */
     user: Hex;
     /** Array of historical TWAP fills. */
     history: TwapHistory[];
@@ -220,9 +220,9 @@ export interface WsUserTwapHistory {
     isSnapshot?: true;
 }
 
-/** User's TWAP slice fills. */
+/** User TWAP slice fills. */
 export interface WsUserTwapSliceFills {
-    /** User's address. */
+    /** User address. */
     user: Hex;
     /** Array of TWAP slice fills. */
     twapSliceFills: TwapSliceFill[];
@@ -246,9 +246,9 @@ export interface WsWebData2 {
      * @pattern ^[0-9]+(\.[0-9]+)?$
      */
     totalVaultEquity: string;
-    /** User's open orders with frontend information. */
+    /** User open orders with frontend information. */
     openOrders: FrontendOrder[];
-    /** Agent's address if one exists. */
+    /** Agent address if one exists. */
     agentAddress: Hex | null;
     /** Timestamp until which the agent is valid. */
     agentValidUntil: number | null;
@@ -265,7 +265,7 @@ export interface WsWebData2 {
     serverTime: number;
     /** Whether this account is a vault. */
     isVault: boolean;
-    /** User's address. */
+    /** User address. */
     user: Hex;
     /** TWAP states. */
     twapStates: [number, TwapState][];

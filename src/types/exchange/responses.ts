@@ -1,22 +1,7 @@
-import type { Hex } from "../../base.ts";
-
-/** Base structure for exchange responses. */
-export interface BaseExchangeResponse {
-    /** Response status indicating success or failure of the action. */
-    status: "ok" | "err";
-    /** Success data or error message. */
-    response:
-        | {
-            /** Type of operation. */
-            type: string;
-            /** Specific data for the action. */
-            data?: unknown;
-        }
-        | string;
-}
+import type { Hex } from "../mod.ts";
 
 /** Response for order cancellation. */
-export interface CancelResponse extends BaseExchangeResponse {
+export interface CancelResponse {
     /** Successful status. */
     status: "ok";
     /** Response details. */
@@ -37,8 +22,24 @@ export interface CancelResponse extends BaseExchangeResponse {
     };
 }
 
+/** Successful variant of {@linkcode CancelResponse} without errors. */
+export interface CancelSuccessResponse {
+    /** Successful status. */
+    status: "ok";
+    /** Response details. */
+    response: {
+        /** Type of response. */
+        type: "cancel";
+        /** Specific data. */
+        data: {
+            /** Array of success statuses. */
+            statuses: "success"[];
+        };
+    };
+}
+
 /** Response for creating a sub-account. */
-export interface CreateSubAccountResponse extends BaseExchangeResponse {
+export interface CreateSubAccountResponse {
     /** Successful status. */
     status: "ok";
     /** Response details. */
@@ -51,7 +52,7 @@ export interface CreateSubAccountResponse extends BaseExchangeResponse {
 }
 
 /** Response for creating a vault. */
-export interface CreateVaultResponse extends BaseExchangeResponse {
+export interface CreateVaultResponse {
     /** Successful status. */
     status: "ok";
     /** Response details. */
@@ -64,7 +65,7 @@ export interface CreateVaultResponse extends BaseExchangeResponse {
 }
 
 /** Error response for failed operations. */
-export interface ErrorResponse extends BaseExchangeResponse {
+export interface ErrorResponse {
     /** Error status. */
     status: "err";
     /** Error message. */
@@ -72,7 +73,7 @@ export interface ErrorResponse extends BaseExchangeResponse {
 }
 
 /** Response for order placement and batch modifications. */
-export interface OrderResponse extends BaseExchangeResponse {
+export interface OrderResponse {
     /** Successful status. */
     status: "ok";
     /** Response details. */
@@ -120,8 +121,47 @@ export interface OrderResponse extends BaseExchangeResponse {
     };
 }
 
+/** Successful variant of {@linkcode OrderResponse} without errors. */
+export type OrderSuccessResponse = {
+    /** Successful status. */
+    status: "ok";
+    /** Response details. */
+    response: {
+        /** Type of response. */
+        type: "order";
+        /** Specific data. */
+        data: {
+            /** Array of successful order statuses. */
+            statuses: (
+                | {
+                    /** Resting order status. */
+                    resting: {
+                        /** Order ID. */
+                        oid: number;
+                        /** Client Order ID. */
+                        cloid?: Hex;
+                    };
+                }
+                | {
+                    /** Filled order status. */
+                    filled: {
+                        /** Total size filled. */
+                        totalSz: string;
+                        /** Average price of fill. */
+                        avgPx: string;
+                        /** Order ID. */
+                        oid: number;
+                        /** Client Order ID. */
+                        cloid?: Hex;
+                    };
+                }
+            )[];
+        };
+    };
+};
+
 /** Successful response without specific data. */
-export interface SuccessResponse extends BaseExchangeResponse {
+export interface SuccessResponse {
     /** Successful status. */
     status: "ok";
     /** Response details. */
@@ -132,7 +172,7 @@ export interface SuccessResponse extends BaseExchangeResponse {
 }
 
 /** Response for canceling a TWAP order. */
-export interface TwapCancelResponse extends BaseExchangeResponse {
+export interface TwapCancelResponse {
     /** Successful status. */
     status: "ok";
     /** Response details. */
@@ -141,7 +181,7 @@ export interface TwapCancelResponse extends BaseExchangeResponse {
         type: "twapCancel";
         /** Specific data. */
         data: {
-            /** Status of the operation. */
+            /** Status of the operation or error message. */
             status:
                 | string
                 | {
@@ -152,8 +192,24 @@ export interface TwapCancelResponse extends BaseExchangeResponse {
     };
 }
 
+/** Successful variant of {@linkcode TwapCancelResponse} without errors. */
+export type TwapCancelSuccessResponse = {
+    /** Successful status. */
+    status: "ok";
+    /** Response details. */
+    response: {
+        /** Type of response. */
+        type: "twapCancel";
+        /** Specific data. */
+        data: {
+            /** Status of the operation. */
+            status: string;
+        };
+    };
+};
+
 /** Response for creating a TWAP order. */
-export interface TwapOrderResponse extends BaseExchangeResponse {
+export interface TwapOrderResponse {
     /** Successful status. */
     status: "ok";
     /** Response details. */
@@ -162,7 +218,7 @@ export interface TwapOrderResponse extends BaseExchangeResponse {
         type: "twapOrder";
         /** Specific data. */
         data: {
-            /** Status of the operation. */
+            /** Status of the operation or error message. */
             status:
                 | {
                     /** Running order status. */
@@ -178,3 +234,25 @@ export interface TwapOrderResponse extends BaseExchangeResponse {
         };
     };
 }
+
+/** Successful variant of {@linkcode TwapOrderResponse} without errors. */
+export type TwapOrderSuccessResponse = {
+    /** Successful status. */
+    status: "ok";
+    /** Response details. */
+    response: {
+        /** Type of response. */
+        type: "twapOrder";
+        /** Specific data. */
+        data: {
+            /** Status of the operation. */
+            status: {
+                /** Running order status. */
+                running: {
+                    /** TWAP ID. */
+                    twapId: number;
+                };
+            };
+        };
+    };
+};

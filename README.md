@@ -113,7 +113,7 @@ const openOrders = await infoClient.openOrders({ user: "0x..." });
 ```ts
 import * as hl from "@nktkas/hyperliquid";
 
-const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+const privateKey = "0x..."; // or `viem`, `ethers`
 
 const transport = new hl.HttpTransport();
 const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
@@ -224,9 +224,6 @@ const exchClient_ethers = new hl.ExchangeClient({ wallet: ethersWallet, transpor
 const [account] = await window.ethereum.request({ method: "eth_requestAccounts" });
 const externalWallet = createWalletClient({ account, transport: custom(window.ethereum) });
 const exchClient_viemMetamask = new hl.ExchangeClient({ wallet: externalWallet, transport });
-
-// 5. Using external wallet (e.g. MetaMask) via `window.ethereum`
-const exchClient_windowMetamask = new hl.ExchangeClient({ wallet: window.ethereum, transport });
 ```
 
 #### Create SubscriptionClient
@@ -304,7 +301,7 @@ const openOrders = await infoClient.openOrders({ user: "0x..." });
 ```ts
 import * as hl from "@nktkas/hyperliquid";
 
-const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+const privateKey = "0x..."; // or `viem`, `ethers`
 
 const transport = new hl.HttpTransport();
 const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
@@ -414,9 +411,6 @@ const result = await multiSignClient.withdraw3({
 
 A client is an interface through which you can interact with the Hyperliquid API.
 
-The client is responsible for formatting an action, creating a signature correctly, sending a request, and validating a
-response.
-
 #### InfoClient
 
 ```ts
@@ -507,8 +501,7 @@ class ExchangeClient {
             | Hex // Private key directly
             | AbstractViemWalletClient // viem
             | AbstractEthersSigner // ethers
-            | AbstractEthersV5Signer // ethers v5
-            | AbstractWindowEthereum; // window.ethereum (EIP-1193)
+            | AbstractEthersV5Signer; // ethers v5
         isTestnet?: boolean; // Whether to use testnet (default: false)
         defaultVaultAddress?: Hex; // Vault address used by default if not provided in method call
         signatureChainId?: Hex | (() => MaybePromise<Hex>); // Chain ID used for signing (default: trying to guess based on wallet and `isTestnet`)
@@ -637,7 +630,11 @@ Transport acts as a layer between class requests and Hyperliquid servers.
 
 #### HTTP Transport
 
-HTTP transport is suitable for one-off requests or serverless environments.
+**Features:**
+
+- Uses [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) for requests. Can be configured using
+  [`fetchOptions`](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit).
+- Automatically determines the target URL based on the request + `isTestnet` flag.
 
 ```ts
 class HttpTransport {
@@ -657,7 +654,19 @@ class HttpTransport {
 
 #### WebSocket Transport
 
-WebSocket transport has better network latency than HTTP transport.
+**Features:**
+
+- Uses [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) for requests.
+- Supports [subscriptions](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions)
+  and [post requests](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/post-requests).
+- Automatically restores connection after loss and resubscribes to previous subscriptions.
+- Smart keep alive (pings only when idle).
+
+**Limitations:**
+
+- Cannot mix api/explorer endpoints or mainnet/testnet in single connection. Need to create separate instances for
+  different endpoints.
+- Cannot send explorer post-requests via WebSocket. Use [HTTP transport](#http-transport).
 
 ```ts
 class WebSocketTransport {
@@ -700,27 +709,23 @@ The import point gives access to functions that generate signatures for Hyperliq
 ```ts
 import { actionSorter, signL1Action } from "@nktkas/hyperliquid/signing";
 
-const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+const privateKey = "0x..."; // or `viem`, `ethers`
 
-const nonce = Date.now();
-const action = {
+const action = actionSorter.cancel({
     type: "cancel",
     cancels: [
         { a: 0, o: 12345 },
     ],
-} as const;
-
-const signature = await signL1Action({
-    wallet: privateKey,
-    action: actionSorter[action.type](action),
-    nonce,
 });
+const nonce = Date.now();
+
+const signature = await signL1Action({ wallet: privateKey, action, nonce });
 
 // Send the signed action to the Hyperliquid API
 const response = await fetch("https://api.hyperliquid.xyz/exchange", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action, signature, nonce }),
+    body: JSON.stringify({ action, signature, nonce }), // recommended to send the same sorted action
 });
 const body = await response.json();
 ```
@@ -728,18 +733,18 @@ const body = await response.json();
 #### Approve agent yourself
 
 ```ts
-import { signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
+import { actionSorter, signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
 
-const privateKey = "0x..."; // or `viem`, `ethers`, `window.ethereum`
+const privateKey = "0x..."; // or `viem`, `ethers`
 
-const action = {
+const action = actionSorter.approveAgent({
     type: "approveAgent",
     signatureChainId: "0x66eee",
     hyperliquidChain: "Mainnet",
     agentAddress: "0x...",
     agentName: "Agent",
     nonce: Date.now(),
-} as const;
+});
 
 const signature = await signUserSignedAction({
     wallet: privateKey,
@@ -751,7 +756,7 @@ const signature = await signUserSignedAction({
 const response = await fetch("https://api.hyperliquid.xyz/exchange", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action, signature, nonce: action.nonce }),
+    body: JSON.stringify({ action, signature, nonce: action.nonce }), // recommended to send the same sorted action
 });
 const body = await response.json();
 ```
@@ -770,8 +775,8 @@ L1 action through an external wallet:
 
 ### How to create a market order?
 
-Hyperliquid doesn't have traditional market orders, but you can achieve market-like execution by placing limit orders
-with `tif: "Ioc"` and prices that guarantee immediate execution:
+Hyperliquid doesn't have traditional market orders, but you can achieve market-like execution by placing limit order
+with `tif: "Ioc"` and price that guarantee immediate execution:
 
 - For buys: set limit price >= current best ask
 - For sells: set limit price <= current best bid
@@ -780,7 +785,7 @@ with `tif: "Ioc"` and prices that guarantee immediate execution:
 
 **Agent Wallet**: Use agent's private key in constructor instead of master account's private key.
 
-**Vault and Sub-Account**: Pass vault or sub-account address via `vaultAddress` parameter to methods or set
+**Vault and Sub-Account**: Pass vault or sub-account address via `vaultAddress` options to methods or set
 `defaultVaultAddress` in constructor.
 
 ## Contributing

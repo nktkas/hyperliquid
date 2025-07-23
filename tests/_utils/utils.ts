@@ -1,4 +1,4 @@
-import type { Hex, InfoClient, PerpsAssetCtx, PerpsUniverse } from "@nktkas/hyperliquid";
+import type { InfoClient, PerpsAssetCtx, PerpsUniverse } from "@nktkas/hyperliquid";
 import BigNumber from "npm:bignumber.js@9";
 
 /** Get asset data by name. */
@@ -16,7 +16,7 @@ export async function getAssetData(client: InfoClient, assetName: string): Promi
 }
 
 /** Generate a random Client Order ID. */
-export function randomCloid(): Hex {
+export function randomCloid(): `0x${string}` {
     return `0x${Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
 }
 

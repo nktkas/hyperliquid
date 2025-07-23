@@ -108,6 +108,11 @@ import type {
     VaultSummary,
 } from "../types/mod.ts";
 
+/** @see https://github.com/microsoft/TypeScript/issues/13923#issuecomment-2191862501 */
+type DeepImmutable<T> = {
+    readonly [K in keyof T]: DeepImmutable<T[K]>;
+};
+
 /** Parameters for the {@linkcode InfoClient} constructor. */
 export interface InfoClientParameters<T extends IRequestTransport = IRequestTransport> {
     /** The transport used to connect to the Hyperliquid API. */
@@ -245,9 +250,12 @@ export class InfoClient<
      * const data = await infoClient.allMids();
      * ```
      */
-    allMids(params?: AllMidsParameters, signal?: AbortSignal): Promise<AllMids>;
+    allMids(params?: DeepImmutable<AllMidsParameters>, signal?: AbortSignal): Promise<AllMids>;
     allMids(signal?: AbortSignal): Promise<AllMids>;
-    allMids(params_or_signal?: AllMidsParameters | AbortSignal, maybeSignal?: AbortSignal): Promise<AllMids> {
+    allMids(
+        params_or_signal?: DeepImmutable<AllMidsParameters> | AbortSignal,
+        maybeSignal?: AbortSignal,
+    ): Promise<AllMids> {
         const params = params_or_signal instanceof AbortSignal ? {} : params_or_signal;
         const signal = params_or_signal instanceof AbortSignal ? params_or_signal : maybeSignal;
 
@@ -268,13 +276,16 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // only HttpTransport supports this method
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.blockDetails({ height: 123 });
      * ```
      */
-    async blockDetails(params: BlockDetailsParameters, signal?: AbortSignal): Promise<BlockDetails> {
+    async blockDetails(
+        params: DeepImmutable<BlockDetailsParameters>,
+        signal?: AbortSignal,
+    ): Promise<BlockDetails> {
         const request = { type: "blockDetails", ...params } satisfies BlockDetailsRequest;
         const { blockDetails } = await this.transport.request<BlockDetailsResponse>("explorer", request, signal);
         return blockDetails;
@@ -303,7 +314,10 @@ export class InfoClient<
      * });
      * ```
      */
-    candleSnapshot(params: CandleSnapshotParameters, signal?: AbortSignal): Promise<Candle[]> {
+    candleSnapshot(
+        params: DeepImmutable<CandleSnapshotParameters>,
+        signal?: AbortSignal,
+    ): Promise<Candle[]> {
         const request = { type: "candleSnapshot", req: params } satisfies CandleSnapshotRequest;
         return this.transport.request("info", request, signal);
     }
@@ -327,7 +341,10 @@ export class InfoClient<
      * const data = await infoClient.clearinghouseState({ user: "0x..." });
      * ```
      */
-    clearinghouseState(params: ClearinghouseStateParameters, signal?: AbortSignal): Promise<PerpsClearinghouseState> {
+    clearinghouseState(
+        params: DeepImmutable<ClearinghouseStateParameters>,
+        signal?: AbortSignal,
+    ): Promise<PerpsClearinghouseState> {
         const request = { type: "clearinghouseState", ...params } satisfies ClearinghouseStateRequest;
         return this.transport.request("info", request, signal);
     }
@@ -351,7 +368,10 @@ export class InfoClient<
      * const data = await infoClient.delegations({ user: "0x..." });
      * ```
      */
-    delegations(params: DelegationsParameters, signal?: AbortSignal): Promise<Delegation[]> {
+    delegations(
+        params: DeepImmutable<DelegationsParameters>,
+        signal?: AbortSignal,
+    ): Promise<Delegation[]> {
         const request = { type: "delegations", ...params } satisfies DelegationsRequest;
         return this.transport.request("info", request, signal);
     }
@@ -375,7 +395,10 @@ export class InfoClient<
      * const data = await infoClient.delegatorHistory({ user: "0x..." });
      * ```
      */
-    delegatorHistory(params: DelegatorHistoryParameters, signal?: AbortSignal): Promise<DelegatorUpdate[]> {
+    delegatorHistory(
+        params: DeepImmutable<DelegatorHistoryParameters>,
+        signal?: AbortSignal,
+    ): Promise<DelegatorUpdate[]> {
         const request = { type: "delegatorHistory", ...params } satisfies DelegatorHistoryRequest;
         return this.transport.request("info", request, signal);
     }
@@ -399,7 +422,10 @@ export class InfoClient<
      * const data = await infoClient.delegatorRewards({ user: "0x..." });
      * ```
      */
-    delegatorRewards(params: DelegatorRewardsParameters, signal?: AbortSignal): Promise<DelegatorReward[]> {
+    delegatorRewards(
+        params: DeepImmutable<DelegatorRewardsParameters>,
+        signal?: AbortSignal,
+    ): Promise<DelegatorReward[]> {
         const request = { type: "delegatorRewards", ...params } satisfies DelegatorRewardsRequest;
         return this.transport.request("info", request, signal);
     }
@@ -423,7 +449,10 @@ export class InfoClient<
      * const data = await infoClient.delegatorSummary({ user: "0x..." });
      * ```
      */
-    delegatorSummary(params: DelegatorSummaryParameters, signal?: AbortSignal): Promise<DelegatorSummary> {
+    delegatorSummary(
+        params: DeepImmutable<DelegatorSummaryParameters>,
+        signal?: AbortSignal,
+    ): Promise<DelegatorSummary> {
         const request = { type: "delegatorSummary", ...params } satisfies DelegatorSummaryRequest;
         return this.transport.request("info", request, signal);
     }
@@ -470,7 +499,10 @@ export class InfoClient<
      * const data = await infoClient.extraAgents({ user: "0x..." });
      * ```
      */
-    extraAgents(params: ExtraAgentsParameters, signal?: AbortSignal): Promise<ExtraAgent[]> {
+    extraAgents(
+        params: DeepImmutable<ExtraAgentsParameters>,
+        signal?: AbortSignal,
+    ): Promise<ExtraAgent[]> {
         const request = { type: "extraAgents", ...params } satisfies ExtraAgentsRequest;
         return this.transport.request("info", request, signal);
     }
@@ -494,7 +526,10 @@ export class InfoClient<
      * const data = await infoClient.frontendOpenOrders({ user: "0x..." });
      * ```
      */
-    frontendOpenOrders(params: FrontendOpenOrdersParameters, signal?: AbortSignal): Promise<FrontendOrder[]> {
+    frontendOpenOrders(
+        params: DeepImmutable<FrontendOpenOrdersParameters>,
+        signal?: AbortSignal,
+    ): Promise<FrontendOrder[]> {
         const request = { type: "frontendOpenOrders", ...params } satisfies FrontendOpenOrdersRequest;
         return this.transport.request("info", request, signal);
     }
@@ -521,7 +556,10 @@ export class InfoClient<
      * });
      * ```
      */
-    fundingHistory(params: FundingHistoryParameters, signal?: AbortSignal): Promise<FundingHistory[]> {
+    fundingHistory(
+        params: DeepImmutable<FundingHistoryParameters>,
+        signal?: AbortSignal,
+    ): Promise<FundingHistory[]> {
         const request = { type: "fundingHistory", ...params } satisfies FundingHistoryRequest;
         return this.transport.request("info", request, signal);
     }
@@ -545,7 +583,10 @@ export class InfoClient<
      * const data = await infoClient.historicalOrders({ user: "0x..." });
      * ```
      */
-    historicalOrders(params: HistoricalOrdersParameters, signal?: AbortSignal): Promise<OrderStatus<FrontendOrder>[]> {
+    historicalOrders(
+        params: DeepImmutable<HistoricalOrdersParameters>,
+        signal?: AbortSignal,
+    ): Promise<OrderStatus<FrontendOrder>[]> {
         const request = { type: "historicalOrders", ...params } satisfies HistoricalOrdersRequest;
         return this.transport.request("info", request, signal);
     }
@@ -569,7 +610,10 @@ export class InfoClient<
      * const data = await infoClient.isVip({ user: "0x..." });
      * ```
      */
-    isVip(params: IsVipParameters, signal?: AbortSignal): Promise<boolean> {
+    isVip(
+        params: DeepImmutable<IsVipParameters>,
+        signal?: AbortSignal,
+    ): Promise<boolean> {
         const request = { type: "isVip", ...params } satisfies IsVipRequest;
         return this.transport.request("info", request, signal);
     }
@@ -593,7 +637,10 @@ export class InfoClient<
      * const data = await infoClient.l2Book({ coin: "ETH", nSigFigs: 2 });
      * ```
      */
-    l2Book(params: L2BookParameters, signal?: AbortSignal): Promise<Book> {
+    l2Book(
+        params: DeepImmutable<L2BookParameters>,
+        signal?: AbortSignal,
+    ): Promise<Book> {
         const request = { type: "l2Book", ...params } satisfies L2BookRequest;
         return this.transport.request("info", request, signal);
     }
@@ -617,7 +664,10 @@ export class InfoClient<
      * const data = await infoClient.leadingVaults({ user: "0x..." });
      * ```
      */
-    leadingVaults(params: LeadingVaultsParameters, signal?: AbortSignal): Promise<VaultLeading[]> {
+    leadingVaults(
+        params: DeepImmutable<LeadingVaultsParameters>,
+        signal?: AbortSignal,
+    ): Promise<VaultLeading[]> {
         const request = { type: "leadingVaults", ...params } satisfies LeadingVaultsRequest;
         return this.transport.request("info", request, signal);
     }
@@ -641,7 +691,10 @@ export class InfoClient<
      * const data = await infoClient.legalCheck({ user: "0x..." });
      * ```
      */
-    legalCheck(params: LegalCheckParameters, signal?: AbortSignal): Promise<LegalCheck> {
+    legalCheck(
+        params: DeepImmutable<LegalCheckParameters>,
+        signal?: AbortSignal,
+    ): Promise<LegalCheck> {
         const request = { type: "legalCheck", ...params } satisfies LegalCheckRequest;
         return this.transport.request("info", request, signal);
     }
@@ -688,7 +741,10 @@ export class InfoClient<
      * const data = await infoClient.marginTable({ id: 1 });
      * ```
      */
-    marginTable(params: MarginTableParameters, signal?: AbortSignal): Promise<MarginTable> {
+    marginTable(
+        params: DeepImmutable<MarginTableParameters>,
+        signal?: AbortSignal,
+    ): Promise<MarginTable> {
         const request = { type: "marginTable", ...params } satisfies MarginTableRequest;
         return this.transport.request("info", request, signal);
     }
@@ -712,7 +768,10 @@ export class InfoClient<
      * const data = await infoClient.maxBuilderFee({ user: "0x...", builder: "0x..." });
      * ```
      */
-    maxBuilderFee(params: MaxBuilderFeeParameters, signal?: AbortSignal): Promise<number> {
+    maxBuilderFee(
+        params: DeepImmutable<MaxBuilderFeeParameters>,
+        signal?: AbortSignal,
+    ): Promise<number> {
         const request = { type: "maxBuilderFee", ...params } satisfies MaxBuilderFeeRequest;
         return this.transport.request("info", request, signal);
     }
@@ -759,9 +818,12 @@ export class InfoClient<
      * const data = await infoClient.meta();
      * ```
      */
-    meta(params?: MetaParameters, signal?: AbortSignal): Promise<PerpsMeta>;
+    meta(params?: DeepImmutable<MetaParameters>, signal?: AbortSignal): Promise<PerpsMeta>;
     meta(signal?: AbortSignal): Promise<PerpsMeta>;
-    meta(params_or_signal?: MetaParameters | AbortSignal, maybeSignal?: AbortSignal): Promise<PerpsMeta> {
+    meta(
+        params_or_signal?: DeepImmutable<MetaParameters> | AbortSignal,
+        maybeSignal?: AbortSignal,
+    ): Promise<PerpsMeta> {
         const params = params_or_signal instanceof AbortSignal ? {} : params_or_signal;
         const signal = params_or_signal instanceof AbortSignal ? params_or_signal : maybeSignal;
 
@@ -811,7 +873,10 @@ export class InfoClient<
      * const data = await infoClient.openOrders({ user: "0x..." });
      * ```
      */
-    openOrders(params: OpenOrdersParameters, signal?: AbortSignal): Promise<Order[]> {
+    openOrders(
+        params: DeepImmutable<OpenOrdersParameters>,
+        signal?: AbortSignal,
+    ): Promise<Order[]> {
         const request = { type: "openOrders", ...params } satisfies OpenOrdersRequest;
         return this.transport.request("info", request, signal);
     }
@@ -835,7 +900,10 @@ export class InfoClient<
      * const data = await infoClient.orderStatus({ user: "0x...", oid: 12345 });
      * ```
      */
-    orderStatus(params: OrderStatusParameters, signal?: AbortSignal): Promise<OrderLookup> {
+    orderStatus(
+        params: DeepImmutable<OrderStatusParameters>,
+        signal?: AbortSignal,
+    ): Promise<OrderLookup> {
         const request = { type: "orderStatus", ...params } satisfies OrderStatusRequest;
         return this.transport.request("info", request, signal);
     }
@@ -928,7 +996,10 @@ export class InfoClient<
      * const data = await infoClient.portfolio({ user: "0x..." });
      * ```
      */
-    portfolio(params: PortfolioParameters, signal?: AbortSignal): Promise<PortfolioPeriods> {
+    portfolio(
+        params: DeepImmutable<PortfolioParameters>,
+        signal?: AbortSignal,
+    ): Promise<PortfolioPeriods> {
         const request = { type: "portfolio", ...params } satisfies PortfolioRequest;
         return this.transport.request("info", request, signal);
     }
@@ -975,7 +1046,10 @@ export class InfoClient<
      * const data = await infoClient.preTransferCheck({ user: "0x...", source: "0x..." });
      * ```
      */
-    preTransferCheck(params: PreTransferCheckParameters, signal?: AbortSignal): Promise<PreTransferCheck> {
+    preTransferCheck(
+        params: DeepImmutable<PreTransferCheckParameters>,
+        signal?: AbortSignal,
+    ): Promise<PreTransferCheck> {
         const request = { type: "preTransferCheck", ...params } satisfies PreTransferCheckRequest;
         return this.transport.request("info", request, signal);
     }
@@ -999,7 +1073,10 @@ export class InfoClient<
      * const data = await infoClient.referral({ user: "0x..." });
      * ```
      */
-    referral(params: ReferralParameters, signal?: AbortSignal): Promise<Referral> {
+    referral(
+        params: DeepImmutable<ReferralParameters>,
+        signal?: AbortSignal,
+    ): Promise<Referral> {
         const request = { type: "referral", ...params } satisfies ReferralRequest;
         return this.transport.request("info", request, signal);
     }
@@ -1024,7 +1101,7 @@ export class InfoClient<
      * ```
      */
     spotClearinghouseState(
-        params: SpotClearinghouseStateParameters,
+        params: DeepImmutable<SpotClearinghouseStateParameters>,
         signal?: AbortSignal,
     ): Promise<SpotClearinghouseState> {
         const request = { type: "spotClearinghouseState", ...params } satisfies SpotClearinghouseStateRequest;
@@ -1050,7 +1127,10 @@ export class InfoClient<
      * const data = await infoClient.spotDeployState({ user: "0x..." });
      * ```
      */
-    spotDeployState(params: SpotDeployStateParameters, signal?: AbortSignal): Promise<SpotDeployState> {
+    spotDeployState(
+        params: DeepImmutable<SpotDeployStateParameters>,
+        signal?: AbortSignal,
+    ): Promise<SpotDeployState> {
         const request = { type: "spotDeployState", ...params } satisfies SpotDeployStateRequest;
         return this.transport.request("info", request, signal);
     }
@@ -1120,7 +1200,10 @@ export class InfoClient<
      * const data = await infoClient.subAccounts({ user: "0x..." });
      * ```
      */
-    subAccounts(params: SubAccountsParameters, signal?: AbortSignal): Promise<SubAccount[] | null> {
+    subAccounts(
+        params: DeepImmutable<SubAccountsParameters>,
+        signal?: AbortSignal,
+    ): Promise<SubAccount[] | null> {
         const request = { type: "subAccounts", ...params } satisfies SubAccountsRequest;
         return this.transport.request("info", request, signal);
     }
@@ -1144,7 +1227,10 @@ export class InfoClient<
      * const data = await infoClient.tokenDetails({ tokenId: "0x..." });
      * ```
      */
-    tokenDetails(params: TokenDetailsParameters, signal?: AbortSignal): Promise<TokenDetails> {
+    tokenDetails(
+        params: DeepImmutable<TokenDetailsParameters>,
+        signal?: AbortSignal,
+    ): Promise<TokenDetails> {
         const request = { type: "tokenDetails", ...params } satisfies TokenDetailsRequest;
         return this.transport.request("info", request, signal);
     }
@@ -1168,7 +1254,10 @@ export class InfoClient<
      * const data = await infoClient.twapHistory({ user: "0x..." });
      * ```
      */
-    twapHistory(params: TwapHistoryParameters, signal?: AbortSignal): Promise<TwapHistory[]> {
+    twapHistory(
+        params: DeepImmutable<TwapHistoryParameters>,
+        signal?: AbortSignal,
+    ): Promise<TwapHistory[]> {
         const request = { type: "twapHistory", ...params } satisfies TwapHistoryRequest;
         return this.transport.request("info", request, signal);
     }
@@ -1186,13 +1275,16 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // only HttpTransport supports this method
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.txDetails({ hash: "0x..." });
      * ```
      */
-    async txDetails(params: TxDetailsParameters, signal?: AbortSignal): Promise<TxDetails> {
+    async txDetails(
+        params: DeepImmutable<TxDetailsParameters>,
+        signal?: AbortSignal,
+    ): Promise<TxDetails> {
         const request = { type: "txDetails", ...params } satisfies TxDetailsRequest;
         const { tx } = await this.transport.request<TxDetailsResponse>("explorer", request, signal);
         return tx;
@@ -1211,13 +1303,16 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // only HttpTransport supports this method
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.userDetails({ user: "0x..." });
      * ```
      */
-    async userDetails(params: UserDetailsParameters, signal?: AbortSignal): Promise<TxDetails[]> {
+    async userDetails(
+        params: DeepImmutable<UserDetailsParameters>,
+        signal?: AbortSignal,
+    ): Promise<TxDetails[]> {
         const request = { type: "userDetails", ...params } satisfies UserDetailsRequest;
         const { txs } = await this.transport.request<UserDetailsResponse>("explorer", request, signal);
         return txs;
@@ -1242,7 +1337,10 @@ export class InfoClient<
      * const data = await infoClient.userFees({ user: "0x..." });
      * ```
      */
-    userFees(params: UserFeesParameters, signal?: AbortSignal): Promise<UserFees> {
+    userFees(
+        params: DeepImmutable<UserFeesParameters>,
+        signal?: AbortSignal,
+    ): Promise<UserFees> {
         const request = { type: "userFees", ...params } satisfies UserFeesRequest;
         return this.transport.request("info", request, signal);
     }
@@ -1266,7 +1364,10 @@ export class InfoClient<
      * const data = await infoClient.userFills({ user: "0x..." });
      * ```
      */
-    userFills(params: UserFillsParameters, signal?: AbortSignal): Promise<Fill[]> {
+    userFills(
+        params: DeepImmutable<UserFillsParameters>,
+        signal?: AbortSignal,
+    ): Promise<Fill[]> {
         const request = { type: "userFills", ...params } satisfies UserFillsRequest;
         return this.transport.request("info", request, signal);
     }
@@ -1293,7 +1394,10 @@ export class InfoClient<
      * });
      * ```
      */
-    userFillsByTime(params: UserFillsByTimeParameters, signal?: AbortSignal): Promise<Fill[]> {
+    userFillsByTime(
+        params: DeepImmutable<UserFillsByTimeParameters>,
+        signal?: AbortSignal,
+    ): Promise<Fill[]> {
         const request = { type: "userFillsByTime", ...params } satisfies UserFillsByTimeRequest;
         return this.transport.request("info", request, signal);
     }
@@ -1320,7 +1424,10 @@ export class InfoClient<
      * });
      * ```
      */
-    userFunding(params: UserFundingParameters, signal?: AbortSignal): Promise<UserFundingUpdate[]> {
+    userFunding(
+        params: DeepImmutable<UserFundingParameters>,
+        signal?: AbortSignal,
+    ): Promise<UserFundingUpdate[]> {
         const request = { type: "userFunding", ...params } satisfies UserFundingRequest;
         return this.transport.request("info", request, signal);
     }
@@ -1348,7 +1455,7 @@ export class InfoClient<
      * ```
      */
     userNonFundingLedgerUpdates(
-        params: UserNonFundingLedgerUpdatesParameters,
+        params: DeepImmutable<UserNonFundingLedgerUpdatesParameters>,
         signal?: AbortSignal,
     ): Promise<UserNonFundingLedgerUpdate[]> {
         const request = { type: "userNonFundingLedgerUpdates", ...params } satisfies UserNonFundingLedgerUpdatesRequest;
@@ -1374,7 +1481,10 @@ export class InfoClient<
      * const data = await infoClient.userRateLimit({ user: "0x..." });
      * ```
      */
-    userRateLimit(params: UserRateLimitParameters, signal?: AbortSignal): Promise<UserRateLimit> {
+    userRateLimit(
+        params: DeepImmutable<UserRateLimitParameters>,
+        signal?: AbortSignal,
+    ): Promise<UserRateLimit> {
         const request = { type: "userRateLimit", ...params } satisfies UserRateLimitRequest;
         return this.transport.request("info", request, signal);
     }
@@ -1398,7 +1508,10 @@ export class InfoClient<
      * const data = await infoClient.userRole({ user: "0x..." });
      * ```
      */
-    userRole(params: UserRoleParameters, signal?: AbortSignal): Promise<UserRole> {
+    userRole(
+        params: DeepImmutable<UserRoleParameters>,
+        signal?: AbortSignal,
+    ): Promise<UserRole> {
         const request = { type: "userRole", ...params } satisfies UserRoleRequest;
         return this.transport.request("info", request, signal);
     }
@@ -1423,7 +1536,7 @@ export class InfoClient<
      * ```
      */
     userToMultiSigSigners(
-        params: UserToMultiSigSignersParameters,
+        params: DeepImmutable<UserToMultiSigSignersParameters>,
         signal?: AbortSignal,
     ): Promise<MultiSigSigners | null> {
         const request = { type: "userToMultiSigSigners", ...params } satisfies UserToMultiSigSignersRequest;
@@ -1449,7 +1562,10 @@ export class InfoClient<
      * const data = await infoClient.userTwapSliceFills({ user: "0x..." });
      * ```
      */
-    userTwapSliceFills(params: UserTwapSliceFillsParameters, signal?: AbortSignal): Promise<TwapSliceFill[]> {
+    userTwapSliceFills(
+        params: DeepImmutable<UserTwapSliceFillsParameters>,
+        signal?: AbortSignal,
+    ): Promise<TwapSliceFill[]> {
         const request = { type: "userTwapSliceFills", ...params } satisfies UserTwapSliceFillsRequest;
         return this.transport.request("info", request, signal);
     }
@@ -1477,7 +1593,7 @@ export class InfoClient<
      * ```
      */
     userTwapSliceFillsByTime(
-        params: UserTwapSliceFillsByTimeParameters,
+        params: DeepImmutable<UserTwapSliceFillsByTimeParameters>,
         signal?: AbortSignal,
     ): Promise<TwapSliceFill[]> {
         const request = { type: "userTwapSliceFillsByTime", ...params } satisfies UserTwapSliceFillsByTimeRequest;
@@ -1503,7 +1619,10 @@ export class InfoClient<
      * const data = await infoClient.userVaultEquities({ user: "0x..." });
      * ```
      */
-    userVaultEquities(params: UserVaultEquitiesParameters, signal?: AbortSignal): Promise<VaultEquity[]> {
+    userVaultEquities(
+        params: DeepImmutable<UserVaultEquitiesParameters>,
+        signal?: AbortSignal,
+    ): Promise<VaultEquity[]> {
         const request = { type: "userVaultEquities", ...params } satisfies UserVaultEquitiesRequest;
         return this.transport.request("info", request, signal);
     }
@@ -1573,7 +1692,10 @@ export class InfoClient<
      * const data = await infoClient.vaultDetails({ vaultAddress: "0x..." });
      * ```
      */
-    vaultDetails(params: VaultDetailsParameters, signal?: AbortSignal): Promise<VaultDetails | null> {
+    vaultDetails(
+        params: DeepImmutable<VaultDetailsParameters>,
+        signal?: AbortSignal,
+    ): Promise<VaultDetails | null> {
         const request = { type: "vaultDetails", ...params } satisfies VaultDetailsRequest;
         return this.transport.request("info", request, signal);
     }

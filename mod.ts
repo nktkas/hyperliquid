@@ -3,12 +3,7 @@ export * from "./src/base.ts";
 export * from "./src/transports/base.ts";
 
 // Signing
-export type {
-    AbstractEthersSigner,
-    AbstractEthersV5Signer,
-    AbstractViemWalletClient,
-    AbstractWindowEthereum,
-} from "./src/signing/mod.ts";
+export type { AbstractEthersSigner, AbstractEthersV5Signer, AbstractViemWalletClient } from "./src/signing/mod.ts";
 
 // Clients
 export * from "./src/clients/exchange.ts";

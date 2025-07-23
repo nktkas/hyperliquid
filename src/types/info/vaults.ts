@@ -1,4 +1,4 @@
-import type { Hex } from "../../base.ts";
+import type { Hex } from "../mod.ts";
 import type { PortfolioPeriods } from "./accounts.ts";
 
 /** Details about a vault. */
@@ -15,17 +15,20 @@ export interface VaultDetails {
     portfolio: PortfolioPeriods;
     /** Annual percentage rate. */
     apr: number;
-    /** Current user's follower state */
+    /** Current user follower state */
     followerState: VaultFollowerState | null;
     /** Ownership percentage held by leader. */
     leaderFraction: number;
-    /** Leader's commission percentage. */
+    /** Leader commission percentage. */
     leaderCommission: number;
     /** Vault followers list. */
-    followers: (Omit<VaultFollowerState, "user"> & {
-        /** Follower's address or Leader. */
-        user: Hex | "Leader";
-    })[];
+    followers: (
+        & Omit<VaultFollowerState, "user">
+        & {
+            /** Follower address or Leader. */
+            user: Hex | "Leader";
+        }
+    )[];
     /** Maximum distributable amount. */
     maxDistributable: number;
     /** Maximum withdrawable amount. */
@@ -40,12 +43,12 @@ export interface VaultDetails {
     alwaysCloseOnWithdraw: boolean;
 }
 
-/** User's vault equity details. */
+/** User vault equity details. */
 export interface VaultEquity {
     /** Vault address. */
     vaultAddress: Hex;
     /**
-     * User's deposited equity.
+     * User deposited equity.
      * @pattern ^[0-9]+(\.[0-9]+)?$
      */
     equity: string;
@@ -58,7 +61,7 @@ export interface VaultFollowerState {
     /** Follower address. */
     user: Hex;
     /**
-     * Follower's vault equity.
+     * Follower vault equity.
      * @pattern ^[0-9]+(\.[0-9]+)?$
      */
     vaultEquity: string;

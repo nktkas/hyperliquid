@@ -1,4 +1,4 @@
-import type { Hex } from "../../base.ts";
+import type { Hex } from "../mod.ts";
 
 /**
  * Request mid coin prices.
@@ -7,7 +7,7 @@ import type { Hex } from "../../base.ts";
 export interface AllMidsRequest {
     /** Type of request. */
     type: "allMids";
-    /** Name of perp dex. */
+    /** DEX name (empty string for main dex). */
     dex?: string;
 }
 
@@ -20,7 +20,7 @@ export interface CandleSnapshotRequest {
     type: "candleSnapshot";
     /** Request parameters. */
     req: {
-        /** Asset symbol. */
+        /** Asset symbol (e.g., BTC). */
         coin: string;
         /** Time interval. */
         interval: "1m" | "3m" | "5m" | "15m" | "30m" | "1h" | "2h" | "4h" | "8h" | "12h" | "1d" | "3d" | "1w" | "1M";
@@ -38,7 +38,7 @@ export interface CandleSnapshotRequest {
 export interface ClearinghouseStateRequest {
     /** Type of request. */
     type: "clearinghouseState";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -49,7 +49,7 @@ export interface ClearinghouseStateRequest {
 export interface DelegationsRequest {
     /** Type of request. */
     type: "delegations";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -60,7 +60,7 @@ export interface DelegationsRequest {
 export interface DelegatorHistoryRequest {
     /** Type of request. */
     type: "delegatorHistory";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -71,7 +71,7 @@ export interface DelegatorHistoryRequest {
 export interface DelegatorRewardsRequest {
     /** Type of request. */
     type: "delegatorRewards";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -82,7 +82,7 @@ export interface DelegatorRewardsRequest {
 export interface DelegatorSummaryRequest {
     /** Type of request. */
     type: "delegatorSummary";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -96,13 +96,13 @@ export interface ExchangeStatusRequest {
 }
 
 /**
- * Request user's extra agents.
+ * Request user extra agents.
  * @returns {ExtraAgent[]}
  */
 export interface ExtraAgentsRequest {
     /** Type of request. */
     type: "extraAgents";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -113,9 +113,9 @@ export interface ExtraAgentsRequest {
 export interface FrontendOpenOrdersRequest {
     /** Type of request. */
     type: "frontendOpenOrders";
-    /** User's address. */
+    /** User address. */
     user: Hex;
-    /** Name of perp dex. */
+    /** DEX name (empty string for main dex). */
     dex?: string;
 }
 
@@ -126,7 +126,7 @@ export interface FrontendOpenOrdersRequest {
 export interface FundingHistoryRequest {
     /** Type of request. */
     type: "fundingHistory";
-    /** Asset symbol. */
+    /** Asset symbol (e.g., BTC). */
     coin: string;
     /** Start time (in ms since epoch). */
     startTime: number;
@@ -135,13 +135,13 @@ export interface FundingHistoryRequest {
 }
 
 /**
- * Request user's historical orders.
+ * Request user historical orders.
  * @returns {OrderStatus<FrontendOrder>[]}
  */
 export interface HistoricalOrdersRequest {
     /** Type of request. */
     type: "historicalOrders";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -152,7 +152,7 @@ export interface HistoricalOrdersRequest {
 export interface IsVipRequest {
     /** Type of request. */
     type: "isVip";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -163,7 +163,7 @@ export interface IsVipRequest {
 export interface L2BookRequest {
     /** Type of request. */
     type: "l2Book";
-    /** Asset symbol. */
+    /** Asset symbol (e.g., BTC). */
     coin: string;
     /** Number of significant figures. */
     nSigFigs?: 2 | 3 | 4 | 5 | null;
@@ -178,7 +178,7 @@ export interface L2BookRequest {
 export interface LeadingVaultsRequest {
     /** Type of request. */
     type: "leadingVaults";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -189,7 +189,7 @@ export interface LeadingVaultsRequest {
 export interface LegalCheckRequest {
     /** Type of request. */
     type: "legalCheck";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -209,7 +209,7 @@ export interface LiquidatableRequest {
 export interface MarginTableRequest {
     /** Type of request. */
     type: "marginTable";
-    /** Unique identifier for the margin requirements table. */
+    /** Margin requirements table. */
     id: number;
 }
 
@@ -220,7 +220,7 @@ export interface MarginTableRequest {
 export interface MaxBuilderFeeRequest {
     /** Type of request. */
     type: "maxBuilderFee";
-    /** User's address. */
+    /** User address. */
     user: Hex;
     /** Builder address. */
     builder: Hex;
@@ -242,7 +242,7 @@ export interface MaxMarketOrderNtlsRequest {
 export interface MetaRequest {
     /** Type of request. */
     type: "meta";
-    /** Name of perp dex. */
+    /** DEX name (empty string for main dex). */
     dex?: string;
 }
 
@@ -262,9 +262,9 @@ export interface MetaAndAssetCtxsRequest {
 export interface OpenOrdersRequest {
     /** Type of request. */
     type: "openOrders";
-    /** User's address. */
+    /** User address. */
     user: Hex;
-    /** Name of perp dex. */
+    /** DEX name (empty string for main dex). */
     dex?: string;
 }
 
@@ -275,9 +275,9 @@ export interface OpenOrdersRequest {
 export interface OrderStatusRequest {
     /** Type of request. */
     type: "orderStatus";
-    /** User's address. */
+    /** User address. */
     user: Hex;
-    /** Order ID or client order ID. */
+    /** Order ID or Client Order ID. */
     oid: number | Hex;
 }
 
@@ -315,7 +315,7 @@ export interface PerpsAtOpenInterestCapRequest {
 export interface PortfolioRequest {
     /** Type of request. */
     type: "portfolio";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -329,13 +329,13 @@ export interface PredictedFundingsRequest {
 }
 
 /**
- * Request user's existence check before transfer.
+ * Request user existence check before transfer.
  * @returns {PreTransferCheck}
  */
 export interface PreTransferCheckRequest {
     /** Type of request. */
     type: "preTransferCheck";
-    /** Destination address. */
+    /** User address. */
     user: Hex;
     /** Source address. */
     source: Hex;
@@ -348,7 +348,7 @@ export interface PreTransferCheckRequest {
 export interface ReferralRequest {
     /** Type of request. */
     type: "referral";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -359,9 +359,9 @@ export interface ReferralRequest {
 export interface SpotClearinghouseStateRequest {
     /** Type of request. */
     type: "spotClearinghouseState";
-    /** User's address. */
+    /** User address. */
     user: Hex;
-    /** Name of perp dex. */
+    /** DEX name (empty string for main dex). */
     dex?: string;
 }
 
@@ -372,7 +372,7 @@ export interface SpotClearinghouseStateRequest {
 export interface SpotDeployStateRequest {
     /** Type of request. */
     type: "spotDeployState";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -401,7 +401,7 @@ export interface SpotMetaAndAssetCtxsRequest {
 export interface SubAccountsRequest {
     /** Type of request. */
     type: "subAccounts";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -423,7 +423,7 @@ export interface TokenDetailsRequest {
 export interface TwapHistoryRequest {
     /** Type of request. */
     type: "twapHistory";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -434,7 +434,7 @@ export interface TwapHistoryRequest {
 export interface UserFeesRequest {
     /** Type of request. */
     type: "userFees";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -445,7 +445,7 @@ export interface UserFeesRequest {
 export interface UserFillsRequest {
     /** Type of request. */
     type: "userFills";
-    /** User's address. */
+    /** User address. */
     user: Hex;
     /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
     aggregateByTime?: boolean;
@@ -458,7 +458,7 @@ export interface UserFillsRequest {
 export interface UserFillsByTimeRequest {
     /** Type of request. */
     type: "userFillsByTime";
-    /** User's address. */
+    /** User address. */
     user: Hex;
     /** Start time (in ms since epoch). */
     startTime: number;
@@ -475,7 +475,7 @@ export interface UserFillsByTimeRequest {
 export interface UserFundingRequest {
     /** Type of request. */
     type: "userFunding";
-    /** User's address. */
+    /** User address. */
     user: Hex;
     /** Start time (in ms since epoch). */
     startTime: number;
@@ -490,7 +490,7 @@ export interface UserFundingRequest {
 export interface UserNonFundingLedgerUpdatesRequest {
     /** Type of request. */
     type: "userNonFundingLedgerUpdates";
-    /** User's address. */
+    /** User address. */
     user: Hex;
     /** Start time (in ms since epoch). */
     startTime: number;
@@ -505,7 +505,7 @@ export interface UserNonFundingLedgerUpdatesRequest {
 export interface UserRateLimitRequest {
     /** Type of request. */
     type: "userRateLimit";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -516,7 +516,7 @@ export interface UserRateLimitRequest {
 export interface UserRoleRequest {
     /** Type of request. */
     type: "userRole";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -527,7 +527,7 @@ export interface UserRoleRequest {
 export interface UserToMultiSigSignersRequest {
     /** Type of request. */
     type: "userToMultiSigSigners";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -538,7 +538,7 @@ export interface UserToMultiSigSignersRequest {
 export interface UserTwapSliceFillsRequest {
     /** Type of request. */
     type: "userTwapSliceFills";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -549,7 +549,7 @@ export interface UserTwapSliceFillsRequest {
 export interface UserTwapSliceFillsByTimeRequest {
     /** Type of request. */
     type: "userTwapSliceFillsByTime";
-    /** User's address. */
+    /** User address. */
     user: Hex;
     /** Start time (in ms since epoch). */
     startTime: number;
@@ -566,7 +566,7 @@ export interface UserTwapSliceFillsByTimeRequest {
 export interface UserVaultEquitiesRequest {
     /** Type of request. */
     type: "userVaultEquities";
-    /** User's address. */
+    /** User address. */
     user: Hex;
 }
 
@@ -597,7 +597,7 @@ export interface VaultDetailsRequest {
     type: "vaultDetails";
     /** Vault address. */
     vaultAddress: Hex;
-    /** User's address. */
+    /** User address. */
     user?: Hex | null;
 }
 

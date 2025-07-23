@@ -10,12 +10,6 @@ import {
     signUserSignedAction,
 } from "../../src/signing/mod.ts";
 
-type DeepMutable<T> = {
-    -readonly [P in keyof T]: T[P] extends readonly (infer U)[] ? U[]
-        : T[P] extends object ? DeepMutable<T[P]>
-        : T[P];
-};
-
 // —————————— Arguments ——————————
 
 const PRIVATE_KEY = "0x822e9959e022b78423eb653a62ea0020cd283e71a2a8133a6ff2aeffaf373cff";
@@ -569,9 +563,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                     const fn = async (wallet: AbstractWallet) => {
                         const signature = await signMultiSigAction({
                             wallet,
-                            action: MULTI_SIG_ACTION_SIGNATURE.data.action as unknown as DeepMutable<
-                                typeof MULTI_SIG_ACTION_SIGNATURE.data.action
-                            >,
+                            action: MULTI_SIG_ACTION_SIGNATURE.data.action,
                             nonce: MULTI_SIG_ACTION_SIGNATURE.data.nonce,
                             isTestnet: false,
                         });
@@ -602,9 +594,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                     const fn = async (wallet: AbstractWallet) => {
                         const signature = await signMultiSigAction({
                             wallet,
-                            action: MULTI_SIG_ACTION_SIGNATURE.data.action as unknown as DeepMutable<
-                                typeof MULTI_SIG_ACTION_SIGNATURE.data.action
-                            >,
+                            action: MULTI_SIG_ACTION_SIGNATURE.data.action,
                             nonce: MULTI_SIG_ACTION_SIGNATURE.data.nonce,
                             isTestnet: false,
                             vaultAddress: MULTI_SIG_ACTION_SIGNATURE.data.vaultAddress,
@@ -636,9 +626,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                     const fn = async (wallet: AbstractWallet) => {
                         const signature = await signMultiSigAction({
                             wallet,
-                            action: MULTI_SIG_ACTION_SIGNATURE.data.action as unknown as DeepMutable<
-                                typeof MULTI_SIG_ACTION_SIGNATURE.data.action
-                            >,
+                            action: MULTI_SIG_ACTION_SIGNATURE.data.action,
                             nonce: MULTI_SIG_ACTION_SIGNATURE.data.nonce,
                             isTestnet: false,
                             expiresAfter: MULTI_SIG_ACTION_SIGNATURE.data.expiresAfter,
@@ -670,9 +658,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                     const fn = async (wallet: AbstractWallet) => {
                         const signature = await signMultiSigAction({
                             wallet,
-                            action: MULTI_SIG_ACTION_SIGNATURE.data.action as unknown as DeepMutable<
-                                typeof MULTI_SIG_ACTION_SIGNATURE.data.action
-                            >,
+                            action: MULTI_SIG_ACTION_SIGNATURE.data.action,
                             nonce: MULTI_SIG_ACTION_SIGNATURE.data.nonce,
                             isTestnet: false,
                             vaultAddress: MULTI_SIG_ACTION_SIGNATURE.data.vaultAddress,
@@ -707,9 +693,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                     const fn = async (wallet: AbstractWallet) => {
                         const signature = await signMultiSigAction({
                             wallet,
-                            action: MULTI_SIG_ACTION_SIGNATURE.data.action as unknown as DeepMutable<
-                                typeof MULTI_SIG_ACTION_SIGNATURE.data.action
-                            >,
+                            action: MULTI_SIG_ACTION_SIGNATURE.data.action,
                             nonce: MULTI_SIG_ACTION_SIGNATURE.data.nonce,
                             isTestnet: true,
                         });
@@ -740,9 +724,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                     const fn = async (wallet: AbstractWallet) => {
                         const signature = await signMultiSigAction({
                             wallet,
-                            action: MULTI_SIG_ACTION_SIGNATURE.data.action as unknown as DeepMutable<
-                                typeof MULTI_SIG_ACTION_SIGNATURE.data.action
-                            >,
+                            action: MULTI_SIG_ACTION_SIGNATURE.data.action,
                             nonce: MULTI_SIG_ACTION_SIGNATURE.data.nonce,
                             isTestnet: true,
                             vaultAddress: MULTI_SIG_ACTION_SIGNATURE.data.vaultAddress,
@@ -774,9 +756,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                     const fn = async (wallet: AbstractWallet) => {
                         const signature = await signMultiSigAction({
                             wallet,
-                            action: MULTI_SIG_ACTION_SIGNATURE.data.action as unknown as DeepMutable<
-                                typeof MULTI_SIG_ACTION_SIGNATURE.data.action
-                            >,
+                            action: MULTI_SIG_ACTION_SIGNATURE.data.action,
                             nonce: MULTI_SIG_ACTION_SIGNATURE.data.nonce,
                             isTestnet: true,
                             expiresAfter: MULTI_SIG_ACTION_SIGNATURE.data.expiresAfter,
@@ -808,9 +788,7 @@ Deno.test("Signature Generation Tests", async (t) => {
                     const fn = async (wallet: AbstractWallet) => {
                         const signature = await signMultiSigAction({
                             wallet,
-                            action: MULTI_SIG_ACTION_SIGNATURE.data.action as unknown as DeepMutable<
-                                typeof MULTI_SIG_ACTION_SIGNATURE.data.action
-                            >,
+                            action: MULTI_SIG_ACTION_SIGNATURE.data.action,
                             nonce: MULTI_SIG_ACTION_SIGNATURE.data.nonce,
                             isTestnet: true,
                             vaultAddress: MULTI_SIG_ACTION_SIGNATURE.data.vaultAddress,
