@@ -18,42 +18,6 @@ export interface WsActiveAssetCtx {
     ctx: PerpsAssetCtx;
 }
 
-/** Active asset trading data. */
-export interface WsActiveAssetData {
-    /** User address. */
-    user: Hex;
-    /** Asset symbol (e.g., BTC). */
-    coin: string;
-    /** Leverage configuration. */
-    leverage:
-        | {
-            /** Leverage type. */
-            type: "isolated";
-            /** Leverage value used. */
-            value: number;
-            /**
-             * Amount of USD used (1 = 1$).
-             * @pattern ^[0-9]+(\.[0-9]+)?$
-             */
-            rawUsd: string;
-        }
-        | {
-            /** Leverage type. */
-            type: "cross";
-            /** Leverage value used. */
-            value: number;
-        };
-    /**  Maximum trade size range [min, max]. */
-    maxTradeSzs: [string, string];
-    /** Available to trade range [min, max]. */
-    availableToTrade: [string, string];
-    /**
-     * Mark price.
-     * @pattern ^[0-9]+(\.[0-9]+)?$
-     */
-    markPx: string;
-}
-
 /** Active spot asset context. */
 export interface WsActiveSpotAssetCtx {
     /** Asset symbol (e.g., BTC). */

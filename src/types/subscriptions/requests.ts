@@ -12,30 +12,6 @@ export interface WsActiveAssetCtxRequest {
 }
 
 /**
- * Trading data events for a specific asset and user.
- * @returns {WsActiveAssetData}
- */
-export interface WsActiveAssetDataRequest {
-    /** Type of subscription. */
-    type: "activeAssetData";
-    /** Asset symbol (e.g., BTC). */
-    coin: string;
-    /** User's address. */
-    user: Hex;
-}
-
-/**
- * Mid prices for all actively traded assets.
- * @returns {WsAllMids}
- */
-export interface WsAllMidsRequest {
-    /** Type of subscription. */
-    type: "allMids";
-    /** DEX name (empty string for main dex). */
-    dex?: string;
-}
-
-/**
  * Best bid and offer events for a specific asset.
  * @returns {WsBbo}
  */
@@ -75,21 +51,6 @@ export interface WsExplorerBlockRequest {
 export interface WsExplorerTxsRequest {
     /** Type of subscription. */
     type: "explorerTxs";
-}
-
-/**
- * L2 order book events for a specific asset.
- * @returns {Book}
- */
-export interface WsL2BookRequest {
-    /** Type of subscription. */
-    type: "l2Book";
-    /** Asset symbol (e.g., BTC). */
-    coin: string;
-    /** Number of significant figures. */
-    nSigFigs?: 2 | 3 | 4 | 5 | null;
-    /** Mantissa for aggregation. */
-    mantissa?: 2 | 5 | null;
 }
 
 /**
@@ -137,19 +98,6 @@ export interface WsUserEventsRequest {
 }
 
 /**
- * Trade fill events for a specific user.
- * @returns {WsUserFills}
- */
-export interface WsUserFillsRequest {
-    /** Type of subscription. */
-    type: "userFills";
-    /** User address. */
-    user: Hex;
-    /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
-    aggregateByTime?: boolean;
-}
-
-/**
  * Funding payment events for a specific user.
  * @returns {WsUserFundings}
  */
@@ -178,17 +126,6 @@ export interface WsUserNonFundingLedgerUpdatesRequest {
 export interface WsUserTwapHistoryRequest {
     /** Type of subscription. */
     type: "userTwapHistory";
-    /** User address. */
-    user: Hex;
-}
-
-/**
- * TWAP execution events for a specific user.
- * @returns {WsUserTwapSliceFills}
- */
-export interface WsUserTwapSliceFillsRequest {
-    /** Type of subscription. */
-    type: "userTwapSliceFills";
     /** User address. */
     user: Hex;
 }

@@ -577,7 +577,7 @@ class SubscriptionClient {
 
     // Market
     activeAssetCtx(args: EventActiveAssetCtxParameters, listener: (data: WsActiveAssetCtx | WsActiveSpotAssetCtx) => void): Promise<Subscription>;
-    activeAssetData(args: EventActiveAssetDataParameters, listener: (data: WsActiveAssetData) => void): Promise<Subscription>;
+    activeAssetData(args: EventActiveAssetDataParameters, listener: (data: ActiveAssetData) => void): Promise<Subscription>;
     allMids(listener: (data: WsAllMids) => void): Promise<Subscription>;
     bbo(args: EventBboParameters, listener: (data: WsBbo) => void): Promise<Subscription>;
     candle(args: EventCandleParameters, listener: (data: Candle) => void): Promise<Subscription>;
@@ -597,7 +597,7 @@ class SubscriptionClient {
     userTwapHistory(args: EventUserTwapHistory, listener: (data: WsUserTwapHistory) => void): Promise<Subscription>;
     userTwapSliceFills(args: EventUserTwapSliceFills, listener: (data: WsUserTwapSliceFills) => void): Promise<Subscription>;
 
-    // Explorer
+    // Explorer (RPC endpoint)
     explorerBlock(listener: (data: WsBlockDetails[]) => void): Promise<Subscription>;
     explorerTxs(listener: (data: TxDetails[]) => void): Promise<Subscription>;
 }

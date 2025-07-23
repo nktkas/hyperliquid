@@ -12,6 +12,7 @@ const cliArgs = parseArgs(Deno.args, { default: { wait: 1000 } }) as Args<{
 }>;
 
 const METHODS_TO_TEST = [ // controls which tests to run
+    "activeAssetData",
     "allMids",
     "blockDetails",
     "candleSnapshot",
@@ -86,6 +87,19 @@ function run<T extends Record<string, unknown>>(
         await fn(MethodReturnType, args);
     });
 }
+
+export type MethodReturnType_activeAssetData = Awaited<ReturnType<InfoClient["activeAssetData"]>>;
+run(
+    "activeAssetData",
+    async (types, { user }) => {
+        const data = await Promise.all([
+            infoClient.activeAssetData({ user, coin: "BTC" }),
+            infoClient.activeAssetData({ user, coin: "NEAR" }),
+        ]);
+        schemaCoverage(types, data);
+    },
+    { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" } as const,
+);
 
 export type MethodReturnType_allMids = Awaited<ReturnType<InfoClient["allMids"]>>;
 run(

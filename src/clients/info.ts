@@ -1,5 +1,7 @@
 import type { IRequestTransport } from "../transports/base.ts";
 import type {
+    ActiveAssetData,
+    ActiveAssetDataRequest,
     AllMids,
     AllMidsRequest,
     BlockDetails,
@@ -119,6 +121,8 @@ export interface InfoClientParameters<T extends IRequestTransport = IRequestTran
     transport: T;
 }
 
+/** Request parameters for the {@linkcode InfoClient.activeAssetData} method. */
+export type ActiveAssetDataParameters = Omit<ActiveAssetDataRequest, "type">;
 /** Request parameters for the {@linkcode InfoClient.allMids} method. */
 export type AllMidsParameters = Omit<AllMidsRequest, "type">;
 /** Request parameters for the {@linkcode InfoClient.blockDetails} method. */
@@ -229,6 +233,33 @@ export class InfoClient<
      */
     constructor(args: InfoClientParameters<T>) {
         this.transport = args.transport;
+    }
+
+    /**
+     * Request user active asset data.
+     * @param params - An optional request-specific parameters.
+     * @param signal - An [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If this option is set, the request can be canceled by calling [`abort()`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort) on the corresponding [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController).
+     * @returns User active asset data.
+     *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-active-asset-data
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const infoClient = new hl.InfoClient({ transport });
+     *
+     * const data = await infoClient.activeAssetData({ user: "0x...", coin: "BTC" });
+     * ```
+     */
+    activeAssetData(
+        params: DeepImmutable<ActiveAssetDataParameters>,
+        signal?: AbortSignal,
+    ): Promise<ActiveAssetData> {
+        const request = { type: "activeAssetData", ...params } satisfies ActiveAssetDataRequest;
+        return this.transport.request("info", request, signal);
     }
 
     /**

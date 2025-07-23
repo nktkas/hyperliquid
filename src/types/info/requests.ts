@@ -1,6 +1,19 @@
 import type { Hex } from "../mod.ts";
 
 /**
+ * Request user active asset data.
+ * @returns {ActiveAssetData}
+ */
+export interface ActiveAssetDataRequest {
+    /** Type of request. */
+    type: "activeAssetData";
+    /** Asset symbol (e.g., BTC). */
+    coin: string;
+    /** User address. */
+    user: Hex;
+}
+
+/**
  * Request mid coin prices.
  * @returns {AllMids}
  */

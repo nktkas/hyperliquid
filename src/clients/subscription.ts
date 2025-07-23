@@ -1,24 +1,26 @@
 import type { ISubscriptionTransport, Subscription } from "../transports/base.ts";
 import type {
+    ActiveAssetData,
+    ActiveAssetDataRequest,
+    AllMidsRequest,
     Book,
     Candle,
+    L2BookRequest,
     Order,
     OrderStatus,
     TxDetails,
+    UserFillsRequest,
+    UserTwapSliceFillsRequest,
     WsActiveAssetCtx,
     WsActiveAssetCtxRequest,
-    WsActiveAssetData,
-    WsActiveAssetDataRequest,
     WsActiveSpotAssetCtx,
     WsAllMids,
-    WsAllMidsRequest,
     WsBbo,
     WsBboRequest,
     WsBlockDetails,
     WsCandleRequest,
     WsExplorerBlockRequest,
     WsExplorerTxsRequest,
-    WsL2BookRequest,
     WsNotification,
     WsNotificationRequest,
     WsOrderUpdatesRequest,
@@ -27,7 +29,6 @@ import type {
     WsUserEvent,
     WsUserEventsRequest,
     WsUserFills,
-    WsUserFillsRequest,
     WsUserFundings,
     WsUserFundingsRequest,
     WsUserNonFundingLedgerUpdates,
@@ -35,7 +36,6 @@ import type {
     WsUserTwapHistory,
     WsUserTwapHistoryRequest,
     WsUserTwapSliceFills,
-    WsUserTwapSliceFillsRequest,
     WsWebData2,
     WsWebData2Request,
 } from "../types/mod.ts";
@@ -54,15 +54,15 @@ export interface SubscriptionClientParameters<T extends ISubscriptionTransport =
 /** Subscription parameters for the {@linkcode SubscriptionClient.activeAssetCtx} method. */
 export type EventActiveAssetCtxParameters = Omit<WsActiveAssetCtxRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.activeAssetData} method. */
-export type EventActiveAssetDataParameters = Omit<WsActiveAssetDataRequest, "type">;
+export type EventActiveAssetDataParameters = Omit<ActiveAssetDataRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.allMids} method. */
-export type WsAllMidsParameters = Omit<WsAllMidsRequest, "type">;
+export type WsAllMidsParameters = Omit<AllMidsRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.bbo} method. */
 export type EventBboParameters = Omit<WsBboRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.candle} method. */
 export type EventCandleParameters = Omit<WsCandleRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.l2Book} method. */
-export type EventL2BookParameters = Omit<WsL2BookRequest, "type">;
+export type EventL2BookParameters = Omit<L2BookRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.notification} method. */
 export type EventNotificationParameters = Omit<WsNotificationRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.orderUpdates} method. */
@@ -72,7 +72,7 @@ export type EventTradesParameters = Omit<WsTradesRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userEvents} method. */
 export type EventUserEventsParameters = Omit<WsUserEventsRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userFills} method. */
-export type EventUserFillsParameters = Omit<WsUserFillsRequest, "type">;
+export type EventUserFillsParameters = Omit<UserFillsRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userFundings} method. */
 export type EventUserFundingsParameters = Omit<WsUserFundingsRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userNonFundingLedgerUpdates} method. */
@@ -80,7 +80,7 @@ export type EventUserNonFundingLedgerUpdatesParameters = Omit<WsUserNonFundingLe
 /** Subscription parameters for the {@linkcode SubscriptionClient.userTwapHistory} method. */
 export type EventUserTwapHistory = Omit<WsUserTwapHistoryRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userTwapSliceFills} method. */
-export type EventUserTwapSliceFills = Omit<WsUserTwapSliceFillsRequest, "type">;
+export type EventUserTwapSliceFills = Omit<UserTwapSliceFillsRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.webData2} method. */
 export type EventWebData2Parameters = Omit<WsWebData2Request, "type">;
 
@@ -166,10 +166,10 @@ export class SubscriptionClient<
      */
     activeAssetData(
         params: DeepImmutable<EventActiveAssetDataParameters>,
-        listener: (data: WsActiveAssetData) => void,
+        listener: (data: ActiveAssetData) => void,
     ): Promise<Subscription> {
-        const payload = { type: "activeAssetData", ...params } satisfies WsActiveAssetDataRequest;
-        return this.transport.subscribe<WsActiveAssetData>(payload.type, payload, (e) => {
+        const payload = { type: "activeAssetData", ...params } satisfies ActiveAssetDataRequest;
+        return this.transport.subscribe<ActiveAssetData>(payload.type, payload, (e) => {
             if (e.detail.coin === params.coin && e.detail.user === params.user.toLowerCase()) {
                 listener(e.detail);
             }
@@ -206,7 +206,7 @@ export class SubscriptionClient<
         const params = typeof params_or_listener === "function" ? {} : params_or_listener;
         const listener = typeof params_or_listener === "function" ? params_or_listener : maybeListener!;
 
-        const payload = { type: "allMids", ...params } satisfies WsAllMidsRequest;
+        const payload = { type: "allMids", ...params } satisfies AllMidsRequest;
         return this.transport.subscribe<WsAllMids>(payload.type, payload, (e) => {
             listener(e.detail);
         });
@@ -364,7 +364,7 @@ export class SubscriptionClient<
             nSigFigs: params.nSigFigs ?? null,
             mantissa: params.mantissa ?? null,
             ...params,
-        } satisfies WsL2BookRequest;
+        } satisfies L2BookRequest;
         return this.transport.subscribe<Book>(payload.type, payload, (e) => {
             if (e.detail.coin === params.coin) {
                 listener(e.detail);
@@ -528,7 +528,7 @@ export class SubscriptionClient<
             type: "userFills",
             aggregateByTime: params.aggregateByTime ?? false,
             ...params,
-        } satisfies WsUserFillsRequest;
+        } satisfies UserFillsRequest;
         return this.transport.subscribe<WsUserFills>(payload.type, payload, (e) => {
             if (e.detail.user === params.user.toLowerCase()) {
                 listener(e.detail);
@@ -663,7 +663,7 @@ export class SubscriptionClient<
         params: DeepImmutable<EventUserTwapSliceFills>,
         listener: (data: WsUserTwapSliceFills) => void,
     ): Promise<Subscription> {
-        const payload = { type: "userTwapSliceFills", ...params } as WsUserTwapSliceFillsRequest;
+        const payload = { type: "userTwapSliceFills", ...params } as UserTwapSliceFillsRequest;
         return this.transport.subscribe<WsUserTwapSliceFills>(payload.type, payload, (e) => {
             if (e.detail.user === params.user.toLowerCase()) {
                 listener(e.detail);

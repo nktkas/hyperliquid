@@ -1,5 +1,41 @@
 import type { Hex } from "../mod.ts";
 
+/** User active asset data. */
+export interface ActiveAssetData {
+    /** User address. */
+    user: Hex;
+    /** Asset symbol (e.g., BTC). */
+    coin: string;
+    /** Leverage configuration. */
+    leverage:
+        | {
+            /** Leverage type. */
+            type: "isolated";
+            /** Leverage value used. */
+            value: number;
+            /**
+             * Amount of USD used (1 = 1$).
+             * @pattern ^[0-9]+(\.[0-9]+)?$
+             */
+            rawUsd: string;
+        }
+        | {
+            /** Leverage type. */
+            type: "cross";
+            /** Leverage value used. */
+            value: number;
+        };
+    /** Maximum trade size range [min, max]. */
+    maxTradeSzs: [string, string];
+    /** Available to trade range [min, max]. */
+    availableToTrade: [string, string];
+    /**
+     * Mark price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    markPx: string;
+}
+
 /** Position for a specific asset. */
 export interface AssetPosition {
     /** Position type. */
