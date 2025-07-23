@@ -8,7 +8,8 @@ Deno.test("HyperliquidEventTarget", async (t) => {
 
         let receivedMsg: unknown;
         eventTarget.addEventListener("test", (e) => {
-            receivedMsg = e.detail;
+            const detail = (e as CustomEvent).detail;
+            receivedMsg = detail;
         });
 
         const event = new MessageEvent("message", { data: '{"channel":"test","data":{"foo":"bar"}}' });
@@ -23,7 +24,8 @@ Deno.test("HyperliquidEventTarget", async (t) => {
 
         let receivedMsg: unknown;
         eventTarget.addEventListener("_explorerBlock", (e) => {
-            receivedMsg = e.detail;
+            const detail = (e as CustomEvent).detail;
+            receivedMsg = detail;
         });
 
         const event = new MessageEvent("message", {
@@ -51,7 +53,8 @@ Deno.test("HyperliquidEventTarget", async (t) => {
 
         let receivedMsg: unknown;
         eventTarget.addEventListener("_explorerTxs", (e) => {
-            receivedMsg = e.detail;
+            const detail = (e as CustomEvent).detail;
+            receivedMsg = detail;
         });
 
         const event = new MessageEvent("message", {

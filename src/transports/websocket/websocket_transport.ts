@@ -221,7 +221,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
                 unsubscribe = async () => {
                     try {
                         // Remove listener and cleanup
-                        this._hlEvents.removeEventListener(channel, listener);
+                        this._hlEvents.removeEventListener(channel, listener as EventListener);
                         const subscription = this._subscriptions.get(id);
                         subscription?.listeners.delete(listener);
 
@@ -245,7 +245,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
                 };
 
                 // Add listener and cache unsubscribe function
-                this._hlEvents.addEventListener(channel, listener);
+                this._hlEvents.addEventListener(channel, listener as EventListener);
                 subscription.listeners.set(listener, unsubscribe);
             }
 

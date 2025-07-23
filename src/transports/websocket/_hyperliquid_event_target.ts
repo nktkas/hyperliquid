@@ -1,4 +1,3 @@
-import { TypedEventTarget } from "typescript-event-target";
 import type { BlockDetails, TxDetails } from "../../types/mod.ts";
 
 /** Represents a message from the Hyperliquid WebSocket API. */
@@ -57,7 +56,7 @@ interface PostResponse {
 }
 
 /** Base system events and dynamic channel events for Hyperliquid WebSocket API. */
-interface HyperliquidEventMap {
+export interface HyperliquidEventMap {
     subscriptionResponse: CustomEvent<SubscriptionResponse>;
     post: CustomEvent<PostResponse>;
     error: CustomEvent<string>;
@@ -69,7 +68,7 @@ interface HyperliquidEventMap {
 }
 
 /** Listens for WebSocket messages and sends them as Hyperliquid typed events. */
-export class HyperliquidEventTarget extends TypedEventTarget<HyperliquidEventMap> {
+export class HyperliquidEventTarget extends EventTarget {
     constructor(socket: WebSocket) {
         super();
         socket.addEventListener("message", (event) => {

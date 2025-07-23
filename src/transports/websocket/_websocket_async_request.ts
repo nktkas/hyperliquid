@@ -1,5 +1,5 @@
 import type { ReconnectingWebSocket } from "./_reconnecting_websocket.ts";
-import type { HyperliquidEventTarget } from "./_hyperliquid_event_target.ts";
+import type { HyperliquidEventMap, HyperliquidEventTarget } from "./_hyperliquid_event_target.ts";
 import { WebSocketRequestError } from "./websocket_transport.ts";
 
 interface PostRequest {
@@ -40,23 +40,27 @@ export class WebSocketAsyncRequest {
     constructor(protected socket: ReconnectingWebSocket, hlEvents: HyperliquidEventTarget) {
         // Monitor responses and match the pending request
         hlEvents.addEventListener("subscriptionResponse", (event) => {
+            const detail = (event as HyperliquidEventMap["subscriptionResponse"]).detail;
+
             // Use a stringified request as an id
-            const id = WebSocketAsyncRequest.requestToId(event.detail);
-            this.queue.findLast((item) => item.id === id)?.resolve(event.detail);
+            const id = WebSocketAsyncRequest.requestToId(detail);
+            this.queue.findLast((item) => item.id === id)?.resolve(detail);
         });
         hlEvents.addEventListener("post", (event) => {
-            const data = event.detail.response.type === "info"
-                ? event.detail.response.payload.data
-                : event.detail.response.payload;
-            this.queue.findLast((item) => item.id === event.detail.id)?.resolve(data);
+            const detail = (event as HyperliquidEventMap["post"]).detail;
+
+            const data = detail.response.type === "info" ? detail.response.payload.data : detail.response.payload;
+            this.queue.findLast((item) => item.id === detail.id)?.resolve(data);
         });
         hlEvents.addEventListener("pong", () => {
             this.queue.findLast((item) => item.id === "ping")?.resolve();
         });
         hlEvents.addEventListener("error", (event) => {
+            const detail = (event as HyperliquidEventMap["error"]).detail;
+
             try {
                 // Error event doesn't have an id, use original request to match
-                const request = event.detail.match(/{.*}/)?.[0];
+                const request = detail.match(/{.*}/)?.[0];
                 if (!request) return;
 
                 const parsedRequest = JSON.parse(request) as Record<string, unknown>;
@@ -64,7 +68,7 @@ export class WebSocketAsyncRequest {
                 // For `post` requests
                 if ("id" in parsedRequest && typeof parsedRequest.id === "number") {
                     this.queue.findLast((item) => item.id === parsedRequest.id)
-                        ?.reject(new WebSocketRequestError(`Server error: ${event.detail}`, { cause: event.detail }));
+                        ?.reject(new WebSocketRequestError(`Server error: ${detail}`, { cause: detail }));
                     return;
                 }
 
@@ -75,35 +79,35 @@ export class WebSocketAsyncRequest {
                 ) {
                     const id = WebSocketAsyncRequest.requestToId(parsedRequest);
                     this.queue.findLast((item) => item.id === id)
-                        ?.reject(new WebSocketRequestError(`Server error: ${event.detail}`, { cause: event.detail }));
+                        ?.reject(new WebSocketRequestError(`Server error: ${detail}`, { cause: detail }));
                     return;
                 }
 
                 // For `Already subscribed` and `Invalid subscription` requests
-                if (event.detail.startsWith("Already subscribed") || event.detail.startsWith("Invalid subscription")) {
+                if (detail.startsWith("Already subscribed") || detail.startsWith("Invalid subscription")) {
                     const id = WebSocketAsyncRequest.requestToId({
                         method: "subscribe",
                         subscription: parsedRequest,
                     });
                     this.queue.findLast((item) => item.id === id)
-                        ?.reject(new WebSocketRequestError(`Server error: ${event.detail}`, { cause: event.detail }));
+                        ?.reject(new WebSocketRequestError(`Server error: ${detail}`, { cause: detail }));
                     return;
                 }
                 // For `Already unsubscribed` requests
-                if (event.detail.startsWith("Already unsubscribed")) {
+                if (detail.startsWith("Already unsubscribed")) {
                     const id = WebSocketAsyncRequest.requestToId({
                         method: "unsubscribe",
                         subscription: parsedRequest,
                     });
                     this.queue.findLast((item) => item.id === id)
-                        ?.reject(new WebSocketRequestError(`Server error: ${event.detail}`, { cause: event.detail }));
+                        ?.reject(new WebSocketRequestError(`Server error: ${detail}`, { cause: detail }));
                     return;
                 }
 
                 // For unknown requests
                 const id = WebSocketAsyncRequest.requestToId(parsedRequest);
                 this.queue.findLast((item) => item.id === id)
-                    ?.reject(new WebSocketRequestError(`Server error: ${event.detail}`, { cause: event.detail }));
+                    ?.reject(new WebSocketRequestError(`Server error: ${detail}`, { cause: detail }));
             } catch {
                 // Ignore JSON parsing errors
             }
