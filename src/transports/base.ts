@@ -17,6 +17,7 @@ export interface IRequestTransport extends Partial<AsyncDisposable> {
      * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
      * @returns A promise that resolves with parsed JSON response body.
      */
+    request<T>(endpoint: "info" | "exchange", payload: unknown, signal?: AbortSignal): Promise<T>;
     request<T>(endpoint: "info" | "exchange" | "explorer", payload: unknown, signal?: AbortSignal): Promise<T>;
 }
 

@@ -155,7 +155,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
      *
      * @throws {WebSocketRequestError} - An error that occurs when a WebSocket request fails.
      */
-    async request<T>(type: "info" | "exchange" | "explorer", payload: unknown, signal?: AbortSignal): Promise<T> {
+    async request<T>(type: "info" | "exchange", payload: unknown, signal?: AbortSignal): Promise<T> {
         try {
             const timeoutSignal = this.timeout ? AbortSignal.timeout(this.timeout) : undefined;
             const combinedSignal = signal && timeoutSignal

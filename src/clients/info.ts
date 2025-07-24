@@ -307,19 +307,20 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // only HttpTransport supports this method
+     * const transport = new hl.HttpTransport(); // only `HttpTransport` supports this method
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.blockDetails({ height: 123 });
      * ```
      */
-    async blockDetails(
+    blockDetails(
+        this: T extends { request(endpoint: "explorer", ...args: unknown[]): unknown } ? this : never,
         params: DeepImmutable<BlockDetailsParameters>,
         signal?: AbortSignal,
     ): Promise<BlockDetails> {
         const request = { type: "blockDetails", ...params } satisfies BlockDetailsRequest;
-        const { blockDetails } = await this.transport.request<BlockDetailsResponse>("explorer", request, signal);
-        return blockDetails;
+        return this.transport.request<BlockDetailsResponse>("explorer", request, signal)
+            .then(({ blockDetails }) => blockDetails);
     }
 
     /**
@@ -1306,19 +1307,20 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // only HttpTransport supports this method
+     * const transport = new hl.HttpTransport(); // only `HttpTransport` supports this method
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.txDetails({ hash: "0x..." });
      * ```
      */
-    async txDetails(
+    txDetails(
+        this: T extends { request(endpoint: "explorer", ...args: unknown[]): unknown } ? this : never,
         params: DeepImmutable<TxDetailsParameters>,
         signal?: AbortSignal,
     ): Promise<TxDetails> {
         const request = { type: "txDetails", ...params } satisfies TxDetailsRequest;
-        const { tx } = await this.transport.request<TxDetailsResponse>("explorer", request, signal);
-        return tx;
+        return this.transport.request<TxDetailsResponse>("explorer", request, signal)
+            .then(({ tx }) => tx);
     }
 
     /**
@@ -1334,19 +1336,20 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // only HttpTransport supports this method
+     * const transport = new hl.HttpTransport(); // only `HttpTransport` supports this method
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.userDetails({ user: "0x..." });
      * ```
      */
-    async userDetails(
+    userDetails(
+        this: T extends { request(endpoint: "explorer", ...args: unknown[]): unknown } ? this : never,
         params: DeepImmutable<UserDetailsParameters>,
         signal?: AbortSignal,
     ): Promise<TxDetails[]> {
         const request = { type: "userDetails", ...params } satisfies UserDetailsRequest;
-        const { txs } = await this.transport.request<UserDetailsResponse>("explorer", request, signal);
-        return txs;
+        return this.transport.request<UserDetailsResponse>("explorer", request, signal)
+            .then(({ txs }) => txs);
     }
 
     /**
