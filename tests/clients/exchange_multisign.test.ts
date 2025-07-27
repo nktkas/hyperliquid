@@ -900,7 +900,7 @@ run(
             .catch((e) => {
                 if (e instanceof SchemaCoverageError) throw e;
                 anyFnSuccess([
-                    () => assertIsError(e, ApiRequestError, "Referral code already registered for this user"),
+                    () => assertIsError(e, ApiRequestError, "Referral code already registered"),
                     () =>
                         assertIsError(
                             e,
@@ -925,7 +925,7 @@ export type MethodReturnType_scheduleCancel = Awaited<ReturnType<ExchangeClient[
 run(
     "scheduleCancel",
     async (types, { client }) => {
-        await client.scheduleCancel({ time: Date.now() + 10000 })
+        await client.scheduleCancel({ time: Date.now() + 30000 })
             .then((data) => {
                 schemaCoverage(types, [data]);
             })
@@ -1410,7 +1410,7 @@ Deno.test("_guessSignatureChainId", async (t) => {
                 const signatureChainId = typeof exchClient.signatureChainId === "string"
                     ? exchClient.signatureChainId
                     : await exchClient.signatureChainId();
-                assertEquals(signatureChainId, "0xa4b1");
+                assertEquals(signatureChainId, "0x1");
             });
 
             await t.step("testnet", async () => {
@@ -1420,7 +1420,7 @@ Deno.test("_guessSignatureChainId", async (t) => {
                 const signatureChainId = typeof exchClient.signatureChainId === "string"
                     ? exchClient.signatureChainId
                     : await exchClient.signatureChainId();
-                assertEquals(signatureChainId, "0x66eee");
+                assertEquals(signatureChainId, "0x1");
             });
         },
         ignore: !METHODS_TO_TEST.includes("_guessSignatureChainId"),

@@ -102,17 +102,17 @@ function resolveTypeAlias(type: string): string {
     return type;
 }
 
-function findTypeDependencies(primaryType: string, types: Types, found = new Set<string>()): string[] {
-    if (found.has(primaryType) || !types[primaryType]) return [];
-    found.add(primaryType);
+function findTypeDependencies(primaryType: string, types: Types, _found = new Set<string>()): string[] {
+    if (_found.has(primaryType) || !types[primaryType]) return [];
+    _found.add(primaryType);
 
     for (const field of types[primaryType]) {
         const baseType = field.type.replace(/\[.*?\]/g, "");
         if (types[baseType]) {
-            findTypeDependencies(baseType, types, found);
+            findTypeDependencies(baseType, types, _found);
         }
     }
-    return Array.from(found);
+    return Array.from(_found);
 }
 
 function encodeValue(type: string, value: unknown, types: Types): Uint8Array {
@@ -215,7 +215,7 @@ export function isValidPrivateKey(privateKey: unknown): privateKey is string {
 
 /** Converts a private key to an Ethereum address. */
 export function privateKeyToAddress(privateKey: string): `0x${string}` {
-    const cleanPrivKey = privateKey.startsWith("0x") ? privateKey.slice(2) : privateKey;
+    const cleanPrivKey = cleanHex(privateKey);
 
     const publicKey = getPublicKey(cleanPrivKey, false);
     const publicKeyWithoutPrefix = publicKey.slice(1);

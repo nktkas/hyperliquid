@@ -96,7 +96,7 @@ export interface ExchangeClientParameters<
      * The network that will be used to sign transactions.
      * Must match the network of the {@link wallet}.
      *
-     * Defaults to trying to get the current wallet network. Otherwise `0xa4b1` for `isTestnet = false` or `0x66eee` for `isTestnet = true` will be used.
+     * Defaults to get chain id from wallet otherwise `0x1`.
      */
     signatureChainId?: Hex | (() => MaybePromise<Hex>);
     /**
@@ -194,9 +194,9 @@ export type Withdraw3Parameters = ExtractRequestAction<Withdraw3Request>;
 
 interface BaseRequestOptions {
     /**
-     * An [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
-     * If this option is set, the request can be canceled by calling [`abort()`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort)
-     * on the corresponding [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController).
+     * An {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal}
+     * If this option is set, the request can be canceled by calling {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort | abort()}
+     * on the corresponding {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController | AbortController}.
      */
     signal?: AbortSignal;
 }
@@ -415,7 +415,7 @@ export class ExchangeClient<
         this.isTestnet = args.isTestnet ?? false;
         this.defaultVaultAddress = args.defaultVaultAddress;
         this.defaultExpiresAfter = args.defaultExpiresAfter;
-        this.signatureChainId = args.signatureChainId ?? (() => getWalletChainId(this.wallet, this.isTestnet));
+        this.signatureChainId = args.signatureChainId ?? (() => getWalletChainId(this.wallet));
         this.nonceManager = args.nonceManager ?? new NonceManager().getNonce;
     }
 
@@ -433,7 +433,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -468,7 +468,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -503,7 +503,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -551,7 +551,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -589,7 +589,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -627,7 +627,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -661,7 +661,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -692,7 +692,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -736,7 +736,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -769,7 +769,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -807,7 +807,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -844,7 +844,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -907,7 +907,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -937,12 +937,12 @@ export class ExchangeClient<
      * @throws {ApiRequestError} When the API returns an unsuccessful response.
      * @throws {TransportError} When the transport layer throws an error.
      *
-     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/evm/dual-block-architecture
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/hyperevm/dual-block-architecture
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -975,7 +975,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1107,7 +1107,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1154,7 +1154,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1200,7 +1200,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1233,7 +1233,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1266,7 +1266,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1311,7 +1311,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1344,7 +1344,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1377,7 +1377,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1420,7 +1420,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1446,39 +1446,6 @@ export class ExchangeClient<
     }
 
     /**
-     * Modify a sub-account's.
-     * @param params - Action-specific parameters.
-     * @param opts - Request execution options.
-     * @returns Successful response without specific data.
-     *
-     * @throws {ApiRequestError} When the API returns an unsuccessful response.
-     * @throws {TransportError} When the transport layer throws an error.
-     *
-     * @see null
-     * @example
-     * ```ts
-     * import * as hl from "@nktkas/hyperliquid";
-     *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
-     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
-     * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
-     *
-     * await exchClient.subAccountModify({ subAccountUser: "0x...", name: "..."  });
-     * ```
-     */
-    async subAccountModify(
-        params: DeepImmutable<SubAccountModifyParameters>,
-        opts?: SubAccountModifyOptions,
-    ): Promise<SuccessResponse> {
-        const action = actionSorter.subAccountModify({
-            type: "subAccountModify",
-            ...params,
-        });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
-        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
-    }
-
-    /**
      * Opt Out of Spot Dusting.
      * @param params - Action-specific parameters.
      * @param opts - Request execution options.
@@ -1492,7 +1459,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1505,6 +1472,39 @@ export class ExchangeClient<
     ): Promise<SuccessResponse> {
         const action = actionSorter.spotUser({
             type: "spotUser",
+            ...params,
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
+    }
+
+    /**
+     * Modify a sub-account's.
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
+     * @returns Successful response without specific data.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+     * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
+     *
+     * await exchClient.subAccountModify({ subAccountUser: "0x...", name: "..."  });
+     * ```
+     */
+    async subAccountModify(
+        params: DeepImmutable<SubAccountModifyParameters>,
+        opts?: SubAccountModifyOptions,
+    ): Promise<SuccessResponse> {
+        const action = actionSorter.subAccountModify({
+            type: "subAccountModify",
             ...params,
         });
         const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
@@ -1525,7 +1525,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1563,7 +1563,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1596,7 +1596,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1631,7 +1631,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1665,7 +1665,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1708,7 +1708,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1742,7 +1742,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1776,7 +1776,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1811,7 +1811,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1846,7 +1846,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1879,7 +1879,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1916,7 +1916,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *
@@ -1949,7 +1949,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const privateKey = "0x..."; // or `viem`, `ethers`
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
      *

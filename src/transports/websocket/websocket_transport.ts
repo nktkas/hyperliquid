@@ -150,7 +150,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
      *
      * @param endpoint - The API endpoint to send the request to (`explorer` requests are not supported).
      * @param payload - The payload to send with the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param signal - An {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal}. If this option is set, the request can be canceled by calling {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort | abort()} on the corresponding {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController | AbortController}.
      * @returns A promise that resolves with parsed JSON response body.
      *
      * @throws {WebSocketRequestError} - An error that occurs when a WebSocket request fails.
@@ -173,7 +173,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
         } catch (error) {
             if (error instanceof WebSocketRequestError) throw error; // Re-throw known errors
             throw new WebSocketRequestError(
-                "Unknown error while making a WebSocket request. See the `cause` for more details.",
+                `Unknown error while making a WebSocket request: ${error}`,
                 { cause: error },
             );
         }
@@ -238,7 +238,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
                     } catch (error) {
                         if (error instanceof WebSocketRequestError) throw error; // Re-throw known errors
                         throw new WebSocketRequestError(
-                            "Unknown error while unsubscribing from a WebSocket channel. See the `cause` for more details.",
+                            `Unknown error while unsubscribing from a WebSocket channel: ${error}`,
                             { cause: error },
                         );
                     }
@@ -260,7 +260,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
         } catch (error) {
             if (error instanceof WebSocketRequestError) throw error; // Re-throw known errors
             throw new WebSocketRequestError(
-                "Unknown error while subscribing to a WebSocket channel. See the `cause` for more details.",
+                `Unknown error while subscribing to a WebSocket channel: ${error}`,
                 { cause: error },
             );
         }
@@ -268,7 +268,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
 
     /**
      * Waits until the WebSocket connection is ready.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param signal - An {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal}. If this option is set, the promise can be canceled by calling {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort | abort()} on the corresponding {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController | AbortController}.
      * @returns A promise that resolves when the connection is ready.
      */
     ready(signal?: AbortSignal): Promise<void> {
@@ -296,7 +296,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
 
     /**
      * Closes the WebSocket connection and waits until it is fully closed.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param signal - An {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal}. If this option is set, the promise can be canceled by calling {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort | abort()} on the corresponding {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController | AbortController}.
      * @returns A promise that resolves when the connection is fully closed.
      */
     close(signal?: AbortSignal): Promise<void> {

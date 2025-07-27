@@ -11,35 +11,24 @@ import type {
 } from "../types/mod.ts";
 import { ExchangeClient, type ExchangeClientParameters } from "./exchange.ts";
 import {
-    type AbstractEthersSigner,
-    type AbstractEthersV5Signer,
-    type AbstractViemWalletClient,
     type AbstractWallet,
+    type actionSorter,
     getWalletAddress,
     signL1Action,
     signUserSignedAction,
+    userSignedActionEip712Types,
 } from "../signing/mod.ts";
-import { type actionSorter, userSignedActionEip712Types } from "../signing/mod.ts";
-
-type Signers = [AbstractWalletWithAddress, ...AbstractWallet[]];
 
 /** Parameters for the {@linkcode MultiSignClient} constructor. */
 export interface MultiSignClientParameters<
     T extends IRequestTransport = IRequestTransport,
-    S extends Readonly<Signers> = Signers,
+    S extends readonly AbstractWallet[] = AbstractWallet[],
 > extends Omit<ExchangeClientParameters<T, S[0]>, "wallet"> {
     /** The multi-signature account address. */
     multiSignAddress: Hex;
     /** Array of wallets used for multi-signature operations. The first wallet acts as the leader. */
     signers: S;
 }
-
-/** Abstract interface for a wallet that can sign typed data and has wallet address. */
-export type AbstractWalletWithAddress =
-    | Hex // Private key
-    | Required<AbstractViemWalletClient>
-    | Required<AbstractEthersSigner>
-    | Required<AbstractEthersV5Signer>;
 
 /**
  * Multi-signature exchange client for interacting with the Hyperliquid API.
@@ -48,7 +37,7 @@ export type AbstractWalletWithAddress =
  */
 export class MultiSignClient<
     T extends IRequestTransport = IRequestTransport,
-    S extends Readonly<Signers> = Signers,
+    S extends readonly AbstractWallet[] = AbstractWallet[],
 > extends ExchangeClient<T, S[0]> implements MultiSignClientParameters<T, S> {
     multiSignAddress: Hex;
     signers: S;

@@ -174,7 +174,7 @@ export class WebSocketAsyncRequest {
 
     /** Normalizes an object and then converts it to a string. */
     static requestToId(value: unknown): string {
-        const lowerHex = containsUppercaseHex(value) ? deepLowerHex(value) : value;
+        const lowerHex = deepLowerHex(value);
         const sorted = deepSortKeys(lowerHex);
         return JSON.stringify(sorted); // Also removes undefined
     }
@@ -187,7 +187,7 @@ function deepLowerHex(obj: unknown): unknown {
     }
 
     if (Array.isArray(obj)) {
-        return obj.map(deepLowerHex);
+        return obj.map((value) => deepLowerHex(value));
     }
 
     if (typeof obj === "object" && obj !== null) {
@@ -202,12 +202,6 @@ function deepLowerHex(obj: unknown): unknown {
     }
 
     return obj;
-}
-
-/** Check if an object contains uppercase hexadecimal strings. */
-function containsUppercaseHex(obj: unknown): boolean {
-    const str = JSON.stringify(obj);
-    return /0X[0-9a-fA-F]*|0x[0-9a-fA-F]*[A-F][0-9a-fA-F]*/.test(str);
 }
 
 /** Deeply sort the keys of an object. */

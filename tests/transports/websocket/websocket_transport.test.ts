@@ -136,7 +136,7 @@ Deno.test("WebSocketTransport", async (t) => {
                 const error = await assertRejects(
                     () => promise,
                     WebSocketRequestError,
-                    "Unknown error while making a WebSocket request. See the `cause` for more details.",
+                    "Unknown error while making a WebSocket request:",
                 );
                 assertIsError(error.cause, Error, "Aborted");
 
@@ -156,7 +156,7 @@ Deno.test("WebSocketTransport", async (t) => {
                 const error = await assertRejects(
                     () => promise,
                     WebSocketRequestError,
-                    "Unknown error while making a WebSocket request. See the `cause` for more details.",
+                    "Unknown error while making a WebSocket request:",
                 );
                 assertIsError(error.cause, DOMException, "Signal timed out.");
 

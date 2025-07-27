@@ -663,7 +663,7 @@ export class SubscriptionClient<
         params: DeepImmutable<EventUserTwapSliceFills>,
         listener: (data: WsUserTwapSliceFills) => void,
     ): Promise<Subscription> {
-        const payload = { type: "userTwapSliceFills", ...params } as UserTwapSliceFillsRequest;
+        const payload = { type: "userTwapSliceFills", ...params } satisfies UserTwapSliceFillsRequest;
         return this.transport.subscribe<WsUserTwapSliceFills>(payload.type, payload, (e) => {
             if (e.detail.user === params.user.toLowerCase()) {
                 listener(e.detail);

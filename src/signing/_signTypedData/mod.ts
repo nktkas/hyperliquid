@@ -1,28 +1,18 @@
 import {
-    type AbstractEthersSigner,
     type AbstractEthersV5Signer,
-    isAbstractEthersSigner,
+    type AbstractEthersV6Signer,
     isAbstractEthersV5Signer,
+    isAbstractEthersV6Signer,
 } from "./ethers.ts";
 import { isValidPrivateKey, privateKeyToAddress, signTypedData as signTypedDataWithPrivateKey } from "./private_key.ts";
-import { type AbstractViemWalletClient, isAbstractViemWalletClient } from "./viem.ts";
-
-export {
-    type AbstractEthersSigner,
-    type AbstractEthersV5Signer,
-    type AbstractViemWalletClient,
-    isAbstractEthersSigner,
-    isAbstractEthersV5Signer,
-    isAbstractViemWalletClient,
-    isValidPrivateKey,
-    privateKeyToAddress,
-};
+import { type AbstractViemJsonRpcAccount, type AbstractViemLocalAccount, isAbstractViemWallet } from "./viem.ts";
 
 /** Abstract interface for a wallet that can sign typed data. */
 export type AbstractWallet =
     | `0x${string}` // Private key
-    | AbstractViemWalletClient
-    | AbstractEthersSigner
+    | AbstractViemJsonRpcAccount
+    | AbstractViemLocalAccount
+    | AbstractEthersV6Signer
     | AbstractEthersV5Signer;
 
 /** ECDSA signature components for Ethereum transactions and typed data. */
@@ -55,15 +45,7 @@ export async function signTypedData(args: {
     const { wallet, domain, types, primaryType, message } = args;
 
     let signature: `0x${string}`;
-    if (isValidPrivateKey(wallet)) {
-        signature = await signTypedDataWithPrivateKey({
-            privateKey: wallet,
-            domain,
-            types,
-            primaryType,
-            message,
-        });
-    } else if (isAbstractViemWalletClient(wallet)) {
+    if (isAbstractViemWallet(wallet)) {
         signature = await wallet.signTypedData({
             domain,
             types: {
@@ -78,10 +60,12 @@ export async function signTypedData(args: {
             primaryType,
             message,
         });
-    } else if (isAbstractEthersSigner(wallet)) {
+    } else if (isAbstractEthersV6Signer(wallet)) {
         signature = await wallet.signTypedData(domain, types, message) as `0x${string}`;
     } else if (isAbstractEthersV5Signer(wallet)) {
         signature = await wallet._signTypedData(domain, types, message) as `0x${string}`;
+    } else if (isValidPrivateKey(wallet)) {
+        signature = await signTypedDataWithPrivateKey({ privateKey: wallet, domain, types, primaryType, message });
     } else {
         throw new Error("Unsupported wallet for signing typed data");
     }
@@ -94,4 +78,44 @@ function splitSignature(signature: `0x${string}`): Signature {
     const s = `0x${signature.slice(66, 130)}` as const;
     const v = parseInt(signature.slice(130, 132), 16) as 27 | 28;
     return { r, s, v };
+}
+
+/** Get the chain ID of the wallet. */
+export async function getWalletChainId(wallet: AbstractWallet): Promise<`0x${string}`> {
+    if (isAbstractViemWallet(wallet)) {
+        if ("getChainId" in wallet && wallet.getChainId) {
+            const chainId = await wallet.getChainId();
+            return `0x${chainId.toString(16)}`;
+        } else {
+            return "0x1";
+        }
+    } else if (isAbstractEthersV6Signer(wallet) || isAbstractEthersV5Signer(wallet)) {
+        if ("provider" in wallet && wallet.provider) {
+            const network = await wallet.provider.getNetwork();
+            return `0x${network.chainId.toString(16)}`;
+        } else {
+            return "0x1";
+        }
+    } else {
+        return "0x1";
+    }
+}
+
+/** Get the wallet address from various wallet types. */
+export async function getWalletAddress(wallet: AbstractWallet): Promise<`0x${string}`> {
+    if (isAbstractViemWallet(wallet)) {
+        if ("address" in wallet && wallet.address) {
+            return wallet.address;
+        } else if ("getAddresses" in wallet && wallet.getAddresses) {
+            const addresses = await wallet.getAddresses();
+            return addresses[0];
+        }
+    } else if (isAbstractEthersV6Signer(wallet) || isAbstractEthersV5Signer(wallet)) {
+        if ("getAddress" in wallet && wallet.getAddress) {
+            return await wallet.getAddress() as `0x${string}`;
+        }
+    } else if (isValidPrivateKey(wallet)) {
+        return privateKeyToAddress(wallet);
+    }
+    throw new Error("Unsupported wallet for getting address");
 }

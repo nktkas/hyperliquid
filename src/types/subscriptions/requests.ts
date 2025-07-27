@@ -3,6 +3,7 @@ import type { Hex } from "../mod.ts";
 /**
  * Context events for a specific perpetual asset.
  * @returns {WsActiveAssetCtx | WsActiveSpotAssetCtx}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export interface WsActiveAssetCtxRequest {
     /** Type of subscription. */
@@ -14,6 +15,7 @@ export interface WsActiveAssetCtxRequest {
 /**
  * Best bid and offer events for a specific asset.
  * @returns {WsBbo}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export interface WsBboRequest {
     /** Type of subscription. */
@@ -25,6 +27,7 @@ export interface WsBboRequest {
 /**
  * Candlestick data events for a specific asset.
  * @returns {Candle}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export interface WsCandleRequest {
     /** Type of subscription. */
@@ -38,6 +41,7 @@ export interface WsCandleRequest {
 /**
  * Explorer block events.
  * @returns {WsBlockDetails[]}
+ * @see null
  */
 export interface WsExplorerBlockRequest {
     /** Type of subscription. */
@@ -47,6 +51,7 @@ export interface WsExplorerBlockRequest {
 /**
  * Explorer transaction events.
  * @returns {TxDetails[]}
+ * @see null
  */
 export interface WsExplorerTxsRequest {
     /** Type of subscription. */
@@ -56,6 +61,7 @@ export interface WsExplorerTxsRequest {
 /**
  * Notification events for a specific user.
  * @returns {WsNotification}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export interface WsNotificationRequest {
     /** Type of subscription. */
@@ -67,6 +73,7 @@ export interface WsNotificationRequest {
 /**
  * Order status events for a specific user.
  * @returns {OrderStatus<Order>[]}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export interface WsOrderUpdatesRequest {
     /** Type of subscription. */
@@ -78,6 +85,7 @@ export interface WsOrderUpdatesRequest {
 /**
  * Real-time trade updates for a specific asset.
  * @returns {WsTrade[]}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export interface WsTradesRequest {
     /** Type of subscription. */
@@ -89,6 +97,7 @@ export interface WsTradesRequest {
 /**
  * Non-order events for a specific user.
  * @returns {WsUserEvent}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export interface WsUserEventsRequest {
     /** Type of subscription. */
@@ -100,6 +109,7 @@ export interface WsUserEventsRequest {
 /**
  * Funding payment events for a specific user.
  * @returns {WsUserFundings}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export interface WsUserFundingsRequest {
     /** Type of subscription. */
@@ -111,6 +121,7 @@ export interface WsUserFundingsRequest {
 /**
  * Non-funding ledger events for a specific user.
  * @returns {WsUserNonFundingLedgerUpdates}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export interface WsUserNonFundingLedgerUpdatesRequest {
     /** Type of subscription. */
@@ -122,6 +133,7 @@ export interface WsUserNonFundingLedgerUpdatesRequest {
 /**
  * TWAP order history events for a specific user.
  * @returns {WsUserTwapHistory}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export interface WsUserTwapHistoryRequest {
     /** Type of subscription. */
@@ -133,6 +145,7 @@ export interface WsUserTwapHistoryRequest {
 /**
  * Comprehensive user and market data events.
  * @returns {WsWebData2}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export interface WsWebData2Request {
     /** Type of subscription. */

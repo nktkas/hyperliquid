@@ -14,7 +14,7 @@ export interface IRequestTransport extends Partial<AsyncDisposable> {
      * Sends a request to the Hyperliquid API.
      * @param endpoint - The API endpoint to send the request to.
      * @param payload - The payload to send with the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param signal - An {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal}. If this option is set, the request can be canceled by calling {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort | abort()} on the corresponding {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController | AbortController}.
      * @returns A promise that resolves with parsed JSON response body.
      */
     request<T>(endpoint: "info" | "exchange", payload: unknown, signal?: AbortSignal): Promise<T>;

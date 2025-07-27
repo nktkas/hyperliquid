@@ -15,7 +15,7 @@ export class HttpRequestError extends TransportError {
             message = `${response.status} ${response.statusText}`.trim();
             if (body) message += ` - ${body}`;
         } else {
-            message = "Unknown error while making an HTTP request. See the `cause` for more details.";
+            message = `Unknown error while making an HTTP request: ${options?.cause}`;
         }
 
         super(message, options);
@@ -104,7 +104,7 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
      * Sends a request to the Hyperliquid API via fetch.
      * @param endpoint - The API endpoint to send the request to.
      * @param payload - The payload to send with the request.
-     * @param signal - An optional [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+     * @param signal - An {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal}. If this option is set, the request can be canceled by calling {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort | abort()} on the corresponding {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController | AbortController}.
      * @returns A promise that resolves with parsed JSON response body.
      *
      * @throws {HttpRequestError} Thrown when the HTTP request fails.
@@ -171,7 +171,7 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
     }
 }
 
-/** Merges multiple {@linkcode HeadersInit} into one {@linkcode Headers}. */
+/** Merges multiple {@linkcode HeadersInit} into one {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Headers/Headers | Headers}. */
 function mergeHeadersInit(...inits: HeadersInit[]): Headers {
     if (inits.length === 0 || inits.length === 1) {
         return new Headers(inits[0] as HeadersInit | undefined);
@@ -187,7 +187,7 @@ function mergeHeadersInit(...inits: HeadersInit[]): Headers {
     return merged;
 }
 
-/** Merges multiple {@linkcode RequestInit} into one {@linkcode RequestInit}. */
+/** Merges multiple {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/RequestInit | RequestInit} into one {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/RequestInit | RequestInit}. */
 function mergeRequestInit(...inits: RequestInit[]): RequestInit {
     const merged = inits.reduce((acc, init) => ({ ...acc, ...init }), {});
 

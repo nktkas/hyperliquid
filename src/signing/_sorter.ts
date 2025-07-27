@@ -146,7 +146,12 @@ export const actionSorter = {
             type: action.type,
             signatureChainId: action.signatureChainId,
             hyperliquidChain: action.hyperliquidChain,
-            signers: typeof action.signers === "string" ? action.signers : JSON.stringify(action.signers),
+            signers: typeof action.signers === "string" ? action.signers : JSON.stringify(
+                action.signers === null ? action.signers : {
+                    authorizedUsers: action.signers.authorizedUsers,
+                    threshold: action.signers.threshold,
+                },
+            ),
             nonce: action.nonce,
         };
     },

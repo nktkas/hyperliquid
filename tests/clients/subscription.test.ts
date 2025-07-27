@@ -198,7 +198,7 @@ run(
             new Promise((resolve) => {
                 subsClient.candle({ coin: "BTC", interval: "1m" }, resolve);
             }),
-            90_000,
+            120_000,
         );
         schemaCoverage(types, [data], {
             ignoreEnumValuesByPath: {

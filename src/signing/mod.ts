@@ -6,7 +6,7 @@
  * ```ts
  * import { actionSorter, signL1Action } from "@nktkas/hyperliquid/signing";
  *
- * const privateKey = "0x..."; // or `viem`, `ethers`
+ * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
  *
  * const action = actionSorter.cancel({
  *   type: "cancel",
@@ -22,7 +22,7 @@
  * const response = await fetch("https://api.hyperliquid.xyz/exchange", {
  *   method: "POST",
  *   headers: { "Content-Type": "application/json" },
- *   body: JSON.stringify({ action, signature, nonce }), // recommended to send the same sorted action
+ *   body: JSON.stringify({ action, signature, nonce }), // recommended to send the same formatted action
  * });
  * const body = await response.json();
  * ```
@@ -31,7 +31,7 @@
  * ```ts
  * import { actionSorter, signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
  *
- * const privateKey = "0x..."; // or `viem`, `ethers`
+ * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
  *
  * const action = actionSorter.approveAgent({
  *   type: "approveAgent",
@@ -52,7 +52,7 @@
  * const response = await fetch("https://api.hyperliquid.xyz/exchange", {
  *   method: "POST",
  *   headers: { "Content-Type": "application/json" },
- *   body: JSON.stringify({ action, signature, nonce: action.nonce }), // recommended to send the same sorted action
+ *   body: JSON.stringify({ action, signature, nonce: action.nonce }), // recommended to send the same formatted action
  * });
  * const body = await response.json();
  * ```
@@ -110,7 +110,7 @@
  * const response = await fetch("https://api.hyperliquid.xyz/exchange", {
  *   method: "POST",
  *   headers: { "Content-Type": "application/json" },
- *   body: JSON.stringify({ action: multiSigAction, signature: multiSigSignature, nonce }), // recommended to send the same sorted action
+ *   body: JSON.stringify({ action: multiSigAction, signature: multiSigSignature, nonce }), // recommended to send the same formatted action
  * });
  * const body = await response.json();
  * ```
@@ -122,30 +122,21 @@ import { keccak_256 } from "@noble/hashes/sha3";
 import { etc } from "@noble/secp256k1";
 import { encode as encodeMsgpack } from "@msgpack/msgpack";
 import {
-    type AbstractEthersSigner,
-    type AbstractEthersV5Signer,
-    type AbstractViemWalletClient,
     type AbstractWallet,
-    isAbstractEthersSigner,
-    isAbstractEthersV5Signer,
-    isAbstractViemWalletClient,
-    isValidPrivateKey,
-    privateKeyToAddress,
+    getWalletAddress,
+    getWalletChainId,
     type Signature,
     signTypedData,
 } from "./_signTypedData/mod.ts";
+import { actionSorter, userSignedActionEip712Types } from "./_sorter.ts";
 
-export { actionSorter, userSignedActionEip712Types } from "./_sorter.ts";
 export {
-    type AbstractEthersSigner,
-    type AbstractEthersV5Signer,
-    type AbstractViemWalletClient,
     type AbstractWallet,
-    isAbstractEthersSigner,
-    isAbstractEthersV5Signer,
-    isAbstractViemWalletClient,
-    isValidPrivateKey,
+    actionSorter,
+    getWalletAddress,
+    getWalletChainId,
     type Signature,
+    userSignedActionEip712Types,
 };
 
 /**
@@ -216,7 +207,7 @@ function toUint64Bytes(n: bigint | number | string): Uint8Array {
  * ```ts
  * import { actionSorter, signL1Action } from "@nktkas/hyperliquid/signing";
  *
- * const privateKey = "0x..."; // or `viem`, `ethers`
+ * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
  *
  * const action = actionSorter.cancel({
  *   type: "cancel",
@@ -232,7 +223,7 @@ function toUint64Bytes(n: bigint | number | string): Uint8Array {
  * const response = await fetch("https://api.hyperliquid.xyz/exchange", {
  *   method: "POST",
  *   headers: { "Content-Type": "application/json" },
- *   body: JSON.stringify({ action, signature, nonce }), // recommended to send the same sorted action
+ *   body: JSON.stringify({ action, signature, nonce }), // recommended to send the same formatted action
  * });
  * const body = await response.json();
  * ```
@@ -291,7 +282,7 @@ export async function signL1Action(args: {
  * ```ts
  * import { actionSorter, signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
  *
- * const privateKey = "0x..."; // or `viem`, `ethers`
+ * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
  *
  * const action = actionSorter.approveAgent({
  *   type: "approveAgent",
@@ -312,7 +303,7 @@ export async function signL1Action(args: {
  * const response = await fetch("https://api.hyperliquid.xyz/exchange", {
  *   method: "POST",
  *   headers: { "Content-Type": "application/json" },
- *   body: JSON.stringify({ action, signature, nonce: action.nonce }), // recommended to send the same sorted action
+ *   body: JSON.stringify({ action, signature, nonce: action.nonce }), // recommended to send the same formatted action
  * });
  * const body = await response.json();
  * ```
@@ -423,7 +414,7 @@ export async function signUserSignedAction(args: {
  * const response = await fetch("https://api.hyperliquid.xyz/exchange", {
  *   method: "POST",
  *   headers: { "Content-Type": "application/json" },
- *   body: JSON.stringify({ action: multiSigAction, signature: multiSigSignature, nonce }), // recommended to send the same sorted action
+ *   body: JSON.stringify({ action: multiSigAction, signature: multiSigSignature, nonce }), // recommended to send the same formatted action
  * });
  * const body = await response.json();
  * ```
@@ -474,52 +465,8 @@ export async function signMultiSigAction(args: {
             chainId: parseInt(action.signatureChainId),
             verifyingContract: "0x0000000000000000000000000000000000000000",
         },
-        types: {
-            "HyperliquidTransaction:SendMultiSig": [
-                { name: "hyperliquidChain", type: "string" },
-                { name: "multiSigActionHash", type: "bytes32" },
-                { name: "nonce", type: "uint64" },
-            ],
-        },
-        primaryType: "HyperliquidTransaction:SendMultiSig",
+        types: userSignedActionEip712Types.multiSig,
+        primaryType: Object.keys(userSignedActionEip712Types.multiSig)[0],
         message,
     });
-}
-
-// —————————— Helper Functions ——————————
-
-/** Get the chain ID of the wallet or return a default based on the testnet flag. */
-export async function getWalletChainId(wallet: AbstractWallet, isTestnet: boolean): Promise<`0x${string}`> {
-    // Try to get chain id from wallet
-    if (isAbstractViemWalletClient(wallet)) {
-        if ("getChainId" in wallet && typeof wallet.getChainId === "function") {
-            const chainId = await wallet.getChainId() as number;
-            return `0x${chainId.toString(16)}`;
-        }
-    } else if (isAbstractEthersSigner(wallet) || isAbstractEthersV5Signer(wallet)) {
-        if (
-            "provider" in wallet &&
-            typeof wallet.provider === "object" && wallet.provider !== null &&
-            "getNetwork" in wallet.provider &&
-            typeof wallet.provider.getNetwork === "function"
-        ) {
-            const network = await wallet.provider.getNetwork() as { chainId: number | bigint };
-            return `0x${network.chainId.toString(16)}`;
-        }
-    }
-    // Return default chain id based on testnet flag
-    return isTestnet ? "0x66eee" : "0xa4b1";
-}
-
-/** Get the wallet address from various wallet types. */
-export async function getWalletAddress(wallet: AbstractWallet): Promise<`0x${string}`> {
-    if (isValidPrivateKey(wallet)) {
-        return privateKeyToAddress(wallet);
-    } else if (isAbstractViemWalletClient(wallet) && wallet.address) {
-        return wallet.address;
-    } else if ((isAbstractEthersSigner(wallet) || isAbstractEthersV5Signer(wallet)) && wallet.getAddress) {
-        return await wallet.getAddress() as `0x${string}`;
-    } else {
-        throw new Error("Unsupported wallet for getting address");
-    }
 }

@@ -1,6 +1,5 @@
-/** Abstract interface for an [ethers.js signer](https://docs.ethers.org/v6/api/providers/#Signer). */
-export interface AbstractEthersSigner {
-    getAddress?(): Promise<string>;
+/** Abstract interface for an {@link https://docs.ethers.org/v6/api/providers/#Signer | ethers.js signer}. */
+export interface AbstractEthersV6Signer {
     signTypedData(
         domain: {
             name: string;
@@ -16,11 +15,14 @@ export interface AbstractEthersSigner {
         },
         value: Record<string, unknown>,
     ): Promise<string>;
+    getAddress?(): Promise<string>;
+    provider?:
+        | { getNetwork(): Promise<{ chainId: number | bigint }> }
+        | null;
 }
 
-/** Abstract interface for an [ethers.js v5 signer](https://docs.ethers.org/v5/api/signer/). */
+/** Abstract interface for an {@link https://docs.ethers.org/v5/api/signer/ | ethers.js v5 signer}. */
 export interface AbstractEthersV5Signer {
-    getAddress?(): Promise<string>;
     _signTypedData(
         domain: {
             name: string;
@@ -36,10 +38,14 @@ export interface AbstractEthersV5Signer {
         },
         value: Record<string, unknown>,
     ): Promise<string>;
+    getAddress?(): Promise<string>;
+    provider?:
+        | { getNetwork(): Promise<{ chainId: number | bigint }> }
+        | null;
 }
 
 /** Checks if the given value is an abstract ethers signer. */
-export function isAbstractEthersSigner(client: unknown): client is AbstractEthersSigner {
+export function isAbstractEthersV6Signer(client: unknown): client is AbstractEthersV6Signer {
     return typeof client === "object" && client !== null &&
         "signTypedData" in client && typeof client.signTypedData === "function" &&
         client.signTypedData.length === 3;
