@@ -234,7 +234,7 @@ export interface WsWebData2 {
     /** TWAP states. */
     twapStates: [number, TwapState][];
     /** Account summary for spot trading. */
-    spotState: SpotClearinghouseState;
+    spotState?: SpotClearinghouseState;
     /** Context information for spot assets. */
     spotAssetCtxs: SpotAssetCtx[];
     /** Whether the user has opted out of spot dusting. */

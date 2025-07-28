@@ -1,5 +1,5 @@
 import type { InfoClient, PerpsAssetCtx, PerpsUniverse } from "@nktkas/hyperliquid";
-import BigNumber from "npm:bignumber.js@9";
+import { BigNumber } from "npm:bignumber.js@9";
 
 /** Get asset data by name. */
 export async function getAssetData(client: InfoClient, assetName: string): Promise<{

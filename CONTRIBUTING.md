@@ -26,7 +26,8 @@ You can run most tests with the following command:
 deno test -A
 ```
 
-However, for complete testing, you will need a private key from a testnet account with funds:
+However, for complete testing, you will need a private key from a testnet account with funds (~100 usdc-perps, ~3
+usdc-spot, ~0.0000001 hype-spot):
 
 ```bash
 deno test -A -- YOUR_PRIVATE_KEY
