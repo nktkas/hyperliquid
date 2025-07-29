@@ -3,8 +3,8 @@
  * Command: deno run -A build/bundle.ts
  */
 
-import { build } from "npm:esbuild";
-import { denoPlugins } from "jsr:@luca/esbuild-deno-loader";
+import { build } from "npm:esbuild@0.25.5";
+import { denoPlugins } from "jsr:@luca/esbuild-deno-loader@0.11.1";
 
 // Build bundle
 const nodeModulesExists = await Deno.stat("./node_modules").then(() => true).catch(() => false);
