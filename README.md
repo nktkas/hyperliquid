@@ -166,7 +166,7 @@ await sub.unsubscribe();
 // 1. Import module
 import * as hl from "@nktkas/hyperliquid";
 
-// 2. Set up client with
+// 2. Set up client with transport, multi-sign address, and signers
 const multiSignClient = new hl.MultiSignClient({
     transport: new hl.HttpTransport(), // or `WebSocketTransport`
     multiSignAddress: "0x...",
