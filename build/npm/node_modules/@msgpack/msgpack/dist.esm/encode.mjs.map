@@ -1,0 +1,1 @@
+{"version":3,"file":"encodemjs","sourceRoot":"","sources":["../src/encode.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,MAAM,cAAc,CAAC;AAIvC;;;;;GAKG;AACH,MAAM,UAAU,MAAM,CACpB,KAAc,EACd,OAAqD;IAErD,MAAM,OAAO,GAAG,IAAI,OAAO,CAAC,OAAO,CAAC,CAAC;IACrC,OAAO,OAAO,CAAC,eAAe,CAAC,KAAK,CAAC,CAAC;AACxC,CAAC"}
