@@ -7,8 +7,17 @@ import {
 } from "./_reconnecting_websocket.ts";
 import { HyperliquidEventTarget } from "./_hyperliquid_event_target.ts";
 import { WebSocketAsyncRequest } from "./_websocket_async_request.ts";
+import { WebSocketCompatibilityError, getWebSocketEnvironmentInfo, requiresWsPackage, preloadWsPackage } from "./_websocket_factory.ts";
 
-export { type MessageBufferStrategy, ReconnectingWebSocketError, type ReconnectingWebSocketOptions };
+export { 
+    type MessageBufferStrategy, 
+    ReconnectingWebSocketError, 
+    type ReconnectingWebSocketOptions,
+    WebSocketCompatibilityError,
+    getWebSocketEnvironmentInfo,
+    requiresWsPackage,
+    preloadWsPackage
+};
 
 /** Configuration options for the WebSocket transport layer. */
 export interface WebSocketTransportOptions {
