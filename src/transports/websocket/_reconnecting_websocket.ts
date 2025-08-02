@@ -1,5 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 import { TransportError } from "../base.ts";
+import { createCompatibleWebSocketSync, WebSocketCompatibilityError } from "./_websocket_factory.ts";
 
 type MaybePromise<T> = T | Promise<T>;
 
@@ -115,28 +116,35 @@ export class ReconnectingWebSocket implements WebSocket {
     }
 
     protected _createSocket(url: string | URL, protocols?: string | string[]): WebSocket {
-        const socket = new WebSocket(url, protocols);
-        if (this.reconnectOptions.connectionTimeout === null) return socket;
+        try {
+            const socket = createCompatibleWebSocketSync(url, protocols);
+            if (this.reconnectOptions.connectionTimeout === null) return socket;
 
-        const timeoutId = setTimeout(() => {
-            socket.removeEventListener("open", openHandler);
-            socket.removeEventListener("close", closeHandler);
-            socket.close(3008, "Timeout"); // https://www.iana.org/assignments/websocket/websocket.xml#close-code-number
-        }, this.reconnectOptions.connectionTimeout);
+            const timeoutId = setTimeout(() => {
+                socket.removeEventListener("open", openHandler);
+                socket.removeEventListener("close", closeHandler);
+                socket.close(3008, "Timeout"); // https://www.iana.org/assignments/websocket/websocket.xml#close-code-number
+            }, this.reconnectOptions.connectionTimeout);
 
-        const openHandler = () => {
-            socket.removeEventListener("close", closeHandler);
-            clearTimeout(timeoutId);
-        };
-        const closeHandler = () => {
-            socket.removeEventListener("open", openHandler);
-            clearTimeout(timeoutId);
-        };
+            const openHandler = () => {
+                socket.removeEventListener("close", closeHandler);
+                clearTimeout(timeoutId);
+            };
+            const closeHandler = () => {
+                socket.removeEventListener("open", openHandler);
+                clearTimeout(timeoutId);
+            };
 
-        socket.addEventListener("open", openHandler, { once: true });
-        socket.addEventListener("close", closeHandler, { once: true });
+            socket.addEventListener("open", openHandler, { once: true });
+            socket.addEventListener("close", closeHandler, { once: true });
 
-        return socket;
+            return socket;
+        } catch (error) {
+            if (error instanceof WebSocketCompatibilityError) {
+                throw error; // Re-throw compatibility errors with helpful messages
+            }
+            throw new ReconnectingWebSocketError("UNKNOWN_ERROR", error);
+        }
     }
 
     /** Initializes the internal event listeners for the socket. */

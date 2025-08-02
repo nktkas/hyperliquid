@@ -1,0 +1,69 @@
+{
+  "name": "@nktkas/hyperliquid",
+  "version": "0.24.0",
+  "description": "Unofficial Hyperliquid API SDK for all major JS runtimes, written in TypeScript.",
+  "keywords": [
+    "api",
+    "library",
+    "sdk",
+    "javascript",
+    "typescript",
+    "crypto",
+    "cryptocurrency",
+    "trading",
+    "blockchain",
+    "exchange",
+    "web3",
+    "dex",
+    "hyperliquid"
+  ],
+  "author": {
+    "name": "nktkas",
+    "email": "github.turk9@passmail.net",
+    "url": "https://github.com/nktkas"
+  },
+  "homepage": "https://github.com/nktkas/hyperliquid",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nktkas/hyperliquid.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nktkas/hyperliquid/issues"
+  },
+  "main": "./script/mod.js",
+  "module": "./esm/mod.js",
+  "exports": {
+    ".": {
+      "import": "./esm/mod.js",
+      "require": "./script/mod.js"
+    },
+    "./types": {
+      "import": "./esm/src/types/mod.js",
+      "require": "./script/src/types/mod.js"
+    },
+    "./signing": {
+      "import": "./esm/src/signing/mod.js",
+      "require": "./script/src/signing/mod.js"
+    }
+  },
+  "scripts": {},
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "sideEffects": false,
+  "peerDependenciesMeta": {
+    "ws": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@msgpack/msgpack": "^3.1.2",
+    "@noble/hashes": "^1.8.0",
+    "@noble/secp256k1": "^2.3.0"
+  },
+  "peerDependencies": {
+    "ws": ">=8.0.0"
+  },
+  "_generatedBy": "dnt@dev"
+}

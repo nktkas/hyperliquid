@@ -55,12 +55,28 @@ await build({
         license: "MIT",
         engines: {
             /**
+             * - v20.0.0: Minimum supported Node.js version
              * - v22.4.0: Native WebSocket support
-             * - v24.0.0: https://github.com/nktkas/hyperliquid/issues/34
+             * - v24.0.0: Reliable WebSocket close events (https://github.com/nktkas/hyperliquid/issues/34)
+             * 
+             * For Node.js < 24, the 'ws' package is required as a fallback.
+             * Install with: npm install ws
              */
-            node: ">=24.0.0",
+            node: ">=20.0.0",
         },
         sideEffects: false,
+        peerDependencies: {
+            /**
+             * Optional dependency for Node.js < 24.0.0
+             * Provides reliable WebSocket implementation with proper close event handling
+             */
+            ws: ">=8.0.0"
+        },
+        peerDependenciesMeta: {
+            ws: {
+                optional: true
+            }
+        },
     },
     compilerOptions: {
         lib: ["ESNext", "DOM"],

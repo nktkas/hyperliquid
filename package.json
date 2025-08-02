@@ -1,0 +1,79 @@
+{
+  "name": "@nktkas/hyperliquid",
+  "version": "0.24.0-node-compat",
+  "description": "Unofficial Hyperliquid API SDK with Node.js v20+ compatibility",
+  "main": "./build/npm/esm/mod.js",
+  "module": "./build/npm/esm/mod.js",
+  "types": "./build/npm/esm/mod.d.ts",
+  "exports": {
+    ".": {
+      "import": "./build/npm/esm/mod.js",
+      "types": "./build/npm/esm/mod.d.ts"
+    },
+    "./types": {
+      "import": "./build/npm/esm/src/types/mod.js",
+      "types": "./build/npm/esm/src/types/mod.d.ts"
+    },
+    "./signing": {
+      "import": "./build/npm/esm/src/signing/mod.js", 
+      "types": "./build/npm/esm/src/signing/mod.d.ts"
+    }
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "peerDependencies": {
+    "ws": ">=8.0.0"
+  },
+  "peerDependenciesMeta": {
+    "ws": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@msgpack/msgpack": "^3.1.2",
+    "@noble/hashes": "^1.8.0",
+    "@noble/secp256k1": "^2.3.0"
+  },
+  "scripts": {
+    "build": "deno run -A build/npm.ts",
+    "test": "deno test -A",
+    "prepublishOnly": "deno run -A build/npm.ts"
+  },
+  "files": [
+    "build/npm/esm/**/*",
+    "build/npm/script/**/*",
+    "build/npm/*.md",
+    "build/npm/LICENSE"
+  ],
+  "keywords": [
+    "hyperliquid",
+    "api",
+    "sdk",
+    "crypto",
+    "trading",
+    "websocket",
+    "nodejs",
+    "typescript"
+  ],
+  "author": {
+    "name": "nktkas",
+    "email": "github.turk9@passmail.net",
+    "url": "https://github.com/nktkas"
+  },
+  "contributors": [
+    {
+      "name": "silvercondor",
+      "url": "https://github.com/silvercondor"
+    }
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/silvercondor/hyperliquid.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nktkas/hyperliquid/issues"
+  },
+  "homepage": "https://github.com/nktkas/hyperliquid#readme"
+}
