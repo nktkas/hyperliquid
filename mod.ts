@@ -16,6 +16,7 @@ export * from "./src/transports/http/http_transport.ts";
 export * from "./src/transports/websocket/websocket_transport.ts";
 
 // Types
+export type { OrderParams, Signature } from "./src/types/exchange/requests.ts";
 export type * from "./src/types/exchange/responses.ts";
 export type * from "./src/types/explorer/responses.ts";
 export type * from "./src/types/info/accounts.ts";
