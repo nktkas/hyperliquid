@@ -7,6 +7,7 @@ import { build } from "npm:esbuild@0.25.5";
 import { denoPlugins } from "jsr:@luca/esbuild-deno-loader@0.11.1";
 
 // Build bundle
+const outdir = "./build/bundle";
 const nodeModulesExists = await Deno.stat("./node_modules").then(() => true).catch(() => false);
 
 await build({
@@ -19,7 +20,7 @@ await build({
     bundle: true,
     target: "esnext",
     minify: true,
-    outdir: "./build/bundle",
+    outdir,
     sourcemap: true,
 });
 
@@ -29,17 +30,16 @@ if (!nodeModulesExists) {
 
 // Calculate sizes
 async function gzip(data: Uint8Array): Promise<Uint8Array> {
-    const gzipStream = new CompressionStream("gzip");
-    const dataStream = ReadableStream.from([data]);
-    const [compressed] = await Array.fromAsync(dataStream.pipeThrough(gzipStream));
+    const [compressed] = await Array.fromAsync(
+        ReadableStream.from([data]).pipeThrough(new CompressionStream("gzip")),
+    );
     return compressed;
 }
 
-const bundleFiles = await Array.fromAsync(Deno.readDir("./build/bundle"));
+const bundleFiles = await Array.fromAsync(Deno.readDir(outdir));
 const jsFiles = bundleFiles.filter((f) => f.name.endsWith(".js"));
-
 for (const file of jsFiles) {
-    const minifiedCode = await Deno.readFile(`./build/bundle/${file.name}`);
+    const minifiedCode = await Deno.readFile(`${outdir}/${file.name}`);
     const gzippedCode = await gzip(minifiedCode);
 
     const minifiedSize = (minifiedCode.length / 1024).toFixed(1);

@@ -5,24 +5,20 @@
 
 import { build, emptyDir } from "jsr:@deno/dnt@^0.42.1";
 
-const denoConfig = JSON.parse(await Deno.readTextFile("./deno.json"));
-const name = denoConfig.name;
-const version = denoConfig.version;
-const entryPoints = Object.entries(denoConfig.exports)
-    .map(([key, value]) => {
-        return { name: key, path: value as string };
-    });
-
 await emptyDir("./build/npm");
 await build({
-    entryPoints,
+    entryPoints: [
+        { name: ".", path: "./mod.ts" },
+        { name: "./types", path: "./src/types/mod.ts" },
+        { name: "./signing", path: "./src/signing/mod.ts" },
+    ],
     outDir: "./build/npm",
     shims: {},
     typeCheck: "both",
     test: false,
     package: {
-        name,
-        version,
+        name: "@nktkas/hyperliquid",
+        version: JSON.parse(await Deno.readTextFile("./deno.json")).version,
         description: "Unofficial Hyperliquid API SDK for all major JS runtimes, written in TypeScript.",
         keywords: [
             "api",
