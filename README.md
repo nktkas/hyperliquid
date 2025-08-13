@@ -232,7 +232,7 @@ const ethersWallet = new ethers.Wallet("0x...");
 const exchClient = new hl.ExchangeClient({ wallet: ethersWallet, transport });
 
 // 4. Using external wallet (e.g. MetaMask) via Viem
-const [account] = await window.ethereum.request({ method: "eth_requestAccounts" });
+const [account] = await window.ethereum.request({ method: "eth_requestAccounts" }) as `0x${string}`[];
 const externalWallet = createWalletClient({ account, transport: custom(window.ethereum) });
 const exchClient = new hl.ExchangeClient({ wallet: externalWallet, transport });
 ```

@@ -60,7 +60,7 @@
  * @example Signing a multi-signature action
  * ```ts
  * import { actionSorter, signL1Action, signMultiSigAction } from "@nktkas/hyperliquid/signing";
- * import { privateKeyToAccount } from "viem/accounts";
+ * import { privateKeyToAccount } from "npm:viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // or `ethers`, private key directly
  * const multiSigUser = "0x...";
@@ -364,7 +364,7 @@ export async function signUserSignedAction(args: {
  * @example
  * ```ts
  * import { actionSorter, signL1Action, signMultiSigAction } from "@nktkas/hyperliquid/signing";
- * import { privateKeyToAccount } from "viem/accounts";
+ * import { privateKeyToAccount } from "npm:viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // or ethers, private key directly
  * const multiSigUser = "0x...";

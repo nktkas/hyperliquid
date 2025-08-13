@@ -377,7 +377,7 @@ export class ExchangeClient<
      * @example [Viem](https://viem.sh/docs/clients/wallet#local-accounts-private-key-mnemonic-etc)
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { privateKeyToAccount } from "viem/accounts";
+     * import { privateKeyToAccount } from "npm:viem/accounts";
      *
      * const account = privateKeyToAccount("0x...");
      *
@@ -388,7 +388,7 @@ export class ExchangeClient<
      * @example [ethers.js](https://docs.ethers.org/v6/api/wallet/#Wallet) or [ethers.js v5](https://docs.ethers.org/v5/api/signer/#Wallet)
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { ethers } from "ethers";
+     * import { ethers } from "npm:ethers";
      *
      * const wallet = new ethers.Wallet("0x...");
      *
@@ -399,10 +399,10 @@ export class ExchangeClient<
      * @example External wallet (e.g. MetaMask) via [viem](https://viem.sh/docs/clients/wallet)
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { createWalletClient, custom } from "viem";
+     * import { createWalletClient, custom } from "npm:viem";
      *
      * const ethereum = (window as any).ethereum;
-     * const [account] = await ethereum.request({ method: "eth_requestAccounts" });
+     * const [account] = await ethereum.request({ method: "eth_requestAccounts" }) as `0x${string}`[];
      * const wallet = createWalletClient({ account, transport: custom(ethereum) });
      *
      * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
@@ -1020,7 +1020,7 @@ export class ExchangeClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      * import { actionSorter, signL1Action } from "@nktkas/hyperliquid/signing";
-     * import { privateKeyToAccount } from "viem/accounts";
+     * import { privateKeyToAccount } from "npm:viem/accounts";
      *
      * const wallet = privateKeyToAccount("0x..."); // or any other wallet libraries
      * const multiSigUser = "0x...";
