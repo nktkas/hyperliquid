@@ -24,6 +24,7 @@ import type {
     Hex,
     ModifyRequest,
     MultiSigRequest,
+    NoopRequest,
     OrderRequest,
     OrderResponse,
     OrderSuccessResponse,
@@ -238,6 +239,8 @@ export type EvmUserModifyOptions = ExtractRequestOptions<EvmUserModifyRequest>;
 export type ModifyOptions = ExtractRequestOptions<ModifyRequest>;
 /** Request options for the {@linkcode ExchangeClient.multiSig} method. */
 export type MultiSigOptions = ExtractRequestOptions<MultiSigRequest>;
+/** Request options for the {@linkcode ExchangeClient.noop} method. */
+export type NoopOptions = ExtractRequestOptions<NoopRequest>;
 /** Request options for the {@linkcode ExchangeClient.order} method. */
 export type OrderOptions = ExtractRequestOptions<OrderRequest>;
 /** Request options for the {@linkcode ExchangeClient.perpDeploy} method. */
@@ -1143,6 +1146,36 @@ export class ExchangeClient<
         const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
         const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
+    }
+
+    /**
+     * This action does not do anything (no operation), but causes the nonce to be marked as used.
+     * @param opts - Request execution options.
+     * @returns Successful response without specific data.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-an-order
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+     * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
+     *
+     * await exchClient.noop();
+     * ```
+     */
+    async noop(
+        opts?: NoopOptions,
+    ): Promise<SuccessResponse> {
+        const action = actionSorter.noop({
+            type: "noop",
+        });
+        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
     /**

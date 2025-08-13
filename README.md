@@ -504,6 +504,7 @@ class ExchangeClient {
     claimRewards(): Promise<SuccessResponse>;
     createSubAccount(args: CreateSubAccountParameters): Promise<CreateSubAccountResponse>;
     evmUserModify(args: EvmUserModifyParameters): Promise<SuccessResponse>;
+    noop(): Promise<SuccessResponse>;
     registerReferrer(args: RegisterReferrerParameters): Promise<SuccessResponse>;
     reserveRequestWeight(args: ReserveRequestWeightParameters): Promise<SuccessResponse>;
     setDisplayName(args: SetDisplayNameParameters): Promise<SuccessResponse>;

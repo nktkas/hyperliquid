@@ -16,6 +16,7 @@ import type {
     EvmUserModifyRequest,
     ModifyRequest,
     MultiSigRequest,
+    NoopRequest,
     OrderRequest,
     PerpDeployRequest,
     RegisterReferrerRequest,
@@ -284,6 +285,11 @@ export const actionSorter = {
                     action.payload.action,
                 ),
             },
+        };
+    },
+    noop: (action: DeepImmutable<NoopRequest["action"]>): NoopRequest["action"] => {
+        return {
+            type: action.type,
         };
     },
     order: (action: DeepImmutable<OrderRequest["action"]>): OrderRequest["action"] => {

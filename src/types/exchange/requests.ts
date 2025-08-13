@@ -570,6 +570,7 @@ export interface MultiSigRequest {
                 | CWithdrawRequest["action"]
                 | EvmUserModifyRequest["action"]
                 | ModifyRequest["action"]
+                | NoopRequest["action"]
                 | MultiSigRequest["action"]
                 | OrderRequest["action"]
                 | PerpDeployRequest["action"]
@@ -604,6 +605,25 @@ export interface MultiSigRequest {
     signature: Signature;
     /** Vault address (for vault trading). */
     vaultAddress?: Hex;
+    /** Expiration time of the action. */
+    expiresAfter?: number;
+}
+
+/**
+ * This action does not do anything (no operation), but causes the nonce to be marked as used.
+ * @returns {SuccessResponse}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#invalidate-pending-nonce-noop
+ */
+export interface NoopRequest {
+    /** Action to perform. */
+    action: {
+        /** Type of action. */
+        type: "noop";
+    };
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
     /** Expiration time of the action. */
     expiresAfter?: number;
 }
