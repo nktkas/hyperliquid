@@ -103,7 +103,7 @@ if (!Promise.withResolvers) {
 // 1. Import module
 import * as hl from "@nktkas/hyperliquid";
 
-// 1. Set up client with transport
+// 2. Set up client with transport
 const infoClient = new hl.InfoClient({
     transport: new hl.HttpTransport(), // or `WebSocketTransport`
 });
@@ -175,8 +175,8 @@ const multiSignClient = new hl.MultiSignClient({
     ],
 });
 
-// 3. Execute an action
-const data = await multiSignClient.approveAgent({ agentAddress: "0x..." });
+// 3. Execute an action (same as `ExchangeClient`)
+await multiSignClient.approveAgent({ agentAddress: "0x..." });
 ```
 
 ## Usage
@@ -221,20 +221,20 @@ const transport = new hl.HttpTransport(); // or `WebSocketTransport`
 
 // 1. Using private key directly
 const privateKey = "0x...";
-const exchClient_privateKey = new hl.ExchangeClient({ wallet: privateKey, transport });
+const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
 
 // 2. Using Viem
 const viemAccount = privateKeyToAccount("0x...");
-const exchClient_viem = new hl.ExchangeClient({ wallet: viemAccount, transport });
+const exchClient = new hl.ExchangeClient({ wallet: viemAccount, transport });
 
 // 3. Using Ethers (V5 or V6)
 const ethersWallet = new ethers.Wallet("0x...");
-const exchClient_ethers = new hl.ExchangeClient({ wallet: ethersWallet, transport });
+const exchClient = new hl.ExchangeClient({ wallet: ethersWallet, transport });
 
 // 4. Using external wallet (e.g. MetaMask) via Viem
 const [account] = await window.ethereum.request({ method: "eth_requestAccounts" });
 const externalWallet = createWalletClient({ account, transport: custom(window.ethereum) });
-const exchClient_viemMetamask = new hl.ExchangeClient({ wallet: externalWallet, transport });
+const exchClient = new hl.ExchangeClient({ wallet: externalWallet, transport });
 ```
 
 #### Create [SubscriptionClient](#subscriptionclient)
@@ -266,7 +266,7 @@ const multiSignClient = new hl.MultiSignClient({
                     name: string;
                     version: string;
                     chainId: number;
-                    verifyingContract: `0x${string}`;
+                    verifyingContract: Hex;
                 };
                 types: {
                     [key: string]: {
@@ -276,12 +276,13 @@ const multiSignClient = new hl.MultiSignClient({
                 };
                 primaryType: string;
                 message: Record<string, unknown>;
-            }): Promise<`0x${string}`> {
+            }): Promise<Hex> {
                 // Custom signer logic
                 return "0x..."; // return hex signature
             },
         },
         "0x...", // private key directly
+        // ... more signers
     ],
 });
 ```
@@ -302,10 +303,10 @@ const infoClient = new hl.InfoClient({
 // L2 Book
 const l2Book = await infoClient.l2Book({ coin: "BTC" });
 
-// Account clearinghouse state
+// User clearinghouse state
 const clearinghouseState = await infoClient.clearinghouseState({ user: "0x..." });
 
-// Open orders
+// User open orders
 const openOrders = await infoClient.openOrders({ user: "0x..." });
 ```
 
@@ -378,6 +379,7 @@ const multiSignClient = new hl.MultiSignClient({
     multiSignAddress: "0x...",
     signers: [
         "0x...", // `viem`, `ethers`, or private key directly
+        // ... more signers
     ],
 });
 
@@ -418,6 +420,7 @@ class InfoClient {
     tokenDetails(args: TokenDetailsParameters): Promise<TokenDetails>;
 
     // Account
+    activeAssetData(args: ActiveAssetDataParameters): Promise<ActiveAssetData>;
     clearinghouseState(args: ClearinghouseStateParameters): Promise<PerpsClearinghouseState>;
     extraAgents(args: ExtraAgentsParameters): Promise<ExtraAgent[]>;
     isVip(args: IsVipParameters): Promise<boolean>;
@@ -478,8 +481,8 @@ class ExchangeClient {
         transport: HttpTransport | WebSocketTransport;
         wallet: AbstractWallet; // `viem`, `ethers` (v5 or v6), or private key directly
         isTestnet?: boolean; // Whether to use testnet (default: false)
-        defaultVaultAddress?: `0x${string}`; // Vault address used by default if not provided in method call
-        signatureChainId?: `0x${string}` | (() => MaybePromise<`0x${string}`>); // Chain ID used for signing (default: get chain id from wallet otherwise `0x1`)
+        defaultVaultAddress?: Hex; // Vault address used by default if not provided in method call
+        signatureChainId?: Hex | (() => MaybePromise<Hex>); // Chain ID used for signing (default: get chain id from wallet otherwise `0x1`)
         nonceManager?: () => MaybePromise<number>; // Function to get the next nonce (default: monotonically incrementing `Date.now()`)
     });
 
@@ -552,7 +555,6 @@ class SubscriptionClient {
 
     // Market
     activeAssetCtx(args: EventActiveAssetCtxParameters, listener: (data: WsActiveAssetCtx | WsActiveSpotAssetCtx) => void): Promise<Subscription>;
-    activeAssetData(args: EventActiveAssetDataParameters, listener: (data: ActiveAssetData) => void): Promise<Subscription>;
     allMids(listener: (data: WsAllMids) => void): Promise<Subscription>;
     bbo(args: EventBboParameters, listener: (data: WsBbo) => void): Promise<Subscription>;
     candle(args: EventCandleParameters, listener: (data: Candle) => void): Promise<Subscription>;
@@ -560,6 +562,7 @@ class SubscriptionClient {
     trades(args: EventTradesParameters, listener: (data: WsTrade[]) => void): Promise<Subscription>;
 
     // Account
+    activeAssetData(args: EventActiveAssetDataParameters, listener: (data: ActiveAssetData) => void): Promise<Subscription>;
     notification(args: EventNotificationParameters, listener: (data: WsNotification) => void): Promise<Subscription>;
     userEvents(args: EventUserEventsParameters, listener: (data: WsUserEvent) => void): Promise<Subscription>;
     userFundings(args: EventUserFundingsParameters, listener: (data: WsUserFundings) => void): Promise<Subscription>;
@@ -587,8 +590,11 @@ class MultiSignClient extends ExchangeClient {
         args:
             & Omit<ExchangeClientParameters, "wallet"> // instead of `wallet`, you should specify the following parameters:
             & {
-                multiSignAddress: `0x${string}`;
-                signers: [AbstractWallet, ...AbstractWallet[]];
+                multiSignAddress: Hex;
+                signers: [
+                    AbstractWallet, // first is leader for multi-sign transaction (signs transaction 2 times)
+                    ...AbstractWallet[], // may be additional signers
+                ];
             },
     );
 
@@ -668,21 +674,16 @@ class WebSocketTransport {
 
 ### `/types`
 
-The import point gives access to all Hyperliquid-related types, including the base types on which class methods are
-based.
+The import point gives access to all request/response types associated with Hyperliquid API.
 
 ### `/signing`
 
-The import point gives access to functions that generate signatures for Hyperliquid transactions.
+The import point gives access to functions that generate signatures for Hyperliquid API actions.
 
-### Examples
-
-#### Cancel order yourself
+#### L1 Action
 
 ```ts
 import { actionSorter, signL1Action } from "@nktkas/hyperliquid/signing";
-
-const privateKey = "0x..."; // `viem`, `ethers`, or private key directly
 
 const action = actionSorter.cancel({
     type: "cancel",
@@ -692,7 +693,11 @@ const action = actionSorter.cancel({
 });
 const nonce = Date.now();
 
-const signature = await signL1Action({ wallet: privateKey, action, nonce });
+const signature = await signL1Action({
+    wallet: "0x...", // `viem`, `ethers`, or private key directly
+    action,
+    nonce,
+});
 
 // Send the signed action to the Hyperliquid API
 const response = await fetch("https://api.hyperliquid.xyz/exchange", {
@@ -703,12 +708,10 @@ const response = await fetch("https://api.hyperliquid.xyz/exchange", {
 const body = await response.json();
 ```
 
-#### Approve agent yourself
+#### User Signed Action
 
 ```ts
 import { actionSorter, signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
-
-const privateKey = "0x..."; // `viem`, `ethers`, or private key directly
 
 const action = actionSorter.approveAgent({
     type: "approveAgent",
@@ -720,7 +723,7 @@ const action = actionSorter.approveAgent({
 });
 
 const signature = await signUserSignedAction({
-    wallet: privateKey,
+    wallet: "0x...", // `viem`, `ethers`, or private key directly
     action,
     types: userSignedActionEip712Types[action.type],
 });
@@ -738,13 +741,12 @@ const body = await response.json();
 
 ### How to execute an L1 action via an external wallet (e.g. MetaMask)?
 
-Hyperliquid requires chain `1337` for L1 actions (open order, change leverage, etc.). There are two ways to execute an
-L1 action through an external wallet:
+Hyperliquid requires chain `1337` for L1 action signatures. To handle this with external wallets:
 
 - (recommended) Create an
   [Agent Wallet](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/nonces-and-api-wallets#api-wallets)
   and execute all L1 actions through it
-- Change the user's chain to `1337`, however, the user will sign unreadable data
+- Change a user's chain to `1337`, however, the user will sign unreadable data
 
 ### How to create a market order?
 
