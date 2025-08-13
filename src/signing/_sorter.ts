@@ -21,6 +21,7 @@ import type {
     RegisterReferrerRequest,
     ReserveRequestWeightRequest,
     ScheduleCancelRequest,
+    SendAssetRequest,
     SetDisplayNameRequest,
     SetReferrerRequest,
     SpotDeployRequest,
@@ -382,6 +383,20 @@ export const actionSorter = {
         if (sortedAction.time === undefined) delete sortedAction.time;
         return sortedAction;
     },
+    sendAsset: (action: DeepImmutable<SendAssetRequest["action"]>): SendAssetRequest["action"] => {
+        return {
+            type: action.type,
+            signatureChainId: action.signatureChainId,
+            hyperliquidChain: action.hyperliquidChain,
+            destination: action.destination.toLowerCase() as `0x${string}`,
+            sourceDex: action.sourceDex,
+            destinationDex: action.destinationDex,
+            token: action.token,
+            amount: action.amount,
+            fromSubAccount: action.fromSubAccount.toLowerCase() as `0x${string}`,
+            nonce: action.nonce,
+        };
+    },
     setDisplayName: (action: DeepImmutable<SetDisplayNameRequest["action"]>): SetDisplayNameRequest["action"] => {
         return {
             type: action.type,
@@ -669,6 +684,18 @@ export const userSignedActionEip712Types = {
         "HyperliquidTransaction:SendMultiSig": [
             { name: "hyperliquidChain", type: "string" },
             { name: "multiSigActionHash", type: "bytes32" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    sendAsset: {
+        "HyperliquidTransaction:SendAsset": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "destination", type: "string" },
+            { name: "sourceDex", type: "string" },
+            { name: "destinationDex", type: "string" },
+            { name: "token", type: "string" },
+            { name: "amount", type: "string" },
+            { name: "fromSubAccount", type: "string" },
             { name: "nonce", type: "uint64" },
         ],
     },

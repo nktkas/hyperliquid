@@ -31,6 +31,7 @@ import type {
     RegisterReferrerRequest,
     ReserveRequestWeightRequest,
     ScheduleCancelRequest,
+    SendAssetRequest,
     SetDisplayNameRequest,
     SetReferrerRequest,
     SpotDeployRequest,
@@ -153,6 +154,8 @@ export type RegisterReferrerParameters = ExtractRequestAction<RegisterReferrerRe
 export type ReserveRequestWeightParameters = ExtractRequestAction<ReserveRequestWeightRequest>;
 /** Action parameters for the {@linkcode ExchangeClient.scheduleCancel} method. */
 export type ScheduleCancelParameters = ExtractRequestAction<ScheduleCancelRequest>;
+/** Action parameters for the {@linkcode ExchangeClient.sendAsset} method. */
+export type SendAssetParameters = ExtractRequestAction<SendAssetRequest>;
 /** Action parameters for the {@linkcode ExchangeClient.setDisplayName} method. */
 export type SetDisplayNameParameters = ExtractRequestAction<SetDisplayNameRequest>;
 /** Action parameters for the {@linkcode ExchangeClient.setReferrer} method. */
@@ -245,6 +248,8 @@ export type RegisterReferrerOptions = ExtractRequestOptions<RegisterReferrerRequ
 export type ReserveRequestWeightOptions = ExtractRequestOptions<ReserveRequestWeightRequest>;
 /** Request options for the {@linkcode ExchangeClient.scheduleCancel} method. */
 export type ScheduleCancelOptions = ExtractRequestOptions<ScheduleCancelRequest>;
+/** Request options for the {@linkcode ExchangeClient.sendAsset} method. */
+export type SendAssetOptions = ExtractRequestOptions<SendAssetRequest>;
 /** Request options for the {@linkcode ExchangeClient.setDisplayName} method. */
 export type SetDisplayNameOptions = ExtractRequestOptions<SetDisplayNameRequest>;
 /** Request options for the {@linkcode ExchangeClient.setReferrer} method. */
@@ -1295,6 +1300,48 @@ export class ExchangeClient<
         const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
         const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
+    }
+
+    /**
+     * Transfer tokens between different perp DEXs, spot balance, users, and/or sub-accounts.
+     * @param params - Action-specific parameters.
+     * @param opts - Request execution options.
+     * @returns Successful response without specific data.
+     *
+     * @throws {ApiRequestError} When the API returns an unsuccessful response.
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset-testnet-only
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+     * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
+     *
+     * await exchClient.sendAsset({
+     *   destination: "0x0000000000000000000000000000000000000001",
+     *   sourceDex: "",
+     *   destinationDex: "test",
+     *   token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
+     *   amount: "1",
+     *   fromSubAccount: "",
+     * });
+     * ```
+     */
+    async sendAsset(
+        params: DeepImmutable<SendAssetParameters>,
+        opts?: SendAssetOptions,
+    ): Promise<SuccessResponse> {
+        const action = actionSorter.sendAsset({
+            type: "sendAsset",
+            hyperliquidChain: this._getHyperliquidChain(),
+            signatureChainId: await this._getSignatureChainId(),
+            nonce: await this.nonceManager(),
+            ...params,
+        });
+        return await this._executeUserSignedAction({ action }, opts?.signal);
     }
 
     /**

@@ -576,6 +576,7 @@ export interface MultiSigRequest {
                 | RegisterReferrerRequest["action"]
                 | ReserveRequestWeightRequest["action"]
                 | ScheduleCancelRequest["action"]
+                | SendAssetRequest["action"]
                 | SetDisplayNameRequest["action"]
                 | SetReferrerRequest["action"]
                 | SpotDeployRequest["action"]
@@ -781,6 +782,44 @@ export interface ScheduleCancelRequest {
     vaultAddress?: Hex;
     /** Expiration time of the action. */
     expiresAfter?: number;
+}
+
+/**
+ * Transfer tokens between different perp DEXs, spot balance, users, and/or sub-accounts.
+ * @returns {SuccessResponse}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset-testnet-only
+ */
+export interface SendAssetRequest {
+    /** Action to perform. */
+    action: {
+        /** Type of action. */
+        type: "sendAsset";
+        /** Chain ID used for signing. */
+        signatureChainId: Hex;
+        /** HyperLiquid network. */
+        hyperliquidChain: "Mainnet" | "Testnet";
+        /** Destination address. */
+        destination: Hex;
+        /** Source DEX ("" for default USDC perp DEX, "spot" for spot). */
+        sourceDex: string | "";
+        /** Destination DEX ("" for default USDC perp DEX, "spot" for spot). */
+        destinationDex: string | "";
+        /** Token identifier. */
+        token: `${string}:${Hex}`;
+        /**
+         * Amount to send (not in wei).
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
+        amount: string;
+        /** Source sub-account address ("" for main account). */
+        fromSubAccount: Hex | "";
+        /** Unique request identifier (current timestamp in ms). */
+        nonce: number;
+    };
+    /** Unique request identifier (current timestamp in ms). */
+    nonce: number;
+    /** Cryptographic signature. */
+    signature: Signature;
 }
 
 /**

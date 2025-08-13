@@ -512,6 +512,7 @@ class ExchangeClient {
     spotUser(args: SpotUserParameters): Promise<SuccessResponse>;
 
     // Transfer
+    sendAsset(args: SendAssetParameters): Promise<SuccessResponse>;
     spotSend(args: SpotSendParameters): Promise<SuccessResponse>;
     subAccountSpotTransfer(args: SubAccountSpotTransferParameters): Promise<SuccessResponse>;
     subAccountTransfer(args: SubAccountTransferParameters): Promise<SuccessResponse>;
