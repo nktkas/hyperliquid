@@ -53,16 +53,11 @@ deno add jsr:@nktkas/hyperliquid
 <summary>For React Native, you need to import polyfills before importing the SDK:</summary>
 
 ```js
-// React Native 0.76.3 / Expo v52
+// React Native v0.79 / Expo v53
 // Issues:
 // - signing: does not support private keys directly, use `viem` or `ethers`
 
-import { Event, EventTarget } from "event-target-shim";
-
-if (!globalThis.EventTarget || !globalThis.Event) {
-    globalThis.EventTarget = EventTarget;
-    globalThis.Event = Event;
-}
+import "event-target-polyfill";
 
 if (!globalThis.CustomEvent) {
     globalThis.CustomEvent = function (type, params) {
