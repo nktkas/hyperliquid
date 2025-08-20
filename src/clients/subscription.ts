@@ -361,9 +361,9 @@ export class SubscriptionClient<
     ): Promise<Subscription> {
         const payload = {
             type: "l2Book",
+            ...params,
             nSigFigs: params.nSigFigs ?? null,
             mantissa: params.mantissa ?? null,
-            ...params,
         } satisfies L2BookRequest;
         return this.transport.subscribe<Book>(payload.type, payload, (e) => {
             if (e.detail.coin === params.coin) {
@@ -526,8 +526,8 @@ export class SubscriptionClient<
     ): Promise<Subscription> {
         const payload = {
             type: "userFills",
-            aggregateByTime: params.aggregateByTime ?? false,
             ...params,
+            aggregateByTime: params.aggregateByTime ?? false,
         } satisfies UserFillsRequest;
         return this.transport.subscribe<WsUserFills>(payload.type, payload, (e) => {
             if (e.detail.user === params.user.toLowerCase()) {
