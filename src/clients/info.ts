@@ -251,7 +251,7 @@ export class InfoClient<
      * const transport = new hl.HttpTransport(); // or WebSocketTransport
      * const infoClient = new hl.InfoClient({ transport });
      *
-     * const data = await infoClient.activeAssetData({ user: "0x...", coin: "BTC" });
+     * const data = await infoClient.activeAssetData({ user: "0x...", coin: "ETH" });
      * ```
      */
     activeAssetData(

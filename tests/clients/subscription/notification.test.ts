@@ -49,7 +49,7 @@ async function testFn(
                 }
             });
 
-            const twapPromise = openTwap("BTC", true);
+            const twapPromise = openTwap("ETH", true);
         }),
         20_000,
     );

@@ -10,7 +10,7 @@ async function testFn(_t: Deno.TestContext, client: SubscriptionClient) {
         // WsActiveAssetCtx
         deadline(
             new Promise((resolve) => {
-                client.activeAssetCtx({ coin: "BTC" }, resolve);
+                client.activeAssetCtx({ coin: "ETH" }, resolve);
             }),
             10_000,
         ),

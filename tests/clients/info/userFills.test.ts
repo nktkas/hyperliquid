@@ -6,7 +6,11 @@ export type MethodReturnType = Awaited<ReturnType<InfoClient["userFills"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 async function testFn(_t: Deno.TestContext, client: InfoClient) {
     const data = await client.userFills({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" });
-    schemaCoverage(MethodReturnType, [data]);
+    schemaCoverage(MethodReturnType, [data], {
+        ignoreTypesByPath: {
+            "#/items/properties/twapId": ["number"],
+        },
+    });
 }
 
 runTest("userFills", testFn);

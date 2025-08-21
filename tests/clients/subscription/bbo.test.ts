@@ -8,7 +8,7 @@ const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 async function testFn(_t: Deno.TestContext, client: SubscriptionClient) {
     const data = await deadline(
         new Promise((resolve) => {
-            client.bbo({ coin: "BTC" }, resolve);
+            client.bbo({ coin: "ETH" }, resolve);
         }),
         120_000,
     );

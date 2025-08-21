@@ -770,6 +770,8 @@ export interface SpotTransferUpdate {
      */
     nativeTokenFee: string;
     nonce: null;
+    /** Token in which the fee is denominated (e.g., "USDC"). */
+    feeToken: string;
 }
 /** Transfer update between sub-accounts. */
 export interface SubAccountTransferUpdate {

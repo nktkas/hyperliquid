@@ -16,6 +16,9 @@ async function testFn(_t: Deno.TestContext, client: SubscriptionClient) {
         ignorePropertiesByPath: [
             "#/properties/fills/items/properties/liquidation",
         ],
+        ignoreTypesByPath: {
+            "#/properties/fills/items/properties/twapId": ["number"],
+        },
     });
 }
 

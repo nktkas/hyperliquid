@@ -12,7 +12,11 @@ async function testFn(_t: Deno.TestContext, client: SubscriptionClient) {
         }),
         10_000,
     );
-    schemaCoverage(MethodReturnType, [data]);
+    schemaCoverage(MethodReturnType, [data], {
+        ignoreTypesByPath: {
+            "#/properties/twapSliceFills/items/properties/fill/properties/twapId": ["number"],
+        },
+    });
 }
 
 runTest("userTwapSliceFills", testFn, "api");

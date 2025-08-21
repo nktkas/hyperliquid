@@ -296,7 +296,7 @@ const infoClient = new hl.InfoClient({
 });
 
 // L2 Book
-const l2Book = await infoClient.l2Book({ coin: "BTC" });
+const l2Book = await infoClient.l2Book({ coin: "ETH" });
 
 // User clearinghouse state
 const clearinghouseState = await infoClient.clearinghouseState({ user: "0x..." });
@@ -349,7 +349,7 @@ const subsClient = new hl.SubscriptionClient({
 });
 
 // L2 Book updates
-await subsClient.l2Book({ coin: "BTC" }, (data) => {
+await subsClient.l2Book({ coin: "ETH" }, (data) => {
     console.log(data);
 });
 
@@ -359,7 +359,7 @@ await subsClient.userFills({ user: "0x..." }, (data) => {
 });
 
 // Candle updates
-await subsClient.candle({ coin: "BTC", interval: "1h" }, (data) => {
+await subsClient.candle({ coin: "ETH", interval: "1h" }, (data) => {
     console.log(data);
 });
 ```

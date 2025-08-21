@@ -9,7 +9,11 @@ async function testFn(_t: Deno.TestContext, client: InfoClient) {
         user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9",
         startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
     });
-    schemaCoverage(MethodReturnType, [data]);
+    schemaCoverage(MethodReturnType, [data], {
+        ignoreTypesByPath: {
+            "#/items/properties/fill/properties/twapId": ["number"],
+        },
+    });
 }
 
 runTest("userTwapSliceFillsByTime", testFn);

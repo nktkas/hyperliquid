@@ -14,7 +14,7 @@ async function testFn(
 ) {
     // —————————— Prepare ——————————
 
-    const { id, universe, ctx } = await getAssetData("BTC");
+    const { id, universe, ctx } = await getAssetData("ETH");
     const sz = formatSize(new BigNumber(55).div(ctx.markPx), universe.szDecimals);
 
     // —————————— Test ——————————

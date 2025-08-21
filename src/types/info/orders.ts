@@ -75,6 +75,8 @@ export interface Fill {
     liquidation?: FillLiquidation;
     /** Token in which the fee is denominated (e.g., "USDC"). */
     feeToken: string;
+    /** ID of the TWAP. */
+    twapId: number | null;
 }
 
 /** Liquidation details for a trade fill. */

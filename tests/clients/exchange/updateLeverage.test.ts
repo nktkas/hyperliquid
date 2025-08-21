@@ -13,7 +13,7 @@ async function testFn(
 ) {
     // —————————— Prepare ——————————
 
-    const { id } = await getAssetData("BTC");
+    const { id } = await getAssetData("ETH");
 
     // —————————— Test ——————————
 

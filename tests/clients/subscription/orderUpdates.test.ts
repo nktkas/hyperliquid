@@ -62,7 +62,7 @@ async function testFn(
                 }
             });
 
-            const orderPromise = openCancelOrder("BTC");
+            const orderPromise = openCancelOrder("ETH");
         }),
         20_000,
     );

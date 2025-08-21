@@ -6,7 +6,7 @@ export type MethodReturnType = Awaited<ReturnType<InfoClient["candleSnapshot"]>>
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 async function testFn(_t: Deno.TestContext, client: InfoClient) {
     const data = await client.candleSnapshot({
-        coin: "BTC",
+        coin: "ETH",
         interval: "15m",
         startTime: Date.now() - 1000 * 60 * 60 * 24,
     });

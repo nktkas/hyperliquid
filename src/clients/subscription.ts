@@ -125,7 +125,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await subsClient.activeAssetCtx({ coin: "BTC" }, (data) => {
+     * const sub = await subsClient.activeAssetCtx({ coin: "ETH" }, (data) => {
      *   console.log(data);
      * });
      * ```
@@ -159,7 +159,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await subsClient.activeAssetData({ coin: "BTC", user: "0x..." }, (data) => {
+     * const sub = await subsClient.activeAssetData({ coin: "ETH", user: "0x..." }, (data) => {
      *   console.log(data);
      * });
      * ```
@@ -228,7 +228,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await subsClient.bbo({ coin: "BTC" }, (data) => {
+     * const sub = await subsClient.bbo({ coin: "ETH" }, (data) => {
      *   console.log(data);
      * });
      * ```
@@ -261,7 +261,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await subsClient.candle({ coin: "BTC", interval: "1h" }, (data) => {
+     * const sub = await subsClient.candle({ coin: "ETH", interval: "1h" }, (data) => {
      *   console.log(data);
      * });
      * ```
@@ -350,7 +350,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await subsClient.l2Book({ coin: "BTC" }, (data) => {
+     * const sub = await subsClient.l2Book({ coin: "ETH" }, (data) => {
      *   console.log(data);
      * });
      * ```
@@ -450,7 +450,7 @@ export class SubscriptionClient<
      * const transport = new hl.WebSocketTransport();
      * const subsClient = new hl.SubscriptionClient({ transport });
      *
-     * const sub = await subsClient.trades({ coin: "BTC" }, (data) => {
+     * const sub = await subsClient.trades({ coin: "ETH" }, (data) => {
      *   console.log(data);
      * });
      * ```

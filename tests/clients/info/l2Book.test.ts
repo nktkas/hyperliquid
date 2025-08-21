@@ -5,7 +5,7 @@ import { runTest } from "./_t.ts";
 export type MethodReturnType = Awaited<ReturnType<InfoClient["l2Book"]>>;
 const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 async function testFn(_t: Deno.TestContext, client: InfoClient) {
-    const data = await client.l2Book({ coin: "BTC" });
+    const data = await client.l2Book({ coin: "ETH" });
     schemaCoverage(MethodReturnType, [data]);
 }
 

@@ -36,7 +36,7 @@ async function testFn(
         };
     }
 
-    const { id, universe, ctx } = await getAssetData("BTC");
+    const { id, universe, ctx } = await getAssetData("ETH");
     const pxUp = formatPrice(new BigNumber(ctx.markPx).times(1.01), universe.szDecimals);
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const sz = formatSize(new BigNumber("13").div(ctx.markPx), universe.szDecimals);
