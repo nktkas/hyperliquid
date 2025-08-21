@@ -434,6 +434,16 @@ export interface SpotMetaRequest {
 }
 
 /**
+ * Request for the status of the spot deploy auction.
+ * @returns {DeployAuctionStatus}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-pair-deploy-auction
+ */
+export interface SpotPairDeployAuctionStatusRequest {
+    /** Type of request. */
+    type: "spotPairDeployAuctionStatus";
+}
+
+/**
  * Request spot metadata and asset contexts.
  * @returns {SpotMetaAndAssetCtxs}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-asset-contexts

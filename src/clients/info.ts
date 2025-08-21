@@ -71,6 +71,7 @@ import type {
     SpotMetaAndAssetCtxs,
     SpotMetaAndAssetCtxsRequest,
     SpotMetaRequest,
+    SpotPairDeployAuctionStatusRequest,
     SubAccount,
     SubAccountsRequest,
     TokenDetails,
@@ -175,6 +176,8 @@ export type ReferralParameters = Omit<ReferralRequest, "type">;
 export type SpotClearinghouseStateParameters = Omit<SpotClearinghouseStateRequest, "type">;
 /** Request parameters for the {@linkcode InfoClient.spotDeployState} method. */
 export type SpotDeployStateParameters = Omit<SpotDeployStateRequest, "type">;
+/** Request parameters for the {@linkcode InfoClient.spotPairDeployAuctionStatus} method. */
+export type SpotPairDeployAuctionStatusParameters = Omit<SpotPairDeployAuctionStatusRequest, "type">;
 /** Request parameters for the {@linkcode InfoClient.subAccounts} method. */
 export type SubAccountsParameters = Omit<SubAccountsRequest, "type">;
 /** Request parameters for the {@linkcode InfoClient.tokenDetails} method. */
@@ -1164,6 +1167,29 @@ export class InfoClient<
         signal?: AbortSignal,
     ): Promise<SpotDeployState> {
         const request = { type: "spotDeployState", ...params } satisfies SpotDeployStateRequest;
+        return this.transport.request("info", request, signal);
+    }
+
+    /**
+     * Request for the status of the spot deploy auction.
+     * @param signal - An {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal}. If this option is set, the request can be canceled by calling {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort | abort()} on the corresponding {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController | AbortController}.
+     * @returns Status of the spot deploy auction.
+     *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-pair-deploy-auction
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const infoClient = new hl.InfoClient({ transport });
+     *
+     * const data = await infoClient.spotPairDeployAuctionStatus();
+     * ```
+     */
+    spotPairDeployAuctionStatus(signal?: AbortSignal): Promise<DeployAuctionStatus> {
+        const request = { type: "spotPairDeployAuctionStatus" } satisfies SpotPairDeployAuctionStatusRequest;
         return this.transport.request("info", request, signal);
     }
 

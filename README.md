@@ -412,6 +412,7 @@ class InfoClient {
     spotDeployState(args: SpotDeployStateParameters): Promise<SpotDeployState>;
     spotMeta(): Promise<SpotMeta>;
     spotMetaAndAssetCtxs(): Promise<SpotMetaAndAssetCtxs>;
+    spotPairDeployAuctionStatus(): Promise<DeployAuctionStatus>;
     tokenDetails(args: TokenDetailsParameters): Promise<TokenDetails>;
 
     // Account
