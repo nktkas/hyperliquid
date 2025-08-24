@@ -6,7 +6,7 @@
  * ```ts
  * import { actionSorter, signL1Action } from "@nktkas/hyperliquid/signing";
  *
- * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
+ * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly
  *
  * const action = actionSorter.cancel({
  *   type: "cancel",
@@ -31,7 +31,7 @@
  * ```ts
  * import { actionSorter, signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
  *
- * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
+ * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly
  *
  * const action = actionSorter.approveAgent({
  *   type: "approveAgent",
@@ -207,7 +207,7 @@ function toUint64Bytes(n: bigint | number | string): Uint8Array {
  * ```ts
  * import { actionSorter, signL1Action } from "@nktkas/hyperliquid/signing";
  *
- * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
+ * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly
  *
  * const action = actionSorter.cancel({
  *   type: "cancel",
@@ -282,7 +282,7 @@ export async function signL1Action(args: {
  * ```ts
  * import { actionSorter, signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
  *
- * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly`
+ * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly
  *
  * const action = actionSorter.approveAgent({
  *   type: "approveAgent",
