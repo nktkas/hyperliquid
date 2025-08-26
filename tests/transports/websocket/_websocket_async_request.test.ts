@@ -7,8 +7,8 @@ import { WebSocketRequestError } from "../../../src/transports/websocket/websock
 // @ts-ignore: Mocking WebSocket for testing purposes
 class MockWebSocket extends EventTarget implements ReconnectingWebSocket {
     sentMessages: string[] = [];
-
     readyState: number = WebSocket.CONNECTING;
+    reconnectAbortController: AbortController = new AbortController();
 
     send(data: string): void {
         this.sentMessages.push(data);

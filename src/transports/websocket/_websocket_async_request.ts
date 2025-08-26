@@ -138,6 +138,10 @@ export class WebSocketAsyncRequest {
 
         // Reject the request if the signal is aborted
         if (signal?.aborted) return Promise.reject(signal.reason);
+        // or if the WebSocket connection is permanently closed
+        if (this.socket.reconnectAbortController.signal.aborted) {
+            return Promise.reject(this.socket.reconnectAbortController.signal.reason);
+        }
 
         // Create a request
         let id: string | number;
