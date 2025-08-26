@@ -165,7 +165,7 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
             // Return the response body
             return body;
         } catch (error) {
-            if (error instanceof HttpRequestError) throw error; // Re-throw known errors
+            if (error instanceof TransportError) throw error; // Re-throw known errors
             throw new HttpRequestError(undefined, { cause: error });
         }
     }

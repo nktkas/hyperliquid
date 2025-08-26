@@ -171,7 +171,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
                 combinedSignal,
             );
         } catch (error) {
-            if (error instanceof WebSocketRequestError) throw error; // Re-throw known errors
+            if (error instanceof TransportError) throw error; // Re-throw known errors
             throw new WebSocketRequestError(
                 `Unknown error while making a WebSocket request: ${error}`,
                 { cause: error },
@@ -236,7 +236,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
                             }
                         }
                     } catch (error) {
-                        if (error instanceof WebSocketRequestError) throw error; // Re-throw known errors
+                        if (error instanceof TransportError) throw error; // Re-throw known errors
                         throw new WebSocketRequestError(
                             `Unknown error while unsubscribing from a WebSocket channel: ${error}`,
                             { cause: error },
@@ -258,7 +258,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
                 resubscribeSignal: subscription.resubscribeAbortController?.signal,
             };
         } catch (error) {
-            if (error instanceof WebSocketRequestError) throw error; // Re-throw known errors
+            if (error instanceof TransportError) throw error; // Re-throw known errors
             throw new WebSocketRequestError(
                 `Unknown error while subscribing to a WebSocket channel: ${error}`,
                 { cause: error },
