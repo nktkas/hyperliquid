@@ -230,7 +230,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      * ```
      */
@@ -251,7 +251,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.activeAssetData({ user: "0x...", coin: "ETH" });
@@ -278,7 +278,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.allMids();
@@ -339,7 +339,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.candleSnapshot({
@@ -370,7 +370,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.clearinghouseState({ user: "0x..." });
@@ -397,7 +397,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.delegations({ user: "0x..." });
@@ -424,7 +424,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.delegatorHistory({ user: "0x..." });
@@ -451,7 +451,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.delegatorRewards({ user: "0x..." });
@@ -478,7 +478,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.delegatorSummary({ user: "0x..." });
@@ -504,7 +504,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.exchangeStatus();
@@ -528,7 +528,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.extraAgents({ user: "0x..." });
@@ -555,7 +555,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.frontendOpenOrders({ user: "0x..." });
@@ -582,7 +582,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.fundingHistory({
@@ -612,7 +612,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.historicalOrders({ user: "0x..." });
@@ -639,7 +639,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.isVip({ user: "0x..." });
@@ -666,7 +666,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.l2Book({ coin: "ETH", nSigFigs: 2 });
@@ -693,7 +693,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.leadingVaults({ user: "0x..." });
@@ -720,7 +720,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.legalCheck({ user: "0x..." });
@@ -746,7 +746,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.liquidatable();
@@ -770,7 +770,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.marginTable({ id: 1 });
@@ -797,7 +797,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.maxBuilderFee({ user: "0x...", builder: "0x..." });
@@ -823,7 +823,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.maxMarketOrderNtls();
@@ -847,7 +847,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.meta();
@@ -878,7 +878,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.metaAndAssetCtxs();
@@ -902,7 +902,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.openOrders({ user: "0x..." });
@@ -929,7 +929,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.orderStatus({ user: "0x...", oid: 12345 });
@@ -955,7 +955,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.perpDeployAuctionStatus();
@@ -978,7 +978,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.perpDexs();
@@ -1001,7 +1001,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.perpsAtOpenInterestCap();
@@ -1025,7 +1025,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.portfolio({ user: "0x..." });
@@ -1051,7 +1051,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.predictedFundings();
@@ -1075,7 +1075,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.preTransferCheck({ user: "0x...", source: "0x..." });
@@ -1102,7 +1102,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.referral({ user: "0x..." });
@@ -1129,7 +1129,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.spotClearinghouseState({ user: "0x..." });
@@ -1156,7 +1156,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.spotDeployState({ user: "0x..." });
@@ -1182,7 +1182,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.spotPairDeployAuctionStatus();
@@ -1205,7 +1205,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.spotMeta();
@@ -1228,7 +1228,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.spotMetaAndAssetCtxs();
@@ -1252,7 +1252,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.subAccounts({ user: "0x..." });
@@ -1279,7 +1279,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.tokenDetails({ tokenId: "0x..." });
@@ -1306,7 +1306,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.twapHistory({ user: "0x..." });
@@ -1391,7 +1391,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.userFees({ user: "0x..." });
@@ -1418,7 +1418,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.userFills({ user: "0x..." });
@@ -1445,7 +1445,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.userFillsByTime({
@@ -1475,7 +1475,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.userFunding({
@@ -1505,7 +1505,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.userNonFundingLedgerUpdates({
@@ -1535,7 +1535,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.userRateLimit({ user: "0x..." });
@@ -1562,7 +1562,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.userRole({ user: "0x..." });
@@ -1589,7 +1589,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.userToMultiSigSigners({ user: "0x..." });
@@ -1616,7 +1616,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.userTwapSliceFills({ user: "0x..." });
@@ -1643,7 +1643,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.userTwapSliceFillsByTime({
@@ -1673,7 +1673,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.userVaultEquities({ user: "0x..." });
@@ -1699,7 +1699,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.validatorL1Votes();
@@ -1722,7 +1722,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.validatorSummaries();
@@ -1746,7 +1746,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.vaultDetails({ vaultAddress: "0x..." });
@@ -1772,7 +1772,7 @@ export class InfoClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.HttpTransport(); // or WebSocketTransport
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
      * const infoClient = new hl.InfoClient({ transport });
      *
      * const data = await infoClient.vaultSummaries();
