@@ -54,39 +54,39 @@ export interface SubscriptionClientParameters<T extends ISubscriptionTransport =
 }
 
 /** Subscription parameters for the {@linkcode SubscriptionClient.activeAssetCtx} method. */
-export type EventActiveAssetCtxParameters = Omit<WsActiveAssetCtxRequest, "type">;
+export type WsActiveAssetCtxParameters = Omit<WsActiveAssetCtxRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.activeAssetData} method. */
-export type EventActiveAssetDataParameters = Omit<ActiveAssetDataRequest, "type">;
+export type WsActiveAssetDataParameters = Omit<ActiveAssetDataRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.allMids} method. */
 export type WsAllMidsParameters = Omit<AllMidsRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.assetCtxs} method. */
 export type WsAssetCtxsParameters = Omit<WsAssetCtxsRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.bbo} method. */
-export type EventBboParameters = Omit<WsBboRequest, "type">;
+export type WsBboParameters = Omit<WsBboRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.candle} method. */
-export type EventCandleParameters = Omit<WsCandleRequest, "type">;
+export type WsCandleParameters = Omit<WsCandleRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.l2Book} method. */
-export type EventL2BookParameters = Omit<L2BookRequest, "type">;
+export type WsL2BookParameters = Omit<L2BookRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.notification} method. */
-export type EventNotificationParameters = Omit<WsNotificationRequest, "type">;
+export type WsNotificationParameters = Omit<WsNotificationRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.orderUpdates} method. */
-export type EventOrderUpdatesParameters = Omit<WsOrderUpdatesRequest, "type">;
+export type WsOrderUpdatesParameters = Omit<WsOrderUpdatesRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.trades} method. */
-export type EventTradesParameters = Omit<WsTradesRequest, "type">;
+export type WsTradesParameters = Omit<WsTradesRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userEvents} method. */
-export type EventUserEventsParameters = Omit<WsUserEventsRequest, "type">;
+export type WsUserEventsParameters = Omit<WsUserEventsRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userFills} method. */
-export type EventUserFillsParameters = Omit<UserFillsRequest, "type">;
+export type WsUserFillsParameters = Omit<UserFillsRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userFundings} method. */
-export type EventUserFundingsParameters = Omit<WsUserFundingsRequest, "type">;
+export type WsUserFundingsParameters = Omit<WsUserFundingsRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userNonFundingLedgerUpdates} method. */
-export type EventUserNonFundingLedgerUpdatesParameters = Omit<WsUserNonFundingLedgerUpdatesRequest, "type">;
+export type WsUserNonFundingLedgerUpdatesParameters = Omit<WsUserNonFundingLedgerUpdatesRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userTwapHistory} method. */
-export type EventUserTwapHistory = Omit<WsUserTwapHistoryRequest, "type">;
+export type WsUserTwapHistoryParameters = Omit<WsUserTwapHistoryRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userTwapSliceFills} method. */
-export type EventUserTwapSliceFills = Omit<UserTwapSliceFillsRequest, "type">;
+export type WsUserTwapSliceFillsParameters = Omit<UserTwapSliceFillsRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.webData2} method. */
-export type EventWebData2Parameters = Omit<WsWebData2Request, "type">;
+export type WsWebData2Parameters = Omit<WsWebData2Request, "type">;
 
 /**
  * Subscription client for subscribing to various Hyperliquid events.
@@ -135,7 +135,7 @@ export class SubscriptionClient<
      * ```
      */
     activeAssetCtx(
-        params: DeepImmutable<EventActiveAssetCtxParameters>,
+        params: DeepImmutable<WsActiveAssetCtxParameters>,
         listener: (data: WsActiveAssetCtx | WsActiveSpotAssetCtx) => void,
     ): Promise<Subscription> {
         const channel = params.coin.startsWith("@") ? "activeSpotAssetCtx" : "activeAssetCtx";
@@ -169,7 +169,7 @@ export class SubscriptionClient<
      * ```
      */
     activeAssetData(
-        params: DeepImmutable<EventActiveAssetDataParameters>,
+        params: DeepImmutable<WsActiveAssetDataParameters>,
         listener: (data: ActiveAssetData) => void,
     ): Promise<Subscription> {
         const payload = { type: "activeAssetData", ...params } satisfies ActiveAssetDataRequest;
@@ -283,7 +283,7 @@ export class SubscriptionClient<
      * ```
      */
     bbo(
-        params: DeepImmutable<EventBboParameters>,
+        params: DeepImmutable<WsBboParameters>,
         listener: (data: WsBbo) => void,
     ): Promise<Subscription> {
         const payload = { type: "bbo", ...params } satisfies WsBboRequest;
@@ -316,7 +316,7 @@ export class SubscriptionClient<
      * ```
      */
     candle(
-        params: DeepImmutable<EventCandleParameters>,
+        params: DeepImmutable<WsCandleParameters>,
         listener: (data: Candle) => void,
     ): Promise<Subscription> {
         const payload = { type: "candle", ...params } satisfies WsCandleRequest;
@@ -405,7 +405,7 @@ export class SubscriptionClient<
      * ```
      */
     l2Book(
-        params: DeepImmutable<EventL2BookParameters>,
+        params: DeepImmutable<WsL2BookParameters>,
         listener: (data: Book) => void,
     ): Promise<Subscription> {
         const payload = {
@@ -443,7 +443,7 @@ export class SubscriptionClient<
      * ```
      */
     notification(
-        params: DeepImmutable<EventNotificationParameters>,
+        params: DeepImmutable<WsNotificationParameters>,
         listener: (data: WsNotification) => void,
     ): Promise<Subscription> {
         const payload = { type: "notification", ...params } satisfies WsNotificationRequest;
@@ -474,7 +474,7 @@ export class SubscriptionClient<
      * ```
      */
     orderUpdates(
-        params: DeepImmutable<EventOrderUpdatesParameters>,
+        params: DeepImmutable<WsOrderUpdatesParameters>,
         listener: (data: OrderStatus<Order>[]) => void,
     ): Promise<Subscription> {
         const payload = { type: "orderUpdates", ...params } satisfies WsOrderUpdatesRequest;
@@ -505,7 +505,7 @@ export class SubscriptionClient<
      * ```
      */
     trades(
-        params: DeepImmutable<EventTradesParameters>,
+        params: DeepImmutable<WsTradesParameters>,
         listener: (data: WsTrade[]) => void,
     ): Promise<Subscription> {
         const payload = { type: "trades", ...params } satisfies WsTradesRequest;
@@ -539,7 +539,7 @@ export class SubscriptionClient<
      * ```
      */
     userEvents(
-        params: DeepImmutable<EventUserEventsParameters>,
+        params: DeepImmutable<WsUserEventsParameters>,
         listener: (data: WsUserEvent) => void,
     ): Promise<Subscription> {
         const payload = { type: "userEvents", ...params } satisfies WsUserEventsRequest;
@@ -570,7 +570,7 @@ export class SubscriptionClient<
      * ```
      */
     userFills(
-        params: DeepImmutable<EventUserFillsParameters>,
+        params: DeepImmutable<WsUserFillsParameters>,
         listener: (data: WsUserFills) => void,
     ): Promise<Subscription> {
         const payload = {
@@ -607,7 +607,7 @@ export class SubscriptionClient<
      * ```
      */
     userFundings(
-        params: DeepImmutable<EventUserFundingsParameters>,
+        params: DeepImmutable<WsUserFundingsParameters>,
         listener: (data: WsUserFundings) => void,
     ): Promise<Subscription> {
         const payload = { type: "userFundings", ...params } satisfies WsUserFundingsRequest;
@@ -640,7 +640,7 @@ export class SubscriptionClient<
      * ```
      */
     userNonFundingLedgerUpdates(
-        params: DeepImmutable<EventUserNonFundingLedgerUpdatesParameters>,
+        params: DeepImmutable<WsUserNonFundingLedgerUpdatesParameters>,
         listener: (data: WsUserNonFundingLedgerUpdates) => void,
     ): Promise<Subscription> {
         const payload = {
@@ -676,7 +676,7 @@ export class SubscriptionClient<
      * ```
      */
     userTwapHistory(
-        params: DeepImmutable<EventUserTwapHistory>,
+        params: DeepImmutable<WsUserTwapHistory>,
         listener: (data: WsUserTwapHistory) => void,
     ): Promise<Subscription> {
         const payload = { type: "userTwapHistory", ...params } satisfies WsUserTwapHistoryRequest;
@@ -709,7 +709,7 @@ export class SubscriptionClient<
      * ```
      */
     userTwapSliceFills(
-        params: DeepImmutable<EventUserTwapSliceFills>,
+        params: DeepImmutable<WsUserTwapSliceFills>,
         listener: (data: WsUserTwapSliceFills) => void,
     ): Promise<Subscription> {
         const payload = { type: "userTwapSliceFills", ...params } satisfies UserTwapSliceFillsRequest;
@@ -742,7 +742,7 @@ export class SubscriptionClient<
      * ```
      */
     webData2(
-        params: DeepImmutable<EventWebData2Parameters>,
+        params: DeepImmutable<WsWebData2Parameters>,
         listener: (data: WsWebData2) => void,
     ): Promise<Subscription> {
         const payload = { type: "webData2", ...params } satisfies WsWebData2Request;

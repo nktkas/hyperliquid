@@ -552,26 +552,26 @@ class SubscriptionClient {
     });
 
     // Market
-    activeAssetCtx(args: EventActiveAssetCtxParameters, listener: (data: WsActiveAssetCtx | WsActiveSpotAssetCtx) => void): Promise<Subscription>;
+    activeAssetCtx(args: WsActiveAssetCtxParameters, listener: (data: WsActiveAssetCtx | WsActiveSpotAssetCtx) => void): Promise<Subscription>;
     allMids(listener: (data: WsAllMids) => void): Promise<Subscription>;
-    bbo(args: EventBboParameters, listener: (data: WsBbo) => void): Promise<Subscription>;
-    candle(args: EventCandleParameters, listener: (data: Candle) => void): Promise<Subscription>;
-    l2Book(args: EventL2BookParameters, listener: (data: Book) => void): Promise<Subscription>;
-    trades(args: EventTradesParameters, listener: (data: WsTrade[]) => void): Promise<Subscription>;
+    bbo(args: WsBboParameters, listener: (data: WsBbo) => void): Promise<Subscription>;
+    candle(args: WsCandleParameters, listener: (data: Candle) => void): Promise<Subscription>;
+    l2Book(args: WsL2BookParameters, listener: (data: Book) => void): Promise<Subscription>;
+    trades(args: WsTradesParameters, listener: (data: WsTrade[]) => void): Promise<Subscription>;
 
     // Account
-    activeAssetData(args: EventActiveAssetDataParameters, listener: (data: ActiveAssetData) => void): Promise<Subscription>;
-    notification(args: EventNotificationParameters, listener: (data: WsNotification) => void): Promise<Subscription>;
-    userEvents(args: EventUserEventsParameters, listener: (data: WsUserEvent) => void): Promise<Subscription>;
-    userFundings(args: EventUserFundingsParameters, listener: (data: WsUserFundings) => void): Promise<Subscription>;
-    userNonFundingLedgerUpdates(args: EventUserNonFundingLedgerUpdatesParameters, listener: (data: WsUserNonFundingLedgerUpdates) => void): Promise<Subscription>;
-    webData2(args: EventWebData2Parameters, listener: (data: WsWebData2) => void): Promise<Subscription>;
+    activeAssetData(args: WsActiveAssetDataParameters, listener: (data: ActiveAssetData) => void): Promise<Subscription>;
+    notification(args: WsNotificationParameters, listener: (data: WsNotification) => void): Promise<Subscription>;
+    userEvents(args: WsUserEventsParameters, listener: (data: WsUserEvent) => void): Promise<Subscription>;
+    userFundings(args: WsUserFundingsParameters, listener: (data: WsUserFundings) => void): Promise<Subscription>;
+    userNonFundingLedgerUpdates(args: WsUserNonFundingLedgerUpdatesParameters, listener: (data: WsUserNonFundingLedgerUpdates) => void): Promise<Subscription>;
+    webData2(args: WsWebData2Parameters, listener: (data: WsWebData2) => void): Promise<Subscription>;
 
     // Order
-    orderUpdates(args: EventOrderUpdatesParameters, listener: (data: OrderStatus<Order>[]) => void): Promise<Subscription>;
-    userFills(args: EventUserFillsParameters, listener: (data: WsUserFills) => void): Promise<Subscription>;
-    userTwapHistory(args: EventUserTwapHistory, listener: (data: WsUserTwapHistory) => void): Promise<Subscription>;
-    userTwapSliceFills(args: EventUserTwapSliceFills, listener: (data: WsUserTwapSliceFills) => void): Promise<Subscription>;
+    orderUpdates(args: WsOrderUpdatesParameters, listener: (data: OrderStatus<Order>[]) => void): Promise<Subscription>;
+    userFills(args: WsUserFillsParameters, listener: (data: WsUserFills) => void): Promise<Subscription>;
+    userTwapHistory(args: WsUserTwapHistoryParameters, listener: (data: WsUserTwapHistory) => void): Promise<Subscription>;
+    userTwapSliceFills(args: WsUserTwapSliceFillsParameters, listener: (data: WsUserTwapSliceFills) => void): Promise<Subscription>;
 
     // Explorer (RPC endpoint)
     explorerBlock(listener: (data: WsBlockDetails[]) => void): Promise<Subscription>;
