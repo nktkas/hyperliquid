@@ -32,6 +32,14 @@ export interface WsAllMids {
     mids: AllMids;
 }
 
+/** Asset contexts for all perpetual assets on a specified DEX.  */
+export interface WsAssetCtxs {
+    /** DEX name (empty string for main dex). */
+    dex: string;
+    /** Array of context information for each perpetual asset. */
+    ctxs: PerpsAssetCtx[];
+}
+
 /** Best Bid and Offer. */
 export interface WsBbo {
     /** Asset symbol (e.g., BTC). */

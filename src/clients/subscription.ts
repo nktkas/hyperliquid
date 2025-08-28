@@ -15,6 +15,8 @@ import type {
     WsActiveAssetCtxRequest,
     WsActiveSpotAssetCtx,
     WsAllMids,
+    WsAssetCtxs,
+    WsAssetCtxsRequest,
     WsBbo,
     WsBboRequest,
     WsBlockDetails,
@@ -57,6 +59,8 @@ export type EventActiveAssetCtxParameters = Omit<WsActiveAssetCtxRequest, "type"
 export type EventActiveAssetDataParameters = Omit<ActiveAssetDataRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.allMids} method. */
 export type WsAllMidsParameters = Omit<AllMidsRequest, "type">;
+/** Subscription parameters for the {@linkcode SubscriptionClient.assetCtxs} method. */
+export type WsAssetCtxsParameters = Omit<WsAssetCtxsRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.bbo} method. */
 export type EventBboParameters = Omit<WsBboRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.candle} method. */
@@ -209,6 +213,51 @@ export class SubscriptionClient<
         const payload = { type: "allMids", ...params } satisfies AllMidsRequest;
         return this.transport.subscribe<WsAllMids>(payload.type, payload, (e) => {
             listener(e.detail);
+        });
+    }
+
+    /**
+     * Subscribe to asset contexts for all perpetual assets.
+     * @param params - An optional subscription-specific parameters.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.WebSocketTransport();
+     * const subsClient = new hl.SubscriptionClient({ transport });
+     *
+     * const sub = await subsClient.assetCtxs((data) => {
+     *   console.log(data);
+     * });
+     * ```
+     */
+    assetCtxs(listener: (data: WsAssetCtxs) => void): Promise<Subscription>;
+    assetCtxs(
+        params: DeepImmutable<WsAssetCtxsParameters>,
+        listener: (data: WsAssetCtxs) => void,
+    ): Promise<Subscription>;
+    assetCtxs(
+        params_or_listener: DeepImmutable<WsAssetCtxsParameters> | ((data: WsAssetCtxs) => void),
+        maybeListener?: (data: WsAssetCtxs) => void,
+    ): Promise<Subscription> {
+        const params = typeof params_or_listener === "function" ? {} : params_or_listener;
+        const listener = typeof params_or_listener === "function" ? params_or_listener : maybeListener!;
+
+        const payload = {
+            type: "assetCtxs",
+            ...params,
+            dex: params.dex ?? "",
+        } satisfies WsAssetCtxsRequest;
+        return this.transport.subscribe<WsAssetCtxs>(payload.type, payload, (e) => {
+            if (e.detail.dex === payload.dex) {
+                listener(e.detail);
+            }
         });
     }
 

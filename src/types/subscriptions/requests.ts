@@ -13,6 +13,18 @@ export interface WsActiveAssetCtxRequest {
 }
 
 /**
+ * Context events for all perpetual assets on a specified DEX.
+ * @returns {WsAssetCtx[]}
+ * @see null
+ */
+export interface WsAssetCtxsRequest {
+    /** Type of subscription. */
+    type: "assetCtxs";
+    /** DEX name (empty string for main dex). */
+    dex?: string;
+}
+
+/**
  * Best bid and offer events for a specific asset.
  * @returns {WsBbo}
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
