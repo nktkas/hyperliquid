@@ -57,6 +57,8 @@ export interface ClearinghouseStateRequest {
     type: "clearinghouseState";
     /** User address. */
     user: Hex;
+    /** DEX name (empty string for main dex). */
+    dex?: string;
 }
 
 /**
@@ -289,6 +291,8 @@ export interface MetaRequest {
 export interface MetaAndAssetCtxsRequest {
     /** Type of request. */
     type: "metaAndAssetCtxs";
+    /** DEX name (empty string for main dex). */
+    dex?: string;
 }
 
 /**
@@ -347,6 +351,8 @@ export interface PerpDexsRequest {
 export interface PerpsAtOpenInterestCapRequest {
     /** Type of request. */
     type: "perpsAtOpenInterestCap";
+    /** DEX name (empty string for main dex). */
+    dex?: string;
 }
 
 /**

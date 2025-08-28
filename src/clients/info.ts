@@ -162,10 +162,14 @@ export type MarginTableParameters = Omit<MarginTableRequest, "type">;
 export type MaxBuilderFeeParameters = Omit<MaxBuilderFeeRequest, "type">;
 /** Request parameters for the {@linkcode InfoClient.meta} method. */
 export type MetaParameters = Omit<MetaRequest, "type">;
+/** Request parameters for the {@linkcode InfoClient.metaAndAssetCtxs} method. */
+export type MetaAndAssetCtxsParameters = Omit<MetaAndAssetCtxsRequest, "type">;
 /** Request parameters for the {@linkcode InfoClient.openOrders} method. */
 export type OpenOrdersParameters = Omit<OpenOrdersRequest, "type">;
 /** Request parameters for the {@linkcode InfoClient.orderStatus} method. */
 export type OrderStatusParameters = Omit<OrderStatusRequest, "type">;
+/** Request parameters for the {@linkcode InfoClient.perpsAtOpenInterestCap} method. */
+export type PerpsAtOpenInterestCapParameters = Omit<PerpsAtOpenInterestCapRequest, "type">;
 /** Request parameters for the {@linkcode InfoClient.portfolio} method. */
 export type PortfolioParameters = Omit<PortfolioRequest, "type">;
 /** Request parameters for the {@linkcode InfoClient.preTransferCheck} method. */
@@ -884,8 +888,19 @@ export class InfoClient<
      * const data = await infoClient.metaAndAssetCtxs();
      * ```
      */
-    metaAndAssetCtxs(signal?: AbortSignal): Promise<PerpsMetaAndAssetCtxs> {
-        const request = { type: "metaAndAssetCtxs" } satisfies MetaAndAssetCtxsRequest;
+    metaAndAssetCtxs(
+        params?: DeepImmutable<MetaAndAssetCtxsParameters>,
+        signal?: AbortSignal,
+    ): Promise<PerpsMetaAndAssetCtxs>;
+    metaAndAssetCtxs(signal?: AbortSignal): Promise<PerpsMetaAndAssetCtxs>;
+    metaAndAssetCtxs(
+        params_or_signal?: DeepImmutable<MetaAndAssetCtxsParameters> | AbortSignal,
+        maybeSignal?: AbortSignal,
+    ): Promise<PerpsMetaAndAssetCtxs> {
+        const params = params_or_signal instanceof AbortSignal ? {} : params_or_signal;
+        const signal = params_or_signal instanceof AbortSignal ? params_or_signal : maybeSignal;
+
+        const request = { type: "metaAndAssetCtxs", ...params } satisfies MetaAndAssetCtxsRequest;
         return this.transport.request("info", request, signal);
     }
 
@@ -1007,8 +1022,19 @@ export class InfoClient<
      * const data = await infoClient.perpsAtOpenInterestCap();
      * ```
      */
-    perpsAtOpenInterestCap(signal?: AbortSignal): Promise<string[]> {
-        const request = { type: "perpsAtOpenInterestCap" } satisfies PerpsAtOpenInterestCapRequest;
+    perpsAtOpenInterestCap(
+        params?: DeepImmutable<PerpsAtOpenInterestCapParameters>,
+        signal?: AbortSignal,
+    ): Promise<string[]>;
+    perpsAtOpenInterestCap(signal?: AbortSignal): Promise<string[]>;
+    perpsAtOpenInterestCap(
+        params_or_signal?: DeepImmutable<PerpsAtOpenInterestCapParameters> | AbortSignal,
+        maybeSignal?: AbortSignal,
+    ): Promise<string[]> {
+        const params = params_or_signal instanceof AbortSignal ? {} : params_or_signal;
+        const signal = params_or_signal instanceof AbortSignal ? params_or_signal : maybeSignal;
+
+        const request = { type: "perpsAtOpenInterestCap", ...params } satisfies PerpsAtOpenInterestCapRequest;
         return this.transport.request("info", request, signal);
     }
 
