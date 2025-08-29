@@ -8,13 +8,11 @@ const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
 async function testFn(_t: Deno.TestContext, client: SubscriptionClient) {
     const data = await deadline(
         new Promise((resolve) => {
-            client.clearinghouseState({ user: "0xe019d6167E7e324aEd003d94098496b6d986aB05" }, resolve);
+            client.clearinghouseState({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" }, resolve);
         }),
         10_000,
     );
-    schemaCoverage(MethodReturnType, [data], {
-        ignoreEmptyArrayPaths: ["#/properties/clearinghouseState/properties/assetPositions"],
-    });
+    schemaCoverage(MethodReturnType, [data]);
 }
 
 runTest("clearinghouseState", testFn, "api");
