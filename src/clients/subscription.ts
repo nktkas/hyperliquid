@@ -758,7 +758,7 @@ export class SubscriptionClient<
      * ```
      */
     userTwapHistory(
-        params: DeepImmutable<WsUserTwapHistory>,
+        params: DeepImmutable<WsUserTwapHistoryParameters>,
         listener: (data: WsUserTwapHistory) => void,
     ): Promise<Subscription> {
         const payload = { type: "userTwapHistory", ...params } satisfies WsUserTwapHistoryRequest;
@@ -791,7 +791,7 @@ export class SubscriptionClient<
      * ```
      */
     userTwapSliceFills(
-        params: DeepImmutable<WsUserTwapSliceFills>,
+        params: DeepImmutable<WsUserTwapSliceFillsParameters>,
         listener: (data: WsUserTwapSliceFills) => void,
     ): Promise<Subscription> {
         const payload = { type: "userTwapSliceFills", ...params } satisfies UserTwapSliceFillsRequest;
