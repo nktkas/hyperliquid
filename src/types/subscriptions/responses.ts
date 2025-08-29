@@ -69,6 +69,16 @@ export interface WsNotification {
     notification: string;
 }
 
+/** Open orders for a specific user. */
+export interface WsOpenOrders {
+    /** DEX name (empty string for main dex). */
+    dex: string;
+    /** User address. */
+    user: Hex;
+    /** Array of open orders. */
+    orders: FrontendOrder[];
+}
+
 /** Trade information. */
 export interface WsTrade {
     /** Asset symbol (e.g., BTC). */

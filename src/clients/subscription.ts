@@ -7,6 +7,7 @@ import type {
     Candle,
     ClearinghouseStateRequest,
     L2BookRequest,
+    OpenOrdersRequest,
     Order,
     OrderStatus,
     TxDetails,
@@ -27,6 +28,7 @@ import type {
     WsExplorerTxsRequest,
     WsNotification,
     WsNotificationRequest,
+    WsOpenOrders,
     WsOrderUpdatesRequest,
     WsTrade,
     WsTradesRequest,
@@ -73,6 +75,8 @@ export type WsClearinghouseStateParameters = Omit<ClearinghouseStateRequest, "ty
 export type WsL2BookParameters = Omit<L2BookRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.notification} method. */
 export type WsNotificationParameters = Omit<WsNotificationRequest, "type">;
+/** Subscription parameters for the {@linkcode SubscriptionClient.openOrders} method. */
+export type WsOpenOrdersParameters = Omit<OpenOrdersRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.orderUpdates} method. */
 export type WsOrderUpdatesParameters = Omit<WsOrderUpdatesRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.trades} method. */
@@ -490,6 +494,43 @@ export class SubscriptionClient<
         const payload = { type: "notification", ...params } satisfies WsNotificationRequest;
         return this.transport.subscribe<WsNotification>(payload.type, payload, (e) => {
             listener(e.detail);
+        });
+    }
+
+    /**
+     * Subscribe to open orders updates for a specific user.
+     * @param params - Subscription-specific parameters.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.WebSocketTransport();
+     * const subsClient = new hl.SubscriptionClient({ transport });
+     *
+     * const sub = await subsClient.openOrders({ user: "0x..." }, (data) => {
+     *   console.log(data);
+     * });
+     * ```
+     */
+    openOrders(
+        params: DeepImmutable<WsOpenOrdersParameters>,
+        listener: (data: WsOpenOrders) => void,
+    ): Promise<Subscription> {
+        const payload = {
+            type: "openOrders",
+            ...params,
+            dex: params.dex ?? "",
+        } satisfies OpenOrdersRequest;
+        return this.transport.subscribe<WsOpenOrders>(payload.type, payload, (e) => {
+            if (e.detail.user === payload.user.toLowerCase() && e.detail.dex === payload.dex) {
+                listener(e.detail);
+            }
         });
     }
 
