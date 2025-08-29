@@ -53,6 +53,16 @@ export interface WsBbo {
 /** Block details. */
 export type WsBlockDetails = Omit<BlockDetails, "txs">;
 
+/** Clearinghouse state for a specific user.  */
+export interface WsClearinghouseState {
+    /** DEX name (empty string for main dex). */
+    dex: string;
+    /** User address. */
+    user: Hex;
+    /** Perpetual clearinghouse state. */
+    clearinghouseState: PerpsClearinghouseState;
+}
+
 /** User notifications. */
 export interface WsNotification {
     /** Notification content. */

@@ -5,6 +5,7 @@ import type {
     AllMidsRequest,
     Book,
     Candle,
+    ClearinghouseStateRequest,
     L2BookRequest,
     Order,
     OrderStatus,
@@ -21,6 +22,7 @@ import type {
     WsBboRequest,
     WsBlockDetails,
     WsCandleRequest,
+    WsClearinghouseState,
     WsExplorerBlockRequest,
     WsExplorerTxsRequest,
     WsNotification,
@@ -65,6 +67,8 @@ export type WsAssetCtxsParameters = Omit<WsAssetCtxsRequest, "type">;
 export type WsBboParameters = Omit<WsBboRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.candle} method. */
 export type WsCandleParameters = Omit<WsCandleRequest, "type">;
+/** Subscription parameters for the {@linkcode SubscriptionClient.clearinghouseState} method. */
+export type WsClearinghouseStateParameters = Omit<ClearinghouseStateRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.l2Book} method. */
 export type WsL2BookParameters = Omit<L2BookRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.notification} method. */
@@ -322,6 +326,43 @@ export class SubscriptionClient<
         const payload = { type: "candle", ...params } satisfies WsCandleRequest;
         return this.transport.subscribe<Candle>(payload.type, payload, (e) => {
             if (e.detail.s === payload.coin && e.detail.i === payload.interval) {
+                listener(e.detail);
+            }
+        });
+    }
+
+    /**
+     * Subscribe to clearinghouse state updates for a specific user.
+     * @param params - Subscription-specific parameters.
+     * @param listener - A callback function to be called when the event is received.
+     * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+     *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.WebSocketTransport();
+     * const subsClient = new hl.SubscriptionClient({ transport });
+     *
+     * const sub = await subsClient.clearinghouseState({ user: "0x..." }, (data) => {
+     *   console.log(data);
+     * });
+     * ```
+     */
+    clearinghouseState(
+        params: DeepImmutable<WsClearinghouseStateParameters>,
+        listener: (data: WsClearinghouseState) => void,
+    ): Promise<Subscription> {
+        const payload = {
+            type: "clearinghouseState",
+            ...params,
+            dex: params.dex ?? "",
+        } satisfies ClearinghouseStateRequest;
+        return this.transport.subscribe<WsClearinghouseState>(payload.type, payload, (e) => {
+            if (e.detail.user === payload.user.toLowerCase() && e.detail.dex === payload.dex) {
                 listener(e.detail);
             }
         });
