@@ -396,76 +396,76 @@ class InfoClient {
     });
 
     // Market
-    allMids(): Promise<AllMids>;
-    candleSnapshot(args: CandleSnapshotParameters): Promise<Candle[]>;
-    fundingHistory(args: FundingHistoryParameters): Promise<FundingHistory[]>;
-    l2Book(args: L2BookParameters): Promise<Book>;
+    allMids(params?: AllMidsParameters): Promise<AllMids>;
+    candleSnapshot(params: CandleSnapshotParameters): Promise<Candle[]>;
+    fundingHistory(params: FundingHistoryParameters): Promise<FundingHistory[]>;
+    l2Book(params: L2BookParameters): Promise<Book>;
     liquidatable(): Promise<unknown[]>;
-    marginTable(args: MarginTableParameters): Promise<MarginTable>;
+    marginTable(params: MarginTableParameters): Promise<MarginTable>;
     maxMarketOrderNtls(): Promise<[number, string][]>;
-    meta(): Promise<PerpsMeta>;
-    metaAndAssetCtxs(): Promise<PerpsMetaAndAssetCtxs>;
+    meta(params?: MetaParameters): Promise<PerpsMeta>;
+    metaAndAssetCtxs(params?: MetaAndAssetCtxsParameters): Promise<PerpsMetaAndAssetCtxs>;
     perpDeployAuctionStatus(): Promise<DeployAuctionStatus>;
     perpDexs(): Promise<(PerpDex | null)[]>;
-    perpsAtOpenInterestCap(): Promise<string[]>;
+    perpsAtOpenInterestCap(params?: PerpsAtOpenInterestCapParameters): Promise<string[]>;
     predictedFundings(): Promise<PredictedFunding[]>;
-    spotDeployState(args: SpotDeployStateParameters): Promise<SpotDeployState>;
+    spotDeployState(params: SpotDeployStateParameters): Promise<SpotDeployState>;
     spotMeta(): Promise<SpotMeta>;
     spotMetaAndAssetCtxs(): Promise<SpotMetaAndAssetCtxs>;
     spotPairDeployAuctionStatus(): Promise<DeployAuctionStatus>;
-    tokenDetails(args: TokenDetailsParameters): Promise<TokenDetails>;
+    tokenDetails(params: TokenDetailsParameters): Promise<TokenDetails>;
 
     // Account
-    activeAssetData(args: ActiveAssetDataParameters): Promise<ActiveAssetData>;
-    clearinghouseState(args: ClearinghouseStateParameters): Promise<PerpsClearinghouseState>;
-    extraAgents(args: ExtraAgentsParameters): Promise<ExtraAgent[]>;
-    isVip(args: IsVipParameters): Promise<boolean>;
-    legalCheck(args: LegalCheckParameters): Promise<LegalCheck>;
-    maxBuilderFee(args: MaxBuilderFeeParameters): Promise<number>;
-    portfolio(args: PortfolioParameters): Promise<PortfolioPeriods>;
-    preTransferCheck(args: PreTransferCheckParameters): Promise<PreTransferCheck>;
-    referral(args: ReferralParameters): Promise<Referral>;
-    spotClearinghouseState(args: SpotClearinghouseStateParameters): Promise<SpotClearinghouseState>;
-    subAccounts(args: SubAccountsParameters): Promise<SubAccount[] | null>;
-    userFees(args: UserFeesParameters): Promise<UserFees>;
-    userFunding(args: UserFundingParameters): Promise<UserFundingUpdate[]>;
-    userNonFundingLedgerUpdates(args: UserNonFundingLedgerUpdatesParameters): Promise<UserNonFundingLedgerUpdate[]>;
-    userRateLimit(args: UserRateLimitParameters): Promise<UserRateLimit>;
-    userRole(args: UserRoleParameters): Promise<UserRole>;
-    userToMultiSigSigners(args: UserToMultiSigSignersParameters): Promise<MultiSigSigners | null>;
+    activeAssetData(params: ActiveAssetDataParameters): Promise<ActiveAssetData>;
+    clearinghouseState(params: ClearinghouseStateParameters): Promise<PerpsClearinghouseState>;
+    extraAgents(params: ExtraAgentsParameters): Promise<ExtraAgent[]>;
+    isVip(params: IsVipParameters): Promise<boolean | null>;
+    legalCheck(params: LegalCheckParameters): Promise<LegalCheck>;
+    maxBuilderFee(params: MaxBuilderFeeParameters): Promise<number>;
+    portfolio(params: PortfolioParameters): Promise<PortfolioPeriods>;
+    preTransferCheck(params: PreTransferCheckParameters): Promise<PreTransferCheck>;
+    referral(params: ReferralParameters): Promise<Referral>;
+    spotClearinghouseState(params: SpotClearinghouseStateParameters): Promise<SpotClearinghouseState>;
+    subAccounts(params: SubAccountsParameters): Promise<SubAccount[] | null>;
+    userFees(params: UserFeesParameters): Promise<UserFees>;
+    userFunding(params: UserFundingParameters): Promise<UserFundingUpdate[]>;
+    userNonFundingLedgerUpdates(params: UserNonFundingLedgerUpdatesParameters): Promise<UserNonFundingLedgerUpdate[]>;
+    userRateLimit(params: UserRateLimitParameters): Promise<UserRateLimit>;
+    userRole(params: UserRoleParameters): Promise<UserRole>;
+    userToMultiSigSigners(params: UserToMultiSigSignersParameters): Promise<MultiSigSigners | null>;
 
     // Order
-    frontendOpenOrders(args: FrontendOpenOrdersParameters): Promise<FrontendOrder[]>;
-    historicalOrders(args: HistoricalOrdersParameters): Promise<OrderStatus<FrontendOrder>[]>;
-    openOrders(args: OpenOrdersParameters): Promise<Order[]>;
-    orderStatus(args: OrderStatusParameters): Promise<OrderLookup>;
-    twapHistory(args: TwapHistoryParameters): Promise<TwapHistory[]>;
-    userFills(args: UserFillsParameters): Promise<Fill[]>;
-    userFillsByTime(args: UserFillsByTimeParameters): Promise<Fill[]>;
-    userTwapSliceFills(args: UserTwapSliceFillsParameters): Promise<TwapSliceFill[]>;
-    userTwapSliceFillsByTime(args: UserTwapSliceFillsByTimeParameters): Promise<TwapSliceFill[]>;
+    frontendOpenOrders(params: FrontendOpenOrdersParameters): Promise<FrontendOrder[]>;
+    historicalOrders(params: HistoricalOrdersParameters): Promise<OrderStatus<FrontendOrder>[]>;
+    openOrders(params: OpenOrdersParameters): Promise<Order[]>;
+    orderStatus(params: OrderStatusParameters): Promise<OrderLookup>;
+    twapHistory(params: TwapHistoryParameters): Promise<TwapHistory[]>;
+    userFills(params: UserFillsParameters): Promise<Fill[]>;
+    userFillsByTime(params: UserFillsByTimeParameters): Promise<Fill[]>;
+    userTwapSliceFills(params: UserTwapSliceFillsParameters): Promise<TwapSliceFill[]>;
+    userTwapSliceFillsByTime(params: UserTwapSliceFillsByTimeParameters): Promise<TwapSliceFill[]>;
 
     // Validator
-    delegations(args: DelegationsParameters): Promise<Delegation[]>;
-    delegatorHistory(args: DelegatorHistoryParameters): Promise<DelegatorUpdate[]>;
-    delegatorRewards(args: DelegatorRewardsParameters): Promise<DelegatorReward[]>;
-    delegatorSummary(args: DelegatorSummaryParameters): Promise<DelegatorSummary>;
+    delegations(params: DelegationsParameters): Promise<Delegation[]>;
+    delegatorHistory(params: DelegatorHistoryParameters): Promise<DelegatorUpdate[]>;
+    delegatorRewards(params: DelegatorRewardsParameters): Promise<DelegatorReward[]>;
+    delegatorSummary(params: DelegatorSummaryParameters): Promise<DelegatorSummary>;
     validatorL1Votes(): Promise<unknown[]>;
     validatorSummaries(): Promise<ValidatorSummary[]>;
 
     // Vault
-    leadingVaults(args: LeadingVaultsParameters): Promise<VaultLeading[]>;
-    userVaultEquities(args: UserVaultEquitiesParameters): Promise<VaultEquity[]>;
-    vaultDetails(args: VaultDetailsParameters): Promise<VaultDetails | null>;
+    leadingVaults(params: LeadingVaultsParameters): Promise<VaultLeading[]>;
+    userVaultEquities(params: UserVaultEquitiesParameters): Promise<VaultEquity[]>;
+    vaultDetails(params: VaultDetailsParameters): Promise<VaultDetails | null>;
     vaultSummaries(): Promise<VaultSummary[]>;
 
     // Server
     exchangeStatus(): Promise<ExchangeStatus>;
 
     // Explorer (RPC endpoint)
-    blockDetails(args: BlockDetailsParameters): Promise<BlockDetails>;
-    txDetails(args: TxDetailsParameters): Promise<TxDetails>;
-    userDetails(args: UserDetailsParameters): Promise<TxDetails[]>;
+    blockDetails(params: BlockDetailsParameters): Promise<BlockDetails>;
+    txDetails(params: TxDetailsParameters): Promise<TxDetails>;
+    userDetails(params: UserDetailsParameters): Promise<TxDetails[]>;
 }
 ```
 
@@ -483,62 +483,62 @@ class ExchangeClient {
     });
 
     // Order
-    batchModify(args: BatchModifyParameters): Promise<OrderResponseSuccess>;
-    cancel(args: CancelParameters): Promise<CancelResponseSuccess>;
-    cancelByCloid(args: CancelByCloidParameters): Promise<CancelResponseSuccess>;
-    modify(args: ModifyParameters): Promise<SuccessResponse>;
-    order(args: OrderParameters): Promise<OrderResponseSuccess>;
-    scheduleCancel(args?: ScheduleCancelParameters): Promise<SuccessResponse>;
-    twapCancel(args: TwapCancelParameters): Promise<TwapCancelResponseSuccess>;
-    twapOrder(args: TwapOrderParameters): Promise<TwapOrderResponseSuccess>;
-    updateIsolatedMargin(args: UpdateIsolatedMarginParameters): Promise<SuccessResponse>;
-    updateLeverage(args: UpdateLeverageParameters): Promise<SuccessResponse>;
+    batchModify(params: BatchModifyParameters): Promise<OrderResponseSuccess>;
+    cancel(params: CancelParameters): Promise<CancelResponseSuccess>;
+    cancelByCloid(params: CancelByCloidParameters): Promise<CancelResponseSuccess>;
+    modify(params: ModifyParameters): Promise<SuccessResponse>;
+    order(params: OrderParameters): Promise<OrderResponseSuccess>;
+    scheduleCancel(params?: ScheduleCancelParameters): Promise<SuccessResponse>;
+    twapCancel(params: TwapCancelParameters): Promise<TwapCancelResponseSuccess>;
+    twapOrder(params: TwapOrderParameters): Promise<TwapOrderResponseSuccess>;
+    updateIsolatedMargin(params: UpdateIsolatedMarginParameters): Promise<SuccessResponse>;
+    updateLeverage(params: UpdateLeverageParameters): Promise<SuccessResponse>;
 
     // Account
-    approveAgent(args: ApproveAgentParameters): Promise<SuccessResponse>;
-    approveBuilderFee(args: ApproveBuilderFeeParameters): Promise<SuccessResponse>;
+    approveAgent(params: ApproveAgentParameters): Promise<SuccessResponse>;
+    approveBuilderFee(params: ApproveBuilderFeeParameters): Promise<SuccessResponse>;
     claimRewards(): Promise<SuccessResponse>;
-    createSubAccount(args: CreateSubAccountParameters): Promise<CreateSubAccountResponse>;
-    evmUserModify(args: EvmUserModifyParameters): Promise<SuccessResponse>;
+    createSubAccount(params: CreateSubAccountParameters): Promise<CreateSubAccountResponse>;
+    evmUserModify(params: EvmUserModifyParameters): Promise<SuccessResponse>;
     noop(): Promise<SuccessResponse>;
-    registerReferrer(args: RegisterReferrerParameters): Promise<SuccessResponse>;
-    reserveRequestWeight(args: ReserveRequestWeightParameters): Promise<SuccessResponse>;
-    setDisplayName(args: SetDisplayNameParameters): Promise<SuccessResponse>;
-    setReferrer(args: SetReferrerParameters): Promise<SuccessResponse>;
-    subAccountModify(args: SubAccountModifyParameters): Promise<SuccessResponse>;
-    spotUser(args: SpotUserParameters): Promise<SuccessResponse>;
+    registerReferrer(params: RegisterReferrerParameters): Promise<SuccessResponse>;
+    reserveRequestWeight(params: ReserveRequestWeightParameters): Promise<SuccessResponse>;
+    setDisplayName(params: SetDisplayNameParameters): Promise<SuccessResponse>;
+    setReferrer(params: SetReferrerParameters): Promise<SuccessResponse>;
+    subAccountModify(params: SubAccountModifyParameters): Promise<SuccessResponse>;
+    spotUser(params: SpotUserParameters): Promise<SuccessResponse>;
 
     // Transfer
-    sendAsset(args: SendAssetParameters): Promise<SuccessResponse>;
-    spotSend(args: SpotSendParameters): Promise<SuccessResponse>;
-    subAccountSpotTransfer(args: SubAccountSpotTransferParameters): Promise<SuccessResponse>;
-    subAccountTransfer(args: SubAccountTransferParameters): Promise<SuccessResponse>;
-    usdClassTransfer(args: UsdClassTransferParameters): Promise<SuccessResponse>;
-    usdSend(args: UsdSendParameters): Promise<SuccessResponse>;
-    withdraw3(args: Withdraw3Parameters): Promise<SuccessResponse>;
+    sendAsset(params: SendAssetParameters): Promise<SuccessResponse>;
+    spotSend(params: SpotSendParameters): Promise<SuccessResponse>;
+    subAccountSpotTransfer(params: SubAccountSpotTransferParameters): Promise<SuccessResponse>;
+    subAccountTransfer(params: SubAccountTransferParameters): Promise<SuccessResponse>;
+    usdClassTransfer(params: UsdClassTransferParameters): Promise<SuccessResponse>;
+    usdSend(params: UsdSendParameters): Promise<SuccessResponse>;
+    withdraw3(params: Withdraw3Parameters): Promise<SuccessResponse>;
 
     // Staking
-    cDeposit(args: CDepositParameters): Promise<SuccessResponse>;
-    cWithdraw(args: CWithdrawParameters): Promise<SuccessResponse>;
-    tokenDelegate(args: TokenDelegateParameters): Promise<SuccessResponse>;
+    cDeposit(params: CDepositParameters): Promise<SuccessResponse>;
+    cWithdraw(params: CWithdrawParameters): Promise<SuccessResponse>;
+    tokenDelegate(params: TokenDelegateParameters): Promise<SuccessResponse>;
 
     // Market
-    perpDeploy(args: PerpDeployParameters): Promise<SuccessResponse>;
-    spotDeploy(args: SpotDeployParameters): Promise<SuccessResponse>;
+    perpDeploy(params: PerpDeployParameters): Promise<SuccessResponse>;
+    spotDeploy(params: SpotDeployParameters): Promise<SuccessResponse>;
 
     // Vault
-    createVault(args: CreateVaultParameters): Promise<CreateVaultResponse>;
-    vaultDistribute(args: VaultDistributeParameters): Promise<SuccessResponse>;
-    vaultModify(args: VaultModifyParameters): Promise<SuccessResponse>;
-    vaultTransfer(args: VaultTransferParameters): Promise<SuccessResponse>;
+    createVault(params: CreateVaultParameters): Promise<CreateVaultResponse>;
+    vaultDistribute(params: VaultDistributeParameters): Promise<SuccessResponse>;
+    vaultModify(params: VaultModifyParameters): Promise<SuccessResponse>;
+    vaultTransfer(params: VaultTransferParameters): Promise<SuccessResponse>;
 
     // Multi-Sign
-    convertToMultiSigUser(args: ConvertToMultiSigUserParameters): Promise<SuccessResponse>;
-    multiSig(args: MultiSigParameters): Promise<BaseExchangeResponse>;
+    convertToMultiSigUser(params: ConvertToMultiSigUserParameters): Promise<SuccessResponse>;
+    multiSig(params: MultiSigParameters): Promise<BaseExchangeResponse>;
 
     // Validator
-    cSignerAction(args: CSignerActionParameters): Promise<SuccessResponse>;
-    cValidatorAction(args: CValidatorActionParameters): Promise<SuccessResponse>;
+    cSignerAction(params: CSignerActionParameters): Promise<SuccessResponse>;
+    cValidatorAction(params: CValidatorActionParameters): Promise<SuccessResponse>;
 }
 ```
 
@@ -552,26 +552,29 @@ class SubscriptionClient {
     });
 
     // Market
-    activeAssetCtx(args: WsActiveAssetCtxParameters, listener: (data: WsActiveAssetCtx | WsActiveSpotAssetCtx) => void): Promise<Subscription>;
-    allMids(listener: (data: WsAllMids) => void): Promise<Subscription>;
-    bbo(args: WsBboParameters, listener: (data: WsBbo) => void): Promise<Subscription>;
-    candle(args: WsCandleParameters, listener: (data: Candle) => void): Promise<Subscription>;
-    l2Book(args: WsL2BookParameters, listener: (data: Book) => void): Promise<Subscription>;
-    trades(args: WsTradesParameters, listener: (data: WsTrade[]) => void): Promise<Subscription>;
+    activeAssetCtx(params: WsActiveAssetCtxParameters, listener: (data: WsActiveAssetCtx | WsActiveSpotAssetCtx) => void): Promise<Subscription>;
+    allMids(params?: WsAllMidsParameters, listener: (data: WsAllMids) => void): Promise<Subscription>;
+    assetCtxs(params?: WsAssetCtxsParameters, listener: (data: WsAssetCtxs) => void): Promise<Subscription>;
+    bbo(params: WsBboParameters, listener: (data: WsBbo) => void): Promise<Subscription>;
+    candle(params: WsCandleParameters, listener: (data: Candle) => void): Promise<Subscription>;
+    l2Book(params: WsL2BookParameters, listener: (data: Book) => void): Promise<Subscription>;
+    trades(params: WsTradesParameters, listener: (data: WsTrade[]) => void): Promise<Subscription>;
 
     // Account
-    activeAssetData(args: WsActiveAssetDataParameters, listener: (data: ActiveAssetData) => void): Promise<Subscription>;
-    notification(args: WsNotificationParameters, listener: (data: WsNotification) => void): Promise<Subscription>;
-    userEvents(args: WsUserEventsParameters, listener: (data: WsUserEvent) => void): Promise<Subscription>;
-    userFundings(args: WsUserFundingsParameters, listener: (data: WsUserFundings) => void): Promise<Subscription>;
-    userNonFundingLedgerUpdates(args: WsUserNonFundingLedgerUpdatesParameters, listener: (data: WsUserNonFundingLedgerUpdates) => void): Promise<Subscription>;
-    webData2(args: WsWebData2Parameters, listener: (data: WsWebData2) => void): Promise<Subscription>;
+    activeAssetData(params: WsActiveAssetDataParameters, listener: (data: ActiveAssetData) => void): Promise<Subscription>;
+    clearinghouseState(params: WsClearinghouseStateParameters, listener: (data: WsClearinghouseState) => void): Promise<Subscription>;
+    notification(params: WsNotificationParameters, listener: (data: WsNotification) => void): Promise<Subscription>;
+    userEvents(params: WsUserEventsParameters, listener: (data: WsUserEvent) => void): Promise<Subscription>;
+    userFundings(params: WsUserFundingsParameters, listener: (data: WsUserFundings) => void): Promise<Subscription>;
+    userNonFundingLedgerUpdates(params: WsUserNonFundingLedgerUpdatesParameters, listener: (data: WsUserNonFundingLedgerUpdates) => void): Promise<Subscription>;
+    webData2(params: WsWebData2Parameters, listener: (data: WsWebData2) => void): Promise<Subscription>;
 
     // Order
-    orderUpdates(args: WsOrderUpdatesParameters, listener: (data: OrderStatus<Order>[]) => void): Promise<Subscription>;
-    userFills(args: WsUserFillsParameters, listener: (data: WsUserFills) => void): Promise<Subscription>;
-    userTwapHistory(args: WsUserTwapHistoryParameters, listener: (data: WsUserTwapHistory) => void): Promise<Subscription>;
-    userTwapSliceFills(args: WsUserTwapSliceFillsParameters, listener: (data: WsUserTwapSliceFills) => void): Promise<Subscription>;
+    openOrders(params: WsOpenOrdersParameters, listener: (data: WsOpenOrders) => void): Promise<Subscription>;
+    orderUpdates(params: WsOrderUpdatesParameters, listener: (data: OrderStatus<Order>[]) => void): Promise<Subscription>;
+    userFills(params: WsUserFillsParameters, listener: (data: WsUserFills) => void): Promise<Subscription>;
+    userTwapHistory(params: WsUserTwapHistoryParameters, listener: (data: WsUserTwapHistory) => void): Promise<Subscription>;
+    userTwapSliceFills(params: WsUserTwapSliceFillsParameters, listener: (data: WsUserTwapSliceFills) => void): Promise<Subscription>;
 
     // Explorer (RPC endpoint)
     explorerBlock(listener: (data: WsBlockDetails[]) => void): Promise<Subscription>;
