@@ -1,6 +1,6 @@
 /**
  * Builds the Deno library into a bundle and calculates the bundle size
- * Command: deno run -A build/bundle.ts
+ * Command: deno run --allow-env --allow-read --allow-write --allow-run build/bundle.ts
  */
 
 import { build } from "npm:esbuild@0.25.5";

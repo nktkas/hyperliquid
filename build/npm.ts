@@ -1,6 +1,6 @@
 /**
  * Builds the Deno library for working with NodeJS or publishing to npm
- * Command: deno run -A build/npm.ts
+ * Command: deno run --allow-env --allow-read --allow-write --allow-run build/npm.ts
  */
 
 import { build, emptyDir } from "jsr:@deno/dnt@^0.42.1";
