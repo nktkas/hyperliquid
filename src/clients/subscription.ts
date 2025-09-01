@@ -625,7 +625,7 @@ export class SubscriptionClient<
         listener: (data: WsUserEvent) => void,
     ): Promise<Subscription> {
         const payload = { type: "userEvents", ...params } satisfies WsUserEventsRequest;
-        return this.transport.subscribe<WsUserEvent>("user", payload, (e) => {
+        return this.transport.subscribe<WsUserEvent>(payload.type, payload, (e) => {
             listener(e.detail);
         });
     }
