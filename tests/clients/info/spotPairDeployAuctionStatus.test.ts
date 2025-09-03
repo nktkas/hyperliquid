@@ -1,17 +1,13 @@
-import type { InfoClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import { DeployAuctionStatus } from "@nktkas/hyperliquid/schemas";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { runTest } from "./_t.ts";
 
-export type MethodReturnType = Awaited<ReturnType<InfoClient["spotPairDeployAuctionStatus"]>>;
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(_t: Deno.TestContext, client: InfoClient) {
-    const data = await client.spotPairDeployAuctionStatus();
-    schemaCoverage(MethodReturnType, [data], {
-        ignoreTypesByPath: {
-            "#/properties/currentGas": ["string", "null"],
-            "#/properties/endGas": ["string", "null"],
-        },
+runTest("spotPairDeployAuctionStatus", async (_t, client) => {
+    const data = await Promise.all([
+        client.spotPairDeployAuctionStatus(),
+    ]);
+    schemaCoverage(DeployAuctionStatus, data, {
+        ignoreNullTypes: ["#/properties/currentGas"],
+        ignoreDefinedTypes: ["#/properties/endGas"],
     });
-}
-
-runTest("spotPairDeployAuctionStatus", testFn);
+});

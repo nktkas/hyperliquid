@@ -1,12 +1,11 @@
-import type { InfoClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import { ValidatorSummary } from "@nktkas/hyperliquid/schemas";
+import * as v from "valibot";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { runTest } from "./_t.ts";
 
-export type MethodReturnType = Awaited<ReturnType<InfoClient["validatorSummaries"]>>;
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(_t: Deno.TestContext, client: InfoClient) {
-    const data = await client.validatorSummaries();
-    schemaCoverage(MethodReturnType, [data]);
-}
-
-runTest("validatorSummaries", testFn);
+runTest("validatorSummaries", async (_t, client) => {
+    const data = await Promise.all([
+        client.validatorSummaries(),
+    ]);
+    schemaCoverage(v.array(ValidatorSummary), data);
+});

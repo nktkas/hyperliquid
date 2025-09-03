@@ -1,12 +1,10 @@
-import type { InfoClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import { PerpsMetaAndAssetCtxs } from "@nktkas/hyperliquid/schemas";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { runTest } from "./_t.ts";
 
-export type MethodReturnType = Awaited<ReturnType<InfoClient["metaAndAssetCtxs"]>>;
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(_t: Deno.TestContext, client: InfoClient) {
-    const data = await client.metaAndAssetCtxs();
-    schemaCoverage(MethodReturnType, [data]);
-}
-
-runTest("metaAndAssetCtxs", testFn);
+runTest("metaAndAssetCtxs", async (_t, client) => {
+    const data = await Promise.all([
+        client.metaAndAssetCtxs(),
+    ]);
+    schemaCoverage(PerpsMetaAndAssetCtxs, data);
+});

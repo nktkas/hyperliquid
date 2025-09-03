@@ -1,10 +1,9 @@
-import type { InfoClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import { VaultDetails } from "@nktkas/hyperliquid/schemas";
+import * as v from "valibot";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { runTest } from "./_t.ts";
 
-export type MethodReturnType = Awaited<ReturnType<InfoClient["vaultDetails"]>>;
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(_t: Deno.TestContext, client: InfoClient) {
+runTest("vaultDetails", async (_t, client) => {
     const data = await Promise.all([
         client.vaultDetails({ vaultAddress: "0x0000000000000000000000000000000000000000" }), // null
         client.vaultDetails({ vaultAddress: "0x1719884eb866cb12b2287399b15f7db5e7d775ea" }), // relationship.type = normal
@@ -14,7 +13,5 @@ async function testFn(_t: Deno.TestContext, client: InfoClient) {
             user: "0xe019d6167E7e324aEd003d94098496b6d986aB05",
         }),
     ]);
-    schemaCoverage(MethodReturnType, data);
-}
-
-runTest("vaultDetails", testFn);
+    schemaCoverage(v.nullable(VaultDetails), data);
+});

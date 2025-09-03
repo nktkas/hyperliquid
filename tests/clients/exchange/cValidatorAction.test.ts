@@ -1,21 +1,12 @@
+import { ApiRequestError } from "@nktkas/hyperliquid";
 import { assertRejects } from "jsr:@std/assert@1";
-import { ApiRequestError, type ExchangeClient, type InfoClient, type MultiSignClient } from "../../../mod.ts";
-import { schemaGenerator } from "../../_utils/schema/mod.ts";
 import { runTest } from "./_t.ts";
 
-export type MethodReturnType = Awaited<ReturnType<ExchangeClient["cValidatorAction"]>>;
-const _MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(
-    t: Deno.TestContext,
-    client: {
-        info: InfoClient;
-        exchange: ExchangeClient | MultiSignClient;
-    },
-) {
+runTest("cValidatorAction", async (t, clients) => {
     await t.step("changeProfile", async () => {
         await assertRejects(
-            () =>
-                client.exchange.cValidatorAction({
+            async () => {
+                await clients.exchange.cValidatorAction({
                     changeProfile: {
                         node_ip: { Ip: "1.2.3.4" },
                         name: "...",
@@ -25,7 +16,8 @@ async function testFn(
                         commission_bps: null,
                         signer: null,
                     },
-                }),
+                });
+            },
             ApiRequestError,
             "Unknown validator",
         );
@@ -33,8 +25,8 @@ async function testFn(
 
     await t.step("register", async () => {
         await assertRejects(
-            () =>
-                client.exchange.cValidatorAction({
+            async () => {
+                await clients.exchange.cValidatorAction({
                     register: {
                         profile: {
                             node_ip: { Ip: "1.2.3.4" },
@@ -47,7 +39,8 @@ async function testFn(
                         unjailed: false,
                         initial_wei: 1,
                     },
-                }),
+                });
+            },
             ApiRequestError,
             "Validator has delegations disabled",
         );
@@ -55,11 +48,11 @@ async function testFn(
 
     await t.step("unregister", async () => {
         await assertRejects(
-            () => client.exchange.cValidatorAction({ unregister: null }),
+            async () => {
+                await clients.exchange.cValidatorAction({ unregister: null });
+            },
             ApiRequestError,
             "Action disabled on this chain",
         );
     });
-}
-
-runTest("cValidatorAction", testFn);
+});

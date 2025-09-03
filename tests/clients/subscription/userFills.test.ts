@@ -1,25 +1,22 @@
+import { WsUserFills } from "@nktkas/hyperliquid/schemas";
 import { deadline } from "jsr:@std/async@1/deadline";
-import type { SubscriptionClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { runTest } from "./_t.ts";
 
-export type MethodReturnType = Parameters<Parameters<SubscriptionClient["userFills"]>[1]>[0];
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(_t: Deno.TestContext, client: SubscriptionClient) {
-    const data = await deadline(
-        new Promise((resolve) => {
-            client.userFills({ user: "0xe019d6167E7e324aEd003d94098496b6d986aB05" }, resolve);
-        }),
-        10_000,
-    );
-    schemaCoverage(MethodReturnType, [data], {
-        ignorePropertiesByPath: [
-            "#/properties/fills/items/properties/liquidation",
-        ],
-        ignoreTypesByPath: {
-            "#/properties/fills/items/properties/twapId": ["number"],
+runTest("userFills", "api", async (_t, client) => {
+    const data = await Promise.all([
+        deadline(
+            new Promise<WsUserFills>((resolve) => {
+                client.userFills({ user: "0xe019d6167E7e324aEd003d94098496b6d986aB05" }, resolve);
+            }),
+            10_000,
+        ),
+    ]);
+    schemaCoverage(WsUserFills, data, {
+        ignoreDefinedTypes: ["#/properties/fills/items/properties/liquidation"],
+        ignoreBranches: {
+            "#/properties/fills/items/properties/twapId": [0],
         },
+        ignoreUndefinedTypes: ["#/properties/isSnapshot"],
     });
-}
-
-runTest("userFills", testFn, "api");
+});

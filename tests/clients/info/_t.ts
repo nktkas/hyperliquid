@@ -1,12 +1,9 @@
 import { type Args, parseArgs } from "jsr:@std/cli@1/parse-args";
-import { HttpTransport, InfoClient } from "../../../mod.ts";
+import { HttpTransport, InfoClient } from "@nktkas/hyperliquid";
 
 // —————————— Arguments ——————————
 
-const cliArgs = parseArgs(Deno.args, { default: { wait: 0 }, string: ["_"] }) as Args<{
-    /** Delay to avoid rate limits */
-    wait: number;
-}>;
+const cliArgs = parseArgs(Deno.args, { default: { wait: 0 }, string: ["_"] }) as Args<{ wait: number }>;
 
 // —————————— Clients ——————————
 

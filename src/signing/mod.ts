@@ -1,14 +1,14 @@
 /**
- * This module contains functions for generating Hyperliquid transaction signatures
- * and interfaces to various wallet implementations.
+ * This module contains functions for generating Hyperliquid transaction signatures.
  *
  * @example Signing an L1 action
  * ```ts
- * import { actionSorter, signL1Action } from "@nktkas/hyperliquid/signing";
+ * import { signL1Action } from "@nktkas/hyperliquid/signing";
+ * import { CancelRequest, parser } from "@nktkas/hyperliquid/schemas";
  *
  * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly
  *
- * const action = actionSorter.cancel({
+ * const action = parser(CancelRequest.entries.action)({ // for correct signature generation
  *   type: "cancel",
  *   cancels: [
  *     { a: 0, o: 12345 },
@@ -22,18 +22,19 @@
  * const response = await fetch("https://api.hyperliquid.xyz/exchange", {
  *   method: "POST",
  *   headers: { "Content-Type": "application/json" },
- *   body: JSON.stringify({ action, signature, nonce }), // recommended to send the same formatted action
+ *   body: JSON.stringify({ action, signature, nonce }),
  * });
  * const body = await response.json();
  * ```
  *
  * @example Signing a user-signed action
  * ```ts
- * import { actionSorter, signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
+ * import { signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
+ * import { ApproveAgentRequest, parser } from "@nktkas/hyperliquid/schemas";
  *
  * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly
  *
- * const action = actionSorter.approveAgent({
+ * const action = parser(ApproveAgentRequest.entries.action)({ // for correct signature generation
  *   type: "approveAgent",
  *   signatureChainId: "0x66eee",
  *   hyperliquidChain: "Mainnet",
@@ -52,20 +53,21 @@
  * const response = await fetch("https://api.hyperliquid.xyz/exchange", {
  *   method: "POST",
  *   headers: { "Content-Type": "application/json" },
- *   body: JSON.stringify({ action, signature, nonce: action.nonce }), // recommended to send the same formatted action
+ *   body: JSON.stringify({ action, signature, nonce: action.nonce }),
  * });
  * const body = await response.json();
  * ```
  *
  * @example Signing a multi-signature action
  * ```ts
- * import { actionSorter, signL1Action, signMultiSigAction } from "@nktkas/hyperliquid/signing";
+ * import { signL1Action, signMultiSigAction } from "@nktkas/hyperliquid/signing";
+ * import { MultiSigRequest, parser, ScheduleCancelRequest } from "@nktkas/hyperliquid/schemas";
  * import { privateKeyToAccount } from "npm:viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // or `ethers`, private key directly
  * const multiSigUser = "0x...";
  *
- * const action = actionSorter.scheduleCancel({
+ * const action = parser(ScheduleCancelRequest.entries.action)({ // for correct signature generation
  *   type: "scheduleCancel",
  *   time: Date.now() + 10000,
  * });
@@ -80,7 +82,7 @@
  *   });
  * }));
  *
- * // or user-signed action
+ * // // or user-signed action
  * // const signatures = await Promise.all(["0x...", "0x..."].map(async (signerPrivKey) => {
  * //   return await signUserSignedAction({
  * //     wallet: signerPrivKey as `0x${string}`,
@@ -94,7 +96,7 @@
  * // }));
  *
  * // Then use signatures in the multi-sig action
- * const multiSigAction = actionSorter.multiSig({
+ * const multiSigAction = parser(MultiSigRequest.entries.action)({
  *   type: "multiSig",
  *   signatureChainId: "0x66eee",
  *   signatures,
@@ -110,7 +112,7 @@
  * const response = await fetch("https://api.hyperliquid.xyz/exchange", {
  *   method: "POST",
  *   headers: { "Content-Type": "application/json" },
- *   body: JSON.stringify({ action: multiSigAction, signature: multiSigSignature, nonce }), // recommended to send the same formatted action
+ *   body: JSON.stringify({ action: multiSigAction, signature: multiSigSignature, nonce }),
  * });
  * const body = await response.json();
  * ```
@@ -128,24 +130,119 @@ import {
     type Signature,
     signTypedData,
 } from "./_signTypedData/mod.ts";
-import { actionSorter, userSignedActionEip712Types } from "./_sorter.ts";
 
-export {
-    type AbstractWallet,
-    actionSorter,
-    getWalletAddress,
-    getWalletChainId,
-    type Signature,
-    userSignedActionEip712Types,
+export { type AbstractWallet, getWalletAddress, getWalletChainId, type Signature };
+
+/** EIP-712 type definitions for user-signed actions. */
+export const userSignedActionEip712Types = {
+    approveAgent: {
+        "HyperliquidTransaction:ApproveAgent": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "agentAddress", type: "address" },
+            { name: "agentName", type: "string" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    approveBuilderFee: {
+        "HyperliquidTransaction:ApproveBuilderFee": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "maxFeeRate", type: "string" },
+            { name: "builder", type: "address" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    cDeposit: {
+        "HyperliquidTransaction:CDeposit": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "wei", type: "uint64" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    convertToMultiSigUser: {
+        "HyperliquidTransaction:ConvertToMultiSigUser": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "signers", type: "string" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    cWithdraw: {
+        "HyperliquidTransaction:CWithdraw": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "wei", type: "uint64" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    multiSig: {
+        "HyperliquidTransaction:SendMultiSig": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "multiSigActionHash", type: "bytes32" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    sendAsset: {
+        "HyperliquidTransaction:SendAsset": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "destination", type: "string" },
+            { name: "sourceDex", type: "string" },
+            { name: "destinationDex", type: "string" },
+            { name: "token", type: "string" },
+            { name: "amount", type: "string" },
+            { name: "fromSubAccount", type: "string" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    spotSend: {
+        "HyperliquidTransaction:SpotSend": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "destination", type: "string" },
+            { name: "token", type: "string" },
+            { name: "amount", type: "string" },
+            { name: "time", type: "uint64" },
+        ],
+    },
+    tokenDelegate: {
+        "HyperliquidTransaction:TokenDelegate": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "validator", type: "address" },
+            { name: "wei", type: "uint64" },
+            { name: "isUndelegate", type: "bool" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    usdClassTransfer: {
+        "HyperliquidTransaction:UsdClassTransfer": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "amount", type: "string" },
+            { name: "toPerp", type: "bool" },
+            { name: "nonce", type: "uint64" },
+        ],
+    },
+    usdSend: {
+        "HyperliquidTransaction:UsdSend": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "destination", type: "string" },
+            { name: "amount", type: "string" },
+            { name: "time", type: "uint64" },
+        ],
+    },
+    withdraw3: {
+        "HyperliquidTransaction:Withdraw": [
+            { name: "hyperliquidChain", type: "string" },
+            { name: "destination", type: "string" },
+            { name: "amount", type: "string" },
+            { name: "time", type: "uint64" },
+        ],
+    },
 };
 
 /**
  * Create a hash of the L1 action.
  * @example
  * ```ts
- * import { actionSorter, createL1ActionHash } from "@nktkas/hyperliquid/signing";
+ * import { signL1Action } from "@nktkas/hyperliquid/signing";
+ * import { CancelRequest, parser } from "@nktkas/hyperliquid/schemas";
  *
- * const action = actionSorter.cancel({
+ * const action = parser(CancelRequest.entries.action)({ // for correct signature generation
  *   type: "cancel",
  *   cancels: [
  *     { a: 0, o: 12345 },
@@ -205,11 +302,12 @@ function toUint64Bytes(n: bigint | number | string): Uint8Array {
  * Sign an L1 action.
  * @example
  * ```ts
- * import { actionSorter, signL1Action } from "@nktkas/hyperliquid/signing";
+ * import { signL1Action } from "@nktkas/hyperliquid/signing";
+ * import { CancelRequest, parser } from "@nktkas/hyperliquid/schemas";
  *
  * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly
  *
- * const action = actionSorter.cancel({
+ * const action = parser(CancelRequest.entries.action)({ // for correct signature generation
  *   type: "cancel",
  *   cancels: [
  *     { a: 0, o: 12345 },
@@ -223,7 +321,7 @@ function toUint64Bytes(n: bigint | number | string): Uint8Array {
  * const response = await fetch("https://api.hyperliquid.xyz/exchange", {
  *   method: "POST",
  *   headers: { "Content-Type": "application/json" },
- *   body: JSON.stringify({ action, signature, nonce }), // recommended to send the same formatted action
+ *   body: JSON.stringify({ action, signature, nonce }),
  * });
  * const body = await response.json();
  * ```
@@ -280,11 +378,12 @@ export async function signL1Action(args: {
  * Sign a user-signed action.
  * @example
  * ```ts
- * import { actionSorter, signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
+ * import { signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
+ * import { ApproveAgentRequest, parser } from "@nktkas/hyperliquid/schemas";
  *
  * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly
  *
- * const action = actionSorter.approveAgent({
+ * const action = parser(ApproveAgentRequest.entries.action)({ // for correct signature generation
  *   type: "approveAgent",
  *   signatureChainId: "0x66eee",
  *   hyperliquidChain: "Mainnet",
@@ -303,7 +402,7 @@ export async function signL1Action(args: {
  * const response = await fetch("https://api.hyperliquid.xyz/exchange", {
  *   method: "POST",
  *   headers: { "Content-Type": "application/json" },
- *   body: JSON.stringify({ action, signature, nonce: action.nonce }), // recommended to send the same formatted action
+ *   body: JSON.stringify({ action, signature, nonce: action.nonce }),
  * });
  * const body = await response.json();
  * ```
@@ -363,13 +462,14 @@ export async function signUserSignedAction(args: {
  * Sign a multi-signature action.
  * @example
  * ```ts
- * import { actionSorter, signL1Action, signMultiSigAction } from "@nktkas/hyperliquid/signing";
+ * import { signL1Action, signMultiSigAction } from "@nktkas/hyperliquid/signing";
+ * import { MultiSigRequest, parser, ScheduleCancelRequest } from "@nktkas/hyperliquid/schemas";
  * import { privateKeyToAccount } from "npm:viem/accounts";
  *
- * const wallet = privateKeyToAccount("0x..."); // or ethers, private key directly
+ * const wallet = privateKeyToAccount("0x..."); // or `ethers`, private key directly
  * const multiSigUser = "0x...";
  *
- * const action = actionSorter.scheduleCancel({
+ * const action = parser(ScheduleCancelRequest.entries.action)({ // for correct signature generation
  *   type: "scheduleCancel",
  *   time: Date.now() + 10000,
  * });
@@ -384,7 +484,7 @@ export async function signUserSignedAction(args: {
  *   });
  * }));
  *
- * // or user-signed action
+ * // // or user-signed action
  * // const signatures = await Promise.all(["0x...", "0x..."].map(async (signerPrivKey) => {
  * //   return await signUserSignedAction({
  * //     wallet: signerPrivKey as `0x${string}`,
@@ -398,7 +498,7 @@ export async function signUserSignedAction(args: {
  * // }));
  *
  * // Then use signatures in the multi-sig action
- * const multiSigAction = actionSorter.multiSig({
+ * const multiSigAction = parser(MultiSigRequest.entries.action)({
  *   type: "multiSig",
  *   signatureChainId: "0x66eee",
  *   signatures,
@@ -414,7 +514,7 @@ export async function signUserSignedAction(args: {
  * const response = await fetch("https://api.hyperliquid.xyz/exchange", {
  *   method: "POST",
  *   headers: { "Content-Type": "application/json" },
- *   body: JSON.stringify({ action: multiSigAction, signature: multiSigSignature, nonce }), // recommended to send the same formatted action
+ *   body: JSON.stringify({ action: multiSigAction, signature: multiSigSignature, nonce }),
  * });
  * const body = await response.json();
  * ```

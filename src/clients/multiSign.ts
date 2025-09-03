@@ -3,16 +3,15 @@ import type {
     CancelSuccessResponse,
     CreateSubAccountResponse,
     CreateVaultResponse,
-    Hex,
+    MultiSigRequest,
     OrderSuccessResponse,
     SuccessResponse,
     TwapCancelSuccessResponse,
     TwapOrderSuccessResponse,
-} from "../types/mod.ts";
+} from "../schemas/mod.ts";
 import { ExchangeClient, type ExchangeClientParameters } from "./exchange.ts";
 import {
     type AbstractWallet,
-    type actionSorter,
     getWalletAddress,
     signL1Action,
     signUserSignedAction,
@@ -25,7 +24,7 @@ export interface MultiSignClientParameters<
     S extends readonly AbstractWallet[] = AbstractWallet[],
 > extends Omit<ExchangeClientParameters<T, S[0]>, "wallet"> {
     /** The multi-signature account address. */
-    multiSignAddress: Hex;
+    multiSignAddress: `0x${string}`;
     /** Array of wallets used for multi-signature operations. The first wallet acts as the leader. */
     signers: S;
 }
@@ -39,7 +38,7 @@ export class MultiSignClient<
     T extends IRequestTransport = IRequestTransport,
     S extends readonly AbstractWallet[] = AbstractWallet[],
 > extends ExchangeClient<T, S[0]> implements MultiSignClientParameters<T, S> {
-    multiSignAddress: Hex;
+    multiSignAddress: `0x${string}`;
     signers: S;
 
     /**
@@ -92,12 +91,11 @@ export class MultiSignClient<
             | TwapCancelSuccessResponse,
     >(
         request: {
-            action: Parameters<
-                typeof actionSorter[
-                    Exclude<keyof typeof actionSorter, keyof typeof userSignedActionEip712Types>
-                ]
-            >[0];
-            vaultAddress?: Hex;
+            action: Exclude<
+                MultiSigRequest["action"]["payload"]["action"],
+                { type: keyof typeof userSignedActionEip712Types }
+            >;
+            vaultAddress?: `0x${string}`;
             expiresAfter: number | undefined;
         },
         signal?: AbortSignal,
@@ -144,11 +142,10 @@ export class MultiSignClient<
             | TwapCancelSuccessResponse,
     >(
         request: {
-            action: Parameters<
-                typeof actionSorter[
-                    Exclude<Extract<keyof typeof actionSorter, keyof typeof userSignedActionEip712Types>, "multiSig">
-                ]
-            >[0];
+            action: Extract<
+                MultiSigRequest["action"]["payload"]["action"],
+                { type: keyof typeof userSignedActionEip712Types }
+            >;
         },
         signal?: AbortSignal,
     ): Promise<T> {

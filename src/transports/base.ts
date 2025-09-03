@@ -1,4 +1,4 @@
-import { HyperliquidError } from "../base.ts";
+import { HyperliquidError } from "../errors.ts";
 
 /**
  * Interface representing a REST transport.
@@ -45,7 +45,7 @@ export interface Subscription {
     resubscribeSignal?: AbortSignal;
 }
 
-/** Base class for all transport-related errors. */
+/** Thrown when a transport error occurs. */
 export class TransportError extends HyperliquidError {
     constructor(message?: string, options?: ErrorOptions) {
         super(message, options);

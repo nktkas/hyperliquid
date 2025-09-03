@@ -1,25 +1,23 @@
-import type { InfoClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import { SpotDeployState } from "@nktkas/hyperliquid/schemas";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { runTest } from "./_t.ts";
 
-export type MethodReturnType = Awaited<ReturnType<InfoClient["spotDeployState"]>>;
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(_t: Deno.TestContext, client: InfoClient) {
+runTest("spotDeployState", async (_t, client) => {
     const data = await Promise.all([
         client.spotDeployState({ user: "0x051dbfc562d44e4a01ebb986da35a47ab4f346db" }), // states.fullName = string
         client.spotDeployState({ user: "0xd8cb8d9747f50be8e423c698f9104ee090540961" }), // states.fullName = null
         client.spotDeployState({ user: "0x051dbfc562d44e4a01ebb986da35a47ab4f346db" }), // states.maxSupply = string
         client.spotDeployState({ user: "0xd8cb8d9747f50be8e423c698f9104ee090540961" }), // states.maxSupply = null
     ]);
-    schemaCoverage(MethodReturnType, data, {
-        ignoreEmptyArrayPaths: [
-            "#/properties/states/items/properties/blacklistUsers",
+    schemaCoverage(SpotDeployState, data, {
+        ignoreEmptyArray: ["#/properties/states/items/properties/blacklistUsers"],
+        ignoreDefinedTypes: [
+            "#/properties/gasAuction/properties/currentGas",
+            "#/properties/gasAuction/properties/endGas",
         ],
-        ignoreTypesByPath: {
-            "#/properties/gasAuction/properties/currentGas": ["string", "null"],
-            "#/properties/gasAuction/properties/endGas": ["string", "null"],
-        },
+        ignoreNullTypes: [
+            "#/properties/gasAuction/properties/endGas",
+            "#/properties/gasAuction/properties/currentGas",
+        ],
     });
-}
-
-runTest("spotDeployState", testFn);
+});

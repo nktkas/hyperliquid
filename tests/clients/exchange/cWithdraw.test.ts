@@ -1,24 +1,16 @@
-import type { ExchangeClient, InfoClient, MultiSignClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import { SuccessResponse } from "@nktkas/hyperliquid/schemas";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { runTest } from "./_t.ts";
 
-export type MethodReturnType = Awaited<ReturnType<ExchangeClient["cWithdraw"]>>;
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(
-    _t: Deno.TestContext,
-    client: {
-        info: InfoClient;
-        exchange: ExchangeClient | MultiSignClient;
-    },
-) {
+runTest("cWithdraw", { evm: "0.00000001" }, async (_t, clients) => {
     // —————————— Prepare ——————————
 
-    await client.exchange.cDeposit({ wei: 1 });
+    await clients.exchange.cDeposit({ wei: 1 });
 
     // —————————— Test ——————————
 
-    const data = await client.exchange.cWithdraw({ wei: 1 });
-    schemaCoverage(MethodReturnType, [data]);
-}
-
-runTest("cWithdraw", testFn, { evm: "0.00000001" });
+    const data = await Promise.all([
+        clients.exchange.cWithdraw({ wei: 1 }),
+    ]);
+    schemaCoverage(SuccessResponse, data);
+});

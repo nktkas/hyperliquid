@@ -9,7 +9,7 @@ await emptyDir("./build/npm");
 await build({
     entryPoints: [
         { name: ".", path: "./mod.ts" },
-        { name: "./types", path: "./src/types/mod.ts" },
+        { name: "./schemas", path: "./src/schemas/mod.ts" },
         { name: "./signing", path: "./src/signing/mod.ts" },
     ],
     outDir: "./build/npm",

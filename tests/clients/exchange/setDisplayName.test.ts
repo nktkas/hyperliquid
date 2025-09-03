@@ -1,18 +1,10 @@
-import type { ExchangeClient, InfoClient, MultiSignClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import { SuccessResponse } from "@nktkas/hyperliquid/schemas";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { runTest } from "./_t.ts";
 
-export type MethodReturnType = Awaited<ReturnType<ExchangeClient["setDisplayName"]>>;
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(
-    _t: Deno.TestContext,
-    client: {
-        info: InfoClient;
-        exchange: ExchangeClient | MultiSignClient;
-    },
-) {
-    const data = await client.exchange.setDisplayName({ displayName: "" });
-    schemaCoverage(MethodReturnType, [data]);
-}
-
-runTest("setDisplayName", testFn);
+runTest("setDisplayName", async (_t, clients) => {
+    const data = await Promise.all([
+        clients.exchange.setDisplayName({ displayName: "" }),
+    ]);
+    schemaCoverage(SuccessResponse, data);
+});

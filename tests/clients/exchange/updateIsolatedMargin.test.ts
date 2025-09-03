@@ -1,26 +1,18 @@
+import { SuccessResponse } from "@nktkas/hyperliquid/schemas";
 import { BigNumber } from "npm:bignumber.js@9";
-import type { ExchangeClient, InfoClient, MultiSignClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { formatPrice, formatSize, getAssetData, runTest } from "./_t.ts";
 
-export type MethodReturnType = Awaited<ReturnType<ExchangeClient["updateIsolatedMargin"]>>;
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(
-    _t: Deno.TestContext,
-    client: {
-        info: InfoClient;
-        exchange: ExchangeClient | MultiSignClient;
-    },
-) {
+runTest("updateIsolatedMargin", { perp: "15" }, async (_t, clients) => {
     // —————————— Prepare ——————————
 
-    const { id, universe, ctx } = await getAssetData("ETH");
+    const { id, universe, ctx } = await getAssetData("SOL");
     const pxUp = formatPrice(new BigNumber(ctx.markPx).times(1.01), universe.szDecimals);
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);
 
-    await client.exchange.updateLeverage({ asset: id, isCross: false, leverage: 1 });
-    await client.exchange.order({
+    await clients.exchange.updateLeverage({ asset: id, isCross: false, leverage: 1 });
+    await clients.exchange.order({
         orders: [{
             a: id,
             b: true,
@@ -35,12 +27,14 @@ async function testFn(
     // —————————— Test ——————————
 
     try {
-        const data = await client.exchange.updateIsolatedMargin({ asset: id, isBuy: true, ntli: 1 });
-        schemaCoverage(MethodReturnType, [data]);
+        const data = await Promise.all([
+            clients.exchange.updateIsolatedMargin({ asset: id, isBuy: true, ntli: 1 }),
+        ]);
+        schemaCoverage(SuccessResponse, data);
     } finally {
         // —————————— Cleanup ——————————
 
-        await client.exchange.order({
+        await clients.exchange.order({
             orders: [{
                 a: id,
                 b: false,
@@ -52,6 +46,4 @@ async function testFn(
             grouping: "na",
         });
     }
-}
-
-runTest("updateIsolatedMargin", testFn, { perp: "15" });
+});

@@ -1,100 +1,101 @@
 import type { IRequestTransport } from "../transports/base.ts";
-import type {
-    ActiveAssetData,
+import {
+    type ActiveAssetData,
     ActiveAssetDataRequest,
-    AllMids,
+    type AllMids,
     AllMidsRequest,
-    BlockDetails,
+    type BlockDetails,
     BlockDetailsRequest,
-    BlockDetailsResponse,
-    Book,
-    Candle,
+    type BlockDetailsResponse,
+    type Book,
+    type Candle,
     CandleSnapshotRequest,
     ClearinghouseStateRequest,
-    Delegation,
+    type Delegation,
     DelegationsRequest,
     DelegatorHistoryRequest,
-    DelegatorReward,
+    type DelegatorReward,
     DelegatorRewardsRequest,
-    DelegatorSummary,
+    type DelegatorSummary,
     DelegatorSummaryRequest,
-    DelegatorUpdate,
-    DeployAuctionStatus,
-    ExchangeStatus,
+    type DelegatorUpdate,
+    type DeployAuctionStatus,
+    type ExchangeStatus,
     ExchangeStatusRequest,
-    ExtraAgent,
+    type ExtraAgent,
     ExtraAgentsRequest,
-    Fill,
+    type Fill,
     FrontendOpenOrdersRequest,
-    FrontendOrder,
-    FundingHistory,
+    type FrontendOrder,
+    type FrontendOrderStatus,
+    type FundingHistory,
     FundingHistoryRequest,
     HistoricalOrdersRequest,
     IsVipRequest,
     L2BookRequest,
     LeadingVaultsRequest,
-    LegalCheck,
+    type LegalCheck,
     LegalCheckRequest,
     LiquidatableRequest,
-    MarginTable,
+    type MarginTable,
     MarginTableRequest,
     MaxBuilderFeeRequest,
     MaxMarketOrderNtlsRequest,
     MetaAndAssetCtxsRequest,
     MetaRequest,
-    MultiSigSigners,
+    type MultiSigSigners,
     OpenOrdersRequest,
-    Order,
-    OrderLookup,
-    OrderStatus,
+    type Order,
+    type OrderLookup,
     OrderStatusRequest,
+    parser,
     PerpDeployAuctionStatusRequest,
-    PerpDex,
+    type PerpDex,
     PerpDexsRequest,
     PerpsAtOpenInterestCapRequest,
-    PerpsClearinghouseState,
-    PerpsMeta,
-    PerpsMetaAndAssetCtxs,
-    PortfolioPeriods,
+    type PerpsClearinghouseState,
+    type PerpsMeta,
+    type PerpsMetaAndAssetCtxs,
+    type PortfolioPeriods,
     PortfolioRequest,
-    PredictedFunding,
+    type PredictedFunding,
     PredictedFundingsRequest,
-    PreTransferCheck,
+    type PreTransferCheck,
     PreTransferCheckRequest,
-    Referral,
+    type Referral,
     ReferralRequest,
-    SpotClearinghouseState,
+    type SpotClearinghouseState,
     SpotClearinghouseStateRequest,
-    SpotDeployState,
+    type SpotDeployState,
     SpotDeployStateRequest,
-    SpotMeta,
-    SpotMetaAndAssetCtxs,
+    type SpotMeta,
+    type SpotMetaAndAssetCtxs,
     SpotMetaAndAssetCtxsRequest,
     SpotMetaRequest,
     SpotPairDeployAuctionStatusRequest,
-    SubAccount,
+    type SubAccount,
     SubAccountsRequest,
-    TokenDetails,
+    type TokenDetails,
     TokenDetailsRequest,
-    TwapHistory,
+    type TwapHistory,
     TwapHistoryRequest,
-    TwapSliceFill,
-    TxDetails,
+    type TwapSliceFill,
+    type TxDetails,
     TxDetailsRequest,
-    TxDetailsResponse,
+    type TxDetailsResponse,
     UserDetailsRequest,
-    UserDetailsResponse,
-    UserFees,
+    type UserDetailsResponse,
+    type UserFees,
     UserFeesRequest,
     UserFillsByTimeRequest,
     UserFillsRequest,
     UserFundingRequest,
-    UserFundingUpdate,
-    UserNonFundingLedgerUpdate,
+    type UserFundingUpdate,
+    type UserNonFundingLedgerUpdate,
     UserNonFundingLedgerUpdatesRequest,
-    UserRateLimit,
+    type UserRateLimit,
     UserRateLimitRequest,
-    UserRole,
+    type UserRole,
     UserRoleRequest,
     UserToMultiSigSignersRequest,
     UserTwapSliceFillsByTimeRequest,
@@ -102,14 +103,14 @@ import type {
     UserVaultEquitiesRequest,
     ValidatorL1VotesRequest,
     ValidatorSummariesRequest,
-    ValidatorSummary,
-    VaultDetails,
+    type ValidatorSummary,
+    type VaultDetails,
     VaultDetailsRequest,
-    VaultEquity,
-    VaultLeading,
+    type VaultEquity,
+    type VaultLeading,
     VaultSummariesRequest,
-    VaultSummary,
-} from "../types/mod.ts";
+    type VaultSummary,
+} from "../schemas/mod.ts";
 
 /** @see https://github.com/microsoft/TypeScript/issues/13923#issuecomment-2191862501 */
 type DeepImmutable<T> = {
@@ -180,8 +181,6 @@ export type ReferralParameters = Omit<ReferralRequest, "type">;
 export type SpotClearinghouseStateParameters = Omit<SpotClearinghouseStateRequest, "type">;
 /** Request parameters for the {@linkcode InfoClient.spotDeployState} method. */
 export type SpotDeployStateParameters = Omit<SpotDeployStateRequest, "type">;
-/** Request parameters for the {@linkcode InfoClient.spotPairDeployAuctionStatus} method. */
-export type SpotPairDeployAuctionStatusParameters = Omit<SpotPairDeployAuctionStatusRequest, "type">;
 /** Request parameters for the {@linkcode InfoClient.subAccounts} method. */
 export type SubAccountsParameters = Omit<SubAccountsRequest, "type">;
 /** Request parameters for the {@linkcode InfoClient.tokenDetails} method. */
@@ -265,7 +264,10 @@ export class InfoClient<
         params: DeepImmutable<ActiveAssetDataParameters>,
         signal?: AbortSignal,
     ): Promise<ActiveAssetData> {
-        const request = { type: "activeAssetData", ...params } satisfies ActiveAssetDataRequest;
+        const request = parser(ActiveAssetDataRequest)({
+            type: "activeAssetData",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -297,7 +299,10 @@ export class InfoClient<
         const params = params_or_signal instanceof AbortSignal ? {} : params_or_signal;
         const signal = params_or_signal instanceof AbortSignal ? params_or_signal : maybeSignal;
 
-        const request = { type: "allMids", ...params } satisfies AllMidsRequest;
+        const request = parser(AllMidsRequest)({
+            type: "allMids",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -321,11 +326,15 @@ export class InfoClient<
      * ```
      */
     blockDetails(
+        // allow only those transports that support `explorer` requests
         this: T extends { request(endpoint: "explorer", ...args: unknown[]): unknown } ? this : never,
         params: DeepImmutable<BlockDetailsParameters>,
         signal?: AbortSignal,
     ): Promise<BlockDetails> {
-        const request = { type: "blockDetails", ...params } satisfies BlockDetailsRequest;
+        const request = parser(BlockDetailsRequest)({
+            type: "blockDetails",
+            ...params,
+        });
         return this.transport.request<BlockDetailsResponse>("explorer", request, signal)
             .then(({ blockDetails }) => blockDetails);
     }
@@ -357,7 +366,10 @@ export class InfoClient<
         params: DeepImmutable<CandleSnapshotParameters>,
         signal?: AbortSignal,
     ): Promise<Candle[]> {
-        const request = { type: "candleSnapshot", req: params } satisfies CandleSnapshotRequest;
+        const request = parser(CandleSnapshotRequest)({
+            type: "candleSnapshot",
+            req: params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -384,7 +396,10 @@ export class InfoClient<
         params: DeepImmutable<ClearinghouseStateParameters>,
         signal?: AbortSignal,
     ): Promise<PerpsClearinghouseState> {
-        const request = { type: "clearinghouseState", ...params } satisfies ClearinghouseStateRequest;
+        const request = parser(ClearinghouseStateRequest)({
+            type: "clearinghouseState",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -411,7 +426,10 @@ export class InfoClient<
         params: DeepImmutable<DelegationsParameters>,
         signal?: AbortSignal,
     ): Promise<Delegation[]> {
-        const request = { type: "delegations", ...params } satisfies DelegationsRequest;
+        const request = parser(DelegationsRequest)({
+            type: "delegations",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -438,7 +456,10 @@ export class InfoClient<
         params: DeepImmutable<DelegatorHistoryParameters>,
         signal?: AbortSignal,
     ): Promise<DelegatorUpdate[]> {
-        const request = { type: "delegatorHistory", ...params } satisfies DelegatorHistoryRequest;
+        const request = parser(DelegatorHistoryRequest)({
+            type: "delegatorHistory",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -465,7 +486,10 @@ export class InfoClient<
         params: DeepImmutable<DelegatorRewardsParameters>,
         signal?: AbortSignal,
     ): Promise<DelegatorReward[]> {
-        const request = { type: "delegatorRewards", ...params } satisfies DelegatorRewardsRequest;
+        const request = parser(DelegatorRewardsRequest)({
+            type: "delegatorRewards",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -492,7 +516,10 @@ export class InfoClient<
         params: DeepImmutable<DelegatorSummaryParameters>,
         signal?: AbortSignal,
     ): Promise<DelegatorSummary> {
-        const request = { type: "delegatorSummary", ...params } satisfies DelegatorSummaryRequest;
+        const request = parser(DelegatorSummaryRequest)({
+            type: "delegatorSummary",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -515,7 +542,9 @@ export class InfoClient<
      * ```
      */
     exchangeStatus(signal?: AbortSignal): Promise<ExchangeStatus> {
-        const request = { type: "exchangeStatus" } satisfies ExchangeStatusRequest;
+        const request = parser(ExchangeStatusRequest)({
+            type: "exchangeStatus",
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -542,7 +571,10 @@ export class InfoClient<
         params: DeepImmutable<ExtraAgentsParameters>,
         signal?: AbortSignal,
     ): Promise<ExtraAgent[]> {
-        const request = { type: "extraAgents", ...params } satisfies ExtraAgentsRequest;
+        const request = parser(ExtraAgentsRequest)({
+            type: "extraAgents",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -569,7 +601,10 @@ export class InfoClient<
         params: DeepImmutable<FrontendOpenOrdersParameters>,
         signal?: AbortSignal,
     ): Promise<FrontendOrder[]> {
-        const request = { type: "frontendOpenOrders", ...params } satisfies FrontendOpenOrdersRequest;
+        const request = parser(FrontendOpenOrdersRequest)({
+            type: "frontendOpenOrders",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -599,7 +634,10 @@ export class InfoClient<
         params: DeepImmutable<FundingHistoryParameters>,
         signal?: AbortSignal,
     ): Promise<FundingHistory[]> {
-        const request = { type: "fundingHistory", ...params } satisfies FundingHistoryRequest;
+        const request = parser(FundingHistoryRequest)({
+            type: "fundingHistory",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -625,8 +663,11 @@ export class InfoClient<
     historicalOrders(
         params: DeepImmutable<HistoricalOrdersParameters>,
         signal?: AbortSignal,
-    ): Promise<OrderStatus<FrontendOrder>[]> {
-        const request = { type: "historicalOrders", ...params } satisfies HistoricalOrdersRequest;
+    ): Promise<FrontendOrderStatus[]> {
+        const request = parser(HistoricalOrdersRequest)({
+            type: "historicalOrders",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -653,7 +694,10 @@ export class InfoClient<
         params: DeepImmutable<IsVipParameters>,
         signal?: AbortSignal,
     ): Promise<boolean | null> {
-        const request = { type: "isVip", ...params } satisfies IsVipRequest;
+        const request = parser(IsVipRequest)({
+            type: "isVip",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -680,7 +724,10 @@ export class InfoClient<
         params: DeepImmutable<L2BookParameters>,
         signal?: AbortSignal,
     ): Promise<Book> {
-        const request = { type: "l2Book", ...params } satisfies L2BookRequest;
+        const request = parser(L2BookRequest)({
+            type: "l2Book",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -707,7 +754,10 @@ export class InfoClient<
         params: DeepImmutable<LeadingVaultsParameters>,
         signal?: AbortSignal,
     ): Promise<VaultLeading[]> {
-        const request = { type: "leadingVaults", ...params } satisfies LeadingVaultsRequest;
+        const request = parser(LeadingVaultsRequest)({
+            type: "leadingVaults",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -734,7 +784,10 @@ export class InfoClient<
         params: DeepImmutable<LegalCheckParameters>,
         signal?: AbortSignal,
     ): Promise<LegalCheck> {
-        const request = { type: "legalCheck", ...params } satisfies LegalCheckRequest;
+        const request = parser(LegalCheckRequest)({
+            type: "legalCheck",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -757,7 +810,9 @@ export class InfoClient<
      * ```
      */
     liquidatable(signal?: AbortSignal): Promise<unknown[]> {
-        const request = { type: "liquidatable" } satisfies LiquidatableRequest;
+        const request = parser(LiquidatableRequest)({
+            type: "liquidatable",
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -784,7 +839,10 @@ export class InfoClient<
         params: DeepImmutable<MarginTableParameters>,
         signal?: AbortSignal,
     ): Promise<MarginTable> {
-        const request = { type: "marginTable", ...params } satisfies MarginTableRequest;
+        const request = parser(MarginTableRequest)({
+            type: "marginTable",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -811,7 +869,10 @@ export class InfoClient<
         params: DeepImmutable<MaxBuilderFeeParameters>,
         signal?: AbortSignal,
     ): Promise<number> {
-        const request = { type: "maxBuilderFee", ...params } satisfies MaxBuilderFeeRequest;
+        const request = parser(MaxBuilderFeeRequest)({
+            type: "maxBuilderFee",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -834,7 +895,9 @@ export class InfoClient<
      * ```
      */
     maxMarketOrderNtls(signal?: AbortSignal): Promise<[number, string][]> {
-        const request = { type: "maxMarketOrderNtls" } satisfies MaxMarketOrderNtlsRequest;
+        const request = parser(MaxMarketOrderNtlsRequest)({
+            type: "maxMarketOrderNtls",
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -866,7 +929,10 @@ export class InfoClient<
         const params = params_or_signal instanceof AbortSignal ? {} : params_or_signal;
         const signal = params_or_signal instanceof AbortSignal ? params_or_signal : maybeSignal;
 
-        const request = { type: "meta", ...params } satisfies MetaRequest;
+        const request = parser(MetaRequest)({
+            type: "meta",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -900,7 +966,10 @@ export class InfoClient<
         const params = params_or_signal instanceof AbortSignal ? {} : params_or_signal;
         const signal = params_or_signal instanceof AbortSignal ? params_or_signal : maybeSignal;
 
-        const request = { type: "metaAndAssetCtxs", ...params } satisfies MetaAndAssetCtxsRequest;
+        const request = parser(MetaAndAssetCtxsRequest)({
+            type: "metaAndAssetCtxs",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -927,7 +996,10 @@ export class InfoClient<
         params: DeepImmutable<OpenOrdersParameters>,
         signal?: AbortSignal,
     ): Promise<Order[]> {
-        const request = { type: "openOrders", ...params } satisfies OpenOrdersRequest;
+        const request = parser(OpenOrdersRequest)({
+            type: "openOrders",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -954,7 +1026,10 @@ export class InfoClient<
         params: DeepImmutable<OrderStatusParameters>,
         signal?: AbortSignal,
     ): Promise<OrderLookup> {
-        const request = { type: "orderStatus", ...params } satisfies OrderStatusRequest;
+        const request = parser(OrderStatusRequest)({
+            type: "orderStatus",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -977,7 +1052,9 @@ export class InfoClient<
      * ```
      */
     perpDeployAuctionStatus(signal?: AbortSignal): Promise<DeployAuctionStatus> {
-        const request = { type: "perpDeployAuctionStatus" } satisfies PerpDeployAuctionStatusRequest;
+        const request = parser(PerpDeployAuctionStatusRequest)({
+            type: "perpDeployAuctionStatus",
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1000,7 +1077,9 @@ export class InfoClient<
      * ```
      */
     perpDexs(signal?: AbortSignal): Promise<(PerpDex | null)[]> {
-        const request = { type: "perpDexs" } satisfies PerpDexsRequest;
+        const request = parser(PerpDexsRequest)({
+            type: "perpDexs",
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1034,7 +1113,10 @@ export class InfoClient<
         const params = params_or_signal instanceof AbortSignal ? {} : params_or_signal;
         const signal = params_or_signal instanceof AbortSignal ? params_or_signal : maybeSignal;
 
-        const request = { type: "perpsAtOpenInterestCap", ...params } satisfies PerpsAtOpenInterestCapRequest;
+        const request = parser(PerpsAtOpenInterestCapRequest)({
+            type: "perpsAtOpenInterestCap",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1061,7 +1143,10 @@ export class InfoClient<
         params: DeepImmutable<PortfolioParameters>,
         signal?: AbortSignal,
     ): Promise<PortfolioPeriods> {
-        const request = { type: "portfolio", ...params } satisfies PortfolioRequest;
+        const request = parser(PortfolioRequest)({
+            type: "portfolio",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1084,7 +1169,9 @@ export class InfoClient<
      * ```
      */
     predictedFundings(signal?: AbortSignal): Promise<PredictedFunding[]> {
-        const request = { type: "predictedFundings" } satisfies PredictedFundingsRequest;
+        const request = parser(PredictedFundingsRequest)({
+            type: "predictedFundings",
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1111,7 +1198,10 @@ export class InfoClient<
         params: DeepImmutable<PreTransferCheckParameters>,
         signal?: AbortSignal,
     ): Promise<PreTransferCheck> {
-        const request = { type: "preTransferCheck", ...params } satisfies PreTransferCheckRequest;
+        const request = parser(PreTransferCheckRequest)({
+            type: "preTransferCheck",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1138,7 +1228,10 @@ export class InfoClient<
         params: DeepImmutable<ReferralParameters>,
         signal?: AbortSignal,
     ): Promise<Referral> {
-        const request = { type: "referral", ...params } satisfies ReferralRequest;
+        const request = parser(ReferralRequest)({
+            type: "referral",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1165,7 +1258,10 @@ export class InfoClient<
         params: DeepImmutable<SpotClearinghouseStateParameters>,
         signal?: AbortSignal,
     ): Promise<SpotClearinghouseState> {
-        const request = { type: "spotClearinghouseState", ...params } satisfies SpotClearinghouseStateRequest;
+        const request = parser(SpotClearinghouseStateRequest)({
+            type: "spotClearinghouseState",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1192,30 +1288,10 @@ export class InfoClient<
         params: DeepImmutable<SpotDeployStateParameters>,
         signal?: AbortSignal,
     ): Promise<SpotDeployState> {
-        const request = { type: "spotDeployState", ...params } satisfies SpotDeployStateRequest;
-        return this.transport.request("info", request, signal);
-    }
-
-    /**
-     * Request for the status of the spot deploy auction.
-     * @param signal - An {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal}. If this option is set, the request can be canceled by calling {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort | abort()} on the corresponding {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController | AbortController}.
-     * @returns Status of the spot deploy auction.
-     *
-     * @throws {TransportError} When the transport layer throws an error.
-     *
-     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-pair-deploy-auction
-     * @example
-     * ```ts
-     * import * as hl from "@nktkas/hyperliquid";
-     *
-     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
-     * const infoClient = new hl.InfoClient({ transport });
-     *
-     * const data = await infoClient.spotPairDeployAuctionStatus();
-     * ```
-     */
-    spotPairDeployAuctionStatus(signal?: AbortSignal): Promise<DeployAuctionStatus> {
-        const request = { type: "spotPairDeployAuctionStatus" } satisfies SpotPairDeployAuctionStatusRequest;
+        const request = parser(SpotDeployStateRequest)({
+            type: "spotDeployState",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1238,7 +1314,9 @@ export class InfoClient<
      * ```
      */
     spotMeta(signal?: AbortSignal): Promise<SpotMeta> {
-        const request = { type: "spotMeta" } satisfies SpotMetaRequest;
+        const request = parser(SpotMetaRequest)({
+            type: "spotMeta",
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1261,7 +1339,34 @@ export class InfoClient<
      * ```
      */
     spotMetaAndAssetCtxs(signal?: AbortSignal): Promise<SpotMetaAndAssetCtxs> {
-        const request = { type: "spotMetaAndAssetCtxs" } satisfies SpotMetaAndAssetCtxsRequest;
+        const request = parser(SpotMetaAndAssetCtxsRequest)({
+            type: "spotMetaAndAssetCtxs",
+        });
+        return this.transport.request("info", request, signal);
+    }
+
+    /**
+     * Request for the status of the spot deploy auction.
+     * @param signal - An {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal}. If this option is set, the request can be canceled by calling {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort | abort()} on the corresponding {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController | AbortController}.
+     * @returns Status of the spot deploy auction.
+     *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-pair-deploy-auction
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+     * const infoClient = new hl.InfoClient({ transport });
+     *
+     * const data = await infoClient.spotPairDeployAuctionStatus();
+     * ```
+     */
+    spotPairDeployAuctionStatus(signal?: AbortSignal): Promise<DeployAuctionStatus> {
+        const request = parser(SpotPairDeployAuctionStatusRequest)({
+            type: "spotPairDeployAuctionStatus",
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1288,7 +1393,10 @@ export class InfoClient<
         params: DeepImmutable<SubAccountsParameters>,
         signal?: AbortSignal,
     ): Promise<SubAccount[] | null> {
-        const request = { type: "subAccounts", ...params } satisfies SubAccountsRequest;
+        const request = parser(SubAccountsRequest)({
+            type: "subAccounts",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1315,7 +1423,10 @@ export class InfoClient<
         params: DeepImmutable<TokenDetailsParameters>,
         signal?: AbortSignal,
     ): Promise<TokenDetails> {
-        const request = { type: "tokenDetails", ...params } satisfies TokenDetailsRequest;
+        const request = parser(TokenDetailsRequest)({
+            type: "tokenDetails",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1342,7 +1453,10 @@ export class InfoClient<
         params: DeepImmutable<TwapHistoryParameters>,
         signal?: AbortSignal,
     ): Promise<TwapHistory[]> {
-        const request = { type: "twapHistory", ...params } satisfies TwapHistoryRequest;
+        const request = parser(TwapHistoryRequest)({
+            type: "twapHistory",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1366,11 +1480,15 @@ export class InfoClient<
      * ```
      */
     txDetails(
+        // allow only those transports that support `explorer` requests
         this: T extends { request(endpoint: "explorer", ...args: unknown[]): unknown } ? this : never,
         params: DeepImmutable<TxDetailsParameters>,
         signal?: AbortSignal,
     ): Promise<TxDetails> {
-        const request = { type: "txDetails", ...params } satisfies TxDetailsRequest;
+        const request = parser(TxDetailsRequest)({
+            type: "txDetails",
+            ...params,
+        });
         return this.transport.request<TxDetailsResponse>("explorer", request, signal)
             .then(({ tx }) => tx);
     }
@@ -1395,11 +1513,15 @@ export class InfoClient<
      * ```
      */
     userDetails(
+        // allow only those transports that support `explorer` requests
         this: T extends { request(endpoint: "explorer", ...args: unknown[]): unknown } ? this : never,
         params: DeepImmutable<UserDetailsParameters>,
         signal?: AbortSignal,
     ): Promise<TxDetails[]> {
-        const request = { type: "userDetails", ...params } satisfies UserDetailsRequest;
+        const request = parser(UserDetailsRequest)({
+            type: "userDetails",
+            ...params,
+        });
         return this.transport.request<UserDetailsResponse>("explorer", request, signal)
             .then(({ txs }) => txs);
     }
@@ -1427,7 +1549,10 @@ export class InfoClient<
         params: DeepImmutable<UserFeesParameters>,
         signal?: AbortSignal,
     ): Promise<UserFees> {
-        const request = { type: "userFees", ...params } satisfies UserFeesRequest;
+        const request = parser(UserFeesRequest)({
+            type: "userFees",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1454,7 +1579,10 @@ export class InfoClient<
         params: DeepImmutable<UserFillsParameters>,
         signal?: AbortSignal,
     ): Promise<Fill[]> {
-        const request = { type: "userFills", ...params } satisfies UserFillsRequest;
+        const request = parser(UserFillsRequest)({
+            type: "userFills",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1484,7 +1612,10 @@ export class InfoClient<
         params: DeepImmutable<UserFillsByTimeParameters>,
         signal?: AbortSignal,
     ): Promise<Fill[]> {
-        const request = { type: "userFillsByTime", ...params } satisfies UserFillsByTimeRequest;
+        const request = parser(UserFillsByTimeRequest)({
+            type: "userFillsByTime",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1514,7 +1645,10 @@ export class InfoClient<
         params: DeepImmutable<UserFundingParameters>,
         signal?: AbortSignal,
     ): Promise<UserFundingUpdate[]> {
-        const request = { type: "userFunding", ...params } satisfies UserFundingRequest;
+        const request = parser(UserFundingRequest)({
+            type: "userFunding",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1544,7 +1678,10 @@ export class InfoClient<
         params: DeepImmutable<UserNonFundingLedgerUpdatesParameters>,
         signal?: AbortSignal,
     ): Promise<UserNonFundingLedgerUpdate[]> {
-        const request = { type: "userNonFundingLedgerUpdates", ...params } satisfies UserNonFundingLedgerUpdatesRequest;
+        const request = parser(UserNonFundingLedgerUpdatesRequest)({
+            type: "userNonFundingLedgerUpdates",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1571,7 +1708,10 @@ export class InfoClient<
         params: DeepImmutable<UserRateLimitParameters>,
         signal?: AbortSignal,
     ): Promise<UserRateLimit> {
-        const request = { type: "userRateLimit", ...params } satisfies UserRateLimitRequest;
+        const request = parser(UserRateLimitRequest)({
+            type: "userRateLimit",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1598,7 +1738,10 @@ export class InfoClient<
         params: DeepImmutable<UserRoleParameters>,
         signal?: AbortSignal,
     ): Promise<UserRole> {
-        const request = { type: "userRole", ...params } satisfies UserRoleRequest;
+        const request = parser(UserRoleRequest)({
+            type: "userRole",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1625,7 +1768,10 @@ export class InfoClient<
         params: DeepImmutable<UserToMultiSigSignersParameters>,
         signal?: AbortSignal,
     ): Promise<MultiSigSigners | null> {
-        const request = { type: "userToMultiSigSigners", ...params } satisfies UserToMultiSigSignersRequest;
+        const request = parser(UserToMultiSigSignersRequest)({
+            type: "userToMultiSigSigners",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1652,7 +1798,10 @@ export class InfoClient<
         params: DeepImmutable<UserTwapSliceFillsParameters>,
         signal?: AbortSignal,
     ): Promise<TwapSliceFill[]> {
-        const request = { type: "userTwapSliceFills", ...params } satisfies UserTwapSliceFillsRequest;
+        const request = parser(UserTwapSliceFillsRequest)({
+            type: "userTwapSliceFills",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1682,7 +1831,10 @@ export class InfoClient<
         params: DeepImmutable<UserTwapSliceFillsByTimeParameters>,
         signal?: AbortSignal,
     ): Promise<TwapSliceFill[]> {
-        const request = { type: "userTwapSliceFillsByTime", ...params } satisfies UserTwapSliceFillsByTimeRequest;
+        const request = parser(UserTwapSliceFillsByTimeRequest)({
+            type: "userTwapSliceFillsByTime",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1709,7 +1861,10 @@ export class InfoClient<
         params: DeepImmutable<UserVaultEquitiesParameters>,
         signal?: AbortSignal,
     ): Promise<VaultEquity[]> {
-        const request = { type: "userVaultEquities", ...params } satisfies UserVaultEquitiesRequest;
+        const request = parser(UserVaultEquitiesRequest)({
+            type: "userVaultEquities",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1732,7 +1887,9 @@ export class InfoClient<
      * ```
      */
     validatorL1Votes(signal?: AbortSignal): Promise<unknown[]> {
-        const request = { type: "validatorL1Votes" } satisfies ValidatorL1VotesRequest;
+        const request = parser(ValidatorL1VotesRequest)({
+            type: "validatorL1Votes",
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1755,7 +1912,9 @@ export class InfoClient<
      * ```
      */
     validatorSummaries(signal?: AbortSignal): Promise<ValidatorSummary[]> {
-        const request = { type: "validatorSummaries" } satisfies ValidatorSummariesRequest;
+        const request = parser(ValidatorSummariesRequest)({
+            type: "validatorSummaries",
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1782,7 +1941,10 @@ export class InfoClient<
         params: DeepImmutable<VaultDetailsParameters>,
         signal?: AbortSignal,
     ): Promise<VaultDetails | null> {
-        const request = { type: "vaultDetails", ...params } satisfies VaultDetailsRequest;
+        const request = parser(VaultDetailsRequest)({
+            type: "vaultDetails",
+            ...params,
+        });
         return this.transport.request("info", request, signal);
     }
 
@@ -1805,7 +1967,9 @@ export class InfoClient<
      * ```
      */
     vaultSummaries(signal?: AbortSignal): Promise<VaultSummary[]> {
-        const request = { type: "vaultSummaries" } satisfies VaultSummariesRequest;
+        const request = parser(VaultSummariesRequest)({
+            type: "vaultSummaries",
+        });
         return this.transport.request("info", request, signal);
     }
 

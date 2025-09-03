@@ -1,23 +1,15 @@
+import { OrderSuccessResponse } from "@nktkas/hyperliquid/schemas";
 import { BigNumber } from "npm:bignumber.js@9";
-import type { ExchangeClient, InfoClient, MultiSignClient } from "../../../mod.ts";
-import { getWalletAddress } from "../../../src/signing/mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import { getWalletAddress } from "@nktkas/hyperliquid/signing";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { formatPrice, formatSize, getAssetData, randomCloid, runTest } from "./_t.ts";
 
-export type MethodReturnType = Awaited<ReturnType<ExchangeClient["batchModify"]>>;
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(
-    _t: Deno.TestContext,
-    client: {
-        info: InfoClient;
-        exchange: ExchangeClient | MultiSignClient;
-    },
-) {
+runTest("batchModify", { perp: "15" }, async (_t, clients) => {
     // —————————— Prepare ——————————
 
-    async function openOrder(client: ExchangeClient, id: number, pxDown: string, sz: string) {
+    async function openOrder(id: number, pxDown: string, sz: string) {
         const cloid = randomCloid();
-        const orderResp = await client.order({
+        const orderResp = await clients.exchange.order({
             orders: [{
                 a: id,
                 b: true,
@@ -36,7 +28,7 @@ async function testFn(
         };
     }
 
-    const { id, universe, ctx } = await getAssetData("ETH");
+    const { id, universe, ctx } = await getAssetData("SOL");
     const pxUp = formatPrice(new BigNumber(ctx.markPx).times(1.01), universe.szDecimals);
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const sz = formatSize(new BigNumber("13").div(ctx.markPx), universe.szDecimals);
@@ -46,9 +38,9 @@ async function testFn(
     try {
         const data = await Promise.all([
             // resting
-            client.exchange.batchModify({
+            clients.exchange.batchModify({
                 modifies: [{
-                    oid: (await openOrder(client.exchange, id, pxDown, sz)).oid,
+                    oid: (await openOrder(id, pxDown, sz)).oid,
                     order: {
                         a: id,
                         b: true,
@@ -60,9 +52,9 @@ async function testFn(
                 }],
             }),
             // resting | cloid
-            client.exchange.batchModify({
+            clients.exchange.batchModify({
                 modifies: [{
-                    oid: (await openOrder(client.exchange, id, pxDown, sz)).cloid,
+                    oid: (await openOrder(id, pxDown, sz)).cloid,
                     order: {
                         a: id,
                         b: true,
@@ -75,9 +67,9 @@ async function testFn(
                 }],
             }),
             // filled
-            client.exchange.batchModify({
+            clients.exchange.batchModify({
                 modifies: [{
-                    oid: (await openOrder(client.exchange, id, pxDown, sz)).cloid,
+                    oid: (await openOrder(id, pxDown, sz)).cloid,
                     order: {
                         a: id,
                         b: true,
@@ -89,9 +81,9 @@ async function testFn(
                 }],
             }),
             // filled | cloid
-            client.exchange.batchModify({
+            clients.exchange.batchModify({
                 modifies: [{
-                    oid: (await openOrder(client.exchange, id, pxDown, sz)).oid,
+                    oid: (await openOrder(id, pxDown, sz)).oid,
                     order: {
                         a: id,
                         b: true,
@@ -104,14 +96,14 @@ async function testFn(
                 }],
             }),
         ]);
-        schemaCoverage(MethodReturnType, data);
+        schemaCoverage(OrderSuccessResponse, data);
     } finally {
         // —————————— Cleanup ——————————
 
-        const openOrders = await client.info.openOrders({ user: await getWalletAddress(client.exchange.wallet) });
+        const openOrders = await clients.info.openOrders({ user: await getWalletAddress(clients.exchange.wallet) });
         const cancels = openOrders.map((o) => ({ a: id, o: o.oid }));
-        await client.exchange.cancel({ cancels });
-        await client.exchange.order({
+        await clients.exchange.cancel({ cancels });
+        await clients.exchange.order({
             orders: [{
                 a: id,
                 b: false,
@@ -123,6 +115,4 @@ async function testFn(
             grouping: "na",
         });
     }
-}
-
-runTest("batchModify", testFn, { perp: "15" });
+});

@@ -1,33 +1,33 @@
-import { HyperliquidError } from "../base.ts";
+import { HyperliquidError } from "../errors.ts";
 import type { IRequestTransport } from "../transports/base.ts";
-import type {
+import {
     ApproveAgentRequest,
     ApproveBuilderFeeRequest,
     BatchModifyRequest,
     CancelByCloidRequest,
     CancelRequest,
-    CancelResponse,
-    CancelSuccessResponse,
+    type CancelResponse,
+    type CancelSuccessResponse,
     CDepositRequest,
     ClaimRewardsRequest,
     ConvertToMultiSigUserRequest,
-    ConvertToMultiSigUserRequestWithoutStringify,
+    type ConvertToMultiSigUserRequestSigners,
     CreateSubAccountRequest,
-    CreateSubAccountResponse,
+    type CreateSubAccountResponse,
     CreateVaultRequest,
-    CreateVaultResponse,
+    type CreateVaultResponse,
     CSignerActionRequest,
     CValidatorActionRequest,
     CWithdrawRequest,
-    ErrorResponse,
+    type ErrorResponse,
     EvmUserModifyRequest,
-    Hex,
     ModifyRequest,
     MultiSigRequest,
     NoopRequest,
     OrderRequest,
-    OrderResponse,
-    OrderSuccessResponse,
+    type OrderResponse,
+    type OrderSuccessResponse,
+    parser,
     PerpDeployRequest,
     RegisterReferrerRequest,
     ReserveRequestWeightRequest,
@@ -41,14 +41,14 @@ import type {
     SubAccountModifyRequest,
     SubAccountSpotTransferRequest,
     SubAccountTransferRequest,
-    SuccessResponse,
+    type SuccessResponse,
     TokenDelegateRequest,
     TwapCancelRequest,
-    TwapCancelResponse,
-    TwapCancelSuccessResponse,
+    type TwapCancelResponse,
+    type TwapCancelSuccessResponse,
     TwapOrderRequest,
-    TwapOrderResponse,
-    TwapOrderSuccessResponse,
+    type TwapOrderResponse,
+    type TwapOrderSuccessResponse,
     UpdateIsolatedMarginRequest,
     UpdateLeverageRequest,
     UsdClassTransferRequest,
@@ -57,10 +57,9 @@ import type {
     VaultModifyRequest,
     VaultTransferRequest,
     Withdraw3Request,
-} from "../types/mod.ts";
+} from "../schemas/mod.ts";
 import {
     type AbstractWallet,
-    actionSorter,
     getWalletChainId,
     signL1Action,
     signMultiSigAction,
@@ -91,7 +90,7 @@ export interface ExchangeClientParameters<
      */
     isTestnet?: boolean;
     /** Sets a default vaultAddress to be used if no vaultAddress is explicitly passed to a method. */
-    defaultVaultAddress?: Hex;
+    defaultVaultAddress?: `0x${string}`;
     /** Sets a default expiresAfter to be used if no expiresAfter is explicitly passed to a method. */
     defaultExpiresAfter?: number | (() => MaybePromise<number>);
     /**
@@ -100,7 +99,7 @@ export interface ExchangeClientParameters<
      *
      * Defaults to get chain id from wallet otherwise `0x1`.
      */
-    signatureChainId?: Hex | (() => MaybePromise<Hex>);
+    signatureChainId?: `0x${string}` | (() => MaybePromise<`0x${string}`>);
     /**
      * Function to get the next nonce for signing transactions.
      *
@@ -128,7 +127,12 @@ export type CancelByCloidParameters = ExtractRequestAction<CancelByCloidRequest>
 /** Action parameters for the {@linkcode ExchangeClient.cDeposit} method. */
 export type CDepositParameters = ExtractRequestAction<CDepositRequest>;
 /** Action parameters for the {@linkcode ExchangeClient.convertToMultiSigUser} method. */
-export type ConvertToMultiSigUserParameters = ExtractRequestAction<ConvertToMultiSigUserRequestWithoutStringify>;
+export type ConvertToMultiSigUserParameters =
+    & Omit<ExtractRequestAction<ConvertToMultiSigUserRequest>, "signers">
+    & {
+        /** Signers configuration. */
+        signers: ConvertToMultiSigUserRequestSigners;
+    };
 /** Action parameters for the {@linkcode ExchangeClient.createSubAccount} method. */
 export type CreateSubAccountParameters = ExtractRequestAction<CreateSubAccountRequest>;
 /** Action parameters for the {@linkcode ExchangeClient.createVault} method. */
@@ -292,7 +296,7 @@ export type VaultTransferOptions = ExtractRequestOptions<VaultTransferRequest>;
 /** Request options for the {@linkcode ExchangeClient.withdraw3} method. */
 export type Withdraw3Options = ExtractRequestOptions<Withdraw3Request>;
 
-/** Custom error class for API request errors. */
+/** Thrown when an API request fails. */
 export class ApiRequestError extends HyperliquidError {
     constructor(
         public response:
@@ -363,9 +367,9 @@ export class ExchangeClient<
     transport: T;
     wallet: W;
     isTestnet: boolean;
-    defaultVaultAddress?: Hex;
+    defaultVaultAddress?: `0x${string}`;
     defaultExpiresAfter?: number | (() => MaybePromise<number>);
-    signatureChainId: Hex | (() => MaybePromise<Hex>);
+    signatureChainId: `0x${string}` | (() => MaybePromise<`0x${string}`>);
     nonceManager: () => MaybePromise<number>;
 
     /**
@@ -452,7 +456,7 @@ export class ExchangeClient<
         params: DeepImmutable<ApproveAgentParameters>,
         opts?: ApproveAgentOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.approveAgent({
+        const action = parser(ApproveAgentRequest.entries.action)({
             type: "approveAgent",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
@@ -487,7 +491,7 @@ export class ExchangeClient<
         params: DeepImmutable<ApproveBuilderFeeParameters>,
         opts?: ApproveBuilderFeeOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.approveBuilderFee({
+        const action = parser(ApproveBuilderFeeRequest.entries.action)({
             type: "approveBuilderFee",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
@@ -536,7 +540,7 @@ export class ExchangeClient<
         params: DeepImmutable<BatchModifyParameters>,
         opts?: BatchModifyOptions,
     ): Promise<OrderSuccessResponse> {
-        const action = actionSorter.batchModify({
+        const action = parser(BatchModifyRequest.entries.action)({
             type: "batchModify",
             ...params,
         });
@@ -574,7 +578,7 @@ export class ExchangeClient<
         params: DeepImmutable<CancelParameters>,
         opts?: CancelOptions,
     ): Promise<CancelSuccessResponse> {
-        const action = actionSorter.cancel({
+        const action = parser(CancelRequest.entries.action)({
             type: "cancel",
             ...params,
         });
@@ -612,7 +616,7 @@ export class ExchangeClient<
         params: DeepImmutable<CancelByCloidParameters>,
         opts?: CancelByCloidOptions,
     ): Promise<CancelSuccessResponse> {
-        const action = actionSorter.cancelByCloid({
+        const action = parser(CancelByCloidRequest.entries.action)({
             type: "cancelByCloid",
             ...params,
         });
@@ -646,7 +650,7 @@ export class ExchangeClient<
         params: DeepImmutable<CDepositParameters>,
         opts?: CDepositOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.cDeposit({
+        const action = parser(CDepositRequest.entries.action)({
             type: "cDeposit",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
@@ -679,7 +683,7 @@ export class ExchangeClient<
     async claimRewards(
         opts?: ClaimRewardsOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.claimRewards({
+        const action = parser(ClaimRewardsRequest.entries.action)({
             type: "claimRewards",
         });
         const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
@@ -720,7 +724,7 @@ export class ExchangeClient<
         params: DeepImmutable<ConvertToMultiSigUserParameters>,
         opts?: ConvertToMultiSigUserOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.convertToMultiSigUser({
+        const action = parser(ConvertToMultiSigUserRequest.entries.action)({
             type: "convertToMultiSigUser",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
@@ -755,7 +759,7 @@ export class ExchangeClient<
         params: DeepImmutable<CreateSubAccountParameters>,
         opts?: CreateSubAccountOptions,
     ): Promise<CreateSubAccountResponse> {
-        const action = actionSorter.createSubAccount({
+        const action = parser(CreateSubAccountRequest.entries.action)({
             type: "createSubAccount",
             ...params,
         });
@@ -793,7 +797,7 @@ export class ExchangeClient<
         params: DeepImmutable<CreateVaultParameters>,
         opts?: CreateVaultOptions,
     ): Promise<CreateVaultResponse> {
-        const action = actionSorter.createVault({
+        const action = parser(CreateVaultRequest.entries.action)({
             type: "createVault",
             ...params,
         });
@@ -830,7 +834,7 @@ export class ExchangeClient<
         params: DeepImmutable<CSignerActionParameters>,
         opts?: CSignerActionOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.CSignerAction({
+        const action = parser(CSignerActionRequest.entries.action)({
             type: "CSignerAction",
             ...params,
         });
@@ -893,7 +897,7 @@ export class ExchangeClient<
         params: DeepImmutable<CValidatorActionParameters>,
         opts?: CValidatorActionOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.CValidatorAction({
+        const action = parser(CValidatorActionRequest.entries.action)({
             type: "CValidatorAction",
             ...params,
         });
@@ -926,7 +930,7 @@ export class ExchangeClient<
         params: DeepImmutable<CWithdrawParameters>,
         opts?: CWithdrawOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.cWithdraw({
+        const action = parser(CWithdrawRequest.entries.action)({
             type: "cWithdraw",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
@@ -961,7 +965,7 @@ export class ExchangeClient<
         params: DeepImmutable<EvmUserModifyParameters>,
         opts?: EvmUserModifyOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.evmUserModify({
+        const action = parser(EvmUserModifyRequest.entries.action)({
             type: "evmUserModify",
             ...params,
         });
@@ -1005,7 +1009,7 @@ export class ExchangeClient<
         params: DeepImmutable<ModifyParameters>,
         opts?: ModifyOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.modify({
+        const action = parser(ModifyRequest.entries.action)({
             type: "modify",
             ...params,
         });
@@ -1027,7 +1031,8 @@ export class ExchangeClient<
      * @example
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
-     * import { actionSorter, signL1Action } from "@nktkas/hyperliquid/signing";
+     * import { signL1Action } from "@nktkas/hyperliquid/signing";
+     * import { parser, ScheduleCancelRequest } from "@nktkas/hyperliquid/schemas";
      * import { privateKeyToAccount } from "npm:viem/accounts";
      *
      * const wallet = privateKeyToAccount("0x..."); // or any other wallet libraries
@@ -1037,7 +1042,7 @@ export class ExchangeClient<
      * const exchClient = new hl.ExchangeClient({ wallet, transport });
      *
      * const nonce = Date.now();
-     * const action = actionSorter.scheduleCancel({
+     * const action = parser(ScheduleCancelRequest.entries.action)({ // for correct signature generation
      *   type: "scheduleCancel",
      *   time: Date.now() + 10000,
      * });
@@ -1051,7 +1056,7 @@ export class ExchangeClient<
      *   });
      * }));
      *
-     * // or user-signed action
+     * // // or user-signed action
      * // const signatures = await Promise.all(["0x...", "0x..."].map(async (signerPrivKey) => {
      * //   return await signUserSignedAction({
      * //     wallet: signerPrivKey as `0x${string}`,
@@ -1091,7 +1096,7 @@ export class ExchangeClient<
     ): Promise<T> {
         const { nonce, ...params } = params_and_nonce;
 
-        const action = actionSorter.multiSig({
+        const action = parser(MultiSigRequest.entries.action)({
             type: "multiSig",
             signatureChainId: await this._getSignatureChainId(),
             ...params,
@@ -1139,7 +1144,7 @@ export class ExchangeClient<
         params: DeepImmutable<OrderParameters>,
         opts?: OrderOptions,
     ): Promise<OrderSuccessResponse> {
-        const action = actionSorter.order({
+        const action = parser(OrderRequest.entries.action)({
             type: "order",
             ...params,
         });
@@ -1171,7 +1176,7 @@ export class ExchangeClient<
     async noop(
         opts?: NoopOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.noop({
+        const action = parser(NoopRequest.entries.action)({
             type: "noop",
         });
         const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
@@ -1216,7 +1221,7 @@ export class ExchangeClient<
         params: DeepImmutable<PerpDeployParameters>,
         opts?: PerpDeployOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.perpDeploy({
+        const action = parser(PerpDeployRequest.entries.action)({
             type: "perpDeploy",
             ...params,
         });
@@ -1249,7 +1254,7 @@ export class ExchangeClient<
         params: DeepImmutable<RegisterReferrerParameters>,
         opts?: RegisterReferrerOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.registerReferrer({
+        const action = parser(RegisterReferrerRequest.entries.action)({
             type: "registerReferrer",
             ...params,
         });
@@ -1282,7 +1287,7 @@ export class ExchangeClient<
         params: DeepImmutable<ReserveRequestWeightParameters>,
         opts?: ReserveRequestWeightOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.reserveRequestWeight({
+        const action = parser(ReserveRequestWeightRequest.entries.action)({
             type: "reserveRequestWeight",
             ...params,
         });
@@ -1326,7 +1331,7 @@ export class ExchangeClient<
         const params = isFirstArgParams ? params_or_opts : {};
         const opts = isFirstArgParams ? maybeOpts : params_or_opts as ScheduleCancelOptions;
 
-        const action = actionSorter.scheduleCancel({
+        const action = parser(ScheduleCancelRequest.entries.action)({
             type: "scheduleCancel",
             ...params,
         });
@@ -1367,7 +1372,7 @@ export class ExchangeClient<
         params: DeepImmutable<SendAssetParameters>,
         opts?: SendAssetOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.sendAsset({
+        const action = parser(SendAssetRequest.entries.action)({
             type: "sendAsset",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
@@ -1402,7 +1407,7 @@ export class ExchangeClient<
         params: DeepImmutable<SetDisplayNameParameters>,
         opts?: SetDisplayNameOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.setDisplayName({
+        const action = parser(SetDisplayNameRequest.entries.action)({
             type: "setDisplayName",
             ...params,
         });
@@ -1435,7 +1440,7 @@ export class ExchangeClient<
         params: DeepImmutable<SetReferrerParameters>,
         opts?: SetReferrerOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.setReferrer({
+        const action = parser(SetReferrerRequest.entries.action)({
             type: "setReferrer",
             ...params,
         });
@@ -1478,7 +1483,7 @@ export class ExchangeClient<
         params: DeepImmutable<SpotDeployParameters>,
         opts?: SpotDeployOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.spotDeploy({
+        const action = parser(SpotDeployRequest.entries.action)({
             type: "spotDeploy",
             ...params,
         });
@@ -1515,7 +1520,7 @@ export class ExchangeClient<
         params: DeepImmutable<SpotSendParameters>,
         opts?: SpotSendOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.spotSend({
+        const action = parser(SpotSendRequest.entries.action)({
             type: "spotSend",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
@@ -1550,7 +1555,7 @@ export class ExchangeClient<
         params: DeepImmutable<SpotUserParameters>,
         opts?: SpotUserOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.spotUser({
+        const action = parser(SpotUserRequest.entries.action)({
             type: "spotUser",
             ...params,
         });
@@ -1583,7 +1588,7 @@ export class ExchangeClient<
         params: DeepImmutable<SubAccountModifyParameters>,
         opts?: SubAccountModifyOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.subAccountModify({
+        const action = parser(SubAccountModifyRequest.entries.action)({
             type: "subAccountModify",
             ...params,
         });
@@ -1621,7 +1626,7 @@ export class ExchangeClient<
         params: DeepImmutable<SubAccountSpotTransferParameters>,
         opts?: SubAccountSpotTransferOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.subAccountSpotTransfer({
+        const action = parser(SubAccountSpotTransferRequest.entries.action)({
             type: "subAccountSpotTransfer",
             ...params,
         });
@@ -1654,7 +1659,7 @@ export class ExchangeClient<
         params: DeepImmutable<SubAccountTransferParameters>,
         opts?: SubAccountTransferOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.subAccountTransfer({
+        const action = parser(SubAccountTransferRequest.entries.action)({
             type: "subAccountTransfer",
             ...params,
         });
@@ -1687,7 +1692,7 @@ export class ExchangeClient<
         params: DeepImmutable<TokenDelegateParameters>,
         opts?: TokenDelegateOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.tokenDelegate({
+        const action = parser(TokenDelegateRequest.entries.action)({
             type: "tokenDelegate",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
@@ -1722,7 +1727,7 @@ export class ExchangeClient<
         params: DeepImmutable<TwapCancelParameters>,
         opts?: TwapCancelOptions,
     ): Promise<TwapCancelSuccessResponse> {
-        const action = actionSorter.twapCancel({
+        const action = parser(TwapCancelRequest.entries.action)({
             type: "twapCancel",
             ...params,
         });
@@ -1765,7 +1770,7 @@ export class ExchangeClient<
         params: DeepImmutable<TwapOrderParameters>,
         opts?: TwapOrderOptions,
     ): Promise<TwapOrderSuccessResponse> {
-        const action = actionSorter.twapOrder({
+        const action = parser(TwapOrderRequest.entries.action)({
             type: "twapOrder",
             ...params,
         });
@@ -1799,7 +1804,7 @@ export class ExchangeClient<
         params: DeepImmutable<UpdateIsolatedMarginParameters>,
         opts?: UpdateIsolatedMarginOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.updateIsolatedMargin({
+        const action = parser(UpdateIsolatedMarginRequest.entries.action)({
             type: "updateIsolatedMargin",
             ...params,
         });
@@ -1833,7 +1838,7 @@ export class ExchangeClient<
         params: DeepImmutable<UpdateLeverageParameters>,
         opts?: UpdateLeverageOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.updateLeverage({
+        const action = parser(UpdateLeverageRequest.entries.action)({
             type: "updateLeverage",
             ...params,
         });
@@ -1867,7 +1872,7 @@ export class ExchangeClient<
         params: DeepImmutable<UsdClassTransferParameters>,
         opts?: UsdClassTransferOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.usdClassTransfer({
+        const action = parser(UsdClassTransferRequest.entries.action)({
             type: "usdClassTransfer",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
@@ -1902,7 +1907,7 @@ export class ExchangeClient<
         params: DeepImmutable<UsdSendParameters>,
         opts?: UsdSendOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.usdSend({
+        const action = parser(UsdSendRequest.entries.action)({
             type: "usdSend",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
@@ -1937,7 +1942,7 @@ export class ExchangeClient<
         params: DeepImmutable<VaultDistributeParameters>,
         opts?: VaultDistributeOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.vaultDistribute({
+        const action = parser(VaultDistributeRequest.entries.action)({
             type: "vaultDistribute",
             ...params,
         });
@@ -1974,7 +1979,7 @@ export class ExchangeClient<
         params: DeepImmutable<VaultModifyParameters>,
         opts?: VaultModifyOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.vaultModify({
+        const action = parser(VaultModifyRequest.entries.action)({
             type: "vaultModify",
             ...params,
         });
@@ -2007,7 +2012,7 @@ export class ExchangeClient<
         params: DeepImmutable<VaultTransferParameters>,
         opts?: VaultTransferOptions,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.vaultTransfer({
+        const action = parser(VaultTransferRequest.entries.action)({
             type: "vaultTransfer",
             ...params,
         });
@@ -2040,7 +2045,7 @@ export class ExchangeClient<
         params: DeepImmutable<Withdraw3Parameters>,
         opts?: Withdraw3Options,
     ): Promise<SuccessResponse> {
-        const action = actionSorter.withdraw3({
+        const action = parser(Withdraw3Request.entries.action)({
             type: "withdraw3",
             hyperliquidChain: this._getHyperliquidChain(),
             signatureChainId: await this._getSignatureChainId(),
@@ -2061,12 +2066,8 @@ export class ExchangeClient<
             | TwapCancelSuccessResponse,
     >(
         request: {
-            action: Parameters<
-                typeof actionSorter[
-                    Exclude<keyof typeof actionSorter, keyof typeof userSignedActionEip712Types>
-                ]
-            >[0];
-            vaultAddress?: Hex;
+            action: Record<string, unknown>;
+            vaultAddress?: `0x${string}`;
             expiresAfter: number | undefined;
         },
         signal?: AbortSignal,
@@ -2113,11 +2114,11 @@ export class ExchangeClient<
             | TwapCancelSuccessResponse,
     >(
         request: {
-            action: Parameters<
-                typeof actionSorter[
-                    Exclude<Extract<keyof typeof actionSorter, keyof typeof userSignedActionEip712Types>, "multiSig">
-                ]
-            >[0];
+            action: {
+                type: keyof typeof userSignedActionEip712Types;
+                signatureChainId: `0x${string}`;
+                [key: string]: unknown;
+            };
         },
         signal?: AbortSignal,
     ): Promise<T> {
@@ -2160,9 +2161,12 @@ export class ExchangeClient<
             | TwapCancelSuccessResponse,
     >(
         request: {
-            action: Parameters<typeof actionSorter["multiSig"]>[0];
+            action: {
+                signatureChainId: `0x${string}`;
+                [key: string]: unknown;
+            };
             nonce: number;
-            vaultAddress?: Hex;
+            vaultAddress?: `0x${string}`;
             expiresAfter?: number;
         },
         signal?: AbortSignal,
@@ -2203,7 +2207,7 @@ export class ExchangeClient<
             : await this.defaultExpiresAfter?.();
     }
 
-    protected async _getSignatureChainId(): Promise<Hex> {
+    protected async _getSignatureChainId(): Promise<`0x${string}`> {
         return typeof this.signatureChainId === "string" ? this.signatureChainId : await this.signatureChainId();
     }
 

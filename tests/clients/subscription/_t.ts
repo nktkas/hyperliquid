@@ -9,17 +9,13 @@ import {
     type PerpsUniverse,
     SubscriptionClient,
     WebSocketTransport,
-} from "../../../mod.ts";
+} from "@nktkas/hyperliquid";
 import { getWalletAddress } from "../../../src/signing/mod.ts";
 
 // —————————— Arguments ——————————
 
-const cliArgs = parseArgs(Deno.args, { default: { wait: 1000 }, string: ["_"] }) as Args<{
-    /** Delay to avoid rate limits */
-    wait: number;
-}>;
-
-const PRIVATE_KEY = cliArgs._[0] as `0x${string}`; // must be sole signer for a multi-sign account
+const cliArgs = parseArgs(Deno.args, { default: { wait: 1000 }, string: ["_"] }) as Args<{ wait: number }>;
+const PRIVATE_KEY = cliArgs._[0] as `0x${string}`;
 
 // —————————— Clients ——————————
 
@@ -40,8 +36,8 @@ async function createExchangeClient(mainExchClient: ExchangeClient): Promise<Exc
 
 export function runTest(
     name: string,
-    testFn: (t: Deno.TestContext, client: SubscriptionClient) => Promise<void>,
     mode: "api" | "rpc",
+    fn: (t: Deno.TestContext, client: SubscriptionClient) => Promise<void>,
 ): void {
     Deno.test(name, async (t) => {
         await new Promise((r) => setTimeout(r, cliArgs.wait)); // delay to avoid rate limits
@@ -50,21 +46,16 @@ export function runTest(
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
 
-        await testFn(t, subsClient);
+        await fn(t, subsClient);
     });
 }
 
-export function runTestWithExch(
+export function runTestWithExchange(
     name: string,
-    testFn: (
+    fn: (
         t: Deno.TestContext,
-        client: {
-            subs: SubscriptionClient;
-            exch: ExchangeClient;
-            info: InfoClient;
-        },
+        client: { subs: SubscriptionClient; exchange: ExchangeClient; info: InfoClient },
     ) => Promise<void>,
-    topup?: { perp?: string },
 ): void {
     if (!PRIVATE_KEY || !/^0x[a-fA-F0-9]{64}$/.test(PRIVATE_KEY)) {
         throw new Error("Please provide a valid private key (0x-prefixed 64 hex characters) as an argument");
@@ -83,15 +74,8 @@ export function runTestWithExch(
 
         const infoClient = new InfoClient({ transport });
 
-        if (topup?.perp) {
-            await mainExchClient.usdSend({
-                destination: await getWalletAddress(exchClient.wallet),
-                amount: topup.perp,
-            });
-        }
-
         try {
-            await testFn(t, { subs: subsClient, exch: exchClient, info: infoClient });
+            await fn(t, { subs: subsClient, exchange: exchClient, info: infoClient });
         } finally {
             const state = await infoClient.clearinghouseState({ user: await getWalletAddress(exchClient.wallet) });
             await exchClient.usdSend({
@@ -144,7 +128,5 @@ export function formatSize(
     szDecimals: number,
     roundingMode: BigNumber.RoundingMode = BigNumber.ROUND_HALF_UP,
 ): string {
-    return new BigNumber(size)
-        .toFixed(szDecimals, roundingMode)
-        .replace(/\.?0+$/, ""); // Remove trailing zeros
+    return new BigNumber(size).toFixed(szDecimals, roundingMode);
 }

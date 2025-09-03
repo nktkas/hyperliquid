@@ -1,12 +1,10 @@
-import type { InfoClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import { MarginTable } from "@nktkas/hyperliquid/schemas";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { runTest } from "./_t.ts";
 
-export type MethodReturnType = Awaited<ReturnType<InfoClient["marginTable"]>>;
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(_t: Deno.TestContext, client: InfoClient) {
-    const data = await client.marginTable({ id: 1 });
-    schemaCoverage(MethodReturnType, [data]);
-}
-
-runTest("marginTable", testFn);
+runTest("marginTable", async (_t, client) => {
+    const data = await Promise.all([
+        client.marginTable({ id: 1 }),
+    ]);
+    schemaCoverage(MarginTable, data);
+});

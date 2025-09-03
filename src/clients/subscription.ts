@@ -1,50 +1,50 @@
 import type { ISubscriptionTransport, Subscription } from "../transports/base.ts";
-import type {
-    ActiveAssetData,
-    ActiveAssetDataRequest,
-    AllMidsRequest,
-    Book,
-    Candle,
-    ClearinghouseStateRequest,
-    L2BookRequest,
-    OpenOrdersRequest,
-    Order,
-    OrderStatus,
-    TxDetails,
-    UserFillsRequest,
-    UserTwapSliceFillsRequest,
-    WsActiveAssetCtx,
+import {
+    type ActiveAssetData,
+    type Book,
+    type Candle,
+    type OrderStatus,
+    parser,
+    type TxDetails,
+    type WsActiveAssetCtx,
     WsActiveAssetCtxRequest,
-    WsActiveSpotAssetCtx,
-    WsAllMids,
-    WsAssetCtxs,
+    WsActiveAssetDataRequest,
+    type WsActiveSpotAssetCtx,
+    type WsAllMids,
+    WsAllMidsRequest,
+    type WsAssetCtxs,
     WsAssetCtxsRequest,
-    WsBbo,
+    type WsBbo,
     WsBboRequest,
-    WsBlockDetails,
+    type WsBlockDetails,
     WsCandleRequest,
-    WsClearinghouseState,
+    type WsClearinghouseState,
+    WsClearinghouseStateRequest,
     WsExplorerBlockRequest,
     WsExplorerTxsRequest,
-    WsNotification,
+    WsL2BookRequest,
+    type WsNotification,
     WsNotificationRequest,
-    WsOpenOrders,
+    type WsOpenOrders,
+    WsOpenOrdersRequest,
     WsOrderUpdatesRequest,
-    WsTrade,
+    type WsTrade,
     WsTradesRequest,
-    WsUserEvent,
+    type WsUserEvent,
     WsUserEventsRequest,
-    WsUserFills,
-    WsUserFundings,
+    type WsUserFills,
+    WsUserFillsRequest,
+    type WsUserFundings,
     WsUserFundingsRequest,
-    WsUserNonFundingLedgerUpdates,
+    type WsUserNonFundingLedgerUpdates,
     WsUserNonFundingLedgerUpdatesRequest,
-    WsUserTwapHistory,
+    type WsUserTwapHistory,
     WsUserTwapHistoryRequest,
-    WsUserTwapSliceFills,
-    WsWebData2,
+    type WsUserTwapSliceFills,
+    WsUserTwapSliceFillsRequest,
+    type WsWebData2,
     WsWebData2Request,
-} from "../types/mod.ts";
+} from "../schemas/mod.ts";
 
 /** @see https://github.com/microsoft/TypeScript/issues/13923#issuecomment-2191862501 */
 type DeepImmutable<T> = {
@@ -60,9 +60,9 @@ export interface SubscriptionClientParameters<T extends ISubscriptionTransport =
 /** Subscription parameters for the {@linkcode SubscriptionClient.activeAssetCtx} method. */
 export type WsActiveAssetCtxParameters = Omit<WsActiveAssetCtxRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.activeAssetData} method. */
-export type WsActiveAssetDataParameters = Omit<ActiveAssetDataRequest, "type">;
+export type WsActiveAssetDataParameters = Omit<WsActiveAssetDataRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.allMids} method. */
-export type WsAllMidsParameters = Omit<AllMidsRequest, "type">;
+export type WsAllMidsParameters = Omit<WsAllMidsRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.assetCtxs} method. */
 export type WsAssetCtxsParameters = Omit<WsAssetCtxsRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.bbo} method. */
@@ -70,13 +70,13 @@ export type WsBboParameters = Omit<WsBboRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.candle} method. */
 export type WsCandleParameters = Omit<WsCandleRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.clearinghouseState} method. */
-export type WsClearinghouseStateParameters = Omit<ClearinghouseStateRequest, "type">;
+export type WsClearinghouseStateParameters = Omit<WsClearinghouseStateRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.l2Book} method. */
-export type WsL2BookParameters = Omit<L2BookRequest, "type">;
+export type WsL2BookParameters = Omit<WsL2BookRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.notification} method. */
 export type WsNotificationParameters = Omit<WsNotificationRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.openOrders} method. */
-export type WsOpenOrdersParameters = Omit<OpenOrdersRequest, "type">;
+export type WsOpenOrdersParameters = Omit<WsOpenOrdersRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.orderUpdates} method. */
 export type WsOrderUpdatesParameters = Omit<WsOrderUpdatesRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.trades} method. */
@@ -84,7 +84,7 @@ export type WsTradesParameters = Omit<WsTradesRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userEvents} method. */
 export type WsUserEventsParameters = Omit<WsUserEventsRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userFills} method. */
-export type WsUserFillsParameters = Omit<UserFillsRequest, "type">;
+export type WsUserFillsParameters = Omit<WsUserFillsRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userFundings} method. */
 export type WsUserFundingsParameters = Omit<WsUserFundingsRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userNonFundingLedgerUpdates} method. */
@@ -92,7 +92,7 @@ export type WsUserNonFundingLedgerUpdatesParameters = Omit<WsUserNonFundingLedge
 /** Subscription parameters for the {@linkcode SubscriptionClient.userTwapHistory} method. */
 export type WsUserTwapHistoryParameters = Omit<WsUserTwapHistoryRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userTwapSliceFills} method. */
-export type WsUserTwapSliceFillsParameters = Omit<UserTwapSliceFillsRequest, "type">;
+export type WsUserTwapSliceFillsParameters = Omit<WsUserTwapSliceFillsRequest, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.webData2} method. */
 export type WsWebData2Parameters = Omit<WsWebData2Request, "type">;
 
@@ -146,8 +146,8 @@ export class SubscriptionClient<
         params: DeepImmutable<WsActiveAssetCtxParameters>,
         listener: (data: WsActiveAssetCtx | WsActiveSpotAssetCtx) => void,
     ): Promise<Subscription> {
+        const payload = parser(WsActiveAssetCtxRequest)({ type: "activeAssetCtx", ...params });
         const channel = params.coin.startsWith("@") ? "activeSpotAssetCtx" : "activeAssetCtx";
-        const payload = { type: "activeAssetCtx", ...params } satisfies WsActiveAssetCtxRequest;
         return this.transport.subscribe<WsActiveAssetCtx | WsActiveSpotAssetCtx>(channel, payload, (e) => {
             if (e.detail.coin === payload.coin) {
                 listener(e.detail);
@@ -180,7 +180,7 @@ export class SubscriptionClient<
         params: DeepImmutable<WsActiveAssetDataParameters>,
         listener: (data: ActiveAssetData) => void,
     ): Promise<Subscription> {
-        const payload = { type: "activeAssetData", ...params } satisfies ActiveAssetDataRequest;
+        const payload = parser(WsActiveAssetDataRequest)({ type: "activeAssetData", ...params });
         return this.transport.subscribe<ActiveAssetData>(payload.type, payload, (e) => {
             if (e.detail.coin === payload.coin && e.detail.user === payload.user.toLowerCase()) {
                 listener(e.detail);
@@ -218,7 +218,7 @@ export class SubscriptionClient<
         const params = typeof params_or_listener === "function" ? {} : params_or_listener;
         const listener = typeof params_or_listener === "function" ? params_or_listener : maybeListener!;
 
-        const payload = { type: "allMids", ...params } satisfies AllMidsRequest;
+        const payload = parser(WsAllMidsRequest)({ type: "allMids", ...params });
         return this.transport.subscribe<WsAllMids>(payload.type, payload, (e) => {
             listener(e.detail);
         });
@@ -257,11 +257,11 @@ export class SubscriptionClient<
         const params = typeof params_or_listener === "function" ? {} : params_or_listener;
         const listener = typeof params_or_listener === "function" ? params_or_listener : maybeListener!;
 
-        const payload = {
+        const payload = parser(WsAssetCtxsRequest)({
             type: "assetCtxs",
             ...params,
             dex: params.dex ?? "",
-        } satisfies WsAssetCtxsRequest;
+        });
         return this.transport.subscribe<WsAssetCtxs>(payload.type, payload, (e) => {
             if (e.detail.dex === payload.dex) {
                 listener(e.detail);
@@ -294,7 +294,7 @@ export class SubscriptionClient<
         params: DeepImmutable<WsBboParameters>,
         listener: (data: WsBbo) => void,
     ): Promise<Subscription> {
-        const payload = { type: "bbo", ...params } satisfies WsBboRequest;
+        const payload = parser(WsBboRequest)({ type: "bbo", ...params });
         return this.transport.subscribe<WsBbo>(payload.type, payload, (e) => {
             if (e.detail.coin === payload.coin) {
                 listener(e.detail);
@@ -327,7 +327,7 @@ export class SubscriptionClient<
         params: DeepImmutable<WsCandleParameters>,
         listener: (data: Candle) => void,
     ): Promise<Subscription> {
-        const payload = { type: "candle", ...params } satisfies WsCandleRequest;
+        const payload = parser(WsCandleRequest)({ type: "candle", ...params });
         return this.transport.subscribe<Candle>(payload.type, payload, (e) => {
             if (e.detail.s === payload.coin && e.detail.i === payload.interval) {
                 listener(e.detail);
@@ -360,11 +360,11 @@ export class SubscriptionClient<
         params: DeepImmutable<WsClearinghouseStateParameters>,
         listener: (data: WsClearinghouseState) => void,
     ): Promise<Subscription> {
-        const payload = {
+        const payload = parser(WsClearinghouseStateRequest)({
             type: "clearinghouseState",
             ...params,
             dex: params.dex ?? "",
-        } satisfies ClearinghouseStateRequest;
+        });
         return this.transport.subscribe<WsClearinghouseState>(payload.type, payload, (e) => {
             if (e.detail.user === payload.user.toLowerCase() && e.detail.dex === payload.dex) {
                 listener(e.detail);
@@ -394,7 +394,7 @@ export class SubscriptionClient<
      * ```
      */
     explorerBlock(listener: (data: WsBlockDetails[]) => void): Promise<Subscription> {
-        const payload = { type: "explorerBlock" } satisfies WsExplorerBlockRequest;
+        const payload = parser(WsExplorerBlockRequest)({ type: "explorerBlock" });
         return this.transport.subscribe<WsBlockDetails[]>("_explorerBlock", payload, (e) => { // Internal channel as it does not have its own channel
             listener(e.detail);
         });
@@ -422,7 +422,7 @@ export class SubscriptionClient<
      * ```
      */
     explorerTxs(listener: (data: TxDetails[]) => void): Promise<Subscription> {
-        const payload = { type: "explorerTxs" } satisfies WsExplorerTxsRequest;
+        const payload = parser(WsExplorerTxsRequest)({ type: "explorerTxs" });
         return this.transport.subscribe<TxDetails[]>("_explorerTxs", payload, (e) => { // Internal channel as it does not have its own channel
             listener(e.detail);
         });
@@ -453,12 +453,12 @@ export class SubscriptionClient<
         params: DeepImmutable<WsL2BookParameters>,
         listener: (data: Book) => void,
     ): Promise<Subscription> {
-        const payload = {
+        const payload = parser(WsL2BookRequest)({
             type: "l2Book",
             ...params,
             nSigFigs: params.nSigFigs ?? null,
             mantissa: params.mantissa ?? null,
-        } satisfies L2BookRequest;
+        });
         return this.transport.subscribe<Book>(payload.type, payload, (e) => {
             if (e.detail.coin === payload.coin) {
                 listener(e.detail);
@@ -491,7 +491,7 @@ export class SubscriptionClient<
         params: DeepImmutable<WsNotificationParameters>,
         listener: (data: WsNotification) => void,
     ): Promise<Subscription> {
-        const payload = { type: "notification", ...params } satisfies WsNotificationRequest;
+        const payload = parser(WsNotificationRequest)({ type: "notification", ...params });
         return this.transport.subscribe<WsNotification>(payload.type, payload, (e) => {
             listener(e.detail);
         });
@@ -522,11 +522,11 @@ export class SubscriptionClient<
         params: DeepImmutable<WsOpenOrdersParameters>,
         listener: (data: WsOpenOrders) => void,
     ): Promise<Subscription> {
-        const payload = {
+        const payload = parser(WsOpenOrdersRequest)({
             type: "openOrders",
             ...params,
             dex: params.dex ?? "",
-        } satisfies OpenOrdersRequest;
+        });
         return this.transport.subscribe<WsOpenOrders>(payload.type, payload, (e) => {
             if (e.detail.user === payload.user.toLowerCase() && e.detail.dex === payload.dex) {
                 listener(e.detail);
@@ -557,10 +557,10 @@ export class SubscriptionClient<
      */
     orderUpdates(
         params: DeepImmutable<WsOrderUpdatesParameters>,
-        listener: (data: OrderStatus<Order>[]) => void,
+        listener: (data: OrderStatus[]) => void,
     ): Promise<Subscription> {
-        const payload = { type: "orderUpdates", ...params } satisfies WsOrderUpdatesRequest;
-        return this.transport.subscribe<OrderStatus<Order>[]>(payload.type, payload, (e) => {
+        const payload = parser(WsOrderUpdatesRequest)({ type: "orderUpdates", ...params });
+        return this.transport.subscribe<OrderStatus[]>(payload.type, payload, (e) => {
             listener(e.detail);
         });
     }
@@ -590,7 +590,7 @@ export class SubscriptionClient<
         params: DeepImmutable<WsTradesParameters>,
         listener: (data: WsTrade[]) => void,
     ): Promise<Subscription> {
-        const payload = { type: "trades", ...params } satisfies WsTradesRequest;
+        const payload = parser(WsTradesRequest)({ type: "trades", ...params });
         return this.transport.subscribe<WsTrade[]>(payload.type, payload, (e) => {
             if (e.detail[0]?.coin === payload.coin) {
                 listener(e.detail);
@@ -624,7 +624,7 @@ export class SubscriptionClient<
         params: DeepImmutable<WsUserEventsParameters>,
         listener: (data: WsUserEvent) => void,
     ): Promise<Subscription> {
-        const payload = { type: "userEvents", ...params } satisfies WsUserEventsRequest;
+        const payload = parser(WsUserEventsRequest)({ type: "userEvents", ...params });
         return this.transport.subscribe<WsUserEvent>("user", payload, (e) => {
             listener(e.detail);
         });
@@ -655,11 +655,11 @@ export class SubscriptionClient<
         params: DeepImmutable<WsUserFillsParameters>,
         listener: (data: WsUserFills) => void,
     ): Promise<Subscription> {
-        const payload = {
+        const payload = parser(WsUserFillsRequest)({
             type: "userFills",
             ...params,
             aggregateByTime: params.aggregateByTime ?? false,
-        } satisfies UserFillsRequest;
+        });
         return this.transport.subscribe<WsUserFills>(payload.type, payload, (e) => {
             if (e.detail.user === payload.user.toLowerCase()) {
                 listener(e.detail);
@@ -692,7 +692,7 @@ export class SubscriptionClient<
         params: DeepImmutable<WsUserFundingsParameters>,
         listener: (data: WsUserFundings) => void,
     ): Promise<Subscription> {
-        const payload = { type: "userFundings", ...params } satisfies WsUserFundingsRequest;
+        const payload = parser(WsUserFundingsRequest)({ type: "userFundings", ...params });
         return this.transport.subscribe<WsUserFundings>(payload.type, payload, (e) => {
             if (e.detail.user === payload.user.toLowerCase()) {
                 listener(e.detail);
@@ -725,10 +725,10 @@ export class SubscriptionClient<
         params: DeepImmutable<WsUserNonFundingLedgerUpdatesParameters>,
         listener: (data: WsUserNonFundingLedgerUpdates) => void,
     ): Promise<Subscription> {
-        const payload = {
+        const payload = parser(WsUserNonFundingLedgerUpdatesRequest)({
             type: "userNonFundingLedgerUpdates",
             ...params,
-        } satisfies WsUserNonFundingLedgerUpdatesRequest;
+        });
         return this.transport.subscribe<WsUserNonFundingLedgerUpdates>(payload.type, payload, (e) => {
             if (e.detail.user === payload.user.toLowerCase()) {
                 listener(e.detail);
@@ -761,7 +761,7 @@ export class SubscriptionClient<
         params: DeepImmutable<WsUserTwapHistoryParameters>,
         listener: (data: WsUserTwapHistory) => void,
     ): Promise<Subscription> {
-        const payload = { type: "userTwapHistory", ...params } satisfies WsUserTwapHistoryRequest;
+        const payload = parser(WsUserTwapHistoryRequest)({ type: "userTwapHistory", ...params });
         return this.transport.subscribe<WsUserTwapHistory>(payload.type, payload, (e) => {
             if (e.detail.user === payload.user.toLowerCase()) {
                 listener(e.detail);
@@ -794,7 +794,7 @@ export class SubscriptionClient<
         params: DeepImmutable<WsUserTwapSliceFillsParameters>,
         listener: (data: WsUserTwapSliceFills) => void,
     ): Promise<Subscription> {
-        const payload = { type: "userTwapSliceFills", ...params } satisfies UserTwapSliceFillsRequest;
+        const payload = parser(WsUserTwapSliceFillsRequest)({ type: "userTwapSliceFills", ...params });
         return this.transport.subscribe<WsUserTwapSliceFills>(payload.type, payload, (e) => {
             if (e.detail.user === payload.user.toLowerCase()) {
                 listener(e.detail);
@@ -827,7 +827,7 @@ export class SubscriptionClient<
         params: DeepImmutable<WsWebData2Parameters>,
         listener: (data: WsWebData2) => void,
     ): Promise<Subscription> {
-        const payload = { type: "webData2", ...params } satisfies WsWebData2Request;
+        const payload = parser(WsWebData2Request)({ type: "webData2", ...params });
         return this.transport.subscribe<WsWebData2>(payload.type, payload, (e) => {
             if (e.detail.user === payload.user.toLowerCase()) {
                 listener(e.detail);

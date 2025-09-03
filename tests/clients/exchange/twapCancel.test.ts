@@ -1,21 +1,13 @@
+import { TwapCancelSuccessResponse } from "@nktkas/hyperliquid/schemas";
 import { BigNumber } from "npm:bignumber.js@9";
-import type { ExchangeClient, InfoClient, MultiSignClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { formatSize, getAssetData, runTest } from "./_t.ts";
 
-export type MethodReturnType = Awaited<ReturnType<ExchangeClient["twapCancel"]>>;
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(
-    _t: Deno.TestContext,
-    client: {
-        info: InfoClient;
-        exchange: ExchangeClient | MultiSignClient;
-    },
-) {
+runTest("twapCancel", { perp: "60" }, async (_t, clients) => {
     // —————————— Prepare ——————————
 
-    async function createTWAP(client: ExchangeClient, id: number, sz: string) {
-        const twapOrderResult = await client.twapOrder({
+    async function createTWAP(id: number, sz: string) {
+        const twapOrderResult = await clients.exchange.twapOrder({
             twap: {
                 a: id,
                 b: true,
@@ -29,16 +21,13 @@ async function testFn(
         return twapId;
     }
 
-    const { id, universe, ctx } = await getAssetData("ETH");
+    const { id, universe, ctx } = await getAssetData("SOL");
     const sz = formatSize(new BigNumber(55).div(ctx.markPx), universe.szDecimals);
 
     // —————————— Test ——————————
 
-    const data = await client.exchange.twapCancel({
-        a: id,
-        t: await createTWAP(client.exchange, id, sz),
-    });
-    schemaCoverage(MethodReturnType, [data]);
-}
-
-runTest("twapCancel", testFn, { perp: "60" });
+    const data = await Promise.all([
+        clients.exchange.twapCancel({ a: id, t: await createTWAP(id, sz) }),
+    ]);
+    schemaCoverage(TwapCancelSuccessResponse, data);
+});

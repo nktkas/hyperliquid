@@ -1,22 +1,17 @@
+import { WsTrade } from "@nktkas/hyperliquid/schemas";
 import { deadline } from "jsr:@std/async@1/deadline";
-import type { SubscriptionClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import * as v from "valibot";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { runTest } from "./_t.ts";
 
-export type MethodReturnType = Parameters<Parameters<SubscriptionClient["trades"]>[1]>[0];
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(_t: Deno.TestContext, client: SubscriptionClient) {
-    const data = await deadline(
-        new Promise((resolve) => {
-            client.trades({ coin: "ETH" }, resolve);
-        }),
-        10_000,
-    );
-    schemaCoverage(MethodReturnType, [data], {
-        ignoreEnumValuesByPath: {
-            "#/items/properties/side": ["B", "A"], // some of them may be missing
-        },
-    });
-}
-
-runTest("trades", testFn, "api");
+runTest("trades", "api", async (_t, client) => {
+    const data = await Promise.all([
+        deadline(
+            new Promise<WsTrade[]>((resolve) => {
+                client.trades({ coin: "ETH" }, resolve);
+            }),
+            10_000,
+        ),
+    ]);
+    schemaCoverage(v.array(WsTrade), data);
+});

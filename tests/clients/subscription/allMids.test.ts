@@ -1,18 +1,16 @@
+import { WsAllMids } from "@nktkas/hyperliquid/schemas";
 import { deadline } from "jsr:@std/async@1/deadline";
-import type { SubscriptionClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { runTest } from "./_t.ts";
 
-export type MethodReturnType = Parameters<Parameters<SubscriptionClient["allMids"]>[1]>[0];
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(_t: Deno.TestContext, client: SubscriptionClient) {
-    const data = await deadline(
-        new Promise((resolve) => {
-            client.allMids(resolve);
-        }),
-        10_000,
-    );
-    schemaCoverage(MethodReturnType, [data]);
-}
-
-runTest("allMids", testFn, "api");
+runTest("allMids", "api", async (_t, client) => {
+    const data = await Promise.all([
+        deadline(
+            new Promise<WsAllMids>((resolve) => {
+                client.allMids(resolve);
+            }),
+            10_000,
+        ),
+    ]);
+    schemaCoverage(WsAllMids, data);
+});

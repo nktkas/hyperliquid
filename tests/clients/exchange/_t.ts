@@ -8,17 +8,11 @@ import {
     MultiSignClient,
     type PerpsAssetCtx,
     type PerpsUniverse,
-} from "../../../mod.ts";
+} from "@nktkas/hyperliquid";
 import { getWalletAddress } from "../../../src/signing/mod.ts";
 
-// —————————— Arguments ——————————
-
-const cliArgs = parseArgs(Deno.args, { default: { wait: 0 }, string: ["_"] }) as Args<{
-    /** Delay to avoid rate limits */
-    wait: number;
-}>;
-const PRIVATE_KEY = cliArgs._[0] as `0x${string}`; // must be sole signer for a multi-sign account
-
+const cliArgs = parseArgs(Deno.args, { default: { wait: 0 }, string: ["_"] }) as Args<{ wait: number }>;
+const PRIVATE_KEY = cliArgs._[0] as `0x${string}`;
 if (!PRIVATE_KEY || !/^0x[a-fA-F0-9]{64}$/.test(PRIVATE_KEY)) {
     throw new Error("Please provide a valid private key (0x-prefixed 64 hex characters) as an argument");
 }
@@ -26,7 +20,11 @@ if (!PRIVATE_KEY || !/^0x[a-fA-F0-9]{64}$/.test(PRIVATE_KEY)) {
 // —————————— Clients ——————————
 
 async function createExchangeClient(mainExchClient: ExchangeClient): Promise<ExchangeClient> {
-    const tempExchClient = new ExchangeClient({ wallet: generatePrivateKey(), transport, isTestnet: true });
+    const tempExchClient = new ExchangeClient({
+        wallet: generatePrivateKey(),
+        transport,
+        isTestnet: true,
+    });
     await mainExchClient.usdSend({
         destination: await getWalletAddress(tempExchClient.wallet),
         amount: "2",
@@ -34,7 +32,11 @@ async function createExchangeClient(mainExchClient: ExchangeClient): Promise<Exc
     return tempExchClient;
 }
 async function createMultiSignClient(mainExchClient: ExchangeClient): Promise<MultiSignClient> {
-    const tempExchClient = new ExchangeClient({ wallet: generatePrivateKey(), transport, isTestnet: true });
+    const tempExchClient = new ExchangeClient({
+        wallet: generatePrivateKey(),
+        transport,
+        isTestnet: true,
+    });
     await mainExchClient.usdSend({
         destination: await getWalletAddress(tempExchClient.wallet),
         amount: "2",
@@ -63,20 +65,40 @@ const multiSignClient = await createMultiSignClient(mainExchClient);
 
 export function runTest(
     name: string,
-    testFn: (
+    fn: (
         t: Deno.TestContext,
-        client: {
-            info: InfoClient;
-            exchange: ExchangeClient | MultiSignClient;
-        },
+        clients: { info: InfoClient; exchange: ExchangeClient | MultiSignClient },
     ) => Promise<void>,
-    topup?: {
-        perp?: string;
-        spot?: string;
-        evm?: string;
-        staking?: string;
-    },
+): void;
+export function runTest(
+    name: string,
+    topup: { perp?: string; spot?: string; evm?: string; staking?: string },
+    fn: (
+        t: Deno.TestContext,
+        clients: { info: InfoClient; exchange: ExchangeClient | MultiSignClient },
+    ) => Promise<void>,
+): void;
+export function runTest(
+    name: string,
+    topup_or_fn?:
+        | {
+            perp?: string;
+            spot?: string;
+            evm?: string;
+            staking?: string;
+        }
+        | ((
+            t: Deno.TestContext,
+            clients: { info: InfoClient; exchange: ExchangeClient | MultiSignClient },
+        ) => Promise<void>),
+    maybeFn?: (
+        t: Deno.TestContext,
+        clients: { info: InfoClient; exchange: ExchangeClient | MultiSignClient },
+    ) => Promise<void>,
 ): void {
+    const topup = typeof topup_or_fn === "function" ? {} : topup_or_fn;
+    const fn = typeof topup_or_fn === "function" ? topup_or_fn : maybeFn!;
+
     Deno.test(name, async (t) => {
         await new Promise((r) => setTimeout(r, cliArgs.wait)); // delay to avoid rate limits
 
@@ -136,7 +158,7 @@ export function runTest(
             for (const exchangeClient of [exchClient, multiSignClient] as const) {
                 await t.step(
                     exchangeClient instanceof MultiSignClient ? "MultiSignClient" : "ExchangeClient",
-                    async (t) => await testFn(t, { info: infoClient, exchange: exchangeClient }),
+                    async (t) => await fn(t, { info: infoClient, exchange: exchangeClient }),
                 );
             }
         } finally {
@@ -199,9 +221,7 @@ export function formatSize(
     szDecimals: number,
     roundingMode: BigNumber.RoundingMode = BigNumber.ROUND_HALF_UP,
 ): string {
-    return new BigNumber(size)
-        .toFixed(szDecimals, roundingMode)
-        .replace(/\.?0+$/, ""); // Remove trailing zeros
+    return new BigNumber(size).toFixed(szDecimals, roundingMode);
 }
 
 export function anyFnSuccess<T>(functions: (() => T)[]): T {

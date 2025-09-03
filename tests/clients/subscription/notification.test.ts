@@ -1,27 +1,18 @@
+import { WsNotification } from "@nktkas/hyperliquid/schemas";
 import { deadline } from "jsr:@std/async@1/deadline";
-import { BigNumber } from "npm:bignumber.js@9";
-import type { ExchangeClient, InfoClient, SubscriptionClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
-import { formatSize, getAssetData, runTestWithExch } from "./_t.ts";
 import { getWalletAddress } from "@nktkas/hyperliquid/signing";
+import { BigNumber } from "npm:bignumber.js@9";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
+import { formatSize, getAssetData, runTestWithExchange } from "./_t.ts";
 
-export type MethodReturnType = Parameters<Parameters<SubscriptionClient["notification"]>[1]>[0];
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(
-    _t: Deno.TestContext,
-    client: {
-        subs: SubscriptionClient;
-        exch: ExchangeClient;
-        info: InfoClient;
-    },
-) {
+runTestWithExchange("notification", async (_t, clients) => {
     // —————————— Prepare ——————————
 
-    async function openTwap(asset: string, buy: boolean): Promise<void> {
+    async function openTwap(asset: string, buy: boolean) {
         const { id, universe, ctx } = await getAssetData(asset);
         const twapSz = formatSize(new BigNumber(55).div(ctx.markPx), universe.szDecimals);
 
-        await client.exch.twapOrder({
+        await clients.exchange.twapOrder({
             twap: {
                 a: id,
                 b: buy,
@@ -35,25 +26,27 @@ async function testFn(
 
     // —————————— Test ——————————
 
-    const data = await deadline(
-        // deno-lint-ignore no-async-promise-executor
-        new Promise<unknown[]>(async (resolve, reject) => {
-            const events: unknown[] = [];
-            await client.subs.notification({ user: await getWalletAddress(client.exch.wallet) }, async (data) => {
-                try {
-                    events.push(data);
-                    await twapPromise;
-                    resolve(events);
-                } catch (error) {
-                    reject(error);
-                }
-            });
+    const data = await Promise.all([
+        deadline(
+            // deno-lint-ignore no-async-promise-executor
+            new Promise<WsNotification[]>(async (resolve, reject) => {
+                const events: WsNotification[] = [];
+                await clients.subs.notification({
+                    user: await getWalletAddress(clients.exchange.wallet),
+                }, async (data) => {
+                    try {
+                        events.push(data);
+                        await twapPromise;
+                        resolve(events);
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
 
-            const twapPromise = openTwap("ETH", true);
-        }),
-        20_000,
-    );
-    schemaCoverage(MethodReturnType, data);
-}
-
-runTestWithExch("notification", testFn);
+                const twapPromise = openTwap("SOL", true);
+            }),
+            20_000,
+        ),
+    ]);
+    schemaCoverage(WsNotification, data.flat());
+});

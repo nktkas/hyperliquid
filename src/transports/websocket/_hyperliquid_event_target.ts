@@ -1,4 +1,4 @@
-import type { BlockDetails, TxDetails } from "../../types/mod.ts";
+import type { BlockDetails, TxDetails } from "../../schemas/mod.ts";
 
 /** Represents a message from the Hyperliquid WebSocket API. */
 interface HyperliquidMsg {

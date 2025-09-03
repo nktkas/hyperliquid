@@ -436,7 +436,7 @@ class InfoClient {
 
     // Order
     frontendOpenOrders(params: FrontendOpenOrdersParameters): Promise<FrontendOrder[]>;
-    historicalOrders(params: HistoricalOrdersParameters): Promise<OrderStatus<FrontendOrder>[]>;
+    historicalOrders(params: HistoricalOrdersParameters): Promise<FrontendOrderStatus[]>;
     openOrders(params: OpenOrdersParameters): Promise<Order[]>;
     orderStatus(params: OrderStatusParameters): Promise<OrderLookup>;
     twapHistory(params: TwapHistoryParameters): Promise<TwapHistory[]>;
@@ -534,7 +534,15 @@ class ExchangeClient {
 
     // Multi-Sign
     convertToMultiSigUser(params: ConvertToMultiSigUserParameters): Promise<SuccessResponse>;
-    multiSig(params: MultiSigParameters): Promise<BaseExchangeResponse>;
+    multiSig(params: MultiSigParameters): Promise<
+        | SuccessResponse
+        | CancelSuccessResponse
+        | CreateSubAccountResponse
+        | CreateVaultResponse
+        | OrderSuccessResponse
+        | TwapOrderSuccessResponse
+        | TwapCancelSuccessResponse
+    >;
 
     // Validator
     cSignerAction(params: CSignerActionParameters): Promise<SuccessResponse>;
@@ -571,7 +579,7 @@ class SubscriptionClient {
 
     // Order
     openOrders(params: WsOpenOrdersParameters, listener: (data: WsOpenOrders) => void): Promise<Subscription>;
-    orderUpdates(params: WsOrderUpdatesParameters, listener: (data: OrderStatus<Order>[]) => void): Promise<Subscription>;
+    orderUpdates(params: WsOrderUpdatesParameters, listener: (data: OrderStatus[]) => void): Promise<Subscription>;
     userFills(params: WsUserFillsParameters, listener: (data: WsUserFills) => void): Promise<Subscription>;
     userTwapHistory(params: WsUserTwapHistoryParameters, listener: (data: WsUserTwapHistory) => void): Promise<Subscription>;
     userTwapSliceFills(params: WsUserTwapSliceFillsParameters, listener: (data: WsUserTwapSliceFills) => void): Promise<Subscription>;
@@ -673,20 +681,90 @@ class WebSocketTransport {
 
 ## Additional Import Points
 
-### `/types`
+### `/schemas`
 
-The import point gives access to all request/response types associated with Hyperliquid API.
+This module provides [valibot](https://valibot.dev) schemas for validating, formatting, and inferring types for data
+used in the Hyperliquid API.
+
+```ts
+import { OrderRequest, parser } from "@nktkas/hyperliquid/schemas";
+//       ^^^^^^^^^^^^
+//       both a valibot schema and a typescript type
+
+const action = {
+    type: "order",
+    orders: [{
+        a: 0,
+        b: true,
+        p: "50000",
+        s: "0.1",
+        r: false,
+        t: { limit: { tif: "Gtc" } },
+    }],
+    grouping: "na",
+} satisfies OrderRequest["action"]; // can be used as type
+
+//                             or as valibot schema
+//                             ⌄⌄⌄⌄⌄⌄⌄⌄⌄⌄⌄
+const validatedAction = parser(OrderRequest.entries.action)(action);
+//                      ^^^^^^
+//                      validates, formats, sorts object keys for correct signature generation
+//                      and returns typed data
+```
+
+Also valibot schema can be converted to JSON Schema:
+
+```ts
+import { OrderRequest } from "@nktkas/hyperliquid/schemas";
+import { toJsonSchema } from "@valibot/to-json-schema";
+
+const schema = toJsonSchema(OrderRequest, { errorMode: "ignore" });
+
+console.log(JSON.stringify(schema, null, 2));
+// {
+//   "$schema": "http://json-schema.org/draft-07/schema#",
+//   "type": "object",
+//   "properties": {
+//     "action": {
+//       "type": "object",
+//       "properties": {
+//         "type": { "const": "order" },
+//         "orders": { "type": "array", "items": {...} },
+//         "grouping": { "anyOf": [...] },
+//         "builder": { "type": "object", ... }
+//       },
+//       "required": ["type", "orders", "grouping"]
+//     },
+//     "nonce": { "type": "number" },
+//     "signature": {
+//       "type": "object",
+//       "properties": {
+//         "r": { "type": "string", ... },
+//         "s": { "type": "string", ... },
+//         "v": { "anyOf": [{"const": 27}, {"const": 28}] }
+//       },
+//       "required": ["r", "s", "v"]
+//     },
+//     "vaultAddress": { "type": "string", ... },
+//     "expiresAfter": { "type": "number" }
+//   },
+//   "required": ["action", "nonce", "signature"]
+// }
+```
 
 ### `/signing`
 
-The import point gives access to functions that generate signatures for Hyperliquid API actions.
+This module contains functions for generating Hyperliquid transaction signatures.
 
 #### L1 Action
 
 ```ts
-import { actionSorter, signL1Action } from "@nktkas/hyperliquid/signing";
+import { signL1Action } from "@nktkas/hyperliquid/signing";
+import { CancelRequest, parser } from "@nktkas/hyperliquid/schemas";
 
-const action = actionSorter.cancel({
+const privateKey = "0x..."; // `viem`, `ethers`, or private key directly
+
+const action = parser(CancelRequest.entries.action)({ // for correct signature generation
     type: "cancel",
     cancels: [
         { a: 0, o: 12345 },
@@ -694,17 +772,13 @@ const action = actionSorter.cancel({
 });
 const nonce = Date.now();
 
-const signature = await signL1Action({
-    wallet: "0x...", // `viem`, `ethers`, or private key directly
-    action,
-    nonce,
-});
+const signature = await signL1Action({ wallet: privateKey, action, nonce });
 
 // Send the signed action to the Hyperliquid API
 const response = await fetch("https://api.hyperliquid.xyz/exchange", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action, signature, nonce }), // recommended to send the same formatted action
+    body: JSON.stringify({ action, signature, nonce }),
 });
 const body = await response.json();
 ```
@@ -712,9 +786,12 @@ const body = await response.json();
 #### User Signed Action
 
 ```ts
-import { actionSorter, signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
+import { signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
+import { ApproveAgentRequest, parser } from "@nktkas/hyperliquid/schemas";
 
-const action = actionSorter.approveAgent({
+const privateKey = "0x..."; // `viem`, `ethers`, or private key directly
+
+const action = parser(ApproveAgentRequest.entries.action)({ // for correct signature generation
     type: "approveAgent",
     signatureChainId: "0x66eee",
     hyperliquidChain: "Mainnet",
@@ -724,7 +801,7 @@ const action = actionSorter.approveAgent({
 });
 
 const signature = await signUserSignedAction({
-    wallet: "0x...", // `viem`, `ethers`, or private key directly
+    wallet: privateKey,
     action,
     types: userSignedActionEip712Types[action.type],
 });
@@ -733,7 +810,7 @@ const signature = await signUserSignedAction({
 const response = await fetch("https://api.hyperliquid.xyz/exchange", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action, signature, nonce: action.nonce }), // recommended to send the same formatted action
+    body: JSON.stringify({ action, signature, nonce: action.nonce }),
 });
 const body = await response.json();
 ```

@@ -1,26 +1,14 @@
+import { CancelSuccessResponse } from "@nktkas/hyperliquid/schemas";
 import { BigNumber } from "npm:bignumber.js@9";
-import type { ExchangeClient, InfoClient, MultiSignClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { formatPrice, formatSize, getAssetData, runTest } from "./_t.ts";
 
-export type MethodReturnType = Awaited<ReturnType<ExchangeClient["cancel"]>>;
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(
-    _t: Deno.TestContext,
-    client: {
-        info: InfoClient;
-        exchange: ExchangeClient | MultiSignClient;
-    },
-) {
+runTest("cancel", { perp: "15" }, async (_t, clients) => {
     // —————————— Prepare ——————————
 
-    async function openOrder(client: ExchangeClient, id: number, pxDown: string, sz: string) {
-        await client.updateLeverage({
-            asset: id,
-            isCross: true,
-            leverage: 3,
-        });
-        const openOrderRes = await client.order({
+    async function openOrder(id: number, pxDown: string, sz: string) {
+        await clients.exchange.updateLeverage({ asset: id, isCross: true, leverage: 3 });
+        const openOrderRes = await clients.exchange.order({
             orders: [{
                 a: id,
                 b: true,
@@ -35,19 +23,19 @@ async function testFn(
         return "resting" in order ? order.resting.oid : order.filled.oid;
     }
 
-    const { id, universe, ctx } = await getAssetData("ETH");
+    const { id, universe, ctx } = await getAssetData("SOL");
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const sz = formatSize(new BigNumber(11).div(ctx.markPx), universe.szDecimals);
 
     // —————————— Test ——————————
 
-    const data = await client.exchange.cancel({
-        cancels: [{
-            a: id,
-            o: await openOrder(client.exchange, id, pxDown, sz),
-        }],
-    });
-    schemaCoverage(MethodReturnType, [data]);
-}
-
-runTest("cancel", testFn, { perp: "15" });
+    const data = await Promise.all([
+        clients.exchange.cancel({
+            cancels: [{
+                a: id,
+                o: await openOrder(id, pxDown, sz),
+            }],
+        }),
+    ]);
+    schemaCoverage(CancelSuccessResponse, data);
+});

@@ -1,10 +1,8 @@
-import type { InfoClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import { OrderLookup } from "@nktkas/hyperliquid/schemas";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { runTest } from "./_t.ts";
 
-export type MethodReturnType = Awaited<ReturnType<InfoClient["orderStatus"]>>;
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(_t: Deno.TestContext, client: InfoClient) {
+runTest("orderStatus", async (_t, client) => {
     const data = await Promise.all([
         client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 0 }), // status = unknownOid
 
@@ -36,25 +34,10 @@ async function testFn(_t: Deno.TestContext, client: InfoClient) {
             oid: "0xd4bb069b673a48161bca56cfc88deb6b",
         }),
     ]);
-    schemaCoverage(MethodReturnType, data, {
-        ignoreEmptyArrayPaths: [
-            "#/anyOf/0/properties/order/properties/order/properties/children",
-        ],
-        ignoreEnumValuesByPath: {
-            "#/anyOf/0/properties/order/properties/status": [
-                "delistedCanceled",
-                "liquidatedCanceled",
-                "marginCanceled",
-                "openInterestCapCanceled",
-                "scheduledCancel",
-                "selfTradeCanceled",
-                "siblingFilledCanceled",
-                "triggered",
-                "vaultWithdrawalCanceled",
-                "reduceOnlyRejected",
-            ],
+    schemaCoverage(OrderLookup, data, {
+        ignoreEmptyArray: ["#/union/0/properties/order/properties/order/properties/children"],
+        ignoreBranches: {
+            "#/union/0/properties/order/properties/status": [3, 5, 6, 7, 8, 10, 11, 12, 13, 14],
         },
     });
-}
-
-runTest("orderStatus", testFn);
+});

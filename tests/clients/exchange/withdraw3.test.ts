@@ -1,21 +1,13 @@
-import type { ExchangeClient, InfoClient, MultiSignClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import { SuccessResponse } from "@nktkas/hyperliquid/schemas";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { runTest } from "./_t.ts";
 
-export type MethodReturnType = Awaited<ReturnType<ExchangeClient["withdraw3"]>>;
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(
-    _t: Deno.TestContext,
-    client: {
-        info: InfoClient;
-        exchange: ExchangeClient | MultiSignClient;
-    },
-) {
-    const data = await client.exchange.withdraw3({
-        amount: "2",
-        destination: "0x0000000000000000000000000000000000000001",
-    });
-    schemaCoverage(MethodReturnType, [data]);
-}
-
-runTest("withdraw3", testFn, { perp: "2" });
+runTest("withdraw3", { perp: "2" }, async (_t, clients) => {
+    const data = await Promise.all([
+        clients.exchange.withdraw3({
+            amount: "2",
+            destination: "0x0000000000000000000000000000000000000001",
+        }),
+    ]);
+    schemaCoverage(SuccessResponse, data);
+});

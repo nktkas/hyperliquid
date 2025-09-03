@@ -1,22 +1,19 @@
+import { TxDetails } from "@nktkas/hyperliquid/schemas";
 import { deadline } from "jsr:@std/async@1/deadline";
-import type { SubscriptionClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import * as v from "valibot";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { runTest } from "./_t.ts";
 
-export type MethodReturnType = Parameters<Parameters<SubscriptionClient["explorerTxs"]>[0]>[0];
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(_t: Deno.TestContext, client: SubscriptionClient) {
-    const data = await deadline(
-        new Promise((resolve) => {
-            client.explorerTxs(resolve);
-        }),
-        10_000,
-    );
-    schemaCoverage(MethodReturnType, [data], {
-        ignoreTypesByPath: {
-            "#/items/properties/error": ["string"],
-        },
+runTest("explorerTxs", "rpc", async (_t, client) => {
+    const data = await Promise.all([
+        deadline(
+            new Promise<TxDetails[]>((resolve) => {
+                client.explorerTxs(resolve);
+            }),
+            10_000,
+        ),
+    ]);
+    schemaCoverage(v.array(TxDetails), data, {
+        ignoreDefinedTypes: ["#/items/properties/error"],
     });
-}
-
-runTest("explorerTxs", testFn, "rpc");
+});

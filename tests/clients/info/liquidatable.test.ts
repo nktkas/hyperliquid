@@ -1,12 +1,12 @@
-import type { InfoClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import * as v from "valibot";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { runTest } from "./_t.ts";
 
-export type MethodReturnType = Awaited<ReturnType<InfoClient["liquidatable"]>>;
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(_t: Deno.TestContext, client: InfoClient) {
-    const data = await client.liquidatable();
-    schemaCoverage(MethodReturnType, [data], { ignoreEmptyArrayPaths: ["#"] });
-}
-
-runTest("liquidatable", testFn);
+runTest("liquidatable", async (_t, client) => {
+    const data = await Promise.all([
+        client.liquidatable(),
+    ]);
+    schemaCoverage(v.array(v.unknown()), data, {
+        ignoreEmptyArray: ["#"],
+    });
+});

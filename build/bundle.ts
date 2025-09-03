@@ -14,6 +14,7 @@ await build({
     plugins: [...denoPlugins({ nodeModulesDir: "auto" })],
     entryPoints: {
         mod: "./mod.ts",
+        schemas: "./src/schemas/mod.ts",
         signing: "./src/signing/mod.ts",
     },
     format: "esm",

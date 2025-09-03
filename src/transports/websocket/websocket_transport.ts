@@ -1,4 +1,5 @@
-import { type IRequestTransport, type ISubscriptionTransport, type Subscription, TransportError } from "../base.ts";
+import { TransportError } from "../base.ts";
+import type { IRequestTransport, ISubscriptionTransport, Subscription } from "../base.ts";
 import {
     type MessageBufferStrategy,
     ReconnectingWebSocket,

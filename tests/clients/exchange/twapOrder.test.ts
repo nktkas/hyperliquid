@@ -1,43 +1,31 @@
+import { TwapOrderSuccessResponse } from "@nktkas/hyperliquid/schemas";
 import { BigNumber } from "npm:bignumber.js@9";
-import type { ExchangeClient, InfoClient, MultiSignClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { formatSize, getAssetData, runTest } from "./_t.ts";
 
-export type MethodReturnType = Awaited<ReturnType<ExchangeClient["twapOrder"]>>;
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(
-    _t: Deno.TestContext,
-    client: {
-        info: InfoClient;
-        exchange: ExchangeClient | MultiSignClient;
-    },
-) {
+runTest("twapOrder", { perp: "60" }, async (_t, clients) => {
     // —————————— Prepare ——————————
 
-    const { id, universe, ctx } = await getAssetData("ETH");
+    const { id, universe, ctx } = await getAssetData("SOL");
     const sz = formatSize(new BigNumber(55).div(ctx.markPx), universe.szDecimals);
 
     // —————————— Test ——————————
 
-    const data = await client.exchange.twapOrder({
-        twap: {
-            a: id,
-            b: true,
-            s: sz,
-            r: false,
-            m: 5,
-            t: false,
-        },
-    });
-    schemaCoverage(MethodReturnType, [data], {
-        ignoreBranchesByPath: {
-            "#/properties/response/properties/data/properties/status/anyOf": [1], // error
-        },
-    });
+    const data = await Promise.all([
+        clients.exchange.twapOrder({
+            twap: {
+                a: id,
+                b: true,
+                s: sz,
+                r: false,
+                m: 5,
+                t: false,
+            },
+        }),
+    ]);
+    schemaCoverage(TwapOrderSuccessResponse, data);
 
     // —————————— Cleanup ——————————
 
-    await client.exchange.twapCancel({ a: id, t: data.response.data.status.running.twapId });
-}
-
-runTest("twapOrder", testFn, { perp: "60" });
+    await clients.exchange.twapCancel({ a: id, t: data[0].response.data.status.running.twapId });
+});

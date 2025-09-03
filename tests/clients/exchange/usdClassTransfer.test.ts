@@ -1,18 +1,10 @@
-import type { ExchangeClient, InfoClient, MultiSignClient } from "../../../mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import { SuccessResponse } from "@nktkas/hyperliquid/schemas";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { runTest } from "./_t.ts";
 
-export type MethodReturnType = Awaited<ReturnType<ExchangeClient["usdClassTransfer"]>>;
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(
-    _t: Deno.TestContext,
-    client: {
-        info: InfoClient;
-        exchange: ExchangeClient | MultiSignClient;
-    },
-) {
-    const data = await client.exchange.usdClassTransfer({ amount: "1", toPerp: false });
-    schemaCoverage(MethodReturnType, [data]);
-}
-
-runTest("usdClassTransfer", testFn, { perp: "1" });
+runTest("usdClassTransfer", { perp: "1" }, async (_t, clients) => {
+    const data = await Promise.all([
+        clients.exchange.usdClassTransfer({ amount: "1", toPerp: false }),
+    ]);
+    schemaCoverage(SuccessResponse, data);
+});

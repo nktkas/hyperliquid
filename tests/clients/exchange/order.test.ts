@@ -1,21 +1,13 @@
+import { OrderSuccessResponse } from "@nktkas/hyperliquid/schemas";
 import { BigNumber } from "npm:bignumber.js@9";
-import type { ExchangeClient, InfoClient, MultiSignClient } from "../../../mod.ts";
-import { getWalletAddress } from "../../../src/signing/mod.ts";
-import { schemaCoverage, schemaGenerator } from "../../_utils/schema/mod.ts";
+import { getWalletAddress } from "@nktkas/hyperliquid/signing";
+import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { formatPrice, formatSize, getAssetData, randomCloid, runTest } from "./_t.ts";
 
-export type MethodReturnType = Awaited<ReturnType<ExchangeClient["order"]>>;
-const MethodReturnType = schemaGenerator(import.meta.url, "MethodReturnType");
-async function testFn(
-    _t: Deno.TestContext,
-    client: {
-        info: InfoClient;
-        exchange: ExchangeClient | MultiSignClient;
-    },
-) {
+runTest("order", { perp: "15" }, async (_t, clients) => {
     // —————————— Prepare ——————————
 
-    const { id, universe, ctx } = await getAssetData("ETH");
+    const { id, universe, ctx } = await getAssetData("SOL");
     const pxUp = formatPrice(new BigNumber(ctx.markPx).times(1.01), universe.szDecimals);
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);
@@ -25,7 +17,7 @@ async function testFn(
     try {
         const data = await Promise.all([
             // resting
-            client.exchange.order({
+            clients.exchange.order({
                 orders: [{
                     a: id,
                     b: true,
@@ -37,7 +29,7 @@ async function testFn(
                 grouping: "na",
             }),
             // resting | cloid
-            client.exchange.order({
+            clients.exchange.order({
                 orders: [{
                     a: id,
                     b: true,
@@ -50,7 +42,7 @@ async function testFn(
                 grouping: "na",
             }),
             // filled
-            client.exchange.order({
+            clients.exchange.order({
                 orders: [{
                     a: id,
                     b: true,
@@ -62,7 +54,7 @@ async function testFn(
                 grouping: "na",
             }),
             // filled | cloid
-            client.exchange.order({
+            clients.exchange.order({
                 orders: [{
                     a: id,
                     b: true,
@@ -75,14 +67,14 @@ async function testFn(
                 grouping: "na",
             }),
         ]);
-        schemaCoverage(MethodReturnType, data);
+        schemaCoverage(OrderSuccessResponse, data);
     } finally {
         // —————————— Cleanup ——————————
 
-        const openOrders = await client.info.openOrders({ user: await getWalletAddress(client.exchange.wallet) });
+        const openOrders = await clients.info.openOrders({ user: await getWalletAddress(clients.exchange.wallet) });
         const cancels = openOrders.map((o) => ({ a: id, o: o.oid }));
-        await client.exchange.cancel({ cancels });
-        await client.exchange.order({
+        await clients.exchange.cancel({ cancels });
+        await clients.exchange.order({
             orders: [{
                 a: id,
                 b: false,
@@ -94,6 +86,4 @@ async function testFn(
             grouping: "na",
         });
     }
-}
-
-runTest("order", testFn, { perp: "15" });
+});
