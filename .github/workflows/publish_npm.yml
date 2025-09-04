@@ -16,7 +16,7 @@ jobs:
                   deno-version: v2.x # Run with latest stable Deno
             - uses: actions/setup-node@v4
               with:
-                  node-version: "22.x" # Run with latest stable Node.js
+                  node-version: "24.x" # Run with latest stable Node.js
                   registry-url: "https://registry.npmjs.org" # Use npm registry
 
             - name: Build package
