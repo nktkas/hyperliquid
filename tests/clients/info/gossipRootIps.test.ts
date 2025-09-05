@@ -7,6 +7,6 @@ runTest("gossipRootIps", async (_t, client) => {
         client.gossipRootIps(),
     ]);
     schemaCoverage(GossipRootIps, data, {
-        ignoreEmptyArray: ["#"]
+        ignoreEmptyArray: ["#"],
     });
 });
