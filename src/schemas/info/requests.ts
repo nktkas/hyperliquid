@@ -1345,3 +1345,25 @@ export const RecentTradesRequest = v.pipe(
     v.description("Request recent trades."),
 );
 export type RecentTradesRequest = v.InferOutput<typeof RecentTradesRequest>;
+
+/**
+ * Request builder deployed perpetual market limits.
+ * @returns {PerpDexLimits}
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-builder-deployed-perp-market-limits
+ */
+export const PerpDexLimitsRequest = v.pipe(
+    v.object({
+        /** Type of request. */
+        type: v.pipe(
+            v.literal("perpDexLimits"),
+            v.description("Type of request."),
+        ),
+        /** DEX name (empty string for main dex). */
+        dex: v.pipe(
+            v.string(),
+            v.description("DEX name (empty string for main dex)."),
+        ),
+    }),
+    v.description("Request perpetual DEX limits."),
+);
+export type PerpDexLimitsRequest = v.InferOutput<typeof PerpDexLimitsRequest>;

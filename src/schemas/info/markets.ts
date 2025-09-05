@@ -141,3 +141,31 @@ export const SpotDeployState = v.pipe(
     v.description("Deploy state for spot tokens."),
 );
 export type SpotDeployState = v.InferOutput<typeof SpotDeployState>;
+
+/** Perpetual DEX limits. */
+export const PerpDexLimits = v.pipe(
+    v.object({
+        /** Total open interest cap. */
+        totalOiCap: v.pipe(
+            UnsignedDecimal,
+            v.description("Total open interest cap."),
+        ),
+        /** Open interest size cap per perpetual. */
+        oiSzCapPerPerp: v.pipe(
+            UnsignedDecimal,
+            v.description("Open interest size cap per perpetual."),
+        ),
+        /** Maximum transfer notional amount. */
+        maxTransferNtl: v.pipe(
+            UnsignedDecimal,
+            v.description("Maximum transfer notional amount."),
+        ),
+        /** Coin to open interest cap mapping. */
+        coinToOiCap: v.pipe(
+            v.array(v.tuple([v.string(), UnsignedDecimal])),
+            v.description("Coin to open interest cap mapping."),
+        ),
+    }),
+    v.description("Perpetual DEX limits."),
+);
+export type PerpDexLimits = v.InferOutput<typeof PerpDexLimits>;

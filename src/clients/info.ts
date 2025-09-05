@@ -53,6 +53,8 @@ import {
     parser,
     PerpDeployAuctionStatusRequest,
     type PerpDex,
+    type PerpDexLimits,
+    PerpDexLimitsRequest,
     PerpDexsRequest,
     PerpsAtOpenInterestCapRequest,
     type PerpsClearinghouseState,
@@ -174,6 +176,8 @@ export type MetaAndAssetCtxsParameters = Omit<MetaAndAssetCtxsRequest, "type">;
 export type OpenOrdersParameters = Omit<OpenOrdersRequest, "type">;
 /** Request parameters for the {@linkcode InfoClient.orderStatus} method. */
 export type OrderStatusParameters = Omit<OrderStatusRequest, "type">;
+/** Request parameters for the {@linkcode InfoClient.perpDexLimits} method. */
+export type PerpDexLimitsParameters = Omit<PerpDexLimitsRequest, "type">;
 /** Request parameters for the {@linkcode InfoClient.perpsAtOpenInterestCap} method. */
 export type PerpsAtOpenInterestCapParameters = Omit<PerpsAtOpenInterestCapRequest, "type">;
 /** Request parameters for the {@linkcode InfoClient.portfolio} method. */
@@ -1088,6 +1092,35 @@ export class InfoClient<
     perpDeployAuctionStatus(signal?: AbortSignal): Promise<DeployAuctionStatus> {
         const request = parser(PerpDeployAuctionStatusRequest)({
             type: "perpDeployAuctionStatus",
+        });
+        return this.transport.request("info", request, signal);
+    }
+
+    /**
+     * Request builder deployed perpetual market limits.
+     * @param signal - An {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal}. If this option is set, the request can be canceled by calling {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort | abort()} on the corresponding {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController | AbortController}.
+     * @returns Status of the perpetual deploy auction.
+     *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-builder-deployed-perp-market-limits
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+     * const infoClient = new hl.InfoClient({ transport });
+     *
+     * const data = await infoClient.perpDexLimits({ dex: "test" });
+     * ```
+     */
+    perpDexLimits(
+        params: DeepImmutable<PerpDexLimitsParameters>,
+        signal?: AbortSignal,
+    ): Promise<PerpDexLimits | null> {
+        const request = parser(PerpDexLimitsRequest)({
+            type: "perpDexLimits",
+            ...params,
         });
         return this.transport.request("info", request, signal);
     }

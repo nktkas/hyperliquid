@@ -406,6 +406,7 @@ class InfoClient {
     meta(params?: MetaParameters): Promise<PerpsMeta>;
     metaAndAssetCtxs(params?: MetaAndAssetCtxsParameters): Promise<PerpsMetaAndAssetCtxs>;
     perpDeployAuctionStatus(): Promise<DeployAuctionStatus>;
+    perpDexLimits(params: PerpDexLimitsParameters): Promise<PerpDexLimits | null>;
     perpDexs(): Promise<(PerpDex | null)[]>;
     perpsAtOpenInterestCap(params?: PerpsAtOpenInterestCapParameters): Promise<string[]>;
     predictedFundings(): Promise<PredictedFunding[]>;
