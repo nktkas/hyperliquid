@@ -23,6 +23,9 @@ await build({
     minify: true,
     outdir,
     sourcemap: true,
+    metafile: true,
+}).then(async (result) => {
+    await Deno.writeTextFile(`${outdir}/meta.json`, JSON.stringify(result.metafile, null, 2));
 });
 
 if (!nodeModulesExists) {

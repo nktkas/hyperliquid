@@ -61,6 +61,7 @@ await build({
     compilerOptions: {
         lib: ["ESNext", "DOM"],
         target: "Latest",
+        sourceMap: true,
     },
 });
 
