@@ -290,3 +290,10 @@ export const ValidatorL1Vote = v.pipe(
     v.description("L1 governance vote cast by a validator."),
 );
 export type ValidatorL1Vote = v.InferOutput<typeof ValidatorL1Vote>;
+
+/** List of gossip root IPs. */
+export const GossipRootIps = v.pipe(
+    v.array(v.pipe(v.string(), v.ipv4())),
+    v.description("List of gossip root IPs."),
+);
+export type GossipRootIps = v.InferOutput<typeof GossipRootIps>;

@@ -30,6 +30,8 @@ import {
     type FrontendOrderStatus,
     type FundingHistory,
     FundingHistoryRequest,
+    type GossipRootIps,
+    GossipRootIpsRequest,
     HistoricalOrdersRequest,
     IsVipRequest,
     L2BookRequest,
@@ -638,6 +640,33 @@ export class InfoClient<
         const request = parser(FundingHistoryRequest)({
             type: "fundingHistory",
             ...params,
+        });
+        return this.transport.request("info", request, signal);
+    }
+
+    /**
+     * Request gossip root IPs.
+     * @param signal - An {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal}. If this option is set, the request can be canceled by calling {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort | abort()} on the corresponding {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController | AbortController}.
+     * @returns Array of gossip root IPs.
+     * 
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+     * const infoClient = new hl.InfoClient({ transport });
+     *
+     * const data = await infoClient.gossipRootIps();
+     * ```
+     */
+    gossipRootIps(
+        signal?: AbortSignal,
+    ): Promise<GossipRootIps> {
+        const request = parser(GossipRootIpsRequest)({
+            type: "gossipRootIps",
         });
         return this.transport.request("info", request, signal);
     }

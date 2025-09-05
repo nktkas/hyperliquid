@@ -1306,3 +1306,20 @@ export const VaultSummariesRequest = v.pipe(
     v.description("Request a list of vaults less than 2 hours old."),
 );
 export type VaultSummariesRequest = v.InferOutput<typeof VaultSummariesRequest>;
+
+/**
+ * Request gossip root IPs.
+ * @returns {GossipRootIps[]}
+ * @see null
+ */
+export const GossipRootIpsRequest = v.pipe(
+    v.object({
+        /** Type of request. */
+        type: v.pipe(
+            v.literal("gossipRootIps"),
+            v.description("Type of request."),
+        ),
+    }),
+    v.description("Request gossip root IPs."),
+);
+export type GossipRootIpsRequest = v.InferOutput<typeof GossipRootIpsRequest>;

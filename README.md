@@ -446,6 +446,7 @@ class InfoClient {
     userTwapSliceFillsByTime(params: UserTwapSliceFillsByTimeParameters): Promise<TwapSliceFill[]>;
 
     // Validator
+    gossipRootIps(): Promise<GossipRootIps>;
     delegations(params: DelegationsParameters): Promise<Delegation[]>;
     delegatorHistory(params: DelegatorHistoryParameters): Promise<DelegatorUpdate[]>;
     delegatorRewards(params: DelegatorRewardsParameters): Promise<DelegatorReward[]>;
@@ -705,7 +706,7 @@ const action = {
 } satisfies OrderRequest["action"]; // can be used as type
 
 //                             or as valibot schema
-//                             ⌄⌄⌄⌄⌄⌄⌄⌄⌄⌄⌄
+//                             ⌄⌄⌄⌄⌄⌄⌄⌄⌄⌄⌄⌄
 const validatedAction = parser(OrderRequest.entries.action)(action);
 //                      ^^^^^^
 //                      validates, formats, sorts object keys for correct signature generation
