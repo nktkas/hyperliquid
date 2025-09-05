@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Hex, SignedDecimal, UnsignedDecimal } from "../_base.ts";
+import { Decimal, Hex, Integer, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /** Mapping of coin symbols to mid prices. */
 export const AllMids = v.pipe(
@@ -10,15 +10,15 @@ export type AllMids = v.InferOutput<typeof AllMids>;
 
 /** Candlestick data point. */
 export const Candle = v.pipe(
-    v.strictObject({
+    v.object({
         /** Opening timestamp (ms since epoch). */
         t: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Opening timestamp (ms since epoch)."),
         ),
         /** Closing timestamp (ms since epoch). */
         T: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Closing timestamp (ms since epoch)."),
         ),
         /** Asset symbol. */
@@ -73,7 +73,7 @@ export const Candle = v.pipe(
         ),
         /** Number of trades executed. */
         n: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Number of trades executed."),
         ),
     }),
@@ -83,7 +83,7 @@ export type Candle = v.InferOutput<typeof Candle>;
 
 /** Historical funding rate record for an asset. */
 export const FundingHistory = v.pipe(
-    v.strictObject({
+    v.object({
         /** Asset symbol. */
         coin: v.pipe(
             v.string(),
@@ -91,17 +91,17 @@ export const FundingHistory = v.pipe(
         ),
         /** Funding rate. */
         fundingRate: v.pipe(
-            SignedDecimal,
+            Decimal,
             v.description("Funding rate."),
         ),
         /** Premium price. */
         premium: v.pipe(
-            SignedDecimal,
+            Decimal,
             v.description("Premium price."),
         ),
         /** Funding record timestamp (ms since epoch). */
         time: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Funding record timestamp (ms since epoch)."),
         ),
     }),
@@ -111,7 +111,7 @@ export type FundingHistory = v.InferOutput<typeof FundingHistory>;
 
 /** Perpetual dex metadata. */
 export const PerpDex = v.pipe(
-    v.strictObject({
+    v.object({
         /** Short name of the perpetual dex. */
         name: v.pipe(
             v.string(),
@@ -139,7 +139,7 @@ export type PerpDex = v.InferOutput<typeof PerpDex>;
 
 /** Individual tier in a margin requirements table. */
 export const MarginTier = v.pipe(
-    v.strictObject({
+    v.object({
         /** Lower position size boundary for this tier. */
         lowerBound: v.pipe(
             UnsignedDecimal,
@@ -147,7 +147,7 @@ export const MarginTier = v.pipe(
         ),
         /** Maximum allowed leverage for this tier. */
         maxLeverage: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.minValue(1),
             v.description("Maximum allowed leverage for this tier."),
         ),
@@ -158,7 +158,7 @@ export type MarginTier = v.InferOutput<typeof MarginTier>;
 
 /** Margin requirements table with multiple tiers. */
 export const MarginTable = v.pipe(
-    v.strictObject({
+    v.object({
         /** Description of the margin table. */
         description: v.pipe(
             v.string(),
@@ -176,14 +176,14 @@ export type MarginTable = v.InferOutput<typeof MarginTable>;
 
 /** Collection of margin tables indexed by ID. */
 export const MarginTables = v.pipe(
-    v.array(v.strictTuple([v.pipe(v.number(), v.safeInteger(), v.minValue(0)), MarginTable])),
+    v.array(v.tuple([UnsignedInteger, MarginTable])),
     v.description("Collection of margin tables indexed by ID."),
 );
 export type MarginTables = v.InferOutput<typeof MarginTables>;
 
 /** Shared context for assets. */
 export const SharedAssetCtx = v.pipe(
-    v.strictObject({
+    v.object({
         /** Previous day's closing price. */
         prevDayPx: v.pipe(
             UnsignedDecimal,
@@ -211,11 +211,11 @@ export type SharedAssetCtx = v.InferOutput<typeof SharedAssetCtx>;
 
 /** Context for a perpetual asset. */
 export const PerpsAssetCtx = v.pipe(
-    v.strictObject({
+    v.object({
         ...SharedAssetCtx.entries,
         /** Funding rate. */
         funding: v.pipe(
-            SignedDecimal,
+            Decimal,
             v.description("Funding rate."),
         ),
         /** Total open interest. */
@@ -225,7 +225,7 @@ export const PerpsAssetCtx = v.pipe(
         ),
         /** Premium price. */
         premium: v.pipe(
-            v.nullable(SignedDecimal),
+            v.nullable(Decimal),
             v.description("Premium price."),
         ),
         /** Oracle price. */
@@ -250,10 +250,10 @@ export type PerpsAssetCtx = v.InferOutput<typeof PerpsAssetCtx>;
 
 /** Trading universe parameters for perpetual assets. */
 export const PerpsUniverse = v.pipe(
-    v.strictObject({
+    v.object({
         /** Minimum decimal places for order sizes. */
         szDecimals: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Minimum decimal places for order sizes."),
         ),
         /** Name of the universe. */
@@ -263,13 +263,13 @@ export const PerpsUniverse = v.pipe(
         ),
         /** Maximum allowed leverage. */
         maxLeverage: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.minValue(1),
             v.description("Maximum allowed leverage."),
         ),
         /** Unique identifier for the margin requirements table. */
         marginTableId: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique identifier for the margin requirements table."),
         ),
         /** Indicates if only isolated margin trading is allowed. */
@@ -289,7 +289,7 @@ export type PerpsUniverse = v.InferOutput<typeof PerpsUniverse>;
 
 /** Metadata for perpetual assets. */
 export const PerpsMeta = v.pipe(
-    v.strictObject({
+    v.object({
         /** Trading universes available for perpetual trading. */
         universe: v.pipe(
             v.array(PerpsUniverse),
@@ -307,7 +307,7 @@ export type PerpsMeta = v.InferOutput<typeof PerpsMeta>;
 
 /** Metadata and context for perpetual assets. */
 export const PerpsMetaAndAssetCtxs = v.pipe(
-    v.strictTuple([
+    v.tuple([
         /** Metadata for assets. */
         v.pipe(
             PerpsMeta,
@@ -329,7 +329,7 @@ export type PerpsMetaAndAssetCtxs = v.InferOutput<typeof PerpsMetaAndAssetCtxs>;
  * The first element is the asset symbol and the second element is an array of predicted funding data for each exchange.
  */
 export const PredictedFunding = v.pipe(
-    v.strictTuple([
+    v.tuple([
         /** Asset symbol. */
         v.pipe(
             v.string(),
@@ -338,7 +338,7 @@ export const PredictedFunding = v.pipe(
         /** Array of predicted funding data for each exchange. */
         v.pipe(
             v.array(
-                v.strictTuple([
+                v.tuple([
                     /** Exchange symbol. */
                     v.pipe(
                         v.string(),
@@ -347,20 +347,20 @@ export const PredictedFunding = v.pipe(
                     /** Predicted funding data. */
                     v.pipe(
                         v.nullable(
-                            v.strictObject({
+                            v.object({
                                 /** Predicted funding rate. */
                                 fundingRate: v.pipe(
-                                    SignedDecimal,
+                                    Decimal,
                                     v.description("Predicted funding rate."),
                                 ),
                                 /** Next funding time (ms since epoch). */
                                 nextFundingTime: v.pipe(
-                                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                    UnsignedInteger,
                                     v.description("Next funding time (ms since epoch)."),
                                 ),
                                 /** Funding interval in hours. */
                                 fundingIntervalHours: v.pipe(
-                                    v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+                                    v.optional(UnsignedInteger),
                                     v.description("Funding interval in hours."),
                                 ),
                             }),
@@ -381,7 +381,7 @@ export type PredictedFunding = v.InferOutput<typeof PredictedFunding>;
 
 /** Context for a spot asset. */
 export const SpotAssetCtx = v.pipe(
-    v.strictObject({
+    v.object({
         ...SharedAssetCtx.entries,
         /** Circulating supply. */
         circulatingSupply: v.pipe(
@@ -410,7 +410,7 @@ export type SpotAssetCtx = v.InferOutput<typeof SpotAssetCtx>;
 
 /** Details for a trading token in spot markets. */
 export const SpotToken = v.pipe(
-    v.strictObject({
+    v.object({
         /** Name of the token. */
         name: v.pipe(
             v.string(),
@@ -418,17 +418,17 @@ export const SpotToken = v.pipe(
         ),
         /** Minimum decimal places for order sizes. */
         szDecimals: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Minimum decimal places for order sizes."),
         ),
         /** Number of decimals for the token's smallest unit. */
         weiDecimals: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Number of decimals for the token's smallest unit."),
         ),
         /** Unique identifier for the token. */
         index: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique identifier for the token."),
         ),
         /** Token ID. */
@@ -444,7 +444,7 @@ export const SpotToken = v.pipe(
         /** EVM contract details. */
         evmContract: v.pipe(
             v.nullable(
-                v.strictObject({
+                v.object({
                     /** Contract address. */
                     address: v.pipe(
                         v.pipe(Hex, v.length(42)),
@@ -452,7 +452,7 @@ export const SpotToken = v.pipe(
                     ),
                     /** Extra decimals in the token's smallest unit. */
                     evm_extra_wei_decimals: v.pipe(
-                        v.pipe(v.number(), v.safeInteger()),
+                        Integer,
                         v.description("Extra decimals in the token's smallest unit."),
                     ),
                 }),
@@ -476,10 +476,10 @@ export type SpotToken = v.InferOutput<typeof SpotToken>;
 
 /** Trading universe parameters for spot assets. */
 export const SpotUniverse = v.pipe(
-    v.strictObject({
+    v.object({
         /** Token indices included in this universe. */
         tokens: v.pipe(
-            v.array(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.array(UnsignedInteger),
             v.description("Token indices included in this universe."),
         ),
         /** Name of the universe. */
@@ -489,7 +489,7 @@ export const SpotUniverse = v.pipe(
         ),
         /** Unique identifier of the universe. */
         index: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique identifier of the universe."),
         ),
         /** Indicates if the token is the primary representation in the system. */
@@ -504,7 +504,7 @@ export type SpotUniverse = v.InferOutput<typeof SpotUniverse>;
 
 /** Metadata for spot assets. */
 export const SpotMeta = v.pipe(
-    v.strictObject({
+    v.object({
         /** Trading universes available for spot trading. */
         universe: v.pipe(
             v.array(SpotUniverse),
@@ -522,7 +522,7 @@ export type SpotMeta = v.InferOutput<typeof SpotMeta>;
 
 /** Metadata and context for spot assets. */
 export const SpotMetaAndAssetCtxs = v.pipe(
-    v.strictTuple([
+    v.tuple([
         /** Metadata for assets. */
         v.pipe(
             SpotMeta,
@@ -540,7 +540,7 @@ export type SpotMetaAndAssetCtxs = v.InferOutput<typeof SpotMetaAndAssetCtxs>;
 
 /** Details of a token. */
 export const TokenDetails = v.pipe(
-    v.strictObject({
+    v.object({
         /** Name of the token. */
         name: v.pipe(
             v.string(),
@@ -563,12 +563,12 @@ export const TokenDetails = v.pipe(
         ),
         /** Decimal places for the minimum tradable unit. */
         szDecimals: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Decimal places for the minimum tradable unit."),
         ),
         /** Decimal places for the token's smallest unit. */
         weiDecimals: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Decimal places for the token's smallest unit."),
         ),
         /** Mid price of the token. */
@@ -589,15 +589,15 @@ export const TokenDetails = v.pipe(
         /** Genesis data for the token. */
         genesis: v.pipe(
             v.nullable(
-                v.strictObject({
+                v.object({
                     /** User balances. */
                     userBalances: v.pipe(
-                        v.array(v.strictTuple([v.pipe(Hex, v.length(42)), v.string()])),
+                        v.array(v.tuple([v.pipe(Hex, v.length(42)), v.string()])),
                         v.description("User balances."),
                     ),
                     /** Existing token balances. */
                     existingTokenBalances: v.pipe(
-                        v.array(v.strictTuple([v.pipe(v.number(), v.safeInteger(), v.minValue(0)), v.string()])),
+                        v.array(v.tuple([UnsignedInteger, v.string()])),
                         v.description("Existing token balances."),
                     ),
                     /** Blacklisted users. */
@@ -631,7 +631,7 @@ export const TokenDetails = v.pipe(
         ),
         /** Non-circulating user balances of the token. */
         nonCirculatingUserBalances: v.pipe(
-            v.array(v.strictTuple([v.pipe(Hex, v.length(42)), v.string()])),
+            v.array(v.tuple([v.pipe(Hex, v.length(42)), v.string()])),
             v.description("Non-circulating user balances of the token."),
         ),
         /** Future emissions amount. */

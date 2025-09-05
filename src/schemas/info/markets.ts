@@ -1,9 +1,9 @@
 import * as v from "valibot";
-import { Hex, UnsignedDecimal } from "../_base.ts";
+import { Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /** Status of the deploy auction. */
 export const DeployAuctionStatus = v.pipe(
-    v.strictObject({
+    v.object({
         /** Current gas. */
         currentGas: v.pipe(
             v.nullable(UnsignedDecimal),
@@ -11,7 +11,7 @@ export const DeployAuctionStatus = v.pipe(
         ),
         /** Duration in seconds. */
         durationSeconds: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Duration in seconds."),
         ),
         /** Ending gas. */
@@ -26,7 +26,7 @@ export const DeployAuctionStatus = v.pipe(
         ),
         /** Auction start time (seconds since epoch). */
         startTimeSeconds: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Auction start time (seconds since epoch)."),
         ),
     }),
@@ -36,10 +36,10 @@ export type DeployAuctionStatus = v.InferOutput<typeof DeployAuctionStatus>;
 
 /** Exchange system status information. */
 export const ExchangeStatus = v.pipe(
-    v.strictObject({
+    v.object({
         /** Server time (in ms since epoch). */
         time: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Server time (in ms since epoch)."),
         ),
         specialStatuses: v.pipe(
@@ -52,19 +52,19 @@ export type ExchangeStatus = v.InferOutput<typeof ExchangeStatus>;
 
 /** Deploy state for spot tokens. */
 export const SpotDeployState = v.pipe(
-    v.strictObject({
+    v.object({
         /** Array of deploy states for tokens. */
         states: v.pipe(
             v.array(
-                v.strictObject({
+                v.object({
                     /** Token ID. */
                     token: v.pipe(
-                        v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                        UnsignedInteger,
                         v.description("Token ID."),
                     ),
                     /** Token specification. */
                     spec: v.pipe(
-                        v.strictObject({
+                        v.object({
                             /** Name of the token. */
                             name: v.pipe(
                                 v.string(),
@@ -72,12 +72,12 @@ export const SpotDeployState = v.pipe(
                             ),
                             /** Minimum decimal places for order sizes. */
                             szDecimals: v.pipe(
-                                v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                UnsignedInteger,
                                 v.description("Minimum decimal places for order sizes."),
                             ),
                             /** Number of decimals for the token's smallest unit. */
                             weiDecimals: v.pipe(
-                                v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                UnsignedInteger,
                                 v.description("Number of decimals for the token's smallest unit."),
                             ),
                         }),
@@ -95,7 +95,7 @@ export const SpotDeployState = v.pipe(
                     ),
                     /** Spot indices for the token. */
                     spots: v.pipe(
-                        v.array(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+                        v.array(UnsignedInteger),
                         v.description("Spot indices for the token."),
                     ),
                     /** Maximum supply of the token. */
@@ -115,12 +115,12 @@ export const SpotDeployState = v.pipe(
                     ),
                     /** User genesis balances for the token. */
                     userGenesisBalances: v.pipe(
-                        v.array(v.strictTuple([v.pipe(Hex, v.length(42)), UnsignedDecimal])),
+                        v.array(v.tuple([v.pipe(Hex, v.length(42)), UnsignedDecimal])),
                         v.description("User genesis balances for the token."),
                     ),
                     /** Existing token genesis balances for the token. */
                     existingTokenGenesisBalances: v.pipe(
-                        v.array(v.strictTuple([v.pipe(v.number(), v.safeInteger(), v.minValue(0)), UnsignedDecimal])),
+                        v.array(v.tuple([UnsignedInteger, UnsignedDecimal])),
                         v.description("Existing token genesis balances for the token."),
                     ),
                     /** Blacklisted users for the token. */

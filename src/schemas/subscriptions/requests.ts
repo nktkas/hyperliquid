@@ -7,7 +7,7 @@ import { Hex } from "../_base.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const WsActiveAssetCtxRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("activeAssetCtx"),
@@ -29,7 +29,7 @@ export type WsActiveAssetCtxRequest = v.InferOutput<typeof WsActiveAssetCtxReque
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-active-asset-data
  */
 export const WsActiveAssetDataRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("activeAssetData"),
@@ -56,7 +56,7 @@ export type WsActiveAssetDataRequest = v.InferOutput<typeof WsActiveAssetDataReq
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-mids-for-all-coins
  */
 export const WsAllMidsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("allMids"),
@@ -78,7 +78,7 @@ export type WsAllMidsRequest = v.InferOutput<typeof WsAllMidsRequest>;
  * @see null
  */
 export const WsAssetCtxsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("assetCtxs"),
@@ -100,7 +100,7 @@ export type WsAssetCtxsRequest = v.InferOutput<typeof WsAssetCtxsRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const WsBboRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("bbo"),
@@ -122,7 +122,7 @@ export type WsBboRequest = v.InferOutput<typeof WsBboRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const WsCandleRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("candle"),
@@ -164,7 +164,7 @@ export type WsCandleRequest = v.InferOutput<typeof WsCandleRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-perpetuals-account-summary
  */
 export const WsClearinghouseStateRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("clearinghouseState"),
@@ -191,7 +191,7 @@ export type WsClearinghouseStateRequest = v.InferOutput<typeof WsClearinghouseSt
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#l2-book-snapshot
  */
 export const WsL2BookRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("l2Book"),
@@ -223,7 +223,7 @@ export type WsL2BookRequest = v.InferOutput<typeof WsL2BookRequest>;
  * @see null
  */
 export const WsExplorerBlockRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("explorerBlock"),
@@ -240,7 +240,7 @@ export type WsExplorerBlockRequest = v.InferOutput<typeof WsExplorerBlockRequest
  * @see null
  */
 export const WsExplorerTxsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("explorerTxs"),
@@ -257,7 +257,7 @@ export type WsExplorerTxsRequest = v.InferOutput<typeof WsExplorerTxsRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const WsNotificationRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("notification"),
@@ -279,7 +279,7 @@ export type WsNotificationRequest = v.InferOutput<typeof WsNotificationRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders
  */
 export const WsOpenOrdersRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("openOrders"),
@@ -306,7 +306,7 @@ export type WsOpenOrdersRequest = v.InferOutput<typeof WsOpenOrdersRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const WsOrderUpdatesRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("orderUpdates"),
@@ -328,7 +328,7 @@ export type WsOrderUpdatesRequest = v.InferOutput<typeof WsOrderUpdatesRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const WsTradesRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("trades"),
@@ -350,7 +350,7 @@ export type WsTradesRequest = v.InferOutput<typeof WsTradesRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const WsUserEventsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("userEvents"),
@@ -372,7 +372,7 @@ export type WsUserEventsRequest = v.InferOutput<typeof WsUserEventsRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills
  */
 export const WsUserFillsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("userFills"),
@@ -399,7 +399,7 @@ export type WsUserFillsRequest = v.InferOutput<typeof WsUserFillsRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const WsUserFundingsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("userFundings"),
@@ -421,7 +421,7 @@ export type WsUserFundingsRequest = v.InferOutput<typeof WsUserFundingsRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const WsUserNonFundingLedgerUpdatesRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("userNonFundingLedgerUpdates"),
@@ -443,7 +443,7 @@ export type WsUserNonFundingLedgerUpdatesRequest = v.InferOutput<typeof WsUserNo
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const WsUserTwapHistoryRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("userTwapHistory"),
@@ -465,7 +465,7 @@ export type WsUserTwapHistoryRequest = v.InferOutput<typeof WsUserTwapHistoryReq
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills
  */
 export const WsUserTwapSliceFillsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("userTwapSliceFills"),
@@ -487,7 +487,7 @@ export type WsUserTwapSliceFillsRequest = v.InferOutput<typeof WsUserTwapSliceFi
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const WsWebData2Request = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of subscription. */
         type: v.pipe(
             v.literal("webData2"),

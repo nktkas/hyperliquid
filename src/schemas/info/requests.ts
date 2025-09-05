@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Hex } from "../_base.ts";
+import { Hex, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request user active asset data.
@@ -7,7 +7,7 @@ import { Hex } from "../_base.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-active-asset-data
  */
 export const ActiveAssetDataRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("activeAssetData"),
@@ -34,7 +34,7 @@ export type ActiveAssetDataRequest = v.InferOutput<typeof ActiveAssetDataRequest
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-mids-for-all-coins
  */
 export const AllMidsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("allMids"),
@@ -56,7 +56,7 @@ export type AllMidsRequest = v.InferOutput<typeof AllMidsRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#candle-snapshot
  */
 export const CandleSnapshotRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("candleSnapshot"),
@@ -64,7 +64,7 @@ export const CandleSnapshotRequest = v.pipe(
         ),
         /** Request parameters. */
         req: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Asset symbol (e.g., BTC). */
                 coin: v.pipe(
                     v.string(),
@@ -92,12 +92,12 @@ export const CandleSnapshotRequest = v.pipe(
                 ),
                 /** Start time (in ms since epoch). */
                 startTime: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Start time (in ms since epoch)."),
                 ),
                 /** End time (in ms since epoch). */
                 endTime: v.pipe(
-                    v.nullish(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+                    v.nullish(UnsignedInteger),
                     v.description("End time (in ms since epoch)."),
                 ),
             }),
@@ -114,7 +114,7 @@ export type CandleSnapshotRequest = v.InferOutput<typeof CandleSnapshotRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-perpetuals-account-summary
  */
 export const ClearinghouseStateRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("clearinghouseState"),
@@ -141,7 +141,7 @@ export type ClearinghouseStateRequest = v.InferOutput<typeof ClearinghouseStateR
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-delegations
  */
 export const DelegationsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("delegations"),
@@ -163,7 +163,7 @@ export type DelegationsRequest = v.InferOutput<typeof DelegationsRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-history
  */
 export const DelegatorHistoryRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("delegatorHistory"),
@@ -185,7 +185,7 @@ export type DelegatorHistoryRequest = v.InferOutput<typeof DelegatorHistoryReque
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-rewards
  */
 export const DelegatorRewardsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("delegatorRewards"),
@@ -207,7 +207,7 @@ export type DelegatorRewardsRequest = v.InferOutput<typeof DelegatorRewardsReque
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-summary
  */
 export const DelegatorSummaryRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("delegatorSummary"),
@@ -229,7 +229,7 @@ export type DelegatorSummaryRequest = v.InferOutput<typeof DelegatorSummaryReque
  * @see null
  */
 export const ExchangeStatusRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("exchangeStatus"),
@@ -246,7 +246,7 @@ export type ExchangeStatusRequest = v.InferOutput<typeof ExchangeStatusRequest>;
  * @see null
  */
 export const ExtraAgentsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("extraAgents"),
@@ -268,7 +268,7 @@ export type ExtraAgentsRequest = v.InferOutput<typeof ExtraAgentsRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders-with-additional-frontend-info
  */
 export const FrontendOpenOrdersRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("frontendOpenOrders"),
@@ -295,7 +295,7 @@ export type FrontendOpenOrdersRequest = v.InferOutput<typeof FrontendOpenOrdersR
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-historical-funding-rates
  */
 export const FundingHistoryRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("fundingHistory"),
@@ -308,12 +308,12 @@ export const FundingHistoryRequest = v.pipe(
         ),
         /** Start time (in ms since epoch). */
         startTime: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Start time (in ms since epoch)."),
         ),
         /** End time (in ms since epoch). */
         endTime: v.pipe(
-            v.nullish(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.nullish(UnsignedInteger),
             v.description("End time (in ms since epoch)."),
         ),
     }),
@@ -327,7 +327,7 @@ export type FundingHistoryRequest = v.InferOutput<typeof FundingHistoryRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-historical-orders
  */
 export const HistoricalOrdersRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("historicalOrders"),
@@ -349,7 +349,7 @@ export type HistoricalOrdersRequest = v.InferOutput<typeof HistoricalOrdersReque
  * @see null
  */
 export const IsVipRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("isVip"),
@@ -371,7 +371,7 @@ export type IsVipRequest = v.InferOutput<typeof IsVipRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#l2-book-snapshot
  */
 export const L2BookRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("l2Book"),
@@ -403,7 +403,7 @@ export type L2BookRequest = v.InferOutput<typeof L2BookRequest>;
  * @see null
  */
 export const LeadingVaultsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("leadingVaults"),
@@ -425,7 +425,7 @@ export type LeadingVaultsRequest = v.InferOutput<typeof LeadingVaultsRequest>;
  * @see null
  */
 export const LegalCheckRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("legalCheck"),
@@ -447,7 +447,7 @@ export type LegalCheckRequest = v.InferOutput<typeof LegalCheckRequest>;
  * @see null
  */
 export const LiquidatableRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("liquidatable"),
@@ -464,7 +464,7 @@ export type LiquidatableRequest = v.InferOutput<typeof LiquidatableRequest>;
  * @see null
  */
 export const MarginTableRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("marginTable"),
@@ -472,7 +472,7 @@ export const MarginTableRequest = v.pipe(
         ),
         /** Margin requirements table. */
         id: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Margin requirements table."),
         ),
     }),
@@ -486,7 +486,7 @@ export type MarginTableRequest = v.InferOutput<typeof MarginTableRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#check-builder-fee-approval
  */
 export const MaxBuilderFeeRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("maxBuilderFee"),
@@ -513,7 +513,7 @@ export type MaxBuilderFeeRequest = v.InferOutput<typeof MaxBuilderFeeRequest>;
  * @see null
  */
 export const MaxMarketOrderNtlsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("maxMarketOrderNtls"),
@@ -530,7 +530,7 @@ export type MaxMarketOrderNtlsRequest = v.InferOutput<typeof MaxMarketOrderNtlsR
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-metadata-universe-and-margin-tables
  */
 export const MetaRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("meta"),
@@ -552,7 +552,7 @@ export type MetaRequest = v.InferOutput<typeof MetaRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-asset-contexts-includes-mark-price-current-funding-open-interest-etc
  */
 export const MetaAndAssetCtxsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("metaAndAssetCtxs"),
@@ -574,7 +574,7 @@ export type MetaAndAssetCtxsRequest = v.InferOutput<typeof MetaAndAssetCtxsReque
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders
  */
 export const OpenOrdersRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("openOrders"),
@@ -601,7 +601,7 @@ export type OpenOrdersRequest = v.InferOutput<typeof OpenOrdersRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-order-status-by-oid-or-cloid
  */
 export const OrderStatusRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("orderStatus"),
@@ -614,7 +614,7 @@ export const OrderStatusRequest = v.pipe(
         ),
         /** Order ID or Client Order ID. */
         oid: v.pipe(
-            v.union([v.pipe(v.number(), v.safeInteger(), v.minValue(0)), v.pipe(Hex, v.length(34))]),
+            v.union([UnsignedInteger, v.pipe(Hex, v.length(34))]),
             v.description("Order ID or Client Order ID."),
         ),
     }),
@@ -628,7 +628,7 @@ export type OrderStatusRequest = v.InferOutput<typeof OrderStatusRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-information-about-the-perp-deploy-auction
  */
 export const PerpDeployAuctionStatusRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("perpDeployAuctionStatus"),
@@ -645,7 +645,7 @@ export type PerpDeployAuctionStatusRequest = v.InferOutput<typeof PerpDeployAuct
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-all-perpetual-dexs
  */
 export const PerpDexsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("perpDexs"),
@@ -662,7 +662,7 @@ export type PerpDexsRequest = v.InferOutput<typeof PerpDexsRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#query-perps-at-open-interest-caps
  */
 export const PerpsAtOpenInterestCapRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("perpsAtOpenInterestCap"),
@@ -684,7 +684,7 @@ export type PerpsAtOpenInterestCapRequest = v.InferOutput<typeof PerpsAtOpenInte
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-portfolio
  */
 export const PortfolioRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("portfolio"),
@@ -706,7 +706,7 @@ export type PortfolioRequest = v.InferOutput<typeof PortfolioRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-predicted-funding-rates-for-different-venues
  */
 export const PredictedFundingsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("predictedFundings"),
@@ -723,7 +723,7 @@ export type PredictedFundingsRequest = v.InferOutput<typeof PredictedFundingsReq
  * @see null
  */
 export const PreTransferCheckRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("preTransferCheck"),
@@ -750,7 +750,7 @@ export type PreTransferCheckRequest = v.InferOutput<typeof PreTransferCheckReque
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-referral-information
  */
 export const ReferralRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("referral"),
@@ -772,7 +772,7 @@ export type ReferralRequest = v.InferOutput<typeof ReferralRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-a-users-token-balances
  */
 export const SpotClearinghouseStateRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("spotClearinghouseState"),
@@ -799,7 +799,7 @@ export type SpotClearinghouseStateRequest = v.InferOutput<typeof SpotClearinghou
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-deploy-auction
  */
 export const SpotDeployStateRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("spotDeployState"),
@@ -821,7 +821,7 @@ export type SpotDeployStateRequest = v.InferOutput<typeof SpotDeployStateRequest
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-metadata
  */
 export const SpotMetaRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("spotMeta"),
@@ -838,7 +838,7 @@ export type SpotMetaRequest = v.InferOutput<typeof SpotMetaRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-asset-contexts
  */
 export const SpotMetaAndAssetCtxsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("spotMetaAndAssetCtxs"),
@@ -855,7 +855,7 @@ export type SpotMetaAndAssetCtxsRequest = v.InferOutput<typeof SpotMetaAndAssetC
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-pair-deploy-auction
  */
 export const SpotPairDeployAuctionStatusRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("spotPairDeployAuctionStatus"),
@@ -872,7 +872,7 @@ export type SpotPairDeployAuctionStatusRequest = v.InferOutput<typeof SpotPairDe
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-subaccounts
  */
 export const SubAccountsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("subAccounts"),
@@ -894,7 +894,7 @@ export type SubAccountsRequest = v.InferOutput<typeof SubAccountsRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-a-token
  */
 export const TokenDetailsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("tokenDetails"),
@@ -916,7 +916,7 @@ export type TokenDetailsRequest = v.InferOutput<typeof TokenDetailsRequest>;
  * @see null
  */
 export const TwapHistoryRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("twapHistory"),
@@ -938,7 +938,7 @@ export type TwapHistoryRequest = v.InferOutput<typeof TwapHistoryRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-fees
  */
 export const UserFeesRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("userFees"),
@@ -960,7 +960,7 @@ export type UserFeesRequest = v.InferOutput<typeof UserFeesRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills
  */
 export const UserFillsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("userFills"),
@@ -987,7 +987,7 @@ export type UserFillsRequest = v.InferOutput<typeof UserFillsRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills-by-time
  */
 export const UserFillsByTimeRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("userFillsByTime"),
@@ -1000,12 +1000,12 @@ export const UserFillsByTimeRequest = v.pipe(
         ),
         /** Start time (in ms since epoch). */
         startTime: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Start time (in ms since epoch)."),
         ),
         /** End time (in ms since epoch). */
         endTime: v.pipe(
-            v.nullish(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.nullish(UnsignedInteger),
             v.description("End time (in ms since epoch)."),
         ),
         /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
@@ -1024,7 +1024,7 @@ export type UserFillsByTimeRequest = v.InferOutput<typeof UserFillsByTimeRequest
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates
  */
 export const UserFundingRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("userFunding"),
@@ -1037,12 +1037,12 @@ export const UserFundingRequest = v.pipe(
         ),
         /** Start time (in ms since epoch). */
         startTime: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Start time (in ms since epoch)."),
         ),
         /** End time (in ms since epoch). */
         endTime: v.pipe(
-            v.nullish(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.nullish(UnsignedInteger),
             v.description("End time (in ms since epoch)."),
         ),
     }),
@@ -1056,7 +1056,7 @@ export type UserFundingRequest = v.InferOutput<typeof UserFundingRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates
  */
 export const UserNonFundingLedgerUpdatesRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("userNonFundingLedgerUpdates"),
@@ -1069,12 +1069,12 @@ export const UserNonFundingLedgerUpdatesRequest = v.pipe(
         ),
         /** Start time (in ms since epoch). */
         startTime: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Start time (in ms since epoch)."),
         ),
         /** End time (in ms since epoch). */
         endTime: v.pipe(
-            v.nullish(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.nullish(UnsignedInteger),
             v.description("End time (in ms since epoch)."),
         ),
     }),
@@ -1088,7 +1088,7 @@ export type UserNonFundingLedgerUpdatesRequest = v.InferOutput<typeof UserNonFun
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-rate-limits
  */
 export const UserRateLimitRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("userRateLimit"),
@@ -1110,7 +1110,7 @@ export type UserRateLimitRequest = v.InferOutput<typeof UserRateLimitRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-role
  */
 export const UserRoleRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("userRole"),
@@ -1132,7 +1132,7 @@ export type UserRoleRequest = v.InferOutput<typeof UserRoleRequest>;
  * @see null
  */
 export const UserToMultiSigSignersRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("userToMultiSigSigners"),
@@ -1154,7 +1154,7 @@ export type UserToMultiSigSignersRequest = v.InferOutput<typeof UserToMultiSigSi
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills
  */
 export const UserTwapSliceFillsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("userTwapSliceFills"),
@@ -1176,7 +1176,7 @@ export type UserTwapSliceFillsRequest = v.InferOutput<typeof UserTwapSliceFillsR
  * @see null
  */
 export const UserTwapSliceFillsByTimeRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("userTwapSliceFillsByTime"),
@@ -1189,12 +1189,12 @@ export const UserTwapSliceFillsByTimeRequest = v.pipe(
         ),
         /** Start time (in ms since epoch). */
         startTime: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Start time (in ms since epoch)."),
         ),
         /** End time (in ms since epoch). */
         endTime: v.pipe(
-            v.nullish(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.nullish(UnsignedInteger),
             v.description("End time (in ms since epoch)."),
         ),
         /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
@@ -1213,7 +1213,7 @@ export type UserTwapSliceFillsByTimeRequest = v.InferOutput<typeof UserTwapSlice
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-vault-deposits
  */
 export const UserVaultEquitiesRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("userVaultEquities"),
@@ -1235,7 +1235,7 @@ export type UserVaultEquitiesRequest = v.InferOutput<typeof UserVaultEquitiesReq
  * @see null
  */
 export const ValidatorL1VotesRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("validatorL1Votes"),
@@ -1252,7 +1252,7 @@ export type ValidatorL1VotesRequest = v.InferOutput<typeof ValidatorL1VotesReque
  * @see null
  */
 export const ValidatorSummariesRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("validatorSummaries"),
@@ -1269,7 +1269,7 @@ export type ValidatorSummariesRequest = v.InferOutput<typeof ValidatorSummariesR
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-details-for-a-vault
  */
 export const VaultDetailsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("vaultDetails"),
@@ -1296,7 +1296,7 @@ export type VaultDetailsRequest = v.InferOutput<typeof VaultDetailsRequest>;
  * @see null
  */
 export const VaultSummariesRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("vaultSummaries"),

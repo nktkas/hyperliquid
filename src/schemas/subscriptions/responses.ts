@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Hex, UnsignedDecimal } from "../_base.ts";
+import { Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 import {
     FundingUpdate,
     PerpsClearinghouseState,
@@ -13,7 +13,7 @@ import { BlockDetails } from "../explorer/responses.ts";
 
 /** Active perpetual asset context. */
 export const WsActiveAssetCtx = v.pipe(
-    v.strictObject({
+    v.object({
         /** Asset symbol (e.g., BTC). */
         coin: v.pipe(
             v.string(),
@@ -31,7 +31,7 @@ export type WsActiveAssetCtx = v.InferOutput<typeof WsActiveAssetCtx>;
 
 /** Active spot asset context. */
 export const WsActiveSpotAssetCtx = v.pipe(
-    v.strictObject({
+    v.object({
         /** Asset symbol (e.g., BTC). */
         coin: v.pipe(
             v.string(),
@@ -49,7 +49,7 @@ export type WsActiveSpotAssetCtx = v.InferOutput<typeof WsActiveSpotAssetCtx>;
 
 /** Mid prices for all assets. */
 export const WsAllMids = v.pipe(
-    v.strictObject({
+    v.object({
         /** Mapping of coin symbols to mid prices. */
         mids: v.pipe(
             AllMids,
@@ -62,7 +62,7 @@ export type WsAllMids = v.InferOutput<typeof WsAllMids>;
 
 /** Asset contexts for all perpetual assets on a specified DEX. */
 export const WsAssetCtxs = v.pipe(
-    v.strictObject({
+    v.object({
         /** DEX name (empty string for main dex). */
         dex: v.pipe(
             v.string(),
@@ -80,7 +80,7 @@ export type WsAssetCtxs = v.InferOutput<typeof WsAssetCtxs>;
 
 /** Best Bid and Offer. */
 export const WsBbo = v.pipe(
-    v.strictObject({
+    v.object({
         /** Asset symbol (e.g., BTC). */
         coin: v.pipe(
             v.string(),
@@ -88,12 +88,12 @@ export const WsBbo = v.pipe(
         ),
         /** Time of the BBO update (in ms since epoch). */
         time: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Time of the BBO update (in ms since epoch)."),
         ),
         /** Best bid and offer tuple [bid, offer], either can be undefined if unavailable. */
         bbo: v.pipe(
-            v.strictTuple([
+            v.tuple([
                 v.union([BookLevel, v.undefined()]),
                 v.union([BookLevel, v.undefined()]),
             ]),
@@ -106,14 +106,14 @@ export type WsBbo = v.InferOutput<typeof WsBbo>;
 
 /** Block details. */
 export const WsBlockDetails = v.pipe(
-    v.omit(v.strictObject(BlockDetails.entries), ["txs"]),
+    v.omit(v.object(BlockDetails.entries), ["txs"]),
     v.description("Block details."),
 );
 export type WsBlockDetails = v.InferOutput<typeof WsBlockDetails>;
 
 /** Clearinghouse state for a specific user. */
 export const WsClearinghouseState = v.pipe(
-    v.strictObject({
+    v.object({
         /** DEX name (empty string for main dex). */
         dex: v.pipe(
             v.string(),
@@ -136,7 +136,7 @@ export type WsClearinghouseState = v.InferOutput<typeof WsClearinghouseState>;
 
 /** User notifications. */
 export const WsNotification = v.pipe(
-    v.strictObject({
+    v.object({
         /** Notification content. */
         notification: v.pipe(
             v.string(),
@@ -149,7 +149,7 @@ export type WsNotification = v.InferOutput<typeof WsNotification>;
 
 /** Open orders for a specific user. */
 export const WsOpenOrders = v.pipe(
-    v.strictObject({
+    v.object({
         /** DEX name (empty string for main dex). */
         dex: v.pipe(
             v.string(),
@@ -172,7 +172,7 @@ export type WsOpenOrders = v.InferOutput<typeof WsOpenOrders>;
 
 /** Trade information. */
 export const WsTrade = v.pipe(
-    v.strictObject({
+    v.object({
         /** Asset symbol (e.g., BTC). */
         coin: v.pipe(
             v.string(),
@@ -195,7 +195,7 @@ export const WsTrade = v.pipe(
         ),
         /** Trade timestamp (in ms since epoch). */
         time: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Trade timestamp (in ms since epoch)."),
         ),
         /** Transaction hash. */
@@ -205,12 +205,12 @@ export const WsTrade = v.pipe(
         ),
         /** Trade ID. */
         tid: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Trade ID."),
         ),
         /** Addresses of users involved in the trade [Maker, Taker]. */
         users: v.pipe(
-            v.strictTuple([v.pipe(Hex, v.length(42)), v.pipe(Hex, v.length(42))]),
+            v.tuple([v.pipe(Hex, v.length(42)), v.pipe(Hex, v.length(42))]),
             v.description("Addresses of users involved in the trade [Maker, Taker]."),
         ),
     }),
@@ -220,7 +220,7 @@ export type WsTrade = v.InferOutput<typeof WsTrade>;
 
 /** User fill event. */
 export const WsUserEventFill = v.pipe(
-    v.strictObject({
+    v.object({
         /** Array of trade fills. */
         fills: v.pipe(
             v.array(Fill),
@@ -233,10 +233,10 @@ export type WsUserEventFill = v.InferOutput<typeof WsUserEventFill>;
 
 /** User funding event. */
 export const WsUserEventFunding = v.pipe(
-    v.strictObject({
+    v.object({
         /** Funding update details. */
         funding: v.pipe(
-            v.omit(v.strictObject(FundingUpdate.entries), ["type"]),
+            v.omit(v.object(FundingUpdate.entries), ["type"]),
             v.description("Funding update details."),
         ),
     }),
@@ -246,13 +246,13 @@ export type WsUserEventFunding = v.InferOutput<typeof WsUserEventFunding>;
 
 /** User liquidation event. */
 export const WsUserEventLiquidation = v.pipe(
-    v.strictObject({
+    v.object({
         /** Liquidation event details. */
         liquidation: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Unique liquidation ID. */
                 lid: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Unique liquidation ID."),
                 ),
                 /** Address of the liquidator. */
@@ -285,11 +285,11 @@ export type WsUserEventLiquidation = v.InferOutput<typeof WsUserEventLiquidation
 
 /** Non-user initiated order cancellation event. */
 export const WsUserEventNonUserCancel = v.pipe(
-    v.strictObject({
+    v.object({
         /** Array of cancelled orders not initiated by the user. */
         nonUserCancel: v.pipe(
             v.array(
-                v.strictObject({
+                v.object({
                     /** Asset symbol (e.g., BTC). */
                     coin: v.pipe(
                         v.string(),
@@ -297,7 +297,7 @@ export const WsUserEventNonUserCancel = v.pipe(
                     ),
                     /** Order ID. */
                     oid: v.pipe(
-                        v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                        UnsignedInteger,
                         v.description("Order ID."),
                     ),
                 }),
@@ -311,7 +311,7 @@ export type WsUserEventNonUserCancel = v.InferOutput<typeof WsUserEventNonUserCa
 
 /** User TWAP history event. */
 export const WsUserEventTwapHistory = v.pipe(
-    v.strictObject({
+    v.object({
         /** Array of historical TWAP fills. */
         twapHistory: v.pipe(
             v.array(TwapHistory),
@@ -324,7 +324,7 @@ export type WsUserEventTwapHistory = v.InferOutput<typeof WsUserEventTwapHistory
 
 /** User TWAP slice fills event. */
 export const WsUserEventTwapSliceFills = v.pipe(
-    v.strictObject({
+    v.object({
         /** Array of TWAP slice fills. */
         twapSliceFills: v.pipe(
             v.array(TwapSliceFill),
@@ -351,7 +351,7 @@ export type WsUserEvent = v.InferOutput<typeof WsUserEvent>;
 
 /** User fills. */
 export const WsUserFills = v.pipe(
-    v.strictObject({
+    v.object({
         /** User address. */
         user: v.pipe(
             v.pipe(Hex, v.length(42)),
@@ -374,7 +374,7 @@ export type WsUserFills = v.InferOutput<typeof WsUserFills>;
 
 /** User fundings. */
 export const WsUserFundings = v.pipe(
-    v.strictObject({
+    v.object({
         /** User address. */
         user: v.pipe(
             v.pipe(Hex, v.length(42)),
@@ -383,9 +383,9 @@ export const WsUserFundings = v.pipe(
         /** Array of funding events. */
         fundings: v.pipe(
             v.array(
-                v.strictObject({
-                    ...v.omit(v.strictObject(FundingUpdate.entries), ["type"]).entries,
-                    ...v.pick(v.strictObject(UserFundingUpdate.entries), ["time"]).entries,
+                v.object({
+                    ...v.omit(v.object(FundingUpdate.entries), ["type"]).entries,
+                    ...v.pick(v.object(UserFundingUpdate.entries), ["time"]).entries,
                 }),
             ),
             v.description("Array of funding events."),
@@ -402,7 +402,7 @@ export type WsUserFundings = v.InferOutput<typeof WsUserFundings>;
 
 /** User non-funding ledger updates. */
 export const WsUserNonFundingLedgerUpdates = v.pipe(
-    v.strictObject({
+    v.object({
         /** User address. */
         user: v.pipe(
             v.pipe(Hex, v.length(42)),
@@ -425,7 +425,7 @@ export type WsUserNonFundingLedgerUpdates = v.InferOutput<typeof WsUserNonFundin
 
 /** User TWAP history. */
 export const WsUserTwapHistory = v.pipe(
-    v.strictObject({
+    v.object({
         /** User address. */
         user: v.pipe(
             v.pipe(Hex, v.length(42)),
@@ -448,7 +448,7 @@ export type WsUserTwapHistory = v.InferOutput<typeof WsUserTwapHistory>;
 
 /** User TWAP slice fills. */
 export const WsUserTwapSliceFills = v.pipe(
-    v.strictObject({
+    v.object({
         /** User address. */
         user: v.pipe(
             v.pipe(Hex, v.length(42)),
@@ -471,7 +471,7 @@ export type WsUserTwapSliceFills = v.InferOutput<typeof WsUserTwapSliceFills>;
 
 /** Comprehensive user and market data. */
 export const WsWebData2 = v.pipe(
-    v.strictObject({
+    v.object({
         /** Account summary for perpetual trading. */
         clearinghouseState: v.pipe(
             PerpsClearinghouseState,
@@ -480,7 +480,7 @@ export const WsWebData2 = v.pipe(
         /** Leading vaults information. */
         leadingVaults: v.pipe(
             v.array(
-                v.strictObject({
+                v.object({
                     /** Address of the vault. */
                     address: v.pipe(
                         v.pipe(Hex, v.length(42)),
@@ -512,7 +512,7 @@ export const WsWebData2 = v.pipe(
         ),
         /** Timestamp until which the agent is valid. */
         agentValidUntil: v.pipe(
-            v.union([v.pipe(v.number(), v.safeInteger(), v.minValue(0)), v.null()]),
+            v.union([UnsignedInteger, v.null()]),
             v.description("Timestamp until which the agent is valid."),
         ),
         /** Cumulative ledger value. */
@@ -532,7 +532,7 @@ export const WsWebData2 = v.pipe(
         ),
         /** Server timestamp (in ms since epoch). */
         serverTime: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Server timestamp (in ms since epoch)."),
         ),
         /** Whether this account is a vault. */
@@ -547,7 +547,7 @@ export const WsWebData2 = v.pipe(
         ),
         /** TWAP states. */
         twapStates: v.pipe(
-            v.array(v.strictTuple([v.pipe(v.number(), v.safeInteger(), v.minValue(0)), TwapState])),
+            v.array(v.tuple([UnsignedInteger, TwapState])),
             v.description("TWAP states."),
         ),
         /** Account summary for spot trading. */

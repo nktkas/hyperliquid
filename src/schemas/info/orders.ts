@@ -1,9 +1,9 @@
 import * as v from "valibot";
-import { Hex, SignedDecimal, UnsignedDecimal } from "../_base.ts";
+import { Decimal, Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /** Order book level. */
 export const BookLevel = v.pipe(
-    v.strictObject({
+    v.object({
         /** Price. */
         px: v.pipe(
             UnsignedDecimal,
@@ -16,7 +16,7 @@ export const BookLevel = v.pipe(
         ),
         /** Number of individual orders. */
         n: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Number of individual orders."),
         ),
     }),
@@ -26,7 +26,7 @@ export type BookLevel = v.InferOutput<typeof BookLevel>;
 
 /** L2 order book snapshot. */
 export const Book = v.pipe(
-    v.strictObject({
+    v.object({
         /** Asset symbol. */
         coin: v.pipe(
             v.string(),
@@ -34,12 +34,12 @@ export const Book = v.pipe(
         ),
         /** Timestamp of the snapshot (in ms since epoch). */
         time: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Timestamp of the snapshot (in ms since epoch)."),
         ),
         /** Bid and ask levels (index 0 = bids, index 1 = asks). */
         levels: v.pipe(
-            v.strictTuple([v.array(BookLevel), v.array(BookLevel)]),
+            v.tuple([v.array(BookLevel), v.array(BookLevel)]),
             v.description("Bid and ask levels (index 0 = bids, index 1 = asks)."),
         ),
     }),
@@ -49,7 +49,7 @@ export type Book = v.InferOutput<typeof Book>;
 
 /** Liquidation details for a trade fill. */
 export const FillLiquidation = v.pipe(
-    v.strictObject({
+    v.object({
         /** Address of the liquidated user. */
         liquidatedUser: v.pipe(
             v.pipe(Hex, v.length(42)),
@@ -72,7 +72,7 @@ export type FillLiquidation = v.InferOutput<typeof FillLiquidation>;
 
 /** Trade fill record. */
 export const Fill = v.pipe(
-    v.strictObject({
+    v.object({
         /** Asset symbol. */
         coin: v.pipe(
             v.string(),
@@ -95,12 +95,12 @@ export const Fill = v.pipe(
         ),
         /** Timestamp when the trade occurred (in ms since epoch). */
         time: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Timestamp when the trade occurred (in ms since epoch)."),
         ),
         /** Start position size. */
         startPosition: v.pipe(
-            SignedDecimal,
+            Decimal,
             v.description("Start position size."),
         ),
         /** Direction indicator for frontend display. */
@@ -110,7 +110,7 @@ export const Fill = v.pipe(
         ),
         /** Realized PnL. */
         closedPnl: v.pipe(
-            SignedDecimal,
+            Decimal,
             v.description("Realized PnL."),
         ),
         /** L1 transaction hash. */
@@ -120,7 +120,7 @@ export const Fill = v.pipe(
         ),
         /** Order ID. */
         oid: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Order ID."),
         ),
         /** Indicates if the fill was a taker order. */
@@ -130,12 +130,12 @@ export const Fill = v.pipe(
         ),
         /** Fee charged or rebate received (negative indicates rebate). */
         fee: v.pipe(
-            SignedDecimal,
+            Decimal,
             v.description("Fee charged or rebate received (negative indicates rebate)."),
         ),
         /** Unique transaction identifier for a partial fill of an order. */
         tid: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique transaction identifier for a partial fill of an order."),
         ),
         /** Client Order ID. */
@@ -155,7 +155,7 @@ export const Fill = v.pipe(
         ),
         /** ID of the TWAP. */
         twapId: v.pipe(
-            v.union([v.pipe(v.number(), v.safeInteger(), v.minValue(0)), v.null()]),
+            v.union([UnsignedInteger, v.null()]),
             v.description("ID of the TWAP."),
         ),
     }),
@@ -165,7 +165,7 @@ export type Fill = v.InferOutput<typeof Fill>;
 
 /** Open order details. */
 export const Order = v.pipe(
-    v.strictObject({
+    v.object({
         /** Asset symbol. */
         coin: v.pipe(
             v.string(),
@@ -188,12 +188,12 @@ export const Order = v.pipe(
         ),
         /** Order ID. */
         oid: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Order ID."),
         ),
         /** Timestamp when the order was placed (in ms since epoch). */
         timestamp: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Timestamp when the order was placed (in ms since epoch)."),
         ),
         /** Original size at order placement. */
@@ -277,8 +277,8 @@ export type TIF = v.InferOutput<typeof TIF>;
 
 /** Open order with additional display information. */
 export const FrontendOrder = v.pipe(
-    v.strictObject({
-        ...v.omit(v.strictObject(Order.entries), ["reduceOnly", "cloid"]).entries,
+    v.object({
+        ...v.omit(v.object(Order.entries), ["reduceOnly", "cloid"]).entries,
         /** Condition for triggering the order. */
         triggerCondition: v.pipe(
             v.string(),
@@ -387,7 +387,7 @@ export type OrderProcessingStatus = v.InferOutput<typeof OrderProcessingStatus>;
 
 /** Order with current processing status. */
 export const OrderStatus = v.pipe(
-    v.strictObject({
+    v.object({
         /** Order details. */
         order: v.pipe(
             Order,
@@ -400,7 +400,7 @@ export const OrderStatus = v.pipe(
         ),
         /** Timestamp when the status was last updated (in ms since epoch). */
         statusTimestamp: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Timestamp when the status was last updated (in ms since epoch)."),
         ),
     }),
@@ -410,7 +410,7 @@ export type OrderStatus = v.InferOutput<typeof OrderStatus>;
 
 /** Frontend order with current processing status. */
 export const FrontendOrderStatus = v.pipe(
-    v.strictObject({
+    v.object({
         /** Order details. */
         order: v.pipe(
             FrontendOrder,
@@ -423,7 +423,7 @@ export const FrontendOrderStatus = v.pipe(
         ),
         /** Timestamp when the status was last updated (in ms since epoch). */
         statusTimestamp: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Timestamp when the status was last updated (in ms since epoch)."),
         ),
     }),
@@ -434,7 +434,7 @@ export type FrontendOrderStatus = v.InferOutput<typeof FrontendOrderStatus>;
 /** Result of an order status lookup. */
 export const OrderLookup = v.pipe(
     v.union([
-        v.strictObject({
+        v.object({
             /** Indicates that the order was found. */
             status: v.pipe(
                 v.literal("order"),
@@ -446,7 +446,7 @@ export const OrderLookup = v.pipe(
                 v.description("Order details."),
             ),
         }),
-        v.strictObject({
+        v.object({
             /** Indicates that the order was not found. */
             status: v.pipe(
                 v.literal("unknownOid"),
@@ -460,7 +460,7 @@ export type OrderLookup = v.InferOutput<typeof OrderLookup>;
 
 /** Current state of a TWAP order. */
 export const TwapState = v.pipe(
-    v.strictObject({
+    v.object({
         /** Asset symbol. */
         coin: v.pipe(
             v.string(),
@@ -478,7 +478,7 @@ export const TwapState = v.pipe(
         ),
         /** Duration in minutes. */
         minutes: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Duration in minutes."),
         ),
         /** Indicates if the TWAP randomizes execution. */
@@ -503,7 +503,7 @@ export const TwapState = v.pipe(
         ),
         /** Start time of the TWAP order (in ms since epoch). */
         timestamp: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Start time of the TWAP order (in ms since epoch)."),
         ),
         /** User address. */
@@ -525,14 +525,14 @@ export type TwapState = v.InferOutput<typeof TwapState>;
  */
 export const TwapStatus = v.pipe(
     v.union([
-        v.strictObject({
+        v.object({
             /** Status of the TWAP order. */
             status: v.pipe(
                 v.union([v.literal("finished"), v.literal("activated"), v.literal("terminated")]),
                 v.description("Status of the TWAP order."),
             ),
         }),
-        v.strictObject({
+        v.object({
             /** Status of the TWAP order. */
             status: v.pipe(
                 v.literal("error"),
@@ -557,10 +557,10 @@ export type TwapStatus = v.InferOutput<typeof TwapStatus>;
 
 /** TWAP history record for a user. */
 export const TwapHistory = v.pipe(
-    v.strictObject({
+    v.object({
         /** Creation time of the history record (in seconds since epoch). */
         time: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Creation time of the history record (in seconds since epoch)."),
         ),
         /** State of the TWAP order. */
@@ -580,15 +580,15 @@ export type TwapHistory = v.InferOutput<typeof TwapHistory>;
 
 /** TWAP slice fill details. */
 export const TwapSliceFill = v.pipe(
-    v.strictObject({
+    v.object({
         /** Fill details for the TWAP slice. */
         fill: v.pipe(
-            v.omit(v.strictObject(Fill.entries), ["cloid", "liquidation"]),
+            v.omit(v.object(Fill.entries), ["cloid", "liquidation"]),
             v.description("Fill details for the TWAP slice."),
         ),
         /** ID of the TWAP. */
         twapId: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("ID of the TWAP."),
         ),
     }),

@@ -1,5 +1,11 @@
 import * as v from "valibot";
 
+export const Integer = v.pipe(v.number(), v.safeInteger());
+export type Integer = v.InferOutput<typeof Integer>;
+
+export const UnsignedInteger = v.pipe(v.number(), v.safeInteger(), v.minValue(0));
+export type UnsignedInteger = v.InferOutput<typeof UnsignedInteger>;
+
 export const UnsignedDecimal = v.pipe(
     v.string(),
     v.regex(/^[0-9]+(\.[0-9]+)?$/),
@@ -7,12 +13,12 @@ export const UnsignedDecimal = v.pipe(
 );
 export type UnsignedDecimal = v.InferOutput<typeof UnsignedDecimal>;
 
-export const SignedDecimal = v.pipe(
+export const Decimal = v.pipe(
     v.string(),
     v.regex(/^-?[0-9]+(\.[0-9]+)?$/),
     v.transform((value) => formatDecimal(value)),
 );
-export type SignedDecimal = v.InferOutput<typeof SignedDecimal>;
+export type Decimal = v.InferOutput<typeof Decimal>;
 
 export const Hex = v.pipe(
     v.string(),

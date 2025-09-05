@@ -1,9 +1,9 @@
 import * as v from "valibot";
-import { Hex, UnsignedDecimal } from "../_base.ts";
+import { Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /** User delegation to a validator. */
 export const Delegation = v.pipe(
-    v.strictObject({
+    v.object({
         /** Validator address. */
         validator: v.pipe(
             v.pipe(Hex, v.length(42)),
@@ -16,7 +16,7 @@ export const Delegation = v.pipe(
         ),
         /** Locked until timestamp (in ms since epoch). */
         lockedUntilTimestamp: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Locked until timestamp (in ms since epoch)."),
         ),
     }),
@@ -26,10 +26,10 @@ export type Delegation = v.InferOutput<typeof Delegation>;
 
 /** Reward received from staking activities. */
 export const DelegatorReward = v.pipe(
-    v.strictObject({
+    v.object({
         /** Timestamp when the reward was received (in ms since epoch). */
         time: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Timestamp when the reward was received (in ms since epoch)."),
         ),
         /** Source of the reward. */
@@ -49,7 +49,7 @@ export type DelegatorReward = v.InferOutput<typeof DelegatorReward>;
 
 /** Summary of a user staking delegations. */
 export const DelegatorSummary = v.pipe(
-    v.strictObject({
+    v.object({
         /** Total amount of delegated tokens. */
         delegated: v.pipe(
             UnsignedDecimal,
@@ -67,7 +67,7 @@ export const DelegatorSummary = v.pipe(
         ),
         /** Number of pending withdrawals. */
         nPendingWithdrawals: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Number of pending withdrawals."),
         ),
     }),
@@ -77,10 +77,10 @@ export type DelegatorSummary = v.InferOutput<typeof DelegatorSummary>;
 
 /** Delegation operation in a delegator update. */
 export const DelegatorUpdateDelegate = v.pipe(
-    v.strictObject({
+    v.object({
         /** Delegation operation details. */
         delegate: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Address of the validator receiving or losing delegation. */
                 validator: v.pipe(
                     v.pipe(Hex, v.length(42)),
@@ -106,10 +106,10 @@ export type DelegatorUpdateDelegate = v.InferOutput<typeof DelegatorUpdateDelega
 
 /** Deposit operation in a delegator update. */
 export const DelegatorUpdateDeposit = v.pipe(
-    v.strictObject({
+    v.object({
         /** Deposit details. */
         cDeposit: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Amount of tokens being deposited. */
                 amount: v.pipe(
                     UnsignedDecimal,
@@ -125,10 +125,10 @@ export type DelegatorUpdateDeposit = v.InferOutput<typeof DelegatorUpdateDeposit
 
 /** Withdrawal operation in a delegator update. */
 export const DelegatorUpdateWithdrawal = v.pipe(
-    v.strictObject({
+    v.object({
         /** Withdrawal details. */
         withdrawal: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Amount of tokens being withdrawn. */
                 amount: v.pipe(
                     UnsignedDecimal,
@@ -149,10 +149,10 @@ export type DelegatorUpdateWithdrawal = v.InferOutput<typeof DelegatorUpdateWith
 
 /** Record of a staking event by a delegator. */
 export const DelegatorUpdate = v.pipe(
-    v.strictObject({
+    v.object({
         /** Timestamp of the delegation event (in ms since epoch). */
         time: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Timestamp of the delegation event (in ms since epoch)."),
         ),
         /** Transaction hash of the delegation event. */
@@ -176,7 +176,7 @@ export type DelegatorUpdate = v.InferOutput<typeof DelegatorUpdate>;
 
 /** Statistics for validator performance over a time period. */
 export const ValidatorStats = v.pipe(
-    v.strictObject({
+    v.object({
         /** Fraction of time the validator was online. */
         uptimeFraction: v.pipe(
             v.string(),
@@ -189,7 +189,7 @@ export const ValidatorStats = v.pipe(
         ),
         /** Number of samples used for statistics calculation. */
         nSamples: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Number of samples used for statistics calculation."),
         ),
     }),
@@ -199,7 +199,7 @@ export type ValidatorStats = v.InferOutput<typeof ValidatorStats>;
 
 /** Summary of a validator status and performance. */
 export const ValidatorSummary = v.pipe(
-    v.strictObject({
+    v.object({
         /** Address of the validator. */
         validator: v.pipe(
             v.pipe(Hex, v.length(42)),
@@ -222,12 +222,12 @@ export const ValidatorSummary = v.pipe(
         ),
         /** Number of blocks produced recently. */
         nRecentBlocks: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Number of blocks produced recently."),
         ),
         /** Total amount of tokens staked. */
         stake: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Total amount of tokens staked."),
         ),
         /** Whether the validator is currently jailed. */
@@ -237,7 +237,7 @@ export const ValidatorSummary = v.pipe(
         ),
         /** Timestamp when the validator can be unjailed (in ms since epoch). */
         unjailableAfter: v.pipe(
-            v.union([v.pipe(v.number(), v.safeInteger(), v.minValue(0)), v.null()]),
+            v.union([UnsignedInteger, v.null()]),
             v.description("Timestamp when the validator can be unjailed (in ms since epoch)."),
         ),
         /** Whether the validator is currently active. */
@@ -252,10 +252,10 @@ export const ValidatorSummary = v.pipe(
         ),
         /** Performance statistics over different time periods. */
         stats: v.pipe(
-            v.strictTuple([
-                v.strictTuple([v.literal("day"), ValidatorStats]),
-                v.strictTuple([v.literal("week"), ValidatorStats]),
-                v.strictTuple([v.literal("month"), ValidatorStats]),
+            v.tuple([
+                v.tuple([v.literal("day"), ValidatorStats]),
+                v.tuple([v.literal("week"), ValidatorStats]),
+                v.tuple([v.literal("month"), ValidatorStats]),
             ]),
             v.description("Performance statistics over different time periods."),
         ),

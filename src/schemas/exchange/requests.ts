@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Hex, TokenId, UnsignedDecimal } from "../_base.ts";
+import { Hex, TokenId, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /** Deeply removes undefined keys from an object.  */
 function removeUndefinedKeys<T>(obj: T): T {
@@ -26,7 +26,7 @@ const Percent = v.pipe(v.string(), v.regex(/^[0-9]+(\.[0-9]+)?%$/), v.transform(
 
 /** ECDSA signature components for Ethereum typed data. */
 export const Signature = v.pipe(
-    v.strictObject({
+    v.object({
         /** First 32-byte component of ECDSA signature. */
         r: v.pipe(
             v.pipe(
@@ -57,10 +57,10 @@ export type Signature = v.InferOutput<typeof Signature>;
 
 /** Order parameters. */
 export const OrderParams = v.pipe(
-    v.strictObject({
+    v.object({
         /** Asset ID. */
         a: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Asset ID."),
         ),
         /** Position side (`true` for long, `false` for short). */
@@ -86,10 +86,10 @@ export const OrderParams = v.pipe(
         /** Order type. */
         t: v.pipe(
             v.union([
-                v.strictObject({
+                v.object({
                     /** Limit order parameters. */
                     limit: v.pipe(
-                        v.strictObject({
+                        v.object({
                             /** Time-in-force. */
                             tif: v.pipe(
                                 v.union([
@@ -105,10 +105,10 @@ export const OrderParams = v.pipe(
                         v.description("Limit order parameters."),
                     ),
                 }),
-                v.strictObject({
+                v.object({
                     /** Trigger order parameters. */
                     trigger: v.pipe(
-                        v.strictObject({
+                        v.object({
                             /** Is market order? */
                             isMarket: v.pipe(
                                 v.boolean(),
@@ -148,10 +148,10 @@ export type OrderParams = v.InferOutput<typeof OrderParams>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet
  */
 export const ApproveAgentRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("approveAgent"),
@@ -179,7 +179,7 @@ export const ApproveAgentRequest = v.pipe(
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 nonce: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -187,7 +187,7 @@ export const ApproveAgentRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -207,10 +207,10 @@ export type ApproveAgentRequest = v.InferOutput<typeof ApproveAgentRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-a-builder-fee
  */
 export const ApproveBuilderFeeRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("approveBuilderFee"),
@@ -238,7 +238,7 @@ export const ApproveBuilderFeeRequest = v.pipe(
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 nonce: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -246,7 +246,7 @@ export const ApproveBuilderFeeRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -266,10 +266,10 @@ export type ApproveBuilderFeeRequest = v.InferOutput<typeof ApproveBuilderFeeReq
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-multiple-orders
  */
 export const BatchModifyRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("batchModify"),
@@ -277,11 +277,11 @@ export const BatchModifyRequest = v.pipe(
                 ),
                 /** Order modifications. */
                 modifies: v.pipe(
-                    v.array(v.strictObject({
+                    v.array(v.object({
                         /** Order ID or Client Order ID. */
                         oid: v.pipe(
                             v.union([
-                                v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                UnsignedInteger,
                                 v.pipe(Hex, v.length(34)),
                             ]),
                             v.description("Order ID or Client Order ID."),
@@ -299,7 +299,7 @@ export const BatchModifyRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -314,7 +314,7 @@ export const BatchModifyRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -329,10 +329,10 @@ export type BatchModifyRequest = v.InferOutput<typeof BatchModifyRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s
  */
 export const CancelRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("cancel"),
@@ -340,15 +340,15 @@ export const CancelRequest = v.pipe(
                 ),
                 /** Orders to cancel. */
                 cancels: v.pipe(
-                    v.array(v.strictObject({
+                    v.array(v.object({
                         /** Asset ID. */
                         a: v.pipe(
-                            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                            UnsignedInteger,
                             v.description("Asset ID."),
                         ),
                         /** Order ID. */
                         o: v.pipe(
-                            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                            UnsignedInteger,
                             v.description("Order ID."),
                         ),
                     })),
@@ -359,7 +359,7 @@ export const CancelRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -374,7 +374,7 @@ export const CancelRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -389,10 +389,10 @@ export type CancelRequest = v.InferOutput<typeof CancelRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid
  */
 export const CancelByCloidRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("cancelByCloid"),
@@ -400,10 +400,10 @@ export const CancelByCloidRequest = v.pipe(
                 ),
                 /** Orders to cancel. */
                 cancels: v.pipe(
-                    v.array(v.strictObject({
+                    v.array(v.object({
                         /** Asset ID. */
                         asset: v.pipe(
-                            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                            UnsignedInteger,
                             v.description("Asset ID."),
                         ),
                         /** Client Order ID. */
@@ -419,7 +419,7 @@ export const CancelByCloidRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -434,7 +434,7 @@ export const CancelByCloidRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -449,10 +449,10 @@ export type CancelByCloidRequest = v.InferOutput<typeof CancelByCloidRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-into-staking
  */
 export const CDepositRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("cDeposit"),
@@ -470,12 +470,12 @@ export const CDepositRequest = v.pipe(
                 ),
                 /** Amount of wei to deposit into staking balance (float * 1e8). */
                 wei: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Amount of wei to deposit into staking balance (float * 1e8)."),
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 nonce: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -483,7 +483,7 @@ export const CDepositRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -503,10 +503,10 @@ export type CDepositRequest = v.InferOutput<typeof CDepositRequest>;
  * @see null
  */
 export const ClaimRewardsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("claimRewards"),
@@ -517,7 +517,7 @@ export const ClaimRewardsRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -527,7 +527,7 @@ export const ClaimRewardsRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -539,7 +539,7 @@ export type ClaimRewardsRequest = v.InferOutput<typeof ClaimRewardsRequest>;
 /** Signers configuration for {@linkcode ConvertToMultiSigUserRequest}. */
 export const ConvertToMultiSigUserRequestSigners = v.pipe(
     v.union([
-        v.strictObject({
+        v.object({
             /** List of authorized user addresses. */
             authorizedUsers: v.pipe(
                 v.array(v.pipe(Hex, v.length(42))),
@@ -547,7 +547,7 @@ export const ConvertToMultiSigUserRequestSigners = v.pipe(
             ),
             /** Minimum number of signatures required. */
             threshold: v.pipe(
-                v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                UnsignedInteger,
                 v.description("Minimum number of signatures required."),
             ),
         }),
@@ -567,10 +567,10 @@ export type ConvertToMultiSigUserRequestSigners = v.InferOutput<typeof ConvertTo
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig
  */
 export const ConvertToMultiSigUserRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("convertToMultiSigUser"),
@@ -611,7 +611,7 @@ export const ConvertToMultiSigUserRequest = v.pipe(
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 nonce: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -619,7 +619,7 @@ export const ConvertToMultiSigUserRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -639,10 +639,10 @@ export type ConvertToMultiSigUserRequest = v.InferOutput<typeof ConvertToMultiSi
  * @see null
  */
 export const CreateSubAccountRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("createSubAccount"),
@@ -659,7 +659,7 @@ export const CreateSubAccountRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -669,7 +669,7 @@ export const CreateSubAccountRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -684,10 +684,10 @@ export type CreateSubAccountRequest = v.InferOutput<typeof CreateSubAccountReque
  * @see null
  */
 export const CreateVaultRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("createVault"),
@@ -707,13 +707,13 @@ export const CreateVaultRequest = v.pipe(
                 ),
                 /** Initial balance (float * 1e6). */
                 initialUsd: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.minValue(100000000), // 100 USDC
                     v.description("Initial balance (float * 1e6)."),
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 nonce: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -721,7 +721,7 @@ export const CreateVaultRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -731,7 +731,7 @@ export const CreateVaultRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -748,11 +748,11 @@ export type CreateVaultRequest = v.InferOutput<typeof CreateVaultRequest>;
  * @see null
  */
 export const CSignerActionRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
             v.union([
-                v.strictObject({
+                v.object({
                     /** Type of action. */
                     type: v.pipe(
                         v.literal("CSignerAction"),
@@ -764,7 +764,7 @@ export const CSignerActionRequest = v.pipe(
                         v.description("Jail the signer."),
                     ),
                 }),
-                v.strictObject({
+                v.object({
                     /** Type of action. */
                     type: v.pipe(
                         v.literal("CSignerAction"),
@@ -781,7 +781,7 @@ export const CSignerActionRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -791,7 +791,7 @@ export const CSignerActionRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -813,11 +813,11 @@ export type CSignerActionRequest = v.InferOutput<typeof CSignerActionRequest>;
  * @see null
  */
 export const CValidatorActionRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
             v.union([
-                v.strictObject({
+                v.object({
                     /** Type of action. */
                     type: v.pipe(
                         v.literal("CValidatorAction"),
@@ -825,11 +825,11 @@ export const CValidatorActionRequest = v.pipe(
                     ),
                     /** Profile changes to apply. */
                     changeProfile: v.pipe(
-                        v.strictObject({
+                        v.object({
                             /** Validator node IP address. */
                             node_ip: v.pipe(
                                 v.union([
-                                    v.strictObject({
+                                    v.object({
                                         /** IP address. */
                                         Ip: v.pipe(
                                             v.string(),
@@ -863,7 +863,7 @@ export const CValidatorActionRequest = v.pipe(
                             ),
                             /** Commission rate in basis points (1 = 0.0001%). */
                             commission_bps: v.pipe(
-                                v.nullable(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+                                v.nullable(UnsignedInteger),
                                 v.description("Commission rate in basis points (1 = 0.0001%)."),
                             ),
                             /** Signer address. */
@@ -875,7 +875,7 @@ export const CValidatorActionRequest = v.pipe(
                         v.description("Profile changes to apply."),
                     ),
                 }),
-                v.strictObject({
+                v.object({
                     /** Type of action. */
                     type: v.pipe(
                         v.literal("CValidatorAction"),
@@ -883,13 +883,13 @@ export const CValidatorActionRequest = v.pipe(
                     ),
                     /** Registration parameters. */
                     register: v.pipe(
-                        v.strictObject({
+                        v.object({
                             /** Validator profile information. */
                             profile: v.pipe(
-                                v.strictObject({
+                                v.object({
                                     /** Validator node IP address. */
                                     node_ip: v.pipe(
-                                        v.strictObject({
+                                        v.object({
                                             /** IP address. */
                                             Ip: v.pipe(
                                                 v.string(),
@@ -916,7 +916,7 @@ export const CValidatorActionRequest = v.pipe(
                                     ),
                                     /** Commission rate in basis points (1 = 0.0001%). */
                                     commission_bps: v.pipe(
-                                        v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                        UnsignedInteger,
                                         v.description("Commission rate in basis points (1 = 0.0001%)."),
                                     ),
                                     /** Signer address. */
@@ -934,14 +934,14 @@ export const CValidatorActionRequest = v.pipe(
                             ),
                             /** Initial stake amount in wei. */
                             initial_wei: v.pipe(
-                                v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                UnsignedInteger,
                                 v.description("Initial stake amount in wei."),
                             ),
                         }),
                         v.description("Registration parameters."),
                     ),
                 }),
-                v.strictObject({
+                v.object({
                     /** Type of action. */
                     type: v.pipe(
                         v.literal("CValidatorAction"),
@@ -958,7 +958,7 @@ export const CValidatorActionRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -968,7 +968,7 @@ export const CValidatorActionRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -988,10 +988,10 @@ export type CValidatorActionRequest = v.InferOutput<typeof CValidatorActionReque
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#withdraw-from-staking
  */
 export const CWithdrawRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("cWithdraw"),
@@ -1009,12 +1009,12 @@ export const CWithdrawRequest = v.pipe(
                 ),
                 /** Amount of wei to withdraw from staking balance (float * 1e8). */
                 wei: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Amount of wei to withdraw from staking balance (float * 1e8)."),
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 nonce: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -1022,7 +1022,7 @@ export const CWithdrawRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1042,10 +1042,10 @@ export type CWithdrawRequest = v.InferOutput<typeof CWithdrawRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/hyperevm/dual-block-architecture
  */
 export const EvmUserModifyRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("evmUserModify"),
@@ -1061,7 +1061,7 @@ export const EvmUserModifyRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1071,7 +1071,7 @@ export const EvmUserModifyRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1086,10 +1086,10 @@ export type EvmUserModifyRequest = v.InferOutput<typeof EvmUserModifyRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order
  */
 export const ModifyRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("modify"),
@@ -1098,7 +1098,7 @@ export const ModifyRequest = v.pipe(
                 /** Order ID or Client Order ID. */
                 oid: v.pipe(
                     v.union([
-                        v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                        UnsignedInteger,
                         v.pipe(Hex, v.length(34)),
                     ]),
                     v.description("Order ID or Client Order ID."),
@@ -1113,7 +1113,7 @@ export const ModifyRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1128,7 +1128,7 @@ export const ModifyRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1143,10 +1143,10 @@ export type ModifyRequest = v.InferOutput<typeof ModifyRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#invalidate-pending-nonce-noop
  */
 export const NoopRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("noop"),
@@ -1157,7 +1157,7 @@ export const NoopRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1167,7 +1167,7 @@ export const NoopRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1182,10 +1182,10 @@ export type NoopRequest = v.InferOutput<typeof NoopRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-an-order
  */
 export const OrderRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("order"),
@@ -1217,7 +1217,7 @@ export const OrderRequest = v.pipe(
                 ),
                 /** Builder fee. */
                 builder: v.pipe(
-                    v.optional(v.strictObject({
+                    v.optional(v.object({
                         /** Builder address. */
                         b: v.pipe(
                             v.pipe(Hex, v.length(42)),
@@ -1225,7 +1225,7 @@ export const OrderRequest = v.pipe(
                         ),
                         /** Builder fee in 0.1bps (1 = 0.0001%). */
                         f: v.pipe(
-                            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                            UnsignedInteger,
                             v.description("Builder fee in 0.1bps (1 = 0.0001%)."),
                         ),
                     })),
@@ -1236,7 +1236,7 @@ export const OrderRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1251,7 +1251,7 @@ export const OrderRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1268,12 +1268,12 @@ export type OrderRequest = v.InferOutput<typeof OrderRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-3-assets
  */
 export const PerpDeployRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
             v.union([
                 v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** Type of action. */
                         type: v.pipe(
                             v.literal("perpDeploy"),
@@ -1281,17 +1281,17 @@ export const PerpDeployRequest = v.pipe(
                         ),
                         /** Parameters for registering a new perpetual asset. */
                         registerAsset: v.pipe(
-                            v.strictObject({
+                            v.object({
                                 /** Max gas in native token wei. If not provided, then uses current deploy auction price. */
                                 maxGas: v.pipe(
-                                    v.nullable(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+                                    v.nullable(UnsignedInteger),
                                     v.description(
                                         "Max gas in native token wei. If not provided, then uses current deploy auction price.",
                                     ),
                                 ),
                                 /** Contains new asset listing parameters. */
                                 assetRequest: v.pipe(
-                                    v.strictObject({
+                                    v.object({
                                         /** Coin symbol for the new asset. */
                                         coin: v.pipe(
                                             v.string(),
@@ -1299,7 +1299,7 @@ export const PerpDeployRequest = v.pipe(
                                         ),
                                         /** Number of decimal places for size. */
                                         szDecimals: v.pipe(
-                                            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                            UnsignedInteger,
                                             v.description("Number of decimal places for size."),
                                         ),
                                         /** Initial oracle price for the asset. */
@@ -1309,7 +1309,7 @@ export const PerpDeployRequest = v.pipe(
                                         ),
                                         /** Margin table identifier for risk management. */
                                         marginTableId: v.pipe(
-                                            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                            UnsignedInteger,
                                             v.description("Margin table identifier for risk management."),
                                         ),
                                         /** Whether the asset can only be traded with isolated margin. */
@@ -1327,7 +1327,7 @@ export const PerpDeployRequest = v.pipe(
                                 ),
                                 /** Contains new dex parameters. */
                                 schema: v.pipe(
-                                    v.nullable(v.strictObject({
+                                    v.nullable(v.object({
                                         /** Full name of the dex. */
                                         fullName: v.pipe(
                                             v.string(),
@@ -1335,7 +1335,7 @@ export const PerpDeployRequest = v.pipe(
                                         ),
                                         /** Collateral token index. */
                                         collateralToken: v.pipe(
-                                            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                            UnsignedInteger,
                                             v.description("Collateral token index."),
                                         ),
                                         /** User to update oracles. If not provided, then deployer is assumed to be oracle updater. */
@@ -1355,7 +1355,7 @@ export const PerpDeployRequest = v.pipe(
                     v.description("Register asset variant"),
                 ),
                 v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** Type of action. */
                         type: v.pipe(
                             v.literal("perpDeploy"),
@@ -1363,7 +1363,7 @@ export const PerpDeployRequest = v.pipe(
                         ),
                         /** Parameters for setting oracle and mark prices for assets. */
                         setOracle: v.pipe(
-                            v.strictObject({
+                            v.object({
                                 /** Name of the dex. */
                                 dex: v.pipe(
                                     v.string(),
@@ -1372,12 +1372,12 @@ export const PerpDeployRequest = v.pipe(
                                 ),
                                 /** A list (sorted by key) of asset and oracle prices. */
                                 oraclePxs: v.pipe(
-                                    v.array(v.strictTuple([v.string(), UnsignedDecimal])),
+                                    v.array(v.tuple([v.string(), UnsignedDecimal])),
                                     v.description("A list (sorted by key) of asset and oracle prices."),
                                 ),
                                 /** An outer list of inner lists (inner list sorted by key) of asset and mark prices. */
                                 markPxs: v.pipe(
-                                    v.array(v.array(v.strictTuple([v.string(), UnsignedDecimal]))),
+                                    v.array(v.array(v.tuple([v.string(), UnsignedDecimal]))),
                                     v.description(
                                         "An outer list of inner lists (inner list sorted by key) of asset and mark prices.",
                                     ),
@@ -1393,7 +1393,7 @@ export const PerpDeployRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1403,7 +1403,7 @@ export const PerpDeployRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1422,10 +1422,10 @@ export type PerpDeployRequest = v.InferOutput<typeof PerpDeployRequest>;
  * @see null
  */
 export const RegisterReferrerRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("registerReferrer"),
@@ -1442,7 +1442,7 @@ export const RegisterReferrerRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1452,7 +1452,7 @@ export const RegisterReferrerRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1467,10 +1467,10 @@ export type RegisterReferrerRequest = v.InferOutput<typeof RegisterReferrerReque
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#reserve-additional-actions
  */
 export const ReserveRequestWeightRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("reserveRequestWeight"),
@@ -1478,7 +1478,7 @@ export const ReserveRequestWeightRequest = v.pipe(
                 ),
                 /** Amount of request weight to reserve. */
                 weight: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Amount of request weight to reserve."),
                 ),
             }),
@@ -1486,7 +1486,7 @@ export const ReserveRequestWeightRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1496,7 +1496,7 @@ export const ReserveRequestWeightRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1511,10 +1511,10 @@ export type ReserveRequestWeightRequest = v.InferOutput<typeof ReserveRequestWei
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#schedule-cancel-dead-mans-switch
  */
 export const ScheduleCancelRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("scheduleCancel"),
@@ -1527,7 +1527,7 @@ export const ScheduleCancelRequest = v.pipe(
                  * If not specified, will cause all scheduled cancel operations to be deleted.
                  */
                 time: v.pipe(
-                    v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+                    v.optional(UnsignedInteger),
                     v.description(
                         "Scheduled time (in ms since epoch)." +
                             "\nMust be at least 5 seconds in the future." +
@@ -1539,7 +1539,7 @@ export const ScheduleCancelRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1554,7 +1554,7 @@ export const ScheduleCancelRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1569,10 +1569,10 @@ export type ScheduleCancelRequest = v.InferOutput<typeof ScheduleCancelRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset-testnet-only
  */
 export const SendAssetRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("sendAsset"),
@@ -1623,7 +1623,7 @@ export const SendAssetRequest = v.pipe(
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 nonce: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -1631,7 +1631,7 @@ export const SendAssetRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1651,10 +1651,10 @@ export type SendAssetRequest = v.InferOutput<typeof SendAssetRequest>;
  * @see null
  */
 export const SetDisplayNameRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("setDisplayName"),
@@ -1677,7 +1677,7 @@ export const SetDisplayNameRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1687,7 +1687,7 @@ export const SetDisplayNameRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1702,10 +1702,10 @@ export type SetDisplayNameRequest = v.InferOutput<typeof SetDisplayNameRequest>;
  * @see null
  */
 export const SetReferrerRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("setReferrer"),
@@ -1722,7 +1722,7 @@ export const SetReferrerRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1732,7 +1732,7 @@ export const SetReferrerRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1753,12 +1753,12 @@ export type SetReferrerRequest = v.InferOutput<typeof SetReferrerRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
  */
 export const SpotDeployRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
             v.union([
                 v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** Type of action. */
                         type: v.pipe(
                             v.literal("spotDeploy"),
@@ -1766,10 +1766,10 @@ export const SpotDeployRequest = v.pipe(
                         ),
                         /** Genesis parameters. */
                         genesis: v.pipe(
-                            v.strictObject({
+                            v.object({
                                 /** Token identifier. */
                                 token: v.pipe(
-                                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                    UnsignedInteger,
                                     v.description("Token identifier."),
                                 ),
                                 /** Maximum token supply. */
@@ -1789,7 +1789,7 @@ export const SpotDeployRequest = v.pipe(
                     v.description("Genesis variant"),
                 ),
                 v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** Type of action. */
                         type: v.pipe(
                             v.literal("spotDeploy"),
@@ -1797,10 +1797,10 @@ export const SpotDeployRequest = v.pipe(
                         ),
                         /** Register hyperliquidity parameters. */
                         registerHyperliquidity: v.pipe(
-                            v.strictObject({
+                            v.object({
                                 /** Spot index (distinct from base token index). */
                                 spot: v.pipe(
-                                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                    UnsignedInteger,
                                     v.description("Spot index (distinct from base token index)."),
                                 ),
                                 /** Starting price for liquidity seeding. */
@@ -1815,12 +1815,12 @@ export const SpotDeployRequest = v.pipe(
                                 ),
                                 /** Total number of orders to place. */
                                 nOrders: v.pipe(
-                                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                    UnsignedInteger,
                                     v.description("Total number of orders to place."),
                                 ),
                                 /** Number of levels to seed with USDC. */
                                 nSeededLevels: v.pipe(
-                                    v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+                                    v.optional(UnsignedInteger),
                                     v.description("Number of levels to seed with USDC."),
                                 ),
                             }),
@@ -1830,7 +1830,7 @@ export const SpotDeployRequest = v.pipe(
                     v.description("Register hyperliquidity variant"),
                 ),
                 v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** Type of action. */
                         type: v.pipe(
                             v.literal("spotDeploy"),
@@ -1838,12 +1838,12 @@ export const SpotDeployRequest = v.pipe(
                         ),
                         /** Register spot parameters. */
                         registerSpot: v.pipe(
-                            v.strictObject({
+                            v.object({
                                 /** Tuple containing base and quote token indices. */
                                 tokens: v.pipe(
-                                    v.strictTuple([
-                                        v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
-                                        v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                    v.tuple([
+                                        UnsignedInteger,
+                                        UnsignedInteger,
                                     ]),
                                     v.description("Tuple containing base and quote token indices."),
                                 ),
@@ -1854,7 +1854,7 @@ export const SpotDeployRequest = v.pipe(
                     v.description("Register spot variant"),
                 ),
                 v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** Type of action. */
                         type: v.pipe(
                             v.literal("spotDeploy"),
@@ -1862,10 +1862,10 @@ export const SpotDeployRequest = v.pipe(
                         ),
                         /** Register token parameters. */
                         registerToken2: v.pipe(
-                            v.strictObject({
+                            v.object({
                                 /** Token specifications. */
                                 spec: v.pipe(
-                                    v.strictObject({
+                                    v.object({
                                         /** Token name. */
                                         name: v.pipe(
                                             v.string(),
@@ -1873,12 +1873,12 @@ export const SpotDeployRequest = v.pipe(
                                         ),
                                         /** Number of decimals for token size. */
                                         szDecimals: v.pipe(
-                                            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                            UnsignedInteger,
                                             v.description("Number of decimals for token size."),
                                         ),
                                         /** Number of decimals for token amounts in wei. */
                                         weiDecimals: v.pipe(
-                                            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                            UnsignedInteger,
                                             v.description("Number of decimals for token amounts in wei."),
                                         ),
                                     }),
@@ -1886,7 +1886,7 @@ export const SpotDeployRequest = v.pipe(
                                 ),
                                 /** Maximum gas allowed for registration. */
                                 maxGas: v.pipe(
-                                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                    UnsignedInteger,
                                     v.description("Maximum gas allowed for registration."),
                                 ),
                                 /** Optional full token name. */
@@ -1901,7 +1901,7 @@ export const SpotDeployRequest = v.pipe(
                     v.description("Register token variant"),
                 ),
                 v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** Type of action. */
                         type: v.pipe(
                             v.literal("spotDeploy"),
@@ -1909,10 +1909,10 @@ export const SpotDeployRequest = v.pipe(
                         ),
                         /** Set deployer trading fee share parameters. */
                         setDeployerTradingFeeShare: v.pipe(
-                            v.strictObject({
+                            v.object({
                                 /** Token identifier. */
                                 token: v.pipe(
-                                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                    UnsignedInteger,
                                     v.description("Token identifier."),
                                 ),
                                 /** The deployer trading fee share. Range is 0% to 100%. */
@@ -1927,7 +1927,7 @@ export const SpotDeployRequest = v.pipe(
                     v.description("Set deployer trading fee share variant"),
                 ),
                 v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** Type of action. */
                         type: v.pipe(
                             v.literal("spotDeploy"),
@@ -1935,22 +1935,22 @@ export const SpotDeployRequest = v.pipe(
                         ),
                         /** User genesis parameters. */
                         userGenesis: v.pipe(
-                            v.strictObject({
+                            v.object({
                                 /** Token identifier. */
                                 token: v.pipe(
-                                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                    UnsignedInteger,
                                     v.description("Token identifier."),
                                 ),
                                 /** Array of tuples: [user address, genesis amount in wei]. */
                                 userAndWei: v.pipe(
-                                    v.array(v.strictTuple([v.pipe(Hex, v.length(42)), UnsignedDecimal])),
+                                    v.array(v.tuple([v.pipe(Hex, v.length(42)), UnsignedDecimal])),
                                     v.description("Array of tuples: [user address, genesis amount in wei]."),
                                 ),
                                 /** Array of tuples: [existing token identifier, genesis amount in wei]. */
                                 existingTokenAndWei: v.pipe(
                                     v.array(
-                                        v.strictTuple([
-                                            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                        v.tuple([
+                                            UnsignedInteger,
                                             UnsignedDecimal,
                                         ]),
                                     ),
@@ -1960,7 +1960,7 @@ export const SpotDeployRequest = v.pipe(
                                 ),
                                 /** Array of tuples: [user address, blacklist status] (`true` for blacklist, `false` to remove existing blacklisted user). */
                                 blacklistUsers: v.pipe(
-                                    v.optional(v.array(v.strictTuple([v.pipe(Hex, v.length(42)), v.boolean()]))),
+                                    v.optional(v.array(v.tuple([v.pipe(Hex, v.length(42)), v.boolean()]))),
                                     v.description(
                                         "Array of tuples: [user address, blacklist status] (`true` for blacklist, `false` to remove existing blacklisted user).",
                                     ),
@@ -1976,7 +1976,7 @@ export const SpotDeployRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1986,7 +1986,7 @@ export const SpotDeployRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2009,10 +2009,10 @@ export type SpotDeployRequest = v.InferOutput<typeof SpotDeployRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-spot-transfer
  */
 export const SpotSendRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("spotSend"),
@@ -2045,7 +2045,7 @@ export const SpotSendRequest = v.pipe(
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 time: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -2053,7 +2053,7 @@ export const SpotSendRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2073,10 +2073,10 @@ export type SpotSendRequest = v.InferOutput<typeof SpotSendRequest>;
  * @see null
  */
 export const SpotUserRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("spotUser"),
@@ -2084,7 +2084,7 @@ export const SpotUserRequest = v.pipe(
                 ),
                 /** Spot dusting options. */
                 toggleSpotDusting: v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** Opt out of spot dusting. */
                         optOut: v.pipe(
                             v.boolean(),
@@ -2098,7 +2098,7 @@ export const SpotUserRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2108,7 +2108,7 @@ export const SpotUserRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2123,10 +2123,10 @@ export type SpotUserRequest = v.InferOutput<typeof SpotUserRequest>;
  * @see null
  */
 export const SubAccountModifyRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("subAccountModify"),
@@ -2148,7 +2148,7 @@ export const SubAccountModifyRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2158,7 +2158,7 @@ export const SubAccountModifyRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2173,10 +2173,10 @@ export type SubAccountModifyRequest = v.InferOutput<typeof SubAccountModifyReque
  * @see null
  */
 export const SubAccountSpotTransferRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("subAccountSpotTransfer"),
@@ -2207,7 +2207,7 @@ export const SubAccountSpotTransferRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2217,7 +2217,7 @@ export const SubAccountSpotTransferRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2232,10 +2232,10 @@ export type SubAccountSpotTransferRequest = v.InferOutput<typeof SubAccountSpotT
  * @see null
  */
 export const SubAccountTransferRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("subAccountTransfer"),
@@ -2253,7 +2253,7 @@ export const SubAccountTransferRequest = v.pipe(
                 ),
                 /** Amount to transfer (float * 1e6). */
                 usd: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Amount to transfer (float * 1e6)."),
                 ),
             }),
@@ -2261,7 +2261,7 @@ export const SubAccountTransferRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2271,7 +2271,7 @@ export const SubAccountTransferRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2286,10 +2286,10 @@ export type SubAccountTransferRequest = v.InferOutput<typeof SubAccountTransferR
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#delegate-or-undelegate-stake-from-validator
  */
 export const TokenDelegateRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("tokenDelegate"),
@@ -2312,7 +2312,7 @@ export const TokenDelegateRequest = v.pipe(
                 ),
                 /** Amount for delegate/undelegate (float * 1e8). */
                 wei: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Amount for delegate/undelegate (float * 1e8)."),
                 ),
                 /** `true` for undelegate, `false` for delegate. */
@@ -2322,7 +2322,7 @@ export const TokenDelegateRequest = v.pipe(
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 nonce: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -2330,7 +2330,7 @@ export const TokenDelegateRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2350,10 +2350,10 @@ export type TokenDelegateRequest = v.InferOutput<typeof TokenDelegateRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order
  */
 export const TwapCancelRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("twapCancel"),
@@ -2361,12 +2361,12 @@ export const TwapCancelRequest = v.pipe(
                 ),
                 /** Asset ID. */
                 a: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Asset ID."),
                 ),
                 /** Twap ID. */
                 t: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Twap ID."),
                 ),
             }),
@@ -2374,7 +2374,7 @@ export const TwapCancelRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2389,7 +2389,7 @@ export const TwapCancelRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2404,10 +2404,10 @@ export type TwapCancelRequest = v.InferOutput<typeof TwapCancelRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-a-twap-order
  */
 export const TwapOrderRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("twapOrder"),
@@ -2415,10 +2415,10 @@ export const TwapOrderRequest = v.pipe(
                 ),
                 /** Twap parameters. */
                 twap: v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** Asset ID. */
                         a: v.pipe(
-                            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                            UnsignedInteger,
                             v.description("Asset ID."),
                         ),
                         /** Position side (`true` for long, `false` for short). */
@@ -2438,7 +2438,7 @@ export const TwapOrderRequest = v.pipe(
                         ),
                         /** TWAP duration in minutes. */
                         m: v.pipe(
-                            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                            UnsignedInteger,
                             v.description("TWAP duration in minutes."),
                         ),
                         /** Enable random order timing. */
@@ -2454,7 +2454,7 @@ export const TwapOrderRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2469,7 +2469,7 @@ export const TwapOrderRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2484,10 +2484,10 @@ export type TwapOrderRequest = v.InferOutput<typeof TwapOrderRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin
  */
 export const UpdateIsolatedMarginRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("updateIsolatedMargin"),
@@ -2495,7 +2495,7 @@ export const UpdateIsolatedMarginRequest = v.pipe(
                 ),
                 /** Asset ID. */
                 asset: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Asset ID."),
                 ),
                 /** Position side (`true` for long, `false` for short). */
@@ -2505,7 +2505,7 @@ export const UpdateIsolatedMarginRequest = v.pipe(
                 ),
                 /** Amount to adjust (float * 1e6). */
                 ntli: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Amount to adjust (float * 1e6)."),
                 ),
             }),
@@ -2513,7 +2513,7 @@ export const UpdateIsolatedMarginRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2528,7 +2528,7 @@ export const UpdateIsolatedMarginRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2543,10 +2543,10 @@ export type UpdateIsolatedMarginRequest = v.InferOutput<typeof UpdateIsolatedMar
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-leverage
  */
 export const UpdateLeverageRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("updateLeverage"),
@@ -2554,7 +2554,7 @@ export const UpdateLeverageRequest = v.pipe(
                 ),
                 /** Asset ID. */
                 asset: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Asset ID."),
                 ),
                 /** `true` for cross leverage, `false` for isolated leverage. */
@@ -2564,7 +2564,7 @@ export const UpdateLeverageRequest = v.pipe(
                 ),
                 /** New leverage value. */
                 leverage: v.pipe(
-                    v.pipe(v.pipe(v.number(), v.safeInteger(), v.minValue(0)), v.minValue(1)),
+                    v.pipe(UnsignedInteger, v.minValue(1)),
                     v.description("New leverage value."),
                 ),
             }),
@@ -2572,7 +2572,7 @@ export const UpdateLeverageRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2587,7 +2587,7 @@ export const UpdateLeverageRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2602,10 +2602,10 @@ export type UpdateLeverageRequest = v.InferOutput<typeof UpdateLeverageRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa
  */
 export const UsdClassTransferRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("usdClassTransfer"),
@@ -2633,7 +2633,7 @@ export const UsdClassTransferRequest = v.pipe(
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 nonce: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -2641,7 +2641,7 @@ export const UsdClassTransferRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2661,10 +2661,10 @@ export type UsdClassTransferRequest = v.InferOutput<typeof UsdClassTransferReque
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-usdc-transfer
  */
 export const UsdSendRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("usdSend"),
@@ -2692,7 +2692,7 @@ export const UsdSendRequest = v.pipe(
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 time: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -2700,7 +2700,7 @@ export const UsdSendRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2720,10 +2720,10 @@ export type UsdSendRequest = v.InferOutput<typeof UsdSendRequest>;
  * @see null
  */
 export const VaultDistributeRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("vaultDistribute"),
@@ -2740,7 +2740,7 @@ export const VaultDistributeRequest = v.pipe(
                  * Set to 0 to close the vault.
                  */
                 usd: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description(
                         "Amount to distribute (float * 1e6)." +
                             "\n\nSet to 0 to close the vault.",
@@ -2751,7 +2751,7 @@ export const VaultDistributeRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2761,7 +2761,7 @@ export const VaultDistributeRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2776,10 +2776,10 @@ export type VaultDistributeRequest = v.InferOutput<typeof VaultDistributeRequest
  * @see null
  */
 export const VaultModifyRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("vaultModify"),
@@ -2805,7 +2805,7 @@ export const VaultModifyRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2815,7 +2815,7 @@ export const VaultModifyRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2830,10 +2830,10 @@ export type VaultModifyRequest = v.InferOutput<typeof VaultModifyRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-a-vault
  */
 export const VaultTransferRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("vaultTransfer"),
@@ -2851,7 +2851,7 @@ export const VaultTransferRequest = v.pipe(
                 ),
                 /** Amount for deposit/withdrawal (float * 1e6). */
                 usd: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Amount for deposit/withdrawal (float * 1e6)."),
                 ),
             }),
@@ -2859,7 +2859,7 @@ export const VaultTransferRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2869,7 +2869,7 @@ export const VaultTransferRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2884,10 +2884,10 @@ export type VaultTransferRequest = v.InferOutput<typeof VaultTransferRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#initiate-a-withdrawal-request
  */
 export const Withdraw3Request = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("withdraw3"),
@@ -2915,7 +2915,7 @@ export const Withdraw3Request = v.pipe(
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 time: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -2923,7 +2923,7 @@ export const Withdraw3Request = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2943,10 +2943,10 @@ export type Withdraw3Request = v.InferOutput<typeof Withdraw3Request>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig
  */
 export const MultiSigRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action to perform. */
         action: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of action. */
                 type: v.pipe(
                     v.literal("multiSig"),
@@ -2964,7 +2964,7 @@ export const MultiSigRequest = v.pipe(
                 ),
                 /** Multi-signature payload information. */
                 payload: v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** Address of the multi-signature user account. */
                         multiSigUser: v.pipe(
                             v.pipe(Hex, v.length(42)),
@@ -3032,7 +3032,7 @@ export const MultiSigRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -3047,7 +3047,7 @@ export const MultiSigRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(v.pipe(v.number(), v.safeInteger(), v.minValue(0))),
+            v.optional(UnsignedInteger),
             v.description("Expiration time of the action."),
         ),
     }),

@@ -1,12 +1,12 @@
 import * as v from "valibot";
-import { Hex } from "../_base.ts";
+import { Hex, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request block details by block height.
  * @returns {BlockDetailsResponse}
  */
 export const BlockDetailsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("blockDetails"),
@@ -14,7 +14,7 @@ export const BlockDetailsRequest = v.pipe(
         ),
         /** Block height. */
         height: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Block height."),
         ),
     }),
@@ -27,7 +27,7 @@ export type BlockDetailsRequest = v.InferOutput<typeof BlockDetailsRequest>;
  * @returns {TxDetailsResponse}
  */
 export const TxDetailsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("txDetails"),
@@ -48,7 +48,7 @@ export type TxDetailsRequest = v.InferOutput<typeof TxDetailsRequest>;
  * @returns {UserDetailsResponse}
  */
 export const UserDetailsRequest = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of request. */
         type: v.pipe(
             v.literal("userDetails"),

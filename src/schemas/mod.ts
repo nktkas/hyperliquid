@@ -101,6 +101,8 @@ export function parser<TSchema extends v.GenericSchema>(schema: TSchema): v.Pars
     return parser;
 }
 
+export { Hex } from "./_base.ts";
+
 export * from "./exchange/requests.ts";
 export * from "./exchange/responses.ts";
 

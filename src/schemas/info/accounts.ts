@@ -1,9 +1,9 @@
 import * as v from "valibot";
-import { Hex, SignedDecimal, UnsignedDecimal } from "../_base.ts";
+import { Decimal, Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /** User active asset data. */
 export const ActiveAssetData = v.pipe(
-    v.strictObject({
+    v.object({
         /** User address. */
         user: v.pipe(
             v.pipe(Hex, v.length(42)),
@@ -17,7 +17,7 @@ export const ActiveAssetData = v.pipe(
         /** Leverage configuration. */
         leverage: v.pipe(
             v.union([
-                v.strictObject({
+                v.object({
                     /** Leverage type. */
                     type: v.pipe(
                         v.literal("isolated"),
@@ -25,7 +25,7 @@ export const ActiveAssetData = v.pipe(
                     ),
                     /** Leverage value used. */
                     value: v.pipe(
-                        v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                        UnsignedInteger,
                         v.minValue(1),
                         v.description("Leverage value used."),
                     ),
@@ -35,7 +35,7 @@ export const ActiveAssetData = v.pipe(
                         v.description("Amount of USD used (1 = 1$)."),
                     ),
                 }),
-                v.strictObject({
+                v.object({
                     /** Leverage type. */
                     type: v.pipe(
                         v.literal("cross"),
@@ -43,7 +43,7 @@ export const ActiveAssetData = v.pipe(
                     ),
                     /** Leverage value used. */
                     value: v.pipe(
-                        v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                        UnsignedInteger,
                         v.minValue(1),
                         v.description("Leverage value used."),
                     ),
@@ -53,12 +53,12 @@ export const ActiveAssetData = v.pipe(
         ),
         /** Maximum trade size range [min, max]. */
         maxTradeSzs: v.pipe(
-            v.strictTuple([UnsignedDecimal, UnsignedDecimal]),
+            v.tuple([UnsignedDecimal, UnsignedDecimal]),
             v.description("Maximum trade size range [min, max]."),
         ),
         /** Available to trade range [min, max]. */
         availableToTrade: v.pipe(
-            v.strictTuple([UnsignedDecimal, UnsignedDecimal]),
+            v.tuple([UnsignedDecimal, UnsignedDecimal]),
             v.description("Available to trade range [min, max]."),
         ),
         /** Mark price. */
@@ -73,7 +73,7 @@ export type ActiveAssetData = v.InferOutput<typeof ActiveAssetData>;
 
 /** Position for a specific asset. */
 export const AssetPosition = v.pipe(
-    v.strictObject({
+    v.object({
         /** Position type. */
         type: v.pipe(
             v.literal("oneWay"),
@@ -81,7 +81,7 @@ export const AssetPosition = v.pipe(
         ),
         /** Position details. */
         position: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Asset symbol. */
                 coin: v.pipe(
                     v.string(),
@@ -89,13 +89,13 @@ export const AssetPosition = v.pipe(
                 ),
                 /** Signed position size. */
                 szi: v.pipe(
-                    SignedDecimal,
+                    Decimal,
                     v.description("Signed position size."),
                 ),
                 /** Leverage details. */
                 leverage: v.pipe(
                     v.union([
-                        v.strictObject({
+                        v.object({
                             /** Leverage type. */
                             type: v.pipe(
                                 v.literal("isolated"),
@@ -103,7 +103,7 @@ export const AssetPosition = v.pipe(
                             ),
                             /** Leverage value used. */
                             value: v.pipe(
-                                v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                UnsignedInteger,
                                 v.minValue(1),
                                 v.description("Leverage value used."),
                             ),
@@ -113,7 +113,7 @@ export const AssetPosition = v.pipe(
                                 v.description("Amount of USD used (1 = 1$)."),
                             ),
                         }),
-                        v.strictObject({
+                        v.object({
                             /** Leverage type. */
                             type: v.pipe(
                                 v.literal("cross"),
@@ -121,7 +121,7 @@ export const AssetPosition = v.pipe(
                             ),
                             /** Leverage value used. */
                             value: v.pipe(
-                                v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                UnsignedInteger,
                                 v.minValue(1),
                                 v.description("Leverage value used."),
                             ),
@@ -141,12 +141,12 @@ export const AssetPosition = v.pipe(
                 ),
                 /** Unrealized profit and loss. */
                 unrealizedPnl: v.pipe(
-                    SignedDecimal,
+                    Decimal,
                     v.description("Unrealized profit and loss."),
                 ),
                 /** Return on equity. */
                 returnOnEquity: v.pipe(
-                    SignedDecimal,
+                    Decimal,
                     v.description("Return on equity."),
                 ),
                 /** Liquidation price. */
@@ -161,26 +161,26 @@ export const AssetPosition = v.pipe(
                 ),
                 /** Maximum allowed leverage. */
                 maxLeverage: v.pipe(
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                    UnsignedInteger,
                     v.minValue(1),
                     v.description("Maximum allowed leverage."),
                 ),
                 /** Cumulative funding details. */
                 cumFunding: v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** Total funding paid or received since account opening. */
                         allTime: v.pipe(
-                            SignedDecimal,
+                            Decimal,
                             v.description("Total funding paid or received since account opening."),
                         ),
                         /** Funding accumulated since the position was opened. */
                         sinceOpen: v.pipe(
-                            SignedDecimal,
+                            Decimal,
                             v.description("Funding accumulated since the position was opened."),
                         ),
                         /** Funding accumulated since the last change in position size. */
                         sinceChange: v.pipe(
-                            SignedDecimal,
+                            Decimal,
                             v.description("Funding accumulated since the last change in position size."),
                         ),
                     }),
@@ -196,7 +196,7 @@ export type AssetPosition = v.InferOutput<typeof AssetPosition>;
 
 /** Escrowed balance for a specific asset. */
 export const EvmEscrowsBalance = v.pipe(
-    v.strictObject({
+    v.object({
         /** Asset symbol. */
         coin: v.pipe(
             v.string(),
@@ -204,7 +204,7 @@ export const EvmEscrowsBalance = v.pipe(
         ),
         /** Unique identifier for the token. */
         token: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique identifier for the token."),
         ),
         /** Total balance. */
@@ -219,7 +219,7 @@ export type EvmEscrowsBalance = v.InferOutput<typeof EvmEscrowsBalance>;
 
 /** Extra agent details for a user. */
 export const ExtraAgent = v.pipe(
-    v.strictObject({
+    v.object({
         /** Extra agent address. */
         address: v.pipe(
             v.pipe(Hex, v.length(42)),
@@ -233,7 +233,7 @@ export const ExtraAgent = v.pipe(
         ),
         /** Validity period as a timestamp (in ms since epoch). */
         validUntil: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Validity period as a timestamp (in ms since epoch)."),
         ),
     }),
@@ -243,7 +243,7 @@ export type ExtraAgent = v.InferOutput<typeof ExtraAgent>;
 
 /** Legal verification status for a user. */
 export const LegalCheck = v.pipe(
-    v.strictObject({
+    v.object({
         /** Whether the user IP address is allowed. */
         ipAllowed: v.pipe(
             v.boolean(),
@@ -266,7 +266,7 @@ export type LegalCheck = v.InferOutput<typeof LegalCheck>;
 
 /** Multi-sig signers for a user. */
 export const MultiSigSigners = v.pipe(
-    v.strictObject({
+    v.object({
         /** Authorized users addresses. */
         authorizedUsers: v.pipe(
             v.array(v.pipe(Hex, v.length(42))),
@@ -275,7 +275,7 @@ export const MultiSigSigners = v.pipe(
         ),
         /** Threshold number of signatures required. */
         threshold: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.minValue(1),
             v.description("Threshold number of signatures required."),
         ),
@@ -286,10 +286,10 @@ export type MultiSigSigners = v.InferOutput<typeof MultiSigSigners>;
 
 /** Account summary for perpetual trading. */
 export const PerpsClearinghouseState = v.pipe(
-    v.strictObject({
+    v.object({
         /** Margin summary details. */
         marginSummary: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Total account value. */
                 accountValue: v.pipe(
                     UnsignedDecimal,
@@ -315,7 +315,7 @@ export const PerpsClearinghouseState = v.pipe(
         ),
         /** Cross-margin summary details. */
         crossMarginSummary: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Total account value. */
                 accountValue: v.pipe(
                     UnsignedDecimal,
@@ -356,7 +356,7 @@ export const PerpsClearinghouseState = v.pipe(
         ),
         /** Timestamp when data was retrieved (in ms since epoch). */
         time: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Timestamp when data was retrieved (in ms since epoch)."),
         ),
     }),
@@ -366,15 +366,15 @@ export type PerpsClearinghouseState = v.InferOutput<typeof PerpsClearinghouseSta
 
 /** Portfolio metrics snapshot. */
 export const Portfolio = v.pipe(
-    v.strictObject({
+    v.object({
         /** History entries for account value as [timestamp, value]. */
         accountValueHistory: v.pipe(
-            v.array(v.strictTuple([v.pipe(v.number(), v.safeInteger(), v.minValue(0)), UnsignedDecimal])),
+            v.array(v.tuple([UnsignedInteger, UnsignedDecimal])),
             v.description("History entries for account value as [timestamp, value]."),
         ),
         /** History entries for profit and loss as [timestamp, value]. */
         pnlHistory: v.pipe(
-            v.array(v.strictTuple([v.pipe(v.number(), v.safeInteger(), v.minValue(0)), SignedDecimal])),
+            v.array(v.tuple([UnsignedInteger, Decimal])),
             v.description("History entries for profit and loss as [timestamp, value]."),
         ),
         /** Volume metric for the portfolio. */
@@ -389,15 +389,15 @@ export type Portfolio = v.InferOutput<typeof Portfolio>;
 
 /** Portfolio metrics grouped by time periods. */
 export const PortfolioPeriods = v.pipe(
-    v.strictTuple([
-        v.strictTuple([v.literal("day"), Portfolio]),
-        v.strictTuple([v.literal("week"), Portfolio]),
-        v.strictTuple([v.literal("month"), Portfolio]),
-        v.strictTuple([v.literal("allTime"), Portfolio]),
-        v.strictTuple([v.literal("perpDay"), Portfolio]),
-        v.strictTuple([v.literal("perpWeek"), Portfolio]),
-        v.strictTuple([v.literal("perpMonth"), Portfolio]),
-        v.strictTuple([v.literal("perpAllTime"), Portfolio]),
+    v.tuple([
+        v.tuple([v.literal("day"), Portfolio]),
+        v.tuple([v.literal("week"), Portfolio]),
+        v.tuple([v.literal("month"), Portfolio]),
+        v.tuple([v.literal("allTime"), Portfolio]),
+        v.tuple([v.literal("perpDay"), Portfolio]),
+        v.tuple([v.literal("perpWeek"), Portfolio]),
+        v.tuple([v.literal("perpMonth"), Portfolio]),
+        v.tuple([v.literal("perpAllTime"), Portfolio]),
     ]),
     v.description("Portfolio metrics grouped by time periods."),
 );
@@ -405,7 +405,7 @@ export type PortfolioPeriods = v.InferOutput<typeof PortfolioPeriods>;
 
 /** Pre-transfer user existence check result. */
 export const PreTransferCheck = v.pipe(
-    v.strictObject({
+    v.object({
         /** Activation fee. */
         fee: v.pipe(
             UnsignedDecimal,
@@ -433,11 +433,11 @@ export type PreTransferCheck = v.InferOutput<typeof PreTransferCheck>;
 
 /** Referral details for a user. */
 export const Referral = v.pipe(
-    v.strictObject({
+    v.object({
         /** Referrer details. */
         referredBy: v.pipe(
             v.union([
-                v.strictObject({
+                v.object({
                     /** Referrer address. */
                     referrer: v.pipe(
                         v.pipe(Hex, v.length(42)),
@@ -477,7 +477,7 @@ export const Referral = v.pipe(
         /** Current state of the referrer. */
         referrerState: v.pipe(
             v.union([
-                v.strictObject({
+                v.object({
                     /** Referrer is ready to receive rewards. */
                     stage: v.pipe(
                         v.literal("ready"),
@@ -485,7 +485,7 @@ export const Referral = v.pipe(
                     ),
                     /** Referral program details. */
                     data: v.pipe(
-                        v.strictObject({
+                        v.object({
                             /** Assigned referral code. */
                             code: v.pipe(
                                 v.string(),
@@ -494,13 +494,13 @@ export const Referral = v.pipe(
                             ),
                             /** Total number of referrals. */
                             nReferrals: v.pipe(
-                                v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                UnsignedInteger,
                                 v.description("Total number of referrals."),
                             ),
                             /** Summary of each referral state. */
                             referralStates: v.pipe(
                                 v.array(
-                                    v.strictObject({
+                                    v.object({
                                         /** Cumulative traded volume. */
                                         cumVlm: v.pipe(
                                             UnsignedDecimal,
@@ -518,7 +518,7 @@ export const Referral = v.pipe(
                                         ),
                                         /** Timestamp when the referred user joined (in ms since epoch). */
                                         timeJoined: v.pipe(
-                                            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                            UnsignedInteger,
                                             v.description(
                                                 "Timestamp when the referred user joined (in ms since epoch).",
                                             ),
@@ -531,9 +531,9 @@ export const Referral = v.pipe(
                                         /** Mapping of token IDs to referral reward states. */
                                         tokenToState: v.pipe(
                                             v.array(
-                                                v.strictTuple([
-                                                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
-                                                    v.strictObject({
+                                                v.tuple([
+                                                    UnsignedInteger,
+                                                    v.object({
                                                         /** Cumulative traded volume. */
                                                         cumVlm: v.pipe(
                                                             UnsignedDecimal,
@@ -566,14 +566,14 @@ export const Referral = v.pipe(
                         v.description("Referral program details."),
                     ),
                 }),
-                v.strictObject({
+                v.object({
                     /** Referrer needs to create a referral code. */
                     stage: v.pipe(
                         v.literal("needToCreateCode"),
                         v.description("Referrer needs to create a referral code."),
                     ),
                 }),
-                v.strictObject({
+                v.object({
                     /** Referrer must complete a trade before earning rewards. */
                     stage: v.pipe(
                         v.literal("needToTrade"),
@@ -581,7 +581,7 @@ export const Referral = v.pipe(
                     ),
                     /** Required trading volume details for activation. */
                     data: v.pipe(
-                        v.strictObject({
+                        v.object({
                             /** Required trading volume. */
                             required: v.pipe(
                                 UnsignedDecimal,
@@ -597,7 +597,7 @@ export const Referral = v.pipe(
         /** History of referral rewards. */
         rewardHistory: v.pipe(
             v.array(
-                v.strictObject({
+                v.object({
                     /** Amount of earned rewards. */
                     earned: v.pipe(
                         UnsignedDecimal,
@@ -615,7 +615,7 @@ export const Referral = v.pipe(
                     ),
                     /** Timestamp when the reward was earned (in ms since epoch). */
                     time: v.pipe(
-                        v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                        UnsignedInteger,
                         v.description("Timestamp when the reward was earned (in ms since epoch)."),
                     ),
                 }),
@@ -625,9 +625,9 @@ export const Referral = v.pipe(
         /** Mapping of token IDs to referral reward states. */
         tokenToState: v.pipe(
             v.array(
-                v.strictTuple([
-                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
-                    v.strictObject({
+                v.tuple([
+                    UnsignedInteger,
+                    v.object({
                         /** Cumulative traded volume. */
                         cumVlm: v.pipe(
                             UnsignedDecimal,
@@ -660,7 +660,7 @@ export type Referral = v.InferOutput<typeof Referral>;
 
 /** Balance for a specific spot token. */
 export const SpotBalance = v.pipe(
-    v.strictObject({
+    v.object({
         /** Asset symbol. */
         coin: v.pipe(
             v.string(),
@@ -668,7 +668,7 @@ export const SpotBalance = v.pipe(
         ),
         /** Unique identifier for the token. */
         token: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique identifier for the token."),
         ),
         /** Total balance. */
@@ -693,7 +693,7 @@ export type SpotBalance = v.InferOutput<typeof SpotBalance>;
 
 /** Account summary for spot trading. */
 export const SpotClearinghouseState = v.pipe(
-    v.strictObject({
+    v.object({
         /** Balance for each token. */
         balances: v.pipe(
             v.array(SpotBalance),
@@ -711,7 +711,7 @@ export type SpotClearinghouseState = v.InferOutput<typeof SpotClearinghouseState
 
 /** Sub-account details for a user. */
 export const SubAccount = v.pipe(
-    v.strictObject({
+    v.object({
         /** Sub-account name. */
         name: v.pipe(
             v.string(),
@@ -745,11 +745,11 @@ export type SubAccount = v.InferOutput<typeof SubAccount>;
 
 /** User fees. */
 export const UserFees = v.pipe(
-    v.strictObject({
+    v.object({
         /** Daily user volume metrics. */
         dailyUserVlm: v.pipe(
             v.array(
-                v.strictObject({
+                v.object({
                     /** Date in YYYY-M-D format. */
                     date: v.pipe(
                         v.string(),
@@ -777,7 +777,7 @@ export const UserFees = v.pipe(
         ),
         /** Fee schedule information. */
         feeSchedule: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Cross-trade fee rate. */
                 cross: v.pipe(
                     UnsignedDecimal,
@@ -800,11 +800,11 @@ export const UserFees = v.pipe(
                 ),
                 /** Fee tiers details. */
                 tiers: v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** VIP fee tier information. */
                         vip: v.pipe(
                             v.array(
-                                v.strictObject({
+                                v.object({
                                     /** Notional volume cutoff. */
                                     ntlCutoff: v.pipe(
                                         UnsignedDecimal,
@@ -837,7 +837,7 @@ export const UserFees = v.pipe(
                         /** Market maker fee tier information. */
                         mm: v.pipe(
                             v.array(
-                                v.strictObject({
+                                v.object({
                                     /** Maker fraction cutoff. */
                                     makerFractionCutoff: v.pipe(
                                         UnsignedDecimal,
@@ -845,7 +845,7 @@ export const UserFees = v.pipe(
                                     ),
                                     /** Add-liquidity fee rate. */
                                     add: v.pipe(
-                                        SignedDecimal,
+                                        Decimal,
                                         v.description("Add-liquidity fee rate."),
                                     ),
                                 }),
@@ -863,7 +863,7 @@ export const UserFees = v.pipe(
                 /** Staking discount tiers details. */
                 stakingDiscountTiers: v.pipe(
                     v.array(
-                        v.strictObject({
+                        v.object({
                             /** Basis points of maximum supply. */
                             bpsOfMaxSupply: v.pipe(
                                 UnsignedDecimal,
@@ -924,7 +924,7 @@ export const UserFees = v.pipe(
         stakingLink: v.union([v.unknown(), v.null()]),
         /** Active staking discount details. */
         activeStakingDiscount: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Basis points of maximum supply. */
                 bpsOfMaxSupply: v.pipe(
                     UnsignedDecimal,
@@ -945,7 +945,7 @@ export type UserFees = v.InferOutput<typeof UserFees>;
 
 /** Funding update details. */
 export const FundingUpdate = v.pipe(
-    v.strictObject({
+    v.object({
         /** Update type. */
         type: v.pipe(
             v.literal("funding"),
@@ -958,22 +958,22 @@ export const FundingUpdate = v.pipe(
         ),
         /** Amount transferred in USDC. */
         usdc: v.pipe(
-            SignedDecimal,
+            Decimal,
             v.description("Amount transferred in USDC."),
         ),
         /** Signed position size. */
         szi: v.pipe(
-            SignedDecimal,
+            Decimal,
             v.description("Signed position size."),
         ),
         /** Applied funding rate. */
         fundingRate: v.pipe(
-            SignedDecimal,
+            Decimal,
             v.description("Applied funding rate."),
         ),
         /** Number of samples. */
         nSamples: v.pipe(
-            v.union([v.pipe(v.number(), v.safeInteger(), v.minValue(0)), v.null()]),
+            v.union([UnsignedInteger, v.null()]),
             v.description("Number of samples."),
         ),
     }),
@@ -983,10 +983,10 @@ export type FundingUpdate = v.InferOutput<typeof FundingUpdate>;
 
 /** Funding ledger update for a user. */
 export const UserFundingUpdate = v.pipe(
-    v.strictObject({
+    v.object({
         /** Timestamp of the update (in ms since epoch). */
         time: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Timestamp of the update (in ms since epoch)."),
         ),
         /** L1 transaction hash. */
@@ -1006,7 +1006,7 @@ export type UserFundingUpdate = v.InferOutput<typeof UserFundingUpdate>;
 
 /** User rate limits. */
 export const UserRateLimit = v.pipe(
-    v.strictObject({
+    v.object({
         /** Cumulative trading volume. */
         cumVlm: v.pipe(
             UnsignedDecimal,
@@ -1014,12 +1014,12 @@ export const UserRateLimit = v.pipe(
         ),
         /** Number of API requests used. */
         nRequestsUsed: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Number of API requests used."),
         ),
         /** Maximum allowed API requests. */
         nRequestsCap: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Maximum allowed API requests."),
         ),
     }),
@@ -1030,14 +1030,14 @@ export type UserRateLimit = v.InferOutput<typeof UserRateLimit>;
 /** User role. */
 export const UserRole = v.pipe(
     v.union([
-        v.strictObject({
+        v.object({
             /** Role identifier. */
             role: v.pipe(
                 v.union([v.literal("missing"), v.literal("user"), v.literal("vault")]),
                 v.description("Role identifier."),
             ),
         }),
-        v.strictObject({
+        v.object({
             /** Role identifier. */
             role: v.pipe(
                 v.literal("agent"),
@@ -1045,7 +1045,7 @@ export const UserRole = v.pipe(
             ),
             /** Details for agent role. */
             data: v.pipe(
-                v.strictObject({
+                v.object({
                     /** Master account address associated with the agent. */
                     user: v.pipe(
                         v.pipe(Hex, v.length(42)),
@@ -1055,7 +1055,7 @@ export const UserRole = v.pipe(
                 v.description("Details for agent role."),
             ),
         }),
-        v.strictObject({
+        v.object({
             /** Role identifier. */
             role: v.pipe(
                 v.literal("subAccount"),
@@ -1063,7 +1063,7 @@ export const UserRole = v.pipe(
             ),
             /** Details for sub-account role. */
             data: v.pipe(
-                v.strictObject({
+                v.object({
                     /** Master account address associated with the sub-account. */
                     master: v.pipe(
                         v.pipe(Hex, v.length(42)),
@@ -1080,7 +1080,7 @@ export type UserRole = v.InferOutput<typeof UserRole>;
 
 /** Transfer between spot and perpetual accounts. */
 export const AccountClassTransferUpdate = v.pipe(
-    v.strictObject({
+    v.object({
         /** Update type. */
         type: v.pipe(
             v.literal("accountClassTransfer"),
@@ -1103,7 +1103,7 @@ export type AccountClassTransferUpdate = v.InferOutput<typeof AccountClassTransf
 
 /** Deposit update to an account. */
 export const DepositUpdate = v.pipe(
-    v.strictObject({
+    v.object({
         /** Update type. */
         type: v.pipe(
             v.literal("deposit"),
@@ -1121,7 +1121,7 @@ export type DepositUpdate = v.InferOutput<typeof DepositUpdate>;
 
 /** Internal transfer between accounts. */
 export const InternalTransferUpdate = v.pipe(
-    v.strictObject({
+    v.object({
         /** Update type. */
         type: v.pipe(
             v.literal("internalTransfer"),
@@ -1154,7 +1154,7 @@ export type InternalTransferUpdate = v.InferOutput<typeof InternalTransferUpdate
 
 /** Liquidation event update. */
 export const LiquidationUpdate = v.pipe(
-    v.strictObject({
+    v.object({
         /** Update type. */
         type: v.pipe(
             v.literal("liquidation"),
@@ -1178,7 +1178,7 @@ export const LiquidationUpdate = v.pipe(
         /** Details of each liquidated position. */
         liquidatedPositions: v.pipe(
             v.array(
-                v.strictObject({
+                v.object({
                     /** Asset symbol of the liquidated position. */
                     coin: v.pipe(
                         v.string(),
@@ -1186,7 +1186,7 @@ export const LiquidationUpdate = v.pipe(
                     ),
                     /** Signed position size liquidated. */
                     szi: v.pipe(
-                        SignedDecimal,
+                        Decimal,
                         v.description("Signed position size liquidated."),
                     ),
                 }),
@@ -1200,7 +1200,7 @@ export type LiquidationUpdate = v.InferOutput<typeof LiquidationUpdate>;
 
 /** Rewards claim event update. */
 export const RewardsClaimUpdate = v.pipe(
-    v.strictObject({
+    v.object({
         /** Update type. */
         type: v.pipe(
             v.literal("rewardsClaim"),
@@ -1223,7 +1223,7 @@ export type RewardsClaimUpdate = v.InferOutput<typeof RewardsClaimUpdate>;
 
 /** Spot transfer update between accounts. */
 export const SpotTransferUpdate = v.pipe(
-    v.strictObject({
+    v.object({
         /** Update type. */
         type: v.pipe(
             v.literal("spotTransfer"),
@@ -1277,7 +1277,7 @@ export type SpotTransferUpdate = v.InferOutput<typeof SpotTransferUpdate>;
 
 /** Transfer update between sub-accounts. */
 export const SubAccountTransferUpdate = v.pipe(
-    v.strictObject({
+    v.object({
         /** Update type. */
         type: v.pipe(
             v.literal("subAccountTransfer"),
@@ -1305,7 +1305,7 @@ export type SubAccountTransferUpdate = v.InferOutput<typeof SubAccountTransferUp
 
 /** Vault creation update. */
 export const VaultCreateUpdate = v.pipe(
-    v.strictObject({
+    v.object({
         /** Update type. */
         type: v.pipe(
             v.literal("vaultCreate"),
@@ -1333,7 +1333,7 @@ export type VaultCreateUpdate = v.InferOutput<typeof VaultCreateUpdate>;
 
 /** Vault deposit update. */
 export const VaultDepositUpdate = v.pipe(
-    v.strictObject({
+    v.object({
         /** Update type. */
         type: v.pipe(
             v.literal("vaultDeposit"),
@@ -1356,7 +1356,7 @@ export type VaultDepositUpdate = v.InferOutput<typeof VaultDepositUpdate>;
 
 /** Vault distribution update. */
 export const VaultDistributionUpdate = v.pipe(
-    v.strictObject({
+    v.object({
         /** Update type. */
         type: v.pipe(
             v.literal("vaultDistribution"),
@@ -1379,7 +1379,7 @@ export type VaultDistributionUpdate = v.InferOutput<typeof VaultDistributionUpda
 
 /** Vault withdrawal event update. */
 export const VaultWithdrawUpdate = v.pipe(
-    v.strictObject({
+    v.object({
         /** Update type. */
         type: v.pipe(
             v.literal("vaultWithdraw"),
@@ -1427,7 +1427,7 @@ export type VaultWithdrawUpdate = v.InferOutput<typeof VaultWithdrawUpdate>;
 
 /** Withdrawal update from an account. */
 export const WithdrawUpdate = v.pipe(
-    v.strictObject({
+    v.object({
         /** Update type. */
         type: v.pipe(
             v.literal("withdraw"),
@@ -1440,7 +1440,7 @@ export const WithdrawUpdate = v.pipe(
         ),
         /** Unique nonce for the withdrawal request. */
         nonce: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Unique nonce for the withdrawal request."),
         ),
         /** Withdrawal fee. */
@@ -1455,10 +1455,10 @@ export type WithdrawUpdate = v.InferOutput<typeof WithdrawUpdate>;
 
 /** Non-funding ledger update for a user. */
 export const UserNonFundingLedgerUpdate = v.pipe(
-    v.strictObject({
+    v.object({
         /** Timestamp of the update (in ms since epoch). */
         time: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Timestamp of the update (in ms since epoch)."),
         ),
         /** L1 transaction hash. */

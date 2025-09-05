@@ -1,9 +1,9 @@
 import * as v from "valibot";
-import { Hex, UnsignedDecimal } from "../_base.ts";
+import { Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /** Response for order cancellation. */
 export const CancelResponse = v.pipe(
-    v.strictObject({
+    v.object({
         /** Successful status. */
         status: v.pipe(
             v.literal("ok"),
@@ -11,7 +11,7 @@ export const CancelResponse = v.pipe(
         ),
         /** Response details. */
         response: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of response. */
                 type: v.pipe(
                     v.literal("cancel"),
@@ -19,13 +19,13 @@ export const CancelResponse = v.pipe(
                 ),
                 /** Specific data. */
                 data: v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** Array of statuses or error messages. */
                         statuses: v.pipe(
                             v.array(
                                 v.union([
                                     v.literal("success"),
-                                    v.strictObject({
+                                    v.object({
                                         /** Error message. */
                                         error: v.pipe(
                                             v.string(),
@@ -49,7 +49,7 @@ export type CancelResponse = v.InferOutput<typeof CancelResponse>;
 
 /** Successful variant of {@linkcode CancelResponse} without errors. */
 export const CancelSuccessResponse = v.pipe(
-    v.strictObject({
+    v.object({
         /** Successful status. */
         status: v.pipe(
             v.literal("ok"),
@@ -57,7 +57,7 @@ export const CancelSuccessResponse = v.pipe(
         ),
         /** Response details. */
         response: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of response. */
                 type: v.pipe(
                     v.literal("cancel"),
@@ -65,7 +65,7 @@ export const CancelSuccessResponse = v.pipe(
                 ),
                 /** Specific data. */
                 data: v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** Array of success statuses. */
                         statuses: v.pipe(
                             v.array(v.literal("success")),
@@ -84,7 +84,7 @@ export type CancelSuccessResponse = v.InferOutput<typeof CancelSuccessResponse>;
 
 /** Response for creating a sub-account. */
 export const CreateSubAccountResponse = v.pipe(
-    v.strictObject({
+    v.object({
         /** Successful status. */
         status: v.pipe(
             v.literal("ok"),
@@ -92,7 +92,7 @@ export const CreateSubAccountResponse = v.pipe(
         ),
         /** Response details. */
         response: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of response. */
                 type: v.pipe(
                     v.literal("createSubAccount"),
@@ -113,7 +113,7 @@ export type CreateSubAccountResponse = v.InferOutput<typeof CreateSubAccountResp
 
 /** Response for creating a vault. */
 export const CreateVaultResponse = v.pipe(
-    v.strictObject({
+    v.object({
         /** Successful status. */
         status: v.pipe(
             v.literal("ok"),
@@ -121,7 +121,7 @@ export const CreateVaultResponse = v.pipe(
         ),
         /** Response details. */
         response: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of response. */
                 type: v.pipe(
                     v.literal("createVault"),
@@ -142,7 +142,7 @@ export type CreateVaultResponse = v.InferOutput<typeof CreateVaultResponse>;
 
 /** Error response for failed operations. */
 export const ErrorResponse = v.pipe(
-    v.strictObject({
+    v.object({
         /** Error status. */
         status: v.pipe(
             v.literal("err"),
@@ -160,7 +160,7 @@ export type ErrorResponse = v.InferOutput<typeof ErrorResponse>;
 
 /** Response for order placement and batch modifications. */
 export const OrderResponse = v.pipe(
-    v.strictObject({
+    v.object({
         /** Successful status. */
         status: v.pipe(
             v.literal("ok"),
@@ -168,7 +168,7 @@ export const OrderResponse = v.pipe(
         ),
         /** Response details. */
         response: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of response. */
                 type: v.pipe(
                     v.literal("order"),
@@ -176,18 +176,18 @@ export const OrderResponse = v.pipe(
                 ),
                 /** Specific data. */
                 data: v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** Array of statuses or error messages. */
                         statuses: v.pipe(
                             v.array(
                                 v.union([
-                                    v.strictObject({
+                                    v.object({
                                         /** Resting order status. */
                                         resting: v.pipe(
-                                            v.strictObject({
+                                            v.object({
                                                 /** Order ID. */
                                                 oid: v.pipe(
-                                                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                                    UnsignedInteger,
                                                     v.description("Order ID."),
                                                 ),
                                                 /** Client Order ID. */
@@ -199,10 +199,10 @@ export const OrderResponse = v.pipe(
                                             v.description("Resting order status."),
                                         ),
                                     }),
-                                    v.strictObject({
+                                    v.object({
                                         /** Filled order status. */
                                         filled: v.pipe(
-                                            v.strictObject({
+                                            v.object({
                                                 /** Total size filled. */
                                                 totalSz: v.pipe(
                                                     UnsignedDecimal,
@@ -215,7 +215,7 @@ export const OrderResponse = v.pipe(
                                                 ),
                                                 /** Order ID. */
                                                 oid: v.pipe(
-                                                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                                    UnsignedInteger,
                                                     v.description("Order ID."),
                                                 ),
                                                 /** Client Order ID. */
@@ -227,7 +227,7 @@ export const OrderResponse = v.pipe(
                                             v.description("Filled order status."),
                                         ),
                                     }),
-                                    v.strictObject({
+                                    v.object({
                                         /** Error message. */
                                         error: v.pipe(
                                             v.string(),
@@ -251,7 +251,7 @@ export type OrderResponse = v.InferOutput<typeof OrderResponse>;
 
 /** Successful variant of {@linkcode OrderResponse} without errors. */
 export const OrderSuccessResponse = v.pipe(
-    v.strictObject({
+    v.object({
         /** Successful status. */
         status: v.pipe(
             v.literal("ok"),
@@ -259,7 +259,7 @@ export const OrderSuccessResponse = v.pipe(
         ),
         /** Response details. */
         response: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of response. */
                 type: v.pipe(
                     v.literal("order"),
@@ -267,18 +267,18 @@ export const OrderSuccessResponse = v.pipe(
                 ),
                 /** Specific data. */
                 data: v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** Array of successful order statuses. */
                         statuses: v.pipe(
                             v.array(
                                 v.union([
-                                    v.strictObject({
+                                    v.object({
                                         /** Resting order status. */
                                         resting: v.pipe(
-                                            v.strictObject({
+                                            v.object({
                                                 /** Order ID. */
                                                 oid: v.pipe(
-                                                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                                    UnsignedInteger,
                                                     v.description("Order ID."),
                                                 ),
                                                 /** Client Order ID. */
@@ -290,10 +290,10 @@ export const OrderSuccessResponse = v.pipe(
                                             v.description("Resting order status."),
                                         ),
                                     }),
-                                    v.strictObject({
+                                    v.object({
                                         /** Filled order status. */
                                         filled: v.pipe(
-                                            v.strictObject({
+                                            v.object({
                                                 /** Total size filled. */
                                                 totalSz: v.pipe(
                                                     UnsignedDecimal,
@@ -306,7 +306,7 @@ export const OrderSuccessResponse = v.pipe(
                                                 ),
                                                 /** Order ID. */
                                                 oid: v.pipe(
-                                                    v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                                    UnsignedInteger,
                                                     v.description("Order ID."),
                                                 ),
                                                 /** Client Order ID. */
@@ -335,7 +335,7 @@ export type OrderSuccessResponse = v.InferOutput<typeof OrderSuccessResponse>;
 
 /** Successful response without specific data. */
 export const SuccessResponse = v.pipe(
-    v.strictObject({
+    v.object({
         /** Successful status. */
         status: v.pipe(
             v.literal("ok"),
@@ -343,7 +343,7 @@ export const SuccessResponse = v.pipe(
         ),
         /** Response details. */
         response: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of response. */
                 type: v.pipe(
                     v.literal("default"),
@@ -359,7 +359,7 @@ export type SuccessResponse = v.InferOutput<typeof SuccessResponse>;
 
 /** Response for canceling a TWAP order. */
 export const TwapCancelResponse = v.pipe(
-    v.strictObject({
+    v.object({
         /** Successful status. */
         status: v.pipe(
             v.literal("ok"),
@@ -367,7 +367,7 @@ export const TwapCancelResponse = v.pipe(
         ),
         /** Response details. */
         response: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of response. */
                 type: v.pipe(
                     v.literal("twapCancel"),
@@ -375,12 +375,12 @@ export const TwapCancelResponse = v.pipe(
                 ),
                 /** Specific data. */
                 data: v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** Status of the operation or error message. */
                         status: v.pipe(
                             v.union([
                                 v.string(),
-                                v.strictObject({
+                                v.object({
                                     /** Error message. */
                                     error: v.pipe(
                                         v.string(),
@@ -403,7 +403,7 @@ export type TwapCancelResponse = v.InferOutput<typeof TwapCancelResponse>;
 
 /** Successful variant of {@linkcode TwapCancelResponse} without errors. */
 export const TwapCancelSuccessResponse = v.pipe(
-    v.strictObject({
+    v.object({
         /** Successful status. */
         status: v.pipe(
             v.literal("ok"),
@@ -411,7 +411,7 @@ export const TwapCancelSuccessResponse = v.pipe(
         ),
         /** Response details. */
         response: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of response. */
                 type: v.pipe(
                     v.literal("twapCancel"),
@@ -419,7 +419,7 @@ export const TwapCancelSuccessResponse = v.pipe(
                 ),
                 /** Specific data. */
                 data: v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** Status of the operation. */
                         status: v.pipe(
                             v.string(),
@@ -438,7 +438,7 @@ export type TwapCancelSuccessResponse = v.InferOutput<typeof TwapCancelSuccessRe
 
 /** Response for creating a TWAP order. */
 export const TwapOrderResponse = v.pipe(
-    v.strictObject({
+    v.object({
         /** Successful status. */
         status: v.pipe(
             v.literal("ok"),
@@ -446,7 +446,7 @@ export const TwapOrderResponse = v.pipe(
         ),
         /** Response details. */
         response: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of response. */
                 type: v.pipe(
                     v.literal("twapOrder"),
@@ -454,24 +454,24 @@ export const TwapOrderResponse = v.pipe(
                 ),
                 /** Specific data. */
                 data: v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** Status of the operation or error message. */
                         status: v.pipe(
                             v.union([
-                                v.strictObject({
+                                v.object({
                                     /** Running order status. */
                                     running: v.pipe(
-                                        v.strictObject({
+                                        v.object({
                                             /** TWAP ID. */
                                             twapId: v.pipe(
-                                                v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                                UnsignedInteger,
                                                 v.description("TWAP ID."),
                                             ),
                                         }),
                                         v.description("Running order status."),
                                     ),
                                 }),
-                                v.strictObject({
+                                v.object({
                                     /** Error message. */
                                     error: v.pipe(
                                         v.string(),
@@ -494,7 +494,7 @@ export type TwapOrderResponse = v.InferOutput<typeof TwapOrderResponse>;
 
 /** Successful variant of {@linkcode TwapOrderResponse} without errors. */
 export const TwapOrderSuccessResponse = v.pipe(
-    v.strictObject({
+    v.object({
         /** Successful status. */
         status: v.pipe(
             v.literal("ok"),
@@ -502,7 +502,7 @@ export const TwapOrderSuccessResponse = v.pipe(
         ),
         /** Response details. */
         response: v.pipe(
-            v.strictObject({
+            v.object({
                 /** Type of response. */
                 type: v.pipe(
                     v.literal("twapOrder"),
@@ -510,16 +510,16 @@ export const TwapOrderSuccessResponse = v.pipe(
                 ),
                 /** Specific data. */
                 data: v.pipe(
-                    v.strictObject({
+                    v.object({
                         /** Status of the operation. */
                         status: v.pipe(
-                            v.strictObject({
+                            v.object({
                                 /** Running order status. */
                                 running: v.pipe(
-                                    v.strictObject({
+                                    v.object({
                                         /** TWAP ID. */
                                         twapId: v.pipe(
-                                            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+                                            UnsignedInteger,
                                             v.description("TWAP ID."),
                                         ),
                                     }),

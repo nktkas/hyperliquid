@@ -1,18 +1,18 @@
 import * as v from "valibot";
-import { Hex, SignedDecimal, UnsignedDecimal } from "../_base.ts";
+import { Decimal, Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 import { PortfolioPeriods } from "./accounts.ts";
 
 /** Vault relationship configuration. */
 export const VaultRelationship = v.pipe(
     v.union([
-        v.strictObject({
+        v.object({
             /** Relationship type. */
             type: v.pipe(
                 v.union([v.literal("normal"), v.literal("child")]),
                 v.description("Relationship type."),
             ),
         }),
-        v.strictObject({
+        v.object({
             /** Relationship type. */
             type: v.pipe(
                 v.literal("parent"),
@@ -20,7 +20,7 @@ export const VaultRelationship = v.pipe(
             ),
             /** Child vault information. */
             data: v.pipe(
-                v.strictObject({
+                v.object({
                     /** Child vault addresses. */
                     childAddresses: v.pipe(
                         v.array(v.pipe(Hex, v.length(42))),
@@ -37,7 +37,7 @@ export type VaultRelationship = v.InferOutput<typeof VaultRelationship>;
 
 /** Vault follower state. */
 export const VaultFollowerState = v.pipe(
-    v.strictObject({
+    v.object({
         /** Follower address. */
         user: v.pipe(
             v.pipe(Hex, v.length(42)),
@@ -50,27 +50,27 @@ export const VaultFollowerState = v.pipe(
         ),
         /** Current profit and loss. */
         pnl: v.pipe(
-            SignedDecimal,
+            Decimal,
             v.description("Current profit and loss."),
         ),
         /** All-time profit and loss. */
         allTimePnl: v.pipe(
-            SignedDecimal,
+            Decimal,
             v.description("All-time profit and loss."),
         ),
         /** Subscription duration in days. */
         daysFollowing: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Subscription duration in days."),
         ),
         /** Vault entry timestamp. */
         vaultEntryTime: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Vault entry timestamp."),
         ),
         /** Timestamp when funds become unlocked. */
         lockupUntil: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Timestamp when funds become unlocked."),
         ),
     }),
@@ -80,7 +80,7 @@ export type VaultFollowerState = v.InferOutput<typeof VaultFollowerState>;
 
 /** Details about a vault. */
 export const VaultDetails = v.pipe(
-    v.strictObject({
+    v.object({
         /** Vault name. */
         name: v.pipe(
             v.string(),
@@ -129,9 +129,9 @@ export const VaultDetails = v.pipe(
         /** Vault followers list. */
         followers: v.pipe(
             v.array(
-                v.strictObject({
-                    ...v.omit(v.strictObject(VaultFollowerState.entries), ["user"]).entries,
-                    ...v.strictObject({
+                v.object({
+                    ...v.omit(v.object(VaultFollowerState.entries), ["user"]).entries,
+                    ...v.object({
                         /** Follower address or Leader. */
                         user: v.pipe(
                             v.union([v.pipe(Hex, v.length(42)), v.literal("Leader")]),
@@ -179,7 +179,7 @@ export type VaultDetails = v.InferOutput<typeof VaultDetails>;
 
 /** User vault equity details. */
 export const VaultEquity = v.pipe(
-    v.strictObject({
+    v.object({
         /** Vault address. */
         vaultAddress: v.pipe(
             v.pipe(Hex, v.length(42)),
@@ -192,7 +192,7 @@ export const VaultEquity = v.pipe(
         ),
         /** Timestamp when the user can withdraw their equity. */
         lockedUntilTimestamp: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Timestamp when the user can withdraw their equity."),
         ),
     }),
@@ -202,7 +202,7 @@ export type VaultEquity = v.InferOutput<typeof VaultEquity>;
 
 /** Summary of a vault. */
 export const VaultSummary = v.pipe(
-    v.strictObject({
+    v.object({
         /** Vault name. */
         name: v.pipe(
             v.string(),
@@ -235,7 +235,7 @@ export const VaultSummary = v.pipe(
         ),
         /** Creation timestamp. */
         createTimeMillis: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Creation timestamp."),
         ),
     }),
@@ -245,7 +245,7 @@ export type VaultSummary = v.InferOutput<typeof VaultSummary>;
 
 /** Vault that a user is leading. */
 export const VaultLeading = v.pipe(
-    v.strictObject({
+    v.object({
         /** Vault address. */
         address: v.pipe(
             v.pipe(Hex, v.length(42)),

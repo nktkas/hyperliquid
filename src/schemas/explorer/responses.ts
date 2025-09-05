@@ -1,9 +1,9 @@
 import * as v from "valibot";
-import { Hex } from "../_base.ts";
+import { Hex, UnsignedInteger } from "../_base.ts";
 
 /** Transaction details. */
 export const TxDetails = v.pipe(
-    v.strictObject({
+    v.object({
         /** Action performed in transaction. */
         action: v.pipe(
             v.looseObject({
@@ -17,7 +17,7 @@ export const TxDetails = v.pipe(
         ),
         /** Block number where transaction was included. */
         block: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Block number where transaction was included."),
         ),
         /** Error message if transaction failed. */
@@ -32,7 +32,7 @@ export const TxDetails = v.pipe(
         ),
         /** Transaction creation timestamp. */
         time: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Transaction creation timestamp."),
         ),
         /** Creator's address. */
@@ -47,7 +47,7 @@ export type TxDetails = v.InferOutput<typeof TxDetails>;
 
 /** Response containing transaction information. */
 export const TxDetailsResponseSchema = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of response. */
         type: v.pipe(
             v.literal("txDetails"),
@@ -65,10 +65,10 @@ export type TxDetailsResponse = v.InferOutput<typeof TxDetailsResponseSchema>;
 
 /** Block details. */
 export const BlockDetails = v.pipe(
-    v.strictObject({
+    v.object({
         /** Block creation timestamp. */
         blockTime: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Block creation timestamp."),
         ),
         /** Block hash. */
@@ -78,12 +78,12 @@ export const BlockDetails = v.pipe(
         ),
         /** Block height in chain. */
         height: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Block height in chain."),
         ),
         /** Total transactions in block. */
         numTxs: v.pipe(
-            v.pipe(v.number(), v.safeInteger(), v.minValue(0)),
+            UnsignedInteger,
             v.description("Total transactions in block."),
         ),
         /** Block proposer address. */
@@ -103,7 +103,7 @@ export type BlockDetails = v.InferOutput<typeof BlockDetails>;
 
 /** Response containing block information. */
 export const BlockDetailsResponse = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of response. */
         type: v.pipe(
             v.literal("blockDetails"),
@@ -121,7 +121,7 @@ export type BlockDetailsResponse = v.InferOutput<typeof BlockDetailsResponse>;
 
 /** Response containing user details. */
 export const UserDetailsResponse = v.pipe(
-    v.strictObject({
+    v.object({
         /** Type of response. */
         type: v.pipe(
             v.literal("userDetails"),
