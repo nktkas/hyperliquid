@@ -409,6 +409,7 @@ class InfoClient {
     perpDexs(): Promise<(PerpDex | null)[]>;
     perpsAtOpenInterestCap(params?: PerpsAtOpenInterestCapParameters): Promise<string[]>;
     predictedFundings(): Promise<PredictedFunding[]>;
+    recentTrades(params: RecentTradesParameters): Promise<Trade[]>;
     spotDeployState(params: SpotDeployStateParameters): Promise<SpotDeployState>;
     spotMeta(): Promise<SpotMeta>;
     spotMetaAndAssetCtxs(): Promise<SpotMetaAndAssetCtxs>;

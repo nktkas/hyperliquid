@@ -643,3 +643,51 @@ export const TokenDetails = v.pipe(
     v.description("Details of a token."),
 );
 export type TokenDetails = v.InferOutput<typeof TokenDetails>;
+
+/** Trade information. */
+export const Trade = v.pipe(
+    v.object({
+        /** Asset symbol (e.g., BTC). */
+        coin: v.pipe(
+            v.string(),
+            v.description("Asset symbol (e.g., BTC)."),
+        ),
+        /** Trade side ("B" = Bid/Buy, "A" = Ask/Sell). */
+        side: v.pipe(
+            v.union([v.literal("B"), v.literal("A")]),
+            v.description('Trade side ("B" = Bid/Buy, "A" = Ask/Sell).'),
+        ),
+        /** Trade price. */
+        px: v.pipe(
+            UnsignedDecimal,
+            v.description("Trade price."),
+        ),
+        /** Trade size. */
+        sz: v.pipe(
+            UnsignedDecimal,
+            v.description("Trade size."),
+        ),
+        /** Trade timestamp (in ms since epoch). */
+        time: v.pipe(
+            UnsignedInteger,
+            v.description("Trade timestamp (in ms since epoch)."),
+        ),
+        /** Transaction hash. */
+        hash: v.pipe(
+            v.pipe(Hex, v.length(66)),
+            v.description("Transaction hash."),
+        ),
+        /** Trade ID. */
+        tid: v.pipe(
+            UnsignedInteger,
+            v.description("Trade ID."),
+        ),
+        /** Addresses of users involved in the trade [Maker, Taker]. */
+        users: v.pipe(
+            v.tuple([v.pipe(Hex, v.length(42)), v.pipe(Hex, v.length(42))]),
+            v.description("Addresses of users involved in the trade [Maker, Taker]."),
+        ),
+    }),
+    v.description("Trade information."),
+);
+export type Trade = v.InferOutput<typeof Trade>;

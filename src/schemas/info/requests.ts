@@ -1323,3 +1323,25 @@ export const GossipRootIpsRequest = v.pipe(
     v.description("Request gossip root IPs."),
 );
 export type GossipRootIpsRequest = v.InferOutput<typeof GossipRootIpsRequest>;
+
+/**
+ * Request recent trades.
+ * @returns {Trade[]}
+ * @see null
+ */
+export const RecentTradesRequest = v.pipe(
+    v.object({
+        /** Type of request. */
+        type: v.pipe(
+            v.literal("recentTrades"),
+            v.description("Type of request."),
+        ),
+        /** Asset symbol (e.g., BTC). */
+        coin: v.pipe(
+            v.string(),
+            v.description("Asset symbol (e.g., BTC)."),
+        ),
+    }),
+    v.description("Request recent trades."),
+);
+export type RecentTradesRequest = v.InferOutput<typeof RecentTradesRequest>;

@@ -64,6 +64,7 @@ import {
     PredictedFundingsRequest,
     type PreTransferCheck,
     PreTransferCheckRequest,
+    RecentTradesRequest,
     type Referral,
     ReferralRequest,
     type SpotClearinghouseState,
@@ -79,6 +80,7 @@ import {
     SubAccountsRequest,
     type TokenDetails,
     TokenDetailsRequest,
+    type Trade,
     type TwapHistory,
     TwapHistoryRequest,
     type TwapSliceFill,
@@ -178,6 +180,8 @@ export type PerpsAtOpenInterestCapParameters = Omit<PerpsAtOpenInterestCapReques
 export type PortfolioParameters = Omit<PortfolioRequest, "type">;
 /** Request parameters for the {@linkcode InfoClient.preTransferCheck} method. */
 export type PreTransferCheckParameters = Omit<PreTransferCheckRequest, "type">;
+/** Request parameters for the {@linkcode InfoClient.recentTrades} method. */
+export type RecentTradesParameters = Omit<RecentTradesRequest, "type">;
 /** Request parameters for the {@linkcode InfoClient.referral} method. */
 export type ReferralParameters = Omit<ReferralRequest, "type">;
 /** Request parameters for the {@linkcode InfoClient.spotClearinghouseState} method. */
@@ -648,7 +652,7 @@ export class InfoClient<
      * Request gossip root IPs.
      * @param signal - An {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal}. If this option is set, the request can be canceled by calling {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort | abort()} on the corresponding {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController | AbortController}.
      * @returns Array of gossip root IPs.
-     * 
+     *
      * @throws {TransportError} When the transport layer throws an error.
      *
      * @see null
@@ -1230,6 +1234,36 @@ export class InfoClient<
     ): Promise<PreTransferCheck> {
         const request = parser(PreTransferCheckRequest)({
             type: "preTransferCheck",
+            ...params,
+        });
+        return this.transport.request("info", request, signal);
+    }
+
+    /**
+     * Request recent trades.
+     * @param params - Request-specific parameters.
+     * @param signal - An {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal}. If this option is set, the request can be canceled by calling {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort | abort()} on the corresponding {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController | AbortController}.
+     * @returns Array of recent trades.
+     *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+     * const infoClient = new hl.InfoClient({ transport });
+     *
+     * const data = await infoClient.recentTrades({ coin: "ETH" });
+     * ```
+     */
+    recentTrades(
+        params: DeepImmutable<RecentTradesParameters>,
+        signal?: AbortSignal,
+    ): Promise<Trade[]> {
+        const request = parser(RecentTradesRequest)({
+            type: "recentTrades",
             ...params,
         });
         return this.transport.request("info", request, signal);
