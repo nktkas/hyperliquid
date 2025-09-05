@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { Hex, Integer, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /** User delegation to a validator. */
 export const Delegation = v.pipe(
@@ -263,3 +263,30 @@ export const ValidatorSummary = v.pipe(
     v.description("Summary of a validator status and performance."),
 );
 export type ValidatorSummary = v.InferOutput<typeof ValidatorSummary>;
+
+/** L1 governance vote cast by a validator. */
+export const ValidatorL1Vote = v.pipe(
+    v.array(
+        v.object({
+            /** Timestamp when the vote expires (in ms since epoch). */
+            expireTime: v.pipe(
+                v.pipe(Integer),
+                v.description("Timestamp when the vote expires (in ms since epoch)."),
+            ),
+            /** Vote decision or action identifier. */
+            action: v.object({
+                D: v.pipe(
+                    v.string(),
+                    v.description("Vote decision or action identifier."),
+                ),
+            }),
+            /** List of validator addresses that cast this vote. */
+            votes: v.pipe(
+                v.array(v.pipe(Hex, v.length(42))),
+                v.description("List of validator addresses that cast this vote."),
+            ),
+        }),
+    ),
+    v.description("L1 governance vote cast by a validator."),
+);
+export type ValidatorL1Vote = v.InferOutput<typeof ValidatorL1Vote>;

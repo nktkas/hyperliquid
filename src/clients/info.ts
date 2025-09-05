@@ -101,6 +101,7 @@ import {
     UserTwapSliceFillsByTimeRequest,
     UserTwapSliceFillsRequest,
     UserVaultEquitiesRequest,
+    type ValidatorL1Vote,
     ValidatorL1VotesRequest,
     ValidatorSummariesRequest,
     type ValidatorSummary,
@@ -1886,7 +1887,7 @@ export class InfoClient<
      * const data = await infoClient.validatorL1Votes();
      * ```
      */
-    validatorL1Votes(signal?: AbortSignal): Promise<unknown[]> {
+    validatorL1Votes(signal?: AbortSignal): Promise<ValidatorL1Vote[]> {
         const request = parser(ValidatorL1VotesRequest)({
             type: "validatorL1Votes",
         });
