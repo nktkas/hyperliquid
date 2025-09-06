@@ -57,9 +57,15 @@ deno add jsr:@nktkas/hyperliquid
 // Issues:
 // - signing: does not support private keys directly, use `viem` or `ethers`
 
-import "event-target-polyfill";
+import "event-target-polyfill"; // for `WebSocketTransport`
+// or
+// import { Event, EventTarget } from "event-target-shim";
+// if (!globalThis.EventTarget || !globalThis.Event) {
+//     globalThis.EventTarget = EventTarget;
+//     globalThis.Event = Event;
+// }
 
-if (!globalThis.CustomEvent) {
+if (!globalThis.CustomEvent) { // for `WebSocketTransport`
     globalThis.CustomEvent = function (type, params) {
         params = params || {};
         const event = new Event(type, params);
@@ -68,15 +74,7 @@ if (!globalThis.CustomEvent) {
     };
 }
 
-if (!AbortSignal.timeout) {
-    AbortSignal.timeout = function (delay) {
-        const controller = new AbortController();
-        setTimeout(() => controller.abort(), delay);
-        return controller.signal;
-    };
-}
-
-if (!Promise.withResolvers) {
+if (!Promise.withResolvers) { // for `WebSocketTransport`
     Promise.withResolvers = function () {
         let resolve, reject;
         const promise = new Promise((res, rej) => {
@@ -84,6 +82,30 @@ if (!Promise.withResolvers) {
             reject = rej;
         });
         return { promise, resolve, reject };
+    };
+}
+
+if (!AbortSignal.any) {
+    AbortSignal.any = function (signals) {
+        const controller = new AbortController();
+        for (const signal of signals) {
+            if (signal.aborted) {
+                controller.abort(signal.reason);
+                return controller.signal;
+            }
+            signal.addEventListener("abort", () => {
+                controller.abort(signal.reason);
+            }, { once: true, signal: controller.signal });
+        }
+        return controller.signal;
+    };
+}
+
+if (!AbortSignal.timeout) {
+    AbortSignal.timeout = function (delay) {
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), delay);
+        return controller.signal;
     };
 }
 ```
@@ -848,7 +870,8 @@ with `tif: "Ioc"` and price that guarantee immediate execution:
 
 [**HttpTransport**](#http-transport): Set the `isTestnet` flag to `true`.
 
-[**WebSocketTransport**](#websocket-transport): Set the `isTestnet` flag to `true` and provide the testnet `url` when initializing the transport.
+[**WebSocketTransport**](#websocket-transport): Set the `isTestnet` flag to `true` and provide the testnet `url` when
+initializing the transport.
 
 ## Contributing
 
