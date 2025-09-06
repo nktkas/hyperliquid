@@ -22,9 +22,32 @@ jobs:
             - name: Build package
               run: deno task build-npm
 
+            - name: Get package version and determine tag
+              id: version
+              run: |
+                  # Read version from deno.json
+                  VERSION=$(deno eval "console.log(JSON.parse(Deno.readTextFileSync('./deno.json')).version)")
+                  echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+                  # Determine npm tag based on version
+                  if [[ "$VERSION" =~ -alpha ]]; then
+                      TAG="alpha"
+                  elif [[ "$VERSION" =~ -beta ]]; then
+                      TAG="beta"
+                  elif [[ "$VERSION" =~ -rc ]]; then
+                      TAG="rc"
+                  elif [[ "$VERSION" =~ - ]]; then
+                      TAG="prerelease"
+                  else
+                      TAG="latest"
+                  fi
+
+                  echo "tag=$TAG" >> $GITHUB_OUTPUT
+                  echo "Publishing version $VERSION with tag $TAG"
+
             - name: Publish package
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
               run: |
                   cd ./build/npm
-                  npm publish --provenance
+                  npm publish --provenance --tag ${{ steps.version.outputs.tag }}
