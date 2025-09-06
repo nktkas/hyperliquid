@@ -225,10 +225,10 @@ export const ValidatorSummary = v.pipe(
             UnsignedInteger,
             v.description("Number of blocks produced recently."),
         ),
-        /** Total amount of tokens staked. */
+        /** Total amount of tokens staked **(unsafe integer)**. */
         stake: v.pipe(
-            UnsignedInteger,
-            v.description("Total amount of tokens staked."),
+            v.pipe(v.number(), v.integer()),
+            v.description("Total amount of tokens staked **(unsafe integer)**."),
         ),
         /** Whether the validator is currently jailed. */
         isJailed: v.pipe(
