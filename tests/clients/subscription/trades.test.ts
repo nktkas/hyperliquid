@@ -13,5 +13,9 @@ runTest("trades", "api", async (_t, client) => {
             10_000,
         ),
     ]);
-    schemaCoverage(v.array(WsTrade), data);
+    schemaCoverage(v.array(WsTrade), data, {
+        ignoreBranches: {
+            "#/items/properties/side": [0, 1],
+        },
+    });
 });

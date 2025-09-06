@@ -46,7 +46,7 @@ export function parser<TSchema extends v.GenericSchema>(schema: TSchema): v.Pars
     const safeParser = v.safeParser(schema);
     const parser = (input: unknown) => {
         const result = safeParser(input);
-        if (result.issues) throw new Error("\n" + v.summarize(result.issues));
+        if (result.issues) throw new Error("\n" + v.summarize(result.issues) + "\n\n" + JSON.stringify(input));
         return result.output;
     };
     parser.schema = schema;
