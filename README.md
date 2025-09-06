@@ -187,7 +187,7 @@ import * as hl from "@nktkas/hyperliquid";
 const httpTransport = new hl.HttpTransport({...}); // Accepts optional parameters (e.g. isTestnet, timeout, etc.)
 
 // 2. WebSocket Transport: has better network latency than HTTP transport
-const wsTransport = new hl.WebSocketTransport({...}); // Accepts optional parameters (e.g. url, timeout, reconnect, etc.)
+const wsTransport = new hl.WebSocketTransport({...}); // Accepts optional parameters (e.g. url, isTestnet, timeout, reconnect, etc.)
 ```
 
 ### 2) Initialize Client
@@ -479,7 +479,6 @@ class ExchangeClient {
     constructor(args: {
         transport: HttpTransport | WebSocketTransport;
         wallet: AbstractWallet; // `viem`, `ethers` (v5 or v6), or private key directly
-        isTestnet?: boolean; // Whether to use testnet (default: false)
         defaultVaultAddress?: Hex; // Vault address used by default if not provided in method call
         signatureChainId?: Hex | (() => MaybePromise<Hex>); // Chain ID used for signing (default: get chain id from wallet otherwise `0x1`)
         nonceManager?: () => MaybePromise<number>; // Function to get the next nonce (default: monotonically incrementing `Date.now()`)
@@ -663,6 +662,7 @@ class HttpTransport {
 class WebSocketTransport {
     constructor(options?: {
         url?: string | URL; // WebSocket URL (default: "wss://api.hyperliquid.xyz/ws")
+        isTestnet?: boolean; // Indicates this transport uses testnet endpoint (default: false)
         timeout?: number; // Request timeout in ms (default: 10_000)
         keepAlive?: {
             interval?: number; // Ping interval in ms (default: 30_000)
@@ -843,6 +843,12 @@ with `tif: "Ioc"` and price that guarantee immediate execution:
 
 **Vault and Sub-Account**: Pass vault or sub-account address via `vaultAddress` options to methods or set
 `defaultVaultAddress` in constructor.
+
+### How to use Testnet?
+
+[**HttpTransport**](#http-transport): Set the `isTestnet` flag to `true`.
+
+[**WebSocketTransport**](#websocket-transport): Set the `isTestnet` flag to `true` and provide the testnet `url` when initializing the transport.
 
 ## Contributing
 

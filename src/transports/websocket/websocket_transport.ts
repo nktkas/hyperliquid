@@ -26,6 +26,12 @@ export interface WebSocketTransportOptions {
     url?: string | URL;
 
     /**
+     * Indicates this transport uses testnet endpoint.
+     * @defaultValue `false`
+     */
+    isTestnet?: boolean;
+
+    /**
      * Timeout for requests in ms.
      * Set to `null` to disable.
      * @defaultValue `10_000`
@@ -85,6 +91,9 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
     > = new Map();
     protected _isReconnecting = false;
 
+    /** Indicates this transport uses testnet endpoint. */
+    isTestnet: boolean;
+
     /**
      * Request timeout in ms.
      * Set to `null` to disable.
@@ -125,6 +134,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
         this._hlEvents = new HyperliquidEventTarget(this.socket);
         this._wsRequester = new WebSocketAsyncRequest(this.socket, this._hlEvents);
 
+        this.isTestnet = options?.isTestnet ?? false;
         this.timeout = options?.timeout === undefined ? 10_000 : options.timeout;
         this.keepAlive = {
             interval: options?.keepAlive?.interval === undefined ? 30_000 : options.keepAlive?.interval,

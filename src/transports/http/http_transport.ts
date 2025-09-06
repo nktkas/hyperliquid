@@ -29,7 +29,7 @@ export class HttpRequestError extends TransportError {
 /** Configuration options for the HTTP transport layer. */
 export interface HttpTransportOptions {
     /**
-     * Specifies whether to use the testnet API endpoints.
+     * Specifies whether to use the testnet API endpoints from the {@linkcode server} property.
      * @defaultValue `false`
      */
     isTestnet?: boolean;

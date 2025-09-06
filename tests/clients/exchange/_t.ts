@@ -20,11 +20,7 @@ if (!PRIVATE_KEY || !/^0x[a-fA-F0-9]{64}$/.test(PRIVATE_KEY)) {
 // —————————— Clients ——————————
 
 async function createExchangeClient(mainExchClient: ExchangeClient): Promise<ExchangeClient> {
-    const tempExchClient = new ExchangeClient({
-        wallet: generatePrivateKey(),
-        transport,
-        isTestnet: true,
-    });
+    const tempExchClient = new ExchangeClient({ wallet: generatePrivateKey(), transport });
     await mainExchClient.usdSend({
         destination: await getWalletAddress(tempExchClient.wallet),
         amount: "2",
@@ -32,11 +28,7 @@ async function createExchangeClient(mainExchClient: ExchangeClient): Promise<Exc
     return tempExchClient;
 }
 async function createMultiSignClient(mainExchClient: ExchangeClient): Promise<MultiSignClient> {
-    const tempExchClient = new ExchangeClient({
-        wallet: generatePrivateKey(),
-        transport,
-        isTestnet: true,
-    });
+    const tempExchClient = new ExchangeClient({ wallet: generatePrivateKey(), transport });
     await mainExchClient.usdSend({
         destination: await getWalletAddress(tempExchClient.wallet),
         amount: "2",
@@ -51,12 +43,11 @@ async function createMultiSignClient(mainExchClient: ExchangeClient): Promise<Mu
         multiSignAddress: await getWalletAddress(tempExchClient.wallet),
         signers: [mainExchClient.wallet],
         transport,
-        isTestnet: true,
     });
 }
 
 const transport = new HttpTransport({ isTestnet: true, timeout: 30_000 });
-const mainExchClient = new ExchangeClient({ wallet: PRIVATE_KEY, transport, isTestnet: true });
+const mainExchClient = new ExchangeClient({ wallet: PRIVATE_KEY, transport });
 const infoClient = new InfoClient({ transport });
 const exchClient = await createExchangeClient(mainExchClient);
 const multiSignClient = await createMultiSignClient(mainExchClient);

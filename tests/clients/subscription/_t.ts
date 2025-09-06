@@ -23,7 +23,6 @@ async function createExchangeClient(mainExchClient: ExchangeClient): Promise<Exc
     const tempExchClient = new ExchangeClient({
         wallet: generatePrivateKey(),
         transport: new HttpTransport({ isTestnet: true }),
-        isTestnet: true,
     });
     await mainExchClient.usdSend({
         destination: await getWalletAddress(tempExchClient.wallet),
@@ -64,12 +63,15 @@ export function runTestWithExchange(
     Deno.test(name, async (t) => {
         await new Promise((r) => setTimeout(r, cliArgs.wait)); // delay to avoid rate limits
 
-        await using transport = new WebSocketTransport({ url: `wss://api.hyperliquid-testnet.xyz/ws` });
+        await using transport = new WebSocketTransport({
+            url: `wss://api.hyperliquid-testnet.xyz/ws`,
+            isTestnet: true,
+        });
         await transport.ready();
 
         const subsClient = new SubscriptionClient({ transport });
 
-        const mainExchClient = new ExchangeClient({ wallet: PRIVATE_KEY, transport, isTestnet: true });
+        const mainExchClient = new ExchangeClient({ wallet: PRIVATE_KEY, transport });
         const exchClient = await createExchangeClient(mainExchClient);
 
         const infoClient = new InfoClient({ transport });

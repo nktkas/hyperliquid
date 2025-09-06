@@ -110,7 +110,7 @@ export class MultiSignClient<
                 wallet: signer,
                 action: [this.multiSignAddress.toLowerCase(), outerSigner.toLowerCase(), action],
                 nonce,
-                isTestnet: this.isTestnet,
+                isTestnet: this.transport.isTestnet,
                 vaultAddress,
                 expiresAfter,
             });

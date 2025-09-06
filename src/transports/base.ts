@@ -2,14 +2,14 @@ import { HyperliquidError } from "../errors.ts";
 
 /**
  * Interface representing a REST transport.
- *
  * Handles communication with Hyperliquid API endpoints.
- *
  * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint | Info endpoint}
  * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint | Exchange endpoint}
  * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/post-requests | Websocket post requests}
  */
 export interface IRequestTransport extends Partial<AsyncDisposable> {
+    /** Indicates this transport uses testnet endpoint(s). */
+    isTestnet: boolean;
     /**
      * Sends a request to the Hyperliquid API.
      * @param endpoint - The API endpoint to send the request to.

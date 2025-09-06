@@ -83,12 +83,6 @@ export interface ExchangeClientParameters<
     transport: T;
     /** The viem or ethers.js wallet used for signing transactions. */
     wallet: W;
-    /**
-     * Specifies whether the client uses testnet.
-     *
-     * Defaults to `false`.
-     */
-    isTestnet?: boolean;
     /** Sets a default vaultAddress to be used if no vaultAddress is explicitly passed to a method. */
     defaultVaultAddress?: `0x${string}`;
     /** Sets a default expiresAfter to be used if no expiresAfter is explicitly passed to a method. */
@@ -366,7 +360,6 @@ export class ExchangeClient<
 > implements ExchangeClientParameters<T, W>, AsyncDisposable {
     transport: T;
     wallet: W;
-    isTestnet: boolean;
     defaultVaultAddress?: `0x${string}`;
     defaultExpiresAfter?: number | (() => MaybePromise<number>);
     signatureChainId: `0x${string}` | (() => MaybePromise<`0x${string}`>);
@@ -424,7 +417,6 @@ export class ExchangeClient<
     constructor(args: ExchangeClientParameters<T, W>) {
         this.transport = args.transport;
         this.wallet = args.wallet;
-        this.isTestnet = args.isTestnet ?? false;
         this.defaultVaultAddress = args.defaultVaultAddress;
         this.defaultExpiresAfter = args.defaultExpiresAfter;
         this.signatureChainId = args.signatureChainId ?? (() => getWalletChainId(this.wallet));
@@ -2080,7 +2072,7 @@ export class ExchangeClient<
             wallet: this.wallet,
             action,
             nonce,
-            isTestnet: this.isTestnet,
+            isTestnet: this.transport.isTestnet,
             vaultAddress,
             expiresAfter,
         });
@@ -2178,7 +2170,7 @@ export class ExchangeClient<
             wallet: this.wallet,
             action,
             nonce,
-            isTestnet: this.isTestnet,
+            isTestnet: this.transport.isTestnet,
             vaultAddress,
             expiresAfter,
         });
@@ -2212,7 +2204,7 @@ export class ExchangeClient<
     }
 
     protected _getHyperliquidChain(): "Mainnet" | "Testnet" {
-        return this.isTestnet ? "Testnet" : "Mainnet";
+        return this.transport.isTestnet ? "Testnet" : "Mainnet";
     }
 
     protected _validateResponse<
