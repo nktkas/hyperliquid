@@ -124,7 +124,7 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
                         "Accept-Encoding": "gzip, deflate, br, zstd",
                         "Content-Type": "application/json",
                     },
-                    keepalive: true,
+                    keepalive: typeof window !== "undefined",
                     method: "POST",
                     signal: this.timeout ? AbortSignal.timeout(this.timeout) : undefined,
                 },
