@@ -704,6 +704,13 @@ class WebSocketTransport {
 }
 ```
 
+### Errors
+
+- [`HyperliquidError`](src/errors.ts#L2) - Base error class for all SDK errors.
+- [`TransportError`](src/transports/base.ts#L49) - Thrown when a transport layer error occurs.
+- [`ApiRequestError`](src/clients//exchange.ts#L294) - Thrown when an API request fails.
+- [`SchemaError`](src/schemas/mod.ts#L79) - Thrown when a schema validation error occurs.
+
 ## Additional Import Points
 
 ### `/schemas`

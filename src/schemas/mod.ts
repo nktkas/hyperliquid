@@ -5,7 +5,7 @@
  * ```ts
  * import { OrderRequest, parser } from "@nktkas/hyperliquid/schemas";
  * //       ^^^^^^^^^^^^
- * //       both a Valibot schema and a TypeScript type
+ * //       both a valibot schema and a typescript type
  *
  * const action = {
  *   type: "order",
@@ -21,7 +21,7 @@
  * } satisfies OrderRequest["action"]; // can be used as type
  *
  * //                             or as valibot schema
- * //                             ⌄⌄⌄⌄⌄⌄⌄⌄⌄⌄⌄
+ * //                             ⌄⌄⌄⌄⌄⌄⌄⌄⌄⌄⌄⌄
  * const validatedAction = parser(OrderRequest.entries.action)(action);
  * //                      ^^^^^^
  * //                      validates, formats, sorts object keys for correct signature generation
