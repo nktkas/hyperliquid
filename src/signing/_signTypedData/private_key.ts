@@ -34,11 +34,15 @@ export async function signTypedData(args: {
 
     const hash = hashTypedData({ domain, types, primaryType, message });
 
-    const signature = await signAsync(hash, cleanHex(privateKey));
+    const signature = await signAsync(
+        hash,
+        etc.hexToBytes(cleanHex(privateKey)),
+        { prehash: false, format: "recovered" },
+    );
 
-    const r = signature.r.toString(16).padStart(64, "0");
-    const s = signature.s.toString(16).padStart(64, "0");
-    const v = (signature.recovery + 27).toString(16).padStart(2, "0");
+    const r = etc.bytesToHex(signature.slice(1, 33));
+    const s = etc.bytesToHex(signature.slice(33, 65));
+    const v = (signature[0] + 27).toString(16).padStart(2, "0");
 
     return `0x${r}${s}${v}`;
 }
@@ -210,14 +214,15 @@ function cleanHex(hex: string): string {
 /** Validates if a string is a valid secp256k1 private key. */
 export function isValidPrivateKey(privateKey: unknown): privateKey is string {
     if (typeof privateKey !== "string") return false;
-    return utils.isValidPrivateKey(cleanHex(privateKey));
+    const privateKeyBytes = etc.hexToBytes(cleanHex(privateKey));
+    return utils.isValidSecretKey(privateKeyBytes);
 }
 
 /** Converts a private key to an Ethereum address. */
 export function privateKeyToAddress(privateKey: string): `0x${string}` {
-    const cleanPrivKey = cleanHex(privateKey);
+    const privateKeyBytes = etc.hexToBytes(cleanHex(privateKey));
 
-    const publicKey = getPublicKey(cleanPrivKey, false);
+    const publicKey = getPublicKey(privateKeyBytes, false);
     const publicKeyWithoutPrefix = publicKey.slice(1);
 
     const hash = keccak_256(publicKeyWithoutPrefix);
