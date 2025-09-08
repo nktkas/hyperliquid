@@ -1367,3 +1367,25 @@ export const PerpDexLimitsRequest = v.pipe(
     v.description("Request perpetual DEX limits."),
 );
 export type PerpDexLimitsRequest = v.InferOutput<typeof PerpDexLimitsRequest>;
+
+/**
+ * Request comprehensive user and market data.
+ * @returns {WebData2}
+ * @see null
+ */
+export const WebData2Request = v.pipe(
+    v.object({
+        /** Type of request. */
+        type: v.pipe(
+            v.literal("webData2"),
+            v.description("Type of request."),
+        ),
+        /** User address. */
+        user: v.pipe(
+            v.pipe(Hex, v.length(42)),
+            v.description("User address."),
+        ),
+    }),
+    v.description("Request web data v2."),
+);
+export type WebData2Request = v.InferOutput<typeof WebData2Request>;

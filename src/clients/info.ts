@@ -117,6 +117,8 @@ import {
     type VaultLeading,
     VaultSummariesRequest,
     type VaultSummary,
+    type WebData2,
+    WebData2Request,
 } from "../schemas/mod.ts";
 
 /** @see https://github.com/microsoft/TypeScript/issues/13923#issuecomment-2191862501 */
@@ -226,6 +228,8 @@ export type UserTwapSliceFillsByTimeParameters = Omit<UserTwapSliceFillsByTimeRe
 export type UserVaultEquitiesParameters = Omit<UserVaultEquitiesRequest, "type">;
 /** Request parameters for the {@linkcode InfoClient.vaultDetails} method. */
 export type VaultDetailsParameters = Omit<VaultDetailsRequest, "type">;
+/** Request parameters for the {@linkcode InfoClient.webData2} method. */
+export type WebData2Parameters = Omit<WebData2Request, "type">;
 
 /**
  * Info client for interacting with the Hyperliquid API.
@@ -2066,6 +2070,36 @@ export class InfoClient<
     vaultSummaries(signal?: AbortSignal): Promise<VaultSummary[]> {
         const request = parser(VaultSummariesRequest)({
             type: "vaultSummaries",
+        });
+        return this.transport.request("info", request, signal);
+    }
+
+    /**
+     * Request comprehensive user and market data.
+     * @param params - Request-specific parameters.
+     * @param signal - An {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal}. If this option is set, the request can be canceled by calling {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort | abort()} on the corresponding {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController | AbortController}.
+     * @returns Comprehensive user and market data.
+     *
+     * @throws {TransportError} When the transport layer throws an error.
+     *
+     * @see null
+     * @example
+     * ```ts
+     * import * as hl from "@nktkas/hyperliquid";
+     *
+     * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+     * const infoClient = new hl.InfoClient({ transport });
+     *
+     * const data = await infoClient.webData2({ user: "0x..." });
+     * ```
+     */
+    webData2(
+        params: DeepImmutable<WebData2Parameters>,
+        signal?: AbortSignal,
+    ): Promise<WebData2> {
+        const request = parser(WebData2Request)({
+            type: "webData2",
+            ...params,
         });
         return this.transport.request("info", request, signal);
     }

@@ -1,5 +1,7 @@
 import * as v from "valibot";
 import { Decimal, Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { FrontendOrder, TwapState } from "./orders.ts";
+import { PerpsAssetCtx, PerpsMeta, SpotAssetCtx } from "./assets.ts";
 
 /** User active asset data. */
 export const ActiveAssetData = v.pipe(
@@ -1488,3 +1490,109 @@ export const UserNonFundingLedgerUpdate = v.pipe(
     v.description("Non-funding ledger update for a user."),
 );
 export type UserNonFundingLedgerUpdate = v.InferOutput<typeof UserNonFundingLedgerUpdate>;
+
+/** Comprehensive user and market data. */
+export const WebData2 = v.pipe(
+    v.object({
+        /** Account summary for perpetual trading. */
+        clearinghouseState: v.pipe(
+            PerpsClearinghouseState,
+            v.description("Account summary for perpetual trading."),
+        ),
+        /** Leading vaults information. */
+        leadingVaults: v.pipe(
+            v.array(
+                v.object({
+                    /** Address of the vault. */
+                    address: v.pipe(
+                        v.pipe(Hex, v.length(42)),
+                        v.description("Address of the vault."),
+                    ),
+                    /** Name of the vault. */
+                    name: v.pipe(
+                        v.string(),
+                        v.description("Name of the vault."),
+                    ),
+                }),
+            ),
+            v.description("Leading vaults information."),
+        ),
+        /** Total equity in vaults. */
+        totalVaultEquity: v.pipe(
+            UnsignedDecimal,
+            v.description("Total equity in vaults."),
+        ),
+        /** User open orders with frontend information. */
+        openOrders: v.pipe(
+            v.array(FrontendOrder),
+            v.description("User open orders with frontend information."),
+        ),
+        /** Agent address if one exists. */
+        agentAddress: v.pipe(
+            v.union([v.pipe(Hex, v.length(42)), v.null()]),
+            v.description("Agent address if one exists."),
+        ),
+        /** Timestamp until which the agent is valid. */
+        agentValidUntil: v.pipe(
+            v.union([UnsignedInteger, v.null()]),
+            v.description("Timestamp until which the agent is valid."),
+        ),
+        /** Cumulative ledger value. */
+        cumLedger: v.pipe(
+            UnsignedDecimal,
+            v.description("Cumulative ledger value."),
+        ),
+        /** Metadata for perpetual assets. */
+        meta: v.pipe(
+            PerpsMeta,
+            v.description("Metadata for perpetual assets."),
+        ),
+        /** Context information for perpetual assets. */
+        assetCtxs: v.pipe(
+            v.array(PerpsAssetCtx),
+            v.description("Context information for perpetual assets."),
+        ),
+        /** Server timestamp (in ms since epoch). */
+        serverTime: v.pipe(
+            UnsignedInteger,
+            v.description("Server timestamp (in ms since epoch)."),
+        ),
+        /** Whether this account is a vault. */
+        isVault: v.pipe(
+            v.boolean(),
+            v.description("Whether this account is a vault."),
+        ),
+        /** User address. */
+        user: v.pipe(
+            v.pipe(Hex, v.length(42)),
+            v.description("User address."),
+        ),
+        /** TWAP states. */
+        twapStates: v.pipe(
+            v.array(v.tuple([UnsignedInteger, TwapState])),
+            v.description("TWAP states."),
+        ),
+        /** Account summary for spot trading. */
+        spotState: v.pipe(
+            v.optional(SpotClearinghouseState),
+            v.description("Account summary for spot trading."),
+        ),
+        /** Context information for spot assets. */
+        spotAssetCtxs: v.pipe(
+            v.array(SpotAssetCtx),
+            v.description("Context information for spot assets."),
+        ),
+        /** Whether the user has opted out of spot dusting. */
+        optOutOfSpotDusting: v.pipe(
+            v.optional(v.literal(true)),
+            v.description("Whether the user has opted out of spot dusting."),
+        ),
+        /** Assets currently at their open interest cap. */
+        perpsAtOpenInterestCap: v.pipe(
+            v.optional(v.array(v.string())),
+            v.description("Assets currently at their open interest cap."),
+        ),
+    }),
+    v.description("Comprehensive user and market data."),
+);
+export type WebData2 = v.InferOutput<typeof WebData2>;

@@ -531,6 +531,7 @@ class ExchangeClient {
     setReferrer(params: SetReferrerParameters): Promise<SuccessResponse>;
     subAccountModify(params: SubAccountModifyParameters): Promise<SuccessResponse>;
     spotUser(params: SpotUserParameters): Promise<SuccessResponse>;
+    webData2(params: WebData2Parameters): Promise<WebData2>;
 
     // Transfer
     sendAsset(params: SendAssetParameters): Promise<SuccessResponse>;
