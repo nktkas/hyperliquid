@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-import-prefix
 import { WsUserEvent } from "@nktkas/hyperliquid/schemas";
 import { deadline } from "jsr:@std/async@1/deadline";
 import { getWalletAddress } from "@nktkas/hyperliquid/signing";

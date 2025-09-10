@@ -1,5 +1,6 @@
 import * as v from "valibot";
-import { Hex, TokenId, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { Hex, TokenId, UnsignedDecimalMayInputNumber, UnsignedIntegerMayInputString } from "../_base.ts";
+import { TIF } from "../info/orders.ts";
 
 /** Deeply removes undefined keys from an object.  */
 function removeUndefinedKeys<T>(obj: T): T {
@@ -60,7 +61,7 @@ export const OrderParams = v.pipe(
     v.object({
         /** Asset ID. */
         a: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Asset ID."),
         ),
         /** Position side (`true` for long, `false` for short). */
@@ -70,12 +71,12 @@ export const OrderParams = v.pipe(
         ),
         /** Price. */
         p: v.pipe(
-            UnsignedDecimal,
+            UnsignedDecimalMayInputNumber,
             v.description("Price."),
         ),
         /** Size (in base currency units). */
         s: v.pipe(
-            UnsignedDecimal,
+            UnsignedDecimalMayInputNumber,
             v.description("Size (in base currency units)."),
         ),
         /** Is reduce-only? */
@@ -92,13 +93,7 @@ export const OrderParams = v.pipe(
                         v.object({
                             /** Time-in-force. */
                             tif: v.pipe(
-                                v.union([
-                                    v.literal("Gtc"),
-                                    v.literal("Ioc"),
-                                    v.literal("Alo"),
-                                    v.literal("FrontendMarket"),
-                                    v.literal("LiquidationMarket"),
-                                ]),
+                                TIF,
                                 v.description("Time-in-force."),
                             ),
                         }),
@@ -116,7 +111,7 @@ export const OrderParams = v.pipe(
                             ),
                             /** Trigger price. */
                             triggerPx: v.pipe(
-                                UnsignedDecimal,
+                                UnsignedDecimalMayInputNumber,
                                 v.description("Trigger price."),
                             ),
                             /** Indicates whether it is take profit or stop loss. */
@@ -179,7 +174,7 @@ export const ApproveAgentRequest = v.pipe(
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 nonce: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -187,7 +182,7 @@ export const ApproveAgentRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -238,7 +233,7 @@ export const ApproveBuilderFeeRequest = v.pipe(
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 nonce: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -246,7 +241,7 @@ export const ApproveBuilderFeeRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -281,7 +276,7 @@ export const BatchModifyRequest = v.pipe(
                         /** Order ID or Client Order ID. */
                         oid: v.pipe(
                             v.union([
-                                UnsignedInteger,
+                                UnsignedIntegerMayInputString,
                                 v.pipe(Hex, v.length(34)),
                             ]),
                             v.description("Order ID or Client Order ID."),
@@ -299,7 +294,7 @@ export const BatchModifyRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -314,7 +309,7 @@ export const BatchModifyRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -343,12 +338,12 @@ export const CancelRequest = v.pipe(
                     v.array(v.object({
                         /** Asset ID. */
                         a: v.pipe(
-                            UnsignedInteger,
+                            UnsignedIntegerMayInputString,
                             v.description("Asset ID."),
                         ),
                         /** Order ID. */
                         o: v.pipe(
-                            UnsignedInteger,
+                            UnsignedIntegerMayInputString,
                             v.description("Order ID."),
                         ),
                     })),
@@ -359,7 +354,7 @@ export const CancelRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -374,7 +369,7 @@ export const CancelRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -403,7 +398,7 @@ export const CancelByCloidRequest = v.pipe(
                     v.array(v.object({
                         /** Asset ID. */
                         asset: v.pipe(
-                            UnsignedInteger,
+                            UnsignedIntegerMayInputString,
                             v.description("Asset ID."),
                         ),
                         /** Client Order ID. */
@@ -419,7 +414,7 @@ export const CancelByCloidRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -434,7 +429,7 @@ export const CancelByCloidRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -470,12 +465,12 @@ export const CDepositRequest = v.pipe(
                 ),
                 /** Amount of wei to deposit into staking balance (float * 1e8). */
                 wei: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Amount of wei to deposit into staking balance (float * 1e8)."),
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 nonce: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -483,7 +478,7 @@ export const CDepositRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -517,7 +512,7 @@ export const ClaimRewardsRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -527,7 +522,7 @@ export const ClaimRewardsRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -547,7 +542,7 @@ export const ConvertToMultiSigUserRequestSigners = v.pipe(
             ),
             /** Minimum number of signatures required. */
             threshold: v.pipe(
-                UnsignedInteger,
+                UnsignedIntegerMayInputString,
                 v.description("Minimum number of signatures required."),
             ),
         }),
@@ -611,7 +606,7 @@ export const ConvertToMultiSigUserRequest = v.pipe(
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 nonce: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -619,7 +614,7 @@ export const ConvertToMultiSigUserRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -659,7 +654,7 @@ export const CreateSubAccountRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -669,7 +664,7 @@ export const CreateSubAccountRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -707,13 +702,13 @@ export const CreateVaultRequest = v.pipe(
                 ),
                 /** Initial balance (float * 1e6). */
                 initialUsd: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.minValue(100000000), // 100 USDC
                     v.description("Initial balance (float * 1e6)."),
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 nonce: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -721,7 +716,7 @@ export const CreateVaultRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -731,7 +726,7 @@ export const CreateVaultRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -781,7 +776,7 @@ export const CSignerActionRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -791,7 +786,7 @@ export const CSignerActionRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -863,7 +858,7 @@ export const CValidatorActionRequest = v.pipe(
                             ),
                             /** Commission rate in basis points (1 = 0.0001%). */
                             commission_bps: v.pipe(
-                                v.nullable(UnsignedInteger),
+                                v.nullable(UnsignedIntegerMayInputString),
                                 v.description("Commission rate in basis points (1 = 0.0001%)."),
                             ),
                             /** Signer address. */
@@ -916,7 +911,7 @@ export const CValidatorActionRequest = v.pipe(
                                     ),
                                     /** Commission rate in basis points (1 = 0.0001%). */
                                     commission_bps: v.pipe(
-                                        UnsignedInteger,
+                                        UnsignedIntegerMayInputString,
                                         v.description("Commission rate in basis points (1 = 0.0001%)."),
                                     ),
                                     /** Signer address. */
@@ -934,7 +929,7 @@ export const CValidatorActionRequest = v.pipe(
                             ),
                             /** Initial stake amount in wei. */
                             initial_wei: v.pipe(
-                                UnsignedInteger,
+                                UnsignedIntegerMayInputString,
                                 v.description("Initial stake amount in wei."),
                             ),
                         }),
@@ -958,7 +953,7 @@ export const CValidatorActionRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -968,7 +963,7 @@ export const CValidatorActionRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1009,12 +1004,12 @@ export const CWithdrawRequest = v.pipe(
                 ),
                 /** Amount of wei to withdraw from staking balance (float * 1e8). */
                 wei: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Amount of wei to withdraw from staking balance (float * 1e8)."),
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 nonce: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -1022,7 +1017,7 @@ export const CWithdrawRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1061,7 +1056,7 @@ export const EvmUserModifyRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1071,7 +1066,7 @@ export const EvmUserModifyRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1098,7 +1093,7 @@ export const ModifyRequest = v.pipe(
                 /** Order ID or Client Order ID. */
                 oid: v.pipe(
                     v.union([
-                        UnsignedInteger,
+                        UnsignedIntegerMayInputString,
                         v.pipe(Hex, v.length(34)),
                     ]),
                     v.description("Order ID or Client Order ID."),
@@ -1113,7 +1108,7 @@ export const ModifyRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1128,7 +1123,7 @@ export const ModifyRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1157,7 +1152,7 @@ export const NoopRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1167,7 +1162,7 @@ export const NoopRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1225,7 +1220,7 @@ export const OrderRequest = v.pipe(
                         ),
                         /** Builder fee in 0.1bps (1 = 0.0001%). */
                         f: v.pipe(
-                            UnsignedInteger,
+                            UnsignedIntegerMayInputString,
                             v.description("Builder fee in 0.1bps (1 = 0.0001%)."),
                         ),
                     })),
@@ -1236,7 +1231,7 @@ export const OrderRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1251,7 +1246,7 @@ export const OrderRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1284,7 +1279,7 @@ export const PerpDeployRequest = v.pipe(
                             v.object({
                                 /** Max gas in native token wei. If not provided, then uses current deploy auction price. */
                                 maxGas: v.pipe(
-                                    v.nullable(UnsignedInteger),
+                                    v.nullable(UnsignedIntegerMayInputString),
                                     v.description(
                                         "Max gas in native token wei. If not provided, then uses current deploy auction price.",
                                     ),
@@ -1299,17 +1294,17 @@ export const PerpDeployRequest = v.pipe(
                                         ),
                                         /** Number of decimal places for size. */
                                         szDecimals: v.pipe(
-                                            UnsignedInteger,
+                                            UnsignedIntegerMayInputString,
                                             v.description("Number of decimal places for size."),
                                         ),
                                         /** Initial oracle price for the asset. */
                                         oraclePx: v.pipe(
-                                            UnsignedDecimal,
+                                            UnsignedDecimalMayInputNumber,
                                             v.description("Initial oracle price for the asset."),
                                         ),
                                         /** Margin table identifier for risk management. */
                                         marginTableId: v.pipe(
-                                            UnsignedInteger,
+                                            UnsignedIntegerMayInputString,
                                             v.description("Margin table identifier for risk management."),
                                         ),
                                         /** Whether the asset can only be traded with isolated margin. */
@@ -1335,7 +1330,7 @@ export const PerpDeployRequest = v.pipe(
                                         ),
                                         /** Collateral token index. */
                                         collateralToken: v.pipe(
-                                            UnsignedInteger,
+                                            UnsignedIntegerMayInputString,
                                             v.description("Collateral token index."),
                                         ),
                                         /** User to update oracles. If not provided, then deployer is assumed to be oracle updater. */
@@ -1372,12 +1367,12 @@ export const PerpDeployRequest = v.pipe(
                                 ),
                                 /** A list (sorted by key) of asset and oracle prices. */
                                 oraclePxs: v.pipe(
-                                    v.array(v.tuple([v.string(), UnsignedDecimal])),
+                                    v.array(v.tuple([v.string(), UnsignedDecimalMayInputNumber])),
                                     v.description("A list (sorted by key) of asset and oracle prices."),
                                 ),
                                 /** An outer list of inner lists (inner list sorted by key) of asset and mark prices. */
                                 markPxs: v.pipe(
-                                    v.array(v.array(v.tuple([v.string(), UnsignedDecimal]))),
+                                    v.array(v.array(v.tuple([v.string(), UnsignedDecimalMayInputNumber]))),
                                     v.description(
                                         "An outer list of inner lists (inner list sorted by key) of asset and mark prices.",
                                     ),
@@ -1393,7 +1388,7 @@ export const PerpDeployRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1403,7 +1398,7 @@ export const PerpDeployRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1442,7 +1437,7 @@ export const RegisterReferrerRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1452,7 +1447,7 @@ export const RegisterReferrerRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1478,7 +1473,7 @@ export const ReserveRequestWeightRequest = v.pipe(
                 ),
                 /** Amount of request weight to reserve. */
                 weight: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Amount of request weight to reserve."),
                 ),
             }),
@@ -1486,7 +1481,7 @@ export const ReserveRequestWeightRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1496,7 +1491,7 @@ export const ReserveRequestWeightRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1527,7 +1522,7 @@ export const ScheduleCancelRequest = v.pipe(
                  * If not specified, will cause all scheduled cancel operations to be deleted.
                  */
                 time: v.pipe(
-                    v.optional(UnsignedInteger),
+                    v.optional(UnsignedIntegerMayInputString),
                     v.description(
                         "Scheduled time (in ms since epoch)." +
                             "\nMust be at least 5 seconds in the future." +
@@ -1539,7 +1534,7 @@ export const ScheduleCancelRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1554,7 +1549,7 @@ export const ScheduleCancelRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1610,7 +1605,7 @@ export const SendAssetRequest = v.pipe(
                 ),
                 /** Amount to send (not in wei). */
                 amount: v.pipe(
-                    UnsignedDecimal,
+                    UnsignedDecimalMayInputNumber,
                     v.description("Amount to send (not in wei)."),
                 ),
                 /** Source sub-account address ("" for main account). */
@@ -1623,7 +1618,7 @@ export const SendAssetRequest = v.pipe(
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 nonce: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -1631,7 +1626,7 @@ export const SendAssetRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1677,7 +1672,7 @@ export const SetDisplayNameRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1687,7 +1682,7 @@ export const SetDisplayNameRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1722,7 +1717,7 @@ export const SetReferrerRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1732,7 +1727,7 @@ export const SetReferrerRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -1769,12 +1764,12 @@ export const SpotDeployRequest = v.pipe(
                             v.object({
                                 /** Token identifier. */
                                 token: v.pipe(
-                                    UnsignedInteger,
+                                    UnsignedIntegerMayInputString,
                                     v.description("Token identifier."),
                                 ),
                                 /** Maximum token supply. */
                                 maxSupply: v.pipe(
-                                    UnsignedDecimal,
+                                    UnsignedDecimalMayInputNumber,
                                     v.description("Maximum token supply."),
                                 ),
                                 /** Set hyperliquidity balance to 0. */
@@ -1800,27 +1795,27 @@ export const SpotDeployRequest = v.pipe(
                             v.object({
                                 /** Spot index (distinct from base token index). */
                                 spot: v.pipe(
-                                    UnsignedInteger,
+                                    UnsignedIntegerMayInputString,
                                     v.description("Spot index (distinct from base token index)."),
                                 ),
                                 /** Starting price for liquidity seeding. */
                                 startPx: v.pipe(
-                                    UnsignedDecimal,
+                                    UnsignedDecimalMayInputNumber,
                                     v.description("Starting price for liquidity seeding."),
                                 ),
                                 /** Order size as a float (not in wei). */
                                 orderSz: v.pipe(
-                                    UnsignedDecimal,
+                                    UnsignedDecimalMayInputNumber,
                                     v.description("Order size as a float (not in wei)."),
                                 ),
                                 /** Total number of orders to place. */
                                 nOrders: v.pipe(
-                                    UnsignedInteger,
+                                    UnsignedIntegerMayInputString,
                                     v.description("Total number of orders to place."),
                                 ),
                                 /** Number of levels to seed with USDC. */
                                 nSeededLevels: v.pipe(
-                                    v.optional(UnsignedInteger),
+                                    v.optional(UnsignedIntegerMayInputString),
                                     v.description("Number of levels to seed with USDC."),
                                 ),
                             }),
@@ -1842,8 +1837,8 @@ export const SpotDeployRequest = v.pipe(
                                 /** Tuple containing base and quote token indices. */
                                 tokens: v.pipe(
                                     v.tuple([
-                                        UnsignedInteger,
-                                        UnsignedInteger,
+                                        UnsignedIntegerMayInputString,
+                                        UnsignedIntegerMayInputString,
                                     ]),
                                     v.description("Tuple containing base and quote token indices."),
                                 ),
@@ -1873,12 +1868,12 @@ export const SpotDeployRequest = v.pipe(
                                         ),
                                         /** Number of decimals for token size. */
                                         szDecimals: v.pipe(
-                                            UnsignedInteger,
+                                            UnsignedIntegerMayInputString,
                                             v.description("Number of decimals for token size."),
                                         ),
                                         /** Number of decimals for token amounts in wei. */
                                         weiDecimals: v.pipe(
-                                            UnsignedInteger,
+                                            UnsignedIntegerMayInputString,
                                             v.description("Number of decimals for token amounts in wei."),
                                         ),
                                     }),
@@ -1886,7 +1881,7 @@ export const SpotDeployRequest = v.pipe(
                                 ),
                                 /** Maximum gas allowed for registration. */
                                 maxGas: v.pipe(
-                                    UnsignedInteger,
+                                    UnsignedIntegerMayInputString,
                                     v.description("Maximum gas allowed for registration."),
                                 ),
                                 /** Optional full token name. */
@@ -1912,7 +1907,7 @@ export const SpotDeployRequest = v.pipe(
                             v.object({
                                 /** Token identifier. */
                                 token: v.pipe(
-                                    UnsignedInteger,
+                                    UnsignedIntegerMayInputString,
                                     v.description("Token identifier."),
                                 ),
                                 /** The deployer trading fee share. Range is 0% to 100%. */
@@ -1938,20 +1933,20 @@ export const SpotDeployRequest = v.pipe(
                             v.object({
                                 /** Token identifier. */
                                 token: v.pipe(
-                                    UnsignedInteger,
+                                    UnsignedIntegerMayInputString,
                                     v.description("Token identifier."),
                                 ),
                                 /** Array of tuples: [user address, genesis amount in wei]. */
                                 userAndWei: v.pipe(
-                                    v.array(v.tuple([v.pipe(Hex, v.length(42)), UnsignedDecimal])),
+                                    v.array(v.tuple([v.pipe(Hex, v.length(42)), UnsignedDecimalMayInputNumber])),
                                     v.description("Array of tuples: [user address, genesis amount in wei]."),
                                 ),
                                 /** Array of tuples: [existing token identifier, genesis amount in wei]. */
                                 existingTokenAndWei: v.pipe(
                                     v.array(
                                         v.tuple([
-                                            UnsignedInteger,
-                                            UnsignedDecimal,
+                                            UnsignedIntegerMayInputString,
+                                            UnsignedDecimalMayInputNumber,
                                         ]),
                                     ),
                                     v.description(
@@ -1976,7 +1971,7 @@ export const SpotDeployRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -1986,7 +1981,7 @@ export const SpotDeployRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2040,12 +2035,12 @@ export const SpotSendRequest = v.pipe(
                 ),
                 /** Amount to send (not in wei). */
                 amount: v.pipe(
-                    UnsignedDecimal,
+                    UnsignedDecimalMayInputNumber,
                     v.description("Amount to send (not in wei)."),
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 time: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -2053,7 +2048,7 @@ export const SpotSendRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2098,7 +2093,7 @@ export const SpotUserRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2108,7 +2103,7 @@ export const SpotUserRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2148,7 +2143,7 @@ export const SubAccountModifyRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2158,7 +2153,7 @@ export const SubAccountModifyRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2199,7 +2194,7 @@ export const SubAccountSpotTransferRequest = v.pipe(
                 ),
                 /** Amount to send (not in wei). */
                 amount: v.pipe(
-                    UnsignedDecimal,
+                    UnsignedDecimalMayInputNumber,
                     v.description("Amount to send (not in wei)."),
                 ),
             }),
@@ -2207,7 +2202,7 @@ export const SubAccountSpotTransferRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2217,7 +2212,7 @@ export const SubAccountSpotTransferRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2253,7 +2248,7 @@ export const SubAccountTransferRequest = v.pipe(
                 ),
                 /** Amount to transfer (float * 1e6). */
                 usd: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Amount to transfer (float * 1e6)."),
                 ),
             }),
@@ -2261,7 +2256,7 @@ export const SubAccountTransferRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2271,7 +2266,7 @@ export const SubAccountTransferRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2312,7 +2307,7 @@ export const TokenDelegateRequest = v.pipe(
                 ),
                 /** Amount for delegate/undelegate (float * 1e8). */
                 wei: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Amount for delegate/undelegate (float * 1e8)."),
                 ),
                 /** `true` for undelegate, `false` for delegate. */
@@ -2322,7 +2317,7 @@ export const TokenDelegateRequest = v.pipe(
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 nonce: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -2330,7 +2325,7 @@ export const TokenDelegateRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2361,12 +2356,12 @@ export const TwapCancelRequest = v.pipe(
                 ),
                 /** Asset ID. */
                 a: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Asset ID."),
                 ),
                 /** Twap ID. */
                 t: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Twap ID."),
                 ),
             }),
@@ -2374,7 +2369,7 @@ export const TwapCancelRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2389,7 +2384,7 @@ export const TwapCancelRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2418,7 +2413,7 @@ export const TwapOrderRequest = v.pipe(
                     v.object({
                         /** Asset ID. */
                         a: v.pipe(
-                            UnsignedInteger,
+                            UnsignedIntegerMayInputString,
                             v.description("Asset ID."),
                         ),
                         /** Position side (`true` for long, `false` for short). */
@@ -2428,7 +2423,7 @@ export const TwapOrderRequest = v.pipe(
                         ),
                         /** Size (in base currency units). */
                         s: v.pipe(
-                            UnsignedDecimal,
+                            UnsignedDecimalMayInputNumber,
                             v.description("Size (in base currency units)."),
                         ),
                         /** Is reduce-only? */
@@ -2438,7 +2433,7 @@ export const TwapOrderRequest = v.pipe(
                         ),
                         /** TWAP duration in minutes. */
                         m: v.pipe(
-                            UnsignedInteger,
+                            UnsignedIntegerMayInputString,
                             v.description("TWAP duration in minutes."),
                         ),
                         /** Enable random order timing. */
@@ -2454,7 +2449,7 @@ export const TwapOrderRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2469,7 +2464,7 @@ export const TwapOrderRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2495,7 +2490,7 @@ export const UpdateIsolatedMarginRequest = v.pipe(
                 ),
                 /** Asset ID. */
                 asset: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Asset ID."),
                 ),
                 /** Position side (`true` for long, `false` for short). */
@@ -2505,7 +2500,7 @@ export const UpdateIsolatedMarginRequest = v.pipe(
                 ),
                 /** Amount to adjust (float * 1e6). */
                 ntli: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Amount to adjust (float * 1e6)."),
                 ),
             }),
@@ -2513,7 +2508,7 @@ export const UpdateIsolatedMarginRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2528,7 +2523,7 @@ export const UpdateIsolatedMarginRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2554,7 +2549,7 @@ export const UpdateLeverageRequest = v.pipe(
                 ),
                 /** Asset ID. */
                 asset: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Asset ID."),
                 ),
                 /** `true` for cross leverage, `false` for isolated leverage. */
@@ -2564,7 +2559,7 @@ export const UpdateLeverageRequest = v.pipe(
                 ),
                 /** New leverage value. */
                 leverage: v.pipe(
-                    v.pipe(UnsignedInteger, v.minValue(1)),
+                    v.pipe(UnsignedIntegerMayInputString, v.minValue(1)),
                     v.description("New leverage value."),
                 ),
             }),
@@ -2572,7 +2567,7 @@ export const UpdateLeverageRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2587,7 +2582,7 @@ export const UpdateLeverageRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2623,7 +2618,7 @@ export const UsdClassTransferRequest = v.pipe(
                 ),
                 /** Amount to transfer (1 = 1$). */
                 amount: v.pipe(
-                    UnsignedDecimal,
+                    UnsignedDecimalMayInputNumber,
                     v.description("Amount to transfer (1 = 1$)."),
                 ),
                 /** `true` for Spot to Perp, `false` for Perp to Spot. */
@@ -2633,7 +2628,7 @@ export const UsdClassTransferRequest = v.pipe(
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 nonce: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -2641,7 +2636,7 @@ export const UsdClassTransferRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2687,12 +2682,12 @@ export const UsdSendRequest = v.pipe(
                 ),
                 /** Amount to send (1 = 1$). */
                 amount: v.pipe(
-                    UnsignedDecimal,
+                    UnsignedDecimalMayInputNumber,
                     v.description("Amount to send (1 = 1$)."),
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 time: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -2700,7 +2695,7 @@ export const UsdSendRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2740,7 +2735,7 @@ export const VaultDistributeRequest = v.pipe(
                  * Set to 0 to close the vault.
                  */
                 usd: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description(
                         "Amount to distribute (float * 1e6)." +
                             "\n\nSet to 0 to close the vault.",
@@ -2751,7 +2746,7 @@ export const VaultDistributeRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2761,7 +2756,7 @@ export const VaultDistributeRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2805,7 +2800,7 @@ export const VaultModifyRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2815,7 +2810,7 @@ export const VaultModifyRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2851,7 +2846,7 @@ export const VaultTransferRequest = v.pipe(
                 ),
                 /** Amount for deposit/withdrawal (float * 1e6). */
                 usd: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Amount for deposit/withdrawal (float * 1e6)."),
                 ),
             }),
@@ -2859,7 +2854,7 @@ export const VaultTransferRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -2869,7 +2864,7 @@ export const VaultTransferRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),
@@ -2910,12 +2905,12 @@ export const Withdraw3Request = v.pipe(
                 ),
                 /** Amount to withdraw (1 = 1$). */
                 amount: v.pipe(
-                    UnsignedDecimal,
+                    UnsignedDecimalMayInputNumber,
                     v.description("Amount to withdraw (1 = 1$)."),
                 ),
                 /** Unique request identifier (current timestamp in ms). */
                 time: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -2923,7 +2918,7 @@ export const Withdraw3Request = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -3032,7 +3027,7 @@ export const MultiSigRequest = v.pipe(
         ),
         /** Unique request identifier (current timestamp in ms). */
         nonce: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Unique request identifier (current timestamp in ms)."),
         ),
         /** Cryptographic signature. */
@@ -3047,7 +3042,7 @@ export const MultiSigRequest = v.pipe(
         ),
         /** Expiration time of the action. */
         expiresAfter: v.pipe(
-            v.optional(UnsignedInteger),
+            v.optional(UnsignedIntegerMayInputString),
             v.description("Expiration time of the action."),
         ),
     }),

@@ -1,10 +1,18 @@
-import { SuccessResponse } from "@nktkas/hyperliquid/schemas";
+import { parser, SuccessResponse, UsdClassTransferRequest } from "@nktkas/hyperliquid/schemas";
 import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { runTest } from "./_t.ts";
 
-runTest("usdClassTransfer", { perp: "1" }, async (_t, clients) => {
-    const data = await Promise.all([
-        clients.exchange.usdClassTransfer({ amount: "1", toPerp: false }),
-    ]);
-    schemaCoverage(SuccessResponse, data);
+runTest({
+    name: "usdClassTransfer",
+    topup: { perp: "1" },
+    codeTestFn: async (_t, clients) => {
+        const data = await Promise.all([
+            clients.exchange.usdClassTransfer({ amount: "1", toPerp: false }),
+        ]);
+        schemaCoverage(SuccessResponse, data);
+    },
+    cliTestFn: async (_t, runCommand) => {
+        const data = await runCommand(["exchange", "usdClassTransfer", "--amount", "1", "--toPerp", "false"]);
+        parser(UsdClassTransferRequest)(JSON.parse(data));
+    },
 });

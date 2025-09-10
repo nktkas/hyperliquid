@@ -1,31 +1,55 @@
-import { TwapOrderSuccessResponse } from "@nktkas/hyperliquid/schemas";
+// deno-lint-ignore-file no-import-prefix
+import { parser, TwapOrderRequest, TwapOrderSuccessResponse } from "@nktkas/hyperliquid/schemas";
 import { BigNumber } from "npm:bignumber.js@9";
 import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { formatSize, getAssetData, runTest } from "./_t.ts";
 
-runTest("twapOrder", { perp: "60" }, async (_t, clients) => {
-    // —————————— Prepare ——————————
+runTest({
+    name: "twapOrder",
+    topup: { perp: "60" },
+    codeTestFn: async (_t, clients) => {
+        // —————————— Prepare ——————————
 
-    const { id, universe, ctx } = await getAssetData("SOL");
-    const sz = formatSize(new BigNumber(55).div(ctx.markPx), universe.szDecimals);
+        const { id, universe, ctx } = await getAssetData("SOL");
+        const sz = formatSize(new BigNumber(55).div(ctx.markPx), universe.szDecimals);
 
-    // —————————— Test ——————————
+        // —————————— Test ——————————
 
-    const data = await Promise.all([
-        clients.exchange.twapOrder({
-            twap: {
-                a: id,
-                b: true,
-                s: sz,
-                r: false,
-                m: 5,
-                t: false,
-            },
-        }),
-    ]);
-    schemaCoverage(TwapOrderSuccessResponse, data);
+        const data = await Promise.all([
+            clients.exchange.twapOrder({
+                twap: {
+                    a: id,
+                    b: true,
+                    s: sz,
+                    r: false,
+                    m: 5,
+                    t: false,
+                },
+            }),
+        ]);
+        schemaCoverage(TwapOrderSuccessResponse, data);
 
-    // —————————— Cleanup ——————————
+        // —————————— Cleanup ——————————
 
-    await clients.exchange.twapCancel({ a: id, t: data[0].response.data.status.running.twapId });
+        await clients.exchange.twapCancel({ a: id, t: data[0].response.data.status.running.twapId });
+    },
+    cliTestFn: async (_t, runCommand) => {
+        const data = await runCommand([
+            "exchange",
+            "twapOrder",
+            "--a",
+            "0",
+            "--b",
+            "true",
+            "--s",
+            "0",
+            "--r",
+            "false",
+            "--m",
+            "5",
+            "--t",
+            "false",
+        ]);
+        parser(TwapOrderRequest)(JSON.parse(data));
+    },
 });

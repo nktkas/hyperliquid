@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-import-prefix
 import { assert } from "jsr:@std/assert@1";
 import { privateKeyToAccount } from "npm:viem@2/accounts";
 import { ethers } from "npm:ethers@6";

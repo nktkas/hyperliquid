@@ -797,7 +797,7 @@ import { CancelRequest, parser } from "@nktkas/hyperliquid/schemas";
 
 const privateKey = "0x..."; // `viem`, `ethers`, or private key directly
 
-const action = parser(CancelRequest.entries.action)({ // for correct signature generation
+const action = parser(CancelRequest.entries.action)({ // for correct signature generation (optional)
     type: "cancel",
     cancels: [
         { a: 0, o: 12345 },
@@ -824,7 +824,7 @@ import { ApproveAgentRequest, parser } from "@nktkas/hyperliquid/schemas";
 
 const privateKey = "0x..."; // `viem`, `ethers`, or private key directly
 
-const action = parser(ApproveAgentRequest.entries.action)({ // for correct signature generation
+const action = parser(ApproveAgentRequest.entries.action)({ // for correct signature generation (optional)
     type: "approveAgent",
     signatureChainId: "0x66eee",
     hyperliquidChain: "Mainnet",

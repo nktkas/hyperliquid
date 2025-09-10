@@ -1,4 +1,4 @@
-import { HyperliquidError } from "../errors.ts";
+import { HyperliquidError } from "../_errors.ts";
 import type { IRequestTransport } from "../transports/base.ts";
 import {
     ApproveAgentRequest,
@@ -2060,7 +2060,7 @@ export class ExchangeClient<
         request: {
             action: Record<string, unknown>;
             vaultAddress?: `0x${string}`;
-            expiresAfter: number | undefined;
+            expiresAfter: number | string | undefined;
         },
         signal?: AbortSignal,
     ): Promise<T> {
@@ -2074,7 +2074,7 @@ export class ExchangeClient<
             nonce,
             isTestnet: this.transport.isTestnet,
             vaultAddress,
-            expiresAfter,
+            expiresAfter: typeof expiresAfter === "string" ? Number(expiresAfter) : expiresAfter,
         });
 
         // Send a request
@@ -2157,9 +2157,9 @@ export class ExchangeClient<
                 signatureChainId: `0x${string}`;
                 [key: string]: unknown;
             };
-            nonce: number;
+            nonce: number | string;
             vaultAddress?: `0x${string}`;
-            expiresAfter?: number;
+            expiresAfter?: number | string;
         },
         signal?: AbortSignal,
     ): Promise<T> {
@@ -2169,10 +2169,10 @@ export class ExchangeClient<
         const signature = await signMultiSigAction({
             wallet: this.wallet,
             action,
-            nonce,
+            nonce: typeof nonce === "string" ? Number(nonce) : nonce,
             isTestnet: this.transport.isTestnet,
             vaultAddress,
-            expiresAfter,
+            expiresAfter: typeof expiresAfter === "string" ? Number(expiresAfter) : expiresAfter,
         });
 
         // Send a request

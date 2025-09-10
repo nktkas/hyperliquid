@@ -96,7 +96,7 @@ export class MultiSignClient<
                 { type: keyof typeof userSignedActionEip712Types }
             >;
             vaultAddress?: `0x${string}`;
-            expiresAfter: number | undefined;
+            expiresAfter: number | string | undefined;
         },
         signal?: AbortSignal,
     ): Promise<T> {
@@ -112,7 +112,7 @@ export class MultiSignClient<
                 nonce,
                 isTestnet: this.transport.isTestnet,
                 vaultAddress,
-                expiresAfter,
+                expiresAfter: typeof expiresAfter === "string" ? Number(expiresAfter) : expiresAfter,
             });
         }));
 

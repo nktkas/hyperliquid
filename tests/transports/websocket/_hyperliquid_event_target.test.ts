@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-import-prefix
 import { assert, assertEquals, assertFalse } from "jsr:@std/assert@1";
 import { HyperliquidEventTarget } from "../../../src/transports/websocket/_hyperliquid_event_target.ts";
 

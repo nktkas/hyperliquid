@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-import-prefix
 /**
  * Builds the Deno library for working with NodeJS or publishing to npm
  * Command: deno run --allow-env --allow-read --allow-write --allow-run build/npm.ts
@@ -8,9 +9,10 @@ import { build, emptyDir } from "jsr:@deno/dnt@^0.42.1";
 await emptyDir("./build/npm");
 await build({
     entryPoints: [
-        { name: ".", path: "./mod.ts" },
+        { name: ".", path: "./src/mod.ts" },
         { name: "./schemas", path: "./src/schemas/mod.ts" },
         { name: "./signing", path: "./src/signing/mod.ts" },
+        { name: "./bin/cli", path: "./bin/cli.ts", kind: "bin" },
     ],
     outDir: "./build/npm",
     shims: {},

@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-import-prefix
 import { TxDetails } from "@nktkas/hyperliquid/schemas";
 import { deadline } from "jsr:@std/async@1/deadline";
 import * as v from "valibot";

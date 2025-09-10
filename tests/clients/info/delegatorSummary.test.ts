@@ -1,10 +1,22 @@
-import { DelegatorSummary } from "@nktkas/hyperliquid/schemas";
+import { DelegatorSummary, DelegatorSummaryRequest, parser } from "@nktkas/hyperliquid/schemas";
 import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { runTest } from "./_t.ts";
 
-runTest("delegatorSummary", async (_t, client) => {
-    const data = await Promise.all([
-        client.delegatorSummary({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" }),
-    ]);
-    schemaCoverage(DelegatorSummary, data);
+runTest({
+    name: "delegatorSummary",
+    codeTestFn: async (_t, client) => {
+        const data = await Promise.all([
+            client.delegatorSummary({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" }),
+        ]);
+        schemaCoverage(DelegatorSummary, data);
+    },
+    cliTestFn: async (_t, runCommand) => {
+        const data = await runCommand([
+            "info",
+            "delegatorSummary",
+            "--user",
+            "0x563C175E6f11582f65D6d9E360A618699DEe14a9",
+        ]);
+        parser(DelegatorSummaryRequest)(JSON.parse(data));
+    },
 });

@@ -1,5 +1,4 @@
-// deno-lint-ignore-file require-await
-
+// deno-lint-ignore-file require-await no-import-prefix
 import { assert, assertEquals, assertIsError, assertRejects } from "jsr:@std/assert@1";
 import { HttpRequestError, HttpTransport } from "../../../src/transports/http/http_transport.ts";
 

@@ -1,4 +1,5 @@
-import { signTypedData as signTypedDataPrivKey } from "../../src/signing/_signTypedData/private_key.ts";
+// deno-lint-ignore-file no-import-prefix
+import { signTypedData as signTypedDataPrivKey } from "../../src/signing/signTypedData/private_key.ts";
 import { Wallet } from "npm:ethers@6";
 import { assertEquals } from "jsr:@std/assert@1";
 

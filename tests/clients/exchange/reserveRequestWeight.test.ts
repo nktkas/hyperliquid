@@ -1,10 +1,17 @@
-import { SuccessResponse } from "@nktkas/hyperliquid/schemas";
+import { parser, ReserveRequestWeightRequest, SuccessResponse } from "@nktkas/hyperliquid/schemas";
 import { schemaCoverage } from "../../_utils/schema_coverage.ts";
 import { runTest } from "./_t.ts";
 
-runTest("reserveRequestWeight", async (_t, clients) => {
-    const data = await Promise.all([
-        clients.exchange.reserveRequestWeight({ weight: 1 }),
-    ]);
-    schemaCoverage(SuccessResponse, data);
+runTest({
+    name: "reserveRequestWeight",
+    codeTestFn: async (_t, clients) => {
+        const data = await Promise.all([
+            clients.exchange.reserveRequestWeight({ weight: 1 }),
+        ]);
+        schemaCoverage(SuccessResponse, data);
+    },
+    cliTestFn: async (_t, runCommand) => {
+        const data = await runCommand(["exchange", "reserveRequestWeight", "--weight", "1"]);
+        parser(ReserveRequestWeightRequest)(JSON.parse(data));
+    },
 });

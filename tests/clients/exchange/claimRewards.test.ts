@@ -1,17 +1,25 @@
-import { SuccessResponse } from "@nktkas/hyperliquid/schemas";
+// deno-lint-ignore-file no-import-prefix
+import { ClaimRewardsRequest, parser, SuccessResponse } from "@nktkas/hyperliquid/schemas";
 import { ApiRequestError } from "@nktkas/hyperliquid";
 import { assertIsError } from "jsr:@std/assert@1";
 import { schemaCoverage, SchemaCoverageError } from "../../_utils/schema_coverage.ts";
 import { runTest } from "./_t.ts";
 
-runTest("claimRewards", async (_t, clients) => {
-    await Promise.all([
-        clients.exchange.claimRewards(),
-    ])
-        .then((data) => {
-            schemaCoverage(SuccessResponse, data);
-        }).catch((e) => {
-            if (e instanceof SchemaCoverageError) throw e;
-            assertIsError(e, ApiRequestError, "No rewards to claim");
-        });
+runTest({
+    name: "claimRewards",
+    codeTestFn: async (_t, clients) => {
+        await Promise.all([
+            clients.exchange.claimRewards(),
+        ])
+            .then((data) => {
+                schemaCoverage(SuccessResponse, data);
+            }).catch((e) => {
+                if (e instanceof SchemaCoverageError) throw e;
+                assertIsError(e, ApiRequestError, "No rewards to claim");
+            });
+    },
+    cliTestFn: async (_t, runCommand) => {
+        const data = await runCommand(["exchange", "claimRewards"]);
+        parser(ClaimRewardsRequest)(JSON.parse(data));
+    },
 });

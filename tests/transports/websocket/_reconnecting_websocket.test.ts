@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-import-prefix
 import { assert, assertEquals, assertInstanceOf, assertIsError, assertNotEquals } from "jsr:@std/assert@1";
 import {
     ReconnectingWebSocket,

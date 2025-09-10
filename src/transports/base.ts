@@ -1,4 +1,4 @@
-import { HyperliquidError } from "../errors.ts";
+import { HyperliquidError } from "../_errors.ts";
 
 /**
  * Interface representing a REST transport.

@@ -129,7 +129,7 @@ import {
     getWalletChainId,
     type Signature,
     signTypedData,
-} from "./_signTypedData/mod.ts";
+} from "./signTypedData/mod.ts";
 
 export { type AbstractWallet, getWalletAddress, getWalletChainId, type Signature };
 

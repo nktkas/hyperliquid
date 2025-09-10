@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Hex, UnsignedInteger } from "../_base.ts";
+import { Hex, UnsignedIntegerMayInputString } from "../_base.ts";
 
 /**
  * Request user active asset data.
@@ -92,12 +92,12 @@ export const CandleSnapshotRequest = v.pipe(
                 ),
                 /** Start time (in ms since epoch). */
                 startTime: v.pipe(
-                    UnsignedInteger,
+                    UnsignedIntegerMayInputString,
                     v.description("Start time (in ms since epoch)."),
                 ),
                 /** End time (in ms since epoch). */
                 endTime: v.pipe(
-                    v.nullish(UnsignedInteger),
+                    v.nullish(UnsignedIntegerMayInputString),
                     v.description("End time (in ms since epoch)."),
                 ),
             }),
@@ -308,12 +308,12 @@ export const FundingHistoryRequest = v.pipe(
         ),
         /** Start time (in ms since epoch). */
         startTime: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Start time (in ms since epoch)."),
         ),
         /** End time (in ms since epoch). */
         endTime: v.pipe(
-            v.nullish(UnsignedInteger),
+            v.nullish(UnsignedIntegerMayInputString),
             v.description("End time (in ms since epoch)."),
         ),
     }),
@@ -384,12 +384,22 @@ export const L2BookRequest = v.pipe(
         ),
         /** Number of significant figures. */
         nSigFigs: v.pipe(
-            v.nullish(v.union([v.literal(2), v.literal(3), v.literal(4), v.literal(5)])),
+            v.nullish(
+                v.pipe(
+                    UnsignedIntegerMayInputString,
+                    v.union([v.literal(2), v.literal(3), v.literal(4), v.literal(5)]),
+                ),
+            ),
             v.description("Number of significant figures."),
         ),
         /** Mantissa for aggregation (if `nSigFigs` is 5). */
         mantissa: v.pipe(
-            v.nullish(v.union([v.literal(2), v.literal(5)])),
+            v.nullish(
+                v.pipe(
+                    UnsignedIntegerMayInputString,
+                    v.union([v.literal(2), v.literal(5)]),
+                ),
+            ),
             v.description("Mantissa for aggregation (if `nSigFigs` is 5)."),
         ),
     }),
@@ -472,7 +482,7 @@ export const MarginTableRequest = v.pipe(
         ),
         /** Margin requirements table. */
         id: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Margin requirements table."),
         ),
     }),
@@ -614,7 +624,7 @@ export const OrderStatusRequest = v.pipe(
         ),
         /** Order ID or Client Order ID. */
         oid: v.pipe(
-            v.union([UnsignedInteger, v.pipe(Hex, v.length(34))]),
+            v.union([UnsignedIntegerMayInputString, v.pipe(Hex, v.length(34))]),
             v.description("Order ID or Client Order ID."),
         ),
     }),
@@ -1000,12 +1010,12 @@ export const UserFillsByTimeRequest = v.pipe(
         ),
         /** Start time (in ms since epoch). */
         startTime: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Start time (in ms since epoch)."),
         ),
         /** End time (in ms since epoch). */
         endTime: v.pipe(
-            v.nullish(UnsignedInteger),
+            v.nullish(UnsignedIntegerMayInputString),
             v.description("End time (in ms since epoch)."),
         ),
         /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
@@ -1037,12 +1047,12 @@ export const UserFundingRequest = v.pipe(
         ),
         /** Start time (in ms since epoch). */
         startTime: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Start time (in ms since epoch)."),
         ),
         /** End time (in ms since epoch). */
         endTime: v.pipe(
-            v.nullish(UnsignedInteger),
+            v.nullish(UnsignedIntegerMayInputString),
             v.description("End time (in ms since epoch)."),
         ),
     }),
@@ -1069,12 +1079,12 @@ export const UserNonFundingLedgerUpdatesRequest = v.pipe(
         ),
         /** Start time (in ms since epoch). */
         startTime: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Start time (in ms since epoch)."),
         ),
         /** End time (in ms since epoch). */
         endTime: v.pipe(
-            v.nullish(UnsignedInteger),
+            v.nullish(UnsignedIntegerMayInputString),
             v.description("End time (in ms since epoch)."),
         ),
     }),
@@ -1189,12 +1199,12 @@ export const UserTwapSliceFillsByTimeRequest = v.pipe(
         ),
         /** Start time (in ms since epoch). */
         startTime: v.pipe(
-            UnsignedInteger,
+            UnsignedIntegerMayInputString,
             v.description("Start time (in ms since epoch)."),
         ),
         /** End time (in ms since epoch). */
         endTime: v.pipe(
-            v.nullish(UnsignedInteger),
+            v.nullish(UnsignedIntegerMayInputString),
             v.description("End time (in ms since epoch)."),
         ),
         /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */

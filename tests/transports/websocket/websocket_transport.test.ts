@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-import-prefix
 import { assert, assertEquals, assertFalse, assertIsError, assertRejects } from "jsr:@std/assert@1";
 import { WebSocketRequestError, WebSocketTransport } from "../../../src/transports/websocket/websocket_transport.ts";
 

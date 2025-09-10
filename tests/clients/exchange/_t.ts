@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-import-prefix
 import { type Args, parseArgs } from "jsr:@std/cli@1/parse-args";
 import { generatePrivateKey } from "npm:viem@2/accounts";
 import { BigNumber } from "npm:bignumber.js@9";
@@ -54,41 +55,22 @@ const multiSignClient = await createMultiSignClient(mainExchClient);
 
 // —————————— Functions ——————————
 
-export function runTest(
-    name: string,
-    fn: (
+export function runTest(options: {
+    name: string;
+    topup?: { perp?: string; spot?: string; evm?: string; staking?: string };
+    codeTestFn: (
         t: Deno.TestContext,
-        clients: { info: InfoClient; exchange: ExchangeClient | MultiSignClient },
-    ) => Promise<void>,
-): void;
-export function runTest(
-    name: string,
-    topup: { perp?: string; spot?: string; evm?: string; staking?: string },
-    fn: (
+        clients: {
+            info: InfoClient;
+            exchange: ExchangeClient | MultiSignClient;
+        },
+    ) => Promise<void>;
+    cliTestFn?: (
         t: Deno.TestContext,
-        clients: { info: InfoClient; exchange: ExchangeClient | MultiSignClient },
-    ) => Promise<void>,
-): void;
-export function runTest(
-    name: string,
-    topup_or_fn?:
-        | {
-            perp?: string;
-            spot?: string;
-            evm?: string;
-            staking?: string;
-        }
-        | ((
-            t: Deno.TestContext,
-            clients: { info: InfoClient; exchange: ExchangeClient | MultiSignClient },
-        ) => Promise<void>),
-    maybeFn?: (
-        t: Deno.TestContext,
-        clients: { info: InfoClient; exchange: ExchangeClient | MultiSignClient },
-    ) => Promise<void>,
-): void {
-    const topup = typeof topup_or_fn === "function" ? {} : topup_or_fn;
-    const fn = typeof topup_or_fn === "function" ? topup_or_fn : maybeFn!;
+        runCommand: (args: string[]) => Promise<string>,
+    ) => Promise<void>;
+}): void {
+    const { name, topup, codeTestFn, cliTestFn } = options;
 
     Deno.test(name, async (t) => {
         await new Promise((r) => setTimeout(r, cliArgs.wait)); // delay to avoid rate limits
@@ -149,7 +131,7 @@ export function runTest(
             for (const exchangeClient of [exchClient, multiSignClient] as const) {
                 await t.step(
                     exchangeClient instanceof MultiSignClient ? "MultiSignClient" : "ExchangeClient",
-                    async (t) => await fn(t, { info: infoClient, exchange: exchangeClient }),
+                    async (t) => await codeTestFn(t, { info: infoClient, exchange: exchangeClient }),
                 );
             }
         } finally {
@@ -170,6 +152,30 @@ export function runTest(
                     }),
             ]);
         }
+
+        await t.step({
+            name: "CLI",
+            fn: async (t) => {
+                await cliTestFn!(t, async (args: string[]) => {
+                    const command = new Deno.Command("deno", {
+                        args: ["run", "-A", "bin/cli.ts", "--offline", "--private-key", PRIVATE_KEY, ...args],
+                        stdout: "piped",
+                        stderr: "piped",
+                    });
+                    const { stdout, stderr } = await command.output();
+                    const error = new TextDecoder().decode(stderr);
+                    if (error !== "") {
+                        throw new Error(`Command failed with error: ${error}`);
+                    }
+                    const output = new TextDecoder().decode(stdout);
+                    if (output.startsWith("Hyperliquid CLI")) {
+                        throw new Error(`Invalid command argument(s)`);
+                    }
+                    return output;
+                });
+            },
+            ignore: cliTestFn === undefined,
+        });
     });
 }
 

@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-import-prefix
 import { WsBbo } from "@nktkas/hyperliquid/schemas";
 import { deadline } from "jsr:@std/async@1/deadline";
 import { schemaCoverage } from "../../_utils/schema_coverage.ts";

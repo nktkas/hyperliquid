@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-import-prefix
 import { type Args, parseArgs } from "jsr:@std/cli@1/parse-args";
 import { BigNumber } from "npm:bignumber.js@9";
 import { generatePrivateKey } from "npm:viem@2/accounts";

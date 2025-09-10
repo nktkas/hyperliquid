@@ -13,14 +13,14 @@ jobs:
             - uses: actions/checkout@v4
             - uses: denoland/setup-deno@v2
               with:
-                  deno-version: v2.x # Run with latest stable Deno
+                  deno-version: v2.x
             - uses: actions/setup-node@v4
               with:
-                  node-version: "24.x" # Run with latest stable Node.js
-                  registry-url: "https://registry.npmjs.org" # Use npm registry
+                  node-version: "24.x"
+                  registry-url: "https://registry.npmjs.org"
 
             - name: Build package
-              run: deno task build-npm
+              run: deno task build:npm
 
             - name: Get package version and determine tag
               id: version

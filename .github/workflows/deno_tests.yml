@@ -10,7 +10,7 @@ jobs:
             - uses: actions/checkout@v4
             - uses: denoland/setup-deno@v2
               with:
-                  deno-version: v2.x # Run with latest stable Deno
+                  deno-version: v2.x
 
             # Check if the code is formatted according to Deno's default formatting conventions.
             - name: deno fmt

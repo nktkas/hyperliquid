@@ -73,7 +73,7 @@
  */
 
 import * as v from "valibot";
-import { HyperliquidError } from "../errors.ts";
+import { HyperliquidError } from "../_errors.ts";
 
 /** Thrown when a schema validation error occurs.  */
 export class SchemaError extends HyperliquidError {

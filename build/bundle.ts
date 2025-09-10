@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-import-prefix
 /**
  * Builds the Deno library into a bundle and calculates the bundle size
  * Command: deno run --allow-env --allow-read --allow-write --allow-run build/bundle.ts
@@ -13,7 +14,7 @@ const nodeModulesExists = await Deno.stat("./node_modules").then(() => true).cat
 await build({
     plugins: [...denoPlugins({ nodeModulesDir: "auto" })],
     entryPoints: {
-        mod: "./mod.ts",
+        mod: "./src/mod.ts",
         schemas: "./src/schemas/mod.ts",
         signing: "./src/signing/mod.ts",
     },
@@ -33,7 +34,7 @@ if (!nodeModulesExists) {
 }
 
 // Calculate sizes
-async function gzip(data: Uint8Array): Promise<Uint8Array> {
+async function gzip(data: Uint8Array<ArrayBuffer>): Promise<Uint8Array> {
     const [compressed] = await Array.fromAsync(
         ReadableStream.from([data]).pipeThrough(new CompressionStream("gzip")),
     );
