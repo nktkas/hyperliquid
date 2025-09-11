@@ -324,7 +324,7 @@ Trading Operations:
   scheduleCancel          [--time <number>]
 
 TWAP Operations:
-  twapOrder               --a <number> --b <bool> --s <string> --r <bool> --m <number> --t <bool>
+  twapOrder               --a <number> --b <bool> --s <number> --r <bool> --m <number> --t <bool>
   twapCancel              --a <number> --t <number>
 
 Position Management:
@@ -332,19 +332,19 @@ Position Management:
   updateIsolatedMargin    --asset <number> --isBuy <bool> --ntli <number>
 
 Fund Transfers:
-  withdraw3               --destination <address> --amount <string>
-  usdSend                 --destination <address> --amount <string>
-  spotSend                --destination <address> --token <name:address> --amount <string>
-  sendAsset               --destination <address> --token <name:address> --amount <string>
+  withdraw3               --destination <address> --amount <number>
+  usdSend                 --destination <address> --amount <number>
+  spotSend                --destination <address> --token <name:address> --amount <number>
+  sendAsset               --destination <address> --token <name:address> --amount <number>
                           --sourceDex <string> --destinationDex <string> [--fromSubAccount <address>]
-  usdClassTransfer        --amount <string> --toPerp <bool>
+  usdClassTransfer        --amount <number> --toPerp <bool>
 
 Sub-Account Management:
   createSubAccount        --name <string>
   subAccountModify        --subAccountUser <address> --name <string>
   subAccountTransfer      --subAccountUser <address> --isDeposit <bool> --usd <number>
   subAccountSpotTransfer  --subAccountUser <address> --isDeposit <bool> 
-                          --token <name:address> --amount <string>
+                          --token <name:address> --amount <number>
 
 Vault Operations:
   createVault             --name <string> --description <string> --initialUsd <number>
@@ -358,7 +358,7 @@ Agent & Referrer:
   approveBuilderFee       --maxFeeRate <number> --builder <address>
   registerReferrer        --code <string>
   setReferrer             --code <string>
-  setDisplayName          [--displayName <string>]
+  setDisplayName          --displayName <string>
 
 Staking & Delegation:
   tokenDelegate           --validator <address> --wei <number> --isUndelegate <bool>
@@ -392,10 +392,10 @@ Examples:
   npx @nktkas/hyperliquid info candleSnapshot --coin BTC --interval 1h --startTime 1700000000000
 
   # Place a limit order
-  npx @nktkas/hyperliquid exchange order --private-key 0x... --orders '[{\\"a\\":0,\\"b\\":true,\\"p\\":\\"30000\\",\\"s\\":\\"0.1\\",\\"r\\":false,\\"t\\":{\\"limit\\":{\\"tif\\":\\"Gtc\\"}}}]'
+  npx @nktkas/hyperliquid exchange order --private-key 0x... --orders '[{\\"a\\":0,\\"b\\":true,\\"p\\":30000,\\"s\\":0.1,\\"r\\":false,\\"t\\":{\\"limit\\":{\\"tif\\":\\"Gtc\\"}}}]'
 
   # Modify an existing order
-  npx @nktkas/hyperliquid exchange modify --private-key 0x... --oid 12345 --order '{\\"a\\":0,\\"b\\":true,\\"p\\":\\"31000\\",\\"s\\":\\"0.1\\",\\"r\\":false,\\"t\\":{\\"limit\\":{\\"tif\\":\\"Gtc\\"}}}'
+  npx @nktkas/hyperliquid exchange modify --private-key 0x... --oid 12345 --order '{\\"a\\":0,\\"b\\":true,\\"p\\":31000,\\"s\\":0.1,\\"r\\":false,\\"t\\":{\\"limit\\":{\\"tif\\":\\"Gtc\\"}}}'
 
   # Cancel orders
   npx @nktkas/hyperliquid exchange cancel --private-key 0x... --cancels '[{\\"a\\":0,\\"o\\":12345}]'
@@ -404,10 +404,10 @@ Examples:
   npx @nktkas/hyperliquid exchange updateLeverage --private-key 0x... --asset 0 --isCross true --leverage 5
 
   # Withdraw funds
-  npx @nktkas/hyperliquid exchange withdraw3 --private-key 0x... --destination 0x... --amount "100.5"
+  npx @nktkas/hyperliquid exchange withdraw3 --private-key 0x... --destination 0x... --amount 100.5
 
   # Send USD to another user
-  npx @nktkas/hyperliquid exchange usdSend --private-key 0x... --destination 0x... --amount "50.0"
+  npx @nktkas/hyperliquid exchange usdSend --private-key 0x... --destination 0x... --amount 50
 
   # Create a vault
   npx @nktkas/hyperliquid exchange createVault --private-key 0x... --name "My Vault" --description "Test vault" --initialUsd 1000`);
