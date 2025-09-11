@@ -1,4 +1,5 @@
 // deno-lint-ignore-file no-import-prefix
+import { parser, PerpDeployRequest } from "@nktkas/hyperliquid/schemas";
 import { ApiRequestError } from "@nktkas/hyperliquid";
 import { assertRejects } from "jsr:@std/assert@1";
 import { runTest } from "./_t.ts";
@@ -44,5 +45,25 @@ runTest({
                 "Error deploying perp:",
             );
         });
+    },
+    cliTestFn: async (_t, runCommand) => {
+        const data = await runCommand([
+            "exchange",
+            "perpDeploy",
+            "--registerAsset",
+            JSON.stringify({
+                maxGas: 1000000000000,
+                assetRequest: {
+                    coin: "1",
+                    szDecimals: 1,
+                    oraclePx: "1",
+                    marginTableId: 1,
+                    onlyIsolated: true,
+                },
+                dex: "test",
+                schema: null,
+            }),
+        ]);
+        parser(PerpDeployRequest)(JSON.parse(data));
     },
 });

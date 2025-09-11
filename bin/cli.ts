@@ -27,85 +27,11 @@ function isClassMethod<T>(classConstructor: new (...args: any[]) => T, method: s
 
 function transformParams(method: string, params: Record<string, unknown>): Record<string, unknown> {
     switch (method) {
-        case "modify": {
-            v.assert(v.string(), params?.order);
-            return {
-                ...params,
-                order: JSON.parse(params.order),
-            };
-        }
-        case "convertToMultiSigUser": {
-            v.assert(v.string(), params?.authorizedUsers);
-            return {
-                ...params,
-                authorizedUsers: JSON.parse(params.authorizedUsers),
-            };
-        }
         case "cSignerAction": {
             return {
                 ...params,
                 jailSelf: "jailSelf" in params ? null : undefined,
                 unjailSelf: "unjailSelf" in params ? null : undefined,
-            };
-        }
-        case "order": {
-            v.assert(v.string(), params?.orders);
-            return {
-                ...params,
-                orders: JSON.parse(params.orders),
-                grouping: params.grouping ?? "na",
-            };
-        }
-        case "approveAgent": {
-            return {
-                ...params,
-                agentName: params.agentName ?? null,
-            };
-        }
-        case "sendAsset": {
-            return {
-                ...params,
-                fromSubAccount: params.fromSubAccount ?? "",
-            };
-        }
-        case "vaultModify": {
-            return {
-                ...params,
-                allowDeposits: params.allowDeposits ?? null,
-                alwaysCloseOnWithdraw: params.alwaysCloseOnWithdraw ?? null,
-            };
-        }
-        case "setDisplayName": {
-            return {
-                ...params,
-                displayName: params.displayName ?? "",
-            };
-        }
-        case "batchModify": {
-            v.assert(v.string(), params?.modifies);
-            return {
-                ...params,
-                modifies: JSON.parse(params.modifies),
-            };
-        }
-        case "cancel": {
-            v.assert(v.string(), params?.cancels);
-            return {
-                ...params,
-                cancels: JSON.parse(params.cancels),
-            };
-        }
-        case "cancelByCloid": {
-            v.assert(v.string(), params?.cancels);
-            return {
-                ...params,
-                cancels: JSON.parse(params.cancels),
-            };
-        }
-        case "createVault": {
-            return {
-                ...params,
-                nonce: Date.now(),
             };
         }
         case "spotUser": {
@@ -122,10 +48,17 @@ function transformParams(method: string, params: Record<string, unknown>): Recor
                 },
             };
         }
+        case "cValidatorAction": {
+            if ("unregister" in params) {
+                return {
+                    ...params,
+                    unregister: null,
+                };
+            }
+        }
+        /* falls through */
         default: {
-            return {
-                ...params,
-            };
+            return params;
         }
     }
 }
@@ -371,9 +304,15 @@ Spot & EVM Operations:
   evmUserModify           --usingBigBlocks <bool>
   reserveRequestWeight    --weight <number>
 
+Deploy Market:
+  perpDeploy              --registerAsset <json> | --setOracle <json>
+  spotDeploy              --genesis <json> | --registerHyperliquidity <json> | --registerSpot <json> |
+                          --registerToken2 <json> | --setDeployerTradingFeeShare <json> | --userGenesis <json>
+
 Multi-Sig & Advanced:
   convertToMultiSigUser   --authorizedUsers <json> --threshold <number>
   cSignerAction           --jailSelf | --unjailSelf
+  cValidatorAction        --changeProfile <json> | --register <json> | --unregister
   noop                    (no params)
 
 =============================================================================
@@ -413,11 +352,9 @@ Examples:
   npx @nktkas/hyperliquid exchange createVault --private-key 0x... --name "My Vault" --description "Test vault" --initialUsd 1000`);
 }
 
-type FindInArgvTypes = "hex" | "bool" | "number" | "empty";
-function findInArgv(types: FindInArgvTypes | FindInArgvTypes[]): string[] {
-    // Convert to array if one type is passed in
-    const typeArray = Array.isArray(types) ? types : [types];
+type FindInArgvType = "hex" | "bool" | "number" | "empty" | "json_object" | "json_array";
 
+function findInArgv(types: FindInArgvType[]): string[] {
     // Validation functions for each type
     const validators = {
         // to avoid converting them to numbers
@@ -428,6 +365,22 @@ function findInArgv(types: FindInArgvTypes | FindInArgvTypes[]): string[] {
         number: (value: string) => /^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(value),
         // to avoid converting them to booleans
         empty: (value: string) => value === "",
+        json_object: (value: string) => {
+            try {
+                const parsed = JSON.parse(value);
+                return typeof parsed === "object" && parsed !== null && !Array.isArray(parsed);
+            } catch {
+                return false;
+            }
+        },
+        json_array: (value: string) => {
+            try {
+                const parsed = JSON.parse(value);
+                return Array.isArray(parsed);
+            } catch {
+                return false;
+            }
+        },
     };
 
     const foundKeys = [];
@@ -442,7 +395,7 @@ function findInArgv(types: FindInArgvTypes | FindInArgvTypes[]): string[] {
             const value = arg.slice(eqIndex + 1);
 
             // Check value for all requested types
-            for (const type of typeArray) {
+            for (const type of types) {
                 if (validators[type] && validators[type](value)) {
                     foundKeys.push(key);
                     break; // Don't add duplicates
@@ -454,7 +407,7 @@ function findInArgv(types: FindInArgvTypes | FindInArgvTypes[]): string[] {
             const key = arg.slice(2);
 
             // Check value for all requested types
-            for (const type of typeArray) {
+            for (const type of types) {
                 if (validators[type] && validators[type](nextArg)) {
                     foundKeys.push(key);
                     break; // Don't add duplicates
@@ -467,9 +420,10 @@ function findInArgv(types: FindInArgvTypes | FindInArgvTypes[]): string[] {
 }
 
 const cliArgs = parseArgs(process.argv.slice(2), {
-    boolean: ["testnet", "offline", ...findInArgv("bool")],
+    boolean: ["testnet", "offline", ...findInArgv(["bool"])],
     string: ["_", ...findInArgv(["hex", "number", "empty"])],
 });
+findInArgv(["json_object", "json_array"]).forEach((key) => cliArgs[key] = JSON.parse(cliArgs[key])); // Parse JSON strings
 const [endpoint, method] = cliArgs._ as string[];
 
 if (cliArgs.help || cliArgs.h || !endpoint || !method) {

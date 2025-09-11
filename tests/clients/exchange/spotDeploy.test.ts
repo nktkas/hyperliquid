@@ -1,4 +1,5 @@
 // deno-lint-ignore-file no-import-prefix
+import { parser, SpotDeployRequest } from "@nktkas/hyperliquid/schemas";
 import { ApiRequestError } from "@nktkas/hyperliquid";
 import { assertRejects } from "jsr:@std/assert@1";
 import { runTest } from "./_t.ts";
@@ -104,5 +105,22 @@ runTest({
                 "Error deploying spot:",
             );
         });
+    },
+    cliTestFn: async (_t, runCommand) => {
+        const data = await runCommand([
+            "exchange",
+            "spotDeploy",
+            "--registerToken2",
+            JSON.stringify({
+                spec: {
+                    name: "TestToken",
+                    szDecimals: 8,
+                    weiDecimals: 8,
+                },
+                maxGas: 1000000,
+                fullName: "TestToken (TT)",
+            }),
+        ]);
+        parser(SpotDeployRequest)(JSON.parse(data));
     },
 });
