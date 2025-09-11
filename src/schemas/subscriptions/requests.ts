@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Hex } from "../_base.ts";
+import { Address } from "../_base.ts";
 
 /**
  * Subscription to context events for a specific perpetual asset.
@@ -42,7 +42,7 @@ export const WsActiveAssetDataRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -172,7 +172,7 @@ export const WsClearinghouseStateRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** DEX name (empty string for main dex). */
@@ -265,7 +265,7 @@ export const WsNotificationRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -287,7 +287,7 @@ export const WsOpenOrdersRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** DEX name (empty string for main dex). */
@@ -314,7 +314,7 @@ export const WsOrderUpdatesRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -358,7 +358,7 @@ export const WsUserEventsRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -380,7 +380,7 @@ export const WsUserFillsRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
@@ -407,7 +407,7 @@ export const WsUserFundingsRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -429,7 +429,7 @@ export const WsUserNonFundingLedgerUpdatesRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -451,7 +451,7 @@ export const WsUserTwapHistoryRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -473,7 +473,7 @@ export const WsUserTwapSliceFillsRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -495,7 +495,7 @@ export const WsWebData2Request = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),

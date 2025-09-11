@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { Address, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /** Status of the deploy auction. */
 export const DeployAuctionStatus = v.pipe(
@@ -115,7 +115,7 @@ export const SpotDeployState = v.pipe(
                     ),
                     /** User genesis balances for the token. */
                     userGenesisBalances: v.pipe(
-                        v.array(v.tuple([v.pipe(Hex, v.length(42)), UnsignedDecimal])),
+                        v.array(v.tuple([Address, UnsignedDecimal])),
                         v.description("User genesis balances for the token."),
                     ),
                     /** Existing token genesis balances for the token. */
@@ -125,7 +125,7 @@ export const SpotDeployState = v.pipe(
                     ),
                     /** Blacklisted users for the token. */
                     blacklistUsers: v.pipe(
-                        v.array(v.pipe(Hex, v.length(42))),
+                        v.array(Address),
                         v.description("Blacklisted users for the token."),
                     ),
                 }),

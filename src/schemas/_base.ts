@@ -40,6 +40,9 @@ export const Hex = v.pipe(
 );
 export type Hex = v.InferOutput<typeof Hex>;
 
+export const Address = v.pipe(Hex, v.length(42));
+export type Address = v.InferOutput<typeof Address>;
+
 export const TokenId = v.pipe(
     v.string(),
     v.regex(/^[^:]+:0x[0-9a-fA-F]+$/),

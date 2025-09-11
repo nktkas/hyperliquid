@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Decimal, Hex, Integer, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { Address, Decimal, Hex, Integer, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /** Mapping of coin symbols to mid prices. */
 export const AllMids = v.pipe(
@@ -124,12 +124,12 @@ export const PerpDex = v.pipe(
         ),
         /** Hex address of the dex deployer. */
         deployer: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Hex address of the dex deployer."),
         ),
         /** Hex address of the oracle updater, or null if not available. */
         oracle_updater: v.pipe(
-            v.nullable(v.pipe(Hex, v.length(42))),
+            v.nullable(Address),
             v.description("Hex address of the oracle updater, or null if not available."),
         ),
     }),
@@ -447,7 +447,7 @@ export const SpotToken = v.pipe(
                 v.object({
                     /** Contract address. */
                     address: v.pipe(
-                        v.pipe(Hex, v.length(42)),
+                        Address,
                         v.description("Contract address."),
                     ),
                     /** Extra decimals in the token's smallest unit. */
@@ -592,7 +592,7 @@ export const TokenDetails = v.pipe(
                 v.object({
                     /** User balances. */
                     userBalances: v.pipe(
-                        v.array(v.tuple([v.pipe(Hex, v.length(42)), v.string()])),
+                        v.array(v.tuple([Address, v.string()])),
                         v.description("User balances."),
                     ),
                     /** Existing token balances. */
@@ -602,7 +602,7 @@ export const TokenDetails = v.pipe(
                     ),
                     /** Blacklisted users. */
                     blacklistUsers: v.pipe(
-                        v.array(v.pipe(Hex, v.length(42))),
+                        v.array(Address),
                         v.description("Blacklisted users."),
                     ),
                 }),
@@ -611,7 +611,7 @@ export const TokenDetails = v.pipe(
         ),
         /** Deployer address. */
         deployer: v.pipe(
-            v.nullable(v.pipe(Hex, v.length(42))),
+            v.nullable(Address),
             v.description("Deployer address."),
         ),
         /** Gas used during token deployment. */
@@ -631,7 +631,7 @@ export const TokenDetails = v.pipe(
         ),
         /** Non-circulating user balances of the token. */
         nonCirculatingUserBalances: v.pipe(
-            v.array(v.tuple([v.pipe(Hex, v.length(42)), v.string()])),
+            v.array(v.tuple([Address, v.string()])),
             v.description("Non-circulating user balances of the token."),
         ),
         /** Future emissions amount. */
@@ -684,7 +684,7 @@ export const Trade = v.pipe(
         ),
         /** Addresses of users involved in the trade [Maker, Taker]. */
         users: v.pipe(
-            v.tuple([v.pipe(Hex, v.length(42)), v.pipe(Hex, v.length(42))]),
+            v.tuple([Address, Address]),
             v.description("Addresses of users involved in the trade [Maker, Taker]."),
         ),
     }),

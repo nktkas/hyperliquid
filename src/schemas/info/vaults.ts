@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Decimal, Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { Address, Decimal, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 import { PortfolioPeriods } from "./accounts.ts";
 
 /** Vault relationship configuration. */
@@ -23,7 +23,7 @@ export const VaultRelationship = v.pipe(
                 v.object({
                     /** Child vault addresses. */
                     childAddresses: v.pipe(
-                        v.array(v.pipe(Hex, v.length(42))),
+                        v.array(Address),
                         v.description("Child vault addresses."),
                     ),
                 }),
@@ -40,7 +40,7 @@ export const VaultFollowerState = v.pipe(
     v.object({
         /** Follower address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Follower address."),
         ),
         /** Follower vault equity. */
@@ -88,12 +88,12 @@ export const VaultDetails = v.pipe(
         ),
         /** Vault address. */
         vaultAddress: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Vault address."),
         ),
         /** Leader address. */
         leader: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Leader address."),
         ),
         /** Vault description. */
@@ -134,7 +134,7 @@ export const VaultDetails = v.pipe(
                     ...v.object({
                         /** Follower address or Leader. */
                         user: v.pipe(
-                            v.union([v.pipe(Hex, v.length(42)), v.literal("Leader")]),
+                            v.union([Address, v.literal("Leader")]),
                             v.description("Follower address or Leader."),
                         ),
                     }).entries,
@@ -182,7 +182,7 @@ export const VaultEquity = v.pipe(
     v.object({
         /** Vault address. */
         vaultAddress: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Vault address."),
         ),
         /** User deposited equity. */
@@ -210,12 +210,12 @@ export const VaultSummary = v.pipe(
         ),
         /** Vault address. */
         vaultAddress: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Vault address."),
         ),
         /** Leader address. */
         leader: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Leader address."),
         ),
         /** Total value locked. */
@@ -248,7 +248,7 @@ export const VaultLeading = v.pipe(
     v.object({
         /** Vault address. */
         address: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Vault address."),
         ),
         /** Vault name. */

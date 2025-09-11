@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 import {
     FundingUpdate,
     PerpsClearinghouseState,
@@ -121,7 +121,7 @@ export const WsClearinghouseState = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** Perpetual clearinghouse state. */
@@ -157,7 +157,7 @@ export const WsOpenOrders = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** Array of open orders. */
@@ -210,7 +210,7 @@ export const WsTrade = v.pipe(
         ),
         /** Addresses of users involved in the trade [Maker, Taker]. */
         users: v.pipe(
-            v.tuple([v.pipe(Hex, v.length(42)), v.pipe(Hex, v.length(42))]),
+            v.tuple([Address, Address]),
             v.description("Addresses of users involved in the trade [Maker, Taker]."),
         ),
     }),
@@ -257,12 +257,12 @@ export const WsUserEventLiquidation = v.pipe(
                 ),
                 /** Address of the liquidator. */
                 liquidator: v.pipe(
-                    v.pipe(Hex, v.length(42)),
+                    Address,
                     v.description("Address of the liquidator."),
                 ),
                 /** Address of the liquidated user. */
                 liquidated_user: v.pipe(
-                    v.pipe(Hex, v.length(42)),
+                    Address,
                     v.description("Address of the liquidated user."),
                 ),
                 /** Notional position size that was liquidated. */
@@ -354,7 +354,7 @@ export const WsUserFills = v.pipe(
     v.object({
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** Array of fill events. */
@@ -377,7 +377,7 @@ export const WsUserFundings = v.pipe(
     v.object({
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** Array of funding events. */
@@ -405,7 +405,7 @@ export const WsUserNonFundingLedgerUpdates = v.pipe(
     v.object({
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** Array of non-funding ledger updates. */
@@ -428,7 +428,7 @@ export const WsUserTwapHistory = v.pipe(
     v.object({
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** Array of historical TWAP fills. */
@@ -451,7 +451,7 @@ export const WsUserTwapSliceFills = v.pipe(
     v.object({
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** Array of TWAP slice fills. */
@@ -483,7 +483,7 @@ export const WsWebData2 = v.pipe(
                 v.object({
                     /** Address of the vault. */
                     address: v.pipe(
-                        v.pipe(Hex, v.length(42)),
+                        Address,
                         v.description("Address of the vault."),
                     ),
                     /** Name of the vault. */
@@ -507,7 +507,7 @@ export const WsWebData2 = v.pipe(
         ),
         /** Agent address if one exists. */
         agentAddress: v.pipe(
-            v.union([v.pipe(Hex, v.length(42)), v.null()]),
+            v.union([Address, v.null()]),
             v.description("Agent address if one exists."),
         ),
         /** Timestamp until which the agent is valid. */
@@ -542,7 +542,7 @@ export const WsWebData2 = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** TWAP states. */

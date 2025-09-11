@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Decimal, Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { Address, Decimal, Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 import { FrontendOrder, TwapState } from "./orders.ts";
 import { PerpsAssetCtx, PerpsMeta, SpotAssetCtx } from "./assets.ts";
 
@@ -8,7 +8,7 @@ export const ActiveAssetData = v.pipe(
     v.object({
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** Asset symbol (e.g., BTC). */
@@ -224,7 +224,7 @@ export const ExtraAgent = v.pipe(
     v.object({
         /** Extra agent address. */
         address: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Extra agent address."),
         ),
         /** Extra agent name. */
@@ -271,7 +271,7 @@ export const MultiSigSigners = v.pipe(
     v.object({
         /** Authorized users addresses. */
         authorizedUsers: v.pipe(
-            v.array(v.pipe(Hex, v.length(42))),
+            v.array(Address),
             v.minLength(1),
             v.description("Authorized users addresses."),
         ),
@@ -442,7 +442,7 @@ export const Referral = v.pipe(
                 v.object({
                     /** Referrer address. */
                     referrer: v.pipe(
-                        v.pipe(Hex, v.length(42)),
+                        Address,
                         v.description("Referrer address."),
                     ),
                     /** Referral code used. */
@@ -527,7 +527,7 @@ export const Referral = v.pipe(
                                         ),
                                         /** Address of the referred user. */
                                         user: v.pipe(
-                                            v.pipe(Hex, v.length(42)),
+                                            Address,
                                             v.description("Address of the referred user."),
                                         ),
                                         /** Mapping of token IDs to referral reward states. */
@@ -722,12 +722,12 @@ export const SubAccount = v.pipe(
         ),
         /** Sub-account address. */
         subAccountUser: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Sub-account address."),
         ),
         /** Master account address. */
         master: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Master account address."),
         ),
         /** Perpetual trading clearinghouse state summary. */
@@ -1050,7 +1050,7 @@ export const UserRole = v.pipe(
                 v.object({
                     /** Master account address associated with the agent. */
                     user: v.pipe(
-                        v.pipe(Hex, v.length(42)),
+                        Address,
                         v.description("Master account address associated with the agent."),
                     ),
                 }),
@@ -1068,7 +1068,7 @@ export const UserRole = v.pipe(
                 v.object({
                     /** Master account address associated with the sub-account. */
                     master: v.pipe(
-                        v.pipe(Hex, v.length(42)),
+                        Address,
                         v.description("Master account address associated with the sub-account."),
                     ),
                 }),
@@ -1136,12 +1136,12 @@ export const InternalTransferUpdate = v.pipe(
         ),
         /** Initiator address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Initiator address."),
         ),
         /** Destination address. */
         destination: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Destination address."),
         ),
         /** Transfer fee. */
@@ -1248,12 +1248,12 @@ export const SpotTransferUpdate = v.pipe(
         ),
         /** Initiator address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Initiator address."),
         ),
         /** Destination address. */
         destination: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Destination address."),
         ),
         /** Transfer fee. */
@@ -1292,12 +1292,12 @@ export const SubAccountTransferUpdate = v.pipe(
         ),
         /** Initiator address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Initiator address."),
         ),
         /** Destination address. */
         destination: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Destination address."),
         ),
     }),
@@ -1315,7 +1315,7 @@ export const VaultCreateUpdate = v.pipe(
         ),
         /** Address of the created vault. */
         vault: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Address of the created vault."),
         ),
         /** Initial allocated amount in USDC. */
@@ -1343,7 +1343,7 @@ export const VaultDepositUpdate = v.pipe(
         ),
         /** Address of the target vault. */
         vault: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Address of the target vault."),
         ),
         /** Amount deposited in USDC. */
@@ -1366,7 +1366,7 @@ export const VaultDistributionUpdate = v.pipe(
         ),
         /** Address of the vault distributing funds. */
         vault: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Address of the vault distributing funds."),
         ),
         /** Amount distributed in USDC. */
@@ -1389,12 +1389,12 @@ export const VaultWithdrawUpdate = v.pipe(
         ),
         /** Vault address. */
         vault: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Vault address."),
         ),
         /** Address of the user withdrawing funds. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Address of the user withdrawing funds."),
         ),
         /** Withdrawal request amount in USD. */
@@ -1505,7 +1505,7 @@ export const WebData2 = v.pipe(
                 v.object({
                     /** Address of the vault. */
                     address: v.pipe(
-                        v.pipe(Hex, v.length(42)),
+                        Address,
                         v.description("Address of the vault."),
                     ),
                     /** Name of the vault. */
@@ -1529,7 +1529,7 @@ export const WebData2 = v.pipe(
         ),
         /** Agent address if one exists. */
         agentAddress: v.pipe(
-            v.union([v.pipe(Hex, v.length(42)), v.null()]),
+            v.union([Address, v.null()]),
             v.description("Agent address if one exists."),
         ),
         /** Timestamp until which the agent is valid. */
@@ -1564,7 +1564,7 @@ export const WebData2 = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** TWAP states. */

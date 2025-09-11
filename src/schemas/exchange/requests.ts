@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Hex, TokenId, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { Address, Hex, TokenId, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 import { TIF } from "../info/orders.ts";
 
 /** Deeply removes undefined keys from an object.  */
@@ -164,12 +164,12 @@ export const ApproveAgentRequest = v.pipe(
                 ),
                 /** Agent address. */
                 agentAddress: v.pipe(
-                    v.pipe(Hex, v.length(42)),
+                    Address,
                     v.description("Agent address."),
                 ),
-                /** Agent name or null for unnamed agent. */
+                /** Agent name or null for unnamed agent (default: null). */
                 agentName: v.pipe(
-                    v.nullable(v.string()),
+                    v.optional(v.nullable(v.string()), null),
                     v.description("Agent name or null for unnamed agent."),
                 ),
                 /** Unique request identifier (current timestamp in ms). */
@@ -228,7 +228,7 @@ export const ApproveBuilderFeeRequest = v.pipe(
                 ),
                 /** Builder address. */
                 builder: v.pipe(
-                    v.pipe(Hex, v.length(42)),
+                    Address,
                     v.description("Builder address."),
                 ),
                 /** Unique request identifier (current timestamp in ms). */
@@ -304,7 +304,7 @@ export const BatchModifyRequest = v.pipe(
         ),
         /** Vault address (for vault trading). */
         vaultAddress: v.pipe(
-            v.optional(v.pipe(Hex, v.length(42))),
+            v.optional(Address),
             v.description("Vault address (for vault trading)."),
         ),
         /** Expiration time of the action. */
@@ -364,7 +364,7 @@ export const CancelRequest = v.pipe(
         ),
         /** Vault address (for vault trading). */
         vaultAddress: v.pipe(
-            v.optional(v.pipe(Hex, v.length(42))),
+            v.optional(Address),
             v.description("Vault address (for vault trading)."),
         ),
         /** Expiration time of the action. */
@@ -424,7 +424,7 @@ export const CancelByCloidRequest = v.pipe(
         ),
         /** Vault address (for vault trading). */
         vaultAddress: v.pipe(
-            v.optional(v.pipe(Hex, v.length(42))),
+            v.optional(Address),
             v.description("Vault address (for vault trading)."),
         ),
         /** Expiration time of the action. */
@@ -537,7 +537,7 @@ export const ConvertToMultiSigUserRequestSigners = v.pipe(
         v.object({
             /** List of authorized user addresses. */
             authorizedUsers: v.pipe(
-                v.array(v.pipe(Hex, v.length(42))),
+                v.array(Address),
                 v.description("List of authorized user addresses."),
             ),
             /** Minimum number of signatures required. */
@@ -706,9 +706,9 @@ export const CreateVaultRequest = v.pipe(
                     v.minValue(100000000), // 100 USDC
                     v.description("Initial balance (float * 1e6)."),
                 ),
-                /** Unique request identifier (current timestamp in ms). */
+                /** Unique request identifier (current timestamp in ms) (default: Date.now()). */
                 nonce: v.pipe(
-                    UnsignedInteger,
+                    v.optional(UnsignedInteger, () => Date.now()), // default value is allowed because this is an L1 action
                     v.description("Unique request identifier (current timestamp in ms)."),
                 ),
             }),
@@ -863,7 +863,7 @@ export const CValidatorActionRequest = v.pipe(
                             ),
                             /** Signer address. */
                             signer: v.pipe(
-                                v.nullable(v.pipe(Hex, v.length(42))),
+                                v.nullable(Address),
                                 v.description("Signer address."),
                             ),
                         }),
@@ -916,7 +916,7 @@ export const CValidatorActionRequest = v.pipe(
                                     ),
                                     /** Signer address. */
                                     signer: v.pipe(
-                                        v.pipe(Hex, v.length(42)),
+                                        Address,
                                         v.description("Signer address."),
                                     ),
                                 }),
@@ -1118,7 +1118,7 @@ export const ModifyRequest = v.pipe(
         ),
         /** Vault address (for vault trading). */
         vaultAddress: v.pipe(
-            v.optional(v.pipe(Hex, v.length(42))),
+            v.optional(Address),
             v.description("Vault address (for vault trading)."),
         ),
         /** Expiration time of the action. */
@@ -1193,16 +1193,12 @@ export const OrderRequest = v.pipe(
                 ),
                 /**
                  * Order grouping strategy:
-                 * - `na`: Standard order without grouping.
+                 * - `na`: Standard order without grouping (default).
                  * - `normalTpsl`: TP/SL order with fixed size that doesn't adjust with position changes.
                  * - `positionTpsl`: TP/SL order that adjusts proportionally with the position size.
                  */
                 grouping: v.pipe(
-                    v.union([
-                        v.literal("na"),
-                        v.literal("normalTpsl"),
-                        v.literal("positionTpsl"),
-                    ]),
+                    v.optional(v.union([v.literal("na"), v.literal("normalTpsl"), v.literal("positionTpsl")]), "na"),
                     v.description(
                         "Order grouping strategy:" +
                             "\n- `na`: Standard order without grouping." +
@@ -1215,7 +1211,7 @@ export const OrderRequest = v.pipe(
                     v.optional(v.object({
                         /** Builder address. */
                         b: v.pipe(
-                            v.pipe(Hex, v.length(42)),
+                            Address,
                             v.description("Builder address."),
                         ),
                         /** Builder fee in 0.1bps (1 = 0.0001%). */
@@ -1241,7 +1237,7 @@ export const OrderRequest = v.pipe(
         ),
         /** Vault address (for vault trading). */
         vaultAddress: v.pipe(
-            v.optional(v.pipe(Hex, v.length(42))),
+            v.optional(Address),
             v.description("Vault address (for vault trading)."),
         ),
         /** Expiration time of the action. */
@@ -1335,7 +1331,7 @@ export const PerpDeployRequest = v.pipe(
                                         ),
                                         /** User to update oracles. If not provided, then deployer is assumed to be oracle updater. */
                                         oracleUpdater: v.pipe(
-                                            v.nullable(v.pipe(Hex, v.length(42))),
+                                            v.nullable(Address),
                                             v.description(
                                                 "User to update oracles. If not provided, then deployer is assumed to be oracle updater.",
                                             ),
@@ -1544,7 +1540,7 @@ export const ScheduleCancelRequest = v.pipe(
         ),
         /** Vault address (for vault trading). */
         vaultAddress: v.pipe(
-            v.optional(v.pipe(Hex, v.length(42))),
+            v.optional(Address),
             v.description("Vault address (for vault trading)."),
         ),
         /** Expiration time of the action. */
@@ -1585,7 +1581,7 @@ export const SendAssetRequest = v.pipe(
                 ),
                 /** Destination address. */
                 destination: v.pipe(
-                    v.pipe(Hex, v.length(42)),
+                    Address,
                     v.description("Destination address."),
                 ),
                 /** Source DEX ("" for default USDC perp DEX, "spot" for spot). */
@@ -1608,12 +1604,9 @@ export const SendAssetRequest = v.pipe(
                     UnsignedDecimal,
                     v.description("Amount to send (not in wei)."),
                 ),
-                /** Source sub-account address ("" for main account). */
+                /** Source sub-account address ("" for main account) (default: ""). */
                 fromSubAccount: v.pipe(
-                    v.union([
-                        v.literal(""),
-                        v.pipe(Hex, v.length(42)),
-                    ]),
+                    v.optional(v.union([v.literal(""), Address]), ""),
                     v.description('Source sub-account address ("" for main account).'),
                 ),
                 /** Unique request identifier (current timestamp in ms). */
@@ -1938,7 +1931,7 @@ export const SpotDeployRequest = v.pipe(
                                 ),
                                 /** Array of tuples: [user address, genesis amount in wei]. */
                                 userAndWei: v.pipe(
-                                    v.array(v.tuple([v.pipe(Hex, v.length(42)), UnsignedDecimal])),
+                                    v.array(v.tuple([Address, UnsignedDecimal])),
                                     v.description("Array of tuples: [user address, genesis amount in wei]."),
                                 ),
                                 /** Array of tuples: [existing token identifier, genesis amount in wei]. */
@@ -1955,7 +1948,7 @@ export const SpotDeployRequest = v.pipe(
                                 ),
                                 /** Array of tuples: [user address, blacklist status] (`true` for blacklist, `false` to remove existing blacklisted user). */
                                 blacklistUsers: v.pipe(
-                                    v.optional(v.array(v.tuple([v.pipe(Hex, v.length(42)), v.boolean()]))),
+                                    v.optional(v.array(v.tuple([Address, v.boolean()]))),
                                     v.description(
                                         "Array of tuples: [user address, blacklist status] (`true` for blacklist, `false` to remove existing blacklisted user).",
                                     ),
@@ -2025,7 +2018,7 @@ export const SpotSendRequest = v.pipe(
                 ),
                 /** Destination address. */
                 destination: v.pipe(
-                    v.pipe(Hex, v.length(42)),
+                    Address,
                     v.description("Destination address."),
                 ),
                 /** Token identifier. */
@@ -2129,7 +2122,7 @@ export const SubAccountModifyRequest = v.pipe(
                 ),
                 /** Sub-account address to modify. */
                 subAccountUser: v.pipe(
-                    v.pipe(Hex, v.length(42)),
+                    Address,
                     v.description("Sub-account address to modify."),
                 ),
                 /** New sub-account name. */
@@ -2179,7 +2172,7 @@ export const SubAccountSpotTransferRequest = v.pipe(
                 ),
                 /** Sub-account address. */
                 subAccountUser: v.pipe(
-                    v.pipe(Hex, v.length(42)),
+                    Address,
                     v.description("Sub-account address."),
                 ),
                 /** `true` for deposit, `false` for withdrawal. */
@@ -2238,7 +2231,7 @@ export const SubAccountTransferRequest = v.pipe(
                 ),
                 /** Sub-account address. */
                 subAccountUser: v.pipe(
-                    v.pipe(Hex, v.length(42)),
+                    Address,
                     v.description("Sub-account address."),
                 ),
                 /** `true` for deposit, `false` for withdrawal. */
@@ -2302,7 +2295,7 @@ export const TokenDelegateRequest = v.pipe(
                 ),
                 /** Validator address. */
                 validator: v.pipe(
-                    v.pipe(Hex, v.length(42)),
+                    Address,
                     v.description("Validator address."),
                 ),
                 /** Amount for delegate/undelegate (float * 1e8). */
@@ -2379,7 +2372,7 @@ export const TwapCancelRequest = v.pipe(
         ),
         /** Vault address (for vault trading). */
         vaultAddress: v.pipe(
-            v.optional(v.pipe(Hex, v.length(42))),
+            v.optional(Address),
             v.description("Vault address (for vault trading)."),
         ),
         /** Expiration time of the action. */
@@ -2459,7 +2452,7 @@ export const TwapOrderRequest = v.pipe(
         ),
         /** Vault address (for vault trading). */
         vaultAddress: v.pipe(
-            v.optional(v.pipe(Hex, v.length(42))),
+            v.optional(Address),
             v.description("Vault address (for vault trading)."),
         ),
         /** Expiration time of the action. */
@@ -2518,7 +2511,7 @@ export const UpdateIsolatedMarginRequest = v.pipe(
         ),
         /** Vault address (for vault trading). */
         vaultAddress: v.pipe(
-            v.optional(v.pipe(Hex, v.length(42))),
+            v.optional(Address),
             v.description("Vault address (for vault trading)."),
         ),
         /** Expiration time of the action. */
@@ -2577,7 +2570,7 @@ export const UpdateLeverageRequest = v.pipe(
         ),
         /** Vault address (for vault trading). */
         vaultAddress: v.pipe(
-            v.optional(v.pipe(Hex, v.length(42))),
+            v.optional(Address),
             v.description("Vault address (for vault trading)."),
         ),
         /** Expiration time of the action. */
@@ -2677,7 +2670,7 @@ export const UsdSendRequest = v.pipe(
                 ),
                 /** Destination address. */
                 destination: v.pipe(
-                    v.pipe(Hex, v.length(42)),
+                    Address,
                     v.description("Destination address."),
                 ),
                 /** Amount to send (1 = 1$). */
@@ -2726,7 +2719,7 @@ export const VaultDistributeRequest = v.pipe(
                 ),
                 /** Vault address. */
                 vaultAddress: v.pipe(
-                    v.pipe(Hex, v.length(42)),
+                    Address,
                     v.description("Vault address."),
                 ),
                 /**
@@ -2782,17 +2775,17 @@ export const VaultModifyRequest = v.pipe(
                 ),
                 /** Vault address. */
                 vaultAddress: v.pipe(
-                    v.pipe(Hex, v.length(42)),
+                    Address,
                     v.description("Vault address."),
                 ),
-                /** Allow deposits from followers. */
+                /** Allow deposits from followers (default: null). */
                 allowDeposits: v.pipe(
-                    v.nullable(v.boolean()),
+                    v.optional(v.nullable(v.boolean()), null),
                     v.description("Allow deposits from followers."),
                 ),
-                /** Always close positions on withdrawal. */
+                /** Always close positions on withdrawal (default: null). */
                 alwaysCloseOnWithdraw: v.pipe(
-                    v.nullable(v.boolean()),
+                    v.optional(v.nullable(v.boolean()), null),
                     v.description("Always close positions on withdrawal."),
                 ),
             }),
@@ -2836,7 +2829,7 @@ export const VaultTransferRequest = v.pipe(
                 ),
                 /** Vault address. */
                 vaultAddress: v.pipe(
-                    v.pipe(Hex, v.length(42)),
+                    Address,
                     v.description("Vault address."),
                 ),
                 /** `true` for deposit, `false` for withdrawal. */
@@ -2900,7 +2893,7 @@ export const Withdraw3Request = v.pipe(
                 ),
                 /** Destination address. */
                 destination: v.pipe(
-                    v.pipe(Hex, v.length(42)),
+                    Address,
                     v.description("Destination address."),
                 ),
                 /** Amount to withdraw (1 = 1$). */
@@ -2962,12 +2955,12 @@ export const MultiSigRequest = v.pipe(
                     v.object({
                         /** Address of the multi-signature user account. */
                         multiSigUser: v.pipe(
-                            v.pipe(Hex, v.length(42)),
+                            Address,
                             v.description("Address of the multi-signature user account."),
                         ),
                         /** Address of the authorized user initiating the request (any authorized user). */
                         outerSigner: v.pipe(
-                            v.pipe(Hex, v.length(42)),
+                            Address,
                             v.description(
                                 "Address of the authorized user initiating the request (any authorized user).",
                             ),
@@ -3037,7 +3030,7 @@ export const MultiSigRequest = v.pipe(
         ),
         /** Vault address (for vault trading). */
         vaultAddress: v.pipe(
-            v.optional(v.pipe(Hex, v.length(42))),
+            v.optional(Address),
             v.description("Vault address (for vault trading)."),
         ),
         /** Expiration time of the action. */

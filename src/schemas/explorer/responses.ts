@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Hex, UnsignedInteger } from "../_base.ts";
+import { Address, Hex, UnsignedInteger } from "../_base.ts";
 
 /** Transaction details. */
 export const TxDetails = v.pipe(
@@ -37,7 +37,7 @@ export const TxDetails = v.pipe(
         ),
         /** Creator's address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Creator's address."),
         ),
     }),
@@ -88,7 +88,7 @@ export const BlockDetails = v.pipe(
         ),
         /** Block proposer address. */
         proposer: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Block proposer address."),
         ),
         /** List of transactions. */

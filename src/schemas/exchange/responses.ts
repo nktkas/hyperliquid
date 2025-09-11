@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /** Response for order cancellation. */
 export const CancelResponse = v.pipe(
@@ -100,7 +100,7 @@ export const CreateSubAccountResponse = v.pipe(
                 ),
                 /** Sub-account address. */
                 data: v.pipe(
-                    v.pipe(Hex, v.length(42)),
+                    Address,
                     v.description("Sub-account address."),
                 ),
             }),
@@ -129,7 +129,7 @@ export const CreateVaultResponse = v.pipe(
                 ),
                 /** Vault address. */
                 data: v.pipe(
-                    v.pipe(Hex, v.length(42)),
+                    Address,
                     v.description("Vault address."),
                 ),
             }),

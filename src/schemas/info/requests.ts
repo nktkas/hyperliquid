@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Hex, UnsignedInteger } from "../_base.ts";
+import { Address, Hex, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request user active asset data.
@@ -20,7 +20,7 @@ export const ActiveAssetDataRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -122,7 +122,7 @@ export const ClearinghouseStateRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** DEX name (empty string for main dex). */
@@ -149,7 +149,7 @@ export const DelegationsRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -171,7 +171,7 @@ export const DelegatorHistoryRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -193,7 +193,7 @@ export const DelegatorRewardsRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -215,7 +215,7 @@ export const DelegatorSummaryRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -254,7 +254,7 @@ export const ExtraAgentsRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -276,7 +276,7 @@ export const FrontendOpenOrdersRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** DEX name (empty string for main dex). */
@@ -335,7 +335,7 @@ export const HistoricalOrdersRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -357,7 +357,7 @@ export const IsVipRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -411,7 +411,7 @@ export const LeadingVaultsRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -433,7 +433,7 @@ export const LegalCheckRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -494,12 +494,12 @@ export const MaxBuilderFeeRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** Builder address. */
         builder: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Builder address."),
         ),
     }),
@@ -582,7 +582,7 @@ export const OpenOrdersRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** DEX name (empty string for main dex). */
@@ -609,7 +609,7 @@ export const OrderStatusRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** Order ID or Client Order ID. */
@@ -692,7 +692,7 @@ export const PortfolioRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -731,12 +731,12 @@ export const PreTransferCheckRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** Source address. */
         source: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Source address."),
         ),
     }),
@@ -758,7 +758,7 @@ export const ReferralRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -780,7 +780,7 @@ export const SpotClearinghouseStateRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** DEX name (empty string for main dex). */
@@ -807,7 +807,7 @@ export const SpotDeployStateRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -880,7 +880,7 @@ export const SubAccountsRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -924,7 +924,7 @@ export const TwapHistoryRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -946,7 +946,7 @@ export const UserFeesRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -968,7 +968,7 @@ export const UserFillsRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
@@ -995,7 +995,7 @@ export const UserFillsByTimeRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** Start time (in ms since epoch). */
@@ -1032,7 +1032,7 @@ export const UserFundingRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** Start time (in ms since epoch). */
@@ -1064,7 +1064,7 @@ export const UserNonFundingLedgerUpdatesRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** Start time (in ms since epoch). */
@@ -1096,7 +1096,7 @@ export const UserRateLimitRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -1118,7 +1118,7 @@ export const UserRoleRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -1140,7 +1140,7 @@ export const UserToMultiSigSignersRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -1162,7 +1162,7 @@ export const UserTwapSliceFillsRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -1184,7 +1184,7 @@ export const UserTwapSliceFillsByTimeRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
         /** Start time (in ms since epoch). */
@@ -1221,7 +1221,7 @@ export const UserVaultEquitiesRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
@@ -1277,12 +1277,12 @@ export const VaultDetailsRequest = v.pipe(
         ),
         /** Vault address. */
         vaultAddress: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Vault address."),
         ),
         /** User address. */
         user: v.pipe(
-            v.nullish(v.pipe(Hex, v.length(42))),
+            v.nullish(Address),
             v.description("User address."),
         ),
     }),
@@ -1382,7 +1382,7 @@ export const WebData2Request = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),

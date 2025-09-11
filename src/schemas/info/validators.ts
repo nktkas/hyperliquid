@@ -1,12 +1,12 @@
 import * as v from "valibot";
-import { Hex, Integer, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { Address, Hex, Integer, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /** User delegation to a validator. */
 export const Delegation = v.pipe(
     v.object({
         /** Validator address. */
         validator: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Validator address."),
         ),
         /** Amount of tokens delegated to the validator. */
@@ -83,7 +83,7 @@ export const DelegatorUpdateDelegate = v.pipe(
             v.object({
                 /** Address of the validator receiving or losing delegation. */
                 validator: v.pipe(
-                    v.pipe(Hex, v.length(42)),
+                    Address,
                     v.description("Address of the validator receiving or losing delegation."),
                 ),
                 /** Amount of tokens being delegated or undelegated. */
@@ -202,12 +202,12 @@ export const ValidatorSummary = v.pipe(
     v.object({
         /** Address of the validator. */
         validator: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Address of the validator."),
         ),
         /** Address of the validator signer. */
         signer: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Address of the validator signer."),
         ),
         /** Name of the validator. */
@@ -281,7 +281,7 @@ export const ValidatorL1Vote = v.pipe(
         }),
         /** List of validator addresses that cast this vote. */
         votes: v.pipe(
-            v.array(v.pipe(Hex, v.length(42))),
+            v.array(Address),
             v.description("List of validator addresses that cast this vote."),
         ),
     }),

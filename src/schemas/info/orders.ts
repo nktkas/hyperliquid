@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Decimal, Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { Address, Decimal, Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /** Order book level. */
 export const BookLevel = v.pipe(
@@ -52,7 +52,7 @@ export const FillLiquidation = v.pipe(
     v.object({
         /** Address of the liquidated user. */
         liquidatedUser: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("Address of the liquidated user."),
         ),
         /** Mark price at the time of liquidation. */
@@ -508,7 +508,7 @@ export const TwapState = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),

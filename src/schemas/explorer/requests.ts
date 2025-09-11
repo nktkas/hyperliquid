@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Hex, UnsignedInteger } from "../_base.ts";
+import { Address, Hex, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request block details by block height.
@@ -56,7 +56,7 @@ export const UserDetailsRequest = v.pipe(
         ),
         /** User address. */
         user: v.pipe(
-            v.pipe(Hex, v.length(42)),
+            Address,
             v.description("User address."),
         ),
     }),
