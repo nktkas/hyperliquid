@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Hex, UnsignedIntegerMayInputString } from "../_base.ts";
+import { Hex, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request block details by block height.
@@ -14,7 +14,7 @@ export const BlockDetailsRequest = v.pipe(
         ),
         /** Block height. */
         height: v.pipe(
-            UnsignedIntegerMayInputString,
+            UnsignedInteger,
             v.description("Block height."),
         ),
     }),

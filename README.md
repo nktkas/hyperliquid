@@ -759,7 +759,7 @@ Also valibot schema can be converted to JSON Schema:
 import { OrderRequest } from "@nktkas/hyperliquid/schemas";
 import { toJsonSchema } from "@valibot/to-json-schema";
 
-const schema = toJsonSchema(OrderRequest, { errorMode: "ignore" });
+const schema = toJsonSchema(OrderRequest, { errorMode: "ignore", typeMode: "output" });
 
 console.log(JSON.stringify(schema, null, 2));
 // {
