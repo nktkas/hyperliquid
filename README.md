@@ -196,6 +196,14 @@ const multiSignClient = new hl.MultiSignClient({
 await multiSignClient.approveAgent({ agentAddress: "0x..." });
 ```
 
+### CLI
+
+The SDK includes a command-line interface for quick interactions with Hyperliquid API without writing code.
+
+```bash
+npx @nktkas/hyperliquid --help
+```
+
 ## Usage
 
 ### 1) Initialize Transport
