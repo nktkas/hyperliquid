@@ -21,6 +21,7 @@ import {
     CWithdrawRequest,
     type ErrorResponse,
     EvmUserModifyRequest,
+    Hex,
     ModifyRequest,
     MultiSigRequest,
     NoopRequest,
@@ -66,6 +67,7 @@ import {
     signUserSignedAction,
     userSignedActionEip712Types,
 } from "../signing/mod.ts";
+import type * as v from "valibot";
 
 type MaybePromise<T> = T | Promise<T>;
 
@@ -84,7 +86,7 @@ export interface ExchangeClientParameters<
     /** The viem or ethers.js wallet used for signing transactions. */
     wallet: W;
     /** Sets a default vaultAddress to be used if no vaultAddress is explicitly passed to a method. */
-    defaultVaultAddress?: `0x${string}`;
+    defaultVaultAddress?: string;
     /** Sets a default expiresAfter to be used if no expiresAfter is explicitly passed to a method. */
     defaultExpiresAfter?: number | (() => MaybePromise<number>);
     /**
@@ -93,7 +95,7 @@ export interface ExchangeClientParameters<
      *
      * Defaults to get chain id from wallet otherwise `0x1`.
      */
-    signatureChainId?: `0x${string}` | (() => MaybePromise<`0x${string}`>);
+    signatureChainId?: string | (() => MaybePromise<string>);
     /**
      * Function to get the next nonce for signing transactions.
      *
@@ -109,90 +111,92 @@ type ExtractRequestAction<T extends { action: Record<string, unknown> }> = T["ac
     ? DistributiveOmit<T["action"], "type" | "signatureChainId" | "hyperliquidChain" | "nonce" | "time"> // user-signed actions
     : DistributiveOmit<T["action"], "type">; // L1 actions
 /** Action parameters for the {@linkcode ExchangeClient.approveAgent} method. */
-export type ApproveAgentParameters = ExtractRequestAction<ApproveAgentRequest>;
+export type ApproveAgentParameters = ExtractRequestAction<v.InferInput<typeof ApproveAgentRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.approveBuilderFee} method. */
-export type ApproveBuilderFeeParameters = ExtractRequestAction<ApproveBuilderFeeRequest>;
+export type ApproveBuilderFeeParameters = ExtractRequestAction<v.InferInput<typeof ApproveBuilderFeeRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.batchModify} method. */
-export type BatchModifyParameters = ExtractRequestAction<BatchModifyRequest>;
+export type BatchModifyParameters = ExtractRequestAction<v.InferInput<typeof BatchModifyRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.cancel} method. */
-export type CancelParameters = ExtractRequestAction<CancelRequest>;
+export type CancelParameters = ExtractRequestAction<v.InferInput<typeof CancelRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.cancelByCloid} method. */
-export type CancelByCloidParameters = ExtractRequestAction<CancelByCloidRequest>;
+export type CancelByCloidParameters = ExtractRequestAction<v.InferInput<typeof CancelByCloidRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.cDeposit} method. */
-export type CDepositParameters = ExtractRequestAction<CDepositRequest>;
+export type CDepositParameters = ExtractRequestAction<v.InferInput<typeof CDepositRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.convertToMultiSigUser} method. */
 export type ConvertToMultiSigUserParameters =
-    & Omit<ExtractRequestAction<ConvertToMultiSigUserRequest>, "signers">
+    & Omit<ExtractRequestAction<v.InferInput<typeof ConvertToMultiSigUserRequest>>, "signers">
     & {
         /** Signers configuration. */
         signers: ConvertToMultiSigUserRequestSigners;
     };
 /** Action parameters for the {@linkcode ExchangeClient.createSubAccount} method. */
-export type CreateSubAccountParameters = ExtractRequestAction<CreateSubAccountRequest>;
+export type CreateSubAccountParameters = ExtractRequestAction<v.InferInput<typeof CreateSubAccountRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.createVault} method. */
-export type CreateVaultParameters = ExtractRequestAction<CreateVaultRequest>;
+export type CreateVaultParameters = ExtractRequestAction<v.InferInput<typeof CreateVaultRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.cSignerAction} method. */
-export type CSignerActionParameters = ExtractRequestAction<CSignerActionRequest>;
+export type CSignerActionParameters = ExtractRequestAction<v.InferInput<typeof CSignerActionRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.cValidatorAction} method. */
-export type CValidatorActionParameters = ExtractRequestAction<CValidatorActionRequest>;
+export type CValidatorActionParameters = ExtractRequestAction<v.InferInput<typeof CValidatorActionRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.cWithdraw} method. */
-export type CWithdrawParameters = ExtractRequestAction<CWithdrawRequest>;
+export type CWithdrawParameters = ExtractRequestAction<v.InferInput<typeof CWithdrawRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.evmUserModify} method. */
-export type EvmUserModifyParameters = ExtractRequestAction<EvmUserModifyRequest>;
+export type EvmUserModifyParameters = ExtractRequestAction<v.InferInput<typeof EvmUserModifyRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.modify} method. */
-export type ModifyParameters = ExtractRequestAction<ModifyRequest>;
+export type ModifyParameters = ExtractRequestAction<v.InferInput<typeof ModifyRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.multiSig} method. */
-export type MultiSigParameters = ExtractRequestAction<MultiSigRequest> & Pick<MultiSigRequest, "nonce">;
+export type MultiSigParameters =
+    & ExtractRequestAction<v.InferInput<typeof MultiSigRequest>>
+    & Pick<v.InferInput<typeof MultiSigRequest>, "nonce">;
 /** Action parameters for the {@linkcode ExchangeClient.order} method. */
-export type OrderParameters = ExtractRequestAction<OrderRequest>;
+export type OrderParameters = ExtractRequestAction<v.InferInput<typeof OrderRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.perpDeploy} method. */
-export type PerpDeployParameters = ExtractRequestAction<PerpDeployRequest>;
+export type PerpDeployParameters = ExtractRequestAction<v.InferInput<typeof PerpDeployRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.registerReferrer} method. */
-export type RegisterReferrerParameters = ExtractRequestAction<RegisterReferrerRequest>;
+export type RegisterReferrerParameters = ExtractRequestAction<v.InferInput<typeof RegisterReferrerRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.reserveRequestWeight} method. */
-export type ReserveRequestWeightParameters = ExtractRequestAction<ReserveRequestWeightRequest>;
+export type ReserveRequestWeightParameters = ExtractRequestAction<v.InferInput<typeof ReserveRequestWeightRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.scheduleCancel} method. */
-export type ScheduleCancelParameters = ExtractRequestAction<ScheduleCancelRequest>;
+export type ScheduleCancelParameters = ExtractRequestAction<v.InferInput<typeof ScheduleCancelRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.sendAsset} method. */
-export type SendAssetParameters = ExtractRequestAction<SendAssetRequest>;
+export type SendAssetParameters = ExtractRequestAction<v.InferInput<typeof SendAssetRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.setDisplayName} method. */
-export type SetDisplayNameParameters = ExtractRequestAction<SetDisplayNameRequest>;
+export type SetDisplayNameParameters = ExtractRequestAction<v.InferInput<typeof SetDisplayNameRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.setReferrer} method. */
-export type SetReferrerParameters = ExtractRequestAction<SetReferrerRequest>;
+export type SetReferrerParameters = ExtractRequestAction<v.InferInput<typeof SetReferrerRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.spotDeploy} method. */
-export type SpotDeployParameters = ExtractRequestAction<SpotDeployRequest>;
+export type SpotDeployParameters = ExtractRequestAction<v.InferInput<typeof SpotDeployRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.spotSend} method. */
-export type SpotSendParameters = ExtractRequestAction<SpotSendRequest>;
+export type SpotSendParameters = ExtractRequestAction<v.InferInput<typeof SpotSendRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.spotUser} method. */
-export type SpotUserParameters = ExtractRequestAction<SpotUserRequest>;
+export type SpotUserParameters = ExtractRequestAction<v.InferInput<typeof SpotUserRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.subAccountModify} method. */
-export type SubAccountModifyParameters = ExtractRequestAction<SubAccountModifyRequest>;
+export type SubAccountModifyParameters = ExtractRequestAction<v.InferInput<typeof SubAccountModifyRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.subAccountSpotTransfer} method. */
-export type SubAccountSpotTransferParameters = ExtractRequestAction<SubAccountSpotTransferRequest>;
+export type SubAccountSpotTransferParameters = ExtractRequestAction<v.InferInput<typeof SubAccountSpotTransferRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.subAccountTransfer} method. */
-export type SubAccountTransferParameters = ExtractRequestAction<SubAccountTransferRequest>;
+export type SubAccountTransferParameters = ExtractRequestAction<v.InferInput<typeof SubAccountTransferRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.tokenDelegate} method. */
-export type TokenDelegateParameters = ExtractRequestAction<TokenDelegateRequest>;
+export type TokenDelegateParameters = ExtractRequestAction<v.InferInput<typeof TokenDelegateRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.twapCancel} method. */
-export type TwapCancelParameters = ExtractRequestAction<TwapCancelRequest>;
+export type TwapCancelParameters = ExtractRequestAction<v.InferInput<typeof TwapCancelRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.twapOrder} method. */
-export type TwapOrderParameters = ExtractRequestAction<TwapOrderRequest>;
+export type TwapOrderParameters = ExtractRequestAction<v.InferInput<typeof TwapOrderRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.updateIsolatedMargin} method. */
-export type UpdateIsolatedMarginParameters = ExtractRequestAction<UpdateIsolatedMarginRequest>;
+export type UpdateIsolatedMarginParameters = ExtractRequestAction<v.InferInput<typeof UpdateIsolatedMarginRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.updateLeverage} method. */
-export type UpdateLeverageParameters = ExtractRequestAction<UpdateLeverageRequest>;
+export type UpdateLeverageParameters = ExtractRequestAction<v.InferInput<typeof UpdateLeverageRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.usdClassTransfer} method. */
-export type UsdClassTransferParameters = ExtractRequestAction<UsdClassTransferRequest>;
+export type UsdClassTransferParameters = ExtractRequestAction<v.InferInput<typeof UsdClassTransferRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.usdSend} method. */
-export type UsdSendParameters = ExtractRequestAction<UsdSendRequest>;
+export type UsdSendParameters = ExtractRequestAction<v.InferInput<typeof UsdSendRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.vaultDistribute} method. */
-export type VaultDistributeParameters = ExtractRequestAction<VaultDistributeRequest>;
+export type VaultDistributeParameters = ExtractRequestAction<v.InferInput<typeof VaultDistributeRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.vaultModify} method. */
-export type VaultModifyParameters = ExtractRequestAction<VaultModifyRequest>;
+export type VaultModifyParameters = ExtractRequestAction<v.InferInput<typeof VaultModifyRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.vaultTransfer} method. */
-export type VaultTransferParameters = ExtractRequestAction<VaultTransferRequest>;
+export type VaultTransferParameters = ExtractRequestAction<v.InferInput<typeof VaultTransferRequest>>;
 /** Action parameters for the {@linkcode ExchangeClient.withdraw3} method. */
-export type Withdraw3Parameters = ExtractRequestAction<Withdraw3Request>;
+export type Withdraw3Parameters = ExtractRequestAction<v.InferInput<typeof Withdraw3Request>>;
 
 interface BaseRequestOptions {
     /**
@@ -206,89 +210,89 @@ type ExtractRequestOptions<T extends { action: Record<string, unknown> }> =
     & BaseRequestOptions
     & Omit<T, "action" | "nonce" | "signature">;
 /** Request options for the {@linkcode ExchangeClient.approveAgent} method. */
-export type ApproveAgentOptions = ExtractRequestOptions<ApproveAgentRequest>;
+export type ApproveAgentOptions = ExtractRequestOptions<v.InferInput<typeof ApproveAgentRequest>>;
 /** Request options for the {@linkcode ExchangeClient.approveBuilderFee} method. */
-export type ApproveBuilderFeeOptions = ExtractRequestOptions<ApproveBuilderFeeRequest>;
+export type ApproveBuilderFeeOptions = ExtractRequestOptions<v.InferInput<typeof ApproveBuilderFeeRequest>>;
 /** Request options for the {@linkcode ExchangeClient.batchModify} method. */
-export type BatchModifyOptions = ExtractRequestOptions<BatchModifyRequest>;
+export type BatchModifyOptions = ExtractRequestOptions<v.InferInput<typeof BatchModifyRequest>>;
 /** Request options for the {@linkcode ExchangeClient.cancel} method. */
-export type CancelOptions = ExtractRequestOptions<CancelRequest>;
+export type CancelOptions = ExtractRequestOptions<v.InferInput<typeof CancelRequest>>;
 /** Request options for the {@linkcode ExchangeClient.cancelByCloid} method. */
-export type CancelByCloidOptions = ExtractRequestOptions<CancelByCloidRequest>;
+export type CancelByCloidOptions = ExtractRequestOptions<v.InferInput<typeof CancelByCloidRequest>>;
 /** Request options for the {@linkcode ExchangeClient.cDeposit} method. */
-export type CDepositOptions = ExtractRequestOptions<CDepositRequest>;
+export type CDepositOptions = ExtractRequestOptions<v.InferInput<typeof CDepositRequest>>;
 /** Request options for the {@linkcode ExchangeClient.claimRewards} method. */
-export type ClaimRewardsOptions = ExtractRequestOptions<ClaimRewardsRequest>;
+export type ClaimRewardsOptions = ExtractRequestOptions<v.InferInput<typeof ClaimRewardsRequest>>;
 /** Request options for the {@linkcode ExchangeClient.convertToMultiSigUser} method. */
-export type ConvertToMultiSigUserOptions = ExtractRequestOptions<ConvertToMultiSigUserRequest>;
+export type ConvertToMultiSigUserOptions = ExtractRequestOptions<v.InferInput<typeof ConvertToMultiSigUserRequest>>;
 /** Request options for the {@linkcode ExchangeClient.createSubAccount} method. */
-export type CreateSubAccountOptions = ExtractRequestOptions<CreateSubAccountRequest>;
+export type CreateSubAccountOptions = ExtractRequestOptions<v.InferInput<typeof CreateSubAccountRequest>>;
 /** Request options for the {@linkcode ExchangeClient.createVault} method. */
-export type CreateVaultOptions = ExtractRequestOptions<CreateVaultRequest>;
+export type CreateVaultOptions = ExtractRequestOptions<v.InferInput<typeof CreateVaultRequest>>;
 /** Request options for the {@linkcode ExchangeClient.cSignerAction} method. */
-export type CSignerActionOptions = ExtractRequestOptions<CSignerActionRequest>;
+export type CSignerActionOptions = ExtractRequestOptions<v.InferInput<typeof CSignerActionRequest>>;
 /** Request options for the {@linkcode ExchangeClient.cValidatorAction} method. */
-export type CValidatorActionOptions = ExtractRequestOptions<CValidatorActionRequest>;
+export type CValidatorActionOptions = ExtractRequestOptions<v.InferInput<typeof CValidatorActionRequest>>;
 /** Request options for the {@linkcode ExchangeClient.cWithdraw} method. */
-export type CWithdrawOptions = ExtractRequestOptions<CWithdrawRequest>;
+export type CWithdrawOptions = ExtractRequestOptions<v.InferInput<typeof CWithdrawRequest>>;
 /** Request options for the {@linkcode ExchangeClient.evmUserModify} method. */
-export type EvmUserModifyOptions = ExtractRequestOptions<EvmUserModifyRequest>;
+export type EvmUserModifyOptions = ExtractRequestOptions<v.InferInput<typeof EvmUserModifyRequest>>;
 /** Request options for the {@linkcode ExchangeClient.modify} method. */
-export type ModifyOptions = ExtractRequestOptions<ModifyRequest>;
+export type ModifyOptions = ExtractRequestOptions<v.InferInput<typeof ModifyRequest>>;
 /** Request options for the {@linkcode ExchangeClient.multiSig} method. */
-export type MultiSigOptions = ExtractRequestOptions<MultiSigRequest>;
+export type MultiSigOptions = ExtractRequestOptions<v.InferInput<typeof MultiSigRequest>>;
 /** Request options for the {@linkcode ExchangeClient.noop} method. */
-export type NoopOptions = ExtractRequestOptions<NoopRequest>;
+export type NoopOptions = ExtractRequestOptions<v.InferInput<typeof NoopRequest>>;
 /** Request options for the {@linkcode ExchangeClient.order} method. */
-export type OrderOptions = ExtractRequestOptions<OrderRequest>;
+export type OrderOptions = ExtractRequestOptions<v.InferInput<typeof OrderRequest>>;
 /** Request options for the {@linkcode ExchangeClient.perpDeploy} method. */
-export type PerpDeployOptions = ExtractRequestOptions<PerpDeployRequest>;
+export type PerpDeployOptions = ExtractRequestOptions<v.InferInput<typeof PerpDeployRequest>>;
 /** Request options for the {@linkcode ExchangeClient.registerReferrer} method. */
-export type RegisterReferrerOptions = ExtractRequestOptions<RegisterReferrerRequest>;
+export type RegisterReferrerOptions = ExtractRequestOptions<v.InferInput<typeof RegisterReferrerRequest>>;
 /** Request options for the {@linkcode ExchangeClient.reserveRequestWeight} method. */
-export type ReserveRequestWeightOptions = ExtractRequestOptions<ReserveRequestWeightRequest>;
+export type ReserveRequestWeightOptions = ExtractRequestOptions<v.InferInput<typeof ReserveRequestWeightRequest>>;
 /** Request options for the {@linkcode ExchangeClient.scheduleCancel} method. */
-export type ScheduleCancelOptions = ExtractRequestOptions<ScheduleCancelRequest>;
+export type ScheduleCancelOptions = ExtractRequestOptions<v.InferInput<typeof ScheduleCancelRequest>>;
 /** Request options for the {@linkcode ExchangeClient.sendAsset} method. */
-export type SendAssetOptions = ExtractRequestOptions<SendAssetRequest>;
+export type SendAssetOptions = ExtractRequestOptions<v.InferInput<typeof SendAssetRequest>>;
 /** Request options for the {@linkcode ExchangeClient.setDisplayName} method. */
-export type SetDisplayNameOptions = ExtractRequestOptions<SetDisplayNameRequest>;
+export type SetDisplayNameOptions = ExtractRequestOptions<v.InferInput<typeof SetDisplayNameRequest>>;
 /** Request options for the {@linkcode ExchangeClient.setReferrer} method. */
-export type SetReferrerOptions = ExtractRequestOptions<SetReferrerRequest>;
+export type SetReferrerOptions = ExtractRequestOptions<v.InferInput<typeof SetReferrerRequest>>;
 /** Request options for the {@linkcode ExchangeClient.spotDeploy} method. */
-export type SpotDeployOptions = ExtractRequestOptions<SpotDeployRequest>;
+export type SpotDeployOptions = ExtractRequestOptions<v.InferInput<typeof SpotDeployRequest>>;
 /** Request options for the {@linkcode ExchangeClient.spotSend} method. */
-export type SpotSendOptions = ExtractRequestOptions<SpotSendRequest>;
+export type SpotSendOptions = ExtractRequestOptions<v.InferInput<typeof SpotSendRequest>>;
 /** Request options for the {@linkcode ExchangeClient.spotUser} method. */
-export type SpotUserOptions = ExtractRequestOptions<SpotUserRequest>;
+export type SpotUserOptions = ExtractRequestOptions<v.InferInput<typeof SpotUserRequest>>;
 /** Request options for the {@linkcode ExchangeClient.subAccountModify} method. */
-export type SubAccountModifyOptions = ExtractRequestOptions<SubAccountModifyRequest>;
+export type SubAccountModifyOptions = ExtractRequestOptions<v.InferInput<typeof SubAccountModifyRequest>>;
 /** Request options for the {@linkcode ExchangeClient.subAccountSpotTransfer} method. */
-export type SubAccountSpotTransferOptions = ExtractRequestOptions<SubAccountSpotTransferRequest>;
+export type SubAccountSpotTransferOptions = ExtractRequestOptions<v.InferInput<typeof SubAccountSpotTransferRequest>>;
 /** Request options for the {@linkcode ExchangeClient.subAccountTransfer} method. */
-export type SubAccountTransferOptions = ExtractRequestOptions<SubAccountTransferRequest>;
+export type SubAccountTransferOptions = ExtractRequestOptions<v.InferInput<typeof SubAccountTransferRequest>>;
 /** Request options for the {@linkcode ExchangeClient.tokenDelegate} method. */
-export type TokenDelegateOptions = ExtractRequestOptions<TokenDelegateRequest>;
+export type TokenDelegateOptions = ExtractRequestOptions<v.InferInput<typeof TokenDelegateRequest>>;
 /** Request options for the {@linkcode ExchangeClient.twapCancel} method. */
-export type TwapCancelOptions = ExtractRequestOptions<TwapCancelRequest>;
+export type TwapCancelOptions = ExtractRequestOptions<v.InferInput<typeof TwapCancelRequest>>;
 /** Request options for the {@linkcode ExchangeClient.twapOrder} method. */
-export type TwapOrderOptions = ExtractRequestOptions<TwapOrderRequest>;
+export type TwapOrderOptions = ExtractRequestOptions<v.InferInput<typeof TwapOrderRequest>>;
 /** Request options for the {@linkcode ExchangeClient.updateIsolatedMargin} method. */
-export type UpdateIsolatedMarginOptions = ExtractRequestOptions<UpdateIsolatedMarginRequest>;
+export type UpdateIsolatedMarginOptions = ExtractRequestOptions<v.InferInput<typeof UpdateIsolatedMarginRequest>>;
 /** Request options for the {@linkcode ExchangeClient.updateLeverage} method. */
-export type UpdateLeverageOptions = ExtractRequestOptions<UpdateLeverageRequest>;
+export type UpdateLeverageOptions = ExtractRequestOptions<v.InferInput<typeof UpdateLeverageRequest>>;
 /** Request options for the {@linkcode ExchangeClient.usdClassTransfer} method. */
-export type UsdClassTransferOptions = ExtractRequestOptions<UsdClassTransferRequest>;
+export type UsdClassTransferOptions = ExtractRequestOptions<v.InferInput<typeof UsdClassTransferRequest>>;
 /** Request options for the {@linkcode ExchangeClient.usdSend} method. */
-export type UsdSendOptions = ExtractRequestOptions<UsdSendRequest>;
+export type UsdSendOptions = ExtractRequestOptions<v.InferInput<typeof UsdSendRequest>>;
 /** Request options for the {@linkcode ExchangeClient.vaultDistribute} method. */
-export type VaultDistributeOptions = ExtractRequestOptions<VaultDistributeRequest>;
+export type VaultDistributeOptions = ExtractRequestOptions<v.InferInput<typeof VaultDistributeRequest>>;
 /** Request options for the {@linkcode ExchangeClient.vaultModify} method. */
-export type VaultModifyOptions = ExtractRequestOptions<VaultModifyRequest>;
+export type VaultModifyOptions = ExtractRequestOptions<v.InferInput<typeof VaultModifyRequest>>;
 /** Request options for the {@linkcode ExchangeClient.vaultTransfer} method. */
-export type VaultTransferOptions = ExtractRequestOptions<VaultTransferRequest>;
+export type VaultTransferOptions = ExtractRequestOptions<v.InferInput<typeof VaultTransferRequest>>;
 /** Request options for the {@linkcode ExchangeClient.withdraw3} method. */
-export type Withdraw3Options = ExtractRequestOptions<Withdraw3Request>;
+export type Withdraw3Options = ExtractRequestOptions<v.InferInput<typeof Withdraw3Request>>;
 
 /** Thrown when an API request fails. */
 export class ApiRequestError extends HyperliquidError {
@@ -417,9 +421,9 @@ export class ExchangeClient<
     constructor(args: ExchangeClientParameters<T, W>) {
         this.transport = args.transport;
         this.wallet = args.wallet;
-        this.defaultVaultAddress = args.defaultVaultAddress;
+        this.defaultVaultAddress = parser(Hex)(args.defaultVaultAddress);
         this.defaultExpiresAfter = args.defaultExpiresAfter;
-        this.signatureChainId = args.signatureChainId ?? (() => getWalletChainId(this.wallet));
+        this.signatureChainId = parser(Hex)(args.signatureChainId) ?? (() => getWalletChainId(this.wallet));
         this.nonceManager = args.nonceManager ?? new NonceManager().getNonce;
     }
 
@@ -536,8 +540,8 @@ export class ExchangeClient<
             type: "batchModify",
             ...params,
         });
-        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
@@ -574,8 +578,8 @@ export class ExchangeClient<
             type: "cancel",
             ...params,
         });
-        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
@@ -612,8 +616,8 @@ export class ExchangeClient<
             type: "cancelByCloid",
             ...params,
         });
-        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
@@ -678,7 +682,7 @@ export class ExchangeClient<
         const action = parser(ClaimRewardsRequest.entries.action)({
             type: "claimRewards",
         });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -755,7 +759,7 @@ export class ExchangeClient<
             type: "createSubAccount",
             ...params,
         });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -793,7 +797,7 @@ export class ExchangeClient<
             type: "createVault",
             ...params,
         });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -830,7 +834,7 @@ export class ExchangeClient<
             type: "CSignerAction",
             ...params,
         });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -893,7 +897,7 @@ export class ExchangeClient<
             type: "CValidatorAction",
             ...params,
         });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -961,7 +965,7 @@ export class ExchangeClient<
             type: "evmUserModify",
             ...params,
         });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1005,8 +1009,8 @@ export class ExchangeClient<
             type: "modify",
             ...params,
         });
-        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
@@ -1093,9 +1097,17 @@ export class ExchangeClient<
             signatureChainId: await this._getSignatureChainId(),
             ...params,
         });
-        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
-        return await this._executeMultiSigAction({ action, vaultAddress, expiresAfter, nonce }, opts?.signal);
+        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        return await this._executeMultiSigAction(
+            {
+                action,
+                vaultAddress,
+                expiresAfter,
+                nonce: Number(nonce),
+            },
+            opts?.signal,
+        );
     }
 
     /**
@@ -1140,8 +1152,8 @@ export class ExchangeClient<
             type: "order",
             ...params,
         });
-        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
@@ -1171,7 +1183,7 @@ export class ExchangeClient<
         const action = parser(NoopRequest.entries.action)({
             type: "noop",
         });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1217,7 +1229,7 @@ export class ExchangeClient<
             type: "perpDeploy",
             ...params,
         });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1250,7 +1262,7 @@ export class ExchangeClient<
             type: "registerReferrer",
             ...params,
         });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1283,7 +1295,7 @@ export class ExchangeClient<
             type: "reserveRequestWeight",
             ...params,
         });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1327,8 +1339,8 @@ export class ExchangeClient<
             type: "scheduleCancel",
             ...params,
         });
-        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
@@ -1403,7 +1415,7 @@ export class ExchangeClient<
             type: "setDisplayName",
             ...params,
         });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1436,7 +1448,7 @@ export class ExchangeClient<
             type: "setReferrer",
             ...params,
         });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1479,7 +1491,7 @@ export class ExchangeClient<
             type: "spotDeploy",
             ...params,
         });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1551,7 +1563,7 @@ export class ExchangeClient<
             type: "spotUser",
             ...params,
         });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1584,7 +1596,7 @@ export class ExchangeClient<
             type: "subAccountModify",
             ...params,
         });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1622,7 +1634,7 @@ export class ExchangeClient<
             type: "subAccountSpotTransfer",
             ...params,
         });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1655,7 +1667,7 @@ export class ExchangeClient<
             type: "subAccountTransfer",
             ...params,
         });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1723,8 +1735,8 @@ export class ExchangeClient<
             type: "twapCancel",
             ...params,
         });
-        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
@@ -1766,8 +1778,8 @@ export class ExchangeClient<
             type: "twapOrder",
             ...params,
         });
-        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
@@ -1800,8 +1812,8 @@ export class ExchangeClient<
             type: "updateIsolatedMargin",
             ...params,
         });
-        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
@@ -1834,8 +1846,8 @@ export class ExchangeClient<
             type: "updateLeverage",
             ...params,
         });
-        const vaultAddress = opts?.vaultAddress ?? this.defaultVaultAddress;
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
@@ -1938,7 +1950,7 @@ export class ExchangeClient<
             type: "vaultDistribute",
             ...params,
         });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1975,7 +1987,7 @@ export class ExchangeClient<
             type: "vaultModify",
             ...params,
         });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -2008,7 +2020,7 @@ export class ExchangeClient<
             type: "vaultTransfer",
             ...params,
         });
-        const expiresAfter = opts?.expiresAfter ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -2060,7 +2072,7 @@ export class ExchangeClient<
         request: {
             action: Record<string, unknown>;
             vaultAddress?: `0x${string}`;
-            expiresAfter: number | string | undefined;
+            expiresAfter: number | undefined;
         },
         signal?: AbortSignal,
     ): Promise<T> {
@@ -2074,7 +2086,7 @@ export class ExchangeClient<
             nonce,
             isTestnet: this.transport.isTestnet,
             vaultAddress,
-            expiresAfter: typeof expiresAfter === "string" ? Number(expiresAfter) : expiresAfter,
+            expiresAfter,
         });
 
         // Send a request
@@ -2157,9 +2169,9 @@ export class ExchangeClient<
                 signatureChainId: `0x${string}`;
                 [key: string]: unknown;
             };
-            nonce: number | string;
+            nonce: number;
             vaultAddress?: `0x${string}`;
-            expiresAfter?: number | string;
+            expiresAfter?: number;
         },
         signal?: AbortSignal,
     ): Promise<T> {
@@ -2169,10 +2181,10 @@ export class ExchangeClient<
         const signature = await signMultiSigAction({
             wallet: this.wallet,
             action,
-            nonce: typeof nonce === "string" ? Number(nonce) : nonce,
+            nonce,
             isTestnet: this.transport.isTestnet,
             vaultAddress,
-            expiresAfter: typeof expiresAfter === "string" ? Number(expiresAfter) : expiresAfter,
+            expiresAfter,
         });
 
         // Send a request

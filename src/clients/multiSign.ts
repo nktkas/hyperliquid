@@ -1,13 +1,15 @@
 import type { IRequestTransport } from "../transports/base.ts";
-import type {
-    CancelSuccessResponse,
-    CreateSubAccountResponse,
-    CreateVaultResponse,
-    MultiSigRequest,
-    OrderSuccessResponse,
-    SuccessResponse,
-    TwapCancelSuccessResponse,
-    TwapOrderSuccessResponse,
+import {
+    type CancelSuccessResponse,
+    type CreateSubAccountResponse,
+    type CreateVaultResponse,
+    Hex,
+    parser,
+    type MultiSigRequest,
+    type OrderSuccessResponse,
+    type SuccessResponse,
+    type TwapCancelSuccessResponse,
+    type TwapOrderSuccessResponse,
 } from "../schemas/mod.ts";
 import { ExchangeClient, type ExchangeClientParameters } from "./exchange.ts";
 import {
@@ -24,7 +26,7 @@ export interface MultiSignClientParameters<
     S extends readonly AbstractWallet[] = AbstractWallet[],
 > extends Omit<ExchangeClientParameters<T, S[0]>, "wallet"> {
     /** The multi-signature account address. */
-    multiSignAddress: `0x${string}`;
+    multiSignAddress: string;
     /** Array of wallets used for multi-signature operations. The first wallet acts as the leader. */
     signers: S;
 }
@@ -65,7 +67,7 @@ export class MultiSignClient<
      */
     constructor(args: MultiSignClientParameters<T, S>) {
         super({ ...args, wallet: args.signers[0] });
-        this.multiSignAddress = args.multiSignAddress;
+        this.multiSignAddress = parser(Hex)(args.multiSignAddress);
         this.signers = args.signers;
 
         Object.defineProperty(this, "wallet", {
@@ -96,7 +98,7 @@ export class MultiSignClient<
                 { type: keyof typeof userSignedActionEip712Types }
             >;
             vaultAddress?: `0x${string}`;
-            expiresAfter: number | string | undefined;
+            expiresAfter: number | undefined;
         },
         signal?: AbortSignal,
     ): Promise<T> {
@@ -112,7 +114,7 @@ export class MultiSignClient<
                 nonce,
                 isTestnet: this.transport.isTestnet,
                 vaultAddress,
-                expiresAfter: typeof expiresAfter === "string" ? Number(expiresAfter) : expiresAfter,
+                expiresAfter,
             });
         }));
 

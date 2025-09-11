@@ -45,6 +45,7 @@ import {
     type WsWebData2,
     WsWebData2Request,
 } from "../schemas/mod.ts";
+import type * as v from "valibot";
 
 /** @see https://github.com/microsoft/TypeScript/issues/13923#issuecomment-2191862501 */
 type DeepImmutable<T> = {
@@ -58,43 +59,43 @@ export interface SubscriptionClientParameters<T extends ISubscriptionTransport =
 }
 
 /** Subscription parameters for the {@linkcode SubscriptionClient.activeAssetCtx} method. */
-export type WsActiveAssetCtxParameters = Omit<WsActiveAssetCtxRequest, "type">;
+export type WsActiveAssetCtxParameters = Omit<v.InferInput<typeof WsActiveAssetCtxRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.activeAssetData} method. */
-export type WsActiveAssetDataParameters = Omit<WsActiveAssetDataRequest, "type">;
+export type WsActiveAssetDataParameters = Omit<v.InferInput<typeof WsActiveAssetDataRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.allMids} method. */
-export type WsAllMidsParameters = Omit<WsAllMidsRequest, "type">;
+export type WsAllMidsParameters = Omit<v.InferInput<typeof  WsAllMidsRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.assetCtxs} method. */
-export type WsAssetCtxsParameters = Omit<WsAssetCtxsRequest, "type">;
+export type WsAssetCtxsParameters = Omit<v.InferInput<typeof WsAssetCtxsRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.bbo} method. */
-export type WsBboParameters = Omit<WsBboRequest, "type">;
+export type WsBboParameters = Omit<v.InferInput<typeof WsBboRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.candle} method. */
-export type WsCandleParameters = Omit<WsCandleRequest, "type">;
+export type WsCandleParameters = Omit<v.InferInput<typeof WsCandleRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.clearinghouseState} method. */
-export type WsClearinghouseStateParameters = Omit<WsClearinghouseStateRequest, "type">;
+export type WsClearinghouseStateParameters = Omit<v.InferInput<typeof WsClearinghouseStateRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.l2Book} method. */
-export type WsL2BookParameters = Omit<WsL2BookRequest, "type">;
+export type WsL2BookParameters = Omit<v.InferInput<typeof WsL2BookRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.notification} method. */
-export type WsNotificationParameters = Omit<WsNotificationRequest, "type">;
+export type WsNotificationParameters = Omit<v.InferInput<typeof WsNotificationRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.openOrders} method. */
-export type WsOpenOrdersParameters = Omit<WsOpenOrdersRequest, "type">;
+export type WsOpenOrdersParameters = Omit<v.InferInput<typeof WsOpenOrdersRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.orderUpdates} method. */
-export type WsOrderUpdatesParameters = Omit<WsOrderUpdatesRequest, "type">;
+export type WsOrderUpdatesParameters = Omit<v.InferInput<typeof WsOrderUpdatesRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.trades} method. */
-export type WsTradesParameters = Omit<WsTradesRequest, "type">;
+export type WsTradesParameters = Omit<v.InferInput<typeof WsTradesRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userEvents} method. */
-export type WsUserEventsParameters = Omit<WsUserEventsRequest, "type">;
+export type WsUserEventsParameters = Omit<v.InferInput<typeof WsUserEventsRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userFills} method. */
-export type WsUserFillsParameters = Omit<WsUserFillsRequest, "type">;
+export type WsUserFillsParameters = Omit<v.InferInput<typeof WsUserFillsRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userFundings} method. */
-export type WsUserFundingsParameters = Omit<WsUserFundingsRequest, "type">;
+export type WsUserFundingsParameters = Omit<v.InferInput<typeof WsUserFundingsRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userNonFundingLedgerUpdates} method. */
-export type WsUserNonFundingLedgerUpdatesParameters = Omit<WsUserNonFundingLedgerUpdatesRequest, "type">;
+export type WsUserNonFundingLedgerUpdatesParameters = Omit<v.InferInput<typeof WsUserNonFundingLedgerUpdatesRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userTwapHistory} method. */
-export type WsUserTwapHistoryParameters = Omit<WsUserTwapHistoryRequest, "type">;
+export type WsUserTwapHistoryParameters = Omit<v.InferInput<typeof WsUserTwapHistoryRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userTwapSliceFills} method. */
-export type WsUserTwapSliceFillsParameters = Omit<WsUserTwapSliceFillsRequest, "type">;
+export type WsUserTwapSliceFillsParameters = Omit<v.InferInput<typeof WsUserTwapSliceFillsRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.webData2} method. */
-export type WsWebData2Parameters = Omit<WsWebData2Request, "type">;
+export type WsWebData2Parameters = Omit<v.InferInput<typeof WsWebData2Request>, "type">;
 
 /**
  * Subscription client for subscribing to various Hyperliquid events.

@@ -120,6 +120,7 @@ import {
     type WebData2,
     WebData2Request,
 } from "../schemas/mod.ts";
+import type * as v from "valibot";
 
 /** @see https://github.com/microsoft/TypeScript/issues/13923#issuecomment-2191862501 */
 type DeepImmutable<T> = {
@@ -133,103 +134,106 @@ export interface InfoClientParameters<T extends IRequestTransport = IRequestTran
 }
 
 /** Request parameters for the {@linkcode InfoClient.activeAssetData} method. */
-export type ActiveAssetDataParameters = Omit<ActiveAssetDataRequest, "type">;
+export type ActiveAssetDataParameters = Omit<v.InferInput<typeof ActiveAssetDataRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.allMids} method. */
-export type AllMidsParameters = Omit<AllMidsRequest, "type">;
+export type AllMidsParameters = Omit<v.InferInput<typeof AllMidsRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.blockDetails} method. */
-export type BlockDetailsParameters = Omit<BlockDetailsRequest, "type">;
+export type BlockDetailsParameters = Omit<v.InferInput<typeof BlockDetailsRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.candleSnapshot} method. */
-export type CandleSnapshotParameters = CandleSnapshotRequest["req"];
+export type CandleSnapshotParameters = v.InferInput<typeof CandleSnapshotRequest>["req"];
 /** Request parameters for the {@linkcode InfoClient.clearinghouseState} method. */
-export type ClearinghouseStateParameters = Omit<ClearinghouseStateRequest, "type">;
+export type ClearinghouseStateParameters = Omit<v.InferInput<typeof ClearinghouseStateRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.delegations} method. */
-export type DelegationsParameters = Omit<DelegationsRequest, "type">;
+export type DelegationsParameters = Omit<v.InferInput<typeof DelegationsRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.delegatorHistory} method. */
-export type DelegatorHistoryParameters = Omit<DelegatorHistoryRequest, "type">;
+export type DelegatorHistoryParameters = Omit<v.InferInput<typeof DelegatorHistoryRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.delegatorRewards} method. */
-export type DelegatorRewardsParameters = Omit<DelegatorRewardsRequest, "type">;
+export type DelegatorRewardsParameters = Omit<v.InferInput<typeof DelegatorRewardsRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.delegatorSummary} method. */
-export type DelegatorSummaryParameters = Omit<DelegatorSummaryRequest, "type">;
+export type DelegatorSummaryParameters = Omit<v.InferInput<typeof DelegatorSummaryRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.extraAgents} method. */
-export type ExtraAgentsParameters = Omit<ExtraAgentsRequest, "type">;
+export type ExtraAgentsParameters = Omit<v.InferInput<typeof ExtraAgentsRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.frontendOpenOrders} method. */
-export type FrontendOpenOrdersParameters = Omit<FrontendOpenOrdersRequest, "type">;
+export type FrontendOpenOrdersParameters = Omit<v.InferInput<typeof FrontendOpenOrdersRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.fundingHistory} method. */
-export type FundingHistoryParameters = Omit<FundingHistoryRequest, "type">;
+export type FundingHistoryParameters = Omit<v.InferInput<typeof FundingHistoryRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.historicalOrders} method. */
-export type HistoricalOrdersParameters = Omit<HistoricalOrdersRequest, "type">;
+export type HistoricalOrdersParameters = Omit<v.InferInput<typeof HistoricalOrdersRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.isVip} method. */
-export type IsVipParameters = Omit<IsVipRequest, "type">;
+export type IsVipParameters = Omit<v.InferInput<typeof IsVipRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.l2Book} method. */
-export type L2BookParameters = Omit<L2BookRequest, "type">;
+export type L2BookParameters = Omit<v.InferInput<typeof L2BookRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.leadingVaults} method. */
-export type LeadingVaultsParameters = Omit<LeadingVaultsRequest, "type">;
+export type LeadingVaultsParameters = Omit<v.InferInput<typeof LeadingVaultsRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.legalCheck} method. */
-export type LegalCheckParameters = Omit<LegalCheckRequest, "type">;
+export type LegalCheckParameters = Omit<v.InferInput<typeof LegalCheckRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.marginTable} method. */
-export type MarginTableParameters = Omit<MarginTableRequest, "type">;
+export type MarginTableParameters = Omit<v.InferInput<typeof MarginTableRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.maxBuilderFee} method. */
-export type MaxBuilderFeeParameters = Omit<MaxBuilderFeeRequest, "type">;
+export type MaxBuilderFeeParameters = Omit<v.InferInput<typeof MaxBuilderFeeRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.meta} method. */
-export type MetaParameters = Omit<MetaRequest, "type">;
+export type MetaParameters = Omit<v.InferInput<typeof MetaRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.metaAndAssetCtxs} method. */
-export type MetaAndAssetCtxsParameters = Omit<MetaAndAssetCtxsRequest, "type">;
+export type MetaAndAssetCtxsParameters = Omit<v.InferInput<typeof MetaAndAssetCtxsRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.openOrders} method. */
-export type OpenOrdersParameters = Omit<OpenOrdersRequest, "type">;
+export type OpenOrdersParameters = Omit<v.InferInput<typeof OpenOrdersRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.orderStatus} method. */
-export type OrderStatusParameters = Omit<OrderStatusRequest, "type">;
+export type OrderStatusParameters = Omit<v.InferInput<typeof OrderStatusRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.perpDexLimits} method. */
-export type PerpDexLimitsParameters = Omit<PerpDexLimitsRequest, "type">;
+export type PerpDexLimitsParameters = Omit<v.InferInput<typeof PerpDexLimitsRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.perpsAtOpenInterestCap} method. */
-export type PerpsAtOpenInterestCapParameters = Omit<PerpsAtOpenInterestCapRequest, "type">;
+export type PerpsAtOpenInterestCapParameters = Omit<v.InferInput<typeof PerpsAtOpenInterestCapRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.portfolio} method. */
-export type PortfolioParameters = Omit<PortfolioRequest, "type">;
+export type PortfolioParameters = Omit<v.InferInput<typeof PortfolioRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.preTransferCheck} method. */
-export type PreTransferCheckParameters = Omit<PreTransferCheckRequest, "type">;
+export type PreTransferCheckParameters = Omit<v.InferInput<typeof PreTransferCheckRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.recentTrades} method. */
-export type RecentTradesParameters = Omit<RecentTradesRequest, "type">;
+export type RecentTradesParameters = Omit<v.InferInput<typeof RecentTradesRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.referral} method. */
-export type ReferralParameters = Omit<ReferralRequest, "type">;
+export type ReferralParameters = Omit<v.InferInput<typeof ReferralRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.spotClearinghouseState} method. */
-export type SpotClearinghouseStateParameters = Omit<SpotClearinghouseStateRequest, "type">;
+export type SpotClearinghouseStateParameters = Omit<v.InferInput<typeof SpotClearinghouseStateRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.spotDeployState} method. */
-export type SpotDeployStateParameters = Omit<SpotDeployStateRequest, "type">;
+export type SpotDeployStateParameters = Omit<v.InferInput<typeof SpotDeployStateRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.subAccounts} method. */
-export type SubAccountsParameters = Omit<SubAccountsRequest, "type">;
+export type SubAccountsParameters = Omit<v.InferInput<typeof SubAccountsRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.tokenDetails} method. */
-export type TokenDetailsParameters = Omit<TokenDetailsRequest, "type">;
+export type TokenDetailsParameters = Omit<v.InferInput<typeof TokenDetailsRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.twapHistory} method. */
-export type TwapHistoryParameters = Omit<TwapHistoryRequest, "type">;
+export type TwapHistoryParameters = Omit<v.InferInput<typeof TwapHistoryRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.txDetails} method. */
-export type TxDetailsParameters = Omit<TxDetailsRequest, "type">;
+export type TxDetailsParameters = Omit<v.InferInput<typeof TxDetailsRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.userDetails} method. */
-export type UserDetailsParameters = Omit<UserDetailsRequest, "type">;
+export type UserDetailsParameters = Omit<v.InferInput<typeof UserDetailsRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.userFees} method. */
-export type UserFeesParameters = Omit<UserFeesRequest, "type">;
+export type UserFeesParameters = Omit<v.InferInput<typeof UserFeesRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.userFills} method. */
-export type UserFillsParameters = Omit<UserFillsRequest, "type">;
+export type UserFillsParameters = Omit<v.InferInput<typeof UserFillsRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.userFillsByTime} method. */
-export type UserFillsByTimeParameters = Omit<UserFillsByTimeRequest, "type">;
+export type UserFillsByTimeParameters = Omit<v.InferInput<typeof UserFillsByTimeRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.userFunding} method. */
-export type UserFundingParameters = Omit<UserFundingRequest, "type">;
+export type UserFundingParameters = Omit<v.InferInput<typeof UserFundingRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.userNonFundingLedgerUpdates} method. */
-export type UserNonFundingLedgerUpdatesParameters = Omit<UserNonFundingLedgerUpdatesRequest, "type">;
+export type UserNonFundingLedgerUpdatesParameters = Omit<
+    v.InferInput<typeof UserNonFundingLedgerUpdatesRequest>,
+    "type"
+>;
 /** Request parameters for the {@linkcode InfoClient.userRateLimit} method. */
-export type UserRateLimitParameters = Omit<UserRateLimitRequest, "type">;
+export type UserRateLimitParameters = Omit<v.InferInput<typeof UserRateLimitRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.userRole} method. */
-export type UserRoleParameters = Omit<UserRoleRequest, "type">;
+export type UserRoleParameters = Omit<v.InferInput<typeof UserRoleRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.userToMultiSigSigners} method. */
-export type UserToMultiSigSignersParameters = Omit<UserToMultiSigSignersRequest, "type">;
+export type UserToMultiSigSignersParameters = Omit<v.InferInput<typeof UserToMultiSigSignersRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.userTwapSliceFills} method. */
-export type UserTwapSliceFillsParameters = Omit<UserTwapSliceFillsRequest, "type">;
+export type UserTwapSliceFillsParameters = Omit<v.InferInput<typeof UserTwapSliceFillsRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.userTwapSliceFillsByTime} method. */
-export type UserTwapSliceFillsByTimeParameters = Omit<UserTwapSliceFillsByTimeRequest, "type">;
+export type UserTwapSliceFillsByTimeParameters = Omit<v.InferInput<typeof UserTwapSliceFillsByTimeRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.userVaultEquities} method. */
-export type UserVaultEquitiesParameters = Omit<UserVaultEquitiesRequest, "type">;
+export type UserVaultEquitiesParameters = Omit<v.InferInput<typeof UserVaultEquitiesRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.vaultDetails} method. */
-export type VaultDetailsParameters = Omit<VaultDetailsRequest, "type">;
+export type VaultDetailsParameters = Omit<v.InferInput<typeof VaultDetailsRequest>, "type">;
 /** Request parameters for the {@linkcode InfoClient.webData2} method. */
-export type WebData2Parameters = Omit<WebData2Request, "type">;
+export type WebData2Parameters = Omit<v.InferInput<typeof WebData2Request>, "type">;
 
 /**
  * Info client for interacting with the Hyperliquid API.
