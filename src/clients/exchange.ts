@@ -59,6 +59,7 @@ import {
     VaultTransferRequest,
     Withdraw3Request,
 } from "../schemas/mod.ts";
+import { Address } from "../schemas/_base.ts";
 import {
     type AbstractWallet,
     getWalletChainId,
@@ -421,9 +422,11 @@ export class ExchangeClient<
     constructor(args: ExchangeClientParameters<T, W>) {
         this.transport = args.transport;
         this.wallet = args.wallet;
-        this.defaultVaultAddress = parser(Hex)(args.defaultVaultAddress);
+        this.defaultVaultAddress = args.defaultVaultAddress ? parser(Address)(args.defaultVaultAddress) : undefined;
         this.defaultExpiresAfter = args.defaultExpiresAfter;
-        this.signatureChainId = parser(Hex)(args.signatureChainId) ?? (() => getWalletChainId(this.wallet));
+        this.signatureChainId = args.signatureChainId
+            ? parser(Hex)(args.signatureChainId)
+            : (() => getWalletChainId(this.wallet));
         this.nonceManager = args.nonceManager ?? new NonceManager().getNonce;
     }
 
@@ -540,8 +543,8 @@ export class ExchangeClient<
             type: "batchModify",
             ...params,
         });
-        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = opts?.vaultAddress ? parser(Address)(opts.vaultAddress) : this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
@@ -578,8 +581,8 @@ export class ExchangeClient<
             type: "cancel",
             ...params,
         });
-        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = opts?.vaultAddress ? parser(Address)(opts.vaultAddress) : this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
@@ -616,8 +619,8 @@ export class ExchangeClient<
             type: "cancelByCloid",
             ...params,
         });
-        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = opts?.vaultAddress ? parser(Address)(opts.vaultAddress) : this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
@@ -682,7 +685,7 @@ export class ExchangeClient<
         const action = parser(ClaimRewardsRequest.entries.action)({
             type: "claimRewards",
         });
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -759,7 +762,7 @@ export class ExchangeClient<
             type: "createSubAccount",
             ...params,
         });
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -797,7 +800,7 @@ export class ExchangeClient<
             type: "createVault",
             ...params,
         });
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -834,7 +837,7 @@ export class ExchangeClient<
             type: "CSignerAction",
             ...params,
         });
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -897,7 +900,7 @@ export class ExchangeClient<
             type: "CValidatorAction",
             ...params,
         });
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -965,7 +968,7 @@ export class ExchangeClient<
             type: "evmUserModify",
             ...params,
         });
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1009,8 +1012,8 @@ export class ExchangeClient<
             type: "modify",
             ...params,
         });
-        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = opts?.vaultAddress ? parser(Address)(opts.vaultAddress) : this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
@@ -1097,8 +1100,8 @@ export class ExchangeClient<
             signatureChainId: await this._getSignatureChainId(),
             ...params,
         });
-        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = opts?.vaultAddress ? parser(Address)(opts.vaultAddress) : this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeMultiSigAction(
             {
                 action,
@@ -1152,8 +1155,8 @@ export class ExchangeClient<
             type: "order",
             ...params,
         });
-        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = opts?.vaultAddress ? parser(Address)(opts.vaultAddress) : this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
@@ -1183,7 +1186,7 @@ export class ExchangeClient<
         const action = parser(NoopRequest.entries.action)({
             type: "noop",
         });
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1229,7 +1232,7 @@ export class ExchangeClient<
             type: "perpDeploy",
             ...params,
         });
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1262,7 +1265,7 @@ export class ExchangeClient<
             type: "registerReferrer",
             ...params,
         });
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1295,7 +1298,7 @@ export class ExchangeClient<
             type: "reserveRequestWeight",
             ...params,
         });
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1339,8 +1342,8 @@ export class ExchangeClient<
             type: "scheduleCancel",
             ...params,
         });
-        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = opts?.vaultAddress ? parser(Address)(opts.vaultAddress) : this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
@@ -1415,7 +1418,7 @@ export class ExchangeClient<
             type: "setDisplayName",
             ...params,
         });
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1448,7 +1451,7 @@ export class ExchangeClient<
             type: "setReferrer",
             ...params,
         });
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1491,7 +1494,7 @@ export class ExchangeClient<
             type: "spotDeploy",
             ...params,
         });
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1563,7 +1566,7 @@ export class ExchangeClient<
             type: "spotUser",
             ...params,
         });
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1596,7 +1599,7 @@ export class ExchangeClient<
             type: "subAccountModify",
             ...params,
         });
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1634,7 +1637,7 @@ export class ExchangeClient<
             type: "subAccountSpotTransfer",
             ...params,
         });
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1667,7 +1670,7 @@ export class ExchangeClient<
             type: "subAccountTransfer",
             ...params,
         });
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1735,8 +1738,8 @@ export class ExchangeClient<
             type: "twapCancel",
             ...params,
         });
-        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = opts?.vaultAddress ? parser(Address)(opts.vaultAddress) : this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
@@ -1778,8 +1781,8 @@ export class ExchangeClient<
             type: "twapOrder",
             ...params,
         });
-        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = opts?.vaultAddress ? parser(Address)(opts.vaultAddress) : this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
@@ -1812,8 +1815,8 @@ export class ExchangeClient<
             type: "updateIsolatedMargin",
             ...params,
         });
-        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = opts?.vaultAddress ? parser(Address)(opts.vaultAddress) : this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
@@ -1846,8 +1849,8 @@ export class ExchangeClient<
             type: "updateLeverage",
             ...params,
         });
-        const vaultAddress = parser(Hex)(opts?.vaultAddress) ?? this.defaultVaultAddress;
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const vaultAddress = opts?.vaultAddress ? parser(Address)(opts.vaultAddress) : this.defaultVaultAddress;
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, vaultAddress, expiresAfter }, opts?.signal);
     }
 
@@ -1950,7 +1953,7 @@ export class ExchangeClient<
             type: "vaultDistribute",
             ...params,
         });
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -1987,7 +1990,7 @@ export class ExchangeClient<
             type: "vaultModify",
             ...params,
         });
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 
@@ -2020,7 +2023,7 @@ export class ExchangeClient<
             type: "vaultTransfer",
             ...params,
         });
-        const expiresAfter = Number(opts?.expiresAfter) ?? await this._getDefaultExpiresAfter();
+        const expiresAfter = Number(opts?.expiresAfter) || await this._getDefaultExpiresAfter();
         return await this._executeL1Action({ action, expiresAfter }, opts?.signal);
     }
 

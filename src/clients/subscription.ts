@@ -63,7 +63,7 @@ export type WsActiveAssetCtxParameters = Omit<v.InferInput<typeof WsActiveAssetC
 /** Subscription parameters for the {@linkcode SubscriptionClient.activeAssetData} method. */
 export type WsActiveAssetDataParameters = Omit<v.InferInput<typeof WsActiveAssetDataRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.allMids} method. */
-export type WsAllMidsParameters = Omit<v.InferInput<typeof  WsAllMidsRequest>, "type">;
+export type WsAllMidsParameters = Omit<v.InferInput<typeof WsAllMidsRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.assetCtxs} method. */
 export type WsAssetCtxsParameters = Omit<v.InferInput<typeof WsAssetCtxsRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.bbo} method. */
@@ -89,7 +89,10 @@ export type WsUserFillsParameters = Omit<v.InferInput<typeof WsUserFillsRequest>
 /** Subscription parameters for the {@linkcode SubscriptionClient.userFundings} method. */
 export type WsUserFundingsParameters = Omit<v.InferInput<typeof WsUserFundingsRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userNonFundingLedgerUpdates} method. */
-export type WsUserNonFundingLedgerUpdatesParameters = Omit<v.InferInput<typeof WsUserNonFundingLedgerUpdatesRequest>, "type">;
+export type WsUserNonFundingLedgerUpdatesParameters = Omit<
+    v.InferInput<typeof WsUserNonFundingLedgerUpdatesRequest>,
+    "type"
+>;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userTwapHistory} method. */
 export type WsUserTwapHistoryParameters = Omit<v.InferInput<typeof WsUserTwapHistoryRequest>, "type">;
 /** Subscription parameters for the {@linkcode SubscriptionClient.userTwapSliceFills} method. */

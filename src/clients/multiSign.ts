@@ -3,14 +3,14 @@ import {
     type CancelSuccessResponse,
     type CreateSubAccountResponse,
     type CreateVaultResponse,
-    Hex,
-    parser,
     type MultiSigRequest,
     type OrderSuccessResponse,
+    parser,
     type SuccessResponse,
     type TwapCancelSuccessResponse,
     type TwapOrderSuccessResponse,
 } from "../schemas/mod.ts";
+import { Address } from "../schemas/_base.ts";
 import { ExchangeClient, type ExchangeClientParameters } from "./exchange.ts";
 import {
     type AbstractWallet,
@@ -67,7 +67,7 @@ export class MultiSignClient<
      */
     constructor(args: MultiSignClientParameters<T, S>) {
         super({ ...args, wallet: args.signers[0] });
-        this.multiSignAddress = parser(Hex)(args.multiSignAddress);
+        this.multiSignAddress = parser(Address)(args.multiSignAddress);
         this.signers = args.signers;
 
         Object.defineProperty(this, "wallet", {
