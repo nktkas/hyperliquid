@@ -2,8 +2,7 @@
 import * as hl from "@nktkas/hyperliquid";
 import { Hex } from "@nktkas/hyperliquid/schemas";
 import * as v from "valibot";
-import { parseArgs } from "@std/cli/parse-args";
-// @ts-ignore - ignore missing types
+import parseArgs from "minimist";
 import process from "node:process";
 
 type MethodNames<T> = {

@@ -59,6 +59,10 @@ await build({
             node: ">=24.0.0",
         },
         sideEffects: false,
+        devDependencies: {
+            "@types/minimist": "^1.2.5",
+            "@types/node": "^24.3.1",
+        },
     },
     compilerOptions: {
         lib: ["ESNext", "DOM"],
