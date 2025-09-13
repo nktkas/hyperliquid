@@ -106,7 +106,7 @@ export type WsWebData2Parameters = Omit<v.InferInput<typeof WsWebData2Request>, 
  */
 export class SubscriptionClient<
     T extends ISubscriptionTransport = ISubscriptionTransport,
-> implements SubscriptionClientParameters<T>, AsyncDisposable {
+> implements SubscriptionClientParameters<T> {
     transport: T;
 
     /**
@@ -216,11 +216,11 @@ export class SubscriptionClient<
     allMids(listener: (data: WsAllMids) => void): Promise<Subscription>;
     allMids(params: DeepImmutable<WsAllMidsParameters>, listener: (data: WsAllMids) => void): Promise<Subscription>;
     allMids(
-        params_or_listener: DeepImmutable<WsAllMidsParameters> | ((data: WsAllMids) => void),
+        paramsOrListener: DeepImmutable<WsAllMidsParameters> | ((data: WsAllMids) => void),
         maybeListener?: (data: WsAllMids) => void,
     ): Promise<Subscription> {
-        const params = typeof params_or_listener === "function" ? {} : params_or_listener;
-        const listener = typeof params_or_listener === "function" ? params_or_listener : maybeListener!;
+        const params = typeof paramsOrListener === "function" ? {} : paramsOrListener;
+        const listener = typeof paramsOrListener === "function" ? paramsOrListener : maybeListener!;
 
         const payload = parser(WsAllMidsRequest)({ type: "allMids", ...params });
         return this.transport.subscribe<WsAllMids>(payload.type, payload, (e) => {
@@ -255,11 +255,11 @@ export class SubscriptionClient<
         listener: (data: WsAssetCtxs) => void,
     ): Promise<Subscription>;
     assetCtxs(
-        params_or_listener: DeepImmutable<WsAssetCtxsParameters> | ((data: WsAssetCtxs) => void),
+        paramsOrListener: DeepImmutable<WsAssetCtxsParameters> | ((data: WsAssetCtxs) => void),
         maybeListener?: (data: WsAssetCtxs) => void,
     ): Promise<Subscription> {
-        const params = typeof params_or_listener === "function" ? {} : params_or_listener;
-        const listener = typeof params_or_listener === "function" ? params_or_listener : maybeListener!;
+        const params = typeof paramsOrListener === "function" ? {} : paramsOrListener;
+        const listener = typeof paramsOrListener === "function" ? paramsOrListener : maybeListener!;
 
         const payload = parser(WsAssetCtxsRequest)({
             type: "assetCtxs",
@@ -837,9 +837,5 @@ export class SubscriptionClient<
                 listener(e.detail);
             }
         });
-    }
-
-    async [Symbol.asyncDispose](): Promise<void> {
-        await this.transport[Symbol.asyncDispose]?.();
     }
 }

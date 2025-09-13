@@ -201,9 +201,9 @@ export type Withdraw3Parameters = ExtractRequestAction<v.InferInput<typeof Withd
 
 interface BaseRequestOptions {
     /**
-     * An {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal}
-     * If this option is set, the request can be canceled by calling {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort | abort()}
-     * on the corresponding {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController | AbortController}.
+     * An [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal)
+     * If this option is set, the request can be canceled by calling [`abort()`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort)
+     * on the corresponding [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController).
      */
     signal?: AbortSignal;
 }
@@ -362,7 +362,7 @@ class NonceManager {
 export class ExchangeClient<
     T extends IRequestTransport = IRequestTransport,
     W extends AbstractWallet = AbstractWallet,
-> implements ExchangeClientParameters<T, W>, AsyncDisposable {
+> implements ExchangeClientParameters<T, W> {
     transport: T;
     wallet: W;
     defaultVaultAddress?: `0x${string}`;
@@ -1090,10 +1090,10 @@ export class ExchangeClient<
             | TwapOrderSuccessResponse
             | TwapCancelSuccessResponse,
     >(
-        params_and_nonce: DeepImmutable<MultiSigParameters>,
+        paramsAndNonce: DeepImmutable<MultiSigParameters>,
         opts?: MultiSigOptions,
     ): Promise<T> {
-        const { nonce, ...params } = params_and_nonce;
+        const { nonce, ...params } = paramsAndNonce;
 
         const action = parser(MultiSigRequest.entries.action)({
             type: "multiSig",
@@ -1329,14 +1329,14 @@ export class ExchangeClient<
     ): Promise<SuccessResponse>;
     async scheduleCancel(opts?: ScheduleCancelOptions): Promise<SuccessResponse>;
     async scheduleCancel(
-        params_or_opts?:
+        paramsOrOpts?:
             | DeepImmutable<ScheduleCancelParameters>
             | ScheduleCancelOptions,
         maybeOpts?: ScheduleCancelOptions,
     ): Promise<SuccessResponse> {
-        const isFirstArgParams = params_or_opts && "time" in params_or_opts;
-        const params = isFirstArgParams ? params_or_opts : {};
-        const opts = isFirstArgParams ? maybeOpts : params_or_opts as ScheduleCancelOptions;
+        const isFirstArgParams = paramsOrOpts && "time" in paramsOrOpts;
+        const params = isFirstArgParams ? paramsOrOpts : {};
+        const opts = isFirstArgParams ? maybeOpts : paramsOrOpts as ScheduleCancelOptions;
 
         const action = parser(ScheduleCancelRequest.entries.action)({
             type: "scheduleCancel",
@@ -2253,9 +2253,5 @@ export class ExchangeClient<
                 throw new ApiRequestError(response as TwapOrderResponse | TwapCancelResponse);
             }
         }
-    }
-
-    async [Symbol.asyncDispose](): Promise<void> {
-        await this.transport[Symbol.asyncDispose]?.();
     }
 }

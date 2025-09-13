@@ -1,15 +1,17 @@
 // deno-lint-ignore-file no-import-prefix
 import { assert, assertEquals, assertRejects } from "jsr:@std/assert@1";
-import { WebSocketAsyncRequest } from "../../../src/transports/websocket/_websocket_async_request.ts";
+import {
+    WebSocketAsyncRequest,
+    WebSocketRequestError,
+} from "../../../src/transports/websocket/_websocket_async_request.ts";
 import { HyperliquidEventTarget } from "../../../src/transports/websocket/_hyperliquid_event_target.ts";
 import type { ReconnectingWebSocket } from "../../../src/transports/websocket/_reconnecting_websocket.ts";
-import { WebSocketRequestError } from "../../../src/transports/websocket/websocket_transport.ts";
 
 // @ts-ignore: Mocking WebSocket for testing purposes
 class MockWebSocket extends EventTarget implements ReconnectingWebSocket {
     sentMessages: string[] = [];
-    readyState: number = WebSocket.CONNECTING;
-    reconnectAbortController: AbortController = new AbortController();
+    readyState = WebSocket.CONNECTING;
+    terminateSignal = new AbortController().signal;
 
     send(data: string): void {
         this.sentMessages.push(data);
@@ -144,11 +146,7 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
                     };
                     mockSocket.mockMessage(mockMessage);
 
-                    await assertRejects(
-                        () => promise,
-                        WebSocketRequestError,
-                        `Server error: ${mockMessage.data}`,
-                    );
+                    await assertRejects(() => promise, WebSocketRequestError, mockMessage.data);
                 });
             });
 
@@ -167,11 +165,7 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
                     };
                     mockSocket.mockMessage(mockMessage);
 
-                    await assertRejects(
-                        () => promise,
-                        WebSocketRequestError,
-                        `Server error: ${mockMessage.data}`,
-                    );
+                    await assertRejects(() => promise, WebSocketRequestError, mockMessage.data);
                 });
 
                 await t.step("Already subscribed", async () => {
@@ -188,11 +182,7 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
                     };
                     mockSocket.mockMessage(mockMessage);
 
-                    await assertRejects(
-                        () => promise,
-                        WebSocketRequestError,
-                        `Server error: ${mockMessage.data}`,
-                    );
+                    await assertRejects(() => promise, WebSocketRequestError, mockMessage.data);
                 });
 
                 await t.step("Invalid subscription", async () => {
@@ -209,11 +199,7 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
                     };
                     mockSocket.mockMessage(mockMessage);
 
-                    await assertRejects(
-                        () => promise,
-                        WebSocketRequestError,
-                        `Server error: ${mockMessage.data}`,
-                    );
+                    await assertRejects(() => promise, WebSocketRequestError, mockMessage.data);
                 });
 
                 await t.step("Already unsubscribed", async () => {
@@ -230,11 +216,7 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
                     };
                     mockSocket.mockMessage(mockMessage);
 
-                    await assertRejects(
-                        () => promise,
-                        WebSocketRequestError,
-                        `Server error: ${mockMessage.data}`,
-                    );
+                    await assertRejects(() => promise, WebSocketRequestError, mockMessage.data);
                 });
             });
 

@@ -1,5 +1,6 @@
 import { TransportError } from "../base.ts";
 import type { IRequestTransport } from "../base.ts";
+import { AbortSignal_ } from "../_polyfills.ts";
 
 type MaybePromise<T> = T | Promise<T>;
 
@@ -33,13 +34,11 @@ export interface HttpTransportOptions {
      * @defaultValue `false`
      */
     isTestnet?: boolean;
-
     /**
      * Request timeout in ms. Set to `null` to disable.
      * @defaultValue `10_000`
      */
     timeout?: number | null;
-
     /**
      * Custom server to use for API requests.
      * @defaultValue `https://api.hyperliquid.xyz` for mainnet and `https://api.hyperliquid-testnet.xyz` for testnet.
@@ -48,23 +47,26 @@ export interface HttpTransportOptions {
         mainnet?: { api?: string | URL; rpc?: string | URL };
         testnet?: { api?: string | URL; rpc?: string | URL };
     };
-
-    /** A custom {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/RequestInit | RequestInit} that is merged with a fetch request. */
+    /** A custom [`RequestInit`](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit) that is merged with a fetch request. */
     fetchOptions?: Omit<RequestInit, "body" | "method">;
-
     /**
      * A callback function that is called before the request is sent.
      * @param request - An original request to send.
-     * @returns If returned a {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Request/Request | Request}, it will replace the original request.
+     * @returns If returned a [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request), it will replace the original request.
      */
     onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>;
-
     /**
      * A callback function that is called after the response is received.
      * @param response - An original response to process.
-     * @returns If returned a {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Response/Response | Response}, it will replace the original response.
+     * @returns If returned a [`Response`](https://developer.mozilla.org/en-US/docs/Web/API/Response/Response), it will replace the original response.
      */
     onResponse?: (response: Response) => MaybePromise<Response | void | null | undefined>;
+    /**
+     * A callback function that is called when an error occurs during fetching.
+     * @param error - The error that occurred.
+     * @returns If returned an [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error), it will be thrown instead of the original error (still wraps an error in {@linkcode HttpRequestError}).
+     */
+    onError?: (error: unknown) => MaybePromise<Error | void | null | undefined>;
 }
 
 /** HTTP implementation of the REST transport interface. */
@@ -78,6 +80,7 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
     fetchOptions: Omit<RequestInit, "body" | "method">;
     onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>;
     onResponse?: (response: Response) => MaybePromise<Response | void | null | undefined>;
+    onError?: (error: unknown) => MaybePromise<Error | void | null | undefined>;
 
     /**
      * Creates a new HTTP transport instance.
@@ -99,13 +102,14 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
         this.fetchOptions = options?.fetchOptions ?? {};
         this.onRequest = options?.onRequest;
         this.onResponse = options?.onResponse;
+        this.onError = options?.onError;
     }
 
     /**
      * Sends a request to the Hyperliquid API via fetch.
      * @param endpoint - The API endpoint to send the request to.
      * @param payload - The payload to send with the request.
-     * @param signal - An {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal}. If this option is set, the request can be canceled by calling {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort | abort()} on the corresponding {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController | AbortController}.
+     * @param signal - An [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) can be used to cancel the request by calling [`abort()`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort) on the corresponding [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController).
      * @returns A promise that resolves with parsed JSON response body.
      *
      * @throws {HttpRequestError} Thrown when the HTTP request fails.
@@ -126,7 +130,7 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
                     },
                     keepalive: true,
                     method: "POST",
-                    signal: this.timeout ? AbortSignal.timeout(this.timeout) : undefined,
+                    signal: this.timeout ? AbortSignal_.timeout(this.timeout) : undefined,
                 },
                 this.fetchOptions,
                 { signal },
@@ -140,7 +144,14 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
             }
 
             // Send the Request and wait for a Response
-            let response = await fetch(request);
+            let response = await fetch(request)
+                .catch(async (error) => {
+                    if (this.onError) {
+                        const customError = await this.onError(error);
+                        if (customError instanceof Error) throw customError;
+                    }
+                    throw error;
+                });
 
             // Call the onResponse callback, if provided
             if (this.onResponse) {
@@ -172,7 +183,7 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
     }
 }
 
-/** Merges multiple {@linkcode HeadersInit} into one {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Headers/Headers | Headers}. */
+/** Merges multiple `HeadersInit` into one [`Headers`](https://developer.mozilla.org/en-US/docs/Web/API/Headers/Headers). */
 function mergeHeadersInit(...inits: HeadersInit[]): Headers {
     if (inits.length === 0 || inits.length === 1) {
         return new Headers(inits[0] as HeadersInit | undefined);
@@ -188,7 +199,7 @@ function mergeHeadersInit(...inits: HeadersInit[]): Headers {
     return merged;
 }
 
-/** Merges multiple {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/RequestInit | RequestInit} into one {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/RequestInit | RequestInit}. */
+/** Merges multiple [`RequestInit`](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit) into one [`RequestInit`](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit). */
 function mergeRequestInit(...inits: RequestInit[]): RequestInit {
     const merged = inits.reduce((acc, init) => ({ ...acc, ...init }), {});
 
@@ -201,7 +212,7 @@ function mergeRequestInit(...inits: RequestInit[]): RequestInit {
     const signals = inits.map((init) => init.signal)
         .filter((signal) => signal instanceof AbortSignal);
     if (signals.length > 0) {
-        merged.signal = signals.length > 1 ? AbortSignal.any(signals) : signals[0];
+        merged.signal = signals.length > 1 ? AbortSignal_.any(signals) : signals[0];
     }
 
     return merged;

@@ -52,16 +52,12 @@ await build({
         },
         license: "MIT",
         engines: {
-            /**
-             * - v22.4.0: Native WebSocket support
-             * - v24.0.0: https://github.com/nktkas/hyperliquid/issues/34
-             */
-            node: ">=24.0.0",
+            node: ">=20.19.0",
         },
         sideEffects: false,
         devDependencies: {
-            "@types/minimist": "^1.2.5",
-            "@types/node": "^24.3.1",
+            "@types/minimist": "*",
+            "@types/node": "*",
         },
     },
     compilerOptions: {

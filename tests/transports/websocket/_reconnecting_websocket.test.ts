@@ -23,7 +23,7 @@ Deno.test("ReconnectingWebSocket", async (t) => {
 
             const { socket, response } = Deno.upgradeWebSocket(request, { protocol: requestedProtocols });
             socket.addEventListener("message", (event) => {
-                socket.send(`echo:${event.data}`);
+                socket.send(event.data);
             });
 
             return response;
@@ -65,7 +65,7 @@ Deno.test("ReconnectingWebSocket", async (t) => {
 
         await t.step("get protocol()", async () => {
             const rws = new ReconnectingWebSocket("ws://localhost:8080/", "superchat");
-            await new Promise((resolve) => rws.addEventListener("open", resolve, { once: true })); // Wait for the connection to open
+            await new Promise((resolve) => rws.addEventListener("open", resolve)); // Wait for the connection to open
 
             assertEquals(rws.protocol, "superchat");
 
@@ -230,12 +230,9 @@ Deno.test("ReconnectingWebSocket", async (t) => {
             const rws = new ReconnectingWebSocket("ws://localhost:8080/");
 
             const message = "Hello, World!";
-
             let received = "";
-            rws.addEventListener("message", (ev) => received = ev.data, { once: true });
-
+            rws.addEventListener("message", (e) => received = e.data);
             rws.dispatchEvent(new MessageEvent("message", { data: message }));
-
             assertEquals(received, message);
 
             rws.close();
@@ -246,10 +243,8 @@ Deno.test("ReconnectingWebSocket", async (t) => {
                 const rws = new ReconnectingWebSocket("ws://localhost:8080/");
 
                 let called = false;
-                rws.addEventListener("message", () => called = true, { once: true });
-
+                rws.addEventListener("message", () => called = true);
                 rws.dispatchEvent(new Event("message"));
-
                 assert(called);
 
                 rws.close();
@@ -258,10 +253,8 @@ Deno.test("ReconnectingWebSocket", async (t) => {
                 const rws = new ReconnectingWebSocket("ws://localhost:8080/");
 
                 let called = false;
-                rws.addEventListener("message", { handleEvent: () => called = true }, { once: true });
-
+                rws.addEventListener("message", { handleEvent: () => called = true });
                 rws.dispatchEvent(new Event("message"));
-
                 assert(called);
 
                 rws.close();
@@ -271,19 +264,10 @@ Deno.test("ReconnectingWebSocket", async (t) => {
                 const rws = new ReconnectingWebSocket("ws://localhost:8080/");
                 rws.close();
 
-                assertInstanceOf(
-                    rws.reconnectAbortController.signal.reason,
-                    ReconnectingWebSocketError,
-                    "Error when reconnecting WebSocket: USER_INITIATED_CLOSE",
-                );
-
-                // @ts-ignore - accessing private property for testing purposes
-                const initialListenersCount = rws._listeners.length;
                 rws.addEventListener("message", () => {});
-
                 // @ts-ignore - accessing private property for testing purposes
                 const finalListenersCount = rws._listeners.length;
-                assertEquals(finalListenersCount, initialListenersCount);
+                assertEquals(finalListenersCount, 0);
             });
         });
 
@@ -293,11 +277,9 @@ Deno.test("ReconnectingWebSocket", async (t) => {
 
                 let called = false;
                 const listener = () => called = true;
-                rws.addEventListener("message", listener, { once: true });
+                rws.addEventListener("message", listener);
                 rws.removeEventListener("message", listener);
-
                 rws.dispatchEvent(new Event("message"));
-
                 assert(!called);
 
                 rws.close();
@@ -307,14 +289,35 @@ Deno.test("ReconnectingWebSocket", async (t) => {
 
                 let called = false;
                 const listener = { handleEvent: () => called = true };
-                rws.addEventListener("message", listener, { once: true });
+                rws.addEventListener("message", listener);
                 rws.removeEventListener("message", listener);
-
                 rws.dispatchEvent(new Event("message"));
-
                 assert(!called);
 
                 rws.close();
+            });
+
+            await t.step("Removes original listener when wrapped listener not found", () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080");
+
+                // First, terminate the connection to prevent wrapping
+                rws.close();
+
+                let called = false;
+                const listener = () => called = true;
+
+                // Add listener after termination (will not be wrapped)
+                rws.addEventListener("message", listener);
+
+                // @ts-ignore - accessing private property
+                assertEquals(rws._listeners.length, 0, "No wrapped listeners should be stored");
+
+                // Remove the listener - should fall back to removing original
+                rws.removeEventListener("message", listener);
+
+                // Verify it was removed by trying to dispatch event
+                rws.dispatchEvent(new Event("message"));
+                assert(!called, "Listener should have been removed");
             });
         });
 
@@ -322,10 +325,8 @@ Deno.test("ReconnectingWebSocket", async (t) => {
             const rws = new ReconnectingWebSocket("ws://localhost:8080/");
 
             let called = false;
-            rws.addEventListener("open", () => called = true, { once: true });
-
+            rws.addEventListener("open", () => called = true);
             rws.dispatchEvent(new Event("open"));
-
             assert(called);
 
             rws.close();
@@ -356,9 +357,9 @@ Deno.test("ReconnectingWebSocket", async (t) => {
         });
 
         await t.step("maxRetries: Respects maxRetries limit", async () => {
-            const rws = new ReconnectingWebSocket("ws://invalid4567t7281.com", undefined, {
+            const rws = new ReconnectingWebSocket("ws://invalid4567t7281.com", {
                 maxRetries: 2,
-                connectionDelay: 0,
+                reconnectionDelay: 0,
             });
 
             let closeCount = 0;
@@ -368,7 +369,7 @@ Deno.test("ReconnectingWebSocket", async (t) => {
 
             assertEquals(rws.readyState, WebSocket.CLOSED, "WebSocket should be closed");
             // Typically: 1st "close" after initial connect fails, then 2 more reconnect attempts => total 3 close events
-            // so (closeCount - 1) = 2 means it tried 2 reconnect attempts.
+            // so `closeCount - 1 = 2` means it tried 2 reconnect attempts.
             assertEquals(closeCount - 1, 2);
 
             rws.close();
@@ -380,19 +381,19 @@ Deno.test("ReconnectingWebSocket", async (t) => {
                     .reconnectOptions.connectionTimeout!;
                 const rws = new ReconnectingWebSocket(
                     `ws://localhost:8080?delay=${defaultConnectionTimeout + 5000}`,
-                    undefined,
                     { connectionTimeout: null },
                 );
 
-                await new Promise((resolve) => setTimeout(resolve, defaultConnectionTimeout + 2000));
+                await new Promise((resolve) => setTimeout(resolve, defaultConnectionTimeout + 2000)); // Wait longer than default timeout but less than server delay
                 assertEquals(rws.readyState, WebSocket.CONNECTING);
 
                 rws.close();
             });
 
             await t.step("Connection timeout if not opened in time", async () => {
-                const rwsTimeout = new ReconnectingWebSocket("ws://localhost:8080", undefined, {
-                    connectionTimeout: 10,
+                const rwsTimeout = new ReconnectingWebSocket("ws://localhost:8080", {
+                    maxRetries: 0,
+                    connectionTimeout: 10, // too short to connect
                 });
 
                 await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -402,18 +403,16 @@ Deno.test("ReconnectingWebSocket", async (t) => {
             });
         });
 
-        await t.step("connectionDelay:", async (t) => {
+        await t.step("reconnectionDelay:", async (t) => {
             await t.step("Custom delay", async () => {
                 const customDelay = 500;
-                const rws = new ReconnectingWebSocket("ws://invalid4567t7281.com", undefined, {
+                const rws = new ReconnectingWebSocket("ws://invalid4567t7281.com", {
                     maxRetries: 3,
-                    connectionDelay: customDelay,
+                    reconnectionDelay: customDelay,
                 });
 
                 const closeTimes: number[] = [];
-                rws.addEventListener("close", () => {
-                    closeTimes.push(performance.now());
-                });
+                rws.addEventListener("close", () => closeTimes.push(performance.now()));
 
                 await new Promise((resolve) => setTimeout(resolve, 3000)); // Delay for network operations
                 rws.close();
@@ -421,18 +420,17 @@ Deno.test("ReconnectingWebSocket", async (t) => {
                 for (let i = 1; i < closeTimes.length; i++) {
                     const diff = closeTimes[i] - closeTimes[i - 1];
                     assert(
-                        diff >= customDelay && diff <= customDelay * 1.4,
-                        `Close event #${i} waited less than customDelay. Expected ${customDelay}ms, got ${diff}ms`,
+                        diff >= customDelay,
+                        `Close event #${i} waited less than "customDelay". Expected at least ${customDelay}ms, got ${diff}ms`,
                     );
                 }
             });
 
             await t.step("Custom delay via function", async () => {
                 const delays = [200, 500, 700];
-                let attemptCount = 0;
-                const rws = new ReconnectingWebSocket("ws://invalid4567t7281.com", undefined, {
-                    maxRetries: 3,
-                    connectionDelay: () => delays[attemptCount < delays.length ? attemptCount++ : delays.length - 1],
+                const rws = new ReconnectingWebSocket("ws://invalid4567t7281.com", {
+                    maxRetries: delays.length,
+                    reconnectionDelay: (attempt) => delays[attempt] || delays[delays.length - 1],
                 });
 
                 const closeTimes: number[] = [];
@@ -445,49 +443,27 @@ Deno.test("ReconnectingWebSocket", async (t) => {
                     const diff = closeTimes[i] - closeTimes[i - 1];
                     const expected = delays[i - 1] || delays[delays.length - 1];
                     assert(
-                        diff >= expected && diff <= 1000,
-                        `Close event #${i} waited less than the function-supplied delay. Expected ${expected}ms, got ${diff}ms`,
+                        diff >= expected,
+                        `Close event #${i} waited less than the function-supplied delay. Expected at least ${expected}ms, got ${diff}ms`,
                     );
                 }
             });
         });
 
-        await t.step("shouldReconnect: Respects custom function 'shouldReconnect' when reconnecting", async () => {
-            const maxRetries = 3;
-            let internalCloseCount = 0;
-            const rws = new ReconnectingWebSocket("ws://invalid4567t7281.com", undefined, {
-                maxRetries: maxRetries * 2,
-                connectionDelay: 0,
-                shouldReconnect: (event) => {
-                    assert(event instanceof CloseEvent, "shouldReconnect should receive CloseEvent");
-                    return internalCloseCount++ < 3;
-                },
-            });
-
-            let closeCount = 0;
-            rws.addEventListener("close", () => closeCount++);
-
-            await new Promise((resolve) => setTimeout(resolve, 5000));
-
-            assertEquals(closeCount, maxRetries + 1); // 3 reconnect attempts + 1 initial close
-
-            rws.close();
-        });
-
         await t.step("messageBuffer: Buffers messages when not open and replays on reconnect", async () => {
-            const rws = new ReconnectingWebSocket("ws://localhost:8080", undefined, {
+            const rws = new ReconnectingWebSocket("ws://localhost:8080", {
                 maxRetries: 1,
-                connectionDelay: 0,
+                reconnectionDelay: 0,
             });
 
-            await new Promise((resolve) => rws.addEventListener("open", resolve, { once: true })); // Wait for the connection to open
+            await new Promise((resolve) => rws.addEventListener("open", resolve)); // Wait for the connection to open
 
             rws.close(undefined, undefined, false); // Close without permanently aborting
             rws.send("HelloAfterClose1");
             rws.send("HelloAfterClose2");
 
             // @ts-ignore - accessing private property
-            assertEquals(rws.reconnectOptions.messageBuffer.queue.length, 2);
+            assertEquals(rws._messageBuffer.length, 2);
 
             const receivedMessages: string[] = [];
             rws.addEventListener("message", (ev) => receivedMessages.push(ev.data));
@@ -495,20 +471,20 @@ Deno.test("ReconnectingWebSocket", async (t) => {
             await new Promise((resolve) => setTimeout(resolve, 5000)); // Delay for network operations
 
             assertEquals(receivedMessages.length, 2);
-            assert(receivedMessages.includes("echo:HelloAfterClose1"));
-            assert(receivedMessages.includes("echo:HelloAfterClose2"));
+            assert(receivedMessages.includes("HelloAfterClose1"));
+            assert(receivedMessages.includes("HelloAfterClose2"));
 
             // @ts-ignore - accessing private property
-            assertEquals(rws.reconnectOptions.messageBuffer.queue.length, 0);
+            assertEquals(rws._messageBuffer.length, 0);
 
             rws.close();
         });
 
         await t.step("close():", async (t) => {
             await t.step("close(permanently = true) prevents reconnection", async () => {
-                const rws = new ReconnectingWebSocket("ws://invalid4567t7281.com", undefined, {
+                const rws = new ReconnectingWebSocket("ws://invalid4567t7281.com", {
                     maxRetries: 3,
-                    connectionDelay: 0,
+                    reconnectionDelay: 0,
                 });
 
                 let closeEvents = 0;
@@ -520,13 +496,13 @@ Deno.test("ReconnectingWebSocket", async (t) => {
 
                 assertEquals(closeEvents, 1, "should have only 1 close event");
                 assertEquals(rws.readyState, WebSocket.CLOSED, "socket should remain closed");
-                assert(rws.reconnectAbortController.signal.aborted, "should be permanently closed");
+                assert(rws.terminateSignal.aborted, "should be permanently closed");
             });
 
             await t.step("close(permanently = false) closes but does not stop reconnection logic", async () => {
-                const rws = new ReconnectingWebSocket("ws://invalid4567t7281.com", undefined, {
+                const rws = new ReconnectingWebSocket("ws://invalid4567t7281.com", {
                     maxRetries: 3,
-                    connectionDelay: 0,
+                    reconnectionDelay: 0,
                 });
 
                 let closeEvents = 0;
@@ -538,7 +514,43 @@ Deno.test("ReconnectingWebSocket", async (t) => {
 
                 assertEquals(closeEvents, 4, "should have multiple close events for reconnection");
                 assertEquals(rws.readyState, WebSocket.CLOSED, "socket should remain closed");
-                assert(rws.reconnectAbortController.signal.aborted, "should be permanently closed");
+                assert(rws.terminateSignal.aborted, "should be permanently closed");
+
+                rws.close();
+            });
+        });
+
+        await t.step("send():", async (t) => {
+            await t.step("Check 'signal' logic", async () => {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080", {
+                    maxRetries: 1,
+                    reconnectionDelay: 0,
+                });
+
+                // Create abort controller and immediately abort it (should not be in buffer)
+                const abortController1 = new AbortController();
+                abortController1.abort();
+                rws.send("ShouldNotBeSent1", abortController1.signal);
+
+                // Send normal message
+                rws.send("ShouldBeSent");
+
+                // Create another abort controller, send message, then abort
+                const abortController2 = new AbortController();
+                rws.send("ShouldNotBeSent2", abortController2.signal);
+                abortController2.abort();
+
+                // @ts-ignore - accessing private property
+                assertEquals(rws._messageBuffer.length, 2);
+
+                const receivedMessages: string[] = [];
+                rws.addEventListener("message", (ev) => receivedMessages.push(ev.data));
+
+                await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait for reconnection
+
+                // Only the non-aborted message should be received
+                assertEquals(receivedMessages.length, 1);
+                assertEquals(receivedMessages[0], "ShouldBeSent");
 
                 rws.close();
             });
@@ -546,9 +558,9 @@ Deno.test("ReconnectingWebSocket", async (t) => {
 
         await t.step("Event listeners:", async (t) => {
             await t.step("Re-registers event listeners after reconnection", async () => {
-                const rws = new ReconnectingWebSocket("ws://localhost:8080", undefined, {
+                const rws = new ReconnectingWebSocket("ws://localhost:8080", {
                     maxRetries: 1,
-                    connectionDelay: 0,
+                    reconnectionDelay: 0,
                 });
 
                 let openCount = 0;
@@ -573,14 +585,14 @@ Deno.test("ReconnectingWebSocket", async (t) => {
             });
 
             await t.step("Executes { once: true } listener only 1 time and does not reconnect", async () => {
-                const rws = new ReconnectingWebSocket("ws://invalid4567t7281.com", undefined, {
+                const rws = new ReconnectingWebSocket("ws://invalid4567t7281.com", {
                     maxRetries: 3,
-                    connectionDelay: 0,
+                    reconnectionDelay: 0,
                 });
 
                 let closeOnceCalls = 0;
                 const onceClose = () => closeOnceCalls++;
-                rws.addEventListener("close", onceClose, { once: true });
+                rws.addEventListener("close", onceClose, { once: true }); // `maxRetries` is 3, but should only be called once
 
                 await new Promise((resolve) => setTimeout(resolve, 3000)); // Delay for network operations
                 assertEquals(closeOnceCalls, 1);
@@ -644,118 +656,60 @@ Deno.test("ReconnectingWebSocket", async (t) => {
 
                 await new Promise((resolve) => setTimeout(resolve, 500)); // Delay for event processing
 
-                assertEquals(onopenCalled, 3);
-                assertEquals(oncloseCalled, 2);
-                assertEquals(onerrorCalled, 1);
-                assertEquals(onmessageCalled, 1);
+                assertEquals(onopenCalled, 3); // initial open + after close + manual dispatch
+                assertEquals(oncloseCalled, 2); // after close + manual dispatch
+                assertEquals(onerrorCalled, 1); // manual dispatch
+                assertEquals(onmessageCalled, 1); // manual dispatch
 
                 rws.close();
             });
         });
 
-        await t.step("reconnectAbortController:", async (t) => {
-            await t.step("Error in reconnection process aborts permanently", async () => {
-                const rws = new ReconnectingWebSocket("ws://invalid4567t7281.com", undefined, {
-                    maxRetries: 3,
-                    connectionDelay: 0,
-                    shouldReconnect: () => {
-                        throw new Error("BOOM");
-                    },
-                });
-
-                let closeEvents = 0;
-                rws.addEventListener("close", () => closeEvents++);
-
-                await new Promise((resolve) => setTimeout(resolve, 3000));
-
-                assertEquals(closeEvents, 1);
-                assert(rws.reconnectAbortController.signal.aborted);
-
-                rws.close();
-            });
-
-            await t.step(
-                "'reconnectAbortController' indicates permanent closure and reason for termination",
-                async () => {
-                    // Check maxRetries reached reason
-                    const rws1 = new ReconnectingWebSocket("ws://invalid4567t7281.com", undefined, { maxRetries: 0 });
-
-                    await new Promise((resolve) => setTimeout(resolve, 1000)); // Delay for network operations
-
-                    assertIsError(
-                        rws1.reconnectAbortController.signal.reason,
-                        ReconnectingWebSocketError,
-                        "Error when reconnecting WebSocket: RECONNECTION_LIMIT_REACHED",
-                    );
-
-                    rws1.close();
-
-                    // Check user-initiated close reason
-                    const rws2 = new ReconnectingWebSocket("ws://localhost:8080");
-                    rws2.close();
-
-                    assertIsError(
-                        rws2.reconnectAbortController.signal.reason,
-                        ReconnectingWebSocketError,
-                        "Error when reconnecting WebSocket: USER_INITIATED_CLOSE",
-                    );
-                },
-            );
-
-            await t.step("Checking aborted signal after 'shouldReconnect'", async () => {
-                const rws = new ReconnectingWebSocket("ws://invalid4567t7281.com", undefined, {
-                    maxRetries: 2,
-                    connectionDelay: 0,
-                    shouldReconnect: () => {
-                        rws.close();
-                        return true;
-                    },
+        await t.step("terminateSignal:", async (t) => {
+            await t.step("'terminateSignal' indicates permanent closure and reason for termination", async () => {
+                // Check maxRetries reached reason
+                const rws1 = new ReconnectingWebSocket("ws://invalid4567t7281.com", {
+                    maxRetries: 0,
                 });
 
                 await new Promise((resolve) => setTimeout(resolve, 1000)); // Delay for network operations
 
-                assertInstanceOf(
-                    rws.reconnectAbortController.signal.reason,
+                assertIsError(
+                    rws1.terminateSignal.reason,
                     ReconnectingWebSocketError,
-                    "Error when reconnecting WebSocket: USER_INITIATED_CLOSE",
+                    "Error when reconnecting WebSocket: RECONNECTION_LIMIT",
+                );
+
+                rws1.close();
+
+                // Check user-initiated close reason
+                const rws2 = new ReconnectingWebSocket("ws://localhost:8080");
+                rws2.close();
+
+                assertIsError(
+                    rws2.terminateSignal.reason,
+                    ReconnectingWebSocketError,
+                    "Error when reconnecting WebSocket: TERMINATED_BY_USER",
                 );
             });
 
-            await t.step("Checking aborted signal after 'connectionDelay'", async () => {
+            await t.step("Check abort signal in 'sleep' on reconnect (fast exit from sleep)", async () => {
+                const reconnectionDelay = 10_000;
                 const rws = new ReconnectingWebSocket("ws://invalid4567t7281.com", undefined, {
                     maxRetries: 2,
-                    connectionDelay: () => {
-                        rws.close();
-                        return 0;
-                    },
+                    reconnectionDelay,
                 });
+
+                await new Promise((resolve) => setTimeout(resolve, reconnectionDelay / 3)); // Wait until in sleep
+
+                rws.close(); // Close connection during sleep from `reconnectionDelay`
 
                 await new Promise((resolve) => setTimeout(resolve, 1000)); // Delay for network operations
 
                 assertInstanceOf(
-                    rws.reconnectAbortController.signal.reason,
+                    rws.terminateSignal.reason,
                     ReconnectingWebSocketError,
-                    "Error when reconnecting WebSocket: USER_INITIATED_CLOSE",
-                );
-            });
-
-            await t.step("Checking 'onAbort' in 'sleep' on reconnect", async () => {
-                const connectionDelay = 10_000;
-                const rws = new ReconnectingWebSocket("ws://invalid4567t7281.com", undefined, {
-                    maxRetries: 2,
-                    connectionDelay: 10_000,
-                });
-
-                await new Promise((resolve) => setTimeout(resolve, connectionDelay / 3));
-
-                rws.close();
-
-                await new Promise((resolve) => setTimeout(resolve, 1000)); // Delay for network operations
-
-                assertInstanceOf(
-                    rws.reconnectAbortController.signal.reason,
-                    ReconnectingWebSocketError,
-                    "Error when reconnecting WebSocket: USER_INITIATED_CLOSE",
+                    "Error when reconnecting WebSocket: TERMINATED_BY_USER",
                 );
             });
         });

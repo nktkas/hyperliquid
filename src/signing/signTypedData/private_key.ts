@@ -1,5 +1,5 @@
 import { keccak_256 } from "@noble/hashes/sha3";
-import { etc, getPublicKey, signAsync, utils } from "@noble/secp256k1";
+import * as secp from "@noble/secp256k1";
 
 interface Types {
     [type: string]: {
@@ -34,14 +34,14 @@ export async function signTypedData(args: {
 
     const hash = hashTypedData({ domain, types, primaryType, message });
 
-    const signature = await signAsync(
+    const signature = await secp.signAsync(
         hash,
-        etc.hexToBytes(cleanHex(privateKey)),
+        secp.etc.hexToBytes(cleanHex(privateKey)),
         { prehash: false, format: "recovered" },
     );
 
-    const r = etc.bytesToHex(signature.slice(1, 33));
-    const s = etc.bytesToHex(signature.slice(33, 65));
+    const r = secp.etc.bytesToHex(signature.slice(1, 33));
+    const s = secp.etc.bytesToHex(signature.slice(33, 65));
     const v = (signature[0] + 27).toString(16).padStart(2, "0");
 
     return `0x${r}${s}${v}`;
@@ -81,13 +81,13 @@ function hashTypedData(args: {
     bytes.push(hashStruct("EIP712Domain", domain, types));
     if (primaryType !== "EIP712Domain") bytes.push(hashStruct(primaryType, message, types));
 
-    return keccak_256(etc.concatBytes(...bytes));
+    return keccak_256(secp.etc.concatBytes(...bytes));
 }
 
 function hashStruct(primaryType: string, data: Record<string, unknown>, types: Types): Uint8Array {
     const typeHash = keccak_256(new TextEncoder().encode(encodeType(primaryType, types)));
     const encodedValues = types[primaryType].map((field) => encodeValue(field.type, data[field.name], types));
-    return keccak_256(etc.concatBytes(typeHash, ...encodedValues));
+    return keccak_256(secp.etc.concatBytes(typeHash, ...encodedValues));
 }
 
 function encodeType(primaryType: string, types: Types): string {
@@ -133,7 +133,7 @@ function encodeValue(type: string, value: unknown, types: Types): Uint8Array {
 
         // Encode each element in the array and hash them together
         const encodedElements = value.map((v) => encodeValue(baseType, v, types));
-        return keccak_256(etc.concatBytes(...encodedElements));
+        return keccak_256(secp.etc.concatBytes(...encodedElements));
     }
 
     if (types[type]) {
@@ -146,7 +146,7 @@ function encodeValue(type: string, value: unknown, types: Types): Uint8Array {
     }
 
     if (type === "address") {
-        const bytes = etc.hexToBytes(cleanHex(value as string));
+        const bytes = secp.etc.hexToBytes(cleanHex(value as string));
         if (bytes.length !== 20) {
             throw new Error(`Address must be 20 bytes.`);
         }
@@ -170,7 +170,7 @@ function encodeValue(type: string, value: unknown, types: Types): Uint8Array {
 
         // Convert to 32-byte big-endian
         const hex = BigInt.asUintN(256, resizedValue).toString(16).padStart(64, "0");
-        return etc.hexToBytes(hex);
+        return secp.etc.hexToBytes(hex);
     }
 
     if (type === "bool") {
@@ -180,7 +180,7 @@ function encodeValue(type: string, value: unknown, types: Types): Uint8Array {
     }
 
     if (type === "bytes") {
-        const bytes = typeof value === "string" ? etc.hexToBytes(cleanHex(value)) : value as Uint8Array;
+        const bytes = typeof value === "string" ? secp.etc.hexToBytes(cleanHex(value)) : value as Uint8Array;
         return keccak_256(bytes);
     }
 
@@ -193,7 +193,7 @@ function encodeValue(type: string, value: unknown, types: Types): Uint8Array {
         }
 
         // Convert hex to bytes
-        const bytes = etc.hexToBytes(cleanHex(value as string));
+        const bytes = secp.etc.hexToBytes(cleanHex(value as string));
         if (bytes.length !== size) {
             throw new Error(`${type} requires exactly ${size} bytes. Received: ${bytes.length} from '${value}'`);
         }
@@ -214,21 +214,21 @@ function cleanHex(hex: string): string {
 /** Validates if a string is a valid secp256k1 private key. */
 export function isValidPrivateKey(privateKey: unknown): privateKey is string {
     if (typeof privateKey !== "string") return false;
-    const privateKeyBytes = etc.hexToBytes(cleanHex(privateKey));
-    return utils.isValidSecretKey(privateKeyBytes);
+    const privateKeyBytes = secp.etc.hexToBytes(cleanHex(privateKey));
+    return secp.utils.isValidSecretKey(privateKeyBytes);
 }
 
 /** Converts a private key to an Ethereum address. */
 export function privateKeyToAddress(privateKey: string): `0x${string}` {
-    const privateKeyBytes = etc.hexToBytes(cleanHex(privateKey));
+    const privateKeyBytes = secp.etc.hexToBytes(cleanHex(privateKey));
 
-    const publicKey = getPublicKey(privateKeyBytes, false);
+    const publicKey = secp.getPublicKey(privateKeyBytes, false);
     const publicKeyWithoutPrefix = publicKey.slice(1);
 
     const hash = keccak_256(publicKeyWithoutPrefix);
 
     const addressBytes = hash.slice(-20);
-    const address = etc.bytesToHex(addressBytes);
+    const address = secp.etc.bytesToHex(addressBytes);
 
     return `0x${address}`;
 }

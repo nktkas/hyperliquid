@@ -121,7 +121,7 @@
  */
 
 import { keccak_256 } from "@noble/hashes/sha3";
-import { etc } from "@noble/secp256k1";
+import * as secp from "@noble/secp256k1";
 import { encode as encodeMsgpack } from "@msgpack/msgpack";
 import {
     type AbstractWallet,
@@ -273,14 +273,14 @@ export function createL1ActionHash(args: {
 
     // 3. Vault address
     const vaultMarker = vaultAddress ? new Uint8Array([1]) : new Uint8Array([0]);
-    const vaultBytes = vaultAddress ? etc.hexToBytes(vaultAddress.slice(2)) : new Uint8Array();
+    const vaultBytes = vaultAddress ? secp.etc.hexToBytes(vaultAddress.slice(2)) : new Uint8Array();
 
     // 4. Expires after
     const expiresMarker = expiresAfter !== undefined ? new Uint8Array([0]) : new Uint8Array();
     const expiresBytes = expiresAfter !== undefined ? toUint64Bytes(expiresAfter) : new Uint8Array();
 
     // Create a hash
-    const bytes = etc.concatBytes(
+    const bytes = secp.etc.concatBytes(
         actionBytes,
         nonceBytes,
         vaultMarker,
@@ -289,7 +289,7 @@ export function createL1ActionHash(args: {
         expiresBytes,
     );
     const hash = keccak_256(bytes);
-    return `0x${etc.bytesToHex(hash)}`;
+    return `0x${secp.etc.bytesToHex(hash)}`;
 }
 
 function toUint64Bytes(n: bigint | number | string): Uint8Array {

@@ -32,11 +32,11 @@ Deno.test("HyperliquidEventTarget", async (t) => {
         const event = new MessageEvent("message", {
             data: JSON.stringify([
                 {
-                    height: 123,
                     blockTime: 1678900000,
-                    hash: "0x1234",
-                    proposer: "0x1234",
+                    hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+                    height: 123,
                     numTxs: 42,
+                    proposer: "0x0000000000000000000000000000000000000000",
                 },
             ]),
         });
@@ -61,12 +61,12 @@ Deno.test("HyperliquidEventTarget", async (t) => {
         const event = new MessageEvent("message", {
             data: JSON.stringify([
                 {
-                    action: { someField: 1 },
+                    action: { type: "someAction" },
                     block: 234,
                     error: null,
-                    hash: "0x1234",
+                    hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
                     time: 1678900001,
-                    user: "0x1234",
+                    user: "0x0000000000000000000000000000000000000000",
                 },
             ]),
         });
@@ -75,7 +75,7 @@ Deno.test("HyperliquidEventTarget", async (t) => {
         assert(Array.isArray(receivedMsg), "Should be an array of transaction details");
         const firstTx = receivedMsg[0];
         assertEquals(firstTx.block, 234);
-        assertEquals(firstTx.user, "0x1234");
+        assertEquals(firstTx.user, "0x0000000000000000000000000000000000000000");
     });
 
     await t.step("Invalid JSON => no event dispatched, no crash", () => {

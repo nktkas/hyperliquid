@@ -42,11 +42,13 @@ export function runTest(
     Deno.test(name, async (t) => {
         await new Promise((r) => setTimeout(r, cliArgs.wait)); // delay to avoid rate limits
 
-        await using transport = new WebSocketTransport({ url: `wss://${mode}.hyperliquid-testnet.xyz/ws` });
+        const transport = new WebSocketTransport({ url: `wss://${mode}.hyperliquid-testnet.xyz/ws` });
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
 
         await fn(t, subsClient);
+
+        await transport.close();
     });
 }
 
@@ -64,10 +66,7 @@ export function runTestWithExchange(
     Deno.test(name, async (t) => {
         await new Promise((r) => setTimeout(r, cliArgs.wait)); // delay to avoid rate limits
 
-        await using transport = new WebSocketTransport({
-            url: `wss://api.hyperliquid-testnet.xyz/ws`,
-            isTestnet: true,
-        });
+        const transport = new WebSocketTransport({ isTestnet: true });
         await transport.ready();
 
         const subsClient = new SubscriptionClient({ transport });
@@ -85,6 +84,8 @@ export function runTestWithExchange(
                 destination: await getWalletAddress(mainExchClient.wallet),
                 amount: state.withdrawable,
             }).catch(() => undefined);
+
+            await transport.close();
         }
     });
 }

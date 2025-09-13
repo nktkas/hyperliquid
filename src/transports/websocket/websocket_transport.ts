@@ -1,18 +1,24 @@
-import { TransportError } from "../base.ts";
-import type { IRequestTransport, ISubscriptionTransport, Subscription } from "../base.ts";
+import { type IRequestTransport, type ISubscriptionTransport, type Subscription, TransportError } from "../base.ts";
+import { AbortSignal_ } from "../_polyfills.ts";
 import {
-    type MessageBufferStrategy,
     ReconnectingWebSocket,
     ReconnectingWebSocketError,
     type ReconnectingWebSocketOptions,
 } from "./_reconnecting_websocket.ts";
 import { HyperliquidEventTarget } from "./_hyperliquid_event_target.ts";
-import { WebSocketAsyncRequest } from "./_websocket_async_request.ts";
+import { WebSocketAsyncRequest, WebSocketRequestError } from "./_websocket_async_request.ts";
 
-export { type MessageBufferStrategy, ReconnectingWebSocketError, type ReconnectingWebSocketOptions };
+export { ReconnectingWebSocketError, WebSocketRequestError };
+
+type MaybePromise<T> = T | Promise<T>;
 
 /** Configuration options for the WebSocket transport layer. */
 export interface WebSocketTransportOptions {
+    /**
+     * Indicates this transport uses testnet endpoint.
+     * @defaultValue `false`
+     */
+    isTestnet?: boolean;
     /**
      * The WebSocket URL.
      * - Mainnet:
@@ -21,63 +27,38 @@ export interface WebSocketTransportOptions {
      * - Testnet:
      *   - API: `wss://api.hyperliquid-testnet.xyz/ws`
      *   - Explorer: `wss://rpc.hyperliquid-testnet.xyz/ws`
-     * @defaultValue `wss://api.hyperliquid.xyz/ws`
+     * @defaultValue `wss://api.hyperliquid.xyz/ws` for `isTestnet` = `false`, `wss://api.hyperliquid-testnet.xyz/ws` for `isTestnet` = `true`
      */
     url?: string | URL;
-
-    /**
-     * Indicates this transport uses testnet endpoint.
-     * @defaultValue `false`
-     */
-    isTestnet?: boolean;
-
     /**
      * Timeout for requests in ms.
      * Set to `null` to disable.
      * @defaultValue `10_000`
      */
     timeout?: number | null;
-
-    /** Keep-alive configuration. */
-    keepAlive?: {
-        /**
-         * Interval between sending ping messages in ms.
-         * Set to `null` to disable.
-         * @defaultValue `30_000`
-         */
-        interval?: number | null;
-
-        /**
-         * Timeout for the ping request in ms.
-         * Set to `null` to disable.
-         * @defaultValue same as {@link timeout} for requests.
-         */
-        timeout?: number | null;
-    };
-
+    /**
+     * Interval between sending ping messages in ms.
+     * Set to `null` to disable.
+     * @defaultValue `30_000`
+     */
+    keepAliveInterval?: number | null;
     /** Reconnection policy configuration for closed connections. */
     reconnect?: ReconnectingWebSocketOptions;
-
     /**
-     * Enable automatic event resubscription after reconnection.
+     * Enable automatic re-subscription to Hyperliquid subscription after reconnection.
      * @defaultValue `true`
      */
-    autoResubscribe?: boolean;
-}
-
-/** Error thrown when a WebSocket request fails. */
-export class WebSocketRequestError extends TransportError {
-    constructor(message?: string, options?: ErrorOptions) {
-        super(message, options);
-        this.name = "WebSocketRequestError";
-    }
+    resubscribe?: boolean;
+    onRequest?: (type: string, payload: unknown) => MaybePromise<unknown | void | null | undefined>;
+    onResponse?: (response: unknown) => MaybePromise<unknown | void | null | undefined>;
+    onError?: (error: unknown) => MaybePromise<Error | void | null | undefined>;
 }
 
 /** WebSocket implementation of the REST and Subscription transport interfaces. */
-export class WebSocketTransport implements IRequestTransport, ISubscriptionTransport, AsyncDisposable {
+export class WebSocketTransport implements IRequestTransport, ISubscriptionTransport {
     protected _wsRequester: WebSocketAsyncRequest;
     protected _hlEvents: HyperliquidEventTarget;
-    protected _keepAliveTimeout: ReturnType<typeof setTimeout> | null = null;
+    protected _keepAliveTimeout: ReturnType<typeof setTimeout> | undefined;
     protected _subscriptions: Map<
         string, // Unique identifier based on the payload
         {
@@ -86,37 +67,25 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
                 () => Promise<void> // Unsubscribe function
             >;
             promise: Promise<unknown>; // Subscription request promise
-            resubscribeAbortController?: AbortController; // To monitor reconnection errors
+            promiseFinished: boolean;
+            resubscribeAbortController: AbortController; // To monitor reconnection errors
         }
     > = new Map();
-    protected _isReconnecting = false;
 
     /** Indicates this transport uses testnet endpoint. */
     isTestnet: boolean;
-
     /**
-     * Request timeout in ms.
+     * Timeout for requests in ms.
      * Set to `null` to disable.
      */
     timeout: number | null;
-
-    /** Keep-alive configuration. */
-    keepAlive: {
-        /**
-         * Interval between sending ping messages in ms.
-         * Set to `null` to disable.
-         */
-        interval: number | null;
-
-        /**
-         * Timeout for the ping request in ms.
-         * Set to `null` to disable.
-         */
-        timeout?: number | null;
-    };
-
-    /** Enable automatic resubscription after reconnection. */
-    autoResubscribe: boolean;
+    /**
+     * Interval between sending ping messages in ms.
+     * Set to `null` to disable.
+     */
+    keepAliveInterval: number | null;
+    /** Enable automatic re-subscription to Hyperliquid subscription after reconnection. */
+    resubscribe: boolean;
 
     /** The WebSocket that is used for communication. */
     readonly socket: ReconnectingWebSocket;
@@ -126,59 +95,110 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
      * @param options - Configuration options for the WebSocket transport layer.
      */
     constructor(options?: WebSocketTransportOptions) {
+        this.isTestnet = options?.isTestnet ?? false;
+        this.timeout = options?.timeout === undefined ? 10_000 : options.timeout;
+        this.keepAliveInterval = options?.keepAliveInterval ?? 30_000;
+        this.resubscribe = options?.resubscribe ?? true;
+
         this.socket = new ReconnectingWebSocket(
-            options?.url ?? "wss://api.hyperliquid.xyz/ws",
-            undefined,
+            options?.url ?? this.isTestnet ? "wss://api.hyperliquid-testnet.xyz/ws" : "wss://api.hyperliquid.xyz/ws",
             options?.reconnect,
         );
+
         this._hlEvents = new HyperliquidEventTarget(this.socket);
         this._wsRequester = new WebSocketAsyncRequest(this.socket, this._hlEvents);
 
-        this.isTestnet = options?.isTestnet ?? false;
-        this.timeout = options?.timeout === undefined ? 10_000 : options.timeout;
-        this.keepAlive = {
-            interval: options?.keepAlive?.interval === undefined ? 30_000 : options.keepAlive?.interval,
-            timeout: options?.keepAlive?.timeout === undefined ? this.timeout : options.keepAlive?.timeout,
-        };
-        this.autoResubscribe = options?.autoResubscribe ?? true;
-
         // Initialize listeners
         this.socket.addEventListener("open", () => {
-            this._keepAliveStart();
-            this._resubscribeStart();
+            this._keepAliveRun();
+            this._resubscribeRun();
         });
-        this.socket.addEventListener("close", () => {
+        const handleClose = () => {
             this._keepAliveStop();
             this._resubscribeStop();
-            this._isReconnecting = true;
-        });
+        };
+        this.socket.addEventListener("close", handleClose);
+        this.socket.addEventListener("error", handleClose);
+    }
+
+    /**
+     * Keep the connection alive.
+     * Sends ping only when no other requests were sent within the keep-alive interval.
+     */
+    protected _keepAliveRun(): void {
+        if (this.keepAliveInterval === null || this._keepAliveTimeout) return;
+
+        const tick = async () => {
+            if (
+                this.socket.readyState !== ReconnectingWebSocket.OPEN || !this._keepAliveTimeout ||
+                this.keepAliveInterval === null
+            ) return;
+
+            // Check if the last request was sent more than the keep-alive interval ago
+            if (Date.now() - this._wsRequester.lastRequestTime >= this.keepAliveInterval) {
+                const timeoutSignal = this.timeout ? AbortSignal_.timeout(this.keepAliveInterval) : undefined;
+                await this._wsRequester.request("ping", timeoutSignal)
+                    .catch(() => undefined); // Ignore errors
+            }
+
+            // Schedule the next ping
+            if (
+                this.socket.readyState === ReconnectingWebSocket.OPEN && this._keepAliveTimeout &&
+                this.keepAliveInterval !== null
+            ) {
+                const nextDelay = this.keepAliveInterval - (Date.now() - this._wsRequester.lastRequestTime);
+                this._keepAliveTimeout = setTimeout(tick, nextDelay);
+            }
+        };
+
+        this._keepAliveTimeout = setTimeout(tick, this.keepAliveInterval);
+    }
+    protected _keepAliveStop(): void {
+        clearTimeout(this._keepAliveTimeout);
+        this._keepAliveTimeout = undefined;
+    }
+
+    /** Resubscribe to all existing subscriptions if auto-resubscribe is enabled. */
+    protected _resubscribeRun(): void {
+        if (this.resubscribe) {
+            for (const [id, subscription] of this._subscriptions.entries()) {
+                if (subscription.promiseFinished) { // reconnect only previously connected subscriptions to avoid double subscriptions due to message buffering.
+                    subscription.promise = this._wsRequester.request("subscribe", JSON.parse(id))
+                        .catch((error) => subscription.resubscribeAbortController.abort(error))
+                        .finally(() => subscription.promiseFinished = true);
+                    subscription.promiseFinished = false;
+                }
+            }
+        }
+    }
+    protected _resubscribeStop(): void {
+        if (!this.resubscribe || this.socket.terminateSignal.aborted) {
+            for (const subscriptionInfo of this._subscriptions.values()) {
+                for (const [_, unsubscribe] of subscriptionInfo.listeners) {
+                    unsubscribe(); // does not cause an error if used when the connection is closed
+                }
+            }
+        }
     }
 
     /**
      * Sends a request to the Hyperliquid API via WebSocket.
-     *
-     * Note: Explorer requests are not supported in the Hyperliquid WebSocket API.
-     *
-     * @param endpoint - The API endpoint to send the request to (`explorer` requests are not supported).
+     * @param endpoint - The API endpoint to send the request to.
      * @param payload - The payload to send with the request.
-     * @param signal - An {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal}. If this option is set, the request can be canceled by calling {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort | abort()} on the corresponding {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController | AbortController}.
+     * @param signal - An [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) can be used to cancel the request by calling [`abort()`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort) on the corresponding [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController).
      * @returns A promise that resolves with parsed JSON response body.
-     *
      * @throws {WebSocketRequestError} - An error that occurs when a WebSocket request fails.
      */
     async request<T>(type: "info" | "exchange", payload: unknown, signal?: AbortSignal): Promise<T> {
         try {
-            const timeoutSignal = this.timeout ? AbortSignal.timeout(this.timeout) : undefined;
+            const timeoutSignal = this.timeout ? AbortSignal_.timeout(this.timeout) : undefined;
             const combinedSignal = signal && timeoutSignal
-                ? AbortSignal.any([signal, timeoutSignal])
+                ? AbortSignal_.any([signal, timeoutSignal])
                 : signal ?? timeoutSignal;
 
             return await this._wsRequester.request(
                 "post",
-                {
-                    type: type === "exchange" ? "action" : type,
-                    payload,
-                },
+                { type: type === "exchange" ? "action" : type, payload },
                 combinedSignal,
             );
         } catch (error) {
@@ -193,12 +213,10 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
     /**
      * Subscribes to a Hyperliquid event channel.
      * Sends a subscription request to the server and listens for events.
-     *
      * @param channel - The event channel to listen to.
      * @param payload - A payload to send with the subscription request.
      * @param listener - A function to call when the event is dispatched.
      * @returns A promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
-     *
      * @throws {WebSocketRequestError} - An error that occurs when a WebSocket request fails.
      */
     async subscribe<T>(
@@ -214,12 +232,14 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
             let subscription = this._subscriptions.get(id);
             if (!subscription) {
                 // Send subscription request
-                const promise = this._wsRequester.request("subscribe", payload);
+                const promise = this._wsRequester.request("subscribe", payload)
+                    .finally(() => subscription!.promiseFinished = true);
 
                 // Cache subscription info
                 subscription = {
                     listeners: new Map(),
                     promise,
+                    promiseFinished: false,
                     resubscribeAbortController: new AbortController(),
                 };
                 this._subscriptions.set(id, subscription);
@@ -232,7 +252,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
                 unsubscribe = async () => {
                     try {
                         // Remove listener and cleanup
-                        this._hlEvents.removeEventListener(channel, listener as EventListener);
+                        this._hlEvents.removeEventListener(channel, listener);
                         const subscription = this._subscriptions.get(id);
                         subscription?.listeners.delete(listener);
 
@@ -256,7 +276,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
                 };
 
                 // Add listener and cache unsubscribe function
-                this._hlEvents.addEventListener(channel, listener as EventListener);
+                this._hlEvents.addEventListener(channel, listener);
                 subscription.listeners.set(listener, unsubscribe);
             }
 
@@ -266,7 +286,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
             // Return subscription control object
             return {
                 unsubscribe,
-                resubscribeSignal: subscription.resubscribeAbortController?.signal,
+                resubscribeSignal: subscription.resubscribeAbortController.signal,
             };
         } catch (error) {
             if (error instanceof TransportError) throw error; // Re-throw known errors
@@ -279,14 +299,14 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
 
     /**
      * Waits until the WebSocket connection is ready.
-     * @param signal - An {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal}. If this option is set, the promise can be canceled by calling {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort | abort()} on the corresponding {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController | AbortController}.
+     * @param signal - An [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) can be used to cancel the promise by calling [`abort()`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort) on the corresponding [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController).
      * @returns A promise that resolves when the connection is ready.
      */
     ready(signal?: AbortSignal): Promise<void> {
         return new Promise((resolve, reject) => {
             const combinedSignal = signal
-                ? AbortSignal.any([this.socket.reconnectAbortController.signal, signal])
-                : this.socket.reconnectAbortController.signal;
+                ? AbortSignal_.any([this.socket.terminateSignal, signal])
+                : this.socket.terminateSignal;
 
             if (combinedSignal.aborted) return reject(combinedSignal.reason);
             if (this.socket.readyState === ReconnectingWebSocket.OPEN) return resolve();
@@ -307,7 +327,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
 
     /**
      * Closes the WebSocket connection and waits until it is fully closed.
-     * @param signal - An {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal}. If this option is set, the promise can be canceled by calling {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort | abort()} on the corresponding {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/AbortController | AbortController}.
+     * @param signal - An [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) can be used to cancel the promise by calling [`abort()`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort) on the corresponding [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController).
      * @returns A promise that resolves when the connection is fully closed.
      */
     close(signal?: AbortSignal): Promise<void> {
@@ -320,75 +340,14 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
                 resolve();
             };
             const handleAbort = () => {
-                this.socket.removeEventListener("close", handleClose);
                 reject(signal?.reason);
             };
 
-            this.socket.addEventListener("close", handleClose, { once: true });
+            this.socket.addEventListener("close", handleClose, { once: true, signal });
+            this.socket.addEventListener("error", handleClose, { once: true, signal });
             signal?.addEventListener("abort", handleAbort, { once: true });
 
             this.socket.close();
         });
-    }
-
-    /** Keep the connection alive. Sends ping only when necessary. */
-    protected _keepAliveStart(): void {
-        if (this.keepAlive.interval === null || this._keepAliveTimeout) return;
-
-        const tick = async () => {
-            if (
-                this.socket.readyState !== ReconnectingWebSocket.OPEN || !this._keepAliveTimeout ||
-                this.keepAlive.interval === null
-            ) return;
-
-            // Check if the last request was sent more than the keep-alive interval ago
-            if (Date.now() - this._wsRequester.lastRequestTime >= this.keepAlive.interval) {
-                const timeoutSignal = this.keepAlive.timeout ? AbortSignal.timeout(this.keepAlive.timeout) : undefined;
-                await this._wsRequester.request("ping", timeoutSignal)
-                    .catch(() => undefined); // Ignore errors
-            }
-
-            // Schedule the next ping
-            if (
-                this.socket.readyState === ReconnectingWebSocket.OPEN && this._keepAliveTimeout &&
-                this.keepAlive.interval !== null
-            ) {
-                const nextDelay = this.keepAlive.interval - (Date.now() - this._wsRequester.lastRequestTime);
-                this._keepAliveTimeout = setTimeout(tick, nextDelay);
-            }
-        };
-
-        this._keepAliveTimeout = setTimeout(tick, this.keepAlive.interval);
-    }
-    protected _keepAliveStop(): void {
-        if (this._keepAliveTimeout !== null) {
-            clearTimeout(this._keepAliveTimeout);
-            this._keepAliveTimeout = null;
-        }
-    }
-
-    /** Resubscribe to all existing subscriptions if auto-resubscribe is enabled. */
-    protected _resubscribeStart(): void {
-        if (this.autoResubscribe && this._isReconnecting) {
-            for (const [id, subscriptionInfo] of this._subscriptions.entries()) {
-                subscriptionInfo.promise = this._wsRequester.request("subscribe", JSON.parse(id))
-                    .catch((error) => {
-                        subscriptionInfo.resubscribeAbortController?.abort(error);
-                    });
-            }
-        }
-    }
-    protected _resubscribeStop(): void {
-        if (!this.autoResubscribe || this.socket.reconnectAbortController.signal.aborted) {
-            for (const subscriptionInfo of this._subscriptions.values()) {
-                for (const [_, unsubscribe] of subscriptionInfo.listeners) {
-                    unsubscribe(); // does not cause an error if used when the connection is closed
-                }
-            }
-        }
-    }
-
-    async [Symbol.asyncDispose](): Promise<void> {
-        await this.close();
     }
 }

@@ -33,6 +33,20 @@ pnpm add @nktkas/hyperliquid
 yarn add @nktkas/hyperliquid
 ```
 
+If you are using Node.js v20, then to use [`WebSocketTransport`](#websocket-transport), you need to install the
+[`ws`](https://www.npmjs.com/package/ws) package and pass the `WebSocket` class:
+
+```ts
+import WebSocket from "ws"; // install `ws` package
+import * as hl from "@nktkas/hyperliquid";
+
+const transport = new hl.WebSocketTransport({
+    reconnect: {
+        WebSocket, // pass `WebSocket` class from `ws` package
+    },
+});
+```
+
 ### Deno
 
 ```
@@ -49,70 +63,26 @@ deno add jsr:@nktkas/hyperliquid
 
 ### React Native
 
-<details>
-<summary>For React Native, you need to import polyfills before importing the SDK:</summary>
+For React Native, you need to import polyfills before importing the SDK:
 
 ```js
-// React Native v0.79 / Expo v53
+// React Native v0.74.5 / Expo v51
 // Issues:
-// - signing: does not support private keys directly, use `viem` or `ethers`
-
-import "event-target-polyfill"; // for `WebSocketTransport`
-// or
-// import { Event, EventTarget } from "event-target-shim";
-// if (!globalThis.EventTarget || !globalThis.Event) {
-//     globalThis.EventTarget = EventTarget;
-//     globalThis.Event = Event;
-// }
-
-if (!globalThis.CustomEvent) { // for `WebSocketTransport`
-    globalThis.CustomEvent = function (type, params) {
-        params = params || {};
-        const event = new Event(type, params);
-        event.detail = params.detail || null;
-        return event;
-    };
-}
-
-if (!Promise.withResolvers) { // for `WebSocketTransport`
-    Promise.withResolvers = function () {
-        let resolve, reject;
-        const promise = new Promise((res, rej) => {
-            resolve = res;
-            reject = rej;
-        });
-        return { promise, resolve, reject };
-    };
-}
-
-if (!AbortSignal.any) {
-    AbortSignal.any = function (signals) {
-        const controller = new AbortController();
-        for (const signal of signals) {
-            if (signal.aborted) {
-                controller.abort(signal.reason);
-                return controller.signal;
-            }
-            signal.addEventListener("abort", () => {
-                controller.abort(signal.reason);
-            }, { once: true, signal: controller.signal });
-        }
-        return controller.signal;
-    };
-}
-
-if (!AbortSignal.timeout) {
-    AbortSignal.timeout = function (delay) {
-        const controller = new AbortController();
-        setTimeout(() => controller.abort(), delay);
-        return controller.signal;
-    };
-}
+// - signing: does not support a private keys directly, use `viem` or `ethers`
+import "fast-text-encoding"; // `TextEncoder` (utf-8)
+import "event-target-polyfill"; // `EventTarget`, `Event`
+import * as hl from "@nktkas/hyperliquid";
 ```
 
-</details>
-
 ## Quick Start
+
+### CLI
+
+The SDK includes a command-line interface for quick interactions with Hyperliquid API without writing code.
+
+```bash
+npx @nktkas/hyperliquid --help
+```
 
 ### [Info endpoint](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint)
 
@@ -189,19 +159,12 @@ const multiSignClient = new hl.MultiSignClient({
     multiSignAddress: "0x...",
     signers: [
         "0x...", // `viem`, `ethers`, or private key directly
+        // ... more signers
     ],
 });
 
 // 3. Execute an action (same as `ExchangeClient`)
 await multiSignClient.approveAgent({ agentAddress: "0x..." });
-```
-
-### CLI
-
-The SDK includes a command-line interface for quick interactions with Hyperliquid API without writing code.
-
-```bash
-npx @nktkas/hyperliquid --help
 ```
 
 ## Usage
@@ -214,10 +177,10 @@ First, choose and configure your transport layer (more details in the [API Refer
 import * as hl from "@nktkas/hyperliquid";
 
 // 1. HTTP Transport: suitable for one-time requests or serverless environments
-const httpTransport = new hl.HttpTransport({...}); // Accepts optional parameters (e.g. isTestnet, timeout, etc.)
+const httpTransport = new hl.HttpTransport({ ... }); // Accepts optional parameters (e.g. isTestnet, timeout, etc.)
 
 // 2. WebSocket Transport: has better network latency than HTTP transport
-const wsTransport = new hl.WebSocketTransport({...}); // Accepts optional parameters (e.g. url, isTestnet, timeout, reconnect, etc.)
+const wsTransport = new hl.WebSocketTransport({ ... }); // Accepts optional parameters (e.g. url, isTestnet, timeout, reconnect, etc.)
 ```
 
 ### 2) Initialize Client
@@ -635,7 +598,7 @@ class MultiSignClient extends ExchangeClient {
                 multiSignAddress: Hex;
                 signers: [
                     AbstractWallet, // first is leader for multi-sign transaction (signs transaction 2 times)
-                    ...AbstractWallet[], // may be additional signers
+                    ...AbstractWallet[], // ... more signers
                 ];
             },
     );
@@ -650,63 +613,78 @@ Transport acts as a layer between class requests and Hyperliquid servers.
 
 #### HTTP Transport
 
-**Features:**
-
-- Uses [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) for requests. Can be configured using
-  [`fetchOptions`](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit).
-- Automatically determines the target URL based on the request + `isTestnet` flag.
+Uses [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) for requests.
 
 ```ts
 class HttpTransport {
     constructor(options?: {
-        isTestnet?: boolean; // Whether to use testnet url (default: false)
-        timeout?: number; // Request timeout in ms (default: 10_000)
-        server?: { // Custom server URLs
+        /** Whether to use testnet url (default: false) */
+        isTestnet?: boolean;
+        /** Request timeout in ms (default: 10_000) */
+        timeout?: number;
+        /** Custom server URLs */
+        server?: {
             mainnet?: { api?: string | URL; rpc?: string | URL };
             testnet?: { api?: string | URL; rpc?: string | URL };
         };
-        fetchOptions?: RequestInit; // A custom fetch options
-        onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>; // A callback before request is sent
-        onResponse?: (response: Response) => MaybePromise<Response | void | null | undefined>; // A callback after response is received
+        /** Custom fetch options */
+        fetchOptions?: RequestInit;
+        /** Callback before request is sent */
+        onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>;
+        /** Callback after response is received */
+        onResponse?: (response: Response) => MaybePromise<Response | void | null | undefined>;
+        /** Callback on error during fetching */
+        onError?: (error: unknown) => MaybePromise<Error | void | null | undefined>;
     });
 }
 ```
 
 #### WebSocket Transport
 
+Uses [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) for requests. Supports
+[subscriptions](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions) and
+[post requests](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/post-requests).
+
 **Features:**
 
-- Uses [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) for requests.
-- Supports [subscriptions](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions)
-  and [post requests](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/post-requests).
 - Automatically restores connection after loss and resubscribes to previous subscriptions.
 - Smart keep alive (pings only when idle).
 - Lazy initialization with message buffering during connection establishment.
 
 **Limitations:**
 
-- Cannot mix api/explorer endpoints or mainnet/testnet in single connection. Need to create separate instances for
-  different endpoints.
-- Cannot send explorer post-requests via WebSocket. Use [HTTP transport](#http-transport).
+- 1 instance = 1 immutable endpoint. Cannot mix api/explorer endpoints or mainnet/testnet in single connection. Need to
+  create separate instances for different endpoints.
+- Cannot send explorer post-requests via WebSocket.
 
 ```ts
 class WebSocketTransport {
     constructor(options?: {
-        url?: string | URL; // WebSocket URL (default: "wss://api.hyperliquid.xyz/ws")
-        isTestnet?: boolean; // Indicates this transport uses testnet endpoint (default: false)
-        timeout?: number; // Request timeout in ms (default: 10_000)
-        keepAlive?: {
-            interval?: number; // Ping interval in ms (default: 30_000)
-            timeout?: number; // Pong timeout in ms (default: same as `timeout` for requests)
-        };
+        /** Indicates this transport uses testnet endpoint (default: false) */
+        isTestnet?: boolean;
+        /**
+         * WebSocket server URL. Defaults to:
+         * - `wss://api.hyperliquid.xyz/ws` for `isTestnet` = `false`
+         * - `wss://api.hyperliquid-testnet.xyz/ws` for `isTestnet` = `true`
+         */
+        url?: string | URL;
+        /** Timeout for requests in ms (default: 10_000) */
+        timeout?: number;
+        /** Interval between sending ping messages in ms (default: 30_000) */
+        keepAliveInterval?: number;
+        /** Reconnection policy configuration for closed connections */
         reconnect?: {
-            maxRetries?: number; // Maximum number of reconnection attempts (default: 3)
-            connectionTimeout?: number; // Connection timeout in ms (default: 10_000)
-            connectionDelay?: number | ((attempt: number) => number | Promise<number>); // Delay between reconnection (default: Exponential backoff (max 10s))
-            shouldReconnect?: (event: CloseEvent) => boolean | Promise<boolean>; // Custom reconnection logic (default: Always reconnect)
-            messageBuffer?: MessageBufferStrategy; // Message buffering strategy between reconnection (default: FIFO buffer)
+            /** Custom WebSocket constructor (default: global WebSocket) */
+            WebSocket?: new (url: string | URL) => WebSocket;
+            /** Maximum number of reconnection attempts (default: 3) */
+            maxRetries?: number;
+            /** Maximum time in ms to wait for a connection to open (default: 10_000) */
+            connectionTimeout?: number;
+            /** Delay before reconnection in ms (default: Exponential backoff (max 10s)) */
+            reconnectionDelay?: number | ((attempt: number) => number);
         };
-        autoResubscribe?: boolean; // Whether to automatically resubscribe to events after reconnection (default: true)
+        /** Enable automatic re-subscription to Hyperliquid subscription after reconnection (default: true) */
+        resubscribe?: boolean;
     });
     ready(signal?: AbortSignal): Promise<void>;
     close(signal?: AbortSignal): Promise<void>;
@@ -715,10 +693,25 @@ class WebSocketTransport {
 
 ### Errors
 
-- [`HyperliquidError`](src/errors.ts#L2) - Base error class for all SDK errors.
-- [`TransportError`](src/transports/base.ts#L49) - Thrown when a transport layer error occurs.
-- [`ApiRequestError`](src/clients//exchange.ts#L294) - Thrown when an API request fails.
-- [`SchemaError`](src/schemas/mod.ts#L79) - Thrown when a schema validation error occurs.
+All SDK errors extend from `HyperliquidError` base class for unified error handling:
+
+```ts
+import { ApiRequestError, HyperliquidError, SchemaError, TransportError } from "@nktkas/hyperliquid";
+
+try {
+    await exchClient.order({ ... });
+} catch (error) {
+    if (error instanceof SchemaError) {
+        // Invalid data format (before sending request)
+    } else if (error instanceof ApiRequestError) {
+        // API returned error (e.g., insufficient funds)
+    } else if (error instanceof TransportError) {
+        // Network/connection failure (e.g., timeout)
+    } else if (error instanceof HyperliquidError) {
+        // Some other Hyperliquid SDK error
+    }
+}
+```
 
 ## Additional Import Points
 
@@ -875,19 +868,13 @@ with `tif: "Ioc"` and price that guarantee immediate execution:
 - For buys: set limit price >= current best ask
 - For sells: set limit price <= current best bid
 
-### How to use the [Agent Wallet](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/nonces-and-api-wallets#api-wallets) / [Vault](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#subaccounts-and-vaults) / [Sub-Account](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#subaccounts-and-vaults) in `ExchangeClient`?
+### How to use the [Agent Wallet](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/nonces-and-api-wallets#api-wallets) in [`ExchangeClient`](#exchangeclient)?
 
-**Agent Wallet**: Use agent's private key in constructor instead of master account's private key.
+Use agent's private key in constructor instead of master account's private key.
 
-**Vault and Sub-Account**: Pass vault or sub-account address via `vaultAddress` options to methods or set
-`defaultVaultAddress` in constructor.
+### How to use the [Vault](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#subaccounts-and-vaults) / [Sub-Account](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#subaccounts-and-vaults) in [`ExchangeClient`](#exchangeclient)?
 
-### How to use Testnet?
-
-[**HttpTransport**](#http-transport): Set the `isTestnet` flag to `true`.
-
-[**WebSocketTransport**](#websocket-transport): Set the `isTestnet` flag to `true` and provide the testnet `url` when
-initializing the transport.
+Pass vault or sub-account address via `vaultAddress` options to methods or set `defaultVaultAddress` in constructor.
 
 ## Contributing
 
