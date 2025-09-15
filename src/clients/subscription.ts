@@ -389,8 +389,8 @@ export class SubscriptionClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.WebSocketTransport();
-     * const subsClient = new hl.WebSocketTransport({ url: "wss://rpc.hyperliquid.xyz/ws" }); // RPC endpoint
+     * const transport = new hl.WebSocketTransport({ url: "wss://rpc.hyperliquid.xyz/ws" }); // RPC endpoint
+     * const subsClient = new hl.SubscriptionClient({ transport });
      *
      * const sub = await subsClient.explorerBlock((data) => {
      *   console.log(data);
@@ -417,8 +417,8 @@ export class SubscriptionClient<
      * ```ts
      * import * as hl from "@nktkas/hyperliquid";
      *
-     * const transport = new hl.WebSocketTransport();
-     * const subsClient = new hl.WebSocketTransport({ url: "wss://rpc.hyperliquid.xyz/ws" }); // RPC endpoint
+     * const transport = new hl.WebSocketTransport({ url: "wss://rpc.hyperliquid.xyz/ws" }); // RPC endpoint
+     * const subsClient = new hl.SubscriptionClient({ transport });
      *
      * const sub = await subsClient.explorerTxs((data) => {
      *   console.log(data);
