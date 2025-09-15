@@ -20,14 +20,14 @@ export interface WebSocketTransportOptions {
      */
     isTestnet?: boolean;
     /**
-     * The WebSocket URL.
+     * Custom WebSocket endpoint for API and Subscription requests.
      * - Mainnet:
      *   - API: `wss://api.hyperliquid.xyz/ws`
      *   - Explorer: `wss://rpc.hyperliquid.xyz/ws`
      * - Testnet:
      *   - API: `wss://api.hyperliquid-testnet.xyz/ws`
      *   - Explorer: `wss://rpc.hyperliquid-testnet.xyz/ws`
-     * @defaultValue `wss://api.hyperliquid.xyz/ws` for `isTestnet` = `false`, `wss://api.hyperliquid-testnet.xyz/ws` for `isTestnet` = `true`
+     * @defaultValue `wss://api.hyperliquid.xyz/ws` for mainnet, `wss://api.hyperliquid-testnet.xyz/ws` for testnet
      */
     url?: string | URL;
     /**

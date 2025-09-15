@@ -228,7 +228,7 @@ export const WsL2BookRequest = v.pipe(
 export type WsL2BookRequest = v.InferOutput<typeof WsL2BookRequest>;
 
 /**
- * Subscription to explorer block events.
+ * Subscription to explorer block events (RPC endpoint).
  * @returns {WsBlockDetails[]}
  * @see null
  */
@@ -245,7 +245,7 @@ export const WsExplorerBlockRequest = v.pipe(
 export type WsExplorerBlockRequest = v.InferOutput<typeof WsExplorerBlockRequest>;
 
 /**
- * Subscription to explorer transaction events.
+ * Subscription to explorer transaction events (RPC endpoint).
  * @returns {TxDetails[]}
  * @see null
  */

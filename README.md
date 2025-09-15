@@ -23,7 +23,7 @@ runtimes, written in TypeScript.
 > [!NOTE]
 > While this library is in TypeScript, it can also be used in JavaScript and supports ESM/CommonJS.
 
-### Node.js (choose your package manager)
+### Node.js v20+ (choose your package manager)
 
 ```
 npm i @nktkas/hyperliquid
@@ -33,8 +33,8 @@ pnpm add @nktkas/hyperliquid
 yarn add @nktkas/hyperliquid
 ```
 
-If you are using Node.js v20, then to use [`WebSocketTransport`](#websocket-transport), you need to install the
-[`ws`](https://www.npmjs.com/package/ws) package and pass the `WebSocket` class:
+If you are using **Node.js v20 specifically** and intend to use [`WebSocketTransport`](#websocket-transport), you need
+to install the [`ws`](https://www.npmjs.com/package/ws) package and pass the `WebSocket` class to the constructor:
 
 ```ts
 import WebSocket from "ws"; // install `ws` package
@@ -47,7 +47,7 @@ const transport = new hl.WebSocketTransport({
 });
 ```
 
-### Deno
+### Deno v2.0+
 
 ```
 deno add jsr:@nktkas/hyperliquid
@@ -55,24 +55,32 @@ deno add jsr:@nktkas/hyperliquid
 
 ### Web
 
+The SDK is fully browser-compatible; integrate it via CDN or bundle it with your application.
+
 ```html
 <script type="module">
     import * as hl from "https://esm.sh/jsr/@nktkas/hyperliquid";
 </script>
 ```
 
-### React Native
+### React Native v0.74.5 / Expo v51
 
 For React Native, you need to import polyfills before importing the SDK:
 
-```js
-// React Native v0.74.5 / Expo v51
-// Issues:
-// - signing: does not support a private keys directly, use `viem` or `ethers`
+```ts
 import "fast-text-encoding"; // `TextEncoder` (utf-8)
 import "event-target-polyfill"; // `EventTarget`, `Event`
 import * as hl from "@nktkas/hyperliquid";
+
+const transport = new hl.WebSocketTransport();
 ```
+
+<details>
+<summary>Issues:</summary>
+
+- signing: doesn't support a private key directly as a wallet, use `viem` or `ethers` instead
+
+</details>
 
 ## Quick Start
 
@@ -663,9 +671,8 @@ class WebSocketTransport {
         /** Indicates this transport uses testnet endpoint (default: false) */
         isTestnet?: boolean;
         /**
-         * WebSocket server URL. Defaults to:
-         * - `wss://api.hyperliquid.xyz/ws` for `isTestnet` = `false`
-         * - `wss://api.hyperliquid-testnet.xyz/ws` for `isTestnet` = `true`
+         * Custom WebSocket endpoint for API and Subscription requests.
+         * (default: `wss://api.hyperliquid.xyz` for mainnet, `wss://api.testnet.hyperliquid.xyz` for testnet)
          */
         url?: string | URL;
         /** Timeout for requests in ms (default: 10_000) */
