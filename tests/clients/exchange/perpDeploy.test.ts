@@ -38,6 +38,7 @@ runTest({
                             dex: "test",
                             oraclePxs: [["TEST0", "12.0"], ["TEST1", "1"]],
                             markPxs: [[["TEST0", "3.0"], ["TEST1", "14"]]],
+                            externalPerpPxs: [["TEST0", "5.0"], ["TEST1", "6"]],
                         },
                     });
                 },

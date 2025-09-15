@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Address, Hex, UnsignedInteger } from "../_base.ts";
+import { Address, Hex, Integer, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request user active asset data.
@@ -384,12 +384,22 @@ export const L2BookRequest = v.pipe(
         ),
         /** Number of significant figures. */
         nSigFigs: v.pipe(
-            v.nullish(v.union([v.literal(2), v.literal(3), v.literal(4), v.literal(5)])),
+            v.nullish(
+                v.pipe(
+                    Integer,
+                    v.union([v.literal(2), v.literal(3), v.literal(4), v.literal(5)]),
+                ),
+            ),
             v.description("Number of significant figures."),
         ),
         /** Mantissa for aggregation (if `nSigFigs` is 5). */
         mantissa: v.pipe(
-            v.nullish(v.union([v.literal(2), v.literal(5)])),
+            v.nullish(
+                v.pipe(
+                    Integer,
+                    v.union([v.literal(2), v.literal(5)]),
+                ),
+            ),
             v.description("Mantissa for aggregation (if `nSigFigs` is 5)."),
         ),
     }),

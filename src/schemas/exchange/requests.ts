@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Address, Hex, TokenId, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { Address, Hex, Integer, TokenId, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 import { TIF } from "../info/orders.ts";
 
 /** Deeply removes undefined keys from an object.  */
@@ -48,7 +48,10 @@ export const Signature = v.pipe(
         ),
         /** Recovery identifier. */
         v: v.pipe(
-            v.union([v.literal(27), v.literal(28)]),
+            v.pipe(
+                Integer,
+                v.union([v.literal(27), v.literal(28)]),
+            ),
             v.description("Recovery identifier."),
         ),
     }),
@@ -1371,6 +1374,13 @@ export const PerpDeployRequest = v.pipe(
                                     v.array(v.array(v.tuple([v.string(), UnsignedDecimal]))),
                                     v.description(
                                         "An outer list of inner lists (inner list sorted by key) of asset and mark prices.",
+                                    ),
+                                ),
+                                /** A list (sorted by key) of asset and external prices which prevent sudden mark price deviations. */
+                                externalPerpPxs: v.pipe(
+                                    v.array(v.tuple([v.string(), UnsignedDecimal])),
+                                    v.description(
+                                        "A list (sorted by key) of asset and external prices which prevent sudden mark price deviations.",
                                     ),
                                 ),
                             }),
