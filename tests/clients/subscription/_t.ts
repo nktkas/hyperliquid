@@ -42,7 +42,7 @@ export function runTest(
     Deno.test(name, async (t) => {
         await new Promise((r) => setTimeout(r, cliArgs.wait)); // delay to avoid rate limits
 
-        const transport = new WebSocketTransport({ url: `wss://${mode}.hyperliquid-testnet.xyz/ws` });
+        const transport = new WebSocketTransport({ url: `wss://${mode}.hyperliquid-testnet.xyz/ws`, isTestnet: true });
         await transport.ready();
         const subsClient = new SubscriptionClient({ transport });
 

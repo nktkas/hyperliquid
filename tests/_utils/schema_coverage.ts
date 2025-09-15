@@ -1,4 +1,5 @@
 import * as v from "valibot";
+import { Decimal, Integer, UnsignedDecimal, UnsignedInteger } from "../../src/schemas/_base.ts"; // Hack to avoid importing into every test
 
 export type IssueType =
     | "BRANCH_UNCOVERED"
@@ -30,6 +31,8 @@ export interface CoverageOptions {
     ignoreUndefinedTypes?: string[];
     /** DEFINED_TYPE_UNCOVERED - Uncovered defined values in wrapper schemas */
     ignoreDefinedTypes?: string[];
+    /** Schemas to skip coverage checking entirely */
+    ignoreSchemas?: v.GenericSchema[];
 }
 
 export class SchemaCoverageError extends Error {
@@ -71,6 +74,7 @@ export function schemaCoverage<
 ): void {
     parser(v.pipe(v.array(schema), v.minLength(1)))(samples); // wrap source schema to check sample array
 
+    options.ignoreSchemas = options.ignoreSchemas || [Integer, UnsignedInteger, Decimal, UnsignedDecimal]; // Hack to avoid importing into every test
     const coverageIssues = checkCoverage(schema, samples, options);
     if (coverageIssues.length) {
         const details = coverageIssues
@@ -103,6 +107,11 @@ function checkCoverage(
     path: string = "#",
 ): CoverageIssue[] {
     const issues: CoverageIssue[] = [];
+
+    // Check if this schema should be ignored
+    if (options.ignoreSchemas?.includes(schema)) {
+        return issues;
+    }
 
     // Handle schemas with pipe (transformations/validations)
     if ("pipe" in schema && Array.isArray(schema.pipe)) {

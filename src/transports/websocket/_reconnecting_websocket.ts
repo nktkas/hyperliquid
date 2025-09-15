@@ -85,7 +85,9 @@ export class ReconnectingWebSocket implements WebSocket {
             : maybeOptions;
 
         if (!globalThis.WebSocket && !options?.WebSocket) {
-            throw new Error("No WebSocket implementation found. Please provide a custom WebSocket constructor in the options.");
+            throw new Error(
+                "No WebSocket implementation found. Please provide a custom WebSocket constructor in the options.",
+            );
         }
 
         this.reconnectOptions = {
@@ -143,15 +145,17 @@ export class ReconnectingWebSocket implements WebSocket {
 
     /** Initializes the internal event listeners for the socket. */
     protected _initInternalListeners() {
+        const handleClose = () => {
+            this._socket.removeEventListener("error", handleError);
+            this._close();
+        };
+        const handleError = () => {
+            this._socket.removeEventListener("close", handleClose);
+            this._close();
+        };
         this._socket.addEventListener("open", this._open, { once: true });
-        this._socket.addEventListener("close", () => {
-            this._socket.removeEventListener("error", this._close);
-            this._close();
-        }, { once: true });
-        this._socket.addEventListener("error", () => {
-            this._socket.removeEventListener("close", this._close);
-            this._close();
-        }, { once: true });
+        this._socket.addEventListener("close", handleClose, { once: true });
+        this._socket.addEventListener("error", handleError, { once: true });
     }
     protected _open: () => void = () => {
         // Reset the attempt counter

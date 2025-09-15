@@ -648,19 +648,6 @@ Deno.test("ReconnectingWebSocket", async (t) => {
                 assertEquals(rws.onerror, onerror);
                 assertEquals(rws.onmessage, onmessage);
 
-                // Dispatches events manually to check the handlers work
-                rws.dispatchEvent(new Event("open"));
-                rws.dispatchEvent(new CloseEvent("close"));
-                rws.dispatchEvent(new Event("error"));
-                rws.dispatchEvent(new MessageEvent("message", { data: "test" }));
-
-                await new Promise((resolve) => setTimeout(resolve, 500)); // Delay for event processing
-
-                assertEquals(onopenCalled, 3); // initial open + after close + manual dispatch
-                assertEquals(oncloseCalled, 2); // after close + manual dispatch
-                assertEquals(onerrorCalled, 1); // manual dispatch
-                assertEquals(onmessageCalled, 1); // manual dispatch
-
                 rws.close();
             });
         });

@@ -28,7 +28,7 @@ runTest({
         });
     },
     cliTestFn: async (_t, runCommand) => {
-        const data = await runCommand(["exchange", "cSignerAction", "--jailSelf"]);
+        const data = await runCommand(["exchange", "cSignerAction", "--jailSelf", "null"]);
         parser(CSignerActionRequest)(JSON.parse(data));
     },
 });

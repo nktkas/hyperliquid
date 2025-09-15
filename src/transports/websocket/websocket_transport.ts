@@ -101,7 +101,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
         this.resubscribe = options?.resubscribe ?? true;
 
         this.socket = new ReconnectingWebSocket(
-            options?.url ?? this.isTestnet ? "wss://api.hyperliquid-testnet.xyz/ws" : "wss://api.hyperliquid.xyz/ws",
+            options?.url ?? (this.isTestnet ? "wss://api.hyperliquid-testnet.xyz/ws" : "wss://api.hyperliquid.xyz/ws"),
             options?.reconnect,
         );
 

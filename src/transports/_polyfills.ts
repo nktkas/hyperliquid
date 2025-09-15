@@ -1,18 +1,18 @@
 export const Promise_ = {
-    withResolvers: Promise.withResolvers || (<T>() => { // Node.js | React Native
-        let resolve: (value: T | PromiseLike<T>) => void;
+    withResolvers: Promise.withResolvers ? <T>() => Promise.withResolvers<T>() : <T>() => { // Node.js | React Native
+        let resolve!: (value: T | PromiseLike<T>) => void;
         // deno-lint-ignore no-explicit-any
-        let reject: (reason?: any) => void;
+        let reject!: (reason?: any) => void;
         const promise = new Promise<T>((res, rej) => {
             resolve = res;
             reject = rej;
         });
-        return { promise, resolve: resolve!, reject: reject! };
-    }),
+        return { promise, resolve, reject };
+    },
 };
 
 export const AbortSignal_ = {
-    any: AbortSignal.any || ((signals: AbortSignal[]) => { // React Native
+    any: AbortSignal.any ? (signals: AbortSignal[]) => AbortSignal.any(signals) : (signals: AbortSignal[]) => { // React Native
         const controller = new AbortController();
         for (const signal of signals) {
             if (signal.aborted) {
@@ -24,12 +24,12 @@ export const AbortSignal_ = {
             }, { once: true, signal: controller.signal });
         }
         return controller.signal;
-    }),
-    timeout: AbortSignal.timeout || ((milliseconds: number) => { // React Native
+    },
+    timeout: AbortSignal.timeout ? (ms: number) => AbortSignal.timeout(ms) : (ms: number) => { // React Native
         const controller = new AbortController();
-        setTimeout(() => controller.abort(new Error("Signal timed out")), milliseconds);
+        setTimeout(() => controller.abort(new Error("Signal timed out")), ms);
         return controller.signal;
-    }),
+    },
 };
 
 export const CustomEvent_ = globalThis.CustomEvent || class<T> extends Event { // React Native

@@ -44,7 +44,7 @@ runTestWithExchange("notification", async (_t, clients) => {
                     }
                 });
 
-                const twapPromise = openTwap("SOL", true);
+                const twapPromise = openTwap("ETH", true);
             }),
             20_000,
         ),
