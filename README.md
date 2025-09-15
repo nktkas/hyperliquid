@@ -71,8 +71,6 @@ For React Native, you need to import polyfills before importing the SDK:
 import "fast-text-encoding"; // `TextEncoder` (utf-8)
 import "event-target-polyfill"; // `EventTarget`, `Event`
 import * as hl from "@nktkas/hyperliquid";
-
-const transport = new hl.WebSocketTransport();
 ```
 
 <details>
