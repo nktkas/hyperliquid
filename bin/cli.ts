@@ -1,9 +1,12 @@
-#!/usr/bin/env node
 import * as hl from "@nktkas/hyperliquid";
 import { Hex } from "@nktkas/hyperliquid/schemas";
 import * as v from "valibot";
-import parseArgs from "minimist";
-import process from "node:process";
+import { type Args, parseArgs, transformArgs } from "./_utils.ts";
+
+// Hack to avoid `npm i --save-dev @types/node`
+declare const process: {
+    argv: string[];
+};
 
 type MethodNames<T> = {
     // deno-lint-ignore no-explicit-any
@@ -25,15 +28,8 @@ function isClassMethod<T>(classConstructor: new (...args: any[]) => T, method: s
     return classMethods.includes(method as any);
 }
 
-function transformParams(method: string, params: Record<string, unknown>): Record<string, unknown> {
+function transformParams(method: string, params: Args) {
     switch (method) {
-        case "cSignerAction": {
-            return {
-                ...params,
-                jailSelf: "jailSelf" in params ? null : undefined,
-                unjailSelf: "unjailSelf" in params ? null : undefined,
-            };
-        }
         case "spotUser": {
             return {
                 toggleSpotDusting: {
@@ -48,15 +44,6 @@ function transformParams(method: string, params: Record<string, unknown>): Recor
                 },
             };
         }
-        case "cValidatorAction": {
-            if ("unregister" in params) {
-                return {
-                    ...params,
-                    unregister: null,
-                };
-            }
-        }
-        /* falls through */
         default: {
             return params;
         }
@@ -87,35 +74,35 @@ class ExchangeClientWithoutValidation extends hl.ExchangeClient {
 async function executeEndpointMethod(
     endpoint: string,
     method: string,
-    cliArgs: Record<string, unknown>,
+    args: Args,
 ): Promise<unknown> {
-    const isTestnet = Boolean(cliArgs?.testnet);
-    const timeout = Number(cliArgs.timeout) || undefined;
-    const isOffline = Boolean(cliArgs?.offline);
+    const isTestnet = "testnet" in args;
+    const timeout = Number(args.timeout) || undefined;
+    const isOffline = "offline" in args;
 
     const transport = isOffline ? new EchoTransport(isTestnet) : new hl.HttpTransport({ isTestnet, timeout });
     let client: hl.InfoClient | hl.ExchangeClient;
 
     if (endpoint === "info") {
         if (!isClassMethod(hl.InfoClient, method)) {
-            throw new Error(`CLI does not support the "${method}" method in the "info" endpoint`);
+            throw new Error(`CLI does not support the "${method}" method in the "${endpoint}" endpoint`);
         }
 
         client = new hl.InfoClient({ transport });
     } else if (endpoint === "exchange") {
         if (!isClassMethod(hl.ExchangeClient, method)) {
-            throw new Error(`CLI does not support the "${method}" method in the "exchange" endpoint`);
+            throw new Error(`CLI does not support the "${method}" method in the "${endpoint}" endpoint`);
         }
 
         const privateKey = v.parse(
             v.pipe(Hex, v.minLength(66)),
-            cliArgs["private-key"],
+            args["private-key"],
             { message: 'Invalid format "private-key": Expected 32-byte hexadecimal string' },
         );
-        delete cliArgs["private-key"]; // just in case
+        delete args["private-key"]; // just in case
         const vaultAddress = v.parse(
             v.optional(v.pipe(Hex, v.minLength(42))),
-            cliArgs.vault,
+            args.vault,
             { message: 'Invalid format "vault": Expected 20-byte hexadecimal string OR nothing' },
         );
 
@@ -135,7 +122,7 @@ async function executeEndpointMethod(
     }
 
     // @ts-ignore - dynamic method access
-    return await client[method](transformParams(method, cliArgs));
+    return await client[method](transformParams(method, args));
 }
 
 // ──────────────────── Main ────────────────────
@@ -211,12 +198,14 @@ User Account Data:
 
 User Trading History:
   userFills               --user <address> [--aggregateByTime <bool>]
-  userFillsByTime         --user <address> --startTime <number> [--endTime <number>] [--aggregateByTime <bool>]
+  userFillsByTime         --user <address> --startTime <number> [--endTime <number>] 
+                          [--aggregateByTime <bool>]
   userFunding             --user <address> --startTime <number> [--endTime <number>]
   userNonFundingLedgerUpdates  --user <address> --startTime <number> [--endTime <number>]
   twapHistory             --user <address>
   userTwapSliceFills      --user <address>
-  userTwapSliceFillsByTime     --user <address> --startTime <number> [--endTime <number>] [--aggregateByTime <bool>]
+  userTwapSliceFillsByTime     --user <address> --startTime <number> [--endTime <number>] 
+                               [--aggregateByTime <bool>]
 
 Sub-Account & Multi-Sig:
   subAccounts             --user <address>
@@ -311,8 +300,8 @@ Deploy Market:
 
 Multi-Sig & Advanced:
   convertToMultiSigUser   --authorizedUsers <json> --threshold <number>
-  cSignerAction           --jailSelf | --unjailSelf
-  cValidatorAction        --changeProfile <json> | --register <json> | --unregister
+  cSignerAction           --jailSelf null | --unjailSelf null
+  cValidatorAction        --changeProfile <json> | --register <json> | --unregister null
   noop                    (no params)
 
 =============================================================================
@@ -352,84 +341,18 @@ Examples:
   npx @nktkas/hyperliquid exchange createVault --private-key 0x... --name "My Vault" --description "Test vault" --initialUsd 1000`);
 }
 
-type FindInArgvType = "hex" | "bool" | "number" | "empty" | "json_object" | "json_array";
-
-function findInArgv(types: FindInArgvType[]): string[] {
-    // Validation functions for each type
-    const validators = {
-        // to avoid converting them to numbers
-        hex: (value: string) => /^0[xX][0-9a-fA-F]+$/.test(value),
-        // to avoid converting them to strings
-        bool: (value: string) => /^(true|false)$/i.test(value),
-        // to avoid losing precision in fractional numbers
-        number: (value: string) => /^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(value),
-        // to avoid converting them to booleans
-        empty: (value: string) => value === "",
-        json_object: (value: string) => {
-            try {
-                const parsed = JSON.parse(value);
-                return typeof parsed === "object" && parsed !== null && !Array.isArray(parsed);
-            } catch {
-                return false;
-            }
-        },
-        json_array: (value: string) => {
-            try {
-                const parsed = JSON.parse(value);
-                return Array.isArray(parsed);
-            } catch {
-                return false;
-            }
-        },
-    };
-
-    const foundKeys = [];
-
-    for (let i = 0; i < process.argv.length; i++) {
-        const arg = process.argv[i];
-
-        // Processing format --key=value
-        if (arg.startsWith("--") && arg.includes("=")) {
-            const eqIndex = arg.indexOf("=");
-            const key = arg.slice(2, eqIndex);
-            const value = arg.slice(eqIndex + 1);
-
-            // Check value for all requested types
-            for (const type of types) {
-                if (validators[type] && validators[type](value)) {
-                    foundKeys.push(key);
-                    break; // Don't add duplicates
-                }
-            }
-        } // Processing format --key value
-        else if (arg.startsWith("--") && i + 1 < process.argv.length) {
-            const nextArg = process.argv[i + 1];
-            const key = arg.slice(2);
-
-            // Check value for all requested types
-            for (const type of types) {
-                if (validators[type] && validators[type](nextArg)) {
-                    foundKeys.push(key);
-                    break; // Don't add duplicates
-                }
-            }
-        }
-    }
-
-    return foundKeys;
-}
-
-const cliArgs = parseArgs(process.argv.slice(2), {
-    boolean: ["testnet", "offline", ...findInArgv(["bool"])],
-    string: ["_", ...findInArgv(["hex", "number", "empty"])],
+const rawArgs = parseArgs(process.argv.slice(2), {
+    flags: ["testnet", "help", "h", "offline"],
 });
-findInArgv(["json_object", "json_array"]).forEach((key) => cliArgs[key] = JSON.parse(cliArgs[key])); // Parse JSON strings
-const [endpoint, method] = cliArgs._ as string[];
+const args = transformArgs(rawArgs, {
+    number: "string",
+});
+const [endpoint, method] = args._;
 
-if (cliArgs.help || cliArgs.h || !endpoint || !method) {
+if (args.help || args.h || !endpoint || !method) {
     printHelp();
 } else {
-    executeEndpointMethod(endpoint, method, cliArgs)
+    executeEndpointMethod(endpoint, method, args)
         .then((result) => console.log(JSON.stringify(result)))
         .catch((error) => console.error("Error:", error instanceof Error ? error.message : String(error)));
 }

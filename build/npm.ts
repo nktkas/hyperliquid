@@ -5,6 +5,7 @@
  */
 
 import { build, emptyDir } from "jsr:@deno/dnt@^0.42.1";
+import denoJson from "../deno.json" with { type: "json" };
 
 await emptyDir("./build/npm");
 await build({
@@ -19,8 +20,8 @@ await build({
     typeCheck: "both",
     test: false,
     package: {
-        name: "@nktkas/hyperliquid",
-        version: JSON.parse(await Deno.readTextFile("./deno.json")).version,
+        name: denoJson.name,
+        version: denoJson.version,
         description: "Unofficial Hyperliquid API SDK for all major JS runtimes, written in TypeScript.",
         keywords: [
             "api",
@@ -55,10 +56,6 @@ await build({
             node: ">=20.19.0",
         },
         sideEffects: false,
-        devDependencies: {
-            "@types/minimist": "*",
-            "@types/node": "*",
-        },
     },
     compilerOptions: {
         lib: ["ESNext", "DOM"],
