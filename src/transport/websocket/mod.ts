@@ -73,7 +73,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
   > = new Map();
 
   /** Indicates this transport uses testnet endpoint. */
-  isTestnet: boolean;
+  readonly isTestnet: boolean;
   /**
    * Timeout for requests in ms.
    * Set to `null` to disable.

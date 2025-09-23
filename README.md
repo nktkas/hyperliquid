@@ -960,6 +960,10 @@ Use agent's private key instead of master account's private key.
 
 Pass vault or sub-account address via `vaultAddress` options to method or set `defaultVaultAddress` in client options.
 
+### How to use Testnet?
+
+Set `isTestnet: true` in [transport](#transports) options.
+
 ## Contributing
 
 We appreciate your help! To contribute, please read the [contributing instructions](CONTRIBUTING.md).

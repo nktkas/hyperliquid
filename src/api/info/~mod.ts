@@ -1,3 +1,26 @@
+/**
+ * This module re-exports all info-related API request functions and types.
+ *
+ * You can use raw functions to maximize tree-shaking in your app,
+ * or to access [valibot](https://github.com/fabian-hiller/valibot) schemas Request/Response.
+ *
+ * @example
+ * ```ts
+ * import { HttpTransport } from "@nktkas/hyperliquid";
+ * import { clearinghouseState } from "@nktkas/hyperliquid/api/info";
+ * //       ^^^^^^^^^^^^^^^^^^
+ * //       same name as in `InfoClient`
+ *
+ * const transport = new HttpTransport(); // or `WebSocketTransport`
+ * const data = await clearinghouseState(
+ *   { transport }, // same params as in `InfoClient`
+ *   { user: "0x..." },
+ * );
+ * ```
+ *
+ * @module
+ */
+
 export { parser, SchemaError } from "../_common.ts";
 export type { InfoRequestConfig } from "./_common.ts";
 

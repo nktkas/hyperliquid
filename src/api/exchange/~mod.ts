@@ -1,3 +1,42 @@
+/**
+ * This module re-exports all exchange-related API request functions and types.
+ *
+ * You can use raw functions to maximize tree-shaking in your app,
+ * or to access [valibot](https://github.com/fabian-hiller/valibot) schemas Request/Response.
+ *
+ * @example
+ * ```ts
+ * import { HttpTransport } from "@nktkas/hyperliquid";
+ * import { privateKeyToAccount } from "viem/accounts";
+ * import { order } from "@nktkas/hyperliquid/api/exchange";
+ * //       ^^^^^
+ * //       same name as in `ExchangeClient`
+ *
+ * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+ * const transport = new HttpTransport(); // or `WebSocketTransport`
+ *
+ * const data = await order(
+ *   { transport, wallet }, // same params as in `ExchangeClient` or `MultiSignClient`
+ *   {
+ *     orders: [
+ *       {
+ *         a: 0,
+ *         b: true,
+ *         p: "30000",
+ *         s: "0.1",
+ *         r: false,
+ *         t: { limit: { tif: "Gtc" } },
+ *         c: "0x...",
+ *       },
+ *     ],
+ *     grouping: "na",
+ *   },
+ * );
+ * ```
+ *
+ * @module
+ */
+
 export { parser, SchemaError } from "../_common.ts";
 export type { ExchangeRequestConfig } from "./_common.ts";
 
