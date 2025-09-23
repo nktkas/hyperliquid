@@ -1,53 +1,53 @@
 name: Publish Package to npm
 on:
-    workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
-    publish:
-        runs-on: ubuntu-latest
+  publish:
+    runs-on: ubuntu-latest
 
-        permissions:
-            id-token: write
+    permissions:
+      id-token: write
 
-        steps:
-            - uses: actions/checkout@v4
-            - uses: denoland/setup-deno@v2
-              with:
-                  deno-version: v2.x
-            - uses: actions/setup-node@v4
-              with:
-                  node-version: "24.x"
-                  registry-url: "https://registry.npmjs.org"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.x"
+          registry-url: "https://registry.npmjs.org"
 
-            - name: Build package
-              run: deno task build:npm
+      - name: Build package
+        run: deno task build:npm
 
-            - name: Get package version and determine tag
-              id: version
-              run: |
-                  # Read version from deno.json
-                  VERSION=$(deno eval "console.log(JSON.parse(Deno.readTextFileSync('./deno.json')).version)")
-                  echo "version=$VERSION" >> $GITHUB_OUTPUT
+      - name: Get package version and determine tag
+        id: version
+        run: |
+          # Read version from deno.json
+          VERSION=$(deno eval "console.log(JSON.parse(Deno.readTextFileSync('./deno.json')).version)")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-                  # Determine npm tag based on version
-                  if [[ "$VERSION" =~ -alpha ]]; then
-                      TAG="alpha"
-                  elif [[ "$VERSION" =~ -beta ]]; then
-                      TAG="beta"
-                  elif [[ "$VERSION" =~ -rc ]]; then
-                      TAG="rc"
-                  elif [[ "$VERSION" =~ - ]]; then
-                      TAG="prerelease"
-                  else
-                      TAG="latest"
-                  fi
+          # Determine npm tag based on version
+          if [[ "$VERSION" =~ -alpha ]]; then
+              TAG="alpha"
+          elif [[ "$VERSION" =~ -beta ]]; then
+              TAG="beta"
+          elif [[ "$VERSION" =~ -rc ]]; then
+              TAG="rc"
+          elif [[ "$VERSION" =~ - ]]; then
+              TAG="prerelease"
+          else
+              TAG="latest"
+          fi
 
-                  echo "tag=$TAG" >> $GITHUB_OUTPUT
-                  echo "Publishing version $VERSION with tag $TAG"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Publishing version $VERSION with tag $TAG"
 
-            - name: Publish package
-              env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-              run: |
-                  cd ./build/npm
-                  npm publish --provenance --tag ${{ steps.version.outputs.tag }}
+      - name: Publish package
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd ./build/npm
+          npm publish --provenance --tag ${{ steps.version.outputs.tag }}

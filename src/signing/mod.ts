@@ -4,9 +4,10 @@
  * @example Signing an L1 action
  * ```ts
  * import { signL1Action } from "@nktkas/hyperliquid/signing";
- * import { CancelRequest, parser } from "@nktkas/hyperliquid/schemas";
+ * import { CancelRequest, parser } from "@nktkas/hyperliquid/api/exchange";
+ * import { privateKeyToAccount } from "npm:viem/accounts";
  *
- * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly
+ * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  *
  * const action = parser(CancelRequest.entries.action)({ // for correct signature generation
  *   type: "cancel",
@@ -16,7 +17,7 @@
  * });
  * const nonce = Date.now();
  *
- * const signature = await signL1Action({ wallet: privateKey, action, nonce });
+ * const signature = await signL1Action({ wallet, action, nonce });
  *
  * // Send the signed action to the Hyperliquid API
  * const response = await fetch("https://api.hyperliquid.xyz/exchange", {
@@ -29,10 +30,11 @@
  *
  * @example Signing a user-signed action
  * ```ts
- * import { signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
- * import { ApproveAgentRequest, parser } from "@nktkas/hyperliquid/schemas";
+ * import { signUserSignedAction } from "@nktkas/hyperliquid/signing";
+ * import { ApproveAgentRequest, ApproveAgentTypes, parser } from "@nktkas/hyperliquid/api/exchange";
+ * import { privateKeyToAccount } from "npm:viem/accounts";
  *
- * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly
+ * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  *
  * const action = parser(ApproveAgentRequest.entries.action)({ // for correct signature generation
  *   type: "approveAgent",
@@ -43,11 +45,7 @@
  *   nonce: Date.now(),
  * });
  *
- * const signature = await signUserSignedAction({
- *   wallet: privateKey,
- *   action,
- *   types: userSignedActionEip712Types[action.type],
- * });
+ * const signature = await signUserSignedAction({ wallet, action, types: ApproveAgentTypes });
  *
  * // Send the signed action to the Hyperliquid API
  * const response = await fetch("https://api.hyperliquid.xyz/exchange", {
@@ -61,10 +59,10 @@
  * @example Signing a multi-signature action
  * ```ts
  * import { signL1Action, signMultiSigAction } from "@nktkas/hyperliquid/signing";
- * import { MultiSigRequest, parser, ScheduleCancelRequest } from "@nktkas/hyperliquid/schemas";
+ * import { MultiSigRequest, parser, ScheduleCancelRequest } from "@nktkas/hyperliquid/api/exchange";
  * import { privateKeyToAccount } from "npm:viem/accounts";
  *
- * const wallet = privateKeyToAccount("0x..."); // or `ethers`, private key directly
+ * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const multiSigUser = "0x...";
  *
  * const action = parser(ScheduleCancelRequest.entries.action)({ // for correct signature generation
@@ -76,7 +74,7 @@
  * // Create the required number of signatures
  * const signatures = await Promise.all(["0x...", "0x..."].map(async (signerPrivKey) => {
  *   return await signL1Action({
- *     wallet: signerPrivKey as `0x${string}`,
+ *     wallet: privateKeyToAccount(signerPrivKey as `0x${string}`), // viem or ethers
  *     action: [multiSigUser.toLowerCase(), wallet.address.toLowerCase(), action],
  *     nonce,
  *   });
@@ -85,13 +83,13 @@
  * // // or user-signed action
  * // const signatures = await Promise.all(["0x...", "0x..."].map(async (signerPrivKey) => {
  * //   return await signUserSignedAction({
- * //     wallet: signerPrivKey as `0x${string}`,
+ * //     wallet: privateKeyToAccount(signerPrivKey as `0x${string}`), // viem or ethers
  * //     action: {
  * //       ...action,
  * //       payloadMultiSigUser: multiSigUser,
  * //       outerSigner: wallet.address,
  * //     },
- * //     types: userSignedActionEip712Types[action.type],
+ * //     types: SomeTypes,
  * //   });
  * // }));
  *
@@ -120,127 +118,27 @@
  * @module
  */
 
-import { keccak_256 } from "@noble/hashes/sha3";
-import * as secp from "@noble/secp256k1";
+import { keccak_256 } from "@noble/hashes/sha3.js";
+import { bytesToHex, concatBytes, hexToBytes } from "@noble/hashes/utils.js";
 import { encode as encodeMsgpack } from "@msgpack/msgpack";
-import {
-    type AbstractWallet,
-    getWalletAddress,
-    getWalletChainId,
-    type Signature,
-    signTypedData,
-} from "./signTypedData/mod.ts";
+import { type AbstractWallet, type Signature, signTypedData } from "./_signTypedData.ts";
 
-export { type AbstractWallet, getWalletAddress, getWalletChainId, type Signature };
-
-/** EIP-712 type definitions for user-signed actions. */
-export const userSignedActionEip712Types = {
-    approveAgent: {
-        "HyperliquidTransaction:ApproveAgent": [
-            { name: "hyperliquidChain", type: "string" },
-            { name: "agentAddress", type: "address" },
-            { name: "agentName", type: "string" },
-            { name: "nonce", type: "uint64" },
-        ],
-    },
-    approveBuilderFee: {
-        "HyperliquidTransaction:ApproveBuilderFee": [
-            { name: "hyperliquidChain", type: "string" },
-            { name: "maxFeeRate", type: "string" },
-            { name: "builder", type: "address" },
-            { name: "nonce", type: "uint64" },
-        ],
-    },
-    cDeposit: {
-        "HyperliquidTransaction:CDeposit": [
-            { name: "hyperliquidChain", type: "string" },
-            { name: "wei", type: "uint64" },
-            { name: "nonce", type: "uint64" },
-        ],
-    },
-    convertToMultiSigUser: {
-        "HyperliquidTransaction:ConvertToMultiSigUser": [
-            { name: "hyperliquidChain", type: "string" },
-            { name: "signers", type: "string" },
-            { name: "nonce", type: "uint64" },
-        ],
-    },
-    cWithdraw: {
-        "HyperliquidTransaction:CWithdraw": [
-            { name: "hyperliquidChain", type: "string" },
-            { name: "wei", type: "uint64" },
-            { name: "nonce", type: "uint64" },
-        ],
-    },
-    multiSig: {
-        "HyperliquidTransaction:SendMultiSig": [
-            { name: "hyperliquidChain", type: "string" },
-            { name: "multiSigActionHash", type: "bytes32" },
-            { name: "nonce", type: "uint64" },
-        ],
-    },
-    sendAsset: {
-        "HyperliquidTransaction:SendAsset": [
-            { name: "hyperliquidChain", type: "string" },
-            { name: "destination", type: "string" },
-            { name: "sourceDex", type: "string" },
-            { name: "destinationDex", type: "string" },
-            { name: "token", type: "string" },
-            { name: "amount", type: "string" },
-            { name: "fromSubAccount", type: "string" },
-            { name: "nonce", type: "uint64" },
-        ],
-    },
-    spotSend: {
-        "HyperliquidTransaction:SpotSend": [
-            { name: "hyperliquidChain", type: "string" },
-            { name: "destination", type: "string" },
-            { name: "token", type: "string" },
-            { name: "amount", type: "string" },
-            { name: "time", type: "uint64" },
-        ],
-    },
-    tokenDelegate: {
-        "HyperliquidTransaction:TokenDelegate": [
-            { name: "hyperliquidChain", type: "string" },
-            { name: "validator", type: "address" },
-            { name: "wei", type: "uint64" },
-            { name: "isUndelegate", type: "bool" },
-            { name: "nonce", type: "uint64" },
-        ],
-    },
-    usdClassTransfer: {
-        "HyperliquidTransaction:UsdClassTransfer": [
-            { name: "hyperliquidChain", type: "string" },
-            { name: "amount", type: "string" },
-            { name: "toPerp", type: "bool" },
-            { name: "nonce", type: "uint64" },
-        ],
-    },
-    usdSend: {
-        "HyperliquidTransaction:UsdSend": [
-            { name: "hyperliquidChain", type: "string" },
-            { name: "destination", type: "string" },
-            { name: "amount", type: "string" },
-            { name: "time", type: "uint64" },
-        ],
-    },
-    withdraw3: {
-        "HyperliquidTransaction:Withdraw": [
-            { name: "hyperliquidChain", type: "string" },
-            { name: "destination", type: "string" },
-            { name: "amount", type: "string" },
-            { name: "time", type: "uint64" },
-        ],
-    },
-};
+export {
+  type AbstractEthersV5Signer,
+  type AbstractEthersV6Signer,
+  type AbstractViemJsonRpcAccount,
+  type AbstractViemLocalAccount,
+  getWalletAddress,
+  getWalletChainId,
+} from "./_signTypedData.ts";
+export type { AbstractWallet, Signature };
 
 /**
  * Create a hash of the L1 action.
  * @example
  * ```ts
- * import { signL1Action } from "@nktkas/hyperliquid/signing";
- * import { CancelRequest, parser } from "@nktkas/hyperliquid/schemas";
+ * import { createL1ActionHash } from "@nktkas/hyperliquid/signing";
+ * import { CancelRequest, parser } from "@nktkas/hyperliquid/api/exchange";
  *
  * const action = parser(CancelRequest.entries.action)({ // for correct signature generation
  *   type: "cancel",
@@ -254,48 +152,48 @@ export const userSignedActionEip712Types = {
  * ```
  */
 export function createL1ActionHash(args: {
-    /** The action to be hashed (hash depends on key order). */
-    action: Record<string, unknown> | unknown[];
-    /** The current timestamp in ms. */
-    nonce: number;
-    /** Optional vault address used in the action. */
-    vaultAddress?: `0x${string}`;
-    /** Optional expiration time of the action in ms since the epoch. */
-    expiresAfter?: number;
+  /** The action to be hashed (hash depends on key order). */
+  action: Record<string, unknown> | unknown[];
+  /** The current timestamp in ms. */
+  nonce: number;
+  /** Optional vault address used in the action. */
+  vaultAddress?: `0x${string}`;
+  /** Optional expiration time of the action in ms since the epoch. */
+  expiresAfter?: number;
 }): `0x${string}` {
-    const { action, nonce, vaultAddress, expiresAfter } = args;
+  const { action, nonce, vaultAddress, expiresAfter } = args;
 
-    // 1. Action
-    const actionBytes = encodeMsgpack(action);
+  // 1. Action
+  const actionBytes = encodeMsgpack(action, { ignoreUndefined: true });
 
-    // 2. Nonce
-    const nonceBytes = toUint64Bytes(nonce);
+  // 2. Nonce
+  const nonceBytes = toUint64Bytes(nonce);
 
-    // 3. Vault address
-    const vaultMarker = vaultAddress ? new Uint8Array([1]) : new Uint8Array([0]);
-    const vaultBytes = vaultAddress ? secp.etc.hexToBytes(vaultAddress.slice(2)) : new Uint8Array();
+  // 3. Vault address
+  const vaultMarker = vaultAddress ? new Uint8Array([1]) : new Uint8Array([0]);
+  const vaultBytes = vaultAddress ? hexToBytes(vaultAddress.slice(2)) : new Uint8Array();
 
-    // 4. Expires after
-    const expiresMarker = expiresAfter !== undefined ? new Uint8Array([0]) : new Uint8Array();
-    const expiresBytes = expiresAfter !== undefined ? toUint64Bytes(expiresAfter) : new Uint8Array();
+  // 4. Expires after
+  const expiresMarker = expiresAfter !== undefined ? new Uint8Array([0]) : new Uint8Array();
+  const expiresBytes = expiresAfter !== undefined ? toUint64Bytes(expiresAfter) : new Uint8Array();
 
-    // Create a hash
-    const bytes = secp.etc.concatBytes(
-        actionBytes,
-        nonceBytes,
-        vaultMarker,
-        vaultBytes,
-        expiresMarker,
-        expiresBytes,
-    );
-    const hash = keccak_256(bytes);
-    return `0x${secp.etc.bytesToHex(hash)}`;
+  // Create a hash
+  const bytes = concatBytes(
+    actionBytes,
+    nonceBytes,
+    vaultMarker,
+    vaultBytes,
+    expiresMarker,
+    expiresBytes,
+  );
+  const hash = keccak_256(bytes);
+  return `0x${bytesToHex(hash)}`;
 }
 
 function toUint64Bytes(n: bigint | number | string): Uint8Array {
-    const bytes = new Uint8Array(8);
-    new DataView(bytes.buffer).setBigUint64(0, BigInt(n));
-    return bytes;
+  const bytes = new Uint8Array(8);
+  new DataView(bytes.buffer).setBigUint64(0, BigInt(n));
+  return bytes;
 }
 
 /**
@@ -303,9 +201,10 @@ function toUint64Bytes(n: bigint | number | string): Uint8Array {
  * @example
  * ```ts
  * import { signL1Action } from "@nktkas/hyperliquid/signing";
- * import { CancelRequest, parser } from "@nktkas/hyperliquid/schemas";
+ * import { CancelRequest, parser } from "@nktkas/hyperliquid/api/exchange";
+ * import { privateKeyToAccount } from "npm:viem/accounts";
  *
- * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly
+ * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  *
  * const action = parser(CancelRequest.entries.action)({ // for correct signature generation
  *   type: "cancel",
@@ -315,7 +214,7 @@ function toUint64Bytes(n: bigint | number | string): Uint8Array {
  * });
  * const nonce = Date.now();
  *
- * const signature = await signL1Action({ wallet: privateKey, action, nonce });
+ * const signature = await signL1Action({ wallet, action, nonce });
  *
  * // Send the signed action to the Hyperliquid API
  * const response = await fetch("https://api.hyperliquid.xyz/exchange", {
@@ -327,61 +226,62 @@ function toUint64Bytes(n: bigint | number | string): Uint8Array {
  * ```
  */
 export async function signL1Action(args: {
-    /** Wallet to sign the action. */
-    wallet: AbstractWallet;
-    /** The action to be signed (hash depends on key order). */
-    action: Record<string, unknown> | unknown[];
-    /** The current timestamp in ms. */
-    nonce: number;
-    /** Indicates if the action is for the testnet. (default: false) */
-    isTestnet?: boolean;
-    /** Optional vault address used in the action. */
-    vaultAddress?: `0x${string}`;
-    /** Optional expiration time of the action in ms since the epoch. */
-    expiresAfter?: number;
+  /** Wallet to sign the action. */
+  wallet: AbstractWallet;
+  /** The action to be signed (hash depends on key order). */
+  action: Record<string, unknown> | unknown[];
+  /** The current timestamp in ms. */
+  nonce: number;
+  /** Indicates if the action is for the testnet. (default: false) */
+  isTestnet?: boolean;
+  /** Optional vault address used in the action. */
+  vaultAddress?: `0x${string}`;
+  /** Optional expiration time of the action in ms since the epoch. */
+  expiresAfter?: number;
 }): Promise<Signature> {
-    const {
-        wallet,
-        action,
-        nonce,
-        isTestnet = false,
-        vaultAddress,
-        expiresAfter,
-    } = args;
+  const {
+    wallet,
+    action,
+    nonce,
+    isTestnet = false,
+    vaultAddress,
+    expiresAfter,
+  } = args;
 
-    const actionHash = createL1ActionHash({ action, nonce, vaultAddress, expiresAfter });
-    const message = {
-        source: isTestnet ? "b" : "a",
-        connectionId: actionHash,
-    };
+  const actionHash = createL1ActionHash({ action, nonce, vaultAddress, expiresAfter });
+  const message = {
+    source: isTestnet ? "b" : "a",
+    connectionId: actionHash,
+  };
 
-    return await signTypedData({
-        wallet,
-        domain: {
-            name: "Exchange",
-            version: "1",
-            chainId: 1337, // hyperliquid requires chainId to be 1337
-            verifyingContract: "0x0000000000000000000000000000000000000000",
-        },
-        types: {
-            Agent: [
-                { name: "source", type: "string" },
-                { name: "connectionId", type: "bytes32" },
-            ],
-        },
-        primaryType: "Agent",
-        message,
-    });
+  return await signTypedData({
+    wallet,
+    domain: {
+      name: "Exchange",
+      version: "1",
+      chainId: 1337, // hyperliquid requires chainId to be 1337
+      verifyingContract: "0x0000000000000000000000000000000000000000",
+    },
+    types: {
+      Agent: [
+        { name: "source", type: "string" },
+        { name: "connectionId", type: "bytes32" },
+      ],
+    },
+    primaryType: "Agent",
+    message,
+  });
 }
 
 /**
  * Sign a user-signed action.
  * @example
  * ```ts
- * import { signUserSignedAction, userSignedActionEip712Types } from "@nktkas/hyperliquid/signing";
- * import { ApproveAgentRequest, parser } from "@nktkas/hyperliquid/schemas";
+ * import { signUserSignedAction } from "@nktkas/hyperliquid/signing";
+ * import { ApproveAgentRequest, ApproveAgentTypes, parser } from "@nktkas/hyperliquid/api/exchange";
+ * import { privateKeyToAccount } from "npm:viem/accounts";
  *
- * const privateKey = "0x..."; // `viem`, `ethers`, or private key directly
+ * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  *
  * const action = parser(ApproveAgentRequest.entries.action)({ // for correct signature generation
  *   type: "approveAgent",
@@ -392,11 +292,7 @@ export async function signL1Action(args: {
  *   nonce: Date.now(),
  * });
  *
- * const signature = await signUserSignedAction({
- *   wallet: privateKey,
- *   action,
- *   types: userSignedActionEip712Types[action.type],
- * });
+ * const signature = await signUserSignedAction({ wallet, action, types: ApproveAgentTypes });
  *
  * // Send the signed action to the Hyperliquid API
  * const response = await fetch("https://api.hyperliquid.xyz/exchange", {
@@ -408,54 +304,54 @@ export async function signL1Action(args: {
  * ```
  */
 export async function signUserSignedAction(args: {
-    /** Wallet to sign the action. */
-    wallet: AbstractWallet;
-    /** The action to be signed (hex strings must be in lower case). */
-    action:
-        & {
-            signatureChainId: `0x${string}`;
-            [key: string]: unknown;
-        }
-        // special case for multi-sign payload
-        & (
-            | { payloadMultiSigUser: `0x${string}`; outerSigner: `0x${string}` }
-            | { payloadMultiSigUser?: undefined; outerSigner?: undefined }
-        );
-    /** The types of the action (hash depends on key order). */
-    types: {
-        [key: string]: {
-            name: string;
-            type: string;
-        }[];
-    };
+  /** Wallet to sign the action. */
+  wallet: AbstractWallet;
+  /** The action to be signed (hex strings must be in lower case). */
+  action:
+    & {
+      signatureChainId: `0x${string}`;
+      [key: string]: unknown;
+    }
+    // special case for multi-sign payload
+    & (
+      | { payloadMultiSigUser: `0x${string}`; outerSigner: `0x${string}` }
+      | { payloadMultiSigUser?: undefined; outerSigner?: undefined }
+    );
+  /** The types of the action (hash depends on key order). */
+  types: {
+    [key: string]: {
+      name: string;
+      type: string;
+    }[];
+  };
 }): Promise<Signature> {
-    let { wallet, action, types } = args;
+  let { wallet, action, types } = args;
 
-    if (action.type === "approveAgent" && !action.agentName) { // special case for `approveAgent`
-        action = { ...action, agentName: "" }; // set to empty string instead of null
-    }
-    if ("payloadMultiSigUser" in action && "outerSigner" in action) { // special case for multi-sign payload
-        types = structuredClone(types); // for safe mutation
-        Object.values(types)[0].splice( // array mutation
-            1, // after `hyperliquidChain`
-            0, // do not remove any elements
-            { name: "payloadMultiSigUser", type: "address" },
-            { name: "outerSigner", type: "address" },
-        );
-    }
+  if (action.type === "approveAgent" && !action.agentName) { // special case for `approveAgent`
+    action = { ...action, agentName: "" }; // set to empty string instead of null
+  }
+  if ("payloadMultiSigUser" in action && "outerSigner" in action) { // special case for multi-sign payload
+    types = structuredClone(types); // for safe mutation
+    Object.values(types)[0].splice( // array mutation
+      1, // after `hyperliquidChain`
+      0, // do not remove any elements
+      { name: "payloadMultiSigUser", type: "address" },
+      { name: "outerSigner", type: "address" },
+    );
+  }
 
-    return await signTypedData({
-        wallet,
-        domain: {
-            name: "HyperliquidSignTransaction",
-            version: "1",
-            chainId: parseInt(action.signatureChainId),
-            verifyingContract: "0x0000000000000000000000000000000000000000",
-        },
-        types,
-        primaryType: Object.keys(types)[0],
-        message: action,
-    });
+  return await signTypedData({
+    wallet,
+    domain: {
+      name: "HyperliquidSignTransaction",
+      version: "1",
+      chainId: parseInt(action.signatureChainId),
+      verifyingContract: "0x0000000000000000000000000000000000000000",
+    },
+    types,
+    primaryType: Object.keys(types)[0],
+    message: action,
+  });
 }
 
 /**
@@ -463,22 +359,22 @@ export async function signUserSignedAction(args: {
  * @example
  * ```ts
  * import { signL1Action, signMultiSigAction } from "@nktkas/hyperliquid/signing";
- * import { MultiSigRequest, parser, ScheduleCancelRequest } from "@nktkas/hyperliquid/schemas";
+ * import { MultiSigRequest, parser, ScheduleCancelRequest } from "@nktkas/hyperliquid/api/exchange";
  * import { privateKeyToAccount } from "npm:viem/accounts";
  *
- * const wallet = privateKeyToAccount("0x..."); // or `ethers`, private key directly
+ * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const multiSigUser = "0x...";
  *
+ * const nonce = Date.now();
  * const action = parser(ScheduleCancelRequest.entries.action)({ // for correct signature generation
  *   type: "scheduleCancel",
  *   time: Date.now() + 10000,
  * });
- * const nonce = Date.now();
  *
  * // Create the required number of signatures
  * const signatures = await Promise.all(["0x...", "0x..."].map(async (signerPrivKey) => {
  *   return await signL1Action({
- *     wallet: signerPrivKey as `0x${string}`,
+ *     wallet: privateKeyToAccount(signerPrivKey as `0x${string}`), // viem or ethers
  *     action: [multiSigUser.toLowerCase(), wallet.address.toLowerCase(), action],
  *     nonce,
  *   });
@@ -487,13 +383,13 @@ export async function signUserSignedAction(args: {
  * // // or user-signed action
  * // const signatures = await Promise.all(["0x...", "0x..."].map(async (signerPrivKey) => {
  * //   return await signUserSignedAction({
- * //     wallet: signerPrivKey as `0x${string}`,
+ * //     wallet: privateKeyToAccount(signerPrivKey as `0x${string}`), // viem or ethers
  * //     action: {
  * //       ...action,
  * //       payloadMultiSigUser: multiSigUser,
  * //       outerSigner: wallet.address,
  * //     },
- * //     types: userSignedActionEip712Types[action.type],
+ * //     types: SomeTypes,
  * //   });
  * // }));
  *
@@ -520,53 +416,59 @@ export async function signUserSignedAction(args: {
  * ```
  */
 export async function signMultiSigAction(args: {
-    /** Wallet to sign the action. */
-    wallet: AbstractWallet;
-    /** The action to be signed (hash depends on key order). */
-    action: {
-        signatureChainId: `0x${string}`;
-        [key: string]: unknown;
-    };
-    /** The current timestamp in ms. */
-    nonce: number;
-    /** Indicates if the action is for the testnet. (default: false) */
-    isTestnet?: boolean;
-    /** Optional vault address used in the action. */
-    vaultAddress?: `0x${string}`;
-    /** Optional expiration time of the action in ms since the epoch. */
-    expiresAfter?: number;
+  /** Wallet to sign the action. */
+  wallet: AbstractWallet;
+  /** The action to be signed (hash depends on key order). */
+  action: {
+    signatureChainId: `0x${string}`;
+    [key: string]: unknown;
+  };
+  /** The current timestamp in ms. */
+  nonce: number;
+  /** Indicates if the action is for the testnet. (default: false) */
+  isTestnet?: boolean;
+  /** Optional vault address used in the action. */
+  vaultAddress?: `0x${string}`;
+  /** Optional expiration time of the action in ms since the epoch. */
+  expiresAfter?: number;
 }): Promise<Signature> {
-    let {
-        wallet,
-        action,
-        nonce,
-        isTestnet = false,
-        vaultAddress,
-        expiresAfter,
-    } = args;
+  let {
+    wallet,
+    action,
+    nonce,
+    isTestnet = false,
+    vaultAddress,
+    expiresAfter,
+  } = args;
 
-    if ("type" in action) {
-        action = structuredClone(action); // for safe mutation
-        delete action.type;
-    }
+  if ("type" in action) {
+    action = structuredClone(action); // for safe mutation
+    delete action.type;
+  }
 
-    const multiSigActionHash = createL1ActionHash({ action, nonce, vaultAddress, expiresAfter });
-    const message = {
-        hyperliquidChain: isTestnet ? "Testnet" : "Mainnet",
-        multiSigActionHash,
-        nonce,
-    };
+  const multiSigActionHash = createL1ActionHash({ action, nonce, vaultAddress, expiresAfter });
+  const message = {
+    hyperliquidChain: isTestnet ? "Testnet" : "Mainnet",
+    multiSigActionHash,
+    nonce,
+  };
 
-    return await signTypedData({
-        wallet,
-        domain: {
-            name: "HyperliquidSignTransaction",
-            version: "1",
-            chainId: parseInt(action.signatureChainId),
-            verifyingContract: "0x0000000000000000000000000000000000000000",
-        },
-        types: userSignedActionEip712Types.multiSig,
-        primaryType: Object.keys(userSignedActionEip712Types.multiSig)[0],
-        message,
-    });
+  return await signTypedData({
+    wallet,
+    domain: {
+      name: "HyperliquidSignTransaction",
+      version: "1",
+      chainId: parseInt(action.signatureChainId),
+      verifyingContract: "0x0000000000000000000000000000000000000000",
+    },
+    types: {
+      "HyperliquidTransaction:SendMultiSig": [
+        { name: "hyperliquidChain", type: "string" },
+        { name: "multiSigActionHash", type: "bytes32" },
+        { name: "nonce", type: "uint64" },
+      ],
+    },
+    primaryType: "HyperliquidTransaction:SendMultiSig",
+    message,
+  });
 }

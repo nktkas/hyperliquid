@@ -1,134 +1,87 @@
 import * as hl from "@nktkas/hyperliquid";
-import { Hex } from "@nktkas/hyperliquid/schemas";
 import * as v from "valibot";
 import { type Args, parseArgs, transformArgs } from "./_utils.ts";
 
 // Hack to avoid `npm i --save-dev @types/node`
 declare const process: {
-    argv: string[];
+  argv: string[];
 };
 
-type MethodNames<T> = {
-    // deno-lint-ignore no-explicit-any
-    [K in Extract<keyof T, string>]: T[K] extends (...args: any[]) => any ? K : never;
-}[Extract<keyof T, string>];
-// deno-lint-ignore no-explicit-any
-function getClassMethods<T>(classConstructor: new (...args: any[]) => T): MethodNames<T>[] {
-    return Object.getOwnPropertyNames(classConstructor.prototype)
-        .filter((name): name is string => {
-            if (name === "constructor") return false;
-            const descriptor = Object.getOwnPropertyDescriptor(classConstructor.prototype, name);
-            return descriptor?.value && typeof descriptor.value === "function";
-        }) as MethodNames<T>[];
-}
-// deno-lint-ignore no-explicit-any
-function isClassMethod<T>(classConstructor: new (...args: any[]) => T, method: string): method is MethodNames<T> {
-    const classMethods = getClassMethods(classConstructor);
-    // deno-lint-ignore no-explicit-any
-    return classMethods.includes(method as any);
-}
-
 function transformParams(method: string, params: Args) {
-    switch (method) {
-        case "spotUser": {
-            return {
-                toggleSpotDusting: {
-                    ...params,
-                },
-            };
-        }
-        case "twapOrder": {
-            return {
-                twap: {
-                    ...params,
-                },
-            };
-        }
-        default: {
-            return params;
-        }
+  switch (method) {
+    case "spotUser": {
+      return { toggleSpotDusting: { ...params } };
     }
+    case "twapOrder": {
+      return { twap: { ...params } };
+    }
+    default: {
+      return params;
+    }
+  }
 }
 
 class EchoTransport implements hl.IRequestTransport {
-    constructor(public isTestnet: boolean) {}
-    request<T>(endpoint: "info" | "exchange" | "explorer", payload: unknown): Promise<T> {
-        if (endpoint === "explorer") {
-            if (typeof payload === "object" && payload !== null && "type" in payload) {
-                if (payload.type === "blockDetails") {
-                    return new Promise((resolve) => resolve({ blockDetails: payload } as T));
-                } else if (payload.type === "txDetails") {
-                    return new Promise((resolve) => resolve({ tx: payload } as T));
-                } else if (payload.type === "userDetails") {
-                    return new Promise((resolve) => resolve({ txs: payload } as T));
-                }
-            }
-        }
-        return new Promise((resolve) => resolve(payload as T));
-    }
+  constructor(public isTestnet: boolean) {}
+  request<T>(_: "info" | "exchange" | "explorer", payload: unknown): Promise<T> {
+    return new Promise((resolve) => resolve({ status: "ok", response: payload } as T));
+  }
 }
-class ExchangeClientWithoutValidation extends hl.ExchangeClient {
-    override _validateResponse = () => true;
-}
-
 async function executeEndpointMethod(
-    endpoint: string,
-    method: string,
-    args: Args,
+  endpoint: string,
+  method: string,
+  args: Args,
 ): Promise<unknown> {
-    const isTestnet = "testnet" in args;
-    const timeout = Number(args.timeout) || undefined;
-    const isOffline = "offline" in args;
+  const isTestnet = "testnet" in args;
+  const timeout = Number(args.timeout) || undefined;
+  const isOffline = "offline" in args;
 
-    const transport = isOffline ? new EchoTransport(isTestnet) : new hl.HttpTransport({ isTestnet, timeout });
-    let client: hl.InfoClient | hl.ExchangeClient;
+  const transport = isOffline ? new EchoTransport(isTestnet) : new hl.HttpTransport({ isTestnet, timeout });
+  let client: hl.InfoClient | hl.ExchangeClient;
 
-    if (endpoint === "info") {
-        if (!isClassMethod(hl.InfoClient, method)) {
-            throw new Error(`CLI does not support the "${method}" method in the "${endpoint}" endpoint`);
-        }
+  if (endpoint === "info") {
+    client = new hl.InfoClient({ transport });
 
-        client = new hl.InfoClient({ transport });
-    } else if (endpoint === "exchange") {
-        if (!isClassMethod(hl.ExchangeClient, method)) {
-            throw new Error(`CLI does not support the "${method}" method in the "${endpoint}" endpoint`);
-        }
-
-        const privateKey = v.parse(
-            v.pipe(Hex, v.minLength(66)),
-            args["private-key"],
-            { message: 'Invalid format "private-key": Expected 32-byte hexadecimal string' },
-        );
-        delete args["private-key"]; // just in case
-        const vaultAddress = v.parse(
-            v.optional(v.pipe(Hex, v.minLength(42))),
-            args.vault,
-            { message: 'Invalid format "vault": Expected 20-byte hexadecimal string OR nothing' },
-        );
-
-        client = isOffline
-            ? new ExchangeClientWithoutValidation({
-                transport,
-                wallet: privateKey,
-                defaultVaultAddress: vaultAddress,
-            })
-            : new hl.ExchangeClient({
-                transport,
-                wallet: privateKey,
-                defaultVaultAddress: vaultAddress,
-            });
-    } else {
-        throw new Error(`Invalid endpoint "${endpoint}". Use "info" or "exchange"`);
+    if (!(method in client)) {
+      throw new Error(`CLI does not support the "${method}" method in the "${endpoint}" endpoint`);
     }
+  } else if (endpoint === "exchange") {
+    const pk = v.parse(
+      v.pipe(v.string(), v.hexadecimal()),
+      args["private-key"],
+      { message: 'Invalid format "private-key": Expected 32-byte hexadecimal string' },
+    );
+    delete args["private-key"]; // just in case
 
+    const defaultVaultAddress = v.parse(
+      v.optional(v.pipe(v.string(), v.hexadecimal())),
+      args.vault,
+      { message: 'Invalid format "vault": Expected 20-byte hexadecimal string OR nothing' },
+    );
+
+    client = new hl.ExchangeClient({ transport, wallet: pk, defaultVaultAddress });
+
+    if (!(method in client)) {
+      throw new Error(`CLI does not support the "${method}" method in the "${endpoint}" endpoint`);
+    }
+  } else {
+    throw new Error(`Invalid endpoint "${endpoint}". Use "info" or "exchange"`);
+  }
+
+  if (isOffline) {
+    // @ts-ignore - dynamic method access
+    const response = await client[method](transformParams(method, args));
+    return response.response;
+  } else {
     // @ts-ignore - dynamic method access
     return await client[method](transformParams(method, args));
+  }
 }
 
 // ──────────────────── Main ────────────────────
 
 function printHelp() {
-    console.log(`Hyperliquid CLI
+  console.log(`Hyperliquid CLI
 
 Usage:
   npx @nktkas/hyperliquid <endpoint> <method> [options]
@@ -342,17 +295,17 @@ Examples:
 }
 
 const rawArgs = parseArgs(process.argv.slice(2), {
-    flags: ["testnet", "help", "h", "offline"],
+  flags: ["testnet", "help", "h", "offline"],
 });
 const args = transformArgs(rawArgs, {
-    number: "string",
+  number: "string",
 });
 const [endpoint, method] = args._;
 
 if (args.help || args.h || !endpoint || !method) {
-    printHelp();
+  printHelp();
 } else {
-    executeEndpointMethod(endpoint, method, args)
-        .then((result) => console.log(JSON.stringify(result)))
-        .catch((error) => console.error("Error:", error instanceof Error ? error.message : String(error)));
+  executeEndpointMethod(endpoint, method, args)
+    .then((result) => console.log(JSON.stringify(result)))
+    .catch((error) => console.error("Error:", error instanceof Error ? error.message : String(error)));
 }

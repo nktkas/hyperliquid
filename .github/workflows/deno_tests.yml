@@ -1,39 +1,39 @@
 name: Run Deno Tests
 on:
-    workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
-    test:
-        runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-latest
 
-        steps:
-            - uses: actions/checkout@v4
-            - uses: denoland/setup-deno@v2
-              with:
-                  deno-version: v2.x
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
 
-            # Check if the code is formatted according to Deno's default formatting conventions.
-            - name: deno fmt
-              run: |
-                  git config --global core.autocrlf false
-                  git config --global core.eol lf
-                  deno fmt --check
+      # Check if the code is formatted according to Deno's default formatting conventions.
+      - name: deno fmt
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+          deno fmt --check
 
-            # Scan the code for syntax errors and style issues.
-            - name: deno lint
-              run: deno lint
+      # Scan the code for syntax errors and style issues.
+      - name: deno lint
+        run: deno lint
 
-            # Check the code/docs for type errors
-            - name: deno check
-              run: deno check --doc
+      # Check the code/docs for type errors
+      - name: deno check
+        run: deno check --doc
 
-            # Run all test files in the repository and collect code coverage.
-            - name: deno test + coverage
-              run: deno test -A --coverage --coverage-raw-data-only -- ${{ secrets.PRIVATE_KEY }} --wait=5000
+      # Run all test files in the repository and collect code coverage.
+      - name: deno test + coverage
+        run: deno test -A --coverage --coverage-raw-data-only -- ${{ secrets.PRIVATE_KEY }} --wait=5000
 
-            # This generates a report from the collected coverage in `deno test --coverage`.
-            - name: Create coverage report
-              run: deno coverage --exclude=./tests --lcov --output=cov.lcov
+      # This generates a report from the collected coverage in `deno test --coverage`.
+      - name: Create coverage report
+        run: deno coverage --exclude=./tests --lcov --output=cov.lcov
 
-            - name: Upload coverage to Coveralls.io
-              uses: coverallsapp/github-action@v2
+      - name: Upload coverage to Coveralls.io
+        uses: coverallsapp/github-action@v2
