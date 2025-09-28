@@ -81,13 +81,12 @@ export function allMids(
 
   const payload = parser(AllMidsRequest)({ type: "allMids", ...params })
   return config.transport.subscribe<AllMidsEvent>(payload.type, payload, (e) => {
-    // if dex is specified, only send events if the pairs have matching dex name
+    // if dex name is provided, only invoke listener if at least one pair starts with matching dex name
     if (params.dex) {
       const pairs = Object.keys(e.detail.mids)
       if (pairs.length === 0) return
-      const defaultPair = pairs[0]
-      // mids is not for the requested dex
-      if (!defaultPair.toLowerCase().startsWith(params.dex.toLowerCase())) return
+      // pair name format: [dex]:[coin]
+      if (!pairs[0].toLowerCase().startsWith(`${params.dex.toLowerCase()}:`)) return
     }
     listener(e.detail)
   })
