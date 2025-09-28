@@ -1,7 +1,7 @@
-import * as v from "valibot"
-import { type DeepImmutable, parser, UnsignedDecimal } from "../_common.ts"
-import type { SubscriptionRequestConfig } from "./_common.ts"
-import type { Subscription } from "../../transport/base.ts"
+import * as v from "valibot";
+import { type DeepImmutable, parser, UnsignedDecimal } from "../_common.ts";
+import type { SubscriptionRequestConfig } from "./_common.ts";
+import type { Subscription } from "../../transport/base.ts";
 
 // -------------------- Schemas --------------------
 
@@ -10,14 +10,20 @@ export const AllMidsRequest = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
       /** Type of subscription. */
-      type: v.pipe(v.literal("allMids"), v.description("Type of subscription.")),
+      type: v.pipe(
+        v.literal("allMids"),
+        v.description("Type of subscription."),
+      ),
       /** DEX name (empty string for main dex). */
-      dex: v.pipe(v.optional(v.string()), v.description("DEX name (empty string for main dex).")),
+      dex: v.pipe(
+        v.optional(v.string()),
+        v.description("DEX name (empty string for main dex)."),
+      ),
     }),
-    v.description("Subscription to mid price events for all coins.")
-  )
-})()
-export type AllMidsRequest = v.InferOutput<typeof AllMidsRequest>
+    v.description("Subscription to mid price events for all coins."),
+  );
+})();
+export type AllMidsRequest = v.InferOutput<typeof AllMidsRequest>;
 
 /** Event of mid prices for all assets. */
 export const AllMidsEvent = /* @__PURE__ */ (() => {
@@ -26,18 +32,18 @@ export const AllMidsEvent = /* @__PURE__ */ (() => {
       /** Mapping of coin symbols to mid prices. */
       mids: v.pipe(
         v.record(v.string(), UnsignedDecimal),
-        v.description("Mapping of coin symbols to mid prices.")
+        v.description("Mapping of coin symbols to mid prices."),
       ),
     }),
-    v.description("Event of mid prices for all assets.")
-  )
-})()
-export type AllMidsEvent = v.InferOutput<typeof AllMidsEvent>
+    v.description("Event of mid prices for all assets."),
+  );
+})();
+export type AllMidsEvent = v.InferOutput<typeof AllMidsEvent>;
 
 // -------------------- Function --------------------
 
 /** Request parameters for the {@linkcode allMids} function. */
-export type AllMidsParameters = Omit<v.InferInput<typeof AllMidsRequest>, "type">
+export type AllMidsParameters = Omit<v.InferInput<typeof AllMidsRequest>, "type">;
 
 /**
  * Subscribe to mid prices for all actively traded assets.
@@ -64,30 +70,30 @@ export type AllMidsParameters = Omit<v.InferInput<typeof AllMidsRequest>, "type"
  */
 export function allMids(
   config: SubscriptionRequestConfig,
-  listener: (data: AllMidsEvent) => void
-): Promise<Subscription>
+  listener: (data: AllMidsEvent) => void,
+): Promise<Subscription>;
 export function allMids(
   config: SubscriptionRequestConfig,
   params: DeepImmutable<AllMidsParameters>,
-  listener: (data: AllMidsEvent) => void
-): Promise<Subscription>
+  listener: (data: AllMidsEvent) => void,
+): Promise<Subscription>;
 export function allMids(
   config: SubscriptionRequestConfig,
   paramsOrListener: DeepImmutable<AllMidsParameters> | ((data: AllMidsEvent) => void),
-  maybeListener?: (data: AllMidsEvent) => void
+  maybeListener?: (data: AllMidsEvent) => void,
 ): Promise<Subscription> {
-  const params = typeof paramsOrListener === "function" ? {} : paramsOrListener
-  const listener = typeof paramsOrListener === "function" ? paramsOrListener : maybeListener!
+  const params = typeof paramsOrListener === "function" ? {} : paramsOrListener;
+  const listener = typeof paramsOrListener === "function" ? paramsOrListener : maybeListener!;
 
-  const payload = parser(AllMidsRequest)({ type: "allMids", ...params })
+  const payload = parser(AllMidsRequest)({ type: "allMids", ...params });
   return config.transport.subscribe<AllMidsEvent>(payload.type, payload, (e) => {
-    // if dex name is provided, only invoke listener if at least one pair starts with matching dex name
-    if (params.dex) {
-      const pairs = Object.keys(e.detail.mids)
-      if (pairs.length === 0) return
+     // if dex name is provided, only invoke listener if at least one pair starts with matching dex name
+     if (params.dex) {
+      const pairs = Object.keys(e.detail.mids);
+      if (pairs.length === 0) return;
       // pair name format: [dex]:[coin]
-      if (!pairs[0].toLowerCase().startsWith(`${params.dex.toLowerCase()}:`)) return
+      if (!pairs[0].toLowerCase().startsWith(`${params.dex.toLowerCase()}:`)) return;
     }
-    listener(e.detail)
-  })
+    listener(e.detail);
+  });
 }
