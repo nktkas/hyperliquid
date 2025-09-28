@@ -88,11 +88,14 @@ export function allMids(
   const payload = parser(AllMidsRequest)({ type: "allMids", ...params });
   return config.transport.subscribe<AllMidsEvent>(payload.type, payload, (e) => {
      // if dex name is provided, only invoke listener if at least one pair starts with matching dex name
+     const pairs = Object.keys(e.detail.mids);
+     if (pairs.length === 0) return;
+     const defaultPair = pairs[0];
      if (params.dex) {
-      const pairs = Object.keys(e.detail.mids);
-      if (pairs.length === 0) return;
       // pair name format: [dex]:[coin]
-      if (!pairs[0].toLowerCase().startsWith(`${params.dex.toLowerCase()}:`)) return;
+      if (!defaultPair.toLowerCase().startsWith(`${params.dex.toLowerCase()}:`)) return;
+    } else {
+      if (defaultPair.includes(':')) return;
     }
     listener(e.detail);
   });
