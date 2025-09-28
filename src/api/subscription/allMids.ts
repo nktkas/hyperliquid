@@ -87,7 +87,7 @@ export function allMids(
       if (pairs.length === 0) return
       const defaultPair = pairs[0]
       // mids is not for the requested dex
-      if (!defaultPair.startsWith(params.dex)) return
+      if (!defaultPair.toLowerCase().startsWith(params.dex.toLowerCase())) return
     }
     listener(e.detail)
   })
