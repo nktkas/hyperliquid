@@ -11,7 +11,7 @@ await emptyDir("./build/npm");
 await build({
   entryPoints: [
     ...Object.entries(denoJson.exports).map(([key, value]) => ({ name: key, path: value })),
-    { name: "./bin/cli", path: "./bin/cli.ts", kind: "bin" },
+    { name: "@nktkas/hyperliquid", path: "./bin/cli.ts", kind: "bin" },
   ],
   outDir: "./build/npm",
   shims: {},
