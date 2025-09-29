@@ -16,7 +16,7 @@ export const ActiveSpotAssetCtxRequest = /* @__PURE__ */ (() => {
       ),
       /** Asset ID (e.g., @1). */
       coin: v.pipe(
-        v.pipe(v.string(), v.regex(/^@[0-9]+$/)),
+        v.string(),
         v.description("Asset ID (e.g., @1)."),
       ),
     }),
