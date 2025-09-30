@@ -12,6 +12,12 @@ runTest("allMids", "api", async (_t, client) => {
       }),
       10_000,
     ),
+    deadline(
+      new Promise<AllMidsEvent>((resolve) => {
+        client.allMids({ dex: "unit" }, resolve);
+      }),
+      10_000,
+    ),
   ]);
   schemaCoverage(AllMidsEvent, data);
 });
