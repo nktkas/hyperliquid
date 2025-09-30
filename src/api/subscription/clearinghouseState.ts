@@ -287,7 +287,7 @@ export function clearinghouseState(
   const payload = parser(ClearinghouseStateRequest)({
     type: "clearinghouseState",
     ...params,
-    dex: params.dex ?? "",
+    dex: params.dex ?? "", // same value as in response
   });
   return config.transport.subscribe<ClearinghouseStateEvent>(payload.type, payload, (e) => {
     if (e.detail.user === payload.user.toLowerCase() && e.detail.dex === payload.dex) {

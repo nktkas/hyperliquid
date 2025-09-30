@@ -150,7 +150,7 @@ export function assetCtxs(
   const payload = parser(AssetCtxsRequest)({
     type: "assetCtxs",
     ...params,
-    dex: params.dex ?? "",
+    dex: params.dex ?? "", // same value as in response
   });
   return config.transport.subscribe<AssetCtxsEvent>(payload.type, payload, (e) => {
     if (e.detail.dex === payload.dex) {

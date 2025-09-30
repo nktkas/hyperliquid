@@ -227,7 +227,7 @@ export function openOrders(
   const payload = parser(OpenOrdersRequest)({
     type: "openOrders",
     ...params,
-    dex: params.dex ?? "",
+    dex: params.dex ?? "", // same value as in response
   });
   return config.transport.subscribe<OpenOrdersEvent>(payload.type, payload, (e) => {
     if (e.detail.user === payload.user.toLowerCase() && e.detail.dex === payload.dex) {
