@@ -26,7 +26,7 @@ runTest({
           });
         },
         ApiRequestError,
-        "Error deploying perp:",
+        "Invalid perp deployer",
       );
     });
 

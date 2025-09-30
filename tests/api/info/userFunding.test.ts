@@ -8,7 +8,7 @@ runTest({
     const data = await Promise.all([
       client.userFunding({
         user: "0xe019d6167E7e324aEd003d94098496b6d986aB05",
-        startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
+        startTime: Date.now() - 1000 * 60 * 60 * 24 * 365 * 5,
       }),
     ]);
     schemaCoverage(UserFundingResponse, data);
