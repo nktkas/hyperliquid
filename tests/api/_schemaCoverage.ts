@@ -44,19 +44,6 @@ export class SchemaCoverageError extends Error {
 
 type Equal<T, U> = (<G>() => G extends T ? 1 : 2) extends (<G>() => G extends U ? 1 : 2) ? true : false;
 
-/** Creates a valibot parser with summarized error messages. */
-export function parser<TSchema extends v.GenericSchema>(schema: TSchema): v.Parser<TSchema, undefined> {
-  const safeParser = v.safeParser(schema);
-  const parser = (input: unknown) => {
-    const result = safeParser(input);
-    if (result.issues) throw new Error("\n" + v.summarize(result.issues) + "\n\n" + JSON.stringify(input));
-    return result.output;
-  };
-  parser.schema = schema;
-  parser.config = undefined;
-  return parser;
-}
-
 /**
  * Validates a valibot schema against a set of samples and checks for coverage issues.
  * @param schema - The valibot schema object to validate
@@ -72,7 +59,13 @@ export function schemaCoverage<
   samples: TSample[] & (Equal<TSample, v.InferOutput<TSchema>> extends true ? TSample[] : never),
   options: CoverageOptions = {},
 ): void {
-  parser(v.pipe(v.array(schema), v.minLength(1)))(samples); // wrap source schema to check sample array
+  v.assert(
+    v.pipe(
+      v.array(strict(schema)),
+      v.minLength(1),
+    ),
+    samples,
+  );
 
   options.ignoreSchemas = options.ignoreSchemas || [Integer, UnsignedInteger, Decimal, UnsignedDecimal]; // Hack to avoid importing into every test
   const coverageIssues = checkCoverage(schema, samples, options);
@@ -82,6 +75,85 @@ export function schemaCoverage<
       .join("\n");
     throw new SchemaCoverageError(`Schema coverage issues:\n${details}`, coverageIssues);
   }
+}
+
+/** Convert an object or tuple schema to strict version (no extra properties/items allowed) recursively. */
+function strict(schema: v.GenericSchema): v.GenericSchema {
+  if (!("type" in schema)) return schema;
+
+  // Optional
+  if (schema.type === "optional" && "wrapped" in schema) {
+    const wrapped = strict(schema.wrapped as v.GenericSchema);
+    return "default" in schema && schema.default !== undefined
+      ? v.optional(wrapped, schema.default)
+      : v.optional(wrapped);
+  }
+
+  // Nullable
+  if (schema.type === "nullable" && "wrapped" in schema) {
+    const wrapped = strict(schema.wrapped as v.GenericSchema);
+    return "default" in schema && schema.default !== undefined
+      ? v.nullable(wrapped, schema.default)
+      : v.nullable(wrapped);
+  }
+
+  // Nullish
+  if (schema.type === "nullish" && "wrapped" in schema) {
+    const wrapped = strict(schema.wrapped as v.GenericSchema);
+    return "default" in schema && schema.default !== undefined
+      ? v.nullish(wrapped, schema.default)
+      : v.nullish(wrapped);
+  }
+
+  // Array
+  if (schema.type === "array" && "item" in schema) {
+    const item = strict(schema.item as v.GenericSchema);
+    return v.array(item);
+  }
+
+  // Record
+  if (schema.type === "record" && "value" in schema) {
+    const value = strict(schema.value as v.GenericSchema);
+    const key = "key" in schema ? schema.key : v.string();
+    return v.record(key as v.GenericSchema<string, string | number | symbol>, value);
+  }
+
+  // Union
+  if (schema.type === "union" && "options" in schema) {
+    const options = (schema.options as v.GenericSchema[]).map(strict);
+    return v.union(options);
+  }
+
+  // Variant
+  if (schema.type === "variant" && "options" in schema && "key" in schema) {
+    const options = (schema.options as v.GenericSchema[]).map(strict);
+    return v.variant(schema.key as string, options as v.VariantOptions<string>);
+  }
+
+  // Lazy
+  if (schema.type === "lazy" && "getter" in schema) {
+    return v.lazy(() => strict((schema.getter as () => v.GenericSchema)()));
+  }
+
+  // Object
+  if (schema.type === "object" && "entries" in schema) {
+    const entries = Object.fromEntries(
+      Object.entries(schema.entries as Record<string, v.GenericSchema>).map(
+        ([key, value]) => [key, strict(value)],
+      ),
+    );
+    const newSchema = v.strictObject(entries);
+    return "pipe" in schema && schema.pipe ? v.pipe(newSchema, ...schema.pipe as v.GenericPipeAction[]) : newSchema;
+  }
+
+  // Tuple
+  if (schema.type === "tuple" && "items" in schema) {
+    const items = (schema.items as v.GenericSchema[]).map(strict);
+    const newSchema = v.strictTuple(items);
+    return "pipe" in schema && schema.pipe ? v.pipe(newSchema, ...schema.pipe as v.GenericPipeAction[]) : newSchema;
+  }
+
+  return schema;
 }
 
 /**
