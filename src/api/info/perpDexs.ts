@@ -53,6 +53,7 @@ export const PerpDexsResponse = /* @__PURE__ */ (() => {
               v.nullable(Address),
               v.description("Hex address of the oracle updater, or null if not available."),
             ),
+            override_fee_recipient: v.null(), // FIXME: find out what this field is
           }),
           v.description(" Perpetual dex metadata."),
         ),
