@@ -678,7 +678,7 @@ class WebSocketTransport {
     isTestnet?: boolean;
     /**
      * Custom WebSocket endpoint for API and Subscription requests.
-     * (default: `wss://api.hyperliquid.xyz` for `isTestnet` = false, `wss://api.testnet.hyperliquid.xyz` for `isTestnet` = true)
+     * (default: `wss://api.hyperliquid.xyz/ws` for `isTestnet` = false, `wss://api.hyperliquid-testnet.xyz/ws` for `isTestnet` = true)
      */
     url?: string | URL;
     /** Timeout for requests in ms (default: 10_000) */
