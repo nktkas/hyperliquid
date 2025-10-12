@@ -1,11 +1,11 @@
 // deno-lint-ignore-file no-import-prefix
 /**
  * Builds the Deno library for working with NodeJS or publishing to npm
- * Command: deno run --allow-env --allow-read --allow-write --allow-run build/npm.ts
+ * Command: deno run -A .github/scripts/build_npm.ts
  */
 
 import { build, emptyDir } from "jsr:@deno/dnt@^0.42.1";
-import denoJson from "../deno.json" with { type: "json" };
+import denoJson from "../../deno.json" with { type: "json" };
 
 await emptyDir("./build/npm");
 await build({

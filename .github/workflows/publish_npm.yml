@@ -20,7 +20,7 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Build package
-        run: deno task build:npm
+        run: deno run -A .github/scripts/build_npm.ts
 
       - name: Get package version and determine tag
         id: version

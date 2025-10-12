@@ -31,8 +31,5 @@
     ]
   },
   "license": "MIT",
-  "lock": false,
-  "tasks": {
-    "build:npm": "deno run --allow-env --allow-read --allow-write --allow-run build/npm.ts"
-  }
+  "lock": false
 }
