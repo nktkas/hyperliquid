@@ -290,7 +290,7 @@ export function clearinghouseState(
     dex: params.dex ?? "", // same value as in response
   });
   return config.transport.subscribe<ClearinghouseStateEvent>(payload.type, payload, (e) => {
-    if (e.detail.user === payload.user.toLowerCase() && e.detail.dex === payload.dex) {
+    if (e.detail.user === payload.user && e.detail.dex === payload.dex) {
       listener(e.detail);
     }
   });

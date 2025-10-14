@@ -500,6 +500,11 @@ export const WebData2Event = /* @__PURE__ */ (() => {
             ),
             v.description("Margin requirement tables for different leverage tiers."),
           ),
+          /** Collateral token index. */
+          collateralToken: v.pipe(
+            UnsignedInteger,
+            v.description("Collateral token index."),
+          ),
         }),
         v.description("Metadata for perpetual assets."),
       ),
@@ -823,7 +828,7 @@ export function webData2(
 ): Promise<Subscription> {
   const payload = parser(WebData2Request)({ type: "webData2", ...params });
   return config.transport.subscribe<WebData2Event>(payload.type, payload, (e) => {
-    if (e.detail.user === payload.user.toLowerCase()) {
+    if (e.detail.user === payload.user) {
       listener(e.detail);
     }
   });

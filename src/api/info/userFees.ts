@@ -215,10 +215,10 @@ export const UserFeesResponse = /* @__PURE__ */ (() => {
         v.union([v.unknown(), v.null()]),
         v.description("Trial details."),
       ),
-      /** Fee trial reward amount. */
-      feeTrialReward: v.pipe(
+      /** Fee trial escrow amount. */
+      feeTrialEscrow: v.pipe(
         UnsignedDecimal,
-        v.description("Fee trial reward amount."),
+        v.description("Fee trial escrow amount."),
       ),
       /** Timestamp when next trial becomes available. */
       nextTrialAvailableTimestamp: v.pipe(

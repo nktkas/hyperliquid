@@ -376,6 +376,11 @@ export const TwapHistoryEvent = /* @__PURE__ */ (() => {
                     '\n- `"error"`: An error occurred.',
                 ),
               ),
+              /** TWAP ID. */
+              twapId: v.pipe(
+                UnsignedInteger,
+                v.description("TWAP ID."),
+              ),
             }),
             v.description("TWAP history record."),
           ),

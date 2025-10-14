@@ -195,7 +195,7 @@ export function userTwapHistory(
 ): Promise<Subscription> {
   const payload = parser(UserTwapHistoryRequest)({ type: "userTwapHistory", ...params });
   return config.transport.subscribe<UserTwapHistoryEvent>(payload.type, payload, (e) => {
-    if (e.detail.user === payload.user.toLowerCase()) {
+    if (e.detail.user === payload.user) {
       listener(e.detail);
     }
   });

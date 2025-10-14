@@ -123,7 +123,7 @@ export function userFundings(
 ): Promise<Subscription> {
   const payload = parser(UserFundingsRequest)({ type: "userFundings", ...params });
   return config.transport.subscribe<UserFundingsEvent>(payload.type, payload, (e) => {
-    if (e.detail.user === payload.user.toLowerCase()) {
+    if (e.detail.user === payload.user) {
       listener(e.detail);
     }
   });

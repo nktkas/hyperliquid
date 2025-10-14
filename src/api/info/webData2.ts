@@ -505,6 +505,11 @@ export const WebData2Response = /* @__PURE__ */ (() => {
             ),
             v.description("Margin requirement tables for different leverage tiers."),
           ),
+          /** Collateral token index. */
+          collateralToken: v.pipe(
+            UnsignedInteger,
+            v.description("Collateral token index."),
+          ),
         }),
         v.description("Metadata for perpetual assets."),
       ),

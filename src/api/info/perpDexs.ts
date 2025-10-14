@@ -39,7 +39,7 @@ export const PerpDexsResponse = /* @__PURE__ */ (() => {
               v.description("Short name of the perpetual dex."),
             ),
             /** Complete name of the perpetual dex. */
-            full_name: v.pipe(
+            fullName: v.pipe(
               v.string(),
               v.description("Complete name of the perpetual dex."),
             ),
@@ -49,11 +49,20 @@ export const PerpDexsResponse = /* @__PURE__ */ (() => {
               v.description("Hex address of the dex deployer."),
             ),
             /** Hex address of the oracle updater, or null if not available. */
-            oracle_updater: v.pipe(
+            oracleUpdater: v.pipe(
               v.nullable(Address),
               v.description("Hex address of the oracle updater, or null if not available."),
             ),
-            override_fee_recipient: v.null(), // FIXME: find out what this field is
+            /** Hex address of the fee recipient, or null if not available. */
+            feeRecipient: v.pipe(
+              v.nullable(Address),
+              v.description("Hex address of the fee recipient, or null if not available."),
+            ),
+            /** Mapping of asset names to their streaming open interest caps. */
+            assetToStreamingOiCap: v.pipe(
+              v.array(v.tuple([v.string(), v.string()])),
+              v.description("Mapping of asset names to their streaming open interest caps."),
+            ),
           }),
           v.description(" Perpetual dex metadata."),
         ),

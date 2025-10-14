@@ -175,7 +175,7 @@ export function userTwapSliceFills(
 ): Promise<Subscription> {
   const payload = parser(UserTwapSliceFillsRequest)({ type: "userTwapSliceFills", ...params });
   return config.transport.subscribe<UserTwapSliceFillsEvent>(payload.type, payload, (e) => {
-    if (e.detail.user === payload.user.toLowerCase()) {
+    if (e.detail.user === payload.user) {
       listener(e.detail);
     }
   });

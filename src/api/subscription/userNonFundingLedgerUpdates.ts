@@ -527,7 +527,7 @@ export function userNonFundingLedgerUpdates(
 ): Promise<Subscription> {
   const payload = parser(UserNonFundingLedgerUpdatesRequest)({ type: "userNonFundingLedgerUpdates", ...params });
   return config.transport.subscribe<UserNonFundingLedgerUpdatesEvent>(payload.type, payload, (e) => {
-    if (e.detail.user === payload.user.toLowerCase()) {
+    if (e.detail.user === payload.user) {
       listener(e.detail);
     }
   });

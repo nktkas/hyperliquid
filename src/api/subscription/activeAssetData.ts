@@ -138,7 +138,7 @@ export function activeAssetData(
 ): Promise<Subscription> {
   const payload = parser(ActiveAssetDataRequest)({ type: "activeAssetData", ...params });
   return config.transport.subscribe<ActiveAssetDataEvent>(payload.type, payload, (e) => {
-    if (e.detail.coin === payload.coin && e.detail.user === payload.user.toLowerCase()) {
+    if (e.detail.coin === payload.coin && e.detail.user === payload.user) {
       listener(e.detail);
     }
   });

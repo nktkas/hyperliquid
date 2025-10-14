@@ -205,7 +205,7 @@ export function userFills(
     aggregateByTime: params.aggregateByTime ?? false,
   });
   return config.transport.subscribe<UserFillsEvent>(payload.type, payload, (e) => {
-    if (e.detail.user === payload.user.toLowerCase()) {
+    if (e.detail.user === payload.user) {
       listener(e.detail);
     }
   });
