@@ -44,6 +44,7 @@ export * from "./trades.ts";
 export * from "./userEvents.ts";
 export * from "./userFills.ts";
 export * from "./userFundings.ts";
+export * from "./userHistoricalOrders.ts";
 export * from "./userNonFundingLedgerUpdates.ts";
 export * from "./userTwapHistory.ts";
 export * from "./userTwapSliceFills.ts";

@@ -575,6 +575,7 @@ class SubscriptionClient {
   notification(params: WsNotificationParameters, listener: (data: WsNotificationEvent) => void);
   userEvents(params: WsUserEventsParameters, listener: (data: WsUserEventsEvent) => void);
   userFundings(params: WsUserFundingsParameters, listener: (data: WsUserFundingsEvent) => void);
+  userHistoricalOrders(params: WsUserHistoricalOrdersParameters, listener: (data: WsUserHistoricalOrdersEvent) => void);
   userNonFundingLedgerUpdates(
     params: WsUserNonFundingLedgerUpdatesParameters,
     listener: (data: WsUserNonFundingLedgerUpdatesEvent) => void,

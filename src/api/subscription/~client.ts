@@ -20,6 +20,7 @@ import { trades } from "./trades.ts";
 import { userEvents } from "./userEvents.ts";
 import { userFills } from "./userFills.ts";
 import { userFundings } from "./userFundings.ts";
+import { userHistoricalOrders } from "./userHistoricalOrders.ts";
 import { userNonFundingLedgerUpdates } from "./userNonFundingLedgerUpdates.ts";
 import { userTwapHistory } from "./userTwapHistory.ts";
 import { userTwapSliceFills } from "./userTwapSliceFills.ts";
@@ -76,6 +77,10 @@ export type {
   UserFundingsEvent as WsUserFundingsEvent,
   UserFundingsParameters as WsUserFundingsParameters,
 } from "./userFundings.ts";
+export type {
+  UserHistoricalOrdersEvent as WsUserHistoricalOrdersEvent,
+  UserHistoricalOrdersParameters as WsUserHistoricalOrdersParameters,
+} from "./userHistoricalOrders.ts";
 export type {
   UserNonFundingLedgerUpdatesEvent as WsUserNonFundingLedgerUpdatesEvent,
   UserNonFundingLedgerUpdatesParameters as WsUserNonFundingLedgerUpdatesParameters,
@@ -536,6 +541,30 @@ export class SubscriptionClient<
    */
   userFundings(...args: OmitFirst<OverloadedParameters<typeof userFundings>>) {
     return userFundings(this, ...args);
+  }
+
+  /**
+   * Subscribe to historical order updates for a specific user.
+   * @param config - General configuration for Subscription API subscriptions.
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+   *
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport();
+   *
+   * const client = new hl.SubscriptionClient({ transport });
+   * const sub = await client.userHistoricalOrders({ user: "0x..." }, (data) => console.log(data));
+   * ```
+   */
+  userHistoricalOrders(...args: OmitFirst<OverloadedParameters<typeof userHistoricalOrders>>) {
+    return userHistoricalOrders(this, ...args);
   }
 
   /**
