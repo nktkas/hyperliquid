@@ -563,6 +563,7 @@ class SubscriptionClient {
 
   // Market
   activeAssetCtx(params: WsActiveAssetCtxParameters, listener: (data: WsActiveAssetCtxEvent) => void);
+  activeSpotAssetCtx(params: WsActiveSpotAssetCtxParameters, listener: (data: WsActiveSpotAssetCtxEvent) => void);
   allMids(params?: WsAllMidsParameters, listener: (data: WsAllMidsEvent) => void);
   assetCtxs(params?: WsAssetCtxsParameters, listener: (data: WsAssetCtxsEvent) => void);
   bbo(params: WsBboParameters, listener: (data: WsBboEvent) => void);
