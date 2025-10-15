@@ -393,6 +393,7 @@ class InfoClient {
   });
 
   // Market
+  alignedQuoteTokenInfo(params: AlignedQuoteTokenInfoParameters): Promise<AlignedQuoteTokenInfoResponse>;
   allMids(params?: AllMidsParameters): Promise<AllMidsResponse>;
   candleSnapshot(params: CandleSnapshotParameters): Promise<CandleSnapshotResponse>;
   fundingHistory(params: FundingHistoryParameters): Promise<FundingHistoryResponse>;
