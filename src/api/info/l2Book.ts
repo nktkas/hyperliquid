@@ -1,6 +1,8 @@
 import * as v from "valibot";
-import { type DeepImmutable, Integer, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
-import type { InfoRequestConfig } from "./_common.ts";
+import { type DeepImmutable, Integer, parser, UnsignedInteger } from "../_base.ts";
+import type { InfoRequestConfig } from "./_base.ts";
+
+import { L2BookLevelSchema } from "../_common_schemas.ts";
 
 // -------------------- Schemas --------------------
 
@@ -47,31 +49,6 @@ export const L2BookRequest = /* @__PURE__ */ (() => {
 })();
 export type L2BookRequest = v.InferOutput<typeof L2BookRequest>;
 
-/** L2 order book level. */
-const L2BookLevel = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Price. */
-      px: v.pipe(
-        UnsignedDecimal,
-        v.description("Price."),
-      ),
-      /** Total size. */
-      sz: v.pipe(
-        UnsignedDecimal,
-        v.description("Total size."),
-      ),
-      /** Number of individual orders. */
-      n: v.pipe(
-        UnsignedInteger,
-        v.description("Number of individual orders."),
-      ),
-    }),
-    v.description("L2 order book level."),
-  );
-})();
-type L2BookLevel = v.InferOutput<typeof L2BookLevel>;
-
 /**
  * L2 order book snapshot.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#l2-book-snapshot
@@ -91,7 +68,7 @@ export const L2BookResponse = /* @__PURE__ */ (() => {
       ),
       /** Bid and ask levels (index 0 = bids, index 1 = asks). */
       levels: v.pipe(
-        v.tuple([v.array(L2BookLevel), v.array(L2BookLevel)]),
+        v.tuple([v.array(L2BookLevelSchema), v.array(L2BookLevelSchema)]),
         v.description("Bid and ask levels (index 0 = bids, index 1 = asks)."),
       ),
     }),

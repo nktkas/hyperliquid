@@ -1,6 +1,6 @@
 import * as v from "valibot";
-import { Address, Decimal, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
-import type { InfoRequestConfig } from "./_common.ts";
+import { Address, Decimal, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import type { InfoRequestConfig } from "./_base.ts";
 
 // -------------------- Schemas --------------------
 
@@ -127,7 +127,7 @@ export const ClearinghouseStateResponse = /* @__PURE__ */ (() => {
                   ),
                   /** Leverage details. */
                   leverage: v.pipe(
-                    v.union([
+                    v.variant("type", [
                       v.object({
                         /** Leverage type. */
                         type: v.pipe(
@@ -184,7 +184,7 @@ export const ClearinghouseStateResponse = /* @__PURE__ */ (() => {
                   ),
                   /** Liquidation price. */
                   liquidationPx: v.pipe(
-                    v.union([UnsignedDecimal, v.null()]),
+                    v.nullable(UnsignedDecimal),
                     v.description("Liquidation price."),
                   ),
                   /** Margin used. */

@@ -13,10 +13,11 @@ runTest({
       ignoreBranches: {
         "#/wrapped/items/properties/clearinghouseState/properties/assetPositions/items/properties/position/properties/leverage":
           [0],
-        "#/wrapped/items/properties/clearinghouseState/properties/assetPositions/items/properties/position/properties/liquidationPx":
-          [0],
       },
-      ignoreDefinedTypes: ["#/wrapped/items/properties/spotState/properties/evmEscrows"],
+      ignoreDefinedTypes: [
+        "#/wrapped/items/properties/spotState/properties/evmEscrows",
+        "#/wrapped/items/properties/clearinghouseState/properties/assetPositions/items/properties/position/properties/liquidationPx",
+      ],
     });
   },
   cliTestFn: async (_t, runCommand) => {

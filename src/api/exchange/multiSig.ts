@@ -1,4 +1,4 @@
-import { Address, type DeepImmutable, Hex, parser, UnsignedInteger } from "../_common.ts";
+import { Address, type DeepImmutable, Hex, parser, UnsignedInteger } from "../_base.ts";
 import {
   type ExchangeRequestConfig,
   executeMultiSigAction,
@@ -6,10 +6,8 @@ import {
   type ExtractRequestOptions,
   getSignatureChainId,
   Signature,
-} from "./_common.ts";
+} from "./_base.ts";
 import * as v from "valibot";
-
-// -------------------- Schemas --------------------
 
 import { ApproveAgentRequest } from "./approveAgent.ts";
 import { ApproveBuilderFeeRequest } from "./approveBuilderFee.ts";
@@ -53,6 +51,8 @@ import { UsdSendRequest } from "./usdSend.ts";
 import { VaultModifyRequest } from "./vaultModify.ts";
 import { VaultTransferRequest } from "./vaultTransfer.ts";
 
+// -------------------- Schemas --------------------
+
 /**
  * A multi-signature request.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig
@@ -95,7 +95,7 @@ export const MultiSigRequest = /* @__PURE__ */ (() => {
               ),
               /** The underlying action to be executed through multi-sig. */
               action: v.pipe(
-                v.union([
+                v.variant("type", [
                   ApproveAgentRequest.entries.action,
                   ApproveBuilderFeeRequest.entries.action,
                   BatchModifyRequest.entries.action,
@@ -172,7 +172,7 @@ export const MultiSigRequest = /* @__PURE__ */ (() => {
 })();
 export type MultiSigRequest = v.InferOutput<typeof MultiSigRequest>;
 
-import { SuccessResponse } from "./_common.ts";
+import { SuccessResponse } from "./_base.ts";
 export {
   CancelSuccessResponse,
   CreateSubAccountResponse,

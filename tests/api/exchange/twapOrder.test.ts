@@ -10,7 +10,7 @@ runTest({
   codeTestFn: async (_t, clients) => {
     // —————————— Prepare ——————————
 
-    const { id, universe, ctx } = await getAssetData("SOL");
+    const { id, universe, ctx } = await getAssetData("BTC");
     const sz = formatSize(new BigNumber(55).div(ctx.markPx), universe.szDecimals);
 
     // —————————— Test ——————————

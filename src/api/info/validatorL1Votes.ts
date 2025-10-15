@@ -1,6 +1,6 @@
 import * as v from "valibot";
-import { Address, Integer, parser } from "../_common.ts";
-import type { InfoRequestConfig } from "./_common.ts";
+import { Address, Integer, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_base.ts";
 
 // -------------------- Schemas --------------------
 
@@ -37,13 +37,18 @@ export const ValidatorL1VotesResponse = /* @__PURE__ */ (() => {
             Integer,
             v.description("Timestamp when the vote expires (in ms since epoch)."),
           ),
-          /** Vote decision or action identifier. */
-          action: v.object({
-            D: v.pipe(
-              v.string(),
-              v.description("Vote decision or action identifier."),
-            ),
-          }),
+          /** Type of the vote. */
+          action: v.pipe(
+            v.union([
+              v.object({
+                D: v.string(),
+              }),
+              v.object({
+                C: v.array(v.string()),
+              }),
+            ]),
+            v.description("Type of the vote."),
+          ),
           /** List of validator addresses that cast this vote. */
           votes: v.pipe(
             v.array(Address),

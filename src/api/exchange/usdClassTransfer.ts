@@ -1,4 +1,4 @@
-import { type DeepImmutable, Hex, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
+import { type DeepImmutable, Hex, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 import {
   type ExchangeRequestConfig,
   executeUserSignedAction,
@@ -8,7 +8,7 @@ import {
   getSignatureChainId,
   type MultiSignRequestConfig,
   Signature,
-} from "./_common.ts";
+} from "./_base.ts";
 import * as v from "valibot";
 
 // -------------------- Schemas --------------------
@@ -72,7 +72,7 @@ export const UsdClassTransferRequest = /* @__PURE__ */ (() => {
 })();
 export type UsdClassTransferRequest = v.InferOutput<typeof UsdClassTransferRequest>;
 
-import { SuccessResponse } from "./_common.ts";
+import { SuccessResponse } from "./_base.ts";
 export { SuccessResponse };
 
 // -------------------- Function --------------------

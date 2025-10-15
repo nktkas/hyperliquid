@@ -23,8 +23,8 @@
  * @module
  */
 
-export { parser, SchemaError } from "../_common.ts";
-export type { SubscriptionRequestConfig } from "./_common.ts";
+export { parser, SchemaError } from "../_base.ts";
+export type { SubscriptionRequestConfig } from "./_base.ts";
 
 export * from "./activeAssetCtx.ts";
 export * from "./activeAssetData.ts";

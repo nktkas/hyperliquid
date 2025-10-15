@@ -1,6 +1,6 @@
 import * as v from "valibot";
-import { Address, Hex, Integer, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
-import type { InfoRequestConfig } from "./_common.ts";
+import { Address, Hex, Integer, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import type { InfoRequestConfig } from "./_base.ts";
 
 // -------------------- Schemas --------------------
 

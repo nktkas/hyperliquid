@@ -12,9 +12,9 @@ runTest({
       }),
     ]);
     schemaCoverage(UserFillsByTimeResponse, data, {
-      ignoreBranches: {
-        "#/items/properties/twapId": [0],
-      },
+      ignoreDefinedTypes: [
+        "#/items/properties/twapId",
+      ],
     });
   },
   cliTestFn: async (_t, runCommand) => {

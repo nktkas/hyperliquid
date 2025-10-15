@@ -1,4 +1,4 @@
-import { Address, type DeepImmutable, Hex, parser, Percent, UnsignedInteger } from "../_common.ts";
+import { Address, type DeepImmutable, Hex, parser, Percent, UnsignedInteger } from "../_base.ts";
 import {
   type ExchangeRequestConfig,
   executeUserSignedAction,
@@ -8,7 +8,7 @@ import {
   getSignatureChainId,
   type MultiSignRequestConfig,
   Signature,
-} from "./_common.ts";
+} from "./_base.ts";
 import * as v from "valibot";
 
 // -------------------- Schemas --------------------
@@ -72,7 +72,7 @@ export const ApproveBuilderFeeRequest = /* @__PURE__ */ (() => {
 })();
 export type ApproveBuilderFeeRequest = v.InferOutput<typeof ApproveBuilderFeeRequest>;
 
-import { SuccessResponse } from "./_common.ts";
+import { SuccessResponse } from "./_base.ts";
 export { SuccessResponse };
 
 // -------------------- Function --------------------

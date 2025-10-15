@@ -1,6 +1,6 @@
-import type { OmitFirst, OverloadedParameters } from "../_common.ts";
+import type { OmitFirst, OverloadedParameters } from "../_base.ts";
 import type { ISubscriptionTransport } from "../../transport/base.ts";
-import type { SubscriptionRequestConfig } from "./_common.ts";
+import type { SubscriptionRequestConfig } from "./_base.ts";
 
 import { activeAssetCtx } from "./activeAssetCtx.ts";
 import { activeAssetData } from "./activeAssetData.ts";

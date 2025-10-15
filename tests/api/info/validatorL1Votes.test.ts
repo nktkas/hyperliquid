@@ -10,6 +10,9 @@ runTest({
     ]);
     schemaCoverage(ValidatorL1VotesResponse, data, {
       ignoreEmptyArray: ["#"],
+      ignoreBranches: {
+        "#/items/properties/action": [0, 1],
+      },
     });
   },
   cliTestFn: async (_t, runCommand) => {

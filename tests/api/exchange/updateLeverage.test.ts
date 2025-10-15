@@ -7,7 +7,7 @@ runTest({
   codeTestFn: async (_t, clients) => {
     // —————————— Prepare ——————————
 
-    const { id } = await getAssetData("SOL");
+    const { id } = await getAssetData("BTC");
 
     // —————————— Test ——————————
 

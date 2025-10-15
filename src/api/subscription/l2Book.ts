@@ -1,7 +1,9 @@
 import * as v from "valibot";
-import { type DeepImmutable, Integer, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
-import type { SubscriptionRequestConfig } from "./_common.ts";
+import { type DeepImmutable, Integer, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_base.ts";
 import type { Subscription } from "../../transport/base.ts";
+
+import { L2BookResponse } from "../info/l2Book.ts";
 
 // -------------------- Schemas --------------------
 
@@ -45,52 +47,9 @@ export const L2BookRequest = /* @__PURE__ */ (() => {
 })();
 export type L2BookRequest = v.InferOutput<typeof L2BookRequest>;
 
-/** L2 order book level. */
-const L2BookLevel = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Price. */
-      px: v.pipe(
-        UnsignedDecimal,
-        v.description("Price."),
-      ),
-      /** Total size. */
-      sz: v.pipe(
-        UnsignedDecimal,
-        v.description("Total size."),
-      ),
-      /** Number of individual orders. */
-      n: v.pipe(
-        UnsignedInteger,
-        v.description("Number of individual orders."),
-      ),
-    }),
-    v.description("L2 order book level."),
-  );
-})();
-
 /** Event of L2 order book snapshot. */
 export const L2BookEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Asset symbol. */
-      coin: v.pipe(
-        v.string(),
-        v.description("Asset symbol."),
-      ),
-      /** Timestamp of the snapshot (in ms since epoch). */
-      time: v.pipe(
-        UnsignedInteger,
-        v.description("Timestamp of the snapshot (in ms since epoch)."),
-      ),
-      /** Bid and ask levels (index 0 = bids, index 1 = asks). */
-      levels: v.pipe(
-        v.tuple([v.array(L2BookLevel), v.array(L2BookLevel)]),
-        v.description("Bid and ask levels (index 0 = bids, index 1 = asks)."),
-      ),
-    }),
-    v.description("Event of L2 order book snapshot."),
-  );
+  return L2BookResponse;
 })();
 export type L2BookEvent = v.InferOutput<typeof L2BookEvent>;
 

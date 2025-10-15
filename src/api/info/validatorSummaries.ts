@@ -1,6 +1,6 @@
 import * as v from "valibot";
-import { Address, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
-import type { InfoRequestConfig } from "./_common.ts";
+import { Address, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import type { InfoRequestConfig } from "./_base.ts";
 
 // -------------------- Schemas --------------------
 
@@ -94,7 +94,7 @@ export const ValidatorSummariesResponse = /* @__PURE__ */ (() => {
           ),
           /** Timestamp when the validator can be unjailed (in ms since epoch). */
           unjailableAfter: v.pipe(
-            v.union([UnsignedInteger, v.null()]),
+            v.nullable(UnsignedInteger),
             v.description("Timestamp when the validator can be unjailed (in ms since epoch)."),
           ),
           /** Whether the validator is currently active. */

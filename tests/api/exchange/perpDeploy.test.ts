@@ -43,7 +43,7 @@ runTest({
           });
         },
         ApiRequestError,
-        "Error deploying perp:",
+        "Invalid oracle updater",
       );
     });
   },

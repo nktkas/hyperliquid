@@ -37,8 +37,8 @@
  * @module
  */
 
-export { parser, SchemaError } from "../_common.ts";
-export type { ExchangeRequestConfig } from "./_common.ts";
+export { parser, SchemaError } from "../_base.ts";
+export type { ExchangeRequestConfig } from "./_base.ts";
 
 export * from "./approveAgent.ts";
 export * from "./approveBuilderFee.ts";

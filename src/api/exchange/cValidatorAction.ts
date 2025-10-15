@@ -1,4 +1,4 @@
-import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_common.ts";
+import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
 import {
   type ExchangeRequestConfig,
   executeL1Action,
@@ -6,7 +6,7 @@ import {
   type ExtractRequestOptions,
   type MultiSignRequestConfig,
   Signature,
-} from "./_common.ts";
+} from "./_base.ts";
 import * as v from "valibot";
 
 // -------------------- Schemas --------------------
@@ -20,7 +20,7 @@ export const CValidatorActionRequest = /* @__PURE__ */ (() => {
     v.object({
       /** Action to perform. */
       action: v.pipe(
-        v.union([
+        v.variant("type", [
           v.object({
             /** Type of action. */
             type: v.pipe(
@@ -32,7 +32,7 @@ export const CValidatorActionRequest = /* @__PURE__ */ (() => {
               v.object({
                 /** Validator node IP address. */
                 node_ip: v.pipe(
-                  v.union([
+                  v.nullable(
                     v.object({
                       /** IP address. */
                       Ip: v.pipe(
@@ -41,8 +41,7 @@ export const CValidatorActionRequest = /* @__PURE__ */ (() => {
                         v.description("IP address."),
                       ),
                     }),
-                    v.null(),
-                  ]),
+                  ),
                   v.description("Validator node IP address."),
                 ),
                 /** Validator name. */
@@ -181,7 +180,7 @@ export const CValidatorActionRequest = /* @__PURE__ */ (() => {
 })();
 export type CValidatorActionRequest = v.InferOutput<typeof CValidatorActionRequest>;
 
-import { SuccessResponse } from "./_common.ts";
+import { SuccessResponse } from "./_base.ts";
 export { SuccessResponse };
 
 // -------------------- Function --------------------

@@ -1,7 +1,9 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
-import type { SubscriptionRequestConfig } from "./_common.ts";
+import { Address, type DeepImmutable, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_base.ts";
 import type { Subscription } from "../../transport/base.ts";
+
+import { ActiveAssetDataResponse } from "../info/activeAssetData.ts";
 
 // -------------------- Schemas --------------------
 
@@ -32,73 +34,7 @@ export type ActiveAssetDataRequest = v.InferOutput<typeof ActiveAssetDataRequest
 
 /** Event of user active asset data. */
 export const ActiveAssetDataEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** Asset symbol (e.g., BTC). */
-      coin: v.pipe(
-        v.string(),
-        v.description("Asset symbol (e.g., BTC)."),
-      ),
-      /** Leverage configuration. */
-      leverage: v.pipe(
-        v.union([
-          v.object({
-            /** Leverage type. */
-            type: v.pipe(
-              v.literal("isolated"),
-              v.description("Leverage type."),
-            ),
-            /** Leverage value used. */
-            value: v.pipe(
-              UnsignedInteger,
-              v.minValue(1),
-              v.description("Leverage value used."),
-            ),
-            /** Amount of USD used (1 = 1$). */
-            rawUsd: v.pipe(
-              UnsignedDecimal,
-              v.description("Amount of USD used (1 = 1$)."),
-            ),
-          }),
-          v.object({
-            /** Leverage type. */
-            type: v.pipe(
-              v.literal("cross"),
-              v.description("Leverage type."),
-            ),
-            /** Leverage value used. */
-            value: v.pipe(
-              UnsignedInteger,
-              v.minValue(1),
-              v.description("Leverage value used."),
-            ),
-          }),
-        ]),
-        v.description("Leverage configuration."),
-      ),
-      /** Maximum trade size range [min, max]. */
-      maxTradeSzs: v.pipe(
-        v.tuple([UnsignedDecimal, UnsignedDecimal]),
-        v.description("Maximum trade size range [min, max]."),
-      ),
-      /** Available to trade range [min, max]. */
-      availableToTrade: v.pipe(
-        v.tuple([UnsignedDecimal, UnsignedDecimal]),
-        v.description("Available to trade range [min, max]."),
-      ),
-      /** Mark price. */
-      markPx: v.pipe(
-        UnsignedDecimal,
-        v.description("Mark price."),
-      ),
-    }),
-    v.description("Event of user active asset data."),
-  );
+  return ActiveAssetDataResponse;
 })();
 export type ActiveAssetDataEvent = v.InferOutput<typeof ActiveAssetDataEvent>;
 

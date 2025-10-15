@@ -1,6 +1,8 @@
 import * as v from "valibot";
-import { type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
-import type { InfoRequestConfig } from "./_common.ts";
+import { type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
+import type { InfoRequestConfig } from "./_base.ts";
+
+import { MarginTableResponse } from "./marginTable.ts";
 
 // -------------------- Schemas --------------------
 
@@ -84,36 +86,7 @@ export const MetaResponse = /* @__PURE__ */ (() => {
           v.pipe(
             v.tuple([
               UnsignedInteger,
-              v.object({
-                /** Description of the margin table. */
-                description: v.pipe(
-                  v.string(),
-                  v.description("Description of the margin table."),
-                ),
-                /** Array of margin tiers defining leverage limits. */
-                marginTiers: v.pipe(
-                  v.array(
-                    /** Individual tier in a margin requirements table. */
-                    v.pipe(
-                      v.object({
-                        /** Lower position size boundary for this tier. */
-                        lowerBound: v.pipe(
-                          UnsignedDecimal,
-                          v.description("Lower position size boundary for this tier."),
-                        ),
-                        /** Maximum allowed leverage for this tier. */
-                        maxLeverage: v.pipe(
-                          UnsignedInteger,
-                          v.minValue(1),
-                          v.description("Maximum allowed leverage for this tier."),
-                        ),
-                      }),
-                      v.description("Individual tier in a margin requirements table."),
-                    ),
-                  ),
-                  v.description("Array of margin tiers defining leverage limits."),
-                ),
-              }),
+              MarginTableResponse,
             ]),
             v.description("Tuple of margin table ID and its details."),
           ),

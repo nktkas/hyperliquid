@@ -1,6 +1,8 @@
 import * as v from "valibot";
-import { Address, Hex, Integer, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
-import type { InfoRequestConfig } from "./_common.ts";
+import { parser, UnsignedDecimal } from "../_base.ts";
+import type { InfoRequestConfig } from "./_base.ts";
+
+import { SpotMetaResponse } from "./spotMeta.ts";
 
 // -------------------- Schemas --------------------
 
@@ -29,114 +31,7 @@ export type SpotMetaAndAssetCtxsRequest = v.InferOutput<typeof SpotMetaAndAssetC
 export const SpotMetaAndAssetCtxsResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.tuple([
-      /** Metadata for assets. */
-      v.pipe(
-        v.object({
-          /** Trading universes available for spot trading. */
-          universe: v.pipe(
-            v.array(
-              /** Trading universe details. */
-              v.pipe(
-                v.object({
-                  /** Token indices included in this universe. */
-                  tokens: v.pipe(
-                    v.array(UnsignedInteger),
-                    v.description("Token indices included in this universe."),
-                  ),
-                  /** Name of the universe. */
-                  name: v.pipe(
-                    v.string(),
-                    v.description("Name of the universe."),
-                  ),
-                  /** Unique identifier of the universe. */
-                  index: v.pipe(
-                    UnsignedInteger,
-                    v.description("Unique identifier of the universe."),
-                  ),
-                  /** Indicates if the token is the primary representation in the system. */
-                  isCanonical: v.pipe(
-                    v.boolean(),
-                    v.description("Indicates if the token is the primary representation in the system."),
-                  ),
-                }),
-                v.description("Trading universe details."),
-              ),
-            ),
-            v.description("Trading universes available for spot trading."),
-          ),
-          /** Tokens available for spot trading. */
-          tokens: v.pipe(
-            v.array(
-              /** Spot token details. */
-              v.pipe(
-                v.object({
-                  /** Name of the token. */
-                  name: v.pipe(
-                    v.string(),
-                    v.description("Name of the token."),
-                  ),
-                  /** Minimum decimal places for order sizes. */
-                  szDecimals: v.pipe(
-                    UnsignedInteger,
-                    v.description("Minimum decimal places for order sizes."),
-                  ),
-                  /** Number of decimals for the token's smallest unit. */
-                  weiDecimals: v.pipe(
-                    UnsignedInteger,
-                    v.description("Number of decimals for the token's smallest unit."),
-                  ),
-                  /** Unique identifier for the token. */
-                  index: v.pipe(
-                    UnsignedInteger,
-                    v.description("Unique identifier for the token."),
-                  ),
-                  /** Token ID. */
-                  tokenId: v.pipe(
-                    Hex,
-                    v.description("Token ID."),
-                  ),
-                  /** Indicates if the token is the primary representation in the system. */
-                  isCanonical: v.pipe(
-                    v.boolean(),
-                    v.description("Indicates if the token is the primary representation in the system."),
-                  ),
-                  /** EVM contract details. */
-                  evmContract: v.pipe(
-                    v.nullable(
-                      v.object({
-                        /** Contract address. */
-                        address: v.pipe(
-                          Address,
-                          v.description("Contract address."),
-                        ),
-                        /** Extra decimals in the token's smallest unit. */
-                        evm_extra_wei_decimals: v.pipe(
-                          Integer,
-                          v.description("Extra decimals in the token's smallest unit."),
-                        ),
-                      }),
-                    ),
-                    v.description("EVM contract details."),
-                  ),
-                  /** Full display name of the token. */
-                  fullName: v.pipe(
-                    v.nullable(v.string()),
-                    v.description("Full display name of the token."),
-                  ),
-                  /** Deployer trading fee share for the token. */
-                  deployerTradingFeeShare: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Deployer trading fee share for the token."),
-                  ),
-                }),
-                v.description("Spot token details."),
-              ),
-            ),
-            v.description("Tokens available for spot trading."),
-          ),
-        }),
-        v.description("Metadata for assets."),
-      ),
+      SpotMetaResponse,
       /** Context for each spot asset. */
       v.pipe(
         v.array(

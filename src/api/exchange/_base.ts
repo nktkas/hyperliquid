@@ -1,5 +1,5 @@
 import type { IRequestTransport } from "../../transport/base.ts";
-import { Address, Hex, Integer, parser, type Prettify } from "../_common.ts";
+import { Address, Hex, Integer, parser, type Prettify } from "../_base.ts";
 import {
   type AbstractWallet,
   getWalletAddress,

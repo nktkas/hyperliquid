@@ -46,7 +46,7 @@ runTestWithExchange("userEvents", async (_t, clients) => {
           }
         });
 
-        const twapPromise = openTwap("ETH", true);
+        const twapPromise = openTwap("BTC", true);
       }),
       20_000,
     ),
@@ -55,7 +55,7 @@ runTestWithExchange("userEvents", async (_t, clients) => {
     ignoreBranches: {
       "#": [0, 1, 2, 3, 5],
       "#/union/4/properties/twapHistory/items/properties/state/properties/side": [1],
-      "#/union/4/properties/twapHistory/items/properties/status/union/0/properties/status": [0, 2],
+      "#/union/4/properties/twapHistory/items/properties/status/variant/0/properties/status": [0, 2],
       "#/union/4/properties/twapHistory/items/properties/status": [1],
     },
   });

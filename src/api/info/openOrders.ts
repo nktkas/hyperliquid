@@ -1,6 +1,8 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
-import type { InfoRequestConfig } from "./_common.ts";
+import { Address, type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_base.ts";
+
+import { OrderSchema } from "../_common_schemas.ts";
 
 // -------------------- Schemas --------------------
 
@@ -38,59 +40,7 @@ export type OpenOrdersRequest = v.InferOutput<typeof OpenOrdersRequest>;
  */
 export const OpenOrdersResponse = /* @__PURE__ */ (() => {
   return v.pipe(
-    v.array(
-      /** Open order details. */
-      v.pipe(
-        v.object({
-          /** Asset symbol. */
-          coin: v.pipe(
-            v.string(),
-            v.description("Asset symbol."),
-          ),
-          /** Order side ("B" = Bid/Buy, "A" = Ask/Sell). */
-          side: v.pipe(
-            v.union([v.literal("B"), v.literal("A")]),
-            v.description('Order side ("B" = Bid/Buy, "A" = Ask/Sell).'),
-          ),
-          /** Limit price. */
-          limitPx: v.pipe(
-            UnsignedDecimal,
-            v.description("Limit price."),
-          ),
-          /** Size. */
-          sz: v.pipe(
-            UnsignedDecimal,
-            v.description("Size."),
-          ),
-          /** Order ID. */
-          oid: v.pipe(
-            UnsignedInteger,
-            v.description("Order ID."),
-          ),
-          /** Timestamp when the order was placed (in ms since epoch). */
-          timestamp: v.pipe(
-            UnsignedInteger,
-            v.description("Timestamp when the order was placed (in ms since epoch)."),
-          ),
-          /** Original size at order placement. */
-          origSz: v.pipe(
-            UnsignedDecimal,
-            v.description("Original size at order placement."),
-          ),
-          /** Client Order ID. */
-          cloid: v.pipe(
-            v.optional(v.pipe(Hex, v.length(34))),
-            v.description("Client Order ID."),
-          ),
-          /** Indicates if the order is reduce-only. */
-          reduceOnly: v.pipe(
-            v.optional(v.literal(true)),
-            v.description("Indicates if the order is reduce-only."),
-          ),
-        }),
-        v.description("Open order details."),
-      ),
-    ),
+    v.array(OrderSchema),
     v.description("Array of open orders."),
   );
 })();

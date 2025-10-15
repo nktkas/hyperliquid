@@ -14,9 +14,7 @@ runTest("userTwapSliceFills", "api", async (_t, client) => {
     ),
   ]);
   schemaCoverage(UserTwapSliceFillsEvent, data, {
-    ignoreBranches: {
-      "#/properties/twapSliceFills/items/properties/fill/properties/twapId": [0],
-    },
     ignoreUndefinedTypes: ["#/properties/isSnapshot"],
+    ignoreDefinedTypes: ["#/properties/twapSliceFills/items/properties/fill/properties/twapId"],
   });
 });

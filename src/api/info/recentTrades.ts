@@ -1,6 +1,6 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
-import type { InfoRequestConfig } from "./_common.ts";
+import { Address, type DeepImmutable, Hex, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import type { InfoRequestConfig } from "./_base.ts";
 
 // -------------------- Schemas --------------------
 
@@ -34,7 +34,7 @@ export type RecentTradesRequest = v.InferOutput<typeof RecentTradesRequest>;
 export const RecentTradesResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.array(
-      /** Trade details. */
+      /** Trade for a specific asset. */
       v.pipe(
         v.object({
           /** Asset symbol (e.g., BTC). */
@@ -78,7 +78,7 @@ export const RecentTradesResponse = /* @__PURE__ */ (() => {
             v.description("Addresses of users involved in the trade [Maker, Taker]."),
           ),
         }),
-        v.description("Trade details."),
+        v.description("Trade for a specific asset."),
       ),
     ),
     v.description("Array of recent trades."),

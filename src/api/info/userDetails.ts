@@ -1,7 +1,9 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedInteger } from "../_common.ts";
-import type { InfoRequestConfig } from "./_common.ts";
+import { Address, type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_base.ts";
 import type { IRequestTransport } from "../../transport/base.ts";
+
+import { TxDetailsResponse } from "./txDetails.ts";
 
 // -------------------- Schemas --------------------
 
@@ -42,50 +44,7 @@ export const UserDetailsResponse = /* @__PURE__ */ (() => {
       ),
       /** Array of user transaction details. */
       txs: v.pipe(
-        v.array(
-          /** Transaction details. */
-          v.pipe(
-            v.object({
-              /** Action performed in transaction. */
-              action: v.pipe(
-                v.looseObject({
-                  /** Action type. */
-                  type: v.pipe(
-                    v.string(),
-                    v.description("Action type."),
-                  ),
-                }),
-                v.description("Action performed in transaction."),
-              ),
-              /** Block number where transaction was included. */
-              block: v.pipe(
-                UnsignedInteger,
-                v.description("Block number where transaction was included."),
-              ),
-              /** Error message if transaction failed. */
-              error: v.pipe(
-                v.nullable(v.string()),
-                v.description("Error message if transaction failed."),
-              ),
-              /** Transaction hash. */
-              hash: v.pipe(
-                v.pipe(Hex, v.length(66)),
-                v.description("Transaction hash."),
-              ),
-              /** Transaction creation timestamp. */
-              time: v.pipe(
-                UnsignedInteger,
-                v.description("Transaction creation timestamp."),
-              ),
-              /** Creator's address. */
-              user: v.pipe(
-                Address,
-                v.description("Creator's address."),
-              ),
-            }),
-            v.description("Transaction details."),
-          ),
-        ),
+        v.array(TxDetailsResponse.entries.tx),
         v.description("Array of user transaction details."),
       ),
     }),

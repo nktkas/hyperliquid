@@ -8,7 +8,7 @@ runTest("bbo", "api", async (_t, client) => {
   const data = await Promise.all([
     deadline(
       new Promise<BboEvent>((resolve) => {
-        client.bbo({ coin: "ETH" }, resolve);
+        client.bbo({ coin: "BTC" }, resolve);
       }),
       120_000,
     ),

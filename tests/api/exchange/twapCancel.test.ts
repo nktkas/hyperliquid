@@ -25,7 +25,7 @@ runTest({
       return twapId;
     }
 
-    const { id, universe, ctx } = await getAssetData("SOL");
+    const { id, universe, ctx } = await getAssetData("BTC");
     const sz = formatSize(new BigNumber(55).div(ctx.markPx), universe.szDecimals);
 
     // —————————— Test ——————————

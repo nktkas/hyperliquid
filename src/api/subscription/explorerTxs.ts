@@ -1,6 +1,6 @@
 import * as v from "valibot";
-import { Address, Hex, parser, UnsignedInteger } from "../_common.ts";
-import type { SubscriptionRequestConfig } from "./_common.ts";
+import { Address, Hex, parser, UnsignedInteger } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_base.ts";
 import type { Subscription } from "../../transport/base.ts";
 
 // -------------------- Schemas --------------------

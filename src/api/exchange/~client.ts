@@ -1,5 +1,5 @@
-import type { OmitFirst, OverloadedParameters } from "../_common.ts";
-import type { ExchangeRequestConfig, MaybePromise, MultiSignRequestConfig } from "./_common.ts";
+import type { OmitFirst, OverloadedParameters } from "../_base.ts";
+import type { ExchangeRequestConfig, MaybePromise, MultiSignRequestConfig } from "./_base.ts";
 import type { IRequestTransport } from "../../transport/base.ts";
 import type { AbstractWallet } from "../../signing/mod.ts";
 import { PrivateKeyEIP712Signer } from "../../utils/minimalEIP712Signer.ts";
@@ -94,9 +94,9 @@ export type { CreateVaultResponse } from "./createVault.ts";
 export type { OrderSuccessResponse } from "./order.ts";
 export type { TwapCancelSuccessResponse } from "./twapCancel.ts";
 export type { TwapOrderSuccessResponse } from "./twapOrder.ts";
-export type { ErrorResponse, SuccessResponse } from "./_common.ts";
+export type { ErrorResponse, SuccessResponse } from "./_base.ts";
 
-export { ApiRequestError } from "./_common.ts";
+export { ApiRequestError } from "./_base.ts";
 
 /**
  * A client for interacting with the Hyperliquid Exchange API.

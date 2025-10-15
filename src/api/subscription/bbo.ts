@@ -1,7 +1,9 @@
 import * as v from "valibot";
-import { type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
-import type { SubscriptionRequestConfig } from "./_common.ts";
+import { type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_base.ts";
 import type { Subscription } from "../../transport/base.ts";
+
+import { L2BookLevelSchema } from "../_common_schemas.ts";
 
 // -------------------- Schemas --------------------
 
@@ -25,30 +27,6 @@ export const BboRequest = /* @__PURE__ */ (() => {
 })();
 export type BboRequest = v.InferOutput<typeof BboRequest>;
 
-/** L2 order book level. */
-const L2BookLevel = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Price. */
-      px: v.pipe(
-        UnsignedDecimal,
-        v.description("Price."),
-      ),
-      /** Total size. */
-      sz: v.pipe(
-        UnsignedDecimal,
-        v.description("Total size."),
-      ),
-      /** Number of individual orders. */
-      n: v.pipe(
-        UnsignedInteger,
-        v.description("Number of individual orders."),
-      ),
-    }),
-    v.description("L2 order book level."),
-  );
-})();
-
 /** Event of best bid and offer. */
 export const BboEvent = /* @__PURE__ */ (() => {
   return v.pipe(
@@ -65,7 +43,7 @@ export const BboEvent = /* @__PURE__ */ (() => {
       ),
       /** Best bid and offer tuple [bid, offer], either can be undefined if unavailable. */
       bbo: v.pipe(
-        v.tuple([L2BookLevel, L2BookLevel]),
+        v.tuple([L2BookLevelSchema, L2BookLevelSchema]),
         v.description("Best bid and offer tuple [bid, offer], either can be undefined if unavailable."),
       ),
     }),

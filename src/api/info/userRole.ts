@@ -1,6 +1,6 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser } from "../_common.ts";
-import type { InfoRequestConfig } from "./_common.ts";
+import { Address, type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_base.ts";
 
 // -------------------- Schemas --------------------
 
@@ -33,7 +33,7 @@ export type UserRoleRequest = v.InferOutput<typeof UserRoleRequest>;
  */
 export const UserRoleResponse = /* @__PURE__ */ (() => {
   return v.pipe(
-    v.union([
+    v.variant("role", [
       v.object({
         /** Role identifier. */
         role: v.pipe(

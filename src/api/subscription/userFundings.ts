@@ -1,6 +1,6 @@
 import * as v from "valibot";
-import { Address, Decimal, type DeepImmutable, parser, UnsignedInteger } from "../_common.ts";
-import type { SubscriptionRequestConfig } from "./_common.ts";
+import { Address, Decimal, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_base.ts";
 import type { Subscription } from "../../transport/base.ts";
 
 // -------------------- Schemas --------------------
@@ -67,7 +67,7 @@ export const UserFundingsEvent = /* @__PURE__ */ (() => {
               ),
               /** Number of samples. */
               nSamples: v.pipe(
-                v.union([UnsignedInteger, v.null()]),
+                v.nullable(UnsignedInteger),
                 v.description("Number of samples."),
               ),
             }),

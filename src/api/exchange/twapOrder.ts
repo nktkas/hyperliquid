@@ -1,4 +1,4 @@
-import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
+import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 import {
   type ExchangeRequestConfig,
   executeL1Action,
@@ -6,7 +6,7 @@ import {
   type ExtractRequestOptions,
   type MultiSignRequestConfig,
   Signature,
-} from "./_common.ts";
+} from "./_base.ts";
 import * as v from "valibot";
 
 // -------------------- Schemas --------------------

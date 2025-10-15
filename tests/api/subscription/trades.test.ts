@@ -8,7 +8,7 @@ runTest("trades", "api", async (_t, client) => {
   const data = await Promise.all([
     deadline(
       new Promise<TradesEvent>((resolve) => {
-        client.trades({ coin: "ETH" }, resolve);
+        client.trades({ coin: "BTC" }, resolve);
       }),
       10_000,
     ),

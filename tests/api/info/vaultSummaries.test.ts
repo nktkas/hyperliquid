@@ -12,7 +12,7 @@ runTest({
       ignoreEmptyArray: ["#"],
       ignoreBranches: {
         "#/items/properties/relationship": [1],
-        "#/items/properties/relationship/union/0/properties/type": [1],
+        "#/items/properties/relationship/variant/0/properties/type": [1],
       },
     });
   },

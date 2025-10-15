@@ -1,6 +1,7 @@
 import * as v from "valibot";
-import { Address, Decimal, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
-import type { InfoRequestConfig } from "./_common.ts";
+import { Address, Decimal, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import type { InfoRequestConfig } from "./_base.ts";
+
 import { PortfolioResponse } from "./portfolio.ts";
 
 // -------------------- Schemas --------------------
@@ -188,7 +189,7 @@ export const VaultDetailsResponse = /* @__PURE__ */ (() => {
         ),
         /** Vault relationship type. */
         relationship: v.pipe(
-          v.union([
+          v.variant("type", [
             v.object({
               /** Relationship type. */
               type: v.pipe(

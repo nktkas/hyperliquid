@@ -1,4 +1,4 @@
-import { type DeepImmutable, parser, UnsignedInteger } from "../_common.ts";
+import { type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
 import {
   type ExchangeRequestConfig,
   executeL1Action,
@@ -6,7 +6,7 @@ import {
   type ExtractRequestOptions,
   type MultiSignRequestConfig,
   Signature,
-} from "./_common.ts";
+} from "./_base.ts";
 import * as v from "valibot";
 
 // -------------------- Schemas --------------------
@@ -20,7 +20,7 @@ export const CSignerActionRequest = /* @__PURE__ */ (() => {
     v.object({
       /** Action to perform. */
       action: v.pipe(
-        v.union([
+        v.variant("type", [
           v.object({
             /** Type of action. */
             type: v.pipe(
@@ -69,7 +69,7 @@ export const CSignerActionRequest = /* @__PURE__ */ (() => {
 })();
 export type CSignerActionRequest = v.InferOutput<typeof CSignerActionRequest>;
 
-import { SuccessResponse } from "./_common.ts";
+import { SuccessResponse } from "./_base.ts";
 export { SuccessResponse };
 
 // -------------------- Function --------------------

@@ -32,7 +32,7 @@ runTest({
       };
     }
 
-    const { id, universe, ctx } = await getAssetData("SOL");
+    const { id, universe, ctx } = await getAssetData("BTC");
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);
 

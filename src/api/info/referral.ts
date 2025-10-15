@@ -1,6 +1,6 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
-import type { InfoRequestConfig } from "./_common.ts";
+import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import type { InfoRequestConfig } from "./_base.ts";
 
 // -------------------- Schemas --------------------
 
@@ -36,7 +36,7 @@ export const ReferralResponse = /* @__PURE__ */ (() => {
     v.object({
       /** Referrer details. */
       referredBy: v.pipe(
-        v.union([
+        v.nullable(
           v.object({
             /** Referrer address. */
             referrer: v.pipe(
@@ -50,8 +50,7 @@ export const ReferralResponse = /* @__PURE__ */ (() => {
               v.description("Referral code used."),
             ),
           }),
-          v.null(),
-        ]),
+        ),
         v.description("Referrer details."),
       ),
       /** Cumulative traded volume. */
@@ -76,7 +75,7 @@ export const ReferralResponse = /* @__PURE__ */ (() => {
       ),
       /** Current state of the referrer. */
       referrerState: v.pipe(
-        v.union([
+        v.variant("stage", [
           v.object({
             /** Referrer is ready to receive rewards. */
             stage: v.pipe(

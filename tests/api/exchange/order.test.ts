@@ -11,7 +11,7 @@ runTest({
   codeTestFn: async (_t, clients) => {
     // —————————— Prepare ——————————
 
-    const { id, universe, ctx } = await getAssetData("SOL");
+    const { id, universe, ctx } = await getAssetData("BTC");
     const pxUp = formatPrice(new BigNumber(ctx.markPx).times(1.01), universe.szDecimals);
     const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
     const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);

@@ -1,5 +1,5 @@
 export { HyperliquidError } from "./_base.ts";
-export { SchemaError } from "./api/_common.ts";
+export { SchemaError } from "./api/_base.ts";
 export * from "./transport/base.ts";
 
 export * from "./transport/http/mod.ts";

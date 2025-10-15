@@ -14,10 +14,12 @@ runTest("userFills", "api", async (_t, client) => {
     ),
   ]);
   schemaCoverage(UserFillsEvent, data, {
-    ignoreDefinedTypes: ["#/properties/fills/items/properties/liquidation"],
-    ignoreBranches: {
-      "#/properties/fills/items/properties/twapId": [0],
-    },
-    ignoreUndefinedTypes: ["#/properties/isSnapshot"],
+    ignoreDefinedTypes: [
+      "#/properties/fills/items/properties/liquidation",
+      "#/properties/fills/items/properties/twapId",
+    ],
+    ignoreUndefinedTypes: [
+      "#/properties/isSnapshot",
+    ],
   });
 });

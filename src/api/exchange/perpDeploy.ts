@@ -1,4 +1,4 @@
-import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
+import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 import {
   type ExchangeRequestConfig,
   executeL1Action,
@@ -6,7 +6,7 @@ import {
   type ExtractRequestOptions,
   type MultiSignRequestConfig,
   Signature,
-} from "./_common.ts";
+} from "./_base.ts";
 import * as v from "valibot";
 
 // -------------------- Schemas --------------------
@@ -20,7 +20,7 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
     v.object({
       /** Action to perform. */
       action: v.pipe(
-        v.union([
+        v.variant("type", [
           v.pipe(
             v.object({
               /** Type of action. */
@@ -168,7 +168,7 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
 })();
 export type PerpDeployRequest = v.InferOutput<typeof PerpDeployRequest>;
 
-import { SuccessResponse } from "./_common.ts";
+import { SuccessResponse } from "./_base.ts";
 export { SuccessResponse };
 
 // -------------------- Function --------------------

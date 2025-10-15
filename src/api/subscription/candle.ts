@@ -1,7 +1,10 @@
 import * as v from "valibot";
-import { type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
-import type { SubscriptionRequestConfig } from "./_common.ts";
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_base.ts";
 import type { Subscription } from "../../transport/base.ts";
+
+import { CandleIntervalSchema } from "../_common_schemas.ts";
+import { CandleSnapshotResponse } from "../info/candleSnapshot.ts";
 
 // -------------------- Schemas --------------------
 
@@ -20,25 +23,7 @@ export const CandleRequest = /* @__PURE__ */ (() => {
         v.description("Asset symbol (e.g., BTC)."),
       ),
       /** Time interval. */
-      interval: v.pipe(
-        v.union([
-          v.literal("1m"),
-          v.literal("3m"),
-          v.literal("5m"),
-          v.literal("15m"),
-          v.literal("30m"),
-          v.literal("1h"),
-          v.literal("2h"),
-          v.literal("4h"),
-          v.literal("8h"),
-          v.literal("12h"),
-          v.literal("1d"),
-          v.literal("3d"),
-          v.literal("1w"),
-          v.literal("1M"),
-        ]),
-        v.description("Time interval."),
-      ),
+      interval: CandleIntervalSchema,
     }),
     v.description("Subscription to candlestick events for a specific asset and time interval."),
   );
@@ -47,76 +32,7 @@ export type CandleRequest = v.InferOutput<typeof CandleRequest>;
 
 /** Event of candlestick data point. */
 export const CandleEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Opening timestamp (ms since epoch). */
-      t: v.pipe(
-        UnsignedInteger,
-        v.description("Opening timestamp (ms since epoch)."),
-      ),
-      /** Closing timestamp (ms since epoch). */
-      T: v.pipe(
-        UnsignedInteger,
-        v.description("Closing timestamp (ms since epoch)."),
-      ),
-      /** Asset symbol. */
-      s: v.pipe(
-        v.string(),
-        v.description("Asset symbol."),
-      ),
-      /** Candle interval. */
-      i: v.pipe(
-        v.union([
-          v.literal("1m"),
-          v.literal("3m"),
-          v.literal("5m"),
-          v.literal("15m"),
-          v.literal("30m"),
-          v.literal("1h"),
-          v.literal("2h"),
-          v.literal("4h"),
-          v.literal("8h"),
-          v.literal("12h"),
-          v.literal("1d"),
-          v.literal("3d"),
-          v.literal("1w"),
-          v.literal("1M"),
-        ]),
-        v.description("Candle interval."),
-      ),
-      /** Opening price. */
-      o: v.pipe(
-        UnsignedDecimal,
-        v.description("Opening price."),
-      ),
-      /** Closing price. */
-      c: v.pipe(
-        UnsignedDecimal,
-        v.description("Closing price."),
-      ),
-      /** Highest price. */
-      h: v.pipe(
-        UnsignedDecimal,
-        v.description("Highest price."),
-      ),
-      /** Lowest price. */
-      l: v.pipe(
-        UnsignedDecimal,
-        v.description("Lowest price."),
-      ),
-      /** Total volume traded in base currency. */
-      v: v.pipe(
-        UnsignedDecimal,
-        v.description("Total volume traded in base currency."),
-      ),
-      /** Number of trades executed. */
-      n: v.pipe(
-        UnsignedInteger,
-        v.description("Number of trades executed."),
-      ),
-    }),
-    v.description("Event of candlestick data point."),
-  );
+  return CandleSnapshotResponse.item;
 })();
 export type CandleEvent = v.InferOutput<typeof CandleEvent>;
 

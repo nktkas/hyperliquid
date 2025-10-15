@@ -1,4 +1,4 @@
-import { type DeepImmutable, parser, UnsignedInteger } from "../_common.ts";
+import { type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
 import {
   type ExchangeRequestConfig,
   executeL1Action,
@@ -6,7 +6,7 @@ import {
   type ExtractRequestOptions,
   type MultiSignRequestConfig,
   Signature,
-} from "./_common.ts";
+} from "./_base.ts";
 import * as v from "valibot";
 
 // -------------------- Schemas --------------------
@@ -55,7 +55,7 @@ export const EvmUserModifyRequest = /* @__PURE__ */ (() => {
 })();
 export type EvmUserModifyRequest = v.InferOutput<typeof EvmUserModifyRequest>;
 
-import { SuccessResponse } from "./_common.ts";
+import { SuccessResponse } from "./_base.ts";
 export { SuccessResponse };
 
 // -------------------- Function --------------------

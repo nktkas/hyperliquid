@@ -16,7 +16,7 @@ runTest("openOrders", "api", async (_t, client) => {
   schemaCoverage(OpenOrdersEvent, data, {
     ignoreBranches: {
       "#/properties/orders/items/properties/orderType": [0, 4, 5],
-      "#/properties/orders/items/properties/tif/union/0": [1, 3, 4],
+      "#/properties/orders/items/properties/tif/wrapped": [1, 3, 4],
     },
   });
 });

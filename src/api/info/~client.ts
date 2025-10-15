@@ -1,6 +1,6 @@
-import type { OmitFirst, OverloadedParameters } from "../_common.ts";
+import type { OmitFirst, OverloadedParameters } from "../_base.ts";
 import type { IRequestTransport } from "../../transport/base.ts";
-import type { InfoRequestConfig } from "./_common.ts";
+import type { InfoRequestConfig } from "./_base.ts";
 
 import { activeAssetData } from "./activeAssetData.ts";
 import { alignedQuoteTokenInfo } from "./alignedQuoteTokenInfo.ts";

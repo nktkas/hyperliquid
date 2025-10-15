@@ -1,4 +1,4 @@
-import { type DeepImmutable, parser, UnsignedInteger } from "../_common.ts";
+import { type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
 import {
   type ExchangeRequestConfig,
   executeL1Action,
@@ -6,7 +6,7 @@ import {
   type ExtractRequestOptions,
   type MultiSignRequestConfig,
   Signature,
-} from "./_common.ts";
+} from "./_base.ts";
 import * as v from "valibot";
 
 // -------------------- Schemas --------------------
@@ -61,7 +61,7 @@ export const SpotUserRequest = /* @__PURE__ */ (() => {
 })();
 export type SpotUserRequest = v.InferOutput<typeof SpotUserRequest>;
 
-import { SuccessResponse } from "./_common.ts";
+import { SuccessResponse } from "./_base.ts";
 export { SuccessResponse };
 
 // -------------------- Function --------------------

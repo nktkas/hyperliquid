@@ -1,6 +1,6 @@
 import * as v from "valibot";
-import { Address, Decimal, type DeepImmutable, Hex, parser, UnsignedInteger } from "../_common.ts";
-import type { InfoRequestConfig } from "./_common.ts";
+import { Address, Decimal, type DeepImmutable, Hex, parser, UnsignedInteger } from "../_base.ts";
+import type { InfoRequestConfig } from "./_base.ts";
 
 // -------------------- Schemas --------------------
 
@@ -87,7 +87,7 @@ export const UserFundingResponse = /* @__PURE__ */ (() => {
               ),
               /** Number of samples. */
               nSamples: v.pipe(
-                v.union([UnsignedInteger, v.null()]),
+                v.nullable(UnsignedInteger),
                 v.description("Number of samples."),
               ),
             }),

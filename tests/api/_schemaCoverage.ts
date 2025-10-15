@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Decimal, Integer, UnsignedDecimal, UnsignedInteger } from "../../src/api/_common.ts"; // Hack to avoid importing into every test
+import { Decimal, Integer, UnsignedDecimal, UnsignedInteger } from "../../src/api/_base.ts"; // Hack to avoid importing into every test
 
 export type IssueType =
   | "BRANCH_UNCOVERED"
@@ -59,13 +59,16 @@ export function schemaCoverage<
   samples: TSample[] & (Equal<TSample, v.InferOutput<TSchema>> extends true ? TSample[] : never),
   options: CoverageOptions = {},
 ): void {
-  v.assert(
+  const assertResult = v.safeParse(
     v.pipe(
       v.array(strict(schema)),
       v.minLength(1),
     ),
     samples,
   );
+  if (!assertResult.success) {
+    throw new Error(JSON.stringify(samples) + "\n\n" + v.summarize(assertResult.issues));
+  }
 
   options.ignoreSchemas = options.ignoreSchemas || [Integer, UnsignedInteger, Decimal, UnsignedDecimal]; // Hack to avoid importing into every test
   const coverageIssues = checkCoverage(schema, samples, options);

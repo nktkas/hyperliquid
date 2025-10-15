@@ -17,7 +17,7 @@ runTest({
     ]);
     schemaCoverage(UserNonFundingLedgerUpdatesResponse, data, {
       ignoreBranches: {
-        "#/items/properties/delta/union/3/properties/leverageType": [0],
+        "#/items/properties/delta/variant/3/properties/leverageType": [0],
       },
     });
   },

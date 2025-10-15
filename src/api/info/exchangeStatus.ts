@@ -1,6 +1,6 @@
 import * as v from "valibot";
-import { parser, UnsignedInteger } from "../_common.ts";
-import type { InfoRequestConfig } from "./_common.ts";
+import { parser, UnsignedInteger } from "../_base.ts";
+import type { InfoRequestConfig } from "./_base.ts";
 
 // -------------------- Schemas --------------------
 
@@ -35,7 +35,7 @@ export const ExchangeStatusResponse = /* @__PURE__ */ (() => {
         v.description("Server time (in ms since epoch)."),
       ),
       specialStatuses: v.pipe(
-        v.union([v.unknown(), v.null()]),
+        v.nullable(v.unknown()),
       ),
     }),
     v.description("Exchange system status information."),

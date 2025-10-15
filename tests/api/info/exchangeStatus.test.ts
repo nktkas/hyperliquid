@@ -8,7 +8,9 @@ runTest({
     const data = await Promise.all([
       client.exchangeStatus(),
     ]);
-    schemaCoverage(ExchangeStatusResponse, data);
+    schemaCoverage(ExchangeStatusResponse, data, {
+      ignoreDefinedTypes: ["#/properties/specialStatuses"],
+    });
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "exchangeStatus"]);

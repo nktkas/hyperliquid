@@ -11,7 +11,7 @@ runTest({
     schemaCoverage(FrontendOpenOrdersResponse, data, {
       ignoreBranches: {
         "#/items/properties/orderType": [0, 4, 5],
-        "#/items/properties/tif/union/0": [1, 3, 4],
+        "#/items/properties/tif/wrapped": [1, 3, 4],
       },
     });
   },

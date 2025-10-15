@@ -1,6 +1,8 @@
 import * as v from "valibot";
-import { type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
-import type { InfoRequestConfig } from "./_common.ts";
+import { type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import type { InfoRequestConfig } from "./_base.ts";
+
+import { CandleIntervalSchema } from "../_common_schemas.ts";
 
 // -------------------- Schemas --------------------
 
@@ -25,25 +27,7 @@ export const CandleSnapshotRequest = /* @__PURE__ */ (() => {
             v.description("Asset symbol (e.g., BTC)."),
           ),
           /** Time interval. */
-          interval: v.pipe(
-            v.union([
-              v.literal("1m"),
-              v.literal("3m"),
-              v.literal("5m"),
-              v.literal("15m"),
-              v.literal("30m"),
-              v.literal("1h"),
-              v.literal("2h"),
-              v.literal("4h"),
-              v.literal("8h"),
-              v.literal("12h"),
-              v.literal("1d"),
-              v.literal("3d"),
-              v.literal("1w"),
-              v.literal("1M"),
-            ]),
-            v.description("Time interval."),
-          ),
+          interval: CandleIntervalSchema,
           /** Start time (in ms since epoch). */
           startTime: v.pipe(
             UnsignedInteger,
@@ -89,25 +73,7 @@ export const CandleSnapshotResponse = /* @__PURE__ */ (() => {
             v.description("Asset symbol."),
           ),
           /** Candle interval. */
-          i: v.pipe(
-            v.union([
-              v.literal("1m"),
-              v.literal("3m"),
-              v.literal("5m"),
-              v.literal("15m"),
-              v.literal("30m"),
-              v.literal("1h"),
-              v.literal("2h"),
-              v.literal("4h"),
-              v.literal("8h"),
-              v.literal("12h"),
-              v.literal("1d"),
-              v.literal("3d"),
-              v.literal("1w"),
-              v.literal("1M"),
-            ]),
-            v.description("Candle interval."),
-          ),
+          i: CandleIntervalSchema,
           /** Opening price. */
           o: v.pipe(
             UnsignedDecimal,

@@ -1,7 +1,9 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
-import type { SubscriptionRequestConfig } from "./_common.ts";
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_base.ts";
 import type { Subscription } from "../../transport/base.ts";
+
+import { RecentTradesResponse } from "../info/recentTrades.ts";
 
 // -------------------- Schemas --------------------
 
@@ -27,57 +29,7 @@ export type TradesRequest = v.InferOutput<typeof TradesRequest>;
 
 /** Event of array of trades for a specific asset. */
 export const TradesEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(
-      /** Trade for a specific asset. */
-      v.pipe(
-        v.object({
-          /** Asset symbol (e.g., BTC). */
-          coin: v.pipe(
-            v.string(),
-            v.description("Asset symbol (e.g., BTC)."),
-          ),
-          /** Trade side ("B" = Bid/Buy, "A" = Ask/Sell). */
-          side: v.pipe(
-            v.union([v.literal("B"), v.literal("A")]),
-            v.description('Trade side ("B" = Bid/Buy, "A" = Ask/Sell).'),
-          ),
-          /** Trade price. */
-          px: v.pipe(
-            UnsignedDecimal,
-            v.description("Trade price."),
-          ),
-          /** Trade size. */
-          sz: v.pipe(
-            UnsignedDecimal,
-            v.description("Trade size."),
-          ),
-          /** Trade timestamp (in ms since epoch). */
-          time: v.pipe(
-            UnsignedInteger,
-            v.description("Trade timestamp (in ms since epoch)."),
-          ),
-          /** Transaction hash. */
-          hash: v.pipe(
-            v.pipe(Hex, v.length(66)),
-            v.description("Transaction hash."),
-          ),
-          /** Trade ID. */
-          tid: v.pipe(
-            UnsignedInteger,
-            v.description("Trade ID."),
-          ),
-          /** Addresses of users involved in the trade [Maker, Taker]. */
-          users: v.pipe(
-            v.tuple([Address, Address]),
-            v.description("Addresses of users involved in the trade [Maker, Taker]."),
-          ),
-        }),
-        v.description("Trade for a specific asset."),
-      ),
-    ),
-    v.description("Event of array of trades for a specific asset."),
-  );
+  return RecentTradesResponse;
 })();
 export type TradesEvent = v.InferOutput<typeof TradesEvent>;
 

@@ -1,6 +1,6 @@
 import * as v from "valibot";
-import { Address, Decimal, type DeepImmutable, Hex, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
-import type { InfoRequestConfig } from "./_common.ts";
+import { Address, Decimal, type DeepImmutable, Hex, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import type { InfoRequestConfig } from "./_base.ts";
 
 // -------------------- Schemas --------------------
 
@@ -462,7 +462,7 @@ export const UserNonFundingLedgerUpdatesResponse = /* @__PURE__ */ (() => {
           ),
           /** Update details. */
           delta: v.pipe(
-            v.union([
+            v.variant("type", [
               AccountClassTransferUpdate,
               DepositUpdate,
               InternalTransferUpdate,

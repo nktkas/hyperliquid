@@ -8,7 +8,7 @@ runTest("candle", "api", async (_t, client) => {
   const data = await Promise.all([
     deadline(
       new Promise<CandleEvent>((resolve) => {
-        client.candle({ coin: "SOL", interval: "1m" }, resolve);
+        client.candle({ coin: "BTC", interval: "1m" }, resolve);
       }),
       120_000,
     ),

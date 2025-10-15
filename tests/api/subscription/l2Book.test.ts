@@ -8,7 +8,7 @@ runTest("l2Book", "api", async (_t, client) => {
   const data = await Promise.all([
     deadline(
       new Promise<L2BookEvent>((resolve) => {
-        client.l2Book({ coin: "ETH" }, resolve);
+        client.l2Book({ coin: "BTC" }, resolve);
       }),
       10_000,
     ),

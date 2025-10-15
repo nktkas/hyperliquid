@@ -1,4 +1,4 @@
-import { Address, type DeepImmutable, Hex, parser, UnsignedDecimal, UnsignedInteger } from "../_common.ts";
+import { Address, type DeepImmutable, Hex, parser, UnsignedInteger } from "../_base.ts";
 import {
   type ExchangeRequestConfig,
   executeL1Action,
@@ -6,8 +6,10 @@ import {
   type ExtractRequestOptions,
   type MultiSignRequestConfig,
   Signature,
-} from "./_common.ts";
+} from "./_base.ts";
 import * as v from "valibot";
+
+import { PlaceOrderParamsSchema } from "../_common_schemas.ts";
 
 // -------------------- Schemas --------------------
 
@@ -38,103 +40,7 @@ export const BatchModifyRequest = /* @__PURE__ */ (() => {
                 v.description("Order ID or Client Order ID."),
               ),
               /** New order parameters. */
-              order: v.pipe(
-                v.object({
-                  /** Asset ID. */
-                  a: v.pipe(
-                    UnsignedInteger,
-                    v.description("Asset ID."),
-                  ),
-                  /** Position side (`true` for long, `false` for short). */
-                  b: v.pipe(
-                    v.boolean(),
-                    v.description("Position side (`true` for long, `false` for short)."),
-                  ),
-                  /** Price. */
-                  p: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Price."),
-                  ),
-                  /** Size (in base currency units). */
-                  s: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Size (in base currency units)."),
-                  ),
-                  /** Is reduce-only? */
-                  r: v.pipe(
-                    v.boolean(),
-                    v.description("Is reduce-only?"),
-                  ),
-                  /** Order type. */
-                  t: v.pipe(
-                    v.union([
-                      v.object({
-                        /** Limit order parameters. */
-                        limit: v.pipe(
-                          v.object({
-                            /**
-                             * Time-in-force.
-                             * - `"Gtc"`: Remains active until filled or canceled.
-                             * - `"Ioc"`: Fills immediately or cancels any unfilled portion.
-                             * - `"Alo"`: Adds liquidity only.
-                             * - `"FrontendMarket"`: Similar to Ioc, used in Hyperliquid UI.
-                             * - `"LiquidationMarket"`: Similar to Ioc, used in Hyperliquid UI.
-                             */
-                            tif: v.pipe(
-                              v.union([
-                                v.literal("Gtc"),
-                                v.literal("Ioc"),
-                                v.literal("Alo"),
-                                v.literal("FrontendMarket"),
-                                v.literal("LiquidationMarket"),
-                              ]),
-                              v.description(
-                                "Time-in-force." +
-                                  '\n- `"Gtc"`: Remains active until filled or canceled.' +
-                                  '\n- `"Ioc"`: Fills immediately or cancels any unfilled portion.' +
-                                  '\n- `"Alo"`: Adds liquidity only.' +
-                                  '\n- `"FrontendMarket"`: Similar to Ioc, used in Hyperliquid UI.' +
-                                  '\n- `"LiquidationMarket"`: Similar to Ioc, used in Hyperliquid UI.',
-                              ),
-                            ),
-                          }),
-                          v.description("Limit order parameters."),
-                        ),
-                      }),
-                      v.object({
-                        /** Trigger order parameters. */
-                        trigger: v.pipe(
-                          v.object({
-                            /** Is market order? */
-                            isMarket: v.pipe(
-                              v.boolean(),
-                              v.description("Is market order?"),
-                            ),
-                            /** Trigger price. */
-                            triggerPx: v.pipe(
-                              UnsignedDecimal,
-                              v.description("Trigger price."),
-                            ),
-                            /** Indicates whether it is take profit or stop loss. */
-                            tpsl: v.pipe(
-                              v.union([v.literal("tp"), v.literal("sl")]),
-                              v.description("Indicates whether it is take profit or stop loss."),
-                            ),
-                          }),
-                          v.description("Trigger order parameters."),
-                        ),
-                      }),
-                    ]),
-                    v.description("Order type."),
-                  ),
-                  /** Client Order ID. */
-                  c: v.pipe(
-                    v.optional(v.pipe(Hex, v.length(34))),
-                    v.description("Client Order ID."),
-                  ),
-                }),
-                v.description("New order parameters."),
-              ),
+              order: PlaceOrderParamsSchema,
             })),
             v.description("Order modifications."),
           ),
