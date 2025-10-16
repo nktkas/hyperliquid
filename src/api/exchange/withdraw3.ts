@@ -43,10 +43,10 @@ export const Withdraw3Request = /* @__PURE__ */ (() => {
             Address,
             v.description("Destination address."),
           ),
-          /** Amount to withdraw (1 = 1$). */
+          /** Amount to withdraw (1 = $1). */
           amount: v.pipe(
             UnsignedDecimal,
-            v.description("Amount to withdraw (1 = 1$)."),
+            v.description("Amount to withdraw (1 = $1)."),
           ),
           /** Unique request identifier (current timestamp in ms). */
           time: v.pipe(

@@ -64,10 +64,10 @@ export const ActiveAssetDataResponse = /* @__PURE__ */ (() => {
               v.minValue(1),
               v.description("Leverage value used."),
             ),
-            /** Amount of USD used (1 = 1$). */
+            /** Amount of USD used (1 = $1). */
             rawUsd: v.pipe(
               UnsignedDecimal,
-              v.description("Amount of USD used (1 = 1$)."),
+              v.description("Amount of USD used (1 = $1)."),
             ),
           }),
           v.object({

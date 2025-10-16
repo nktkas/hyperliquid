@@ -38,10 +38,10 @@ export const UsdClassTransferRequest = /* @__PURE__ */ (() => {
             v.union([v.literal("Mainnet"), v.literal("Testnet")]),
             v.description("HyperLiquid network."),
           ),
-          /** Amount to transfer (1 = 1$). */
+          /** Amount to transfer (1 = $1). */
           amount: v.pipe(
             UnsignedDecimal,
-            v.description("Amount to transfer (1 = 1$)."),
+            v.description("Amount to transfer (1 = $1)."),
           ),
           /** `true` for Spot to Perp, `false` for Perp to Spot. */
           toPerp: v.pipe(
