@@ -12,6 +12,12 @@ runTest("userTwapHistory", "api", async (_t, client) => {
       }),
       10_000,
     ),
+    deadline(
+      new Promise<UserTwapHistoryEvent>((resolve) => {
+        client.userTwapHistory({ user: "0xe019d6167E7e324aEd003d94098496b6d986aB05" }, resolve);
+      }),
+      10_000,
+    ),
   ]);
   schemaCoverage(UserTwapHistoryEvent, data, {
     ignoreUndefinedTypes: ["#/properties/isSnapshot"],

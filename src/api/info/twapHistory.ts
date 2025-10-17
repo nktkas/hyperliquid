@@ -48,6 +48,11 @@ export const TwapHistoryResponse = /* @__PURE__ */ (() => {
           state: TwapStateSchema,
           /** Current status of the TWAP order. */
           status: TwapStatusSchema,
+          /** ID of the TWAP. */
+          twapId: v.pipe(
+            v.optional(UnsignedInteger),
+            v.description("ID of the TWAP."),
+          ),
         }),
         v.description("TWAP history record."),
       ),
