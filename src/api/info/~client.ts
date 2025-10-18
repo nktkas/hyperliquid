@@ -49,6 +49,7 @@ import { tokenDetails } from "./tokenDetails.ts";
 import { twapHistory } from "./twapHistory.ts";
 import { txDetails } from "./txDetails.ts";
 import { userDetails } from "./userDetails.ts";
+import { userDexAbstraction } from "./userDexAbstraction.ts";
 import { userFees } from "./userFees.ts";
 import { userFills } from "./userFills.ts";
 import { userFillsByTime } from "./userFillsByTime.ts";
@@ -113,6 +114,7 @@ export type { TokenDetailsParameters, TokenDetailsResponse } from "./tokenDetail
 export type { TwapHistoryParameters, TwapHistoryResponse } from "./twapHistory.ts";
 export type { TxDetailsParameters, TxDetailsResponse } from "./txDetails.ts";
 export type { UserDetailsParameters, UserDetailsResponse } from "./userDetails.ts";
+export type { UserDexAbstractionInfoParameters, UserDexAbstractionInfoResponse } from "./userDexAbstraction.ts";
 export type { UserFeesParameters, UserFeesResponse } from "./userFees.ts";
 export type { UserFillsParameters, UserFillsResponse } from "./userFills.ts";
 export type { UserFillsByTimeParameters, UserFillsByTimeResponse } from "./userFillsByTime.ts";
@@ -1259,6 +1261,29 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
     ...args: OmitFirst<OverloadedParameters<typeof userDetails>>
   ) {
     return userDetails(this, ...args);
+  }
+
+  /**
+   * Request user HIP-3 DEX abstraction state.
+   * @param params - Parameters specific to the API request.
+   * @param signal - An [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) can be used to cancel the request by calling [`abort()`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort) on the corresponding [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController).
+   * @returns User HIP-3 DEX abstraction state.
+   *
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-hip-3-dex-abstraction-state
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // only `HttpTransport` supports this API
+   *
+   * const client = new hl.InfoClient({ transport });
+   * const data = await client.userDexAbstraction({ user: "0x..." });
+   * ```
+   */
+  userDexAbstraction(...args: OmitFirst<OverloadedParameters<typeof userDexAbstraction>>) {
+    return userDexAbstraction(this, ...args);
   }
 
   /**

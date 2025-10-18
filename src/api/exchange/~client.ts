@@ -4,6 +4,7 @@ import type { IRequestTransport } from "../../transport/base.ts";
 import type { AbstractWallet } from "../../signing/mod.ts";
 import { PrivateKeyEIP712Signer } from "../../utils/minimalEIP712Signer.ts";
 
+import { agentEnableDexAbstraction } from "./agentEnableDexAbstraction.ts";
 import { approveAgent } from "./approveAgent.ts";
 import { approveBuilderFee } from "./approveBuilderFee.ts";
 import { batchModify } from "./batchModify.ts";
@@ -42,51 +43,56 @@ import { updateIsolatedMargin } from "./updateIsolatedMargin.ts";
 import { updateLeverage } from "./updateLeverage.ts";
 import { usdClassTransfer } from "./usdClassTransfer.ts";
 import { usdSend } from "./usdSend.ts";
+import { userDexAbstraction } from "./userDexAbstraction.ts";
 import { vaultDistribute } from "./vaultDistribute.ts";
 import { vaultModify } from "./vaultModify.ts";
 import { vaultTransfer } from "./vaultTransfer.ts";
 import { withdraw3 } from "./withdraw3.ts";
 
-export type { ApproveAgentParameters } from "./approveAgent.ts";
-export type { ApproveBuilderFeeParameters } from "./approveBuilderFee.ts";
-export type { BatchModifyParameters } from "./batchModify.ts";
-export type { CancelParameters } from "./cancel.ts";
-export type { CancelByCloidParameters } from "./cancelByCloid.ts";
-export type { CDepositParameters } from "./cDeposit.ts";
-export type { ConvertToMultiSigUserParameters } from "./convertToMultiSigUser.ts";
-export type { CreateSubAccountParameters } from "./createSubAccount.ts";
-export type { CreateVaultParameters } from "./createVault.ts";
-export type { CSignerActionParameters } from "./cSignerAction.ts";
-export type { CValidatorActionParameters } from "./cValidatorAction.ts";
-export type { CWithdrawParameters } from "./cWithdraw.ts";
-export type { EvmUserModifyParameters } from "./evmUserModify.ts";
-export type { ModifyParameters } from "./modify.ts";
-export type { MultiSigParameters } from "./multiSig.ts";
-export type { OrderParameters } from "./order.ts";
-export type { PerpDeployParameters } from "./perpDeploy.ts";
-export type { RegisterReferrerParameters } from "./registerReferrer.ts";
-export type { ReserveRequestWeightParameters } from "./reserveRequestWeight.ts";
-export type { ScheduleCancelParameters } from "./scheduleCancel.ts";
-export type { SendAssetParameters } from "./sendAsset.ts";
-export type { SetDisplayNameParameters } from "./setDisplayName.ts";
-export type { SetReferrerParameters } from "./setReferrer.ts";
-export type { SpotDeployParameters } from "./spotDeploy.ts";
-export type { SpotSendParameters } from "./spotSend.ts";
-export type { SpotUserParameters } from "./spotUser.ts";
-export type { SubAccountModifyParameters } from "./subAccountModify.ts";
-export type { SubAccountSpotTransferParameters } from "./subAccountSpotTransfer.ts";
-export type { SubAccountTransferParameters } from "./subAccountTransfer.ts";
-export type { TokenDelegateParameters } from "./tokenDelegate.ts";
-export type { TwapCancelParameters } from "./twapCancel.ts";
-export type { TwapOrderParameters } from "./twapOrder.ts";
-export type { UpdateIsolatedMarginParameters } from "./updateIsolatedMargin.ts";
-export type { UpdateLeverageParameters } from "./updateLeverage.ts";
-export type { UsdClassTransferParameters } from "./usdClassTransfer.ts";
-export type { UsdSendParameters } from "./usdSend.ts";
-export type { VaultDistributeParameters } from "./vaultDistribute.ts";
-export type { VaultModifyParameters } from "./vaultModify.ts";
-export type { VaultTransferParameters } from "./vaultTransfer.ts";
-export type { Withdraw3Parameters } from "./withdraw3.ts";
+export type { AgentEnableDexAbstractionOptions } from "./agentEnableDexAbstraction.ts";
+export type { ApproveAgentOptions, ApproveAgentParameters } from "./approveAgent.ts";
+export type { ApproveBuilderFeeOptions, ApproveBuilderFeeParameters } from "./approveBuilderFee.ts";
+export type { BatchModifyOptions, BatchModifyParameters } from "./batchModify.ts";
+export type { CancelOptions, CancelParameters } from "./cancel.ts";
+export type { CancelByCloidOptions, CancelByCloidParameters } from "./cancelByCloid.ts";
+export type { CDepositOptions, CDepositParameters } from "./cDeposit.ts";
+export type { ClaimRewardsOptions } from "./claimRewards.ts";
+export type { ConvertToMultiSigUserOptions, ConvertToMultiSigUserParameters } from "./convertToMultiSigUser.ts";
+export type { CreateSubAccountOptions, CreateSubAccountParameters } from "./createSubAccount.ts";
+export type { CreateVaultOptions, CreateVaultParameters } from "./createVault.ts";
+export type { CSignerActionOptions, CSignerActionParameters } from "./cSignerAction.ts";
+export type { CValidatorActionOptions, CValidatorActionParameters } from "./cValidatorAction.ts";
+export type { CWithdrawOptions, CWithdrawParameters } from "./cWithdraw.ts";
+export type { EvmUserModifyOptions, EvmUserModifyParameters } from "./evmUserModify.ts";
+export type { ModifyOptions, ModifyParameters } from "./modify.ts";
+export type { MultiSigOptions, MultiSigParameters } from "./multiSig.ts";
+export type { OrderOptions, OrderParameters } from "./order.ts";
+export type { NoopOptions } from "./noop.ts";
+export type { PerpDeployOptions, PerpDeployParameters } from "./perpDeploy.ts";
+export type { RegisterReferrerOptions, RegisterReferrerParameters } from "./registerReferrer.ts";
+export type { ReserveRequestWeightOptions, ReserveRequestWeightParameters } from "./reserveRequestWeight.ts";
+export type { ScheduleCancelOptions, ScheduleCancelParameters } from "./scheduleCancel.ts";
+export type { SendAssetOptions, SendAssetParameters } from "./sendAsset.ts";
+export type { SetDisplayNameOptions, SetDisplayNameParameters } from "./setDisplayName.ts";
+export type { SetReferrerOptions, SetReferrerParameters } from "./setReferrer.ts";
+export type { SpotDeployOptions, SpotDeployParameters } from "./spotDeploy.ts";
+export type { SpotSendOptions, SpotSendParameters } from "./spotSend.ts";
+export type { SpotUserOptions, SpotUserParameters } from "./spotUser.ts";
+export type { SubAccountModifyOptions, SubAccountModifyParameters } from "./subAccountModify.ts";
+export type { SubAccountSpotTransferOptions, SubAccountSpotTransferParameters } from "./subAccountSpotTransfer.ts";
+export type { SubAccountTransferOptions, SubAccountTransferParameters } from "./subAccountTransfer.ts";
+export type { TokenDelegateOptions, TokenDelegateParameters } from "./tokenDelegate.ts";
+export type { TwapCancelOptions, TwapCancelParameters } from "./twapCancel.ts";
+export type { TwapOrderOptions, TwapOrderParameters } from "./twapOrder.ts";
+export type { UpdateIsolatedMarginOptions, UpdateIsolatedMarginParameters } from "./updateIsolatedMargin.ts";
+export type { UpdateLeverageOptions, UpdateLeverageParameters } from "./updateLeverage.ts";
+export type { UsdClassTransferOptions, UsdClassTransferParameters } from "./usdClassTransfer.ts";
+export type { UsdSendOptions, UsdSendParameters } from "./usdSend.ts";
+export type { UserDexAbstractionExchangeOptions, UserDexAbstractionExchangeParameters } from "./userDexAbstraction.ts";
+export type { VaultDistributeOptions, VaultDistributeParameters } from "./vaultDistribute.ts";
+export type { VaultModifyOptions, VaultModifyParameters } from "./vaultModify.ts";
+export type { VaultTransferOptions, VaultTransferParameters } from "./vaultTransfer.ts";
+export type { Withdraw3Options, Withdraw3Parameters } from "./withdraw3.ts";
 
 export type { CancelSuccessResponse } from "./cancel.ts";
 export type { CreateSubAccountResponse } from "./createSubAccount.ts";
@@ -176,6 +182,31 @@ export class ExchangeClient<
     this.defaultExpiresAfter = args.defaultExpiresAfter;
     this.signatureChainId = args.signatureChainId;
     this.nonceManager = args.nonceManager;
+  }
+
+  /**
+   * Enable HIP-3 DEX abstraction.
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   * @returns Successful response without specific data.
+   *
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @see null
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const pk = "0x..."; // viem, ethers or private key
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   *
+   * const client = new hl.ExchangeClient({ transport, wallet: pk });
+   * await client.agentEnableDexAbstraction();
+   * ```
+   */
+  agentEnableDexAbstraction(...args: OmitFirst<OverloadedParameters<typeof agentEnableDexAbstraction>>) {
+    return agentEnableDexAbstraction(this, ...args);
   }
 
   /**
@@ -1313,6 +1344,31 @@ export class ExchangeClient<
    */
   usdSend(...args: OmitFirst<OverloadedParameters<typeof usdSend>>) {
     return usdSend(this, ...args);
+  }
+
+  /**
+   * Enable/disable HIP-3 DEX abstraction.
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   * @returns Successful response without specific data.
+   *
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @see null
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const pk = "0x..."; // viem, ethers or private key
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   *
+   * const client = new hl.ExchangeClient({ transport, wallet: pk });
+   * await client.userDexAbstraction({ user: "0x...", enabled: true });
+   * ```
+   */
+  userDexAbstraction(...args: OmitFirst<OverloadedParameters<typeof userDexAbstraction>>) {
+    return userDexAbstraction(this, ...args);
   }
 
   /**

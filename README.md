@@ -392,7 +392,7 @@ class InfoClient {
     transport: HttpTransport | WebSocketTransport;
   });
 
-  // Market
+  // Market Data
   alignedQuoteTokenInfo(params: AlignedQuoteTokenInfoParameters): Promise<AlignedQuoteTokenInfoResponse>;
   allMids(params?: AllMidsParameters): Promise<AllMidsResponse>;
   candleSnapshot(params: CandleSnapshotParameters): Promise<CandleSnapshotResponse>;
@@ -403,19 +403,15 @@ class InfoClient {
   maxMarketOrderNtls(): Promise<MaxMarketOrderNtlsResponse>;
   meta(params?: MetaParameters): Promise<MetaResponse>;
   metaAndAssetCtxs(params?: MetaAndAssetCtxsParameters): Promise<MetaAndAssetCtxsResponse>;
-  perpDeployAuctionStatus(): Promise<PerpDeployAuctionStatusResponse>;
   perpDexLimits(params: PerpDexLimitsParameters): Promise<PerpDexLimitsResponse>;
   perpDexs(): Promise<PerpDexsResponse>;
   perpsAtOpenInterestCap(params?: PerpsAtOpenInterestCapParameters): Promise<PerpsAtOpenInterestCapResponse>;
   predictedFundings(): Promise<PredictedFundingsResponse>;
   recentTrades(params: RecentTradesParameters): Promise<RecentTradesResponse>;
-  spotDeployState(params: SpotDeployStateParameters): Promise<SpotDeployStateResponse>;
   spotMeta(): Promise<SpotMetaResponse>;
   spotMetaAndAssetCtxs(): Promise<SpotMetaAndAssetCtxsResponse>;
-  spotPairDeployAuctionStatus(): Promise<SpotPairDeployAuctionStatusResponse>;
-  tokenDetails(params: TokenDetailsParameters): Promise<TokenDetailsResponse>;
 
-  // Account
+  // User Account
   activeAssetData(params: ActiveAssetDataParameters): Promise<ActiveAssetDataResponse>;
   clearinghouseState(params: ClearinghouseStateParameters): Promise<ClearinghouseStateResponse>;
   extraAgents(params: ExtraAgentsParameters): Promise<ExtraAgentsResponse>;
@@ -427,6 +423,7 @@ class InfoClient {
   referral(params: ReferralParameters): Promise<ReferralResponse>;
   spotClearinghouseState(params: SpotClearinghouseStateParameters): Promise<SpotClearinghouseStateResponse>;
   subAccounts(params: SubAccountsParameters): Promise<SubAccountsResponse>;
+  userDexAbstraction(params: UserDexAbstractionInfoParameters): Promise<UserDexAbstractionInfoResponse>;
   userFees(params: UserFeesParameters): Promise<UserFeesResponse>;
   userFunding(params: UserFundingParameters): Promise<UserFundingResponse>;
   userNonFundingLedgerUpdates(
@@ -437,7 +434,7 @@ class InfoClient {
   userToMultiSigSigners(params: UserToMultiSigSignersParameters): Promise<UserToMultiSigSignersResponse>;
   webData2(params: WebData2Parameters): Promise<WebData2Response>;
 
-  // Order
+  // Orders & TWAP & Position
   frontendOpenOrders(params: FrontendOpenOrdersParameters): Promise<FrontendOpenOrdersResponse>;
   historicalOrders(params: HistoricalOrdersParameters): Promise<HistoricalOrdersResponse>;
   openOrders(params: OpenOrdersParameters): Promise<OpenOrdersResponse>;
@@ -448,12 +445,12 @@ class InfoClient {
   userTwapSliceFills(params: UserTwapSliceFillsParameters): Promise<UserTwapSliceFillsResponse>;
   userTwapSliceFillsByTime(params: UserTwapSliceFillsByTimeParameters): Promise<UserTwapSliceFillsByTimeResponse>;
 
-  // Validator
-  gossipRootIps(): Promise<GossipRootIpsResponse>;
+  // Delegation & Validators
   delegations(params: DelegationsParameters): Promise<DelegationsResponse>;
   delegatorHistory(params: DelegatorHistoryParameters): Promise<DelegatorHistoryResponse>;
   delegatorRewards(params: DelegatorRewardsParameters): Promise<DelegatorRewardsResponse>;
   delegatorSummary(params: DelegatorSummaryParameters): Promise<DelegatorSummaryResponse>;
+  gossipRootIps(): Promise<GossipRootIpsResponse>;
   validatorL1Votes(): Promise<ValidatorL1VotesResponse>;
   validatorSummaries(): Promise<ValidatorSummariesResponse>;
 
@@ -463,13 +460,19 @@ class InfoClient {
   vaultDetails(params: VaultDetailsParameters): Promise<VaultDetailsResponse>;
   vaultSummaries(): Promise<VaultSummariesResponse>;
 
-  // Server
+  // Deploy Market
+  perpDeployAuctionStatus(): Promise<PerpDeployAuctionStatusResponse>;
+  spotDeployState(params: SpotDeployStateParameters): Promise<SpotDeployStateResponse>;
+  spotPairDeployAuctionStatus(): Promise<SpotPairDeployAuctionStatusResponse>;
+
+  // Other
   exchangeStatus(): Promise<ExchangeStatusResponse>;
 
-  // Explorer (RPC endpoint)
+  // Transaction & Block Details (RPC endpoint)
   blockDetails(params: BlockDetailsParameters): Promise<BlockDetailsResponse>;
   txDetails(params: TxDetailsParameters): Promise<TxDetailsResponse>;
   userDetails(params: UserDetailsParameters): Promise<UserDetailsResponse>;
+  tokenDetails(params: TokenDetailsParameters): Promise<TokenDetailsResponse>;
 }
 ```
 
@@ -485,7 +488,7 @@ class ExchangeClient {
     nonceManager?: () => MaybePromise<number>; // Function to get the next nonce (default: monotonically incrementing `Date.now()`)
   });
 
-  // Order
+  // Order & TWAP & Position
   batchModify(params: BatchModifyParameters): Promise<OrderResponseSuccess>;
   cancel(params: CancelParameters): Promise<CancelResponseSuccess>;
   cancelByCloid(params: CancelByCloidParameters): Promise<CancelResponseSuccess>;
@@ -498,36 +501,38 @@ class ExchangeClient {
   updateLeverage(params: UpdateLeverageParameters): Promise<SuccessResponse>;
 
   // Account
+  agentEnableDexAbstraction(): Promise<SuccessResponse>;
   approveAgent(params: ApproveAgentParameters): Promise<SuccessResponse>;
   approveBuilderFee(params: ApproveBuilderFeeParameters): Promise<SuccessResponse>;
-  claimRewards(): Promise<SuccessResponse>;
-  createSubAccount(params: CreateSubAccountParameters): Promise<CreateSubAccountResponse>;
   evmUserModify(params: EvmUserModifyParameters): Promise<SuccessResponse>;
   noop(): Promise<SuccessResponse>;
-  registerReferrer(params: RegisterReferrerParameters): Promise<SuccessResponse>;
   reserveRequestWeight(params: ReserveRequestWeightParameters): Promise<SuccessResponse>;
   setDisplayName(params: SetDisplayNameParameters): Promise<SuccessResponse>;
-  setReferrer(params: SetReferrerParameters): Promise<SuccessResponse>;
-  subAccountModify(params: SubAccountModifyParameters): Promise<SuccessResponse>;
   spotUser(params: SpotUserParameters): Promise<SuccessResponse>;
+  userDexAbstraction(params: UserDexAbstractionExchangeParameters): Promise<UserDexAbstractionExchangeResponse>;
 
-  // Transfer
+  // Fund Transfers
   sendAsset(params: SendAssetParameters): Promise<SuccessResponse>;
   spotSend(params: SpotSendParameters): Promise<SuccessResponse>;
-  subAccountSpotTransfer(params: SubAccountSpotTransferParameters): Promise<SuccessResponse>;
-  subAccountTransfer(params: SubAccountTransferParameters): Promise<SuccessResponse>;
   usdClassTransfer(params: UsdClassTransferParameters): Promise<SuccessResponse>;
   usdSend(params: UsdSendParameters): Promise<SuccessResponse>;
   withdraw3(params: Withdraw3Parameters): Promise<SuccessResponse>;
 
-  // Staking
+  // Sub-Account
+  createSubAccount(params: CreateSubAccountParameters): Promise<CreateSubAccountResponse>;
+  subAccountModify(params: SubAccountModifyParameters): Promise<SuccessResponse>;
+  subAccountSpotTransfer(params: SubAccountSpotTransferParameters): Promise<SuccessResponse>;
+  subAccountTransfer(params: SubAccountTransferParameters): Promise<SuccessResponse>;
+
+  // Referrer
+  claimRewards(): Promise<SuccessResponse>;
+  registerReferrer(params: RegisterReferrerParameters): Promise<SuccessResponse>;
+  setReferrer(params: SetReferrerParameters): Promise<SuccessResponse>;
+
+  // Staking & Delegation
   cDeposit(params: CDepositParameters): Promise<SuccessResponse>;
   cWithdraw(params: CWithdrawParameters): Promise<SuccessResponse>;
   tokenDelegate(params: TokenDelegateParameters): Promise<SuccessResponse>;
-
-  // Market
-  perpDeploy(params: PerpDeployParameters): Promise<SuccessResponse>;
-  spotDeploy(params: SpotDeployParameters): Promise<SuccessResponse>;
 
   // Vault
   createVault(params: CreateVaultParameters): Promise<CreateVaultResponse>;
@@ -547,7 +552,11 @@ class ExchangeClient {
     | TwapCancelSuccessResponse
   >;
 
-  // Validator
+  // Deploy Market
+  perpDeploy(params: PerpDeployParameters): Promise<SuccessResponse>;
+  spotDeploy(params: SpotDeployParameters): Promise<SuccessResponse>;
+
+  // Validator Actions
   cSignerAction(params: CSignerActionParameters): Promise<SuccessResponse>;
   cValidatorAction(params: CValidatorActionParameters): Promise<SuccessResponse>;
 }
@@ -591,7 +600,7 @@ class SubscriptionClient {
   userTwapHistory(params: WsUserTwapHistoryParameters, listener: (data: WsUserTwapHistoryEvent) => void);
   userTwapSliceFills(params: WsUserTwapSliceFillsParameters, listener: (data: WsUserTwapSliceFillsEvent) => void);
 
-  // Explorer (RPC endpoint)
+  // Transaction & Block Details (RPC endpoint)
   explorerBlock(listener: (data: WsExplorerBlockEvent) => void);
   explorerTxs(listener: (data: WsExplorerTxsEvent) => void);
 }

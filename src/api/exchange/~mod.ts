@@ -40,6 +40,7 @@
 export { parser, SchemaError } from "../_base.ts";
 export type { ExchangeRequestConfig } from "./_base.ts";
 
+export * from "./agentEnableDexAbstraction.ts";
 export * from "./approveAgent.ts";
 export * from "./approveBuilderFee.ts";
 export * from "./batchModify.ts";
@@ -78,6 +79,7 @@ export * from "./updateIsolatedMargin.ts";
 export * from "./updateLeverage.ts";
 export * from "./usdClassTransfer.ts";
 export * from "./usdSend.ts";
+export * from "./userDexAbstraction.ts";
 export * from "./vaultDistribute.ts";
 export * from "./vaultModify.ts";
 export * from "./vaultTransfer.ts";

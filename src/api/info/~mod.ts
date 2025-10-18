@@ -71,6 +71,7 @@ export * from "./tokenDetails.ts";
 export * from "./twapHistory.ts";
 export * from "./txDetails.ts";
 export * from "./userDetails.ts";
+export * from "./userDexAbstraction.ts";
 export * from "./userFees.ts";
 export * from "./userFills.ts";
 export * from "./userFillsByTime.ts";

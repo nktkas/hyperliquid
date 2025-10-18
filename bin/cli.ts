@@ -107,156 +107,156 @@ INFO ENDPOINT METHODS
 Market Data:
   alignedQuoteTokenInfo   --token <number>
   allMids                 [--dex <string>]
-  l2Book                  --coin <string> [--nSigFigs <2|3|4|5>] [--mantissa <2|5>]
-  candleSnapshot          --coin <string> --interval <1m|3m|5m|15m|30m|1h|2h|4h|8h|12h|1d|3d|1w|1M> 
+  candleSnapshot          --coin <string> --interval <1m|3m|5m|15m|30m|1h|2h|4h|8h|12h|1d|3d|1w|1M>
                           --startTime <number> [--endTime <number>]
   fundingHistory          --coin <string> --startTime <number> [--endTime <number>]
-  predictedFundings       (no params)
-  recentTrades            --coin <string>
-
-Exchange Information:
+  l2Book                  --coin <string> [--nSigFigs <2|3|4|5>] [--mantissa <2|5>]
+  liquidatable            (no params)
+  marginTable             --id <number>
+  maxMarketOrderNtls      (no params)
   meta                    [--dex <string>]
   metaAndAssetCtxs        [--dex <string>]
+  perpDexLimits           --dex <string>
+  perpDexs                (no params)
+  perpsAtOpenInterestCap  [--dex <string>]
+  predictedFundings       (no params)
+  recentTrades            --coin <string>
   spotMeta                (no params)
   spotMetaAndAssetCtxs    (no params)
-  exchangeStatus          (no params)
-  perpDexs                (no params)
-  perpDexLimits           --dex <string>
-  spotPairDeployAuctionStatus  (no params)
-  perpDeployAuctionStatus      (no params)
-  perpsAtOpenInterestCap       [--dex <string>]
-  maxMarketOrderNtls           (no params)
-  liquidatable                 (no params)
-  marginTable                  --id <number>
 
-User Account Data:
-  clearinghouseState      --user <address> [--dex <string>]
-  spotClearinghouseState  --user <address> [--dex <string>]
-  portfolio               --user <address>
-  openOrders              --user <address> [--dex <string>]
-  frontendOpenOrders      --user <address> [--dex <string>]
-  historicalOrders        --user <address>
-  orderStatus             --user <address> --oid <number|hex>
-  userDetails             --user <address>
-  userFees                --user <address>
-  userRateLimit           --user <address>
-  userRole                --user <address>
+User Account:
   activeAssetData         --user <address> --coin <string>
+  clearinghouseState      --user <address> [--dex <string>]
+  extraAgents             --user <address>
   isVip                   --user <address>
   legalCheck              --user <address>
-  referral                --user <address>
-  spotDeployState         --user <address>
-  preTransferCheck        --user <address> --source <address>
   maxBuilderFee           --user <address> --builder <address>
-  webData2                --user <address>
-
-User Trading History:
-  userFills               --user <address> [--aggregateByTime <bool>]
-  userFillsByTime         --user <address> --startTime <number> [--endTime <number>] 
-                          [--aggregateByTime <bool>]
+  portfolio               --user <address>
+  preTransferCheck        --user <address> --source <address>
+  referral                --user <address>
+  spotClearinghouseState  --user <address> [--dex <string>]
+  subAccounts             --user <address>
+  userDexAbstraction      --user <address>
+  userFees                --user <address>
   userFunding             --user <address> --startTime <number> [--endTime <number>]
   userNonFundingLedgerUpdates  --user <address> --startTime <number> [--endTime <number>]
-  twapHistory             --user <address>
-  userTwapSliceFills      --user <address>
-  userTwapSliceFillsByTime     --user <address> --startTime <number> [--endTime <number>] 
-                               [--aggregateByTime <bool>]
-
-Sub-Account & Multi-Sig:
-  subAccounts             --user <address>
-  extraAgents             --user <address>
+  userRateLimit           --user <address>
+  userRole                --user <address>
   userToMultiSigSigners   --user <address>
+  webData2                --user <address>
 
-Vault Information:
-  vaultSummaries          (no params)
-  vaultDetails            --vaultAddress <address> [--user <address>]
-  leadingVaults           --user <address>
-  userVaultEquities       --user <address>
+Orders & TWAP & Position:
+  frontendOpenOrders      --user <address> [--dex <string>]
+  historicalOrders        --user <address>
+  openOrders              --user <address> [--dex <string>]
+  orderStatus             --user <address> --oid <number|hex>
+  twapHistory             --user <address>
+  userFills               --user <address> [--aggregateByTime <bool>]
+  userFillsByTime         --user <address> --startTime <number>
+                          [--endTime <number>] [--aggregateByTime <bool>]
+  userTwapSliceFills           --user <address>
+  userTwapSliceFillsByTime     --user <address> --startTime <number>
+                               [--endTime <number>] [--aggregateByTime <bool>]
 
 Delegation & Validators:
   delegations             --user <address>
   delegatorHistory        --user <address>
   delegatorRewards        --user <address>
   delegatorSummary        --user <address>
+  gossipRootIps           (no params)
   validatorL1Votes        (no params)
   validatorSummaries      (no params)
-  gossipRootIps           (no params)
+
+Vault:
+  leadingVaults           --user <address>
+  userVaultEquities       --user <address>
+  vaultDetails            --vaultAddress <address> [--user <address>]
+  vaultSummaries          (no params)
+
+Deploy Market:
+  perpDeployAuctionStatus      (no params)
+  spotDeployState              --user <address>
+  spotPairDeployAuctionStatus  (no params)
+
+Other:
+  exchangeStatus          (no params)
 
 Transaction & Block Details:
-  txDetails               --hash <hex>
   blockDetails            --height <number>
   tokenDetails            --tokenId <hex>
+  txDetails               --hash <hex>
+  userDetails             --user <address>
 
 =============================================================================
 EXCHANGE ENDPOINT METHODS
 =============================================================================
 
-Trading Operations:
-  order                   --orders <json> [--grouping <na|normalTpsl|positionTpsl>] 
-                          [--builder <json>]
-  modify                  --oid <number|hex> --order <json>
+Order & TWAP & Position:
   batchModify             --modifies <json>
   cancel                  --cancels <json>
   cancelByCloid           --cancels <json>
+  modify                  --oid <number|hex> --order <json>
+  order                   --orders <json> [--grouping <na|normalTpsl|positionTpsl>] [--builder <json>]
   scheduleCancel          [--time <number>]
-
-TWAP Operations:
-  twapOrder               --a <number> --b <bool> --s <number> --r <bool> --m <number> --t <bool>
   twapCancel              --a <number> --t <number>
-
-Position Management:
-  updateLeverage          --asset <number> --isCross <bool> --leverage <number>
+  twapOrder               --a <number> --b <bool> --s <number> --r <bool> --m <number> --t <bool>
   updateIsolatedMargin    --asset <number> --isBuy <bool> --ntli <number>
+  updateLeverage          --asset <number> --isCross <bool> --leverage <number>
 
-Fund Transfers:
-  withdraw3               --destination <address> --amount <number>
-  usdSend                 --destination <address> --amount <number>
-  spotSend                --destination <address> --token <name:address> --amount <number>
-  sendAsset               --destination <address> --token <name:address> --amount <number>
-                          --sourceDex <string> --destinationDex <string> [--fromSubAccount <address>]
-  usdClassTransfer        --amount <number> --toPerp <bool>
-
-Sub-Account Management:
-  createSubAccount        --name <string>
-  subAccountModify        --subAccountUser <address> --name <string>
-  subAccountTransfer      --subAccountUser <address> --isDeposit <bool> --usd <number>
-  subAccountSpotTransfer  --subAccountUser <address> --isDeposit <bool> 
-                          --token <name:address> --amount <number>
-
-Vault Operations:
-  createVault             --name <string> --description <string> --initialUsd <number>
-  vaultModify             --vaultAddress <address> [--allowDeposits <bool>] 
-                          [--alwaysCloseOnWithdraw <bool>]
-  vaultTransfer           --vaultAddress <address> --isDeposit <bool> --usd <number>
-  vaultDistribute         --vaultAddress <address> --usd <number>
-
-Agent & Referrer:
+Account:
+  agentEnableDexAbstraction  (no params)
   approveAgent            --agentAddress <address> [--agentName <string>]
   approveBuilderFee       --maxFeeRate <number> --builder <address>
+  evmUserModify           --usingBigBlocks <bool>
+  noop                    (no params)
+  reserveRequestWeight    --weight <number>
+  setDisplayName          --displayName <string>
+  spotUser                --optOut <bool>
+  userDexAbstraction      --user <address> --enabled <bool>
+
+Fund Transfers:
+  sendAsset               --destination <address> --token <name:address> --amount <number>
+                          --sourceDex <string> --destinationDex <string> [--fromSubAccount <address>]
+  spotSend                --destination <address> --token <name:address> --amount <number>
+  usdClassTransfer        --amount <number> --toPerp <bool>
+  usdSend                 --destination <address> --amount <number>
+  withdraw3               --destination <address> --amount <number>
+
+Sub-Account:
+  createSubAccount        --name <string>
+  subAccountModify        --subAccountUser <address> --name <string>
+  subAccountSpotTransfer  --subAccountUser <address> --isDeposit <bool>
+                          --token <name:address> --amount <number>
+  subAccountTransfer      --subAccountUser <address> --isDeposit <bool> --usd <number>
+
+Referrer:
+  claimRewards            (no params)
   registerReferrer        --code <string>
   setReferrer             --code <string>
-  setDisplayName          --displayName <string>
 
 Staking & Delegation:
-  tokenDelegate           --validator <address> --wei <number> --isUndelegate <bool>
   cDeposit                --wei <number>
   cWithdraw               --wei <number>
-  claimRewards            (no params)
+  tokenDelegate           --validator <address> --wei <number> --isUndelegate <bool>
 
-Spot & EVM Operations:
-  spotUser                --optOut <bool>
-  evmUserModify           --usingBigBlocks <bool>
-  reserveRequestWeight    --weight <number>
+Vault:
+  createVault             --name <string> --description <string> --initialUsd <number>
+  vaultDistribute         --vaultAddress <address> --usd <number>
+  vaultModify             --vaultAddress <address> [--allowDeposits <bool>]
+                          [--alwaysCloseOnWithdraw <bool>]
+  vaultTransfer           --vaultAddress <address> --isDeposit <bool> --usd <number>
 
 Deploy Market:
   perpDeploy              --registerAsset <json> | --setOracle <json>
   spotDeploy              --genesis <json> | --registerHyperliquidity <json> | --registerSpot <json> |
                           --registerToken2 <json> | --setDeployerTradingFeeShare <json> | --userGenesis <json>
 
-Multi-Sig & Advanced:
-  convertToMultiSigUser   --authorizedUsers <json> --threshold <number>
+Validator Actions:
   cSignerAction           --jailSelf null | --unjailSelf null
   cValidatorAction        --changeProfile <json> | --register <json> | --unregister null
-  noop                    (no params)
+
+Other:
+  convertToMultiSigUser   --authorizedUsers <json> --threshold <number>
 
 =============================================================================
 
