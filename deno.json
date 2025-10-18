@@ -1,6 +1,6 @@
 {
   "name": "@nktkas/hyperliquid",
-  "version": "0.25.3",
+  "version": "0.25.4",
   "exports": {
     ".": "./src/mod.ts",
     "./signing": "./src/signing/mod.ts",
