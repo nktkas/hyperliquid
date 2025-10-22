@@ -74,11 +74,11 @@ export class SymbolConverter {
 
     results.forEach((result, idx) => {
       if (result.status !== "fulfilled") return;
-      this.processBuilderDexResult(result.value, builderDexs[idx].index, builderDexs[idx].dex.name);
+      this.processBuilderDexResult(result.value, builderDexs[idx].index);
     });
   }
 
-  private processBuilderDexResult(meta: MetaResponse, perpDexIndex: number, dexName: string): void {
+  private processBuilderDexResult(meta: MetaResponse, perpDexIndex: number): void {
     const offset = 100000 + perpDexIndex * 10000;
 
     meta.universe.forEach((asset, index) => {
