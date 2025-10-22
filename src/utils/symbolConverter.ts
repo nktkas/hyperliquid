@@ -1,7 +1,7 @@
 import { HttpTransport } from "../transport/http/mod.ts";
-import type { MetaResponse } from "../api/info/meta.ts";
-import type { SpotMetaResponse  } from "../api/info/spotMeta.ts";
-import type { PerpDexsResponse } from "../api/info/perpDexs.ts";
+import { meta, type MetaResponse } from "../api/info/meta.ts";
+import { spotMeta, type SpotMetaResponse } from "../api/info/spotMeta.ts";
+import { perpDexs, type PerpDexsResponse } from "../api/info/perpDexs.ts";
 
 export class SymbolConverter {
   private readonly transport: HttpTransport;
@@ -25,31 +25,28 @@ export class SymbolConverter {
     }
   }
 
-  private request<T>(payload: Record<string, unknown>): Promise<T> {
-    return this.transport.request<T>("info", payload);
-  }
-
   async fetchAssetMaps(): Promise<void> {
-    const [perpMeta, spotMeta, perpDexs] = await Promise.all([
-      this.request<MetaResponse>({ type: "meta" }),
-      this.request<SpotMetaResponse>({ type: "spotMeta" }),
-      this.request<PerpDexsResponse>({ type: "perpDexs" }),
+    const config = { transport: this.transport };
+    const [perpMetaData, spotMetaData, perpDexsData] = await Promise.all([
+      meta(config),
+      spotMeta(config),
+      perpDexs(config),
     ]);
 
-    if (!perpMeta?.universe?.length) {
+    if (!perpMetaData?.universe?.length) {
       throw new Error("Invalid perpetual metadata response");
     }
 
-    if (!spotMeta?.universe?.length || !spotMeta?.tokens?.length) {
+    if (!spotMetaData?.universe?.length || !spotMetaData?.tokens?.length) {
       throw new Error("Invalid spot metadata response");
     }
 
     this.nameToAssetId.clear();
     this.nameToSzDecimals.clear();
 
-    this.processDefaultPerps(perpMeta);
-    this.processSpotAssets(spotMeta);
-    await this.processBuilderDexs(perpDexs);
+    this.processDefaultPerps(perpMetaData);
+    this.processSpotAssets(spotMetaData);
+    await this.processBuilderDexs(perpDexsData);
   }
 
   private processDefaultPerps(perpMeta: MetaResponse): void {
@@ -70,8 +67,9 @@ export class SymbolConverter {
 
     if (builderDexs.length === 0) return;
 
+    const config = { transport: this.transport };
     const results = await Promise.allSettled(
-      builderDexs.map((item) => this.request<MetaResponse>({ type: "meta", dex: item.dex.name })),
+      builderDexs.map((item) => meta(config, { dex: item.dex.name })),
     );
 
     results.forEach((result, idx) => {
