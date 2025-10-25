@@ -5,6 +5,7 @@ import { perpDexs, type PerpDexsResponse } from "../api/info/perpDexs.ts";
 
 export type DexOption = string[] | boolean;
 
+/** Options for creating a SymbolConverter instance. */
 export interface SymbolConverterOptions {
   /** Transport instance to use for API requests. */
   transport: IRequestTransport;
@@ -12,6 +13,26 @@ export interface SymbolConverterOptions {
   dexs?: DexOption;
 }
 
+/**
+ * Utility class for converting asset symbols to their corresponding IDs and size decimals.
+ * Supports perpetuals, spot markets, and optional builder dexs.
+ * @example
+ * ```ts
+ * import { HttpTransport } from "@nktkas/hyperliquid";
+ * import { SymbolConverter } from "@nktkas/hyperliquid/utils";
+ *
+ * const transport = new HttpTransport(); // or `WebSocketTransport`
+ * const converter = await SymbolConverter.create({ transport });
+ *
+ * const btcId = converter.getAssetId("BTC"); // perpetual
+ * const hypeUsdcId = converter.getAssetId("HYPE/USDC"); // spot market
+ * const dexAbcId = converter.getAssetId("test:ABC"); // builder dex (if enabled)
+ *
+ * const btcSzDecimals = converter.getSzDecimals("BTC"); // perpetual
+ * const hypeUsdcSzDecimals = converter.getSzDecimals("HYPE/USDC"); // spot market
+ * const dexAbcSzDecimals = converter.getSzDecimals("test:ABC"); // builder dex (if enabled)
+ * ```
+ */
 export class SymbolConverter {
   private readonly transport: IRequestTransport;
   private readonly dexOption: DexOption;
@@ -29,15 +50,18 @@ export class SymbolConverter {
    * @returns Initialized SymbolConverter instance.
    * @example
    * ```ts
+   * import { HttpTransport } from "@nktkas/hyperliquid";
+   * import { SymbolConverter } from "@nktkas/hyperliquid/utils";
+   *
+   * const transport = new HttpTransport(); // or `WebSocketTransport`
    * const converter = await SymbolConverter.create({ transport });
-   * const btcId = converter.getAssetId("BTC");
    * ```
    */
   static async create(options: SymbolConverterOptions): Promise<SymbolConverter> {
     const instance = new SymbolConverter(options);
     await instance.reload();
     return instance;
-    }
+  }
 
   /**
    * Reload asset mappings from the API.
@@ -64,10 +88,10 @@ export class SymbolConverter {
 
     this.processDefaultPerps(perpMetaData);
     this.processSpotAssets(spotMetaData);
-    
+
     // Only process builder dexs if dex support is enabled
     if (this.dexOption !== false) {
-    await this.processBuilderDexs(perpDexsData);
+      await this.processBuilderDexs(perpDexsData);
     }
   }
 
@@ -138,7 +162,11 @@ export class SymbolConverter {
 
   /**
    * Get asset ID for a coin.
-   * @example "BTC" → 0, "PURR/USDC" → 10000
+   *
+   * - For Perpetuals, use the coin name (e.g., "BTC").
+   * - For Spot markets, use the "BASE/QUOTE" format (e.g., "HYPE/USDC").
+   * - For Builder Dex assets, use the "DEX_NAME:ASSET_NAME" format (e.g., "test:ABC").
+   * @example "BTC" → 0, "HYPE/USDC" → 10107, "test:ABC" → 110000
    */
   getAssetId(name: string): number | undefined {
     return this.nameToAssetId.get(name);
@@ -146,10 +174,13 @@ export class SymbolConverter {
 
   /**
    * Get size decimals for a coin.
-   * @example "BTC" → 5, "PURR/USDC" → 0
+   *
+   * - For Perpetuals, use the coin name (e.g., "BTC").
+   * - For Spot markets, use the "BASE/QUOTE" format (e.g., "HYPE/USDC").
+   * - For Builder Dex assets, use the "DEX_NAME:ASSET_NAME" format (e.g., "test:ABC").
+   * @example "BTC" → 5, "HYPE/USDC" → 2, "test:ABC" → 0
    */
   getSzDecimals(name: string): number | undefined {
     return this.nameToSzDecimals.get(name);
   }
-
 }
