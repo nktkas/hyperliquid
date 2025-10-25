@@ -6,7 +6,7 @@ import { formatPrice, formatSize, getAssetData, runTest } from "./_t.ts";
 
 runTest({
   name: "updateIsolatedMargin",
-  topup: { perp: "15" },
+  topup: { perp: "20" },
   codeTestFn: async (_t, clients) => {
     // —————————— Prepare ——————————
 
@@ -31,10 +31,9 @@ runTest({
     // —————————— Test ——————————
 
     try {
-      const data = await Promise.all([
-        clients.exchange.updateIsolatedMargin({ asset: id, isBuy: true, ntli: 1 }),
-      ]);
-      schemaCoverage(SuccessResponse, data);
+      const data1 = await clients.exchange.updateIsolatedMargin({ asset: id, isBuy: true, ntli: 2 * 1e6 });
+      const data2 = await clients.exchange.updateIsolatedMargin({ asset: id, isBuy: true, ntli: -1 * 1e6 });
+      schemaCoverage(SuccessResponse, [data1, data2]);
     } finally {
       // —————————— Cleanup ——————————
 

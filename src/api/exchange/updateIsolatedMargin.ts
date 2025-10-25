@@ -1,4 +1,4 @@
-import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
+import { Address, type DeepImmutable, Integer, parser, UnsignedInteger } from "../_base.ts";
 import {
   type ExchangeRequestConfig,
   executeL1Action,
@@ -38,7 +38,7 @@ export const UpdateIsolatedMarginRequest = /* @__PURE__ */ (() => {
           ),
           /** Amount to adjust (float * 1e6). */
           ntli: v.pipe(
-            UnsignedInteger,
+            Integer,
             v.description("Amount to adjust (float * 1e6)."),
           ),
         }),
