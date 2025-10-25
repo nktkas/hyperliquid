@@ -945,6 +945,31 @@ console.log(JSON.stringify(schema, null, 2));
 // }
 ```
 
+### `/utils`
+
+This module contains helper functions for interacting with the HyperLiquid API.
+
+#### `SymbolConverter`
+
+Utility class for converting asset symbols to their corresponding IDs and size decimals. See
+[docs](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/asset-ids).
+
+```ts
+import { HttpTransport } from "@nktkas/hyperliquid";
+import { SymbolConverter } from "@nktkas/hyperliquid/utils";
+
+const transport = new HttpTransport(); // or `WebSocketTransport`
+const converter = await SymbolConverter.create({ transport });
+
+const btcId = converter.getAssetId("BTC"); // perpetual → 0
+const hypeUsdcId = converter.getAssetId("HYPE/USDC"); // spot market → 10107
+const dexAbcId = converter.getAssetId("test:ABC"); // builder dex (if enabled) → 110000
+
+const btcSzDecimals = converter.getSzDecimals("BTC"); // perpetual → 5
+const hypeUsdcSzDecimals = converter.getSzDecimals("HYPE/USDC"); // spot market → 2
+const dexAbcSzDecimals = converter.getSzDecimals("test:ABC"); // builder dex (if enabled) → 0
+```
+
 ## FAQ
 
 ### How to execute an L1 action via an external wallet (e.g. MetaMask)?

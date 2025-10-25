@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-import-prefix
-import { type Domain, PrivateKeyEIP712Signer, type Types } from "../../src/utils/minimalEIP712Signer.ts";
+import { type Domain, PrivateKeyEIP712Signer, type Types } from "../../src/utils/_minimalEIP712Signer.ts";
 import { Wallet } from "npm:ethers@6";
 import { assertEquals } from "jsr:@std/assert@1";
 

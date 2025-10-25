@@ -4,6 +4,7 @@
   "exports": {
     ".": "./src/mod.ts",
     "./signing": "./src/signing/mod.ts",
+    "./utils": "./src/utils/mod.ts",
     "./api/exchange": "./src/api/exchange/~mod.ts",
     "./api/info": "./src/api/info/~mod.ts",
     "./api/subscription": "./src/api/subscription/~mod.ts"

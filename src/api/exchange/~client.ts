@@ -2,7 +2,7 @@ import type { OmitFirst, OverloadedParameters } from "../_base.ts";
 import type { ExchangeRequestConfig, MaybePromise, MultiSignRequestConfig } from "./_base.ts";
 import type { IRequestTransport } from "../../transport/base.ts";
 import type { AbstractWallet } from "../../signing/mod.ts";
-import { PrivateKeyEIP712Signer } from "../../utils/minimalEIP712Signer.ts";
+import { PrivateKeyEIP712Signer } from "../../utils/_minimalEIP712Signer.ts";
 
 import { agentEnableDexAbstraction } from "./agentEnableDexAbstraction.ts";
 import { approveAgent } from "./approveAgent.ts";

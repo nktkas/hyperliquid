@@ -16,6 +16,7 @@ export interface SymbolConverterOptions {
 /**
  * Utility class for converting asset symbols to their corresponding IDs and size decimals.
  * Supports perpetuals, spot markets, and optional builder dexs.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/asset-ids
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
@@ -24,13 +25,13 @@ export interface SymbolConverterOptions {
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  * const converter = await SymbolConverter.create({ transport });
  *
- * const btcId = converter.getAssetId("BTC"); // perpetual
- * const hypeUsdcId = converter.getAssetId("HYPE/USDC"); // spot market
- * const dexAbcId = converter.getAssetId("test:ABC"); // builder dex (if enabled)
+ * const btcId = converter.getAssetId("BTC"); // perpetual → 0
+ * const hypeUsdcId = converter.getAssetId("HYPE/USDC"); // spot market → 10107
+ * const dexAbcId = converter.getAssetId("test:ABC"); // builder dex (if enabled) → 110000
  *
- * const btcSzDecimals = converter.getSzDecimals("BTC"); // perpetual
- * const hypeUsdcSzDecimals = converter.getSzDecimals("HYPE/USDC"); // spot market
- * const dexAbcSzDecimals = converter.getSzDecimals("test:ABC"); // builder dex (if enabled)
+ * const btcSzDecimals = converter.getSzDecimals("BTC"); // perpetual → 5
+ * const hypeUsdcSzDecimals = converter.getSzDecimals("HYPE/USDC"); // spot market → 2
+ * const dexAbcSzDecimals = converter.getSzDecimals("test:ABC"); // builder dex (if enabled) → 0
  * ```
  */
 export class SymbolConverter {
@@ -162,7 +163,6 @@ export class SymbolConverter {
 
   /**
    * Get asset ID for a coin.
-   *
    * - For Perpetuals, use the coin name (e.g., "BTC").
    * - For Spot markets, use the "BASE/QUOTE" format (e.g., "HYPE/USDC").
    * - For Builder Dex assets, use the "DEX_NAME:ASSET_NAME" format (e.g., "test:ABC").
@@ -174,7 +174,6 @@ export class SymbolConverter {
 
   /**
    * Get size decimals for a coin.
-   *
    * - For Perpetuals, use the coin name (e.g., "BTC").
    * - For Spot markets, use the "BASE/QUOTE" format (e.g., "HYPE/USDC").
    * - For Builder Dex assets, use the "DEX_NAME:ASSET_NAME" format (e.g., "test:ABC").
