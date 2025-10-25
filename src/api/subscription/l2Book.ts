@@ -1,9 +1,9 @@
 import * as v from "valibot";
-import { type DeepImmutable, Integer, parser } from "../_base.ts";
+import { type DeepImmutable, Integer, parser, UnsignedInteger } from "../_base.ts";
 import type { SubscriptionRequestConfig } from "./_base.ts";
 import type { Subscription } from "../../transport/base.ts";
 
-import { L2BookResponse } from "../info/l2Book.ts";
+import { L2BookLevelSchema } from "../_common_schemas.ts";
 
 // -------------------- Schemas --------------------
 
@@ -49,7 +49,26 @@ export type L2BookRequest = v.InferOutput<typeof L2BookRequest>;
 
 /** Event of L2 order book snapshot. */
 export const L2BookEvent = /* @__PURE__ */ (() => {
-  return L2BookResponse;
+  return v.pipe(
+    v.object({
+      /** Asset symbol. */
+      coin: v.pipe(
+        v.string(),
+        v.description("Asset symbol."),
+      ),
+      /** Timestamp of the snapshot (in ms since epoch). */
+      time: v.pipe(
+        UnsignedInteger,
+        v.description("Timestamp of the snapshot (in ms since epoch)."),
+      ),
+      /** Bid and ask levels (index 0 = bids, index 1 = asks). */
+      levels: v.pipe(
+        v.tuple([v.array(L2BookLevelSchema), v.array(L2BookLevelSchema)]),
+        v.description("Bid and ask levels (index 0 = bids, index 1 = asks)."),
+      ),
+    }),
+    v.description("L2 order book snapshot."),
+  );
 })();
 export type L2BookEvent = v.InferOutput<typeof L2BookEvent>;
 

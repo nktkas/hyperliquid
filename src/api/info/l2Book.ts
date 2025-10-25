@@ -55,24 +55,26 @@ export type L2BookRequest = v.InferOutput<typeof L2BookRequest>;
  */
 export const L2BookResponse = /* @__PURE__ */ (() => {
   return v.pipe(
-    v.object({
-      /** Asset symbol. */
-      coin: v.pipe(
-        v.string(),
-        v.description("Asset symbol."),
-      ),
-      /** Timestamp of the snapshot (in ms since epoch). */
-      time: v.pipe(
-        UnsignedInteger,
-        v.description("Timestamp of the snapshot (in ms since epoch)."),
-      ),
-      /** Bid and ask levels (index 0 = bids, index 1 = asks). */
-      levels: v.pipe(
-        v.tuple([v.array(L2BookLevelSchema), v.array(L2BookLevelSchema)]),
-        v.description("Bid and ask levels (index 0 = bids, index 1 = asks)."),
-      ),
-    }),
-    v.description("L2 order book snapshot."),
+    v.nullable(
+      v.object({
+        /** Asset symbol. */
+        coin: v.pipe(
+          v.string(),
+          v.description("Asset symbol."),
+        ),
+        /** Timestamp of the snapshot (in ms since epoch). */
+        time: v.pipe(
+          UnsignedInteger,
+          v.description("Timestamp of the snapshot (in ms since epoch)."),
+        ),
+        /** Bid and ask levels (index 0 = bids, index 1 = asks). */
+        levels: v.pipe(
+          v.tuple([v.array(L2BookLevelSchema), v.array(L2BookLevelSchema)]),
+          v.description("Bid and ask levels (index 0 = bids, index 1 = asks)."),
+        ),
+      }),
+    ),
+    v.description("L2 order book snapshot or `null` if the market does not exist."),
   );
 })();
 export type L2BookResponse = v.InferOutput<typeof L2BookResponse>;
