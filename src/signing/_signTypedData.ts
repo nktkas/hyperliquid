@@ -222,14 +222,15 @@ export async function getWalletChainId(wallet: AbstractWallet): Promise<`0x${str
 export async function getWalletAddress(wallet: AbstractWallet): Promise<`0x${string}`> {
   if (isAbstractViemWallet(wallet)) {
     if ("address" in wallet && wallet.address) {
-      return wallet.address;
+      return wallet.address.toLowerCase() as `0x${string}`;
     } else if ("getAddresses" in wallet && wallet.getAddresses) {
       const addresses = await wallet.getAddresses();
-      return addresses[0];
+      return addresses[0].toLowerCase() as `0x${string}`;
     }
   } else if (isAbstractEthersV6Signer(wallet) || isAbstractEthersV5Signer(wallet)) {
     if ("getAddress" in wallet && wallet.getAddress) {
-      return await wallet.getAddress() as `0x${string}`;
+      const address = await wallet.getAddress();
+      return address.toLowerCase() as `0x${string}`;
     }
   }
   throw new Error("Unsupported wallet for getting address");

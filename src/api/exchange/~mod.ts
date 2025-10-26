@@ -38,7 +38,7 @@
  */
 
 export { parser, SchemaError } from "../_base.ts";
-export type { ExchangeRequestConfig } from "./_base.ts";
+export { ApiRequestError, type ExchangeRequestConfig, type MultiSignRequestConfig } from "./_base/mod.ts";
 
 export * from "./agentEnableDexAbstraction.ts";
 export * from "./approveAgent.ts";

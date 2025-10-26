@@ -1,6 +1,6 @@
 import type { OmitFirst, OverloadedParameters } from "../_base.ts";
 import type { ISubscriptionTransport } from "../../transport/base.ts";
-import type { SubscriptionRequestConfig } from "./_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
 
 import { activeAssetCtx } from "./activeAssetCtx.ts";
 import { activeAssetData } from "./activeAssetData.ts";
@@ -94,6 +94,8 @@ export type {
   UserTwapSliceFillsParameters as WsUserTwapSliceFillsParameters,
 } from "./userTwapSliceFills.ts";
 export type { WebData2Event as WsWebData2Event, WebData2Parameters as WsWebData2Parameters } from "./webData2.ts";
+
+export type { SubscriptionRequestConfig } from "./_types.ts";
 
 /**
  * A client for interacting with the Hyperliquid Subscription API.

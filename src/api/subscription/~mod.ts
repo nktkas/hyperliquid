@@ -24,7 +24,7 @@
  */
 
 export { parser, SchemaError } from "../_base.ts";
-export type { SubscriptionRequestConfig } from "./_base.ts";
+export type { SubscriptionRequestConfig } from "./_types.ts";
 
 export * from "./activeAssetCtx.ts";
 export * from "./activeAssetData.ts";

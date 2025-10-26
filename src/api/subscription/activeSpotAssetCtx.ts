@@ -1,6 +1,6 @@
 import * as v from "valibot";
 import { type DeepImmutable, parser, UnsignedDecimal } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
 import type { Subscription } from "../../transport/base.ts";
 
 // -------------------- Schemas --------------------

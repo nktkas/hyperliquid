@@ -30,17 +30,17 @@ export class HttpRequestError extends TransportError {
 export interface HttpTransportOptions {
   /**
    * Specifies whether to use the testnet API endpoints from the {@linkcode server} property.
-   * @defaultValue `false`
+   * @default false
    */
   isTestnet?: boolean;
   /**
    * Request timeout in ms. Set to `null` to disable.
-   * @defaultValue `10_000`
+   * @default 10_000
    */
   timeout?: number | null;
   /**
    * Custom server to use for API requests.
-   * @defaultValue `https://api.hyperliquid.xyz` for mainnet and `https://api.hyperliquid-testnet.xyz` for testnet.
+   * @default `https://api.hyperliquid.xyz` for mainnet and `https://api.hyperliquid-testnet.xyz` for testnet.
    */
   server?: {
     mainnet?: { api?: string | URL; rpc?: string | URL };

@@ -1,6 +1,6 @@
 import * as v from "valibot";
 import { type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 import { MarginTableResponse } from "./marginTable.ts";
 

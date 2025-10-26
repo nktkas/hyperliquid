@@ -1,6 +1,6 @@
 import * as v from "valibot";
 import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
 import type { Subscription } from "../../transport/base.ts";
 
 import { TwapFillSchema } from "../_common_schemas.ts";

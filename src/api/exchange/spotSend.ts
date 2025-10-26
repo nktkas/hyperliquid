@@ -1,15 +1,15 @@
+import * as v from "valibot";
 import { Address, type DeepImmutable, Hex, parser, TokenId, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 import {
   type ExchangeRequestConfig,
   executeUserSignedAction,
   type ExtractRequestAction,
   type ExtractRequestOptions,
-  getNonce,
   getSignatureChainId,
+  globalNonceManager,
   type MultiSignRequestConfig,
   Signature,
-} from "./_base.ts";
-import * as v from "valibot";
+} from "./_base/mod.ts";
 
 // -------------------- Schemas --------------------
 
@@ -77,7 +77,7 @@ export const SpotSendRequest = /* @__PURE__ */ (() => {
 })();
 export type SpotSendRequest = v.InferOutput<typeof SpotSendRequest>;
 
-import { SuccessResponse } from "./_base.ts";
+import { SuccessResponse } from "./_base/mod.ts";
 export { SuccessResponse };
 
 // -------------------- Function --------------------
@@ -137,7 +137,7 @@ export async function spotSend(
     type: "spotSend",
     hyperliquidChain: config.transport.isTestnet ? "Testnet" : "Mainnet",
     signatureChainId: await getSignatureChainId(config),
-    time: await getNonce(config),
+    time: globalNonceManager.getNonce(),
     ...params,
   });
   return await executeUserSignedAction(

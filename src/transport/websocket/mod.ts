@@ -16,7 +16,7 @@ type MaybePromise<T> = T | Promise<T>;
 export interface WebSocketTransportOptions {
   /**
    * Indicates this transport uses testnet endpoint.
-   * @defaultValue `false`
+   * @default false
    */
   isTestnet?: boolean;
   /**
@@ -27,26 +27,26 @@ export interface WebSocketTransportOptions {
    * - Testnet:
    *   - API: `wss://api.hyperliquid-testnet.xyz/ws`
    *   - Explorer: `wss://rpc.hyperliquid-testnet.xyz/ws`
-   * @defaultValue `wss://api.hyperliquid.xyz/ws` for mainnet, `wss://api.hyperliquid-testnet.xyz/ws` for testnet
+   * @default `wss://api.hyperliquid.xyz/ws` for mainnet, `wss://api.hyperliquid-testnet.xyz/ws` for testnet
    */
   url?: string | URL;
   /**
    * Timeout for requests in ms.
    * Set to `null` to disable.
-   * @defaultValue `10_000`
+   * @default 10_000
    */
   timeout?: number | null;
   /**
    * Interval between sending ping messages in ms.
    * Set to `null` to disable.
-   * @defaultValue `30_000`
+   * @default 30_000
    */
   keepAliveInterval?: number | null;
   /** Reconnection policy configuration for closed connections. */
   reconnect?: ReconnectingWebSocketOptions;
   /**
    * Enable automatic re-subscription to Hyperliquid subscription after reconnection.
-   * @defaultValue `true`
+   * @default true
    */
   resubscribe?: boolean;
   onRequest?: (type: string, payload: unknown) => MaybePromise<unknown | void | null | undefined>;

@@ -6,25 +6,25 @@ import { AbortSignal_ } from "../_polyfills.ts";
 export interface ReconnectingWebSocketOptions {
   /**
    * Custom WebSocket constructor.
-   * @defaultValue The global `WebSocket` constructor.
+   * @default globalThis.WebSocket
    */
   WebSocket?: new (url: string | URL, protocols?: string | string[]) => WebSocket;
   /**
    * Maximum number of reconnection attempts.
-   * @defaultValue `3`
+   * @default 3
    */
   maxRetries?: number;
   /**
    * Maximum time in ms to wait for a connection to open.
    * Set to `null` to disable.
-   * @defaultValue `10_000`
+   * @default 10_000
    */
   connectionTimeout?: number | null;
   /**
    * Delay before reconnection in ms.
    * May be a number or a function that returns a number.
    * @param attempt - The current attempt number.
-   * @defaultValue `(attempt) => Math.min(~~(1 << attempt) * 150, 10_000)` - Exponential backoff (max 10s)
+   * @default (attempt) => Math.min(~~(1 << attempt) * 150, 10_000); // Exponential backoff (max 10s)
    */
   reconnectionDelay?: number | ((attempt: number) => number);
 }

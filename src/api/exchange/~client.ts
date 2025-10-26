@@ -1,5 +1,5 @@
-import type { OmitFirst, OverloadedParameters } from "../_base.ts";
-import type { ExchangeRequestConfig, MaybePromise, MultiSignRequestConfig } from "./_base.ts";
+import type { MaybePromise, OmitFirst, OverloadedParameters } from "../_base.ts";
+import type { ExchangeRequestConfig, MultiSignRequestConfig } from "./_base/mod.ts";
 import type { IRequestTransport } from "../../transport/base.ts";
 import type { AbstractWallet } from "../../signing/mod.ts";
 import { PrivateKeyEIP712Signer } from "../../utils/_minimalEIP712Signer.ts";
@@ -100,9 +100,9 @@ export type { CreateVaultResponse } from "./createVault.ts";
 export type { OrderSuccessResponse } from "./order.ts";
 export type { TwapCancelSuccessResponse } from "./twapCancel.ts";
 export type { TwapOrderSuccessResponse } from "./twapOrder.ts";
-export type { ErrorResponse, SuccessResponse } from "./_base.ts";
+export type { ErrorResponse, SuccessResponse } from "./_base/mod.ts";
 
-export { ApiRequestError } from "./_base.ts";
+export { ApiRequestError, type ExchangeRequestConfig, type MultiSignRequestConfig } from "./_base/mod.ts";
 
 /**
  * A client for interacting with the Hyperliquid Exchange API.
@@ -116,9 +116,9 @@ export class ExchangeClient<
   transport: T;
   wallet: W;
   signatureChainId?: string | (() => MaybePromise<string>);
-  nonceManager?: () => MaybePromise<number>;
   defaultVaultAddress?: string;
   defaultExpiresAfter?: number | (() => MaybePromise<number>);
+  sequentialRequests?: boolean;
 
   /**
    * Initialises a new instance.
@@ -128,10 +128,10 @@ export class ExchangeClient<
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const privateKey = "0x...";
+   * const pk = "0x...";
    *
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
-   * const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
+   * const exchClient = new hl.ExchangeClient({ wallet: pk, transport });
    * ```
    *
    * @example via [viem](https://viem.sh/docs/clients/wallet#local-accounts-private-key-mnemonic-etc)
@@ -181,7 +181,7 @@ export class ExchangeClient<
     this.defaultVaultAddress = args.defaultVaultAddress;
     this.defaultExpiresAfter = args.defaultExpiresAfter;
     this.signatureChainId = args.signatureChainId;
-    this.nonceManager = args.nonceManager;
+    this.sequentialRequests = args.sequentialRequests;
   }
 
   /**

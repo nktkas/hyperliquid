@@ -212,7 +212,7 @@ import { ethers } from "ethers";
 const transport = new hl.HttpTransport(); // or `WebSocketTransport`
 
 // 1. Using private key directly
-const privateKey = "0x...";
+const pk = "0x...";
 const exchClient = new hl.ExchangeClient({ wallet: privateKey, transport });
 
 // 2. Using Viem
@@ -485,7 +485,7 @@ class ExchangeClient {
     wallet: AbstractWallet | Hex; // viem, ethers or private key directly
     defaultVaultAddress?: Hex; // Vault address used by default if not provided in method call
     signatureChainId?: Hex | (() => MaybePromise<Hex>); // Chain ID used for signing (default: get chain id from wallet otherwise `0x1`)
-    nonceManager?: () => MaybePromise<number>; // Function to get the next nonce (default: monotonically incrementing `Date.now()`)
+    sequentialRequests?: boolean; // Execute requests sequentially to prevent network-level race conditions (default: true)
   });
 
   // Order & TWAP & Position

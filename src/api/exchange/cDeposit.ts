@@ -1,15 +1,15 @@
+import * as v from "valibot";
 import { type DeepImmutable, Hex, parser, UnsignedInteger } from "../_base.ts";
 import {
   type ExchangeRequestConfig,
   executeUserSignedAction,
   type ExtractRequestAction,
   type ExtractRequestOptions,
-  getNonce,
   getSignatureChainId,
+  globalNonceManager,
   type MultiSignRequestConfig,
   Signature,
-} from "./_base.ts";
-import * as v from "valibot";
+} from "./_base/mod.ts";
 
 // -------------------- Schemas --------------------
 
@@ -67,7 +67,7 @@ export const CDepositRequest = /* @__PURE__ */ (() => {
 })();
 export type CDepositRequest = v.InferOutput<typeof CDepositRequest>;
 
-import { SuccessResponse } from "./_base.ts";
+import { SuccessResponse } from "./_base/mod.ts";
 export { SuccessResponse };
 
 // -------------------- Function --------------------
@@ -121,7 +121,7 @@ export async function cDeposit(
     type: "cDeposit",
     hyperliquidChain: config.transport.isTestnet ? "Testnet" : "Mainnet",
     signatureChainId: await getSignatureChainId(config),
-    nonce: await getNonce(config),
+    nonce: globalNonceManager.getNonce(),
     ...params,
   });
   return await executeUserSignedAction(

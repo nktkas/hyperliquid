@@ -1,3 +1,4 @@
+import * as v from "valibot";
 import { type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
 import {
   type ExchangeRequestConfig,
@@ -6,8 +7,7 @@ import {
   type ExtractRequestOptions,
   type MultiSignRequestConfig,
   Signature,
-} from "./_base.ts";
-import * as v from "valibot";
+} from "./_base/mod.ts";
 
 // -------------------- Schemas --------------------
 
@@ -56,7 +56,7 @@ export const SetReferrerRequest = /* @__PURE__ */ (() => {
 })();
 export type SetReferrerRequest = v.InferOutput<typeof SetReferrerRequest>;
 
-import { SuccessResponse } from "./_base.ts";
+import { SuccessResponse } from "./_base/mod.ts";
 export { SuccessResponse };
 
 // -------------------- Function --------------------
@@ -101,8 +101,11 @@ export async function setReferrer(
     type: "setReferrer",
     ...params,
   });
-  const expiresAfter = typeof config.defaultExpiresAfter === "number"
+
+  const expiresAfter_ = typeof config.defaultExpiresAfter === "number"
     ? config.defaultExpiresAfter
     : await config.defaultExpiresAfter?.();
+  const expiresAfter = parser(v.optional(UnsignedInteger))(expiresAfter_);
+
   return await executeL1Action(config, { action, expiresAfter }, opts?.signal);
 }

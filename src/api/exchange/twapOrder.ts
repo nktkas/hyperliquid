@@ -1,3 +1,4 @@
+import * as v from "valibot";
 import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 import {
   type ExchangeRequestConfig,
@@ -6,8 +7,7 @@ import {
   type ExtractRequestOptions,
   type MultiSignRequestConfig,
   Signature,
-} from "./_base.ts";
-import * as v from "valibot";
+} from "./_base/mod.ts";
 
 // -------------------- Schemas --------------------
 
@@ -249,9 +249,14 @@ export async function twapOrder(
     type: "twapOrder",
     ...params,
   });
-  const vaultAddress = opts?.vaultAddress ?? config.defaultVaultAddress;
-  const expiresAfter = typeof config.defaultExpiresAfter === "number"
+
+  const vaultAddress_ = opts?.vaultAddress ?? config.defaultVaultAddress;
+  const vaultAddress = parser(v.optional(Address))(vaultAddress_);
+
+  const expiresAfter_ = typeof config.defaultExpiresAfter === "number"
     ? config.defaultExpiresAfter
     : await config.defaultExpiresAfter?.();
+  const expiresAfter = parser(v.optional(UnsignedInteger))(expiresAfter_);
+
   return await executeL1Action(config, { action, vaultAddress, expiresAfter }, opts?.signal);
 }

@@ -1,6 +1,6 @@
 import * as v from "valibot";
 import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 import { DetailedOrderSchema, TwapStateSchema } from "../_common_schemas.ts";
 import { MetaAndAssetCtxsResponse } from "./metaAndAssetCtxs.ts";

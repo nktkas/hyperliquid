@@ -1,6 +1,6 @@
 import * as v from "valibot";
 import { type DeepImmutable, Integer, parser, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 import { L2BookLevelSchema } from "../_common_schemas.ts";
 

@@ -1,6 +1,6 @@
 import * as v from "valibot";
 import { Address, type DeepImmutable, Hex, parser, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 import type { IRequestTransport } from "../../transport/base.ts";
 
 // -------------------- Schemas --------------------

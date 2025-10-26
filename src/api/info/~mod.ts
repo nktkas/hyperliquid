@@ -22,7 +22,7 @@
  */
 
 export { parser, SchemaError } from "../_base.ts";
-export type { InfoRequestConfig } from "./_base.ts";
+export type { InfoRequestConfig } from "./_types.ts";
 
 export * from "./activeAssetData.ts";
 export * from "./alignedQuoteTokenInfo.ts";

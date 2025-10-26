@@ -1,6 +1,6 @@
 import type { OmitFirst, OverloadedParameters } from "../_base.ts";
 import type { IRequestTransport } from "../../transport/base.ts";
-import type { InfoRequestConfig } from "./_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 import { activeAssetData } from "./activeAssetData.ts";
 import { alignedQuoteTokenInfo } from "./alignedQuoteTokenInfo.ts";
@@ -137,6 +137,8 @@ export type { ValidatorSummariesResponse } from "./validatorSummaries.ts";
 export type { VaultDetailsParameters, VaultDetailsResponse } from "./vaultDetails.ts";
 export type { VaultSummariesResponse } from "./vaultSummaries.ts";
 export type { WebData2Parameters, WebData2Response } from "./webData2.ts";
+
+export type { InfoRequestConfig } from "./_types.ts";
 
 /**
  * A client for interacting with the Hyperliquid Info API.

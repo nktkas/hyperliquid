@@ -1,6 +1,6 @@
 import * as v from "valibot";
 import { Address, type DeepImmutable, parser } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
 import type { Subscription } from "../../transport/base.ts";
 
 import { UserNonFundingLedgerUpdatesResponse } from "../info/userNonFundingLedgerUpdates.ts";

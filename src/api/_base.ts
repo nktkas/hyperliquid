@@ -4,6 +4,8 @@ import { HyperliquidError } from "../_base.ts";
 
 // -------------------- Types --------------------
 
+export type MaybePromise<T> = T | Promise<T>;
+
 export type Prettify<T> =
   & { [K in keyof T]: T[K] }
   & {};

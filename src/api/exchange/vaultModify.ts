@@ -1,3 +1,4 @@
+import * as v from "valibot";
 import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
 import {
   type ExchangeRequestConfig,
@@ -6,8 +7,7 @@ import {
   type ExtractRequestOptions,
   type MultiSignRequestConfig,
   Signature,
-} from "./_base.ts";
-import * as v from "valibot";
+} from "./_base/mod.ts";
 
 // -------------------- Schemas --------------------
 
@@ -65,7 +65,7 @@ export const VaultModifyRequest = /* @__PURE__ */ (() => {
 })();
 export type VaultModifyRequest = v.InferOutput<typeof VaultModifyRequest>;
 
-import { SuccessResponse } from "./_base.ts";
+import { SuccessResponse } from "./_base/mod.ts";
 export { SuccessResponse };
 
 // -------------------- Function --------------------
@@ -114,8 +114,11 @@ export async function vaultModify(
     type: "vaultModify",
     ...params,
   });
-  const expiresAfter = typeof config.defaultExpiresAfter === "number"
+
+  const expiresAfter_ = typeof config.defaultExpiresAfter === "number"
     ? config.defaultExpiresAfter
     : await config.defaultExpiresAfter?.();
+  const expiresAfter = parser(v.optional(UnsignedInteger))(expiresAfter_);
+
   return await executeL1Action(config, { action, expiresAfter }, opts?.signal);
 }

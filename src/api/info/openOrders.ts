@@ -1,6 +1,6 @@
 import * as v from "valibot";
 import { Address, type DeepImmutable, parser } from "../_base.ts";
-import type { InfoRequestConfig } from "./_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 import { OrderSchema } from "../_common_schemas.ts";
 

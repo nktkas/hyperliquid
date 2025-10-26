@@ -1,3 +1,4 @@
+import * as v from "valibot";
 import { Address, type DeepImmutable, Hex, parser, UnsignedInteger } from "../_base.ts";
 import {
   type ExchangeRequestConfig,
@@ -6,8 +7,7 @@ import {
   type ExtractRequestOptions,
   getSignatureChainId,
   Signature,
-} from "./_base.ts";
-import * as v from "valibot";
+} from "./_base/mod.ts";
 
 import { ApproveAgentRequest } from "./approveAgent.ts";
 import { ApproveBuilderFeeRequest } from "./approveBuilderFee.ts";
@@ -172,7 +172,7 @@ export const MultiSigRequest = /* @__PURE__ */ (() => {
 })();
 export type MultiSigRequest = v.InferOutput<typeof MultiSigRequest>;
 
-import { SuccessResponse } from "./_base.ts";
+import { SuccessResponse } from "./_base/mod.ts";
 export {
   CancelSuccessResponse,
   CreateSubAccountResponse,
@@ -287,10 +287,15 @@ export async function multiSig<
     signatureChainId: await getSignatureChainId(config),
     ...params,
   });
-  const vaultAddress = opts?.vaultAddress ?? config.defaultVaultAddress;
-  const expiresAfter = typeof config.defaultExpiresAfter === "number"
+
+  const vaultAddress_ = opts?.vaultAddress ?? config.defaultVaultAddress;
+  const vaultAddress = parser(v.optional(Address))(vaultAddress_);
+
+  const expiresAfter_ = typeof config.defaultExpiresAfter === "number"
     ? config.defaultExpiresAfter
     : await config.defaultExpiresAfter?.();
+  const expiresAfter = parser(v.optional(UnsignedInteger))(expiresAfter_);
+
   return await executeMultiSigAction(
     config,
     {
