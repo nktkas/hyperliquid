@@ -395,6 +395,7 @@ class InfoClient {
   // Market Data
   alignedQuoteTokenInfo(params: AlignedQuoteTokenInfoParameters): Promise<AlignedQuoteTokenInfoResponse>;
   allMids(params?: AllMidsParameters): Promise<AllMidsResponse>;
+  allPerpMetas(): Promise<AllPerpMetasResponse>;
   candleSnapshot(params: CandleSnapshotParameters): Promise<CandleSnapshotResponse>;
   fundingHistory(params: FundingHistoryParameters): Promise<FundingHistoryResponse>;
   l2Book(params: L2BookParameters): Promise<L2BookResponse>;

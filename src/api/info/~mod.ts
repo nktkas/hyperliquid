@@ -27,6 +27,7 @@ export type { InfoRequestConfig } from "./_types.ts";
 export * from "./activeAssetData.ts";
 export * from "./alignedQuoteTokenInfo.ts";
 export * from "./allMids.ts";
+export * from "./allPerpMetas.ts";
 export * from "./blockDetails.ts";
 export * from "./candleSnapshot.ts";
 export * from "./clearinghouseState.ts";

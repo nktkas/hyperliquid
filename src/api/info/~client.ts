@@ -5,6 +5,7 @@ import type { InfoRequestConfig } from "./_types.ts";
 import { activeAssetData } from "./activeAssetData.ts";
 import { alignedQuoteTokenInfo } from "./alignedQuoteTokenInfo.ts";
 import { allMids } from "./allMids.ts";
+import { allPerpMetas } from "./allPerpMetas.ts";
 import { blockDetails } from "./blockDetails.ts";
 import { candleSnapshot } from "./candleSnapshot.ts";
 import { clearinghouseState } from "./clearinghouseState.ts";
@@ -71,6 +72,7 @@ import { webData2 } from "./webData2.ts";
 export type { ActiveAssetDataParameters, ActiveAssetDataResponse } from "./activeAssetData.ts";
 export type { AlignedQuoteTokenInfoParameters, AlignedQuoteTokenInfoResponse } from "./alignedQuoteTokenInfo.ts";
 export type { AllMidsParameters, AllMidsResponse } from "./allMids.ts";
+export type { AllPerpMetasParameters, AllPerpMetasResponse } from "./allPerpMetas.ts";
 export type { BlockDetailsParameters, BlockDetailsResponse } from "./blockDetails.ts";
 export type { CandleSnapshotParameters, CandleSnapshotResponse } from "./candleSnapshot.ts";
 export type { ClearinghouseStateParameters, ClearinghouseStateResponse } from "./clearinghouseState.ts";
@@ -236,6 +238,28 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
       // @ts-ignore: TypeScript can't resolve overloaded signatures from parameter unions
       ...args,
     );
+  }
+
+  /**
+   * Request trading metadata for all DEXes.
+   * @param signal - An [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) can be used to cancel the request by calling [`abort()`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort) on the corresponding [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController).
+   * @returns Metadata for perpetual assets across all DEXes.
+   *
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @see null
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   *
+   * const client = new hl.InfoClient({ transport });
+   * const data = await client.allPerpMetas();
+   * ```
+   */
+  allPerpMetas() {
+    return allPerpMetas(this);
   }
 
   /**
