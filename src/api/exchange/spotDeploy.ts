@@ -20,7 +20,7 @@ export const SpotDeployRequest = /* @__PURE__ */ (() => {
     v.object({
       /** Action to perform. */
       action: v.pipe(
-        v.variant("type", [
+        v.union([
           v.pipe(
             v.object({
               /** Type of action. */

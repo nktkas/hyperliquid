@@ -95,7 +95,7 @@ export const MultiSigRequest = /* @__PURE__ */ (() => {
               ),
               /** The underlying action to be executed through multi-sig. */
               action: v.pipe(
-                v.variant("type", [
+                v.union([
                   ApproveAgentRequest.entries.action,
                   ApproveBuilderFeeRequest.entries.action,
                   BatchModifyRequest.entries.action,

@@ -20,7 +20,7 @@ export const CSignerActionRequest = /* @__PURE__ */ (() => {
     v.object({
       /** Action to perform. */
       action: v.pipe(
-        v.variant("type", [
+        v.union([
           v.object({
             /** Type of action. */
             type: v.pipe(
