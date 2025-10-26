@@ -6,11 +6,11 @@ import { runTest } from "./_t.ts";
 
 runTest({
   name: "cSignerAction",
-  codeTestFn: async (t, clients) => {
+  codeTestFn: async (t, exchClient) => {
     await t.step("jailSelf", async () => {
       await assertRejects(
         async () => {
-          await clients.exchange.cSignerAction({ jailSelf: null });
+          await exchClient.cSignerAction({ jailSelf: null });
         },
         ApiRequestError,
         "Signer invalid or inactive for current epoch",
@@ -20,7 +20,7 @@ runTest({
     await t.step("unjailSelf", async () => {
       await assertRejects(
         async () => {
-          await clients.exchange.cSignerAction({ unjailSelf: null });
+          await exchClient.cSignerAction({ unjailSelf: null });
         },
         ApiRequestError,
         "Signer invalid or inactive for current epoch",
@@ -29,6 +29,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["exchange", "cSignerAction", "--jailSelf", "null"]);
-    parser(CSignerActionRequest)(JSON.parse(data));
+    parser(CSignerActionRequest)(data);
   },
 });

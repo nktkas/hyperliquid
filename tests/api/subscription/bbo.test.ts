@@ -4,14 +4,18 @@ import { deadline } from "jsr:@std/async@1/deadline";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { runTest } from "./_t.ts";
 
-runTest("bbo", "api", async (_t, client) => {
-  const data = await Promise.all([
-    deadline(
-      new Promise<BboEvent>((resolve) => {
-        client.bbo({ coin: "BTC" }, resolve);
-      }),
-      120_000,
-    ),
-  ]);
-  schemaCoverage(BboEvent, data);
+runTest({
+  name: "bbo",
+  mode: "api",
+  fn: async (_t, client) => {
+    const data = await Promise.all([
+      deadline(
+        new Promise<BboEvent>((resolve) => {
+          client.bbo({ coin: "BTC" }, resolve);
+        }),
+        120_000,
+      ),
+    ]);
+    schemaCoverage(BboEvent, data);
+  },
 });

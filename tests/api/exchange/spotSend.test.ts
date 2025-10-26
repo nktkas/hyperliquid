@@ -1,13 +1,18 @@
 import { parser, SpotSendRequest, SuccessResponse } from "@nktkas/hyperliquid/api/exchange";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { runTest } from "./_t.ts";
+import { runTest, topUpSpot } from "./_t.ts";
 
 runTest({
   name: "spotSend",
-  topup: { spot: "1" },
-  codeTestFn: async (_t, clients) => {
+  codeTestFn: async (_t, exchClient) => {
+    // —————————— Prepare ——————————
+
+    await topUpSpot(exchClient, "USDC", "2");
+
+    // —————————— Test ——————————
+
     const data = await Promise.all([
-      clients.exchange.spotSend({
+      exchClient.spotSend({
         destination: "0x0000000000000000000000000000000000000001",
         token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
         amount: "1",
@@ -26,6 +31,6 @@ runTest({
       "--amount",
       "1",
     ]);
-    parser(SpotSendRequest)(JSON.parse(data));
+    parser(SpotSendRequest)(data);
   },
 });

@@ -6,11 +6,11 @@ import { runTest } from "./_t.ts";
 
 runTest({
   name: "spotDeploy",
-  codeTestFn: async (t, clients) => {
+  codeTestFn: async (t, exchClient) => {
     await t.step("registerToken2", async () => {
       await assertRejects(
         async () => {
-          await clients.exchange.spotDeploy({
+          await exchClient.spotDeploy({
             registerToken2: {
               spec: {
                 name: "TestToken",
@@ -29,7 +29,7 @@ runTest({
     await t.step("userGenesis", async () => {
       await assertRejects(
         async () => {
-          await clients.exchange.spotDeploy({
+          await exchClient.spotDeploy({
             userGenesis: {
               token: 0,
               userAndWei: [],
@@ -46,7 +46,7 @@ runTest({
     await t.step("genesis", async () => {
       await assertRejects(
         async () => {
-          await clients.exchange.spotDeploy({
+          await exchClient.spotDeploy({
             genesis: {
               token: 0,
               maxSupply: "10000000000",
@@ -62,7 +62,7 @@ runTest({
     await t.step("registerSpot", async () => {
       await assertRejects(
         async () => {
-          await clients.exchange.spotDeploy({
+          await exchClient.spotDeploy({
             registerSpot: {
               tokens: [0, 0],
             },
@@ -76,7 +76,7 @@ runTest({
     await t.step("registerHyperliquidity", async () => {
       await assertRejects(
         async () => {
-          await clients.exchange.spotDeploy({
+          await exchClient.spotDeploy({
             registerHyperliquidity: {
               spot: 0,
               startPx: "1",
@@ -94,7 +94,7 @@ runTest({
     await t.step("setDeployerTradingFeeShare", async () => {
       await assertRejects(
         async () => {
-          await clients.exchange.spotDeploy({
+          await exchClient.spotDeploy({
             setDeployerTradingFeeShare: {
               token: 0,
               share: "0%",
@@ -121,6 +121,6 @@ runTest({
         fullName: "TestToken (TT)",
       }),
     ]);
-    parser(SpotDeployRequest)(JSON.parse(data));
+    parser(SpotDeployRequest)(data);
   },
 });

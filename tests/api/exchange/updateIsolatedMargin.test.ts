@@ -1,54 +1,31 @@
-// deno-lint-ignore-file no-import-prefix
 import { parser, SuccessResponse, UpdateIsolatedMarginRequest } from "@nktkas/hyperliquid/api/exchange";
-import { BigNumber } from "npm:bignumber.js@9";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { formatPrice, formatSize, getAssetData, runTest } from "./_t.ts";
+import { openOrder, runTest, symbolConverter } from "./_t.ts";
 
 runTest({
   name: "updateIsolatedMargin",
-  topup: { perp: "20" },
-  codeTestFn: async (_t, clients) => {
+  codeTestFn: async (t, exchClient) => {
     // —————————— Prepare ——————————
 
-    const { id, universe, ctx } = await getAssetData("BTC");
-    const pxUp = formatPrice(new BigNumber(ctx.markPx).times(1.01), universe.szDecimals);
-    const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
-    const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);
-
-    await clients.exchange.updateLeverage({ asset: id, isCross: false, leverage: 1 });
-    await clients.exchange.order({
-      orders: [{
-        a: id,
-        b: true,
-        p: pxUp,
-        s: sz,
-        r: false,
-        t: { limit: { tif: "Gtc" } },
-      }],
-      grouping: "na",
-    });
+    const id = symbolConverter.getAssetId("ETH")!;
+    await exchClient.updateLeverage({ asset: id, isCross: false, leverage: 1 });
+    await openOrder(exchClient, "market", "ETH");
 
     // —————————— Test ——————————
 
-    try {
-      const data1 = await clients.exchange.updateIsolatedMargin({ asset: id, isBuy: true, ntli: 2 * 1e6 });
-      const data2 = await clients.exchange.updateIsolatedMargin({ asset: id, isBuy: true, ntli: -1 * 1e6 });
-      schemaCoverage(SuccessResponse, [data1, data2]);
-    } finally {
-      // —————————— Cleanup ——————————
+    await t.step("Increase isolated margin", async () => {
+      const data = await Promise.all([
+        exchClient.updateIsolatedMargin({ asset: id, isBuy: true, ntli: 2 * 1e6 }),
+      ]);
+      schemaCoverage(SuccessResponse, data);
+    });
 
-      await clients.exchange.order({
-        orders: [{
-          a: id,
-          b: false,
-          p: pxDown,
-          s: "0", // full position size
-          r: true,
-          t: { limit: { tif: "Gtc" } },
-        }],
-        grouping: "na",
-      });
-    }
+    await t.step("Decrease isolated margin", async () => {
+      const data = await Promise.all([
+        exchClient.updateIsolatedMargin({ asset: id, isBuy: true, ntli: -1 * 1e6 }),
+      ]);
+      schemaCoverage(SuccessResponse, data);
+    });
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([
@@ -61,6 +38,6 @@ runTest({
       "--ntli",
       "1",
     ]);
-    parser(UpdateIsolatedMarginRequest)(JSON.parse(data));
+    parser(UpdateIsolatedMarginRequest)(data);
   },
 });

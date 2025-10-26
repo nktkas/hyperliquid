@@ -8,7 +8,8 @@ const cliArgs = parseArgs(Deno.args, { default: { wait: 0 }, string: ["_"] }) as
 
 // —————————— Clients ——————————
 
-const infoClient = new InfoClient({ transport: new HttpTransport({ isTestnet: true }) });
+const transport = new HttpTransport({ isTestnet: true });
+const infoClient = new InfoClient({ transport });
 
 // —————————— Functions ——————————
 
@@ -22,12 +23,12 @@ export function runTest(options: {
   Deno.test(name, async (t) => {
     await new Promise((r) => setTimeout(r, cliArgs.wait)); // delay to avoid rate limits
 
-    await t.step("Code", async (t) => {
+    await t.step("code", async (t) => {
       await codeTestFn(t, infoClient);
     });
 
     await t.step({
-      name: "CLI",
+      name: "cli",
       fn: async (t) => {
         await cliTestFn!(t, async (args: string[]) => {
           const command = new Deno.Command("deno", {

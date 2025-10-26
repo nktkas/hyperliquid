@@ -3,168 +3,69 @@ import { type Args, parseArgs } from "jsr:@std/cli@1/parse-args";
 import { generatePrivateKey } from "npm:viem@2/accounts";
 import { BigNumber } from "npm:bignumber.js@9";
 import { ExchangeClient, HttpTransport, InfoClient, MultiSignClient } from "@nktkas/hyperliquid";
+import { SymbolConverter } from "@nktkas/hyperliquid/utils";
 import { getWalletAddress } from "../../../src/signing/mod.ts";
+
+// —————————— Arguments ——————————
 
 const cliArgs = parseArgs(Deno.args, { default: { wait: 0 }, string: ["_"] }) as Args<{ wait: number }>;
 const PRIVATE_KEY = cliArgs._[0] as `0x${string}`;
-if (!PRIVATE_KEY || !/^0x[a-fA-F0-9]{64}$/.test(PRIVATE_KEY)) {
-  throw new Error("Please provide a valid private key (0x-prefixed 64 hex characters) as an argument");
-}
 
-// —————————— Clients ——————————
-
-async function createExchangeClient(mainExchClient: ExchangeClient): Promise<ExchangeClient> {
-  const tempExchClient = new ExchangeClient({ wallet: generatePrivateKey(), transport });
-  await mainExchClient.usdSend({
-    destination: await getWalletAddress(tempExchClient.wallet),
-    amount: "2",
-  });
-  return tempExchClient;
-}
-async function createMultiSignClient(mainExchClient: ExchangeClient): Promise<MultiSignClient> {
-  const tempExchClient = new ExchangeClient({ wallet: generatePrivateKey(), transport });
-  await mainExchClient.usdSend({
-    destination: await getWalletAddress(tempExchClient.wallet),
-    amount: "2",
-  });
-  await tempExchClient.convertToMultiSigUser({
-    signers: {
-      authorizedUsers: [await getWalletAddress(mainExchClient.wallet)],
-      threshold: 1,
-    },
-  });
-  return new MultiSignClient({
-    multiSigUser: await getWalletAddress(tempExchClient.wallet),
-    signers: [mainExchClient.wallet],
-    transport,
-  });
-}
+// —————————— Preparation ——————————
 
 const transport = new HttpTransport({ isTestnet: true, timeout: 30_000 });
 const mainExchClient = new ExchangeClient({ wallet: PRIVATE_KEY, transport });
 const infoClient = new InfoClient({ transport });
-const exchClient = await createExchangeClient(mainExchClient);
-const multiSignClient = await createMultiSignClient(mainExchClient);
 
-// —————————— Functions ——————————
+export const symbolConverter = await SymbolConverter.create({ transport });
+export const allMids = await infoClient.allMids();
+
+// —————————— Test ——————————
 
 export function runTest(options: {
   name: string;
-  topup?: { perp?: string; spot?: string; evm?: string; staking?: string };
   codeTestFn: (
     t: Deno.TestContext,
-    clients: {
-      info: InfoClient;
-      exchange: ExchangeClient | MultiSignClient;
-    },
+    exchClient: ExchangeClient | MultiSignClient,
   ) => Promise<void>;
   cliTestFn?: (
     t: Deno.TestContext,
     runCommand: (args: string[]) => Promise<string>,
   ) => Promise<void>;
 }): void {
-  const { name, topup, codeTestFn, cliTestFn } = options;
+  const { name, codeTestFn, cliTestFn } = options;
+
+  if (!PRIVATE_KEY || !/^0x[a-fA-F0-9]{64}$/.test(PRIVATE_KEY)) {
+    throw new Error("Please provide a valid private key (0x-prefixed 64 hex characters) as an argument");
+  }
 
   Deno.test(name, async (t) => {
     await new Promise((r) => setTimeout(r, cliArgs.wait)); // delay to avoid rate limits
 
-    if (topup) {
-      if (topup.perp) {
-        await mainExchClient.usdSend({
-          destination: await getWalletAddress(exchClient.wallet),
-          amount: topup.perp,
+    for (const clientType of ["user", "multisig"] as const) {
+      const exchClient = await createTempExchangeClient(clientType);
+      await t.step(clientType, async (t) => await codeTestFn(t, exchClient))
+        .finally(async () => {
+          await cleanupTempExchangeClient(exchClient);
         });
-        await mainExchClient.usdSend({
-          destination: multiSignClient.multiSigUser,
-          amount: topup.perp,
-        });
-      }
-      if (topup.spot) {
-        await mainExchClient.spotSend({
-          destination: await getWalletAddress(exchClient.wallet),
-          token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
-          amount: topup.spot,
-        });
-        await mainExchClient.spotSend({
-          destination: multiSignClient.multiSigUser,
-          token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
-          amount: topup.spot,
-        });
-      }
-      if (topup.evm) {
-        await mainExchClient.spotSend({
-          destination: await getWalletAddress(exchClient.wallet),
-          token: "HYPE:0x7317beb7cceed72ef0b346074cc8e7ab",
-          amount: topup.evm,
-        });
-        await mainExchClient.spotSend({
-          destination: multiSignClient.multiSigUser,
-          token: "HYPE:0x7317beb7cceed72ef0b346074cc8e7ab",
-          amount: topup.evm,
-        });
-      }
-      if (topup.staking) {
-        await mainExchClient.spotSend({
-          destination: await getWalletAddress(exchClient.wallet),
-          token: "HYPE:0x7317beb7cceed72ef0b346074cc8e7ab",
-          amount: topup.staking,
-        });
-        await exchClient.cDeposit({ wei: Math.trunc(parseFloat(topup.staking) * 1e8) });
-
-        await mainExchClient.spotSend({
-          destination: multiSignClient.multiSigUser,
-          token: "HYPE:0x7317beb7cceed72ef0b346074cc8e7ab",
-          amount: topup.staking,
-        });
-        await multiSignClient.cDeposit({ wei: Math.trunc(parseFloat(topup.staking) * 1e8) });
-      }
-    }
-
-    try {
-      for (const exchangeClient of [exchClient, multiSignClient] as const) {
-        await t.step(
-          exchangeClient instanceof MultiSignClient ? "MultiSignClient" : "ExchangeClient",
-          async (t) => await codeTestFn(t, { info: infoClient, exchange: exchangeClient }),
-        );
-      }
-    } finally {
-      await Promise.all([
-        infoClient.clearinghouseState({ user: await getWalletAddress(exchClient.wallet) })
-          .then(async (state) => {
-            await exchClient.usdSend({
-              destination: await getWalletAddress(mainExchClient.wallet),
-              amount: state.withdrawable,
-            }).catch(() => undefined);
-          }),
-        infoClient.clearinghouseState({ user: multiSignClient.multiSigUser })
-          .then(async (state) => {
-            await multiSignClient.usdSend({
-              destination: await getWalletAddress(mainExchClient.wallet),
-              amount: state.withdrawable,
-            }).catch(() => undefined);
-          }),
-      ]);
     }
 
     await t.step({
-      name: "CLI",
+      name: "cli",
       fn: async (t) => {
         await cliTestFn!(t, async (args: string[]) => {
           const command = new Deno.Command("deno", {
             args: ["run", "-A", "bin/cli.ts", "--offline", "--private-key", PRIVATE_KEY, ...args],
-            stdout: "piped",
-            stderr: "piped",
           });
           const { stdout, stderr } = await command.output();
+
           const error = new TextDecoder().decode(stderr);
-          if (error !== "") {
-            throw new Error(`Command failed with error: ${error}`);
-          }
+          if (error !== "") throw new Error(`Command failed with error: ${error}`);
+
           const output = new TextDecoder().decode(stdout);
-          if (output.startsWith("Hyperliquid CLI")) {
-            throw new Error(`Invalid command argument(s)`);
-          }
-          return output;
+          if (output.startsWith("Hyperliquid CLI")) throw new Error(`Invalid command argument(s)`);
+
+          return JSON.parse(output);
         });
       },
       ignore: cliTestFn === undefined,
@@ -172,19 +73,93 @@ export function runTest(options: {
   });
 }
 
-// —————————— Utils ——————————
+// —————————— Helper functions ——————————
 
-export function randomCloid(): `0x${string}` {
-  return `0x${Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
+export async function createTempExchangeClient(type: "user" | "multisig"): Promise<ExchangeClient | MultiSignClient> {
+  // Create temporary account
+  const tempExchClient = new ExchangeClient({ wallet: generatePrivateKey(), transport });
+  const tempAddress = await getWalletAddress(tempExchClient.wallet);
+
+  // Activate account
+  await mainExchClient.usdSend({ destination: tempAddress, amount: "2" });
+
+  if (type === "user") {
+    // Return as ExchangeClient
+    return tempExchClient;
+  } else {
+    // Convert to MultiSigUser
+    const mainAddress = await getWalletAddress(mainExchClient.wallet);
+    await tempExchClient.convertToMultiSigUser({
+      signers: {
+        authorizedUsers: [mainAddress],
+        threshold: 1,
+      },
+    });
+
+    // Return as MultiSignClient
+    return new MultiSignClient({
+      multiSigUser: tempAddress,
+      signers: [mainExchClient.wallet],
+      transport,
+    });
+  }
 }
 
-export async function getAssetData(assetName: string) {
-  const data = await infoClient.metaAndAssetCtxs();
-  const id = data[0].universe.findIndex((u) => u.name === assetName);
-  if (id === -1) throw new Error(`Asset "${assetName}" not found`);
-  const universe = data[0].universe[id];
-  const ctx = data[1][id];
-  return { id, universe, ctx };
+export async function cleanupTempExchangeClient(client: ExchangeClient | MultiSignClient): Promise<void> {
+  const mainUser = await getWalletAddress(mainExchClient.wallet);
+  const tempUser = client instanceof MultiSignClient ? client.multiSigUser : await getWalletAddress(client.wallet);
+
+  const webData2 = await infoClient.webData2({ user: tempUser });
+
+  // Cancel all open orders
+  const cancels = webData2.openOrders.map((o) => ({ a: symbolConverter.getAssetId(o.coin)!, o: o.oid }));
+  if (cancels.length > 0) {
+    await client.cancel({ cancels }).catch(() => undefined);
+  }
+
+  // Cancel all running TWAPs
+  for (const [twapId, state] of webData2.twapStates) {
+    const id = symbolConverter.getAssetId(state.coin)!;
+    await client.twapCancel({ a: id, t: twapId }).catch(() => undefined);
+  }
+
+  // Close all positions
+  await Promise.all(webData2.clearinghouseState.assetPositions.map(async (pos) => {
+    const id = symbolConverter.getAssetId(pos.position.coin)!;
+    const szDecimals = symbolConverter.getSzDecimals(pos.position.coin)!;
+    const px = new BigNumber(pos.position.entryPx)
+      .times(pos.position.positionValue.startsWith("-") ? 1.05 : 0.95)
+      .toString();
+    await client.order({
+      orders: [{
+        a: id,
+        b: false,
+        p: formatPrice(px, szDecimals),
+        s: "0", // full position size
+        r: true,
+        t: { limit: { tif: "Gtc" } },
+      }],
+      grouping: "na",
+    }).catch(() => undefined);
+  }));
+
+  // Withdraw all funds back to main account
+  await infoClient.clearinghouseState({ user: tempUser })
+    .then(async (state) => {
+      await client.usdSend({ destination: mainUser, amount: state.withdrawable })
+        .catch(() => undefined);
+    });
+  await infoClient.spotClearinghouseState({ user: tempUser })
+    .then(async (state) => {
+      const usdcBalance = parseFloat(state.balances.find((b) => b.coin === "USDC")?.total ?? "0");
+      if (usdcBalance > 0) {
+        await client.spotSend({
+          destination: mainUser,
+          token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
+          amount: usdcBalance,
+        }).catch(() => undefined);
+      }
+    });
 }
 
 export function formatPrice(
@@ -212,14 +187,141 @@ export function formatSize(
   return new BigNumber(size).toFixed(szDecimals, roundingMode);
 }
 
-export function anyFnSuccess<T>(functions: (() => T)[]): T {
-  const errors: Error[] = [];
-  for (const fn of functions) {
-    try {
-      return fn();
-    } catch (error) {
-      errors.push(error instanceof Error ? error : new Error(String(error)));
-    }
+export function randomCloid(): `0x${string}` {
+  return `0x${Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
+}
+
+export function randomAddress(): `0x${string}` {
+  return `0x${Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
+}
+
+export async function openOrder(
+  client: ExchangeClient,
+  type: "market" | "limit",
+  symbol: string = "ETH",
+  side: "buy" | "sell" = "buy",
+  slippage: number = 0.05, // 5%
+): Promise<{
+  a: number;
+  b: boolean;
+  p: string;
+  s: string;
+  oid: number;
+  cloid: `0x${string}`;
+  pxUp: string;
+  pxDown: string;
+  midPx: string;
+}> {
+  // Top-up account
+  await topUpPerp(client, "13");
+
+  // Get market data
+  const id = symbolConverter.getAssetId(symbol)!;
+  const szDecimals = symbolConverter.getSzDecimals(symbol)!;
+  const midPx = allMids[symbol];
+
+  // Calculate order parameters
+  const pxDown = formatPrice(new BigNumber(midPx).times(1 - slippage), szDecimals);
+  const pxUp = formatPrice(new BigNumber(midPx).times(1 + slippage), szDecimals);
+  const sz = formatSize(new BigNumber(11).div(midPx), szDecimals);
+
+  let executionPx: string;
+  if (type === "market") {
+    executionPx = side === "buy" ? pxUp : pxDown;
+  } else {
+    executionPx = side === "buy" ? pxDown : pxUp;
   }
-  throw new AggregateError(errors, "All functions failed");
+
+  // Place order
+  const result = await client.order({
+    orders: [{
+      a: id,
+      b: side === "buy",
+      p: executionPx,
+      s: sz,
+      r: false,
+      t: { limit: { tif: "Gtc" } },
+      c: randomCloid(),
+    }],
+    grouping: "na",
+  });
+
+  // Extract order info
+  const [order] = result.response.data.statuses;
+  return {
+    a: id,
+    b: side === "buy",
+    p: executionPx,
+    s: sz,
+    oid: "resting" in order ? order.resting.oid : order.filled.oid,
+    cloid: "resting" in order ? order.resting.cloid! : order.filled.cloid!,
+    pxUp,
+    pxDown,
+    midPx,
+  };
+}
+
+export async function createTWAP(
+  client: ExchangeClient,
+  symbol: string = "ETH",
+  side: "buy" | "sell" = "buy",
+): Promise<{
+  a: number;
+  b: boolean;
+  s: string;
+  twapId: number;
+  midPx: string;
+}> {
+  // Top-up account
+  await topUpPerp(client, "60");
+
+  // Get market data
+  const id = symbolConverter.getAssetId(symbol)!;
+  const szDecimals = symbolConverter.getSzDecimals(symbol)!;
+  const midPx = allMids[symbol];
+
+  // Calculate order parameters
+  const sz = formatSize(new BigNumber(55).div(midPx), szDecimals);
+
+  // Place TWAP order
+  const result = await client.twapOrder({
+    twap: {
+      a: id,
+      b: side === "buy",
+      s: sz,
+      r: false,
+      m: 5,
+      t: false,
+    },
+  });
+
+  // Extract TWAP info
+  const twapId = result.response.data.status.running.twapId;
+
+  return {
+    a: id,
+    b: side === "buy",
+    s: sz,
+    twapId,
+    midPx,
+  };
+}
+
+export async function topUpPerp(client: ExchangeClient, amount: string) {
+  const tempUser = client instanceof MultiSignClient ? client.multiSigUser : await getWalletAddress(client.wallet);
+  await mainExchClient.usdSend({ destination: tempUser, amount });
+}
+
+export async function topUpSpot(client: ExchangeClient, token: "USDC" | "HYPE", amount: string) {
+  const tokenAddresses = {
+    USDC: "0xeb62eee3685fc4c43992febcd9e75443",
+    HYPE: "0x7317beb7cceed72ef0b346074cc8e7ab",
+  } as const;
+
+  const tempUser = client instanceof MultiSignClient ? client.multiSigUser : await getWalletAddress(client.wallet);
+  await mainExchClient.spotSend({
+    destination: tempUser,
+    token: `${token}:${tokenAddresses[token]}`,
+    amount,
+  });
 }

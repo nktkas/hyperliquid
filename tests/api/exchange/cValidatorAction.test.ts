@@ -6,11 +6,11 @@ import { runTest } from "./_t.ts";
 
 runTest({
   name: "cValidatorAction",
-  codeTestFn: async (t, clients) => {
+  codeTestFn: async (t, exchClient) => {
     await t.step("changeProfile", async () => {
       await assertRejects(
         async () => {
-          await clients.exchange.cValidatorAction({
+          await exchClient.cValidatorAction({
             changeProfile: {
               node_ip: { Ip: "1.2.3.4" },
               name: "...",
@@ -30,7 +30,7 @@ runTest({
     await t.step("register", async () => {
       await assertRejects(
         async () => {
-          await clients.exchange.cValidatorAction({
+          await exchClient.cValidatorAction({
             register: {
               profile: {
                 node_ip: { Ip: "1.2.3.4" },
@@ -53,7 +53,7 @@ runTest({
     await t.step("unregister", async () => {
       await assertRejects(
         async () => {
-          await clients.exchange.cValidatorAction({ unregister: null });
+          await exchClient.cValidatorAction({ unregister: null });
         },
         ApiRequestError,
         "Action disabled on this chain",
@@ -78,6 +78,6 @@ runTest({
         initial_wei: 1,
       }),
     ]);
-    parser(CValidatorActionRequest)(JSON.parse(data));
+    parser(CValidatorActionRequest)(data);
   },
 });

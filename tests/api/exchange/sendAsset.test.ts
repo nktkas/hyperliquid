@@ -4,9 +4,9 @@ import { runTest } from "./_t.ts";
 
 runTest({
   name: "sendAsset",
-  codeTestFn: async (_t, clients) => {
+  codeTestFn: async (_t, exchClient) => {
     const data = await Promise.all([
-      clients.exchange.sendAsset({
+      exchClient.sendAsset({
         destination: "0x0000000000000000000000000000000000000001",
         sourceDex: "",
         destinationDex: "test",
@@ -32,6 +32,6 @@ runTest({
       "--amount",
       "1",
     ]);
-    parser(SendAssetRequest)(JSON.parse(data));
+    parser(SendAssetRequest)(data);
   },
 });

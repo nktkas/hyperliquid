@@ -1,13 +1,19 @@
 import { parser, SuccessResponse, TokenDelegateRequest } from "@nktkas/hyperliquid/api/exchange";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { runTest } from "./_t.ts";
+import { runTest, topUpSpot } from "./_t.ts";
 
 runTest({
   name: "tokenDelegate",
-  topup: { staking: "0.00000001" },
-  codeTestFn: async (_t, clients) => {
+  codeTestFn: async (_t, exchClient) => {
+    // —————————— Prepare ——————————
+
+    await topUpSpot(exchClient, "HYPE", "0.00000001");
+    await exchClient.cDeposit({ wei: 1 });
+
+    // —————————— Test ——————————
+
     const data = await Promise.all([
-      clients.exchange.tokenDelegate({
+      exchClient.tokenDelegate({
         validator: "0xa012b9040d83c5cbad9e6ea73c525027b755f596",
         wei: 1,
         isUndelegate: false,
@@ -26,6 +32,6 @@ runTest({
       "--isUndelegate",
       "false",
     ]);
-    parser(TokenDelegateRequest)(JSON.parse(data));
+    parser(TokenDelegateRequest)(data);
   },
 });

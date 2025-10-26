@@ -1,95 +1,77 @@
-// deno-lint-ignore-file no-import-prefix
 import { OrderRequest, OrderSuccessResponse, parser } from "@nktkas/hyperliquid/api/exchange";
-import { BigNumber } from "npm:bignumber.js@9";
-import { getWalletAddress } from "@nktkas/hyperliquid/signing";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { formatPrice, formatSize, getAssetData, randomCloid, runTest } from "./_t.ts";
+import { allMids, formatPrice, formatSize, randomCloid, runTest, symbolConverter, topUpPerp } from "./_t.ts";
 
 runTest({
   name: "order",
-  topup: { perp: "15" },
-  codeTestFn: async (_t, clients) => {
+  codeTestFn: async (_t, exchClient) => {
     // —————————— Prepare ——————————
 
-    const { id, universe, ctx } = await getAssetData("BTC");
-    const pxUp = formatPrice(new BigNumber(ctx.markPx).times(1.01), universe.szDecimals);
-    const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
-    const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);
+    await topUpPerp(exchClient, "20");
+
+    const id = symbolConverter.getAssetId("ETH")!;
+    const szDecimals = symbolConverter.getSzDecimals("ETH")!;
+    const midPx = allMids["ETH"];
+
+    const pxUp = formatPrice(parseFloat(midPx) * 1.01, szDecimals);
+    const pxDown = formatPrice(parseFloat(midPx) * 0.99, szDecimals);
+    const sz = formatSize(15 / parseFloat(midPx), szDecimals);
 
     // —————————— Test ——————————
 
-    try {
-      const data = await Promise.all([
-        // resting
-        clients.exchange.order({
-          orders: [{
-            a: id,
-            b: true,
-            p: pxDown,
-            s: sz,
-            r: false,
-            t: { limit: { tif: "Gtc" } },
-          }],
-          grouping: "na",
-        }),
-        // resting | cloid
-        clients.exchange.order({
-          orders: [{
-            a: id,
-            b: true,
-            p: pxDown,
-            s: sz,
-            r: false,
-            t: { limit: { tif: "Gtc" } },
-            c: randomCloid(),
-          }],
-          grouping: "na",
-        }),
-        // filled
-        clients.exchange.order({
-          orders: [{
-            a: id,
-            b: true,
-            p: pxUp,
-            s: sz,
-            r: false,
-            t: { limit: { tif: "Gtc" } },
-          }],
-          grouping: "na",
-        }),
-        // filled | cloid
-        clients.exchange.order({
-          orders: [{
-            a: id,
-            b: true,
-            p: pxUp,
-            s: sz,
-            r: false,
-            t: { limit: { tif: "Gtc" } },
-            c: randomCloid(),
-          }],
-          grouping: "na",
-        }),
-      ]);
-      schemaCoverage(OrderSuccessResponse, data);
-    } finally {
-      // —————————— Cleanup ——————————
-
-      const openOrders = await clients.info.openOrders({ user: await getWalletAddress(clients.exchange.wallet) });
-      const cancels = openOrders.map((o) => ({ a: id, o: o.oid }));
-      await clients.exchange.cancel({ cancels });
-      await clients.exchange.order({
+    const data = await Promise.all([
+      // resting
+      exchClient.order({
         orders: [{
           a: id,
-          b: false,
+          b: true,
           p: pxDown,
-          s: "0", // full position size
-          r: true,
+          s: sz,
+          r: false,
           t: { limit: { tif: "Gtc" } },
         }],
         grouping: "na",
-      });
-    }
+      }),
+      // resting | cloid
+      exchClient.order({
+        orders: [{
+          a: id,
+          b: true,
+          p: pxDown,
+          s: sz,
+          r: false,
+          t: { limit: { tif: "Gtc" } },
+          c: randomCloid(),
+        }],
+        grouping: "na",
+      }),
+      // filled
+      exchClient.order({
+        orders: [{
+          a: id,
+          b: true,
+          p: pxUp,
+          s: sz,
+          r: false,
+          t: { limit: { tif: "Gtc" } },
+        }],
+        grouping: "na",
+      }),
+      // filled | cloid
+      exchClient.order({
+        orders: [{
+          a: id,
+          b: true,
+          p: pxUp,
+          s: sz,
+          r: false,
+          t: { limit: { tif: "Gtc" } },
+          c: randomCloid(),
+        }],
+        grouping: "na",
+      }),
+    ]);
+    schemaCoverage(OrderSuccessResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([
@@ -105,6 +87,6 @@ runTest({
         t: { limit: { tif: "Gtc" } },
       }]),
     ]);
-    parser(OrderRequest)(JSON.parse(data));
+    parser(OrderRequest)(data);
   },
 });

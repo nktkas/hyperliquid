@@ -1,22 +1,22 @@
-// deno-lint-ignore-file no-import-prefix
 import { parser, TwapOrderRequest, TwapOrderSuccessResponse } from "@nktkas/hyperliquid/api/exchange";
-import { BigNumber } from "npm:bignumber.js@9";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { formatSize, getAssetData, runTest } from "./_t.ts";
+import { allMids, formatSize, runTest, symbolConverter } from "./_t.ts";
 
 runTest({
   name: "twapOrder",
-  topup: { perp: "60" },
-  codeTestFn: async (_t, clients) => {
+  codeTestFn: async (_t, exchClient) => {
     // —————————— Prepare ——————————
 
-    const { id, universe, ctx } = await getAssetData("BTC");
-    const sz = formatSize(new BigNumber(55).div(ctx.markPx), universe.szDecimals);
+    const id = symbolConverter.getAssetId("ETH")!;
+    const szDecimals = symbolConverter.getSzDecimals("ETH")!;
+    const midPx = allMids["ETH"];
+
+    const sz = formatSize(60 / parseFloat(midPx), szDecimals);
 
     // —————————— Test ——————————
 
     const data = await Promise.all([
-      clients.exchange.twapOrder({
+      exchClient.twapOrder({
         twap: {
           a: id,
           b: true,
@@ -28,10 +28,6 @@ runTest({
       }),
     ]);
     schemaCoverage(TwapOrderSuccessResponse, data);
-
-    // —————————— Cleanup ——————————
-
-    await clients.exchange.twapCancel({ a: id, t: data[0].response.data.status.running.twapId });
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([
@@ -50,6 +46,6 @@ runTest({
       "--t",
       "false",
     ]);
-    parser(TwapOrderRequest)(JSON.parse(data));
+    parser(TwapOrderRequest)(data);
   },
 });

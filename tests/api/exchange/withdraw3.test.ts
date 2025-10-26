@@ -1,13 +1,18 @@
 import { parser, SuccessResponse, Withdraw3Request } from "@nktkas/hyperliquid/api/exchange";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { runTest } from "./_t.ts";
+import { runTest, topUpPerp } from "./_t.ts";
 
 runTest({
   name: "withdraw3",
-  topup: { perp: "2" },
-  codeTestFn: async (_t, clients) => {
+  codeTestFn: async (_t, exchClient) => {
+    // —————————— Prepare ——————————
+
+    await topUpPerp(exchClient, "2");
+
+    // —————————— Test ——————————
+
     const data = await Promise.all([
-      clients.exchange.withdraw3({
+      exchClient.withdraw3({
         amount: "2",
         destination: "0x0000000000000000000000000000000000000001",
       }),
@@ -23,6 +28,6 @@ runTest({
       "--destination",
       "0x0000000000000000000000000000000000000001",
     ]);
-    parser(Withdraw3Request)(JSON.parse(data));
+    parser(Withdraw3Request)(data);
   },
 });

@@ -4,14 +4,14 @@ import { runTest } from "./_t.ts";
 
 runTest({
   name: "agentEnableDexAbstraction",
-  codeTestFn: async (_t, clients) => {
+  codeTestFn: async (_t, exchClient) => {
     const data = await Promise.all([
-      clients.exchange.agentEnableDexAbstraction(),
+      exchClient.agentEnableDexAbstraction(),
     ]);
     schemaCoverage(SuccessResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["exchange", "agentEnableDexAbstraction"]);
-    parser(AgentEnableDexAbstractionRequest)(JSON.parse(data));
+    parser(AgentEnableDexAbstractionRequest)(data);
   },
 });

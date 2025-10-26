@@ -1,65 +1,30 @@
-// deno-lint-ignore-file no-import-prefix
 import { ModifyRequest, parser, SuccessResponse } from "@nktkas/hyperliquid/api/exchange";
-import { BigNumber } from "npm:bignumber.js@9";
-import { getWalletAddress } from "@nktkas/hyperliquid/signing";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { formatPrice, formatSize, getAssetData, randomCloid, runTest } from "./_t.ts";
+import { openOrder, runTest } from "./_t.ts";
 
 runTest({
   name: "modify",
-  topup: { perp: "15" },
-  codeTestFn: async (_t, clients) => {
+  codeTestFn: async (_t, exchClient) => {
     // —————————— Prepare ——————————
 
-    async function openOrder(id: number, pxDown: string, sz: string) {
-      const cloid = randomCloid();
-      const orderResp = await clients.exchange.order({
-        orders: [{
-          a: id,
-          b: true,
-          p: pxDown,
-          s: sz,
-          r: false,
-          t: { limit: { tif: "Gtc" } },
-          c: cloid,
-        }],
-        grouping: "na",
-      });
-      const [order] = orderResp.response.data.statuses;
-      return {
-        oid: "resting" in order ? order.resting.oid : order.filled.oid,
-        cloid: "resting" in order ? order.resting.cloid! : order.filled.cloid!,
-      };
-    }
-
-    const { id, universe, ctx } = await getAssetData("BTC");
-    const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
-    const sz = formatSize(new BigNumber(15).div(ctx.markPx), universe.szDecimals);
+    const order = await openOrder(exchClient, "limit");
 
     // —————————— Test ——————————
 
-    try {
-      const data = await Promise.all([
-        clients.exchange.modify({
-          oid: (await openOrder(id, pxDown, sz)).oid,
-          order: {
-            a: id,
-            b: true,
-            p: pxDown,
-            s: sz,
-            r: false,
-            t: { limit: { tif: "Gtc" } },
-          },
-        }),
-      ]);
-      schemaCoverage(SuccessResponse, data);
-    } finally {
-      // —————————— Cleanup ——————————
-
-      const openOrders = await clients.info.openOrders({ user: await getWalletAddress(clients.exchange.wallet) });
-      const cancels = openOrders.map((o) => ({ a: id, o: o.oid }));
-      await clients.exchange.cancel({ cancels });
-    }
+    const data = await Promise.all([
+      exchClient.modify({
+        oid: order.oid,
+        order: {
+          a: order.a,
+          b: order.b,
+          p: order.p,
+          s: order.s,
+          r: false,
+          t: { limit: { tif: "Gtc" } },
+        },
+      }),
+    ]);
+    schemaCoverage(SuccessResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([
@@ -77,6 +42,6 @@ runTest({
         t: { limit: { tif: "Gtc" } },
       }),
     ]);
-    parser(ModifyRequest)(JSON.parse(data));
+    parser(ModifyRequest)(data);
   },
 });

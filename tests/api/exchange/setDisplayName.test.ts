@@ -4,14 +4,14 @@ import { runTest } from "./_t.ts";
 
 runTest({
   name: "setDisplayName",
-  codeTestFn: async (_t, clients) => {
+  codeTestFn: async (_t, exchClient) => {
     const data = await Promise.all([
-      clients.exchange.setDisplayName({ displayName: "" }),
+      exchClient.setDisplayName({ displayName: "" }),
     ]);
     schemaCoverage(SuccessResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["exchange", "setDisplayName", "--displayName", "test"]);
-    parser(SetDisplayNameRequest)(JSON.parse(data));
+    parser(SetDisplayNameRequest)(data);
   },
 });

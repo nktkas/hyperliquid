@@ -1,16 +1,14 @@
-// deno-lint-ignore-file no-import-prefix
 import { ApproveAgentRequest, parser, SuccessResponse } from "@nktkas/hyperliquid/api/exchange";
-import { generatePrivateKey, privateKeyToAddress } from "npm:viem@2/accounts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { runTest } from "./_t.ts";
+import { randomAddress, runTest } from "./_t.ts";
 
 runTest({
   name: "approveAgent",
-  codeTestFn: async (t, clients) => {
+  codeTestFn: async (t, exchClient) => {
     await t.step("with 'agentName'", async () => {
       const data = await Promise.all([
-        clients.exchange.approveAgent({
-          agentAddress: privateKeyToAddress(generatePrivateKey()),
+        exchClient.approveAgent({
+          agentAddress: randomAddress(),
           agentName: "agentName",
         }),
       ]);
@@ -21,8 +19,8 @@ runTest({
 
     await t.step("without 'agentName'", async () => {
       const data = await Promise.all([
-        clients.exchange.approveAgent({
-          agentAddress: privateKeyToAddress(generatePrivateKey()),
+        exchClient.approveAgent({
+          agentAddress: randomAddress(),
           agentName: null,
         }),
       ]);
@@ -36,6 +34,6 @@ runTest({
       "--agentAddress",
       "0x0000000000000000000000000000000000000000",
     ]);
-    parser(ApproveAgentRequest)(JSON.parse(data));
+    parser(ApproveAgentRequest)(data);
   },
 });

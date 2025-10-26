@@ -1,124 +1,103 @@
-// deno-lint-ignore-file no-import-prefix
 import { BatchModifyRequest, OrderSuccessResponse, parser } from "@nktkas/hyperliquid/api/exchange";
-import { BigNumber } from "npm:bignumber.js@9";
-import { getWalletAddress } from "@nktkas/hyperliquid/signing";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { formatPrice, formatSize, getAssetData, randomCloid, runTest } from "./_t.ts";
+import { openOrder, runTest } from "./_t.ts";
 
 runTest({
   name: "batchModify",
-  topup: { perp: "15" },
-  codeTestFn: async (_t, clients) => {
-    // —————————— Prepare ——————————
+  codeTestFn: async (_t, exchClient) => {
+    const data = await Promise.all([
+      // resting
+      (async () => {
+        // —————————— Prepare ——————————
 
-    async function openOrder(id: number, pxDown: string, sz: string) {
-      const cloid = randomCloid();
-      const orderResp = await clients.exchange.order({
-        orders: [{
-          a: id,
-          b: true,
-          p: pxDown,
-          s: sz,
-          r: false,
-          t: { limit: { tif: "Gtc" } },
-          c: cloid,
-        }],
-        grouping: "na",
-      });
-      const [order] = orderResp.response.data.statuses;
-      return {
-        oid: "resting" in order ? order.resting.oid : order.filled.oid,
-        cloid: "resting" in order ? order.resting.cloid! : order.filled.cloid!,
-      };
-    }
+        const order = await openOrder(exchClient, "limit");
 
-    const { id, universe, ctx } = await getAssetData("BTC");
-    const pxUp = formatPrice(new BigNumber(ctx.markPx).times(1.01), universe.szDecimals);
-    const pxDown = formatPrice(new BigNumber(ctx.markPx).times(0.99), universe.szDecimals);
-    const sz = formatSize(new BigNumber("13").div(ctx.markPx), universe.szDecimals);
+        // —————————— Test ——————————
 
-    // —————————— Test ——————————
-
-    try {
-      const data = await Promise.all([
-        // resting
-        clients.exchange.batchModify({
+        return await exchClient.batchModify({
           modifies: [{
-            oid: (await openOrder(id, pxDown, sz)).oid,
+            oid: order.oid,
             order: {
-              a: id,
-              b: true,
-              p: pxDown,
-              s: sz,
+              a: order.a,
+              b: order.b,
+              p: order.p,
+              s: order.s,
               r: false,
               t: { limit: { tif: "Gtc" } },
             },
           }],
-        }),
-        // resting | cloid
-        clients.exchange.batchModify({
-          modifies: [{
-            oid: (await openOrder(id, pxDown, sz)).cloid,
-            order: {
-              a: id,
-              b: true,
-              p: pxDown,
-              s: sz,
-              r: false,
-              t: { limit: { tif: "Gtc" } },
-              c: randomCloid(),
-            },
-          }],
-        }),
-        // filled
-        clients.exchange.batchModify({
-          modifies: [{
-            oid: (await openOrder(id, pxDown, sz)).cloid,
-            order: {
-              a: id,
-              b: true,
-              p: pxUp,
-              s: sz,
-              r: false,
-              t: { limit: { tif: "Gtc" } },
-            },
-          }],
-        }),
-        // filled | cloid
-        clients.exchange.batchModify({
-          modifies: [{
-            oid: (await openOrder(id, pxDown, sz)).oid,
-            order: {
-              a: id,
-              b: true,
-              p: pxUp,
-              s: sz,
-              r: false,
-              t: { limit: { tif: "Gtc" } },
-              c: randomCloid(),
-            },
-          }],
-        }),
-      ]);
-      schemaCoverage(OrderSuccessResponse, data);
-    } finally {
-      // —————————— Cleanup ——————————
+        });
+      })(),
+      // resting | cloid
+      (async () => {
+        // —————————— Prepare ——————————
 
-      const openOrders = await clients.info.openOrders({ user: await getWalletAddress(clients.exchange.wallet) });
-      const cancels = openOrders.map((o) => ({ a: id, o: o.oid }));
-      await clients.exchange.cancel({ cancels });
-      await clients.exchange.order({
-        orders: [{
-          a: id,
-          b: false,
-          p: pxDown,
-          s: "0", // full position size
-          r: true,
-          t: { limit: { tif: "Gtc" } },
-        }],
-        grouping: "na",
-      });
-    }
+        const order = await openOrder(exchClient, "limit");
+
+        // —————————— Test ——————————
+
+        return await exchClient.batchModify({
+          modifies: [{
+            oid: order.cloid,
+            order: {
+              a: order.a,
+              b: order.b,
+              p: order.p,
+              s: order.s,
+              r: false,
+              t: { limit: { tif: "Gtc" } },
+              c: order.cloid,
+            },
+          }],
+        });
+      })(),
+      // filled
+      (async () => {
+        // —————————— Prepare ——————————
+
+        const order = await openOrder(exchClient, "limit");
+
+        // —————————— Test ——————————
+
+        return await exchClient.batchModify({
+          modifies: [{
+            oid: order.oid,
+            order: {
+              a: order.a,
+              b: order.b,
+              p: order.b ? order.pxUp : order.pxDown,
+              s: order.s,
+              r: false,
+              t: { limit: { tif: "Gtc" } },
+            },
+          }],
+        });
+      })(),
+      // filled | cloid
+      (async () => {
+        // —————————— Prepare ——————————
+
+        const order = await openOrder(exchClient, "limit");
+
+        // —————————— Test ——————————
+
+        return await exchClient.batchModify({
+          modifies: [{
+            oid: order.cloid,
+            order: {
+              a: order.a,
+              b: order.b,
+              p: order.b ? order.pxUp : order.pxDown,
+              s: order.s,
+              r: false,
+              t: { limit: { tif: "Gtc" } },
+              c: order.cloid,
+            },
+          }],
+        });
+      })(),
+    ]);
+    schemaCoverage(OrderSuccessResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([
@@ -130,6 +109,6 @@ runTest({
         { oid: 12346, order: { a: 1, b: false, p: "2", s: "2", r: true, t: { limit: { tif: "Alo" } } } },
       ]),
     ]);
-    parser(BatchModifyRequest)(JSON.parse(data));
+    parser(BatchModifyRequest)(data);
   },
 });

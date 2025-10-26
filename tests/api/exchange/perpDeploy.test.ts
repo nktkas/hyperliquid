@@ -6,11 +6,11 @@ import { runTest } from "./_t.ts";
 
 runTest({
   name: "perpDeploy",
-  codeTestFn: async (t, clients) => {
+  codeTestFn: async (t, exchClient) => {
     await t.step("registerAsset", async () => {
       await assertRejects(
         async () => {
-          await clients.exchange.perpDeploy({
+          await exchClient.perpDeploy({
             registerAsset: {
               maxGas: 1000000000000,
               assetRequest: {
@@ -33,7 +33,7 @@ runTest({
     await t.step("setOracle", async () => {
       await assertRejects(
         async () => {
-          await clients.exchange.perpDeploy({
+          await exchClient.perpDeploy({
             setOracle: {
               dex: "test",
               oraclePxs: [["TEST0", "12.0"], ["TEST1", "1"]],
@@ -65,6 +65,6 @@ runTest({
         schema: null,
       }),
     ]);
-    parser(PerpDeployRequest)(JSON.parse(data));
+    parser(PerpDeployRequest)(data);
   },
 });

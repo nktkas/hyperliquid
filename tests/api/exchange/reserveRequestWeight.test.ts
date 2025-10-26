@@ -4,14 +4,14 @@ import { runTest } from "./_t.ts";
 
 runTest({
   name: "reserveRequestWeight",
-  codeTestFn: async (_t, clients) => {
+  codeTestFn: async (_t, exchClient) => {
     const data = await Promise.all([
-      clients.exchange.reserveRequestWeight({ weight: 1 }),
+      exchClient.reserveRequestWeight({ weight: 1 }),
     ]);
     schemaCoverage(SuccessResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["exchange", "reserveRequestWeight", "--weight", "1"]);
-    parser(ReserveRequestWeightRequest)(JSON.parse(data));
+    parser(ReserveRequestWeightRequest)(data);
   },
 });
