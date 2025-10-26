@@ -13,8 +13,8 @@ runTest({
     const szDecimals = symbolConverter.getSzDecimals("ETH")!;
     const midPx = allMids["ETH"];
 
-    const pxUp = formatPrice(parseFloat(midPx) * 1.01, szDecimals);
-    const pxDown = formatPrice(parseFloat(midPx) * 0.99, szDecimals);
+    const pxUp = formatPrice(parseFloat(midPx) * 1.05, szDecimals);
+    const pxDown = formatPrice(parseFloat(midPx) * 0.95, szDecimals);
     const sz = formatSize(15 / parseFloat(midPx), szDecimals);
 
     // —————————— Test ——————————
