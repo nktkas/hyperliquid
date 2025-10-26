@@ -45,6 +45,7 @@ import { spotMeta } from "./spotMeta.ts";
 import { spotMetaAndAssetCtxs } from "./spotMetaAndAssetCtxs.ts";
 import { spotPairDeployAuctionStatus } from "./spotPairDeployAuctionStatus.ts";
 import { subAccounts } from "./subAccounts.ts";
+import { subAccounts2 } from "./subAccounts2.ts";
 import { tokenDetails } from "./tokenDetails.ts";
 import { twapHistory } from "./twapHistory.ts";
 import { txDetails } from "./txDetails.ts";
@@ -110,6 +111,7 @@ export type { SpotMetaResponse } from "./spotMeta.ts";
 export type { SpotMetaAndAssetCtxsResponse } from "./spotMetaAndAssetCtxs.ts";
 export type { SpotPairDeployAuctionStatusResponse } from "./spotPairDeployAuctionStatus.ts";
 export type { SubAccountsParameters, SubAccountsResponse } from "./subAccounts.ts";
+export type { SubAccounts2Parameters, SubAccounts2Response } from "./subAccounts2.ts";
 export type { TokenDetailsParameters, TokenDetailsResponse } from "./tokenDetails.ts";
 export type { TwapHistoryParameters, TwapHistoryResponse } from "./twapHistory.ts";
 export type { TxDetailsParameters, TxDetailsResponse } from "./txDetails.ts";
@@ -1165,6 +1167,29 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    */
   subAccounts(...args: OmitFirst<OverloadedParameters<typeof subAccounts>>) {
     return subAccounts(this, ...args);
+  }
+
+  /**
+   * Request user sub-accounts V2.
+   * @param params - Parameters specific to the API request.
+   * @param signal - An [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) can be used to cancel the request by calling [`abort()`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort) on the corresponding [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController).
+   * @returns Array of user sub-account or null if the user does not have any sub-accounts.
+   *
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @see null
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   *
+   * const client = new hl.InfoClient({ transport });
+   * const data = await client.subAccounts2({ user: "0x..." });
+   * ```
+   */
+  subAccounts2(...args: OmitFirst<OverloadedParameters<typeof subAccounts2>>) {
+    return subAccounts2(this, ...args);
   }
 
   /**

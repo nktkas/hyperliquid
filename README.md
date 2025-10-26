@@ -423,6 +423,7 @@ class InfoClient {
   referral(params: ReferralParameters): Promise<ReferralResponse>;
   spotClearinghouseState(params: SpotClearinghouseStateParameters): Promise<SpotClearinghouseStateResponse>;
   subAccounts(params: SubAccountsParameters): Promise<SubAccountsResponse>;
+  subAccounts2(params: SubAccounts2Parameters): Promise<SubAccounts2Response>;
   userDexAbstraction(params: UserDexAbstractionInfoParameters): Promise<UserDexAbstractionInfoResponse>;
   userFees(params: UserFeesParameters): Promise<UserFeesResponse>;
   userFunding(params: UserFundingParameters): Promise<UserFundingResponse>;

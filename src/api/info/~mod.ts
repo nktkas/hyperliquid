@@ -67,6 +67,7 @@ export * from "./spotMeta.ts";
 export * from "./spotMetaAndAssetCtxs.ts";
 export * from "./spotPairDeployAuctionStatus.ts";
 export * from "./subAccounts.ts";
+export * from "./subAccounts2.ts";
 export * from "./tokenDetails.ts";
 export * from "./twapHistory.ts";
 export * from "./txDetails.ts";

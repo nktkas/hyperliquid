@@ -136,6 +136,7 @@ User Account:
   referral                --user <address>
   spotClearinghouseState  --user <address> [--dex <string>]
   subAccounts             --user <address>
+  subAccounts2            --user <address>
   userDexAbstraction      --user <address>
   userFees                --user <address>
   userFunding             --user <address> --startTime <number> [--endTime <number>]
