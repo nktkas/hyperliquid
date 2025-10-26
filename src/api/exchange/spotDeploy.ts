@@ -235,6 +235,27 @@ export const SpotDeployRequest = /* @__PURE__ */ (() => {
             }),
             v.description("User genesis variant"),
           ),
+          v.pipe(
+            v.object({
+              /** Type of action. */
+              type: v.pipe(
+                v.literal("spotDeploy"),
+                v.description("Type of action."),
+              ),
+              /** Enable quote token parameters. */
+              enableQuoteToken: v.pipe(
+                v.object({
+                  /** The token ID to convert to a quote token. */
+                  token: v.pipe(
+                    UnsignedInteger,
+                    v.description("The token ID to convert to a quote token."),
+                  ),
+                }),
+                v.description("Enable quote token parameters."),
+              ),
+            }),
+            v.description("Convert token to quote token variant"),
+          ),
         ]),
         v.description("Action to perform."),
       ),

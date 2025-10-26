@@ -105,6 +105,20 @@ runTest({
         "Error deploying spot:",
       );
     });
+
+    await t.step("enableQuoteToken", async () => {
+      await assertRejects(
+        async () => {
+          await exchClient.spotDeploy({
+            enableQuoteToken: {
+              token: 0,
+            },
+          });
+        },
+        ApiRequestError,
+        "Error deploying spot:",
+      );
+    });
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

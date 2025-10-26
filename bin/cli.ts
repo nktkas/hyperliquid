@@ -251,7 +251,8 @@ Vault:
 Deploy Market:
   perpDeploy              --registerAsset <json> | --setOracle <json>
   spotDeploy              --genesis <json> | --registerHyperliquidity <json> | --registerSpot <json> |
-                          --registerToken2 <json> | --setDeployerTradingFeeShare <json> | --userGenesis <json>
+                          --registerToken2 <json> | --setDeployerTradingFeeShare <json> | --userGenesis <json> |
+                          --enableQuoteToken <json>
 
 Validator Actions:
   cSignerAction           --jailSelf null | --unjailSelf null
