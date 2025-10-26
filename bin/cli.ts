@@ -249,7 +249,9 @@ Vault:
   vaultTransfer           --vaultAddress <address> --isDeposit <bool> --usd <number>
 
 Deploy Market:
-  perpDeploy              --registerAsset <json> | --setOracle <json>
+  perpDeploy              --registerAsset <json> | --setOracle <json> | --setFundingMultipliers <json> |
+                          --haltTrading <json> | --setMarginTableIds <json> | --setFeeRecipient <json> |
+                          --setOpenInterestCaps <json>
   spotDeploy              --genesis <json> | --registerHyperliquidity <json> | --registerSpot <json> |
                           --registerToken2 <json> | --setDeployerTradingFeeShare <json> | --userGenesis <json> |
                           --enableQuoteToken <json>

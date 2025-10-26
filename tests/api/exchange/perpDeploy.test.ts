@@ -46,6 +46,72 @@ runTest({
         "Invalid oracle updater",
       );
     });
+
+    await t.step("setFundingMultipliers", async () => {
+      await assertRejects(
+        async () => {
+          await exchClient.perpDeploy({
+            setFundingMultipliers: [["TEST0", "1"]],
+          });
+        },
+        ApiRequestError,
+        "Unknown coin TEST0",
+      );
+    });
+
+    await t.step("haltTrading", async () => {
+      await assertRejects(
+        async () => {
+          await exchClient.perpDeploy({
+            haltTrading: {
+              coin: "TEST0",
+              isHalted: true,
+            },
+          });
+        },
+        ApiRequestError,
+        "Unknown coin TEST0",
+      );
+    });
+
+    await t.step("setMarginTableIds", async () => {
+      await assertRejects(
+        async () => {
+          await exchClient.perpDeploy({
+            setMarginTableIds: [["TEST0", 1]],
+          });
+        },
+        ApiRequestError,
+        "Unknown coin TEST0",
+      );
+    });
+
+    await t.step("setFeeRecipient", async () => {
+      await assertRejects(
+        async () => {
+          await exchClient.perpDeploy({
+            setFeeRecipient: {
+              dex: "test",
+              feeRecipient: "0x0000000000000000000000000000000000000000",
+            },
+          });
+        },
+        ApiRequestError,
+        "Invalid perp deployer",
+      );
+    });
+
+    await t.step("setOpenInterestCaps", async () => {
+      await assertRejects(
+        async () => {
+          await exchClient.perpDeploy({
+            setOpenInterestCaps: [["TEST0", 1]],
+          });
+        },
+        ApiRequestError,
+        "Unknown coin TEST0",
+      );
+    });
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

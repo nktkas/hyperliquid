@@ -144,6 +144,101 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
             }),
             v.description("Set oracle variant"),
           ),
+          v.pipe(
+            v.object({
+              /** Type of action. */
+              type: v.pipe(
+                v.literal("perpDeploy"),
+                v.description("Type of action."),
+              ),
+              /** A list (sorted by key) of asset and funding multiplier. */
+              setFundingMultipliers: v.pipe(
+                v.array(v.tuple([v.string(), UnsignedDecimal])),
+                v.description("A list (sorted by key) of asset and funding multiplier."),
+              ),
+            }),
+            v.description("Set funding multipliers variant"),
+          ),
+          v.pipe(
+            v.object({
+              /** Type of action. */
+              type: v.pipe(
+                v.literal("perpDeploy"),
+                v.description("Type of action."),
+              ),
+              /** Parameters for halting or resuming trading for an asset. */
+              haltTrading: v.pipe(
+                v.object({
+                  coin: v.pipe(
+                    v.string(),
+                    v.description("Coin symbol for the asset to halt or resume."),
+                  ),
+                  isHalted: v.pipe(
+                    v.boolean(),
+                    v.description("Whether trading should be halted (true) or resumed (false)."),
+                  ),
+                }),
+                v.description("Parameters for halting or resuming trading for an asset."),
+              ),
+            }),
+            v.description("Halt trading variant"),
+          ),
+          v.pipe(
+            v.object({
+              /** Type of action. */
+              type: v.pipe(
+                v.literal("perpDeploy"),
+                v.description("Type of action."),
+              ),
+              /** A list (sorted by key) of asset and margin table ids. */
+              setMarginTableIds: v.pipe(
+                v.array(v.tuple([v.string(), UnsignedInteger])),
+                v.description("A list (sorted by key) of asset and margin table ids."),
+              ),
+            }),
+            v.description("Set margin table ids variant"),
+          ),
+          v.pipe(
+            v.object({
+              /** Type of action. */
+              type: v.pipe(
+                v.literal("perpDeploy"),
+                v.description("Type of action."),
+              ),
+              /** Parameters for setting the fee recipient. */
+              setFeeRecipient: v.pipe(
+                v.object({
+                  /** Name of the DEX. */
+                  dex: v.pipe(
+                    v.string(),
+                    v.description("Name of the DEX."),
+                  ),
+                  /** Address of the fee recipient. */
+                  feeRecipient: v.pipe(
+                    Address,
+                    v.description("Address of the fee recipient."),
+                  ),
+                }),
+                v.description("Parameters for setting the fee recipient."),
+              ),
+            }),
+            v.description("Set fee recipient variant"),
+          ),
+          v.pipe(
+            v.object({
+              /** Type of action. */
+              type: v.pipe(
+                v.literal("perpDeploy"),
+                v.description("Type of action."),
+              ),
+              /** A list (sorted by key) of asset and open interest cap notionals. */
+              setOpenInterestCaps: v.pipe(
+                v.array(v.tuple([v.string(), UnsignedInteger])),
+                v.description("A list (sorted by key) of asset and open interest cap notionals."),
+              ),
+            }),
+            v.description("Set open interest caps variant"),
+          ),
         ]),
         v.description("Action to perform."),
       ),
