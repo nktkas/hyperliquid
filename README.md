@@ -594,6 +594,7 @@ class SubscriptionClient {
     listener: (data: WsUserNonFundingLedgerUpdatesEvent) => void,
   );
   webData2(params: WsWebData2Parameters, listener: (data: WsWebData2Event) => void);
+  webData3(params: WsWebData3Parameters, listener: (data: WsWebData3Event) => void);
 
   // Order
   openOrders(params: WsOpenOrdersParameters, listener: (data: WsOpenOrdersEvent) => void);

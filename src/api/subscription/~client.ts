@@ -25,6 +25,7 @@ import { userNonFundingLedgerUpdates } from "./userNonFundingLedgerUpdates.ts";
 import { userTwapHistory } from "./userTwapHistory.ts";
 import { userTwapSliceFills } from "./userTwapSliceFills.ts";
 import { webData2 } from "./webData2.ts";
+import { webData3 } from "./webData3.ts";
 
 export type {
   ActiveAssetCtxEvent as WsActiveAssetCtxEvent,
@@ -94,6 +95,7 @@ export type {
   UserTwapSliceFillsParameters as WsUserTwapSliceFillsParameters,
 } from "./userTwapSliceFills.ts";
 export type { WebData2Event as WsWebData2Event, WebData2Parameters as WsWebData2Parameters } from "./webData2.ts";
+export type { WebData3Event as WsWebData3Event, WebData3Parameters as WsWebData3Parameters } from "./webData3.ts";
 
 export type { SubscriptionRequestConfig } from "./_types.ts";
 
@@ -659,5 +661,28 @@ export class SubscriptionClient<
    */
   webData2(...args: OmitFirst<OverloadedParameters<typeof webData2>>) {
     return webData2(this, ...args);
+  }
+
+  /**
+   * Subscribe to comprehensive user and market data updates.
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+   *
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport();
+   *
+   * const client = new hl.SubscriptionClient({ transport });
+   * const sub = await client.webData3({ user: "0x..." }, (data) => console.log(data));
+   * ```
+   */
+  webData3(...args: OmitFirst<OverloadedParameters<typeof webData3>>) {
+    return webData3(this, ...args);
   }
 }
