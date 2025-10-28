@@ -955,7 +955,7 @@ This module contains helper functions for interacting with the HyperLiquid API.
 #### `SymbolConverter`
 
 Helper class for converting asset symbols to asset IDs and size decimals. See
-[docs](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/asset-ids).
+[hyperliquid docs](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/asset-ids).
 
 ```ts
 import { HttpTransport } from "@nktkas/hyperliquid";
@@ -964,32 +964,57 @@ import { SymbolConverter } from "@nktkas/hyperliquid/utils";
 const transport = new HttpTransport(); // or `WebSocketTransport`
 const converter = await SymbolConverter.create({ transport });
 
-const btcId = converter.getAssetId("BTC"); // → 0 (perpetual)
-const hypeUsdcId = converter.getAssetId("HYPE/USDC"); // → 10107 (spot market)
-const dexAbcId = converter.getAssetId("test:ABC"); // → 110000 (builder dex if enabled)
+// By default, dexs are not loaded; specify them when creating an instance
+const converter = await SymbolConverter.create({ transport, dexs: ["test"] });
+```
 
-const btcSzDecimals = converter.getSzDecimals("BTC"); // → 5 (perpetual)
-const hypeUsdcSzDecimals = converter.getSzDecimals("HYPE/USDC"); // → 2 (spot market)
-const dexAbcSzDecimals = converter.getSzDecimals("test:ABC"); // → 0 (builder dex if enabled)
+##### `getAssetId` - Get asset ID for a coin
+
+```ts
+// For Perpetuals, use the coin name
+const btcId = converter.getAssetId("BTC"); // → 0
+
+// For Spot markets, use the "BASE/QUOTE" format
+const hypeUsdcId = converter.getAssetId("HYPE/USDC"); // → 10107
+
+// For Builder Dex assets, use the "DEX_NAME:ASSET_NAME" format
+const dexAbcId = converter.getAssetId("test:ABC"); // → 110000
+```
+
+##### `getSzDecimals` - Get size decimals for a coin.
+
+```ts
+// For Perpetuals, use the coin name
+const btcSzDecimals = converter.getSzDecimals("BTC"); // → 5
+
+// For Spot markets, use the "BASE/QUOTE" format
+const hypeUsdcSzDecimals = converter.getSzDecimals("HYPE/USDC"); // → 2
+
+// For Builder Dex assets, use the "DEX_NAME:ASSET_NAME" format
+const dexAbcSzDecimals = converter.getSzDecimals("test:ABC"); // → 0
+```
+
+##### `getSpotPairId` - Get spot pair ID for info endpoints and subscriptions
+
+```ts
+// Accepts spot markets in the "BASE/QUOTE" format
+const spotPairId = converter.getSpotPairId("HFUN/USDC"); // → "@2"
 ```
 
 #### `formatPrice` and `formatSize`
 
-Helper functions for formatting price and size based on `szDecimals` and
-[docs](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/tick-and-lot-size).
+Helper functions for formatting price and size based on `szDecimals`. See
+[hyperliquid docs](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/tick-and-lot-size).
 
 ```ts
 import { formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
 
-// Perp market (BTC, szDecimals=5)
-const btcPrice = formatPrice("115000.123456", 5); // → "115000"
+//                                              `true` for perp (default), `false` for spot
+// Format price (PUMP/USDC, szDecimals=0)       ⌄⌄⌄⌄⌄
+const price = formatPrice("0.0000123456789", 0, false); // → "0.00001234"
 
-//                                                      `true` for perp (default), `false` for spot
-// Spot market (PUMP/USDC, szDecimals=0)                ⌄⌄⌄⌄⌄
-const pumpUsdcPrice = formatPrice("0.0000123456789", 0, false); // → "0.00001234"
-
-// Format order size (HYPE/USDC, szDecimals=2)
-const hypeUsdcSize = formatSize("1.23456", 2); // → "1.23"
+// Format size (BTC, szDecimals=5)
+const size = formatSize("1.23456789", 5); // → "1.23456"
 ```
 
 ## FAQ

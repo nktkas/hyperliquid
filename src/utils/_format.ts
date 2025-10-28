@@ -6,6 +6,14 @@ import { HyperliquidError } from "../_base.ts";
  * - Maximum (6 for perp, 8 for spot) - `szDecimals` decimal places
  * - Integer prices are always allowed regardless of significant figures
  * - Remove trailing zeros
+ * @example
+ * ```ts
+ * import { formatPrice } from "@nktkas/hyperliquid/utils";
+ *
+ * //        `true` for perp (default), `false` for spot
+ * //                                              ⌄⌄⌄⌄⌄
+ * const price = formatPrice("0.0000123456789", 0, false); // → "0.00001234"
+ * ```
  */
 export function formatPrice(
   price: string | number,
@@ -34,6 +42,12 @@ export function formatPrice(
  * Format size according to Hyperliquid {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/tick-and-lot-size | rules}:
  * - Truncate to `szDecimals` decimal places
  * - Remove trailing zeros
+ * @example
+ * ```ts
+ * import { formatSize } from "@nktkas/hyperliquid/utils";
+ *
+ * const size = formatSize("1.23456789", 5); // → "1.23456"
+ * ```
  */
 export function formatSize(size: string | number, szDecimals: number): string {
   // Prepare: trim, validate, normalize leading/trailing zeros

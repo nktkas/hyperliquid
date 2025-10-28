@@ -25,6 +25,9 @@ export interface SymbolConverterOptions {
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  * const converter = await SymbolConverter.create({ transport });
  *
+ * // By default, dexs are not loaded; specify them when creating an instance
+ * // const converter = await SymbolConverter.create({ transport, dexs: ["test"] });
+ *
  * const btcId = converter.getAssetId("BTC"); // perpetual → 0
  * const hypeUsdcId = converter.getAssetId("HYPE/USDC"); // spot market → 10107
  * const dexAbcId = converter.getAssetId("test:ABC"); // builder dex (if enabled) → 110000
