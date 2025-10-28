@@ -1,22 +1,20 @@
-// deno-lint-ignore-file no-import-prefix
 import { UserHistoricalOrdersEvent } from "@nktkas/hyperliquid/api/subscription";
-import { deadline } from "jsr:@std/async@1/deadline";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { runTest } from "./_t.ts";
+import { collectEventsOverTime, runTest } from "./_t.ts";
 
 runTest({
   name: "userHistoricalOrders",
   mode: "api",
   fn: async (_t, client) => {
     const data = await Promise.all([
-      deadline(
-        new Promise<UserHistoricalOrdersEvent>((resolve) => {
-          client.userHistoricalOrders({ user: "0xe019d6167E7e324aEd003d94098496b6d986aB05" }, resolve);
-        }),
+      collectEventsOverTime<UserHistoricalOrdersEvent>(
+        async (cb) => {
+          await client.userHistoricalOrders({ user: "0xe019d6167E7e324aEd003d94098496b6d986aB05" }, cb);
+        },
         10_000,
       ),
     ]);
-    schemaCoverage(UserHistoricalOrdersEvent, data, {
+    schemaCoverage(UserHistoricalOrdersEvent, data.flat(), {
       ignoreEmptyArray: ["#/properties/orderHistory/items/properties/order/properties/children"],
       ignoreBranches: {
         "#/properties/orderHistory/items/properties/order/properties/orderType": [2, 3, 4, 5],

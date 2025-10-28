@@ -1,27 +1,25 @@
-// deno-lint-ignore-file no-import-prefix
 import { ActiveAssetCtxEvent } from "@nktkas/hyperliquid/api/subscription";
-import { deadline } from "jsr:@std/async@1/deadline";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { runTest } from "./_t.ts";
+import { collectEventsOverTime, runTest } from "./_t.ts";
 
 runTest({
   name: "activeAssetCtx",
   mode: "api",
   fn: async (_t, client) => {
     const data = await Promise.all([
-      deadline(
-        new Promise<ActiveAssetCtxEvent>((resolve) => {
-          client.activeAssetCtx({ coin: "ETH" }, resolve);
-        }),
+      collectEventsOverTime<ActiveAssetCtxEvent>(
+        async (cb) => {
+          await client.activeAssetCtx({ coin: "ETH" }, cb);
+        },
         10_000,
       ),
-      deadline(
-        new Promise<ActiveAssetCtxEvent>((resolve) => {
-          client.activeAssetCtx({ coin: "AXL" }, resolve);
-        }),
+      collectEventsOverTime<ActiveAssetCtxEvent>(
+        async (cb) => {
+          await client.activeAssetCtx({ coin: "AXL" }, cb);
+        },
         10_000,
       ),
     ]);
-    schemaCoverage(ActiveAssetCtxEvent, data);
+    schemaCoverage(ActiveAssetCtxEvent, data.flat());
   },
 });

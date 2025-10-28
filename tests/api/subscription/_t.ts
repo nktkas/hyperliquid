@@ -72,3 +72,16 @@ export function runTestWithExchange(options: {
 // —————————— Utils ——————————
 
 export { createTWAP, formatPrice, formatSize, openOrder, randomCloid } from "../exchange/_t.ts";
+
+export function collectEventsOverTime<T>(
+  // deno-lint-ignore no-explicit-any
+  fn: (cb: (event: T) => void) => any,
+  durationMs: number,
+): Promise<T[]> {
+  // deno-lint-ignore no-async-promise-executor
+  return new Promise(async (resolve) => {
+    const data: T[] = [];
+    await fn((event) => data.push(event));
+    setTimeout(() => resolve(data), durationMs);
+  });
+}

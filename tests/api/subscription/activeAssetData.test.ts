@@ -1,35 +1,25 @@
-// deno-lint-ignore-file no-import-prefix
 import { ActiveAssetDataEvent } from "@nktkas/hyperliquid/api/subscription";
-import { deadline } from "jsr:@std/async@1/deadline";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { runTest } from "./_t.ts";
+import { collectEventsOverTime, runTest } from "./_t.ts";
 
 runTest({
   name: "activeAssetData",
   mode: "api",
   fn: async (_t, client) => {
     const data = await Promise.all([
-      // leverage.type = isolated
-      deadline(
-        new Promise<ActiveAssetDataEvent>((resolve) => {
-          client.activeAssetData(
-            { coin: "GALA", user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" },
-            resolve,
-          );
-        }),
+      collectEventsOverTime<ActiveAssetDataEvent>(
+        async (cb) => {
+          await client.activeAssetData({ coin: "GALA", user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" }, cb);
+        },
         10_000,
       ),
-      // leverage.type = cross
-      deadline(
-        new Promise<ActiveAssetDataEvent>((resolve) => {
-          client.activeAssetData(
-            { coin: "NEAR", user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" },
-            resolve,
-          );
-        }),
+      collectEventsOverTime<ActiveAssetDataEvent>(
+        async (cb) => {
+          await client.activeAssetData({ coin: "NEAR", user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" }, cb);
+        },
         10_000,
       ),
     ]);
-    schemaCoverage(ActiveAssetDataEvent, data);
+    schemaCoverage(ActiveAssetDataEvent, data.flat());
   },
 });

@@ -1,27 +1,25 @@
-// deno-lint-ignore-file no-import-prefix
 import { ActiveSpotAssetCtxEvent } from "@nktkas/hyperliquid/api/subscription";
-import { deadline } from "jsr:@std/async@1/deadline";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { runTest } from "./_t.ts";
+import { collectEventsOverTime, runTest } from "./_t.ts";
 
 runTest({
   name: "activeSpotAssetCtx",
   mode: "api",
   fn: async (_t, client) => {
     const data = await Promise.all([
-      deadline(
-        new Promise<ActiveSpotAssetCtxEvent>((resolve) => {
-          client.activeSpotAssetCtx({ coin: "@107" }, resolve);
-        }),
+      collectEventsOverTime<ActiveSpotAssetCtxEvent>(
+        async (cb) => {
+          await client.activeSpotAssetCtx({ coin: "@107" }, cb);
+        },
         10_000,
       ),
-      deadline(
-        new Promise<ActiveSpotAssetCtxEvent>((resolve) => {
-          client.activeSpotAssetCtx({ coin: "@27" }, resolve);
-        }),
+      collectEventsOverTime<ActiveSpotAssetCtxEvent>(
+        async (cb) => {
+          await client.activeSpotAssetCtx({ coin: "@27" }, cb);
+        },
         10_000,
       ),
     ]);
-    schemaCoverage(ActiveSpotAssetCtxEvent, data);
+    schemaCoverage(ActiveSpotAssetCtxEvent, data.flat());
   },
 });

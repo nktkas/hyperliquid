@@ -1,21 +1,31 @@
-// deno-lint-ignore-file no-import-prefix
 import { BboEvent } from "@nktkas/hyperliquid/api/subscription";
-import { deadline } from "jsr:@std/async@1/deadline";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { runTest } from "./_t.ts";
+import { collectEventsOverTime, runTest } from "./_t.ts";
 
 runTest({
   name: "bbo",
   mode: "api",
   fn: async (_t, client) => {
     const data = await Promise.all([
-      deadline(
-        new Promise<BboEvent>((resolve) => {
-          client.bbo({ coin: "BTC" }, resolve);
-        }),
-        120_000,
+      collectEventsOverTime<BboEvent>(
+        async (cb) => {
+          await client.bbo({ coin: "BTC" }, cb);
+        },
+        60_000,
+      ),
+      collectEventsOverTime<BboEvent>(
+        async (cb) => {
+          await client.bbo({ coin: "ETH" }, cb);
+        },
+        60_000,
+      ),
+      collectEventsOverTime<BboEvent>(
+        async (cb) => {
+          await client.bbo({ coin: "SOL" }, cb);
+        },
+        60_000,
       ),
     ]);
-    schemaCoverage(BboEvent, data);
+    schemaCoverage(BboEvent, data.flat());
   },
 });
