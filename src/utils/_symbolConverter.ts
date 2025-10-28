@@ -33,7 +33,7 @@ export interface SymbolConverterOptions {
  * const hypeUsdcSzDecimals = converter.getSzDecimals("HYPE/USDC"); // spot market → 2
  * const dexAbcSzDecimals = converter.getSzDecimals("test:ABC"); // builder dex (if enabled) → 0
  *
- * const spotPairId = converter.getSpotPairId("HFUN/USDC"); // → "@2" 
+ * const spotPairId = converter.getSpotPairId("HFUN/USDC"); // → "@2"
  * ```
  */
 export class SymbolConverter {
@@ -190,9 +190,9 @@ export class SymbolConverter {
 
   /**
    * Get spot pair ID for info endpoints and subscriptions (e.g., l2book, trades).
-   * - Accepts spot markets in the "BASE/QUOTE" format (e.g., "HFUN/USDC").
-   * - Returns the spot pair name used in subscription payloads (e.g., "@2").
-   * @example "HFUN/USDC" → @2, "PURR/USDC" → PURR/USDC
+   *
+   * Accepts spot markets in the "BASE/QUOTE" format (e.g., "HFUN/USDC").
+   * @example "HFUN/USDC" → "@2", "PURR/USDC" → "PURR/USDC"
    */
   getSpotPairId(name: string): string | undefined {
     return this.nameToSpotPairId.get(name);
