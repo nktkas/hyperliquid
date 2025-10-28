@@ -954,7 +954,7 @@ This module contains helper functions for interacting with the HyperLiquid API.
 
 #### `SymbolConverter`
 
-Utility class for converting asset symbols to their corresponding IDs and size decimals. See
+Helper class for converting asset symbols to asset IDs and size decimals. See
 [docs](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/asset-ids).
 
 ```ts
@@ -964,13 +964,32 @@ import { SymbolConverter } from "@nktkas/hyperliquid/utils";
 const transport = new HttpTransport(); // or `WebSocketTransport`
 const converter = await SymbolConverter.create({ transport });
 
-const btcId = converter.getAssetId("BTC"); // perpetual → 0
-const hypeUsdcId = converter.getAssetId("HYPE/USDC"); // spot market → 10107
-const dexAbcId = converter.getAssetId("test:ABC"); // builder dex (if enabled) → 110000
+const btcId = converter.getAssetId("BTC"); // → 0 (perpetual)
+const hypeUsdcId = converter.getAssetId("HYPE/USDC"); // → 10107 (spot market)
+const dexAbcId = converter.getAssetId("test:ABC"); // → 110000 (builder dex if enabled)
 
-const btcSzDecimals = converter.getSzDecimals("BTC"); // perpetual → 5
-const hypeUsdcSzDecimals = converter.getSzDecimals("HYPE/USDC"); // spot market → 2
-const dexAbcSzDecimals = converter.getSzDecimals("test:ABC"); // builder dex (if enabled) → 0
+const btcSzDecimals = converter.getSzDecimals("BTC"); // → 5 (perpetual)
+const hypeUsdcSzDecimals = converter.getSzDecimals("HYPE/USDC"); // → 2 (spot market)
+const dexAbcSzDecimals = converter.getSzDecimals("test:ABC"); // → 0 (builder dex if enabled)
+```
+
+#### `formatPrice` and `formatSize`
+
+Helper functions for formatting price and size based on `szDecimals` and
+[docs](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/tick-and-lot-size).
+
+```ts
+import { formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
+
+// Perp market (BTC, szDecimals=5)
+const btcPrice = formatPrice("115000.123456", 5); // → "115000"
+
+//                                                      `true` for perp (default), `false` for spot
+// Spot market (PUMP/USDC, szDecimals=0)                ⌄⌄⌄⌄⌄
+const pumpUsdcPrice = formatPrice("0.0000123456789", 0, false); // → "0.00001234"
+
+// Format order size (HYPE/USDC, szDecimals=2)
+const hypeUsdcSize = formatSize("1.23456", 2); // → "1.23"
 ```
 
 ## FAQ
