@@ -102,25 +102,31 @@ Deno.test("SymbolConverter", async (t) => {
     await t.step("dexs: false", async () => {
       const converter = await SymbolConverter.create({ transport, dexs: false });
 
-      const abcId = converter.getAssetId("test:ABC");
-      assertEquals(abcId, undefined, `test:ABC asset ID should be undefined, but got ${abcId}`);
+      const testAbcId = converter.getAssetId("test:ABC");
+      const unitEsId = converter.getAssetId("unit:ES");
+
+      assertEquals(testAbcId, undefined, `test:ABC asset ID should be undefined, but got ${testAbcId}`);
+      assertEquals(unitEsId, undefined, `unit:ES asset ID should be undefined, but got ${unitEsId}`);
     });
 
     await t.step("dexs: [specific dex]", async () => {
       const converter = await SymbolConverter.create({ transport, dexs: ["test"] });
 
-      const abcId = converter.getAssetId("test:ABC");
-      const xyzId = converter.getAssetId("other:XYZ");
+      const testAbcId = converter.getAssetId("test:ABC");
+      const unitEsId = converter.getAssetId("unit:ES");
 
-      assertEquals(abcId, 110000, `test:ABC asset ID should be 110000, but got ${abcId}`);
-      assertEquals(xyzId, undefined, `other:XYZ asset ID should be undefined, but got ${xyzId}`);
+      assertEquals(testAbcId, 110000, `test:ABC asset ID should be 110000, but got ${testAbcId}`);
+      assertEquals(unitEsId, undefined, `unit:ES asset ID should be undefined, but got ${unitEsId}`);
     });
 
     await t.step("dexs: true", async () => {
       const converter = await SymbolConverter.create({ transport, dexs: true });
 
-      const abcId = converter.getAssetId("test:ABC");
-      assertEquals(abcId, 110000, `test:ABC asset ID should be 110000, but got ${abcId}`);
+      const testAbcId = converter.getAssetId("test:ABC");
+      const unitEsId = converter.getAssetId("unit:ES");
+
+      assertEquals(testAbcId, 110000, `test:ABC asset ID should be 110000, but got ${testAbcId}`);
+      assertEquals(unitEsId, 120000, `unit:ES asset ID should be 120000, but got ${unitEsId}`);
     });
   });
 });
