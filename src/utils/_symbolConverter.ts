@@ -32,6 +32,8 @@ export interface SymbolConverterOptions {
  * const btcSzDecimals = converter.getSzDecimals("BTC"); // perpetual → 5
  * const hypeUsdcSzDecimals = converter.getSzDecimals("HYPE/USDC"); // spot market → 2
  * const dexAbcSzDecimals = converter.getSzDecimals("test:ABC"); // builder dex (if enabled) → 0
+ *
+ * const spotPairId = converter.getSpotPairId("HFUN/USDC"); // → "@2"
  * ```
  */
 export class SymbolConverter {
@@ -39,6 +41,7 @@ export class SymbolConverter {
   private readonly dexOption: DexOption;
   private readonly nameToAssetId = new Map<string, number>();
   private readonly nameToSzDecimals = new Map<string, number>();
+  private readonly nameToSpotPairId = new Map<string, string>();
 
   private constructor(options: SymbolConverterOptions) {
     this.transport = options.transport;
@@ -86,6 +89,7 @@ export class SymbolConverter {
 
     this.nameToAssetId.clear();
     this.nameToSzDecimals.clear();
+    this.nameToSpotPairId.clear();
 
     this.processDefaultPerps(perpMetaData);
     this.processSpotAssets(spotMetaData);
@@ -158,6 +162,7 @@ export class SymbolConverter {
       const baseQuoteKey = `${baseToken.name}/${quoteToken.name}`;
       this.nameToAssetId.set(baseQuoteKey, assetId);
       this.nameToSzDecimals.set(baseQuoteKey, baseToken.szDecimals);
+      this.nameToSpotPairId.set(baseQuoteKey, market.name);
     });
   }
 
@@ -181,5 +186,15 @@ export class SymbolConverter {
    */
   getSzDecimals(name: string): number | undefined {
     return this.nameToSzDecimals.get(name);
+  }
+
+  /**
+   * Get spot pair ID for info endpoints and subscriptions (e.g., l2book, trades).
+   *
+   * Accepts spot markets in the "BASE/QUOTE" format (e.g., "HFUN/USDC").
+   * @example "HFUN/USDC" → "@2", "PURR/USDC" → "PURR/USDC"
+   */
+  getSpotPairId(name: string): string | undefined {
+    return this.nameToSpotPairId.get(name);
   }
 }

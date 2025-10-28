@@ -78,6 +78,43 @@ Deno.test("SymbolConverter", async (t) => {
     });
   });
 
+  await t.step("spot pair IDs", async (t) => {
+    const transport = new HttpTransport();
+    const converter = await SymbolConverter.create({ transport });
+
+    await t.step("existing pair", () => {
+      const hypeUsdcPairId = converter.getSpotPairId("HYPE/USDC");
+      const purrUsdcPairId = converter.getSpotPairId("PURR/USDC");
+
+      assertEquals(
+        hypeUsdcPairId,
+        "@107",
+        `HYPE/USDC spot pair ID should be @107, but got ${hypeUsdcPairId}`,
+      );
+      assertEquals(
+        purrUsdcPairId,
+        "PURR/USDC",
+        `PURR/USDC spot pair ID should be PURR/USDC, but got ${purrUsdcPairId}`,
+      );
+    });
+
+    await t.step("non-existent pair", () => {
+      const noneExistentPairId = converter.getSpotPairId("NONE/EXISTENT");
+      const btcPairId = converter.getSpotPairId("BTC"); // not a spot market
+
+      assertEquals(
+        noneExistentPairId,
+        undefined,
+        `NONE/EXISTENT spot pair ID should be undefined, but got ${noneExistentPairId}`,
+      );
+      assertEquals(
+        btcPairId,
+        undefined,
+        `BTC spot pair ID should be undefined, but got ${btcPairId}`,
+      );
+    });
+  });
+
   await t.step("reload", async () => {
     const transport = new HttpTransport();
     const converter = await SymbolConverter.create({ transport });
