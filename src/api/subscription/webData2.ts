@@ -118,7 +118,7 @@ export const WebData2Event = /* @__PURE__ */ (() => {
         v.description("Array of TWAP states."),
       ),
       /** Account summary for spot trading. */
-      spotState: SpotClearinghouseStateResponse,
+      spotState: v.optional(SpotClearinghouseStateResponse),
       /** Context for each spot asset. */
       spotAssetCtxs: SpotMetaAndAssetCtxsResponse.items[1],
       /** Whether the user has opted out of spot dusting. */
