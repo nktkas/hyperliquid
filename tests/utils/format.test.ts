@@ -2,50 +2,66 @@
 import { assertEquals, assertThrows } from "jsr:@std/assert@1";
 import { formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
 
-const REFERENCE_DATA = [
+const REFERENCE_PERPS_DATA = [
   {
     asset: "PURR",
     szDecimals: 0,
-    minPrice: "5.1799",
+    minPrice: "0.0001",
     minSize: "1",
+  },
+  {
+    asset: "DYDX",
+    szDecimals: 1,
+    minPrice: "0.00001",
+    minSize: "0.1",
+  },
+  {
+    asset: "SOL",
+    szDecimals: 2,
+    minPrice: "0.01",
+    minSize: "0.01",
+  },
+  {
+    asset: "BNB",
+    szDecimals: 3,
+    minPrice: "0.1",
+    minSize: "0.001",
+  },
+  {
+    asset: "ETH",
+    szDecimals: 4,
+    minPrice: "0.1",
+    minSize: "0.0001",
   },
   {
     asset: "BTC",
     szDecimals: 5,
-    minPrice: "115000",
+    minPrice: "1",
     minSize: "0.00001",
   },
+];
+const REFERENCE_SPOTS_DATA = [
   {
     asset: "PURR/USDC",
     szDecimals: 0,
-    minPrice: "5.134",
+    minPrice: "0.0001",
     minSize: "1",
   },
   {
     asset: "HYPE/USDC",
     szDecimals: 2,
-    minPrice: "92.395",
+    minPrice: "0.001",
     minSize: "0.01",
   },
   {
-    asset: "PUMP/USDC",
-    szDecimals: 0,
-    minPrice: "0.0048273",
-    minSize: "0.0000001",
+    asset: "UETH/USDC",
+    szDecimals: 4,
+    minPrice: "0.1",
+    minSize: "0.0001",
   },
 ];
 
 Deno.test("formatPrice", async (t) => {
-  await t.step("reference validation", async (t) => {
-    for (const { asset, szDecimals, minPrice } of REFERENCE_DATA) {
-      const isPerp = !asset.includes("/");
-      await t.step(`${asset} (${isPerp ? "perp" : "spot"}, szDecimals=${szDecimals})`, () => {
-        const formatted = formatPrice(minPrice, szDecimals, isPerp);
-        assertEquals(formatted, minPrice);
-      });
-    }
-  });
-
   await t.step("integer bypasses sig figs limit", () => {
     assertEquals(formatPrice("1234567", 0, true), "1234567");
   });
@@ -87,19 +103,29 @@ Deno.test("formatPrice", async (t) => {
     assertThrows(() => formatPrice("1.23e5", 0, true)); // Scientific notation
     assertThrows(() => formatPrice("abc", 0, true)); // Invalid string
   });
+
+  await t.step("reference validation", async (t) => {
+    await t.step("perpetuals", async (t) => {
+      for (const { asset, szDecimals, minPrice } of REFERENCE_PERPS_DATA) {
+        await t.step(`${asset} (szDecimals=${szDecimals})`, () => {
+          const formatted = formatPrice(minPrice, szDecimals, true);
+          assertEquals(formatted, minPrice);
+        });
+      }
+    });
+
+    await t.step("spots", async (t) => {
+      for (const { asset, szDecimals, minPrice } of REFERENCE_SPOTS_DATA) {
+        await t.step(`${asset} (szDecimals=${szDecimals})`, () => {
+          const formatted = formatPrice(minPrice, szDecimals, false);
+          assertEquals(formatted, minPrice);
+        });
+      }
+    });
+  });
 });
 
 Deno.test("formatSize", async (t) => {
-  await t.step("reference validation", async (t) => {
-    for (const { asset, szDecimals, minSize } of REFERENCE_DATA) {
-      const isPerp = !asset.includes("/");
-      await t.step(`${asset} (${isPerp ? "perp" : "spot"}, szDecimals=${szDecimals})`, () => {
-        const formatted = formatSize(minSize, szDecimals);
-        assertEquals(formatted, minSize);
-      });
-    }
-  });
-
   await t.step("truncates to szDecimals", () => {
     assertEquals(formatSize("123.456789", 2), "123.45");
   });
@@ -125,5 +151,25 @@ Deno.test("formatSize", async (t) => {
     assertThrows(() => formatSize("0xFF", 0)); // Hex
     assertThrows(() => formatSize("5e-3", 0)); // Scientific notation
     assertThrows(() => formatSize("invalid", 0)); // Invalid string
+  });
+
+  await t.step("reference validation", async (t) => {
+    await t.step("perpetuals", async (t) => {
+      for (const { asset, szDecimals, minSize } of REFERENCE_PERPS_DATA) {
+        await t.step(`${asset} (szDecimals=${szDecimals})`, () => {
+          const formatted = formatSize(minSize, szDecimals);
+          assertEquals(formatted, minSize);
+        });
+      }
+    });
+
+    await t.step("spots", async (t) => {
+      for (const { asset, szDecimals, minSize } of REFERENCE_SPOTS_DATA) {
+        await t.step(`${asset} (szDecimals=${szDecimals})`, () => {
+          const formatted = formatSize(minSize, szDecimals);
+          assertEquals(formatted, minSize);
+        });
+      }
+    });
   });
 });
