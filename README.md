@@ -968,7 +968,7 @@ const converter = await SymbolConverter.create({ transport });
 const converter = await SymbolConverter.create({ transport, dexs: ["test"] });
 ```
 
-##### `getAssetId` - Get asset ID for a coin
+##### Get asset ID for a coin
 
 ```ts
 // For Perpetuals, use the coin name
@@ -981,7 +981,7 @@ const hypeUsdcId = converter.getAssetId("HYPE/USDC"); // → 10107
 const dexAbcId = converter.getAssetId("test:ABC"); // → 110000
 ```
 
-##### `getSzDecimals` - Get size decimals for a coin.
+##### Get size decimals for a coin.
 
 ```ts
 // For Perpetuals, use the coin name
@@ -994,14 +994,14 @@ const hypeUsdcSzDecimals = converter.getSzDecimals("HYPE/USDC"); // → 2
 const dexAbcSzDecimals = converter.getSzDecimals("test:ABC"); // → 0
 ```
 
-##### `getSpotPairId` - Get spot pair ID for info endpoints and subscriptions
+##### Get spot pair ID for info endpoints and subscriptions
 
 ```ts
 // Accepts spot markets in the "BASE/QUOTE" format
 const spotPairId = converter.getSpotPairId("HFUN/USDC"); // → "@2"
 ```
 
-#### `formatPrice` and `formatSize`
+#### Formatting functions
 
 Helper functions for formatting price and size based on `szDecimals`. See
 [hyperliquid docs](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/tick-and-lot-size).
@@ -1015,6 +1015,57 @@ const price = formatPrice("0.0000123456789", 0, false); // → "0.00001234"
 
 // Format size (BTC, szDecimals=5)
 const size = formatSize("1.23456789", 5); // → "1.23456"
+```
+
+#### Recovering signer address
+
+##### Recover Address from L1 Action
+
+```ts
+import { recoverUserFromL1Action } from "@nktkas/hyperliquid/utils";
+
+const action = {
+  type: "cancel",
+  cancels: [{ a: 0, o: 12345 }],
+};
+const nonce = 1700000000000;
+const signature = {
+  r: "0x...",
+  s: "0x...",
+  v: 27,
+} as const;
+
+const address = await recoverUserFromL1Action({ action, nonce, signature });
+console.log(`Signer address: ${address}`);
+```
+
+##### Recover Address from User Signed Action
+
+```ts
+import { recoverUserFromUserSigned } from "@nktkas/hyperliquid/utils";
+
+const action = {
+  type: "approveAgent",
+  signatureChainId: "0x66eee" as const,
+  hyperliquidChain: "Mainnet",
+  agentAddress: "0x...",
+  agentName: "Agent",
+  nonce: 1700000000000,
+};
+const types = {
+  HyperliquidTransaction: [
+    { name: "hyperliquidChain", type: "string" },
+    // ... other fields
+  ],
+};
+const signature = {
+  r: "0x...",
+  s: "0x...",
+  v: 27,
+} as const;
+
+const address = await recoverUserFromUserSigned({ action, types, signature });
+console.log(`Signer address: ${address}`);
 ```
 
 ## FAQ
