@@ -1,5 +1,3 @@
-// -------------------- EIP-712 --------------------
-
 import { keccak_256 } from "@noble/hashes/sha3.js";
 import * as secp from "@noble/secp256k1";
 
@@ -19,7 +17,7 @@ export interface Domain {
 }
 
 /** Signs typed data with a private key. */
-async function signTypedData(args: {
+export async function signTypedData(args: {
   privateKey: string | Uint8Array;
   domain?: Domain;
   types: Types;
@@ -36,20 +34,18 @@ async function signTypedData(args: {
 
   const hash = hashTypedData({ domain, types, primaryType, message });
 
-  const signature = await secp.signAsync(
-    hash,
-    privateKey instanceof Uint8Array ? privateKey : secp.etc.hexToBytes(cleanHex(privateKey)),
-    { prehash: false, format: "recovered" },
-  );
+  const pk = typeof privateKey === "string" ? secp.etc.hexToBytes(cleanHex(privateKey)) : privateKey;
+  const sigr = await secp.signAsync(hash, pk, { prehash: false, format: "recovered" });
 
-  const r = secp.etc.bytesToHex(signature.slice(1, 33));
-  const s = secp.etc.bytesToHex(signature.slice(33, 65));
-  const v = (signature[0] + 27).toString(16).padStart(2, "0");
+  const r = secp.etc.bytesToHex(sigr.slice(1, 33));
+  const s = secp.etc.bytesToHex(sigr.slice(33, 65));
+  const v = (sigr[0] + 27).toString(16).padStart(2, "0");
 
   return `0x${r}${s}${v}`;
 }
 
-function hashTypedData(args: {
+/** Hashes typed data according to EIP-712. */
+export function hashTypedData(args: {
   domain: Domain;
   types: Types;
   primaryType: string;
@@ -211,7 +207,7 @@ function cleanHex(hex: string): string {
   return hex.startsWith("0x") ? hex.slice(2) : hex;
 }
 
-// -------------------- Interaction API --------------------
+// -------------------- For SDK --------------------
 
 import type { AbstractViemLocalAccount } from "../signing/mod.ts";
 
@@ -221,30 +217,27 @@ export class PrivateKeyEIP712Signer implements AbstractViemLocalAccount {
   address: `0x${string}`;
   constructor(privateKey: string | Uint8Array) {
     this.#privateKey = privateKey;
-    this.address = privateKeyToAddress(privateKey); // and validate the key
+    this.address = privateKeyToAddress(privateKey); // and validate the private key
   }
-  signTypedData(
-    params: {
-      domain: Domain;
-      types: Types;
-      primaryType: string;
-      message: Record<string, unknown>;
-    },
-  ): Promise<`0x${string}`> {
+  signTypedData(params: {
+    domain: Domain;
+    types: Types;
+    primaryType: string;
+    message: Record<string, unknown>;
+  }): Promise<`0x${string}`> {
     return signTypedData({ privateKey: this.#privateKey, ...params });
   }
 }
 
 function privateKeyToAddress(privateKey: string | Uint8Array): `0x${string}` {
   const pk = typeof privateKey === "string" ? secp.etc.hexToBytes(cleanHex(privateKey)) : privateKey;
-
   const publicKey = secp.getPublicKey(pk, false);
+  return publicKeyToAddress(publicKey);
+}
+
+function publicKeyToAddress(publicKey: Uint8Array): `0x${string}` {
   const publicKeyWithoutPrefix = publicKey.slice(1);
-
   const hash = keccak_256(publicKeyWithoutPrefix);
-
   const addressBytes = hash.slice(-20);
-  const address = secp.etc.bytesToHex(addressBytes);
-
-  return `0x${address}`;
+  return `0x${secp.etc.bytesToHex(addressBytes)}`;
 }
