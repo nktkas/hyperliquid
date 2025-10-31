@@ -239,6 +239,7 @@ Referrer:
 Staking & Delegation:
   cDeposit                --wei <number>
   cWithdraw               --wei <number>
+  linkStakingUser         --user <address> --isFinalize <bool>
   tokenDelegate           --validator <address> --wei <number> --isUndelegate <bool>
 
 Vault:

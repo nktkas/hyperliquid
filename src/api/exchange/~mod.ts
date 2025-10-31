@@ -55,6 +55,7 @@ export * from "./cSignerAction.ts";
 export * from "./cValidatorAction.ts";
 export * from "./cWithdraw.ts";
 export * from "./evmUserModify.ts";
+export * from "./linkStakingUser.ts";
 export * from "./modify.ts";
 export * from "./multiSig.ts";
 export * from "./order.ts";

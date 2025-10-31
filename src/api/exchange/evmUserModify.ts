@@ -70,7 +70,7 @@ export type EvmUserModifyOptions = ExtractRequestOptions<v.InferInput<typeof Evm
  * @param config - General configuration for Exchange API requests.
  * @param params - Parameters specific to the API request.
  * @param opts - Request execution options.
- * @returns Response for creating a sub-account.
+ * @returns Successful response without specific data.
  *
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  * @throws {TransportError} When the transport layer throws an error.

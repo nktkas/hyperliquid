@@ -225,7 +225,52 @@ export const UserFeesResponse = /* @__PURE__ */ (() => {
         v.nullable(v.unknown()),
         v.description("Timestamp when next trial becomes available."),
       ),
-      stakingLink: v.nullable(v.unknown()),
+      /**
+       * Permanent link between staking and trading accounts.
+       * Staking user gains full control of trading account funds.
+       * Staking user forfeits own fee discounts.
+       */
+      stakingLink: v.pipe(
+        v.nullable(
+          v.object({
+            /**
+             * Linked account address:
+             * - When queried by staking account: contains trading account address.
+             * - When queried by trading account: contains staking account address.
+             */
+            stakingUser: v.pipe(
+              Address,
+              v.description(
+                "Linked account address:" +
+                  "\n- When queried by staking account: contains trading account address." +
+                  "\n- When queried by trading account: contains staking account address.",
+              ),
+            ),
+            /**
+             * Link status:
+             * - `requested` = link initiated by trading user, awaiting staking user confirmation.
+             * - `stakingUser` = response queried by staking account.
+             * - `tradingUser` = response queried by trading account.
+             */
+            type: v.pipe(
+              v.union([
+                v.literal("requested"),
+                v.literal("stakingUser"),
+                v.literal("tradingUser"),
+              ]),
+              v.description(
+                "Link status:" +
+                  "\n- `requested` = link initiated by trading user, awaiting staking user confirmation" +
+                  "\n- `stakingUser` = response queried by staking account" +
+                  "\n- `tradingUser` = response queried by trading account",
+              ),
+            ),
+          }),
+        ),
+        v.description(
+          "Permanent link between staking and trading accounts. Staking user gains full control of trading account funds. Staking user forfeits own fee discounts.",
+        ),
+      ),
       /** Active staking discount details. */
       activeStakingDiscount: v.pipe(
         v.object({

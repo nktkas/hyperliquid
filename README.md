@@ -534,6 +534,7 @@ class ExchangeClient {
   // Staking & Delegation
   cDeposit(params: CDepositParameters): Promise<SuccessResponse>;
   cWithdraw(params: CWithdrawParameters): Promise<SuccessResponse>;
+  linkStakingUser(params: LinkStakingUserParameters): Promise<SuccessResponse>;
   tokenDelegate(params: TokenDelegateParameters): Promise<SuccessResponse>;
 
   // Vault

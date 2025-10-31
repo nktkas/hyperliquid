@@ -19,6 +19,7 @@ import { cSignerAction } from "./cSignerAction.ts";
 import { cValidatorAction } from "./cValidatorAction.ts";
 import { cWithdraw } from "./cWithdraw.ts";
 import { evmUserModify } from "./evmUserModify.ts";
+import { linkStakingUser } from "./linkStakingUser.ts";
 import { modify } from "./modify.ts";
 import { multiSig } from "./multiSig.ts";
 import { order } from "./order.ts";
@@ -64,6 +65,7 @@ export type { CSignerActionOptions, CSignerActionParameters } from "./cSignerAct
 export type { CValidatorActionOptions, CValidatorActionParameters } from "./cValidatorAction.ts";
 export type { CWithdrawOptions, CWithdrawParameters } from "./cWithdraw.ts";
 export type { EvmUserModifyOptions, EvmUserModifyParameters } from "./evmUserModify.ts";
+export type { LinkStakingUserOptions, LinkStakingUserParameters } from "./linkStakingUser.ts";
 export type { ModifyOptions, ModifyParameters } from "./modify.ts";
 export type { MultiSigOptions, MultiSigParameters } from "./multiSig.ts";
 export type { OrderOptions, OrderParameters } from "./order.ts";
@@ -609,7 +611,7 @@ export class ExchangeClient<
    * Configure block type for EVM transactions.
    * @param params - Parameters specific to the API request.
    * @param opts - Request execution options.
-   * @returns Response for creating a sub-account.
+   * @returns Successful response without specific data.
    *
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    * @throws {TransportError} When the transport layer throws an error.
@@ -628,6 +630,31 @@ export class ExchangeClient<
    */
   evmUserModify(...args: OmitFirst<OverloadedParameters<typeof evmUserModify>>) {
     return evmUserModify(this, ...args);
+  }
+
+  /**
+   * Link staking and trading accounts for fee discount attribution.
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   * @returns Successful response without specific data.
+   *
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/trading/fees#staking-linking
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const pk = "0x..."; // viem, ethers or private key
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   *
+   * const client = new hl.ExchangeClient({ transport, wallet: pk });
+   * await client.linkStakingUser({ user: "0x...", isFinalize: false });
+   * ```
+   */
+  linkStakingUser(...args: OmitFirst<OverloadedParameters<typeof linkStakingUser>>) {
+    return linkStakingUser(this, ...args);
   }
 
   /**
