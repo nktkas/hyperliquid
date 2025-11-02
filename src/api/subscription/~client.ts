@@ -1,112 +1,141 @@
-import type { OmitFirst, OverloadedParameters } from "../_base.ts";
-import type { ISubscriptionTransport } from "../../transport/base.ts";
-import type { SubscriptionRequestConfig } from "./_types.ts";
+import type { OmitFirst, OverloadedParameters } from "../_base.ts"
+import type { ISubscriptionTransport } from "../../transport/base.ts"
+import type { SubscriptionRequestConfig } from "./_types.ts"
 
-import { activeAssetCtx } from "./activeAssetCtx.ts";
-import { activeAssetData } from "./activeAssetData.ts";
-import { activeSpotAssetCtx } from "./activeSpotAssetCtx.ts";
-import { allMids } from "./allMids.ts";
-import { assetCtxs } from "./assetCtxs.ts";
-import { bbo } from "./bbo.ts";
-import { candle } from "./candle.ts";
-import { clearinghouseState } from "./clearinghouseState.ts";
-import { explorerBlock } from "./explorerBlock.ts";
-import { explorerTxs } from "./explorerTxs.ts";
-import { l2Book } from "./l2Book.ts";
-import { notification } from "./notification.ts";
-import { openOrders } from "./openOrders.ts";
-import { orderUpdates } from "./orderUpdates.ts";
-import { trades } from "./trades.ts";
-import { userEvents } from "./userEvents.ts";
-import { userFills } from "./userFills.ts";
-import { userFundings } from "./userFundings.ts";
-import { userHistoricalOrders } from "./userHistoricalOrders.ts";
-import { userNonFundingLedgerUpdates } from "./userNonFundingLedgerUpdates.ts";
-import { userTwapHistory } from "./userTwapHistory.ts";
-import { userTwapSliceFills } from "./userTwapSliceFills.ts";
-import { webData2 } from "./webData2.ts";
-import { webData3 } from "./webData3.ts";
+import { activeAssetCtx } from "./activeAssetCtx.ts"
+import { activeAssetData } from "./activeAssetData.ts"
+import { activeSpotAssetCtx } from "./activeSpotAssetCtx.ts"
+import { allMids } from "./allMids.ts"
+import { assetCtxs } from "./assetCtxs.ts"
+import { bbo } from "./bbo.ts"
+import { candle } from "./candle.ts"
+import { clearinghouseState } from "./clearinghouseState.ts"
+import { explorerBlock } from "./explorerBlock.ts"
+import { explorerTxs } from "./explorerTxs.ts"
+import { l2Book } from "./l2Book.ts"
+import { notification } from "./notification.ts"
+import { openOrders } from "./openOrders.ts"
+import { orderUpdates } from "./orderUpdates.ts"
+import { spotState } from "./spotState.ts"
+import { trades } from "./trades.ts"
+import { userEvents } from "./userEvents.ts"
+import { userFills } from "./userFills.ts"
+import { userFundings } from "./userFundings.ts"
+import { userHistoricalOrders } from "./userHistoricalOrders.ts"
+import { userNonFundingLedgerUpdates } from "./userNonFundingLedgerUpdates.ts"
+import { userTwapHistory } from "./userTwapHistory.ts"
+import { userTwapSliceFills } from "./userTwapSliceFills.ts"
+import { webData2 } from "./webData2.ts"
+import { webData3 } from "./webData3.ts"
 
 export type {
   ActiveAssetCtxEvent as WsActiveAssetCtxEvent,
   ActiveAssetCtxParameters as WsActiveAssetCtxParameters,
-} from "./activeAssetCtx.ts";
+} from "./activeAssetCtx.ts"
 export type {
   ActiveAssetDataEvent as WsActiveAssetDataEvent,
   ActiveAssetDataParameters as WsActiveAssetDataParameters,
-} from "./activeAssetData.ts";
+} from "./activeAssetData.ts"
 export type {
   ActiveSpotAssetCtxEvent as WsActiveSpotAssetCtxEvent,
   ActiveSpotAssetCtxParameters as WsActiveSpotAssetCtxParameters,
-} from "./activeSpotAssetCtx.ts";
-export type { AllMidsEvent as WsAllMidsEvent, AllMidsParameters as WsAllMidsParameters } from "./allMids.ts";
-export type { AssetCtxsEvent as WsAssetCtxsEvent, AssetCtxsParameters as WsAssetCtxsParameters } from "./assetCtxs.ts";
-export type { BboEvent as WsBboEvent, BboParameters as WsBboParameters } from "./bbo.ts";
-export type { CandleEvent as WsCandleEvent, CandleParameters as WsCandleParameters } from "./candle.ts";
+} from "./activeSpotAssetCtx.ts"
+export type {
+  AllMidsEvent as WsAllMidsEvent,
+  AllMidsParameters as WsAllMidsParameters,
+} from "./allMids.ts"
+export type {
+  AssetCtxsEvent as WsAssetCtxsEvent,
+  AssetCtxsParameters as WsAssetCtxsParameters,
+} from "./assetCtxs.ts"
+export type { BboEvent as WsBboEvent, BboParameters as WsBboParameters } from "./bbo.ts"
+export type {
+  CandleEvent as WsCandleEvent,
+  CandleParameters as WsCandleParameters,
+} from "./candle.ts"
 export type {
   ClearinghouseStateEvent as WsClearinghouseStateEvent,
   ClearinghouseStateParameters as WsClearinghouseStateParameters,
-} from "./clearinghouseState.ts";
+} from "./clearinghouseState.ts"
 export type {
   ExplorerBlockEvent as WsExplorerBlockEvent,
   ExplorerBlockParameters as WsExplorerBlockParameters,
-} from "./explorerBlock.ts";
+} from "./explorerBlock.ts"
 export type {
   ExplorerTxsEvent as WsExplorerTxsEvent,
   ExplorerTxsParameters as WsExplorerTxsParameters,
-} from "./explorerTxs.ts";
-export type { L2BookEvent as WsL2BookEvent, L2BookParameters as WsL2BookParameters } from "./l2Book.ts";
+} from "./explorerTxs.ts"
+export type {
+  L2BookEvent as WsL2BookEvent,
+  L2BookParameters as WsL2BookParameters,
+} from "./l2Book.ts"
 export type {
   NotificationEvent as WsNotificationEvent,
   NotificationParameters as WsNotificationParameters,
-} from "./notification.ts";
+} from "./notification.ts"
 export type {
   OpenOrdersEvent as WsOpenOrdersEvent,
   OpenOrdersParameters as WsOpenOrdersParameters,
-} from "./openOrders.ts";
+} from "./openOrders.ts"
 export type {
   OrderUpdatesEvent as WsOrderUpdatesEvent,
   OrderUpdatesParameters as WsOrderUpdatesParameters,
-} from "./orderUpdates.ts";
-export type { TradesEvent as WsTradesEvent, TradesParameters as WsTradesParameters } from "./trades.ts";
+} from "./orderUpdates.ts"
+export type {
+  SpotStateEvent as WsSpotStateEvent,
+  SpotStateParameters as WsSpotStateParameters,
+} from "./spotState.ts"
+export type {
+  TradesEvent as WsTradesEvent,
+  TradesParameters as WsTradesParameters,
+} from "./trades.ts"
 export type {
   UserEventsEvent as WsUserEventsEvent,
   UserEventsParameters as WsUserEventsParameters,
-} from "./userEvents.ts";
-export type { UserFillsEvent as WsUserFillsEvent, UserFillsParameters as WsUserFillsParameters } from "./userFills.ts";
+} from "./userEvents.ts"
+export type {
+  UserFillsEvent as WsUserFillsEvent,
+  UserFillsParameters as WsUserFillsParameters,
+} from "./userFills.ts"
 export type {
   UserFundingsEvent as WsUserFundingsEvent,
   UserFundingsParameters as WsUserFundingsParameters,
-} from "./userFundings.ts";
+} from "./userFundings.ts"
 export type {
   UserHistoricalOrdersEvent as WsUserHistoricalOrdersEvent,
   UserHistoricalOrdersParameters as WsUserHistoricalOrdersParameters,
-} from "./userHistoricalOrders.ts";
+} from "./userHistoricalOrders.ts"
 export type {
   UserNonFundingLedgerUpdatesEvent as WsUserNonFundingLedgerUpdatesEvent,
   UserNonFundingLedgerUpdatesParameters as WsUserNonFundingLedgerUpdatesParameters,
-} from "./userNonFundingLedgerUpdates.ts";
+} from "./userNonFundingLedgerUpdates.ts"
 export type {
   UserTwapHistoryEvent as WsUserTwapHistoryEvent,
   UserTwapHistoryParameters as WsUserTwapHistoryParameters,
-} from "./userTwapHistory.ts";
+} from "./userTwapHistory.ts"
 export type {
   UserTwapSliceFillsEvent as WsUserTwapSliceFillsEvent,
   UserTwapSliceFillsParameters as WsUserTwapSliceFillsParameters,
-} from "./userTwapSliceFills.ts";
-export type { WebData2Event as WsWebData2Event, WebData2Parameters as WsWebData2Parameters } from "./webData2.ts";
-export type { WebData3Event as WsWebData3Event, WebData3Parameters as WsWebData3Parameters } from "./webData3.ts";
+} from "./userTwapSliceFills.ts"
+export type {
+  WebData2Event as WsWebData2Event,
+  WebData2Parameters as WsWebData2Parameters,
+} from "./webData2.ts"
+export type {
+  WebData3Event as WsWebData3Event,
+  WebData3Parameters as WsWebData3Parameters,
+} from "./webData3.ts"
 
-export type { SubscriptionRequestConfig } from "./_types.ts";
+export type { SubscriptionRequestConfig } from "./_types.ts"
 
 /**
  * A client for interacting with the Hyperliquid Subscription API.
  * @typeParam T - The transport (extends {@linkcode ISubscriptionTransport}) used to connect to the Hyperliquid API.
  */
-export class SubscriptionClient<
-  T extends ISubscriptionTransport = ISubscriptionTransport,
-> implements SubscriptionRequestConfig<T> {
-  transport: T;
+export class SubscriptionClient<T extends ISubscriptionTransport = ISubscriptionTransport>
+  implements SubscriptionRequestConfig<T>
+{
+  transport: T
 
   /**
    * Initialises a new instance.
@@ -121,7 +150,7 @@ export class SubscriptionClient<
    * ```
    */
   constructor(args: SubscriptionRequestConfig<T>) {
-    this.transport = args.transport;
+    this.transport = args.transport
   }
 
   /**
@@ -144,7 +173,7 @@ export class SubscriptionClient<
    * ```
    */
   activeAssetCtx(...args: OmitFirst<OverloadedParameters<typeof activeAssetCtx>>) {
-    return activeAssetCtx(this, ...args);
+    return activeAssetCtx(this, ...args)
   }
 
   /**
@@ -167,7 +196,7 @@ export class SubscriptionClient<
    * ```
    */
   activeAssetData(...args: OmitFirst<OverloadedParameters<typeof activeAssetData>>) {
-    return activeAssetData(this, ...args);
+    return activeAssetData(this, ...args)
   }
 
   /**
@@ -190,7 +219,7 @@ export class SubscriptionClient<
    * ```
    */
   activeSpotAssetCtx(...args: OmitFirst<OverloadedParameters<typeof activeSpotAssetCtx>>) {
-    return activeSpotAssetCtx(this, ...args);
+    return activeSpotAssetCtx(this, ...args)
   }
 
   /**
@@ -216,8 +245,8 @@ export class SubscriptionClient<
     return allMids(
       this,
       // @ts-ignore: TypeScript can't resolve overloaded signatures from parameter unions
-      ...args,
-    );
+      ...args
+    )
   }
 
   /**
@@ -243,8 +272,8 @@ export class SubscriptionClient<
     return assetCtxs(
       this,
       // @ts-ignore: TypeScript can't resolve overloaded signatures from parameter unions
-      ...args,
-    );
+      ...args
+    )
   }
 
   /**
@@ -267,7 +296,7 @@ export class SubscriptionClient<
    * ```
    */
   bbo(...args: OmitFirst<OverloadedParameters<typeof bbo>>) {
-    return bbo(this, ...args);
+    return bbo(this, ...args)
   }
 
   /**
@@ -290,7 +319,7 @@ export class SubscriptionClient<
    * ```
    */
   candle(...args: OmitFirst<OverloadedParameters<typeof candle>>) {
-    return candle(this, ...args);
+    return candle(this, ...args)
   }
 
   /**
@@ -313,7 +342,7 @@ export class SubscriptionClient<
    * ```
    */
   clearinghouseState(...args: OmitFirst<OverloadedParameters<typeof clearinghouseState>>) {
-    return clearinghouseState(this, ...args);
+    return clearinghouseState(this, ...args)
   }
 
   /**
@@ -336,7 +365,7 @@ export class SubscriptionClient<
    * ```
    */
   explorerBlock(...args: OmitFirst<OverloadedParameters<typeof explorerBlock>>) {
-    return explorerBlock(this, ...args);
+    return explorerBlock(this, ...args)
   }
 
   /**
@@ -359,7 +388,7 @@ export class SubscriptionClient<
    * ```
    */
   explorerTxs(...args: OmitFirst<OverloadedParameters<typeof explorerTxs>>) {
-    return explorerTxs(this, ...args);
+    return explorerTxs(this, ...args)
   }
 
   /**
@@ -382,7 +411,7 @@ export class SubscriptionClient<
    * ```
    */
   l2Book(...args: OmitFirst<OverloadedParameters<typeof l2Book>>) {
-    return l2Book(this, ...args);
+    return l2Book(this, ...args)
   }
 
   /**
@@ -405,7 +434,7 @@ export class SubscriptionClient<
    * ```
    */
   notification(...args: OmitFirst<OverloadedParameters<typeof notification>>) {
-    return notification(this, ...args);
+    return notification(this, ...args)
   }
 
   /**
@@ -428,7 +457,7 @@ export class SubscriptionClient<
    * ```
    */
   openOrders(...args: OmitFirst<OverloadedParameters<typeof openOrders>>) {
-    return openOrders(this, ...args);
+    return openOrders(this, ...args)
   }
 
   /**
@@ -451,7 +480,30 @@ export class SubscriptionClient<
    * ```
    */
   orderUpdates(...args: OmitFirst<OverloadedParameters<typeof orderUpdates>>) {
-    return orderUpdates(this, ...args);
+    return orderUpdates(this, ...args)
+  }
+
+  /**
+   * Subscribe to spot state updates for a specific user.
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+   *
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport();
+   *
+   * const client = new hl.SubscriptionClient({ transport });
+   * const sub = await client.spotState({ user: "0x..." }, (data) => console.log(data));
+   * ```
+   */
+  spotState(...args: OmitFirst<OverloadedParameters<typeof spotState>>) {
+    return spotState(this, ...args)
   }
 
   /**
@@ -474,7 +526,7 @@ export class SubscriptionClient<
    * ```
    */
   trades(...args: OmitFirst<OverloadedParameters<typeof trades>>) {
-    return trades(this, ...args);
+    return trades(this, ...args)
   }
 
   /**
@@ -498,7 +550,7 @@ export class SubscriptionClient<
    * ```
    */
   userEvents(...args: OmitFirst<OverloadedParameters<typeof userEvents>>) {
-    return userEvents(this, ...args);
+    return userEvents(this, ...args)
   }
 
   /**
@@ -521,7 +573,7 @@ export class SubscriptionClient<
    * ```
    */
   userFills(...args: OmitFirst<OverloadedParameters<typeof userFills>>) {
-    return userFills(this, ...args);
+    return userFills(this, ...args)
   }
 
   /**
@@ -544,7 +596,7 @@ export class SubscriptionClient<
    * ```
    */
   userFundings(...args: OmitFirst<OverloadedParameters<typeof userFundings>>) {
-    return userFundings(this, ...args);
+    return userFundings(this, ...args)
   }
 
   /**
@@ -568,7 +620,7 @@ export class SubscriptionClient<
    * ```
    */
   userHistoricalOrders(...args: OmitFirst<OverloadedParameters<typeof userHistoricalOrders>>) {
-    return userHistoricalOrders(this, ...args);
+    return userHistoricalOrders(this, ...args)
   }
 
   /**
@@ -590,8 +642,10 @@ export class SubscriptionClient<
    * const sub = await client.userNonFundingLedgerUpdates({ user: "0x..." }, (data) => console.log(data));
    * ```
    */
-  userNonFundingLedgerUpdates(...args: OmitFirst<OverloadedParameters<typeof userNonFundingLedgerUpdates>>) {
-    return userNonFundingLedgerUpdates(this, ...args);
+  userNonFundingLedgerUpdates(
+    ...args: OmitFirst<OverloadedParameters<typeof userNonFundingLedgerUpdates>>
+  ) {
+    return userNonFundingLedgerUpdates(this, ...args)
   }
 
   /**
@@ -614,7 +668,7 @@ export class SubscriptionClient<
    * ```
    */
   userTwapHistory(...args: OmitFirst<OverloadedParameters<typeof userTwapHistory>>) {
-    return userTwapHistory(this, ...args);
+    return userTwapHistory(this, ...args)
   }
 
   /**
@@ -637,7 +691,7 @@ export class SubscriptionClient<
    * ```
    */
   userTwapSliceFills(...args: OmitFirst<OverloadedParameters<typeof userTwapSliceFills>>) {
-    return userTwapSliceFills(this, ...args);
+    return userTwapSliceFills(this, ...args)
   }
 
   /**
@@ -660,7 +714,7 @@ export class SubscriptionClient<
    * ```
    */
   webData2(...args: OmitFirst<OverloadedParameters<typeof webData2>>) {
-    return webData2(this, ...args);
+    return webData2(this, ...args)
   }
 
   /**
@@ -683,6 +737,6 @@ export class SubscriptionClient<
    * ```
    */
   webData3(...args: OmitFirst<OverloadedParameters<typeof webData3>>) {
-    return webData3(this, ...args);
+    return webData3(this, ...args)
   }
 }

@@ -1,6 +1,7 @@
-import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
+import * as v from "valibot"
+import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts"
+import type { InfoRequestConfig } from "./_types.ts"
+import { BalanceSchema } from "../_common_schemas.ts"
 
 // -------------------- Schemas --------------------
 
@@ -12,25 +13,16 @@ export const SpotClearinghouseStateRequest = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
       /** Type of request. */
-      type: v.pipe(
-        v.literal("spotClearinghouseState"),
-        v.description("Type of request."),
-      ),
+      type: v.pipe(v.literal("spotClearinghouseState"), v.description("Type of request.")),
       /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
+      user: v.pipe(Address, v.description("User address.")),
       /** DEX name (empty string for main dex). */
-      dex: v.pipe(
-        v.optional(v.string()),
-        v.description("DEX name (empty string for main dex)."),
-      ),
+      dex: v.pipe(v.optional(v.string()), v.description("DEX name (empty string for main dex).")),
     }),
-    v.description("Request spot clearinghouse state."),
-  );
-})();
-export type SpotClearinghouseStateRequest = v.InferOutput<typeof SpotClearinghouseStateRequest>;
+    v.description("Request spot clearinghouse state.")
+  )
+})()
+export type SpotClearinghouseStateRequest = v.InferOutput<typeof SpotClearinghouseStateRequest>
 
 /**
  * Account summary for spot trading.
@@ -40,42 +32,7 @@ export const SpotClearinghouseStateResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
       /** Balance for each token. */
-      balances: v.pipe(
-        v.array(
-          /** Balance for a specific spot token. */
-          v.pipe(
-            v.object({
-              /** Asset symbol. */
-              coin: v.pipe(
-                v.string(),
-                v.description("Asset symbol."),
-              ),
-              /** Unique identifier for the token. */
-              token: v.pipe(
-                UnsignedInteger,
-                v.description("Unique identifier for the token."),
-              ),
-              /** Total balance. */
-              total: v.pipe(
-                UnsignedDecimal,
-                v.description("Total balance."),
-              ),
-              /** Amount on hold. */
-              hold: v.pipe(
-                UnsignedDecimal,
-                v.description("Amount on hold."),
-              ),
-              /** Entry notional value. */
-              entryNtl: v.pipe(
-                UnsignedDecimal,
-                v.description("Entry notional value."),
-              ),
-            }),
-            v.description("Balance for a specific spot token."),
-          ),
-        ),
-        v.description("Balance for each token."),
-      ),
+      balances: v.pipe(v.array(BalanceSchema), v.description("Balance for each token.")),
       /** Escrowed balances. */
       evmEscrows: v.pipe(
         v.optional(
@@ -84,37 +41,31 @@ export const SpotClearinghouseStateResponse = /* @__PURE__ */ (() => {
             v.pipe(
               v.object({
                 /** Asset symbol. */
-                coin: v.pipe(
-                  v.string(),
-                  v.description("Asset symbol."),
-                ),
+                coin: v.pipe(v.string(), v.description("Asset symbol.")),
                 /** Unique identifier for the token. */
-                token: v.pipe(
-                  UnsignedInteger,
-                  v.description("Unique identifier for the token."),
-                ),
+                token: v.pipe(UnsignedInteger, v.description("Unique identifier for the token.")),
                 /** Total balance. */
-                total: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Total balance."),
-                ),
+                total: v.pipe(UnsignedDecimal, v.description("Total balance.")),
               }),
-              v.description("Escrowed balance for a specific asset."),
-            ),
-          ),
+              v.description("Escrowed balance for a specific asset.")
+            )
+          )
         ),
-        v.description("Escrowed balances."),
+        v.description("Escrowed balances.")
       ),
     }),
-    v.description("Account summary for spot trading."),
-  );
-})();
-export type SpotClearinghouseStateResponse = v.InferOutput<typeof SpotClearinghouseStateResponse>;
+    v.description("Account summary for spot trading.")
+  )
+})()
+export type SpotClearinghouseStateResponse = v.InferOutput<typeof SpotClearinghouseStateResponse>
 
 // -------------------- Function --------------------
 
 /** Request parameters for the {@linkcode spotClearinghouseState} function. */
-export type SpotClearinghouseStateParameters = Omit<v.InferInput<typeof SpotClearinghouseStateRequest>, "type">;
+export type SpotClearinghouseStateParameters = Omit<
+  v.InferInput<typeof SpotClearinghouseStateRequest>,
+  "type"
+>
 
 /**
  * Request spot clearinghouse state.
@@ -130,6 +81,7 @@ export type SpotClearinghouseStateParameters = Omit<v.InferInput<typeof SpotClea
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { spotClearinghouseState } from "@nktkas/hyperliquid/api/info";
+import { BalanceSchema } from '../_common_schemas';
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  * const data = await spotClearinghouseState(
@@ -141,11 +93,11 @@ export type SpotClearinghouseStateParameters = Omit<v.InferInput<typeof SpotClea
 export function spotClearinghouseState(
   config: InfoRequestConfig,
   params: DeepImmutable<SpotClearinghouseStateParameters>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ): Promise<SpotClearinghouseStateResponse> {
   const request = parser(SpotClearinghouseStateRequest)({
     type: "spotClearinghouseState",
     ...params,
-  });
-  return config.transport.request("info", request, signal);
+  })
+  return config.transport.request("info", request, signal)
 }
