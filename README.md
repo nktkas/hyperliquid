@@ -487,7 +487,6 @@ class ExchangeClient {
     wallet: AbstractWallet | Hex; // viem, ethers or private key directly
     defaultVaultAddress?: Hex; // Vault address used by default if not provided in method call
     signatureChainId?: Hex | (() => MaybePromise<Hex>); // Chain ID used for signing (default: get chain id from wallet otherwise `0x1`)
-    sequentialRequests?: boolean; // Execute requests sequentially to prevent network-level race conditions (default: true)
   });
 
   // Order & TWAP & Position

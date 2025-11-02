@@ -6,7 +6,6 @@ import {
   type ExtractRequestAction,
   type ExtractRequestOptions,
   getSignatureChainId,
-  globalNonceManager,
   type MultiSignRequestConfig,
   Signature,
 } from "./_base/mod.ts";
@@ -129,16 +128,20 @@ export async function tokenDelegate(
   params: DeepImmutable<TokenDelegateParameters>,
   opts?: TokenDelegateOptions,
 ): Promise<SuccessResponse> {
-  const action = parser(TokenDelegateRequest.entries.action)({
-    type: "tokenDelegate",
-    hyperliquidChain: config.transport.isTestnet ? "Testnet" : "Mainnet",
-    signatureChainId: await getSignatureChainId(config),
-    nonce: globalNonceManager.getNonce(),
-    ...params,
+  const request = parser(TokenDelegateRequest)({
+    action: {
+      type: "tokenDelegate",
+      hyperliquidChain: config.transport.isTestnet ? "Testnet" : "Mainnet",
+      signatureChainId: await getSignatureChainId(config),
+      nonce: 0, // Placeholder; actual nonce generated in `executeUserSignedAction` to prevent race conditions
+      ...params,
+    },
+    nonce: 0, // Placeholder; actual nonce generated in `executeUserSignedAction` to prevent race conditions
+    signature: { // Placeholder; actual signature generated in `executeUserSignedAction`
+      r: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      s: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      v: 27,
+    },
   });
-  return await executeUserSignedAction(
-    config,
-    { action, types: TokenDelegateTypes },
-    opts?.signal,
-  );
+  return await executeUserSignedAction(config, request, TokenDelegateTypes, opts?.signal);
 }

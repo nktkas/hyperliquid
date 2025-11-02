@@ -120,7 +120,6 @@ export class ExchangeClient<
   signatureChainId?: string | (() => MaybePromise<string>);
   defaultVaultAddress?: string;
   defaultExpiresAfter?: number | (() => MaybePromise<number>);
-  sequentialRequests?: boolean;
 
   /**
    * Initialises a new instance.
@@ -183,7 +182,6 @@ export class ExchangeClient<
     this.defaultVaultAddress = args.defaultVaultAddress;
     this.defaultExpiresAfter = args.defaultExpiresAfter;
     this.signatureChainId = args.signatureChainId;
-    this.sequentialRequests = args.sequentialRequests;
   }
 
   /**
@@ -1519,7 +1517,7 @@ export class MultiSignClient<
   /**
    * @note Is the first wallet from {@linkcode signers}. Changing the property also changes the first element in the {@linkcode signers} array.
    */
-  declare readonly wallet: S[0];
+  declare wallet: S[0];
 
   /**
    * Initialises a new multi-signature client instance.

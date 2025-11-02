@@ -6,7 +6,6 @@ import {
   type ExtractRequestAction,
   type ExtractRequestOptions,
   getSignatureChainId,
-  globalNonceManager,
   type MultiSignRequestConfig,
   Signature,
 } from "./_base/mod.ts";
@@ -127,16 +126,20 @@ export async function userDexAbstraction(
   params: DeepImmutable<UserDexAbstractionExchangeParameters>,
   opts?: UserDexAbstractionExchangeOptions,
 ): Promise<SuccessResponse> {
-  const action = parser(UserDexAbstractionExchangeRequest.entries.action)({
-    type: "userDexAbstraction",
-    hyperliquidChain: config.transport.isTestnet ? "Testnet" : "Mainnet",
-    signatureChainId: await getSignatureChainId(config),
-    nonce: globalNonceManager.getNonce(),
-    ...params,
+  const request = parser(UserDexAbstractionExchangeRequest)({
+    action: {
+      type: "userDexAbstraction",
+      hyperliquidChain: config.transport.isTestnet ? "Testnet" : "Mainnet",
+      signatureChainId: await getSignatureChainId(config),
+      nonce: 0, // Placeholder; actual nonce generated in `executeUserSignedAction` to prevent race conditions
+      ...params,
+    },
+    nonce: 0, // Placeholder; actual nonce generated in `executeUserSignedAction` to prevent race conditions
+    signature: { // Placeholder; actual signature generated in `executeUserSignedAction`
+      r: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      s: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      v: 27,
+    },
   });
-  return await executeUserSignedAction(
-    config,
-    { action, types: UserDexAbstractionTypes },
-    opts?.signal,
-  );
+  return await executeUserSignedAction(config, request, UserDexAbstractionTypes, opts?.signal);
 }

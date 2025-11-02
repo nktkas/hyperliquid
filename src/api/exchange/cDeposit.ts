@@ -6,7 +6,6 @@ import {
   type ExtractRequestAction,
   type ExtractRequestOptions,
   getSignatureChainId,
-  globalNonceManager,
   type MultiSignRequestConfig,
   Signature,
 } from "./_base/mod.ts";
@@ -117,16 +116,20 @@ export async function cDeposit(
   params: DeepImmutable<CDepositParameters>,
   opts?: CDepositOptions,
 ): Promise<SuccessResponse> {
-  const action = parser(CDepositRequest.entries.action)({
-    type: "cDeposit",
-    hyperliquidChain: config.transport.isTestnet ? "Testnet" : "Mainnet",
-    signatureChainId: await getSignatureChainId(config),
-    nonce: globalNonceManager.getNonce(),
-    ...params,
+  const request = parser(CDepositRequest)({
+    action: {
+      type: "cDeposit",
+      hyperliquidChain: config.transport.isTestnet ? "Testnet" : "Mainnet",
+      signatureChainId: await getSignatureChainId(config),
+      nonce: 0, // Placeholder; actual nonce generated in `executeUserSignedAction` to prevent race conditions
+      ...params,
+    },
+    nonce: 0, // Placeholder; actual nonce generated in `executeUserSignedAction` to prevent race conditions
+    signature: { // Placeholder; actual signature generated in `executeUserSignedAction`
+      r: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      s: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      v: 27,
+    },
   });
-  return await executeUserSignedAction(
-    config,
-    { action, types: CDepositTypes },
-    opts?.signal,
-  );
+  return await executeUserSignedAction(config, request, CDepositTypes, opts?.signal);
 }

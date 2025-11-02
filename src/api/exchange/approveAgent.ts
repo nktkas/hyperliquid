@@ -6,7 +6,6 @@ import {
   type ExtractRequestAction,
   type ExtractRequestOptions,
   getSignatureChainId,
-  globalNonceManager,
   type MultiSignRequestConfig,
   Signature,
 } from "./_base/mod.ts";
@@ -123,16 +122,20 @@ export async function approveAgent(
   params: DeepImmutable<ApproveAgentParameters>,
   opts?: ApproveAgentOptions,
 ): Promise<SuccessResponse> {
-  const action = parser(ApproveAgentRequest.entries.action)({
-    type: "approveAgent",
-    hyperliquidChain: config.transport.isTestnet ? "Testnet" : "Mainnet",
-    signatureChainId: await getSignatureChainId(config),
-    nonce: globalNonceManager.getNonce(),
-    ...params,
+  const request = parser(ApproveAgentRequest)({
+    action: {
+      type: "approveAgent",
+      hyperliquidChain: config.transport.isTestnet ? "Testnet" : "Mainnet",
+      signatureChainId: await getSignatureChainId(config),
+      nonce: 0, // Placeholder; actual nonce generated in `executeUserSignedAction` to prevent race conditions
+      ...params,
+    },
+    nonce: 0, // Placeholder; actual nonce generated in `executeUserSignedAction` to prevent race conditions
+    signature: { // Placeholder; actual signature generated in `executeUserSignedAction`
+      r: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      s: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      v: 27,
+    },
   });
-  return await executeUserSignedAction(
-    config,
-    { action, types: ApproveAgentTypes },
-    opts?.signal,
-  );
+  return await executeUserSignedAction(config, request, ApproveAgentTypes, opts?.signal);
 }

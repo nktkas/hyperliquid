@@ -6,7 +6,6 @@ import {
   type ExtractRequestAction,
   type ExtractRequestOptions,
   getSignatureChainId,
-  globalNonceManager,
   type MultiSignRequestConfig,
   Signature,
 } from "./_base/mod.ts";
@@ -133,16 +132,20 @@ export async function spotSend(
   params: DeepImmutable<SpotSendParameters>,
   opts?: SpotSendOptions,
 ): Promise<SuccessResponse> {
-  const action = parser(SpotSendRequest.entries.action)({
-    type: "spotSend",
-    hyperliquidChain: config.transport.isTestnet ? "Testnet" : "Mainnet",
-    signatureChainId: await getSignatureChainId(config),
-    time: globalNonceManager.getNonce(),
-    ...params,
+  const request = parser(SpotSendRequest)({
+    action: {
+      type: "spotSend",
+      hyperliquidChain: config.transport.isTestnet ? "Testnet" : "Mainnet",
+      signatureChainId: await getSignatureChainId(config),
+      time: 0, // Placeholder; actual nonce generated in `executeUserSignedAction` to prevent race conditions
+      ...params,
+    },
+    nonce: 0, // Placeholder; actual nonce generated in `executeUserSignedAction` to prevent race conditions
+    signature: { // Placeholder; actual signature generated in `executeUserSignedAction`
+      r: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      s: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      v: 27,
+    },
   });
-  return await executeUserSignedAction(
-    config,
-    { action, types: SpotSendTypes },
-    opts?.signal,
-  );
+  return await executeUserSignedAction(config, request, SpotSendTypes, opts?.signal);
 }

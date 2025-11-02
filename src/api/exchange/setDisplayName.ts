@@ -103,15 +103,20 @@ export async function setDisplayName(
   params: DeepImmutable<SetDisplayNameParameters>,
   opts?: SetDisplayNameOptions,
 ): Promise<SuccessResponse> {
-  const action = parser(SetDisplayNameRequest.entries.action)({
-    type: "setDisplayName",
-    ...params,
+  const request = parser(SetDisplayNameRequest)({
+    action: {
+      type: "setDisplayName",
+      ...params,
+    },
+    nonce: 0, // Placeholder; actual nonce generated in `executeL1Action`
+    signature: { // Placeholder; actual signature generated in `executeL1Action`
+      r: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      s: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      v: 27,
+    },
+    expiresAfter: typeof config.defaultExpiresAfter === "number"
+      ? config.defaultExpiresAfter
+      : await config.defaultExpiresAfter?.(),
   });
-
-  const expiresAfter_ = typeof config.defaultExpiresAfter === "number"
-    ? config.defaultExpiresAfter
-    : await config.defaultExpiresAfter?.();
-  const expiresAfter = parser(v.optional(UnsignedInteger))(expiresAfter_);
-
-  return await executeL1Action(config, { action, expiresAfter }, opts?.signal);
+  return await executeL1Action(config, request, opts?.signal);
 }

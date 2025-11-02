@@ -1,9 +1,9 @@
+import { getSemaphore } from "@henrygd/semaphore";
 import { getWalletAddress, signL1Action, signMultiSigAction, signUserSignedAction } from "../../../signing/mod.ts";
 import { assertSuccessResponse } from "./_errors.ts";
 import type { AnyResponse, AnySuccessResponse, ExchangeRequestConfig, MultiSignRequestConfig } from "./_types.ts";
 import { globalNonceManager } from "./_nonce.ts";
 import { getSignatureChainId } from "./_helpers.ts";
-import { getRequestQueue } from "./_sequential.ts";
 
 export async function executeL1Action<T extends AnySuccessResponse>(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
@@ -14,15 +14,26 @@ export async function executeL1Action<T extends AnySuccessResponse>(
   },
   signal?: AbortSignal,
 ): Promise<T> {
-  const fn = async (): Promise<T> => {
-    const { transport } = config;
-    const { action, vaultAddress, expiresAfter } = request;
+  const { transport } = config;
+  const { action, vaultAddress, expiresAfter } = request;
 
+  // Sequential request execution to prevent nonce race conditions at the network layer
+  const walletAddress = "signers" in config
+    ? await getWalletAddress(config.signers[0])
+    : await getWalletAddress(config.wallet);
+  const walletKey = `@nktkas/hyperliquid:${walletAddress}:${config.transport.isTestnet}`;
+
+  const sem = getSemaphore(walletKey);
+  await sem.acquire();
+
+  // Main logic
+  try {
     const nonce = globalNonceManager.getNonce();
 
+    // Multi-signature request
     if ("signers" in config) {
       const { signers, multiSigUser } = config;
-      const outerSigner = await getWalletAddress(signers[0]);
+      const outerSigner = walletAddress;
 
       // Sign an L1 action for each signer
       const signatures = await Promise.all(signers.map(async (signer) => {
@@ -41,12 +52,7 @@ export async function executeL1Action<T extends AnySuccessResponse>(
 
       // Send a request via multi-sign action
       return await executeMultiSigAction(
-        {
-          ...config,
-          wallet: signers[0],
-          // Disable queue since we're already inside the queue
-          sequentialRequests: false,
-        },
+        { ...config, wallet: signers[0] },
         {
           action: {
             type: "multiSig",
@@ -59,8 +65,9 @@ export async function executeL1Action<T extends AnySuccessResponse>(
           nonce,
         },
         signal,
+        false,
       );
-    } else {
+    } else { // Single-signature request
       const { wallet } = config;
 
       // Sign an L1 action
@@ -82,11 +89,10 @@ export async function executeL1Action<T extends AnySuccessResponse>(
       assertSuccessResponse(response);
       return response as T;
     }
-  };
-
-  // Execute with queue if enabled, otherwise execute directly
-  const queue = await getRequestQueue(config);
-  return queue ? await queue.enqueue(fn) : await fn();
+  } finally {
+    // Release semaphore
+    sem.release();
+  }
 }
 
 export async function executeUserSignedAction<T extends AnySuccessResponse>(
@@ -101,24 +107,37 @@ export async function executeUserSignedAction<T extends AnySuccessResponse>(
         | { nonce: number; time?: undefined }
         | { time: number; nonce?: undefined }
       );
-    types: {
-      [key: string]: {
-        name: string;
-        type: string;
-      }[];
-    };
+  },
+  types: {
+    [key: string]: {
+      name: string;
+      type: string;
+    }[];
   },
   signal?: AbortSignal,
 ): Promise<T> {
-  const fn = async (): Promise<T> => {
-    const { transport } = config;
-    const { action, types } = request;
+  const { transport } = config;
+  const { action } = request;
 
-    const nonce = action.nonce ?? action.time;
+  // Sequential request execution to prevent nonce race conditions at the network layer
+  const walletAddress = "signers" in config
+    ? await getWalletAddress(config.signers[0])
+    : await getWalletAddress(config.wallet);
+  const walletKey = `@nktkas/hyperliquid:${walletAddress}:${config.transport.isTestnet}`;
 
+  const sem = getSemaphore(walletKey);
+  await sem.acquire();
+
+  // Main logic
+  try {
+    const nonce = globalNonceManager.getNonce();
+    if ("time" in action) request.action.time = nonce;
+    if ("nonce" in action) request.action.nonce = nonce;
+
+    // Multi-signature request
     if ("signers" in config) {
       const { signers, multiSigUser } = config;
-      const outerSigner = await getWalletAddress(signers[0]);
+      const outerSigner = walletAddress;
 
       // Sign a user-signed action for each signer
       const signatures = await Promise.all(signers.map(async (signer) => {
@@ -138,12 +157,7 @@ export async function executeUserSignedAction<T extends AnySuccessResponse>(
 
       // Send a request via multi-sign action
       return await executeMultiSigAction(
-        {
-          ...config,
-          wallet: signers[0],
-          // Disable queue since we're already inside the queue
-          sequentialRequests: false,
-        },
+        { ...config, wallet: signers[0] },
         {
           action: {
             type: "multiSig",
@@ -154,8 +168,9 @@ export async function executeUserSignedAction<T extends AnySuccessResponse>(
           nonce,
         },
         signal,
+        false,
       );
-    } else {
+    } else { // Single-signature request
       const { wallet } = config;
 
       // Sign a user-signed action
@@ -170,11 +185,10 @@ export async function executeUserSignedAction<T extends AnySuccessResponse>(
       assertSuccessResponse(response);
       return response as T;
     }
-  };
-
-  // Execute with queue if enabled, otherwise execute directly
-  const queue = await getRequestQueue(config);
-  return queue ? await queue.enqueue(fn) : await fn();
+  } finally {
+    // Release semaphore and nonce manager
+    sem.release();
+  }
 }
 
 export async function executeMultiSigAction<T extends AnySuccessResponse>(
@@ -189,11 +203,22 @@ export async function executeMultiSigAction<T extends AnySuccessResponse>(
     expiresAfter?: number;
   },
   signal?: AbortSignal,
+  semaphore = true,
 ): Promise<T> {
-  const fn = async (): Promise<T> => {
-    const { transport, wallet } = config;
-    const { action, nonce, vaultAddress, expiresAfter } = request;
+  const { transport, wallet } = config;
+  const { action, nonce, vaultAddress, expiresAfter } = request;
 
+  // Sequential request execution to prevent nonce race conditions at the network layer
+  let sem: ReturnType<typeof getSemaphore> | undefined;
+  if (semaphore) {
+    const walletAddress = await getWalletAddress(config.wallet);
+    const walletKey = `@nktkas/hyperliquid:${walletAddress}:${config.transport.isTestnet}`;
+    sem = getSemaphore(walletKey);
+    await sem.acquire();
+  }
+
+  // Main logic
+  try {
     // Sign a multi-signature action
     const signature = await signMultiSigAction({
       wallet,
@@ -212,9 +237,8 @@ export async function executeMultiSigAction<T extends AnySuccessResponse>(
     ) as AnyResponse;
     assertSuccessResponse(response);
     return response as T;
-  };
-
-  // Execute with queue if enabled, otherwise execute directly
-  const queue = await getRequestQueue(config);
-  return queue ? await queue.enqueue(fn) : await fn();
+  } finally {
+    // Release semaphore if used
+    sem?.release();
+  }
 }

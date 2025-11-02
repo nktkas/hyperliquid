@@ -218,7 +218,7 @@ export async function getWalletChainId(wallet: AbstractWallet): Promise<`0x${str
   }
 }
 
-/** Get the wallet address from various wallet types. */
+/** Get the lowercase wallet address from various wallet types. */
 export async function getWalletAddress(wallet: AbstractWallet): Promise<`0x${string}`> {
   if (isAbstractViemWallet(wallet)) {
     if ("address" in wallet && wallet.address) {

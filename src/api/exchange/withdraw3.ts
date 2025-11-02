@@ -6,7 +6,6 @@ import {
   type ExtractRequestAction,
   type ExtractRequestOptions,
   getSignatureChainId,
-  globalNonceManager,
   type MultiSignRequestConfig,
   Signature,
 } from "./_base/mod.ts";
@@ -123,16 +122,20 @@ export async function withdraw3(
   params: DeepImmutable<Withdraw3Parameters>,
   opts?: Withdraw3Options,
 ): Promise<SuccessResponse> {
-  const action = parser(Withdraw3Request.entries.action)({
-    type: "withdraw3",
-    hyperliquidChain: config.transport.isTestnet ? "Testnet" : "Mainnet",
-    signatureChainId: await getSignatureChainId(config),
-    time: globalNonceManager.getNonce(),
-    ...params,
+  const request = parser(Withdraw3Request)({
+    action: {
+      type: "withdraw3",
+      hyperliquidChain: config.transport.isTestnet ? "Testnet" : "Mainnet",
+      signatureChainId: await getSignatureChainId(config),
+      time: 0, // Placeholder; actual nonce generated in `executeUserSignedAction` to prevent race conditions
+      ...params,
+    },
+    nonce: 0, // Placeholder; actual nonce generated in `executeUserSignedAction` to prevent race conditions
+    signature: { // Placeholder; actual signature generated in `executeUserSignedAction`
+      r: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      s: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      v: 27,
+    },
   });
-  return await executeUserSignedAction(
-    config,
-    { action, types: Withdraw3Types },
-    opts?.signal,
-  );
+  return await executeUserSignedAction(config, request, Withdraw3Types, opts?.signal);
 }

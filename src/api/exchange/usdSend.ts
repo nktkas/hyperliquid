@@ -6,7 +6,6 @@ import {
   type ExtractRequestAction,
   type ExtractRequestOptions,
   getSignatureChainId,
-  globalNonceManager,
   type MultiSignRequestConfig,
   Signature,
 } from "./_base/mod.ts";
@@ -123,16 +122,20 @@ export async function usdSend(
   params: DeepImmutable<UsdSendParameters>,
   opts?: UsdSendOptions,
 ): Promise<SuccessResponse> {
-  const action = parser(UsdSendRequest.entries.action)({
-    type: "usdSend",
-    hyperliquidChain: config.transport.isTestnet ? "Testnet" : "Mainnet",
-    signatureChainId: await getSignatureChainId(config),
-    time: globalNonceManager.getNonce(),
-    ...params,
+  const request = parser(UsdSendRequest)({
+    action: {
+      type: "usdSend",
+      hyperliquidChain: config.transport.isTestnet ? "Testnet" : "Mainnet",
+      signatureChainId: await getSignatureChainId(config),
+      time: 0, // Placeholder; actual nonce generated in `executeUserSignedAction` to prevent race conditions
+      ...params,
+    },
+    nonce: 0, // Placeholder; actual nonce generated in `executeUserSignedAction` to prevent race conditions
+    signature: { // Placeholder; actual signature generated in `executeUserSignedAction`
+      r: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      s: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      v: 27,
+    },
   });
-  return await executeUserSignedAction(
-    config,
-    { action, types: UsdSendTypes },
-    opts?.signal,
-  );
+  return await executeUserSignedAction(config, request, UsdSendTypes, opts?.signal);
 }

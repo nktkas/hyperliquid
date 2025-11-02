@@ -125,18 +125,21 @@ export async function scheduleCancel(
   const params = isFirstArgParams ? paramsOrOpts : {};
   const opts = isFirstArgParams ? maybeOpts : paramsOrOpts as ScheduleCancelOptions;
 
-  const action = parser(ScheduleCancelRequest.entries.action)({
-    type: "scheduleCancel",
-    ...params,
+  const request = parser(ScheduleCancelRequest)({
+    action: {
+      type: "scheduleCancel",
+      ...params,
+    },
+    nonce: 0, // Placeholder; actual nonce generated in `executeL1Action`
+    signature: { // Placeholder; actual signature generated in `executeL1Action`
+      r: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      s: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      v: 27,
+    },
+    vaultAddress: opts?.vaultAddress ?? config.defaultVaultAddress,
+    expiresAfter: typeof config.defaultExpiresAfter === "number"
+      ? config.defaultExpiresAfter
+      : await config.defaultExpiresAfter?.(),
   });
-
-  const vaultAddress_ = opts?.vaultAddress ?? config.defaultVaultAddress;
-  const vaultAddress = parser(v.optional(Address))(vaultAddress_);
-
-  const expiresAfter_ = typeof config.defaultExpiresAfter === "number"
-    ? config.defaultExpiresAfter
-    : await config.defaultExpiresAfter?.();
-  const expiresAfter = parser(v.optional(UnsignedInteger))(expiresAfter_);
-
-  return await executeL1Action(config, { action, vaultAddress, expiresAfter }, opts?.signal);
+  return await executeL1Action(config, request, opts?.signal);
 }

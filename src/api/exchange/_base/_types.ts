@@ -54,13 +54,6 @@ export interface ExchangeRequestConfig<
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#expires-after
    */
   defaultExpiresAfter?: number | (() => MaybePromise<number>);
-  /**
-   * Execute requests sequentially to prevent network-level race conditions.
-   * When enabled, requests are queued and executed one by one in order,
-   * ensuring they arrive at the server in the correct sequence.
-   * @default true
-   */
-  sequentialRequests?: boolean;
 }
 
 /** Configuration for Exchange API requests using multi-signature wallets. */

@@ -97,15 +97,20 @@ export async function setReferrer(
   params: DeepImmutable<SetReferrerParameters>,
   opts?: SetReferrerOptions,
 ): Promise<SuccessResponse> {
-  const action = parser(SetReferrerRequest.entries.action)({
-    type: "setReferrer",
-    ...params,
+  const request = parser(SetReferrerRequest)({
+    action: {
+      type: "setReferrer",
+      ...params,
+    },
+    nonce: 0, // Placeholder; actual nonce generated in `executeL1Action`
+    signature: { // Placeholder; actual signature generated in `executeL1Action`
+      r: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      s: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      v: 27,
+    },
+    expiresAfter: typeof config.defaultExpiresAfter === "number"
+      ? config.defaultExpiresAfter
+      : await config.defaultExpiresAfter?.(),
   });
-
-  const expiresAfter_ = typeof config.defaultExpiresAfter === "number"
-    ? config.defaultExpiresAfter
-    : await config.defaultExpiresAfter?.();
-  const expiresAfter = parser(v.optional(UnsignedInteger))(expiresAfter_);
-
-  return await executeL1Action(config, { action, expiresAfter }, opts?.signal);
+  return await executeL1Action(config, request, opts?.signal);
 }

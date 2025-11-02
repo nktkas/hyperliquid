@@ -282,28 +282,22 @@ export async function multiSig<
 ): Promise<T> {
   const { nonce, ...params } = paramsAndNonce;
 
-  const action = parser(MultiSigRequest.entries.action)({
-    type: "multiSig",
-    signatureChainId: await getSignatureChainId(config),
-    ...params,
-  });
-
-  const vaultAddress_ = opts?.vaultAddress ?? config.defaultVaultAddress;
-  const vaultAddress = parser(v.optional(Address))(vaultAddress_);
-
-  const expiresAfter_ = typeof config.defaultExpiresAfter === "number"
-    ? config.defaultExpiresAfter
-    : await config.defaultExpiresAfter?.();
-  const expiresAfter = parser(v.optional(UnsignedInteger))(expiresAfter_);
-
-  return await executeMultiSigAction(
-    config,
-    {
-      action,
-      vaultAddress,
-      expiresAfter,
-      nonce: Number(nonce),
+  const request = parser(MultiSigRequest)({
+    action: {
+      type: "multiSig",
+      signatureChainId: await getSignatureChainId(config),
+      ...params,
     },
-    opts?.signal,
-  );
+    nonce,
+    signature: { // Placeholder; actual signature generated in `executeMultiSigAction`
+      r: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      s: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      v: 27,
+    },
+    vaultAddress: opts?.vaultAddress ?? config.defaultVaultAddress,
+    expiresAfter: typeof config.defaultExpiresAfter === "number"
+      ? config.defaultExpiresAfter
+      : await config.defaultExpiresAfter?.(),
+  });
+  return await executeMultiSigAction(config, request, opts?.signal);
 }

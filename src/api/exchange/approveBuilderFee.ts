@@ -6,7 +6,6 @@ import {
   type ExtractRequestAction,
   type ExtractRequestOptions,
   getSignatureChainId,
-  globalNonceManager,
   type MultiSignRequestConfig,
   Signature,
 } from "./_base/mod.ts";
@@ -123,16 +122,20 @@ export async function approveBuilderFee(
   params: DeepImmutable<ApproveBuilderFeeParameters>,
   opts?: ApproveBuilderFeeOptions,
 ): Promise<SuccessResponse> {
-  const action = parser(ApproveBuilderFeeRequest.entries.action)({
-    type: "approveBuilderFee",
-    hyperliquidChain: config.transport.isTestnet ? "Testnet" : "Mainnet",
-    signatureChainId: await getSignatureChainId(config),
-    nonce: globalNonceManager.getNonce(),
-    ...params,
+  const request = parser(ApproveBuilderFeeRequest)({
+    action: {
+      type: "approveBuilderFee",
+      hyperliquidChain: config.transport.isTestnet ? "Testnet" : "Mainnet",
+      signatureChainId: await getSignatureChainId(config),
+      nonce: 0, // Placeholder; actual nonce generated in `executeUserSignedAction` to prevent race conditions
+      ...params,
+    },
+    nonce: 0, // Placeholder; actual nonce generated in `executeUserSignedAction` to prevent race conditions
+    signature: { // Placeholder; actual signature generated in `executeUserSignedAction`
+      r: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      s: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      v: 27,
+    },
   });
-  return await executeUserSignedAction(
-    config,
-    { action, types: ApproveBuilderFeeTypes },
-    opts?.signal,
-  );
+  return await executeUserSignedAction(config, request, ApproveBuilderFeeTypes, opts?.signal);
 }

@@ -84,14 +84,19 @@ export async function noop(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   opts?: NoopOptions,
 ): Promise<SuccessResponse> {
-  const action = parser(NoopRequest.entries.action)({
-    type: "noop",
+  const request = parser(NoopRequest)({
+    action: {
+      type: "noop",
+    },
+    nonce: 0, // Placeholder; actual nonce generated in `executeL1Action`
+    signature: { // Placeholder; actual signature generated in `executeL1Action`
+      r: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      s: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      v: 27,
+    },
+    expiresAfter: typeof config.defaultExpiresAfter === "number"
+      ? config.defaultExpiresAfter
+      : await config.defaultExpiresAfter?.(),
   });
-
-  const expiresAfter_ = typeof config.defaultExpiresAfter === "number"
-    ? config.defaultExpiresAfter
-    : await config.defaultExpiresAfter?.();
-  const expiresAfter = parser(v.optional(UnsignedInteger))(expiresAfter_);
-
-  return await executeL1Action(config, { action, expiresAfter }, opts?.signal);
+  return await executeL1Action(config, request, opts?.signal);
 }
