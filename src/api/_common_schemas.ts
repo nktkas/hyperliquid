@@ -731,3 +731,37 @@ export const TwapFillSchema = /* @__PURE__ */ (() => {
     v.description("TWAP fill record."),
   );
 })();
+
+/** Balance for a specific spot token. */
+export const BalanceSchema = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.object({
+      /** Asset symbol. */
+      coin: v.pipe(
+        v.string(),
+        v.description("Asset symbol."),
+      ),
+      /** Unique identifier for the token. */
+      token: v.pipe(
+        UnsignedInteger,
+        v.description("Unique identifier for the token."),
+      ),
+      /** Total balance. */
+      total: v.pipe(
+        UnsignedDecimal,
+        v.description("Total balance."),
+      ),
+      /** Amount on hold. */
+      hold: v.pipe(
+        UnsignedDecimal,
+        v.description("Amount on hold."),
+      ),
+      /** Entry notional value. */
+      entryNtl: v.pipe(
+        UnsignedDecimal,
+        v.description("Entry notional value."),
+      ),
+    }),
+    v.description("Balance for a specific spot token."),
+  );
+})();

@@ -16,6 +16,7 @@ import { l2Book } from "./l2Book.ts";
 import { notification } from "./notification.ts";
 import { openOrders } from "./openOrders.ts";
 import { orderUpdates } from "./orderUpdates.ts";
+import { spotState } from "./spotState.ts";
 import { trades } from "./trades.ts";
 import { userEvents } from "./userEvents.ts";
 import { userFills } from "./userFills.ts";
@@ -68,6 +69,7 @@ export type {
   OrderUpdatesEvent as WsOrderUpdatesEvent,
   OrderUpdatesParameters as WsOrderUpdatesParameters,
 } from "./orderUpdates.ts";
+export type { SpotStateEvent as WsSpotStateEvent, SpotStateParameters as WsSpotStateParameters } from "./spotState.ts";
 export type { TradesEvent as WsTradesEvent, TradesParameters as WsTradesParameters } from "./trades.ts";
 export type {
   UserEventsEvent as WsUserEventsEvent,
@@ -452,6 +454,29 @@ export class SubscriptionClient<
    */
   orderUpdates(...args: OmitFirst<OverloadedParameters<typeof orderUpdates>>) {
     return orderUpdates(this, ...args);
+  }
+
+  /**
+   * Subscribe to spot state updates for a specific user.
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+   *
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport();
+   *
+   * const client = new hl.SubscriptionClient({ transport });
+   * const sub = await client.spotState({ user: "0x..." }, (data) => console.log(data));
+   * ```
+   */
+  spotState(...args: OmitFirst<OverloadedParameters<typeof spotState>>) {
+    return spotState(this, ...args);
   }
 
   /**

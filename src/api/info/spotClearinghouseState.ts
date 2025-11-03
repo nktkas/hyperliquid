@@ -2,6 +2,8 @@ import * as v from "valibot";
 import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 import type { InfoRequestConfig } from "./_types.ts";
 
+import { BalanceSchema } from "../_common_schemas.ts";
+
 // -------------------- Schemas --------------------
 
 /**
@@ -41,39 +43,7 @@ export const SpotClearinghouseStateResponse = /* @__PURE__ */ (() => {
     v.object({
       /** Balance for each token. */
       balances: v.pipe(
-        v.array(
-          /** Balance for a specific spot token. */
-          v.pipe(
-            v.object({
-              /** Asset symbol. */
-              coin: v.pipe(
-                v.string(),
-                v.description("Asset symbol."),
-              ),
-              /** Unique identifier for the token. */
-              token: v.pipe(
-                UnsignedInteger,
-                v.description("Unique identifier for the token."),
-              ),
-              /** Total balance. */
-              total: v.pipe(
-                UnsignedDecimal,
-                v.description("Total balance."),
-              ),
-              /** Amount on hold. */
-              hold: v.pipe(
-                UnsignedDecimal,
-                v.description("Amount on hold."),
-              ),
-              /** Entry notional value. */
-              entryNtl: v.pipe(
-                UnsignedDecimal,
-                v.description("Entry notional value."),
-              ),
-            }),
-            v.description("Balance for a specific spot token."),
-          ),
-        ),
+        v.array(BalanceSchema),
         v.description("Balance for each token."),
       ),
       /** Escrowed balances. */
