@@ -3,20 +3,8 @@
 Welcome, and thank you for taking time in contributing to SDK! You can contribute to SDK in different ways:
 
 - Submit new features
-- Report and fix bugs
+- Report bugs
 - Review code
-
-## Development Setup
-
-You will need [Deno](https://deno.com) 2.0+.
-
-1. Fork this repository to your own GitHub account.
-2. Clone the repository to your local device.
-3. Create a new branch `git checkout -b BRANCH_NAME`.
-4. Change code.
-5. [Push your branch to Github after all tests passed.](#Testing)
-6. Make a [pull request](https://github.com/nktkas/hyperliquid/pulls).
-7. Merge to master branch by our maintainers.
 
 ## Testing
 
@@ -35,10 +23,27 @@ deno test -A -- YOUR_PRIVATE_KEY
 
 ## Coding Guidelines
 
-- **TypeScript**: Ensure your code passes TypeScript compilation without errors. Try not to ignore typescript errors and
-  avoid creating unsafe types.
-- **Style**: Follow Deno formatting convention ([deno fmt](https://docs.deno.com/runtime/reference/cli/fmt/)) and code
-  style ([deno lint](https://docs.deno.com/runtime/reference/cli/lint/)).
-- **Dependencies**: Try to use trusted small dependencies (e.g. [@noble](https://github.com/paulmillr/noble-hashes) or
-  [deno @std](https://github.com/denoland/std)).
+- **Style**: After making all changes, run:
+  - [`deno fmt`](https://docs.deno.com/runtime/reference/cli/fmt/) to format your code.
+  - [`deno lint`](https://docs.deno.com/runtime/reference/cli/lint/) to check for linting errors.
+  - [`deno check --doc`](https://docs.deno.com/runtime/reference/cli/check/) to ensure there are no type errors (try not
+    to ignore errors).
+- **Dependencies**: Try to use small and easily auditable dependencies (e.g.
+  [@noble](https://github.com/paulmillr/noble-hashes) or [deno @std](https://docs.deno.com/runtime/reference/std/)).
+- **Testing**: Write tests for any new functionality.
 - **Docs**: Update or add JSDoc comments where appropriate.
+
+## Common Tasks
+
+### Add a new API method
+
+1. Create a file with the method name in the appropriate directory:
+   `src/api/[exchange|info|subscription]/[methodName].ts`
+2. Implement the logic related to the new API (using ready-made patterns from other method files).
+3. Update the `~client.ts` file to include the new method.
+4. Add the raw function export to `~mod.ts`.
+5. Create a test (use patterns from other tests) and run the test.
+6. Update the [`API Reference`](/README.md#api-reference) section in [`README.md`](/README.md).
+7. Run [`deno fmt`](https://docs.deno.com/runtime/reference/cli/fmt/),
+   [`deno lint`](https://docs.deno.com/runtime/reference/cli/lint/), and
+   [`deno check --doc`](https://docs.deno.com/runtime/reference/cli/check/) to ensure code quality.
