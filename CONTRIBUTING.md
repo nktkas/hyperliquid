@@ -43,7 +43,9 @@ deno test -A -- YOUR_PRIVATE_KEY
 3. Update the `~client.ts` file to include the new method.
 4. Add the raw function export to `~mod.ts`.
 5. Create a test (use patterns from other tests) and run the test.
-6. Update the [`API Reference`](/README.md#api-reference) section in [`README.md`](/README.md).
+6. Update docs:
+   - Update the [`API Reference`](/README.md#api-reference) section in [`README.md`](/README.md)
+   - Update the helper message (function `printHelp`) in [`bin/cli.ts`](/bin/cli.ts).
 7. Run [`deno fmt`](https://docs.deno.com/runtime/reference/cli/fmt/),
    [`deno lint`](https://docs.deno.com/runtime/reference/cli/lint/), and
    [`deno check --doc`](https://docs.deno.com/runtime/reference/cli/check/) to ensure code quality.
