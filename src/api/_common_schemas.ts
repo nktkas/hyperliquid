@@ -34,15 +34,30 @@ export const PlaceOrderParamsSchema = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
       /** Asset ID. */
-      a: v.pipe(UnsignedInteger, v.description("Asset ID.")),
+      a: v.pipe(
+        UnsignedInteger,
+        v.description("Asset ID."),
+      ),
       /** Position side (`true` for long, `false` for short). */
-      b: v.pipe(v.boolean(), v.description("Position side (`true` for long, `false` for short).")),
+      b: v.pipe(
+        v.boolean(),
+        v.description("Position side (`true` for long, `false` for short)."),
+      ),
       /** Price. */
-      p: v.pipe(UnsignedDecimal, v.description("Price.")),
+      p: v.pipe(
+        UnsignedDecimal,
+        v.description("Price."),
+      ),
       /** Size (in base currency units). */
-      s: v.pipe(UnsignedDecimal, v.description("Size (in base currency units).")),
+      s: v.pipe(
+        UnsignedDecimal,
+        v.description("Size (in base currency units)."),
+      ),
       /** Is reduce-only? */
-      r: v.pipe(v.boolean(), v.description("Is reduce-only?")),
+      r: v.pipe(
+        v.boolean(),
+        v.description("Is reduce-only?"),
+      ),
       /** Order type. */
       t: v.pipe(
         v.union([
@@ -68,9 +83,15 @@ export const PlaceOrderParamsSchema = /* @__PURE__ */ (() => {
             trigger: v.pipe(
               v.object({
                 /** Is market order? */
-                isMarket: v.pipe(v.boolean(), v.description("Is market order?")),
+                isMarket: v.pipe(
+                  v.boolean(),
+                  v.description("Is market order?"),
+                ),
                 /** Trigger price. */
-                triggerPx: v.pipe(UnsignedDecimal, v.description("Trigger price.")),
+                triggerPx: v.pipe(
+                  UnsignedDecimal,
+                  v.description("Trigger price."),
+                ),
                 /** Indicates whether it is take profit or stop loss. */
                 tpsl: v.pipe(
                   v.union([v.literal("tp"), v.literal("sl")]),
@@ -84,7 +105,10 @@ export const PlaceOrderParamsSchema = /* @__PURE__ */ (() => {
         v.description("Order type."),
       ),
       /** Client Order ID. */
-      c: v.pipe(v.optional(v.pipe(Hex, v.length(34))), v.description("Client Order ID.")),
+      c: v.pipe(
+        v.optional(v.pipe(Hex, v.length(34))),
+        v.description("Client Order ID."),
+      ),
     }),
     v.description("Place order parameters."),
   );
@@ -118,27 +142,45 @@ export const OrderSchema = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
       /** Asset symbol. */
-      coin: v.pipe(v.string(), v.description("Asset symbol.")),
+      coin: v.pipe(
+        v.string(),
+        v.description("Asset symbol."),
+      ),
       /** Order side ("B" = Bid/Buy, "A" = Ask/Sell). */
       side: v.pipe(
         v.union([v.literal("B"), v.literal("A")]),
         v.description('Order side ("B" = Bid/Buy, "A" = Ask/Sell).'),
       ),
       /** Limit price. */
-      limitPx: v.pipe(UnsignedDecimal, v.description("Limit price.")),
+      limitPx: v.pipe(
+        UnsignedDecimal,
+        v.description("Limit price."),
+      ),
       /** Size. */
-      sz: v.pipe(UnsignedDecimal, v.description("Size.")),
+      sz: v.pipe(
+        UnsignedDecimal,
+        v.description("Size."),
+      ),
       /** Order ID. */
-      oid: v.pipe(UnsignedInteger, v.description("Order ID.")),
+      oid: v.pipe(
+        UnsignedInteger,
+        v.description("Order ID."),
+      ),
       /** Timestamp when the order was placed (in ms since epoch). */
       timestamp: v.pipe(
         UnsignedInteger,
         v.description("Timestamp when the order was placed (in ms since epoch)."),
       ),
       /** Original size at order placement. */
-      origSz: v.pipe(UnsignedDecimal, v.description("Original size at order placement.")),
+      origSz: v.pipe(
+        UnsignedDecimal,
+        v.description("Original size at order placement."),
+      ),
       /** Client Order ID. */
-      cloid: v.pipe(v.optional(v.pipe(Hex, v.length(34))), v.description("Client Order ID.")),
+      cloid: v.pipe(
+        v.optional(v.pipe(Hex, v.length(34))),
+        v.description("Client Order ID."),
+      ),
       /** Indicates if the order is reduce-only. */
       reduceOnly: v.pipe(
         v.optional(v.literal(true)),
@@ -154,31 +196,55 @@ export const DetailedOrderSchema = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
       /** Asset symbol. */
-      coin: v.pipe(v.string(), v.description("Asset symbol.")),
+      coin: v.pipe(
+        v.string(),
+        v.description("Asset symbol."),
+      ),
       /** Order side ("B" = Bid/Buy, "A" = Ask/Sell). */
       side: v.pipe(
         v.union([v.literal("B"), v.literal("A")]),
         v.description('Order side ("B" = Bid/Buy, "A" = Ask/Sell).'),
       ),
       /** Limit price. */
-      limitPx: v.pipe(UnsignedDecimal, v.description("Limit price.")),
+      limitPx: v.pipe(
+        UnsignedDecimal,
+        v.description("Limit price."),
+      ),
       /** Size. */
-      sz: v.pipe(UnsignedDecimal, v.description("Size.")),
+      sz: v.pipe(
+        UnsignedDecimal,
+        v.description("Size."),
+      ),
       /** Order ID. */
-      oid: v.pipe(UnsignedInteger, v.description("Order ID.")),
+      oid: v.pipe(
+        UnsignedInteger,
+        v.description("Order ID."),
+      ),
       /** Timestamp when the order was placed (in ms since epoch). */
       timestamp: v.pipe(
         UnsignedInteger,
         v.description("Timestamp when the order was placed (in ms since epoch)."),
       ),
       /** Original size at order placement. */
-      origSz: v.pipe(UnsignedDecimal, v.description("Original size at order placement.")),
+      origSz: v.pipe(
+        UnsignedDecimal,
+        v.description("Original size at order placement."),
+      ),
       /** Condition for triggering the order. */
-      triggerCondition: v.pipe(v.string(), v.description("Condition for triggering the order.")),
+      triggerCondition: v.pipe(
+        v.string(),
+        v.description("Condition for triggering the order."),
+      ),
       /** Indicates if the order is a trigger order. */
-      isTrigger: v.pipe(v.boolean(), v.description("Indicates if the order is a trigger order.")),
+      isTrigger: v.pipe(
+        v.boolean(),
+        v.description("Indicates if the order is a trigger order."),
+      ),
       /** Trigger price. */
-      triggerPx: v.pipe(UnsignedDecimal, v.description("Trigger price.")),
+      triggerPx: v.pipe(
+        UnsignedDecimal,
+        v.description("Trigger price."),
+      ),
       /** Child orders associated with this order. */
       children: v.pipe(
         // deno-lint-ignore no-explicit-any
@@ -191,7 +257,10 @@ export const DetailedOrderSchema = /* @__PURE__ */ (() => {
         v.description("Indicates if the order is a position TP/SL order."),
       ),
       /** Indicates whether the order is reduce-only. */
-      reduceOnly: v.pipe(v.boolean(), v.description("Indicates whether the order is reduce-only.")),
+      reduceOnly: v.pipe(
+        v.boolean(),
+        v.description("Indicates whether the order is reduce-only."),
+      ),
       /**
        * Order type for market execution.
        * - `"Market"`: Executes immediately at the market price.
@@ -231,7 +300,10 @@ export const DetailedOrderSchema = /* @__PURE__ */ (() => {
        */
       tif: v.nullable(TIFSchema),
       /** Client Order ID. */
-      cloid: v.pipe(v.nullable(v.pipe(Hex, v.length(34))), v.description("Client Order ID.")),
+      cloid: v.pipe(
+        v.nullable(v.pipe(Hex, v.length(34))),
+        v.description("Client Order ID."),
+      ),
     }),
     v.description("Open order with additional display information."),
   );
@@ -342,11 +414,20 @@ export const L2BookLevelSchema = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
       /** Price. */
-      px: v.pipe(UnsignedDecimal, v.description("Price.")),
+      px: v.pipe(
+        UnsignedDecimal,
+        v.description("Price."),
+      ),
       /** Total size. */
-      sz: v.pipe(UnsignedDecimal, v.description("Total size.")),
+      sz: v.pipe(
+        UnsignedDecimal,
+        v.description("Total size."),
+      ),
       /** Number of individual orders. */
-      n: v.pipe(UnsignedInteger, v.description("Number of individual orders.")),
+      n: v.pipe(
+        UnsignedInteger,
+        v.description("Number of individual orders."),
+      ),
     }),
     v.description("L2 order book level."),
   );
@@ -357,31 +438,55 @@ export const TwapStateSchema = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
       /** Asset symbol. */
-      coin: v.pipe(v.string(), v.description("Asset symbol.")),
+      coin: v.pipe(
+        v.string(),
+        v.description("Asset symbol."),
+      ),
       /** Executed notional value. */
-      executedNtl: v.pipe(UnsignedDecimal, v.description("Executed notional value.")),
+      executedNtl: v.pipe(
+        UnsignedDecimal,
+        v.description("Executed notional value."),
+      ),
       /** Executed size. */
-      executedSz: v.pipe(UnsignedDecimal, v.description("Executed size.")),
+      executedSz: v.pipe(
+        UnsignedDecimal,
+        v.description("Executed size."),
+      ),
       /** Duration in minutes. */
-      minutes: v.pipe(UnsignedInteger, v.description("Duration in minutes.")),
+      minutes: v.pipe(
+        UnsignedInteger,
+        v.description("Duration in minutes."),
+      ),
       /** Indicates if the TWAP randomizes execution. */
-      randomize: v.pipe(v.boolean(), v.description("Indicates if the TWAP randomizes execution.")),
+      randomize: v.pipe(
+        v.boolean(),
+        v.description("Indicates if the TWAP randomizes execution."),
+      ),
       /** Indicates if the order is reduce-only. */
-      reduceOnly: v.pipe(v.boolean(), v.description("Indicates if the order is reduce-only.")),
+      reduceOnly: v.pipe(
+        v.boolean(),
+        v.description("Indicates if the order is reduce-only."),
+      ),
       /** Order side ("B" = Bid/Buy, "A" = Ask/Sell). */
       side: v.pipe(
         v.union([v.literal("B"), v.literal("A")]),
         v.description('Order side ("B" = Bid/Buy, "A" = Ask/Sell).'),
       ),
       /** Order size. */
-      sz: v.pipe(UnsignedDecimal, v.description("Order size.")),
+      sz: v.pipe(
+        UnsignedDecimal,
+        v.description("Order size."),
+      ),
       /** Start time of the TWAP order (in ms since epoch). */
       timestamp: v.pipe(
         UnsignedInteger,
         v.description("Start time of the TWAP order (in ms since epoch)."),
       ),
       /** User address. */
-      user: v.pipe(Address, v.description("User address.")),
+      user: v.pipe(
+        Address,
+        v.description("User address."),
+      ),
     }),
     v.description("State of the TWAP order."),
   );
@@ -400,15 +505,25 @@ export const TwapStatusSchema = /* @__PURE__ */ (() => {
       v.object({
         /** Status of the TWAP order. */
         status: v.pipe(
-          v.union([v.literal("finished"), v.literal("activated"), v.literal("terminated")]),
+          v.union([
+            v.literal("finished"),
+            v.literal("activated"),
+            v.literal("terminated"),
+          ]),
           v.description("Status of the TWAP order."),
         ),
       }),
       v.object({
         /** Status of the TWAP order. */
-        status: v.pipe(v.literal("error"), v.description("Status of the TWAP order.")),
+        status: v.pipe(
+          v.literal("error"),
+          v.description("Status of the TWAP order."),
+        ),
         /** Error message. */
-        description: v.pipe(v.string(), v.description("Error message.")),
+        description: v.pipe(
+          v.string(),
+          v.description("Error message."),
+        ),
       }),
     ]),
     v.description(
@@ -426,11 +541,20 @@ export const FillSchema = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
       /** Asset symbol. */
-      coin: v.pipe(v.string(), v.description("Asset symbol.")),
+      coin: v.pipe(
+        v.string(),
+        v.description("Asset symbol."),
+      ),
       /** Price. */
-      px: v.pipe(UnsignedDecimal, v.description("Price.")),
+      px: v.pipe(
+        UnsignedDecimal,
+        v.description("Price."),
+      ),
       /** Size. */
-      sz: v.pipe(UnsignedDecimal, v.description("Size.")),
+      sz: v.pipe(
+        UnsignedDecimal,
+        v.description("Size."),
+      ),
       /** Order side ("B" = Bid/Buy, "A" = Ask/Sell). */
       side: v.pipe(
         v.union([v.literal("B"), v.literal("A")]),
@@ -442,17 +566,35 @@ export const FillSchema = /* @__PURE__ */ (() => {
         v.description("Timestamp when the trade occurred (in ms since epoch)."),
       ),
       /** Start position size. */
-      startPosition: v.pipe(Decimal, v.description("Start position size.")),
+      startPosition: v.pipe(
+        Decimal,
+        v.description("Start position size."),
+      ),
       /** Direction indicator for frontend display. */
-      dir: v.pipe(v.string(), v.description("Direction indicator for frontend display.")),
+      dir: v.pipe(
+        v.string(),
+        v.description("Direction indicator for frontend display."),
+      ),
       /** Realized PnL. */
-      closedPnl: v.pipe(Decimal, v.description("Realized PnL.")),
+      closedPnl: v.pipe(
+        Decimal,
+        v.description("Realized PnL."),
+      ),
       /** L1 transaction hash. */
-      hash: v.pipe(v.pipe(Hex, v.length(66)), v.description("L1 transaction hash.")),
+      hash: v.pipe(
+        v.pipe(Hex, v.length(66)),
+        v.description("L1 transaction hash."),
+      ),
       /** Order ID. */
-      oid: v.pipe(UnsignedInteger, v.description("Order ID.")),
+      oid: v.pipe(
+        UnsignedInteger,
+        v.description("Order ID."),
+      ),
       /** Indicates if the fill was a taker order. */
-      crossed: v.pipe(v.boolean(), v.description("Indicates if the fill was a taker order.")),
+      crossed: v.pipe(
+        v.boolean(),
+        v.description("Indicates if the fill was a taker order."),
+      ),
       /** Fee charged or rebate received (negative indicates rebate). */
       fee: v.pipe(
         Decimal,
@@ -464,13 +606,19 @@ export const FillSchema = /* @__PURE__ */ (() => {
         v.description("Unique transaction identifier for a partial fill of an order."),
       ),
       /** Client Order ID. */
-      cloid: v.pipe(v.optional(v.pipe(Hex, v.length(34))), v.description("Client Order ID.")),
+      cloid: v.pipe(
+        v.optional(v.pipe(Hex, v.length(34))),
+        v.description("Client Order ID."),
+      ),
       /** Liquidation details. */
       liquidation: v.pipe(
         v.optional(
           v.object({
             /** Address of the liquidated user. */
-            liquidatedUser: v.pipe(Address, v.description("Address of the liquidated user.")),
+            liquidatedUser: v.pipe(
+              Address,
+              v.description("Address of the liquidated user."),
+            ),
             /** Mark price at the time of liquidation. */
             markPx: v.pipe(
               UnsignedDecimal,
@@ -491,7 +639,10 @@ export const FillSchema = /* @__PURE__ */ (() => {
         v.description('Token in which the fee is denominated (e.g., "USDC").'),
       ),
       /** ID of the TWAP. */
-      twapId: v.pipe(v.nullable(UnsignedInteger), v.description("ID of the TWAP.")),
+      twapId: v.pipe(
+        v.nullable(UnsignedInteger),
+        v.description("ID of the TWAP."),
+      ),
     }),
     v.description("Order fill record."),
   );
@@ -502,11 +653,20 @@ export const TwapFillSchema = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
       /** Asset symbol. */
-      coin: v.pipe(v.string(), v.description("Asset symbol.")),
+      coin: v.pipe(
+        v.string(),
+        v.description("Asset symbol."),
+      ),
       /** Price. */
-      px: v.pipe(UnsignedDecimal, v.description("Price.")),
+      px: v.pipe(
+        UnsignedDecimal,
+        v.description("Price."),
+      ),
       /** Size. */
-      sz: v.pipe(UnsignedDecimal, v.description("Size.")),
+      sz: v.pipe(
+        UnsignedDecimal,
+        v.description("Size."),
+      ),
       /** Order side ("B" = Bid/Buy, "A" = Ask/Sell). */
       side: v.pipe(
         v.union([v.literal("B"), v.literal("A")]),
@@ -518,17 +678,35 @@ export const TwapFillSchema = /* @__PURE__ */ (() => {
         v.description("Timestamp when the trade occurred (in ms since epoch)."),
       ),
       /** Start position size. */
-      startPosition: v.pipe(Decimal, v.description("Start position size.")),
+      startPosition: v.pipe(
+        Decimal,
+        v.description("Start position size."),
+      ),
       /** Direction indicator for frontend display. */
-      dir: v.pipe(v.string(), v.description("Direction indicator for frontend display.")),
+      dir: v.pipe(
+        v.string(),
+        v.description("Direction indicator for frontend display."),
+      ),
       /** Realized PnL. */
-      closedPnl: v.pipe(Decimal, v.description("Realized PnL.")),
+      closedPnl: v.pipe(
+        Decimal,
+        v.description("Realized PnL."),
+      ),
       /** L1 transaction hash. */
-      hash: v.pipe(v.pipe(Hex, v.length(66)), v.description("L1 transaction hash.")),
+      hash: v.pipe(
+        v.pipe(Hex, v.length(66)),
+        v.description("L1 transaction hash."),
+      ),
       /** Order ID. */
-      oid: v.pipe(UnsignedInteger, v.description("Order ID.")),
+      oid: v.pipe(
+        UnsignedInteger,
+        v.description("Order ID."),
+      ),
       /** Indicates if the fill was a taker order. */
-      crossed: v.pipe(v.boolean(), v.description("Indicates if the fill was a taker order.")),
+      crossed: v.pipe(
+        v.boolean(),
+        v.description("Indicates if the fill was a taker order."),
+      ),
       /** Fee charged or rebate received (negative indicates rebate). */
       fee: v.pipe(
         Decimal,
@@ -545,7 +723,10 @@ export const TwapFillSchema = /* @__PURE__ */ (() => {
         v.description('Token in which the fee is denominated (e.g., "USDC").'),
       ),
       /** ID of the TWAP. */
-      twapId: v.pipe(v.nullable(UnsignedInteger), v.description("ID of the TWAP.")),
+      twapId: v.pipe(
+        v.nullable(UnsignedInteger),
+        v.description("ID of the TWAP."),
+      ),
     }),
     v.description("TWAP fill record."),
   );

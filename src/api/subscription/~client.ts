@@ -105,8 +105,9 @@ export type { SubscriptionRequestConfig } from "./_types.ts";
  * A client for interacting with the Hyperliquid Subscription API.
  * @typeParam T - The transport (extends {@linkcode ISubscriptionTransport}) used to connect to the Hyperliquid API.
  */
-export class SubscriptionClient<T extends ISubscriptionTransport = ISubscriptionTransport>
-  implements SubscriptionRequestConfig<T> {
+export class SubscriptionClient<
+  T extends ISubscriptionTransport = ISubscriptionTransport,
+> implements SubscriptionRequestConfig<T> {
   transport: T;
 
   /**

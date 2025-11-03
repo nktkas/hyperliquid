@@ -1,6 +1,7 @@
 import * as v from "valibot";
 import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 import type { InfoRequestConfig } from "./_types.ts";
+
 import { BalanceSchema } from "../_common_schemas.ts";
 
 // -------------------- Schemas --------------------
@@ -13,11 +14,20 @@ export const SpotClearinghouseStateRequest = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
       /** Type of request. */
-      type: v.pipe(v.literal("spotClearinghouseState"), v.description("Type of request.")),
+      type: v.pipe(
+        v.literal("spotClearinghouseState"),
+        v.description("Type of request."),
+      ),
       /** User address. */
-      user: v.pipe(Address, v.description("User address.")),
+      user: v.pipe(
+        Address,
+        v.description("User address."),
+      ),
       /** DEX name (empty string for main dex). */
-      dex: v.pipe(v.optional(v.string()), v.description("DEX name (empty string for main dex).")),
+      dex: v.pipe(
+        v.optional(v.string()),
+        v.description("DEX name (empty string for main dex)."),
+      ),
     }),
     v.description("Request spot clearinghouse state."),
   );
@@ -44,11 +54,20 @@ export const SpotClearinghouseStateResponse = /* @__PURE__ */ (() => {
             v.pipe(
               v.object({
                 /** Asset symbol. */
-                coin: v.pipe(v.string(), v.description("Asset symbol.")),
+                coin: v.pipe(
+                  v.string(),
+                  v.description("Asset symbol."),
+                ),
                 /** Unique identifier for the token. */
-                token: v.pipe(UnsignedInteger, v.description("Unique identifier for the token.")),
+                token: v.pipe(
+                  UnsignedInteger,
+                  v.description("Unique identifier for the token."),
+                ),
                 /** Total balance. */
-                total: v.pipe(UnsignedDecimal, v.description("Total balance.")),
+                total: v.pipe(
+                  UnsignedDecimal,
+                  v.description("Total balance."),
+                ),
               }),
               v.description("Escrowed balance for a specific asset."),
             ),
@@ -65,10 +84,7 @@ export type SpotClearinghouseStateResponse = v.InferOutput<typeof SpotClearingho
 // -------------------- Function --------------------
 
 /** Request parameters for the {@linkcode spotClearinghouseState} function. */
-export type SpotClearinghouseStateParameters = Omit<
-  v.InferInput<typeof SpotClearinghouseStateRequest>,
-  "type"
->;
+export type SpotClearinghouseStateParameters = Omit<v.InferInput<typeof SpotClearinghouseStateRequest>, "type">;
 
 /**
  * Request spot clearinghouse state.
@@ -84,7 +100,6 @@ export type SpotClearinghouseStateParameters = Omit<
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { spotClearinghouseState } from "@nktkas/hyperliquid/api/info";
-import { BalanceSchema } from '../_common_schemas';
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  * const data = await spotClearinghouseState(
