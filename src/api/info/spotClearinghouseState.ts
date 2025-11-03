@@ -1,7 +1,7 @@
-import * as v from "valibot"
-import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts"
-import type { InfoRequestConfig } from "./_types.ts"
-import { BalanceSchema } from "../_common_schemas.ts"
+import * as v from "valibot";
+import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
+import { BalanceSchema } from "../_common_schemas.ts";
 
 // -------------------- Schemas --------------------
 
@@ -19,10 +19,10 @@ export const SpotClearinghouseStateRequest = /* @__PURE__ */ (() => {
       /** DEX name (empty string for main dex). */
       dex: v.pipe(v.optional(v.string()), v.description("DEX name (empty string for main dex).")),
     }),
-    v.description("Request spot clearinghouse state.")
-  )
-})()
-export type SpotClearinghouseStateRequest = v.InferOutput<typeof SpotClearinghouseStateRequest>
+    v.description("Request spot clearinghouse state."),
+  );
+})();
+export type SpotClearinghouseStateRequest = v.InferOutput<typeof SpotClearinghouseStateRequest>;
 
 /**
  * Account summary for spot trading.
@@ -32,7 +32,10 @@ export const SpotClearinghouseStateResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
       /** Balance for each token. */
-      balances: v.pipe(v.array(BalanceSchema), v.description("Balance for each token.")),
+      balances: v.pipe(
+        v.array(BalanceSchema),
+        v.description("Balance for each token."),
+      ),
       /** Escrowed balances. */
       evmEscrows: v.pipe(
         v.optional(
@@ -47,17 +50,17 @@ export const SpotClearinghouseStateResponse = /* @__PURE__ */ (() => {
                 /** Total balance. */
                 total: v.pipe(UnsignedDecimal, v.description("Total balance.")),
               }),
-              v.description("Escrowed balance for a specific asset.")
-            )
-          )
+              v.description("Escrowed balance for a specific asset."),
+            ),
+          ),
         ),
-        v.description("Escrowed balances.")
+        v.description("Escrowed balances."),
       ),
     }),
-    v.description("Account summary for spot trading.")
-  )
-})()
-export type SpotClearinghouseStateResponse = v.InferOutput<typeof SpotClearinghouseStateResponse>
+    v.description("Account summary for spot trading."),
+  );
+})();
+export type SpotClearinghouseStateResponse = v.InferOutput<typeof SpotClearinghouseStateResponse>;
 
 // -------------------- Function --------------------
 
@@ -65,7 +68,7 @@ export type SpotClearinghouseStateResponse = v.InferOutput<typeof SpotClearingho
 export type SpotClearinghouseStateParameters = Omit<
   v.InferInput<typeof SpotClearinghouseStateRequest>,
   "type"
->
+>;
 
 /**
  * Request spot clearinghouse state.
@@ -93,11 +96,11 @@ import { BalanceSchema } from '../_common_schemas';
 export function spotClearinghouseState(
   config: InfoRequestConfig,
   params: DeepImmutable<SpotClearinghouseStateParameters>,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<SpotClearinghouseStateResponse> {
   const request = parser(SpotClearinghouseStateRequest)({
     type: "spotClearinghouseState",
     ...params,
-  })
-  return config.transport.request("info", request, signal)
+  });
+  return config.transport.request("info", request, signal);
 }

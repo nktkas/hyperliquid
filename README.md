@@ -587,6 +587,7 @@ class SubscriptionClient {
   activeAssetData(params: WsActiveAssetDataParameters, listener: (data: WsActiveAssetDataEvent) => void);
   clearinghouseState(params: WsClearinghouseStateParameters, listener: (data: WsClearinghouseStateEvent) => void);
   notification(params: WsNotificationParameters, listener: (data: WsNotificationEvent) => void);
+  spotState(params: WsSpotStateParameters, listener: (data: WsSpotStateEvent) => void);
   userEvents(params: WsUserEventsParameters, listener: (data: WsUserEventsEvent) => void);
   userFundings(params: WsUserFundingsParameters, listener: (data: WsUserFundingsEvent) => void);
   userHistoricalOrders(params: WsUserHistoricalOrdersParameters, listener: (data: WsUserHistoricalOrdersEvent) => void);
