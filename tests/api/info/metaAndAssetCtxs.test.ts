@@ -7,6 +7,7 @@ runTest({
   codeTestFn: async (_t, client) => {
     const data = await Promise.all([
       client.metaAndAssetCtxs(),
+      client.metaAndAssetCtxs({ dex: "gato" }),
     ]);
     schemaCoverage(MetaAndAssetCtxsResponse, data);
   },

@@ -63,6 +63,16 @@ export const PerpDexsResponse = /* @__PURE__ */ (() => {
               v.array(v.tuple([v.string(), v.string()])),
               v.description("Mapping of asset names to their streaming open interest caps."),
             ),
+            /** List of delegated function names and their authorized executor addresses. */
+            subDeployers: v.pipe(
+              v.array(
+                v.tuple([
+                  v.string(),
+                  v.array(Address),
+                ]),
+              ),
+              v.description("List of delegated function names and their authorized executor addresses."),
+            ),
           }),
           v.description(" Perpetual dex metadata."),
         ),

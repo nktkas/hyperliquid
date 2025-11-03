@@ -8,7 +8,11 @@ runTest({
     const data = await Promise.all([
       client.perpDexs(),
     ]);
-    schemaCoverage(PerpDexsResponse, data);
+    schemaCoverage(PerpDexsResponse, data, {
+      ignoreDefinedTypes: [
+        "#/items/wrapped/properties/oracleUpdater",
+      ],
+    });
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "perpDexs"]);

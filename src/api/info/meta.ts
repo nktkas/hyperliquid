@@ -73,6 +73,13 @@ export const MetaResponse = /* @__PURE__ */ (() => {
                 v.optional(v.literal(true)),
                 v.description("Indicates if the universe is delisted."),
               ),
+              /** Trading margin mode constraint. */
+              marginMode: v.pipe(
+                v.optional(
+                  v.union([v.literal("strictIsolated"), v.literal("noCross")]),
+                ),
+                v.description("Trading margin mode constraint."),
+              ),
             }),
             v.description("Trading universe parameters for perpetual asset."),
           ),

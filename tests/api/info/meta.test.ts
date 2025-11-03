@@ -7,7 +7,7 @@ runTest({
   codeTestFn: async (_t, client) => {
     const data = await Promise.all([
       client.meta(),
-      client.meta({ dex: "test" }),
+      client.meta({ dex: "gato" }),
     ]);
     schemaCoverage(MetaResponse, data);
   },
