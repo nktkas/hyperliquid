@@ -239,6 +239,52 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
             }),
             v.description("Set open interest caps variant"),
           ),
+          v.pipe(
+            v.object({
+              /** Type of action. */
+              type: v.pipe(
+                v.literal("perpDeploy"),
+                v.description("Type of action."),
+              ),
+              /** A modification to sub-deployer permissions. */
+              setSubDeployers: v.pipe(
+                v.object({
+                  /** Name of the DEX. */
+                  dex: v.pipe(
+                    v.string(),
+                    v.description("Name of the DEX."),
+                  ),
+                  /** A modification to sub-deployer permissions. */
+                  subDeployers: v.pipe(
+                    v.array(
+                      v.object({
+                        /** Corresponds to a variant of PerpDeployAction. */
+                        variant: v.pipe(
+                          v.string(),
+                          v.description("Corresponds to a variant of PerpDeployAction."),
+                        ),
+                        /** Sub-deployer address. */
+                        user: v.pipe(
+                          Address,
+                          v.description("Sub-deployer address."),
+                        ),
+                        /** Add or remove the subDeployer from the authorized set for the action variant. */
+                        allowed: v.pipe(
+                          v.boolean(),
+                          v.description(
+                            "Add or remove the subDeployer from the authorized set for the action variant.",
+                          ),
+                        ),
+                      }),
+                    ),
+                    v.description("A modification to sub-deployer permissions."),
+                  ),
+                }),
+                v.description("A modification to sub-deployer permissions."),
+              ),
+            }),
+            v.description("Set open interest caps variant"),
+          ),
         ]),
         v.description("Action to perform."),
       ),

@@ -112,6 +112,25 @@ runTest({
         "Unknown coin TEST0",
       );
     });
+
+    await t.step("setOpenInterestCaps", async () => {
+      await assertRejects(
+        async () => {
+          await exchClient.perpDeploy({
+            setSubDeployers: {
+              dex: "test",
+              subDeployers: [{
+                variant: "setOracle",
+                user: "0x0000000000000000000000000000000000000000",
+                allowed: true,
+              }],
+            },
+          });
+        },
+        ApiRequestError,
+        "Invalid perp deployer",
+      );
+    });
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([
