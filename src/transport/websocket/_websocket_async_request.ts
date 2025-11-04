@@ -76,8 +76,7 @@ export class WebSocketAsyncRequest {
 
         // For `post` requests
         if ("id" in parsedRequest && typeof parsedRequest.id === "number") {
-          this.queue
-            .find((x) => x.id === parsedRequest.id)
+          this.queue.find((x) => x.id === parsedRequest.id)
             ?.reject(new WebSocketRequestError(event.detail));
           return;
         }
@@ -85,11 +84,11 @@ export class WebSocketAsyncRequest {
         // For `subscribe` and `unsubscribe` requests
         if (
           "subscription" in parsedRequest &&
-          typeof parsedRequest.subscription === "object" &&
-          parsedRequest.subscription !== null
+          typeof parsedRequest.subscription === "object" && parsedRequest.subscription !== null
         ) {
           const id = WebSocketAsyncRequest.requestToId(parsedRequest);
-          this.queue.find((x) => x.id === id)?.reject(new WebSocketRequestError(event.detail));
+          this.queue.find((x) => x.id === id)
+            ?.reject(new WebSocketRequestError(event.detail));
           return;
         }
 
@@ -102,7 +101,8 @@ export class WebSocketAsyncRequest {
             method: "subscribe",
             subscription: parsedRequest,
           });
-          this.queue.find((x) => x.id === id)?.reject(new WebSocketRequestError(event.detail));
+          this.queue.find((x) => x.id === id)
+            ?.reject(new WebSocketRequestError(event.detail));
           return;
         }
 
@@ -112,13 +112,15 @@ export class WebSocketAsyncRequest {
             method: "unsubscribe",
             subscription: parsedRequest,
           });
-          this.queue.find((x) => x.id === id)?.reject(new WebSocketRequestError(event.detail));
+          this.queue.find((x) => x.id === id)
+            ?.reject(new WebSocketRequestError(event.detail));
           return;
         }
 
         // For unknown requests
         const id = WebSocketAsyncRequest.requestToId(parsedRequest);
-        this.queue.find((x) => x.id === id)?.reject(new WebSocketRequestError(event.detail));
+        this.queue.find((x) => x.id === id)
+          ?.reject(new WebSocketRequestError(event.detail));
       } catch {
         // Ignore JSON parsing errors
       }
@@ -140,11 +142,7 @@ export class WebSocketAsyncRequest {
    * @returns A promise that resolves with the parsed JSON response body.
    */
   async request(method: "ping", signal?: AbortSignal): Promise<void>;
-  async request<T>(
-    method: "post" | "subscribe" | "unsubscribe",
-    payload: unknown,
-    signal?: AbortSignal,
-  ): Promise<T>;
+  async request<T>(method: "post" | "subscribe" | "unsubscribe", payload: unknown, signal?: AbortSignal): Promise<T>;
   async request<T>(
     method: "post" | "subscribe" | "unsubscribe" | "ping",
     payloadOrSignal?: unknown | AbortSignal,
@@ -207,7 +205,7 @@ export class WebSocketAsyncRequest {
         return out;
       },
       // hex to lowercase
-      (v) => (typeof v === "string" && /^0[xX][0-9a-fA-F]+$/.test(v) ? v.toLowerCase() : v),
+      (v) => typeof v === "string" && /^0[xX][0-9a-fA-F]+$/.test(v) ? v.toLowerCase() : v,
     ]);
     return JSON.stringify(transformed); // also removes undefined values
   }
@@ -220,16 +218,10 @@ export class WebSocketAsyncRequest {
  * - does not support circular references
  * - Symbol-keys are not preserved
  */
-function deepTransform(
-  obj: unknown,
-  transformers: ((value: unknown, key?: string) => unknown)[],
-): unknown {
+function deepTransform(obj: unknown, transformers: ((value: unknown, key?: string) => unknown)[]): unknown {
   const transform = (val: unknown, key?: string): unknown => {
     // Apply all transformers in sequence
-    const transformed = transformers.reduce(
-      (acc, fn) => (acc === undefined ? undefined : fn(acc, key)),
-      val,
-    );
+    const transformed = transformers.reduce((acc, fn) => acc === undefined ? undefined : fn(acc, key), val);
 
     // Recurse into arrays and objects
     if (typeof transformed !== "object" || transformed === null) return transformed; // skip primitives
