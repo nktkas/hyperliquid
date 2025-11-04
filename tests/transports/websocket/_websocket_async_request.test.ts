@@ -132,7 +132,7 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
 
     await t.step("rejects", async (t) => {
       await t.step("method === post", async (t) => {
-        await t.step("request error", async () => {
+        await t.step("error in the `error` channel", async () => {
           const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
           const hlEvents = new HyperliquidEventTarget(mockSocket);
           const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
@@ -147,6 +147,26 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
           mockSocket.mockMessage(mockMessage);
 
           await assertRejects(() => promise, WebSocketRequestError, mockMessage.data);
+        });
+
+        await t.step("error in the response payload", async () => {
+          const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
+          const hlEvents = new HyperliquidEventTarget(mockSocket);
+          const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
+
+          const promise = wsRequester.request("post", { test: true });
+          const sent = JSON.parse(mockSocket.sentMessages[0]);
+
+          const mockMessage = {
+            channel: "post",
+            data: {
+              id: sent.id,
+              response: { type: "error", payload: "Operation failed" },
+            },
+          };
+          mockSocket.mockMessage(mockMessage);
+
+          await assertRejects(() => promise, WebSocketRequestError, "Operation failed");
         });
       });
 
