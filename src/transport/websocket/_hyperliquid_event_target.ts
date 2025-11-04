@@ -46,6 +46,13 @@ interface PostResponse {
           }
           | string;
       };
+    }
+    /** Response containing error message. */
+    | {
+      /** Indicates that this is an action response. */
+      type: "error";
+      /** Contains the error message, e.g. 429 Too Many Requests */
+      payload: string;
     };
 }
 

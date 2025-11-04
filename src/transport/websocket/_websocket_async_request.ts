@@ -52,6 +52,12 @@ export class WebSocketAsyncRequest {
       this.queue.find((x) => x.id === id)?.resolve(event.detail);
     });
     hlEvents.addEventListener("post", (event) => {
+      if (event.detail.response.type === "error") {
+        this.queue
+          .find((x) => x.id === event.detail.id)
+          ?.reject(new WebSocketRequestError(event.detail.response.payload));
+        return;
+      }
       const data = event.detail.response.type === "info"
         ? event.detail.response.payload.data
         : event.detail.response.payload;
