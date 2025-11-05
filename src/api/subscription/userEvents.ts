@@ -198,7 +198,17 @@ export const TwapSliceFillsEvent = /* @__PURE__ */ (() => {
     v.object({
       /** Array of TWAP slice fills. */
       twapSliceFills: v.pipe(
-        v.array(TwapFillSchema),
+        v.array(
+          v.object({
+            /** Fill details for the TWAP slice. */
+            fill: TwapFillSchema,
+            /** ID of the TWAP. */
+            twapId: v.pipe(
+              UnsignedInteger,
+              v.description("ID of the TWAP."),
+            ),
+          }),
+        ),
         v.description("Array of TWAP slice fills."),
       ),
     }),
