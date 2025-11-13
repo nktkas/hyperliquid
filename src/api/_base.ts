@@ -40,6 +40,7 @@ export const UnsignedDecimal = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([v.string(), v.number()]),
     v.transform(String),
+    v.string(),
     v.trim(),
     v.regex(/^[0-9]+(\.[0-9]+)?$/),
     v.transform((value) => formatDecimal(value)),
@@ -51,6 +52,7 @@ export const Decimal = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([v.string(), v.number()]),
     v.transform(String),
+    v.string(),
     v.trim(),
     v.regex(/^-?[0-9]+(\.[0-9]+)?$/),
     v.transform((value) => formatDecimal(value)),
@@ -62,6 +64,8 @@ export const Integer = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([v.string(), v.number()]),
     v.transform(Number),
+    v.number(),
+    v.integer(),
     v.safeInteger(),
   );
 })();
@@ -71,6 +75,8 @@ export const UnsignedInteger = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([v.string(), v.number()]),
     v.transform(Number),
+    v.number(),
+    v.integer(),
     v.safeInteger(),
     v.minValue(0),
   );
