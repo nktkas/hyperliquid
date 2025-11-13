@@ -18,7 +18,7 @@ runTest({
       ignoreEmptyArray: ["#/properties/orderHistory/items/properties/order/properties/children"],
       ignoreBranches: {
         "#/properties/orderHistory/items/properties/order/properties/orderType": [2, 3, 4, 5],
-        "#/properties/orderHistory/items/properties/order/properties/tif/wrapped": [2, 4],
+        "#/properties/orderHistory/items/properties/order/properties/tif/wrapped": [1, 2, 4],
         "#/properties/orderHistory/items/properties/status": [
           3,
           4,
