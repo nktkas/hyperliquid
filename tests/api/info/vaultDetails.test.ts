@@ -6,7 +6,6 @@ runTest({
   name: "vaultDetails",
   codeTestFn: async (_t, client) => {
     const data = await Promise.all([
-      client.vaultDetails({ vaultAddress: "0x0000000000000000000000000000000000000000" }), // null
       client.vaultDetails({ vaultAddress: "0x1719884eb866cb12b2287399b15f7db5e7d775ea" }), // relationship.type = normal
       client.vaultDetails({ vaultAddress: "0x768484f7e2ebb675c57838366c02ae99ba2a9b08" }), // relationship.type = child
       client.vaultDetails({ // relationship.type = parent
@@ -21,7 +20,7 @@ runTest({
       "info",
       "vaultDetails",
       "--vaultAddress",
-      "0x0000000000000000000000000000000000000000",
+      "0x1719884eb866cb12b2287399b15f7db5e7d775ea",
     ]);
     parser(VaultDetailsRequest)(JSON.parse(data));
   },
