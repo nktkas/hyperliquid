@@ -49,6 +49,11 @@ export const UserRateLimitResponse = /* @__PURE__ */ (() => {
         UnsignedInteger,
         v.description("Maximum allowed API requests."),
       ),
+      /** Number of surplus API requests. */
+      nRequestsSurplus: v.pipe(
+        UnsignedInteger,
+        v.description("Number of surplus API requests."),
+      ),
     }),
     v.description("User rate limits."),
   );
