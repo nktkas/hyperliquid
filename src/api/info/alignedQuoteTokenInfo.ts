@@ -49,8 +49,8 @@ export const AlignedQuoteTokenInfoResponse = /* @__PURE__ */ (() => {
         UnsignedDecimal,
         v.description("Total EVM minted supply."),
       ),
-      /** Daily wei owed as an array of [date, amount] tuples. */
-      dailyWeiOwed: v.pipe(
+      /** Daily amount owed as an array of [date, amount] tuples. */
+      dailyAmountOwed: v.pipe(
         v.array(
           v.pipe(
             v.tuple([
@@ -59,16 +59,16 @@ export const AlignedQuoteTokenInfoResponse = /* @__PURE__ */ (() => {
                 v.string(),
                 v.description("Date in YYYY-MM-DD format."),
               ),
-              /** Amount of wei owed. */
+              /** Amount owed. */
               v.pipe(
                 UnsignedDecimal,
-                v.description("Amount of wei owed."),
+                v.description("Amount owed."),
               ),
             ]),
             v.description("[date, amount] tuple."),
           ),
         ),
-        v.description("Daily wei owed as an array of [date, amount] tuples."),
+        v.description("Daily amount owed as an array of [date, amount] tuples."),
       ),
       /** Predicted rate. */
       predictedRate: v.pipe(
