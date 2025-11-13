@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Address, parser } from "../_base.ts";
+import { Address, ISO8601WithoutTimezone, parser, UnsignedDecimal } from "../_base.ts";
 import type { InfoRequestConfig } from "./_types.ts";
 
 // -------------------- Schemas --------------------
@@ -72,6 +72,16 @@ export const PerpDexsResponse = /* @__PURE__ */ (() => {
                 ]),
               ),
               v.description("List of delegated function names and their authorized executor addresses."),
+            ),
+            /** Fee scale applied to deployer fees. */
+            deployerFeeScale: v.pipe(
+              UnsignedDecimal,
+              v.description("Fee scale applied to deployer fees."),
+            ),
+            /** ISO 8601 timestamp (without timezone) of the last deployer fee scale change. */
+            lastDeployerFeeScaleChangeTime: v.pipe(
+              ISO8601WithoutTimezone,
+              v.description("ISO 8601 timestamp (without timezone) of the last deployer fee scale change."),
             ),
           }),
           v.description(" Perpetual dex metadata."),

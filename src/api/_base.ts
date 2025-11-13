@@ -115,6 +115,14 @@ export const Percent = /* @__PURE__ */ (() => {
 })();
 export type Percent = v.InferOutput<typeof Percent>;
 
+export const ISO8601WithoutTimezone = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.string(),
+    v.regex(/^\d{4}-(?:0[1-9]|1[0-2])-(?:[12]\d|0[1-9]|3[01])[T ](?:0\d|1\d|2[0-3])(?::[0-5]\d){2}(?:\.\d{1,9})?$/),
+  );
+})();
+export type ISO8601WithoutTimezone = v.InferOutput<typeof ISO8601WithoutTimezone>;
+
 /** Removes leading/trailing zeros from decimal string without precision loss. */
 function formatDecimal(numStr: string): string {
   return numStr
