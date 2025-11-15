@@ -9,14 +9,6 @@
     "./api/info": "./src/api/info/~mod.ts",
     "./api/subscription": "./src/api/subscription/~mod.ts"
   },
-  "imports": {
-    "@henrygd/semaphore": "npm:@henrygd/semaphore@0.1.0",
-    "@msgpack/msgpack": "npm:@msgpack/msgpack@^3.1.2",
-    "@noble/hashes": "npm:@noble/hashes@^2.0.1",
-    "@noble/secp256k1": "npm:@noble/secp256k1@^3.0.0",
-    "typescript-event-target": "npm:typescript-event-target@1.1.1",
-    "valibot": "npm:valibot@1.1.0"
-  },
   "fmt": {
     "lineWidth": 120
   },
@@ -26,11 +18,7 @@
     }
   },
   "publish": {
-    "exclude": [
-      ".github",
-      "build",
-      "tests"
-    ]
+    "exclude": [".github", "tests"]
   },
   "license": "MIT",
   "lock": false

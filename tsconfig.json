@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "lib": ["es2022", "dom"],
+    "module": "node20",
+    "noImplicitOverride": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "rewriteRelativeImportExtensions": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "exclude": ["tests", "dist"]
+}

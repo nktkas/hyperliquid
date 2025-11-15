@@ -31,18 +31,16 @@ export interface ReconnectingWebSocketOptions {
 
 type WebSocketSendData = string | ArrayBufferLike | Blob | ArrayBufferView;
 
+type ReconnectingWebSocketErrorCode = "RECONNECTION_LIMIT" | "TERMINATED_BY_USER" | "UNKNOWN_ERROR";
+
 /** Error thrown when reconnection problems occur. */
 export class ReconnectingWebSocketError extends TransportError {
-  constructor(
-    public code:
-      | "RECONNECTION_LIMIT"
-      | "TERMINATED_BY_USER"
-      | "UNKNOWN_ERROR",
-    cause?: unknown,
-  ) {
+  code: ReconnectingWebSocketErrorCode;
+  constructor(code: ReconnectingWebSocketErrorCode, cause?: unknown) {
     super(`Error when reconnecting WebSocket: ${code}`);
     this.name = "ReconnectingWebSocketError";
     this.cause = cause;
+    this.code = code;
   }
 }
 

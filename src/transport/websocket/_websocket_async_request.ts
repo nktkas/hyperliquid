@@ -29,6 +29,7 @@ export class WebSocketRequestError extends TransportError {
  * Handles request creation, sending, and mapping responses to their corresponding requests.
  */
 export class WebSocketAsyncRequest {
+  protected socket: ReconnectingWebSocket;
   protected lastId = 0;
   protected queue: {
     id: number | string;
@@ -45,7 +46,9 @@ export class WebSocketAsyncRequest {
    * @param socket - WebSocket connection instance for sending requests to the Hyperliquid WebSocket API
    * @param hlEvents - Used to recognize Hyperliquid responses and match them with sent requests
    */
-  constructor(protected socket: ReconnectingWebSocket, hlEvents: HyperliquidEventTarget) {
+  constructor(socket: ReconnectingWebSocket, hlEvents: HyperliquidEventTarget) {
+    this.socket = socket;
+
     // Monitor responses and match the pending request
     hlEvents.addEventListener("subscriptionResponse", (event) => {
       const id = WebSocketAsyncRequest.requestToId(event.detail);

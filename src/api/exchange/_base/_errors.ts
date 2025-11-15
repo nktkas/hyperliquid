@@ -6,16 +6,12 @@ import type { TwapOrderResponse } from "../twapOrder.ts";
 import type { TwapCancelResponse } from "../twapCancel.ts";
 import type { AnyResponse, AnySuccessResponse } from "./_types.ts";
 
+type AnyErrorResponse = ErrorResponse | CancelResponse | OrderResponse | TwapOrderResponse | TwapCancelResponse;
+
 /** Thrown when an API request fails. */
 export class ApiRequestError extends HyperliquidError {
-  constructor(
-    public response:
-      | ErrorResponse
-      | CancelResponse
-      | OrderResponse
-      | TwapOrderResponse
-      | TwapCancelResponse,
-  ) {
+  response: AnyErrorResponse;
+  constructor(response: AnyErrorResponse) {
     let message;
     if (response.status === "err") {
       // ErrorResponse
@@ -42,6 +38,7 @@ export class ApiRequestError extends HyperliquidError {
 
     super(message || "An unknown error occurred while processing an API request. See `response` for more details.");
     this.name = "ApiRequestError";
+    this.response = response;
   }
 }
 

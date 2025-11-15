@@ -11,22 +11,22 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: denoland/setup-deno@v2
-        with:
-          deno-version: v2.x
       - uses: actions/setup-node@v4
         with:
           node-version: "24.x"
           registry-url: "https://registry.npmjs.org"
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Build package
-        run: deno run -A .github/scripts/build_npm.ts
+        run: npm run dev:build
 
       - name: Get package version and determine tag
         id: version
         run: |
-          # Read version from deno.json
-          VERSION=$(deno eval "console.log(JSON.parse(Deno.readTextFileSync('./deno.json')).version)")
+          # Read version from package.json
+          VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
           # Determine npm tag based on version
@@ -48,6 +48,4 @@ jobs:
       - name: Publish package
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          cd ./build/npm
-          npm publish --provenance --tag ${{ steps.version.outputs.tag }}
+        run: npm publish --provenance --tag ${{ steps.version.outputs.tag }}

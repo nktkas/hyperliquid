@@ -1,11 +1,8 @@
-import * as hl from "@nktkas/hyperliquid";
+// @ts-ignore: @types/node
+import process from "node:process";
 import * as v from "valibot";
+import * as hl from "../src/mod.ts";
 import { type Args, parseArgs, transformArgs } from "./_utils.ts";
-
-// Hack to avoid `npm i --save-dev @types/node`
-declare const process: {
-  argv: string[];
-};
 
 function transformParams(method: string, params: Args) {
   switch (method) {
@@ -22,7 +19,10 @@ function transformParams(method: string, params: Args) {
 }
 
 class EchoTransport implements hl.IRequestTransport {
-  constructor(public isTestnet: boolean) {}
+  isTestnet: boolean;
+  constructor(isTestnet: boolean) {
+    this.isTestnet = isTestnet;
+  }
   request<T>(_: "info" | "exchange" | "explorer", payload: unknown): Promise<T> {
     return new Promise((resolve) => resolve({ status: "ok", response: payload } as T));
   }

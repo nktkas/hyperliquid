@@ -1,0 +1,67 @@
+{
+  "name": "@nktkas/hyperliquid",
+  "version": "0.25.9",
+  "description": "Unofficial Hyperliquid API SDK for all major JS runtimes, written in TypeScript.",
+  "keywords": [
+    "api",
+    "library",
+    "sdk",
+    "javascript",
+    "typescript",
+    "cryptocurrency",
+    "trading",
+    "blockchain",
+    "exchange",
+    "web3",
+    "dex",
+    "hyperliquid"
+  ],
+  "homepage": "https://github.com/nktkas/hyperliquid",
+  "bugs": {
+    "url": "https://github.com/nktkas/hyperliquid/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nktkas/hyperliquid.git"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "nktkas",
+    "email": "github.turk9@passmail.net",
+    "url": "https://github.com/nktkas"
+  },
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": "./dist/mod.js",
+    "./signing": "./dist/signing/mod.js",
+    "./utils": "./dist/utils/mod.js",
+    "./api/exchange": "./dist/api/exchange/~mod.js",
+    "./api/info": "./dist/api/info/~mod.js",
+    "./api/subscription": "./dist/api/subscription/~mod.js"
+  },
+  "bin": {
+    "@nktkas/hyperliquid": "./dist/bin/cli.js"
+  },
+  "scripts": {
+    "dev:build": "npx tsc",
+    "dev:fmt": "npx deno fmt && npx sort-package-json",
+    "dev:lint": "npx deno lint",
+    "dev:typecheck": "npx deno check --doc"
+  },
+  "dependencies": {
+    "@henrygd/semaphore": "0.1.0",
+    "@msgpack/msgpack": "3.1.2",
+    "@noble/hashes": "^2.0.1",
+    "@noble/secp256k1": "^3.0.0",
+    "typescript-event-target": "1.1.1",
+    "valibot": "1.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}
