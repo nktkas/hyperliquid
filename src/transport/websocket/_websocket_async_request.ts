@@ -1,6 +1,6 @@
 import { TransportError } from "../base.ts";
 import { Promise_ } from "../_polyfills.ts";
-import type { ReconnectingWebSocket } from "./_reconnecting_websocket.ts";
+import type { ReconnectingWebSocket } from "@nktkas/rews";
 import type { HyperliquidEventTarget } from "./_hyperliquid_event_target.ts";
 
 interface PostRequest {
@@ -157,8 +157,8 @@ export class WebSocketAsyncRequest {
     // Reject the request if the signal is aborted
     if (signal?.aborted) return Promise.reject(signal.reason);
     // or if the WebSocket connection is permanently closed
-    if (this.socket.terminateSignal.aborted) {
-      return Promise.reject(this.socket.terminateSignal.reason);
+    if (this.socket.terminationSignal.aborted) {
+      return Promise.reject(this.socket.terminationSignal.reason);
     }
 
     // Create a request
@@ -176,7 +176,7 @@ export class WebSocketAsyncRequest {
     }
 
     // Send the request
-    this.socket.send(JSON.stringify(request), signal);
+    this.socket.send(JSON.stringify(request));
     this.lastRequestTime = Date.now();
 
     // Wait for a response

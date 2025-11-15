@@ -5,7 +5,7 @@ import {
   WebSocketRequestError,
 } from "../../../src/transport/websocket/_websocket_async_request.ts";
 import { HyperliquidEventTarget } from "../../../src/transport/websocket/_hyperliquid_event_target.ts";
-import type { ReconnectingWebSocket } from "../../../src/transport/websocket/_reconnecting_websocket.ts";
+import type { ReconnectingWebSocket } from "@nktkas/rews";
 
 // @ts-ignore: Mocking WebSocket for testing purposes
 class MockWebSocket extends EventTarget implements ReconnectingWebSocket {

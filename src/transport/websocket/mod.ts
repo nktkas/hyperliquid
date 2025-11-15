@@ -1,10 +1,6 @@
 import { type IRequestTransport, type ISubscriptionTransport, type Subscription, TransportError } from "../base.ts";
 import { AbortSignal_ } from "../_polyfills.ts";
-import {
-  ReconnectingWebSocket,
-  ReconnectingWebSocketError,
-  type ReconnectingWebSocketOptions,
-} from "./_reconnecting_websocket.ts";
+import { ReconnectingWebSocket, ReconnectingWebSocketError, type ReconnectingWebSocketOptions } from "@nktkas/rews";
 import { HyperliquidEventTarget } from "./_hyperliquid_event_target.ts";
 import { WebSocketAsyncRequest, WebSocketRequestError } from "./_websocket_async_request.ts";
 
@@ -172,7 +168,7 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
     }
   }
   protected _resubscribeStop(): void {
-    if (!this.resubscribe || this.socket.terminateSignal.aborted) {
+    if (!this.resubscribe || this.socket.terminationSignal.aborted) {
       for (const subscriptionInfo of this._subscriptions.values()) {
         for (const [_, unsubscribe] of subscriptionInfo.listeners) {
           unsubscribe(); // does not cause an error if used when the connection is closed
@@ -305,8 +301,8 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
   ready(signal?: AbortSignal): Promise<void> {
     return new Promise((resolve, reject) => {
       const combinedSignal = signal
-        ? AbortSignal_.any([this.socket.terminateSignal, signal])
-        : this.socket.terminateSignal;
+        ? AbortSignal_.any([this.socket.terminationSignal, signal])
+        : this.socket.terminationSignal;
 
       if (combinedSignal.aborted) return reject(combinedSignal.reason);
       if (this.socket.readyState === ReconnectingWebSocket.OPEN) return resolve();
