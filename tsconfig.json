@@ -10,7 +10,7 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "rootDir": "src",
+    "rootDirs": ["src", "bin"],
     "outDir": "dist"
   },
   "exclude": ["tests", "dist"]

@@ -34,11 +34,11 @@
   "type": "module",
   "exports": {
     ".": "./dist/mod.js",
-    "./signing": "./dist/signing/mod.js",
-    "./utils": "./dist/utils/mod.js",
-    "./api/exchange": "./dist/api/exchange/~mod.js",
-    "./api/info": "./dist/api/info/~mod.js",
-    "./api/subscription": "./dist/api/subscription/~mod.js"
+    "./signing": "./dist/src/signing/mod.js",
+    "./utils": "./dist/src/utils/mod.js",
+    "./api/exchange": "./dist/src/api/exchange/~mod.js",
+    "./api/info": "./dist/src/api/info/~mod.js",
+    "./api/subscription": "./dist/src/api/subscription/~mod.js"
   },
   "bin": {
     "@nktkas/hyperliquid": "./dist/bin/cli.js"
