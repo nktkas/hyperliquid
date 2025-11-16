@@ -2,8 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 [![npm](https://img.shields.io/npm/v/@nktkas/hyperliquid?color=blue)](https://www.npmjs.com/package/@nktkas/hyperliquid)
-[![Downloads](https://img.shields.io/npm/dm/@nktkas/hyperliquid.svg)](https://www.npmjs.com/package/@nktkas/hyperliquid)
 [![jsr](https://jsr.io/badges/@nktkas/hyperliquid)](https://jsr.io/@nktkas/hyperliquid)
+[![Downloads](https://img.shields.io/npm/dm/@nktkas/hyperliquid.svg)](https://www.npmjs.com/package/@nktkas/hyperliquid)
 [![coveralls](https://img.shields.io/coverallsCoverage/github/nktkas/hyperliquid)](https://coveralls.io/github/nktkas/hyperliquid)
 [![bundlejs](https://img.shields.io/bundlejs/size/@nktkas/hyperliquid)](https://bundlejs.com/?q=@nktkas/hyperliquid)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/nktkas/hyperliquid)
