@@ -1,13 +1,12 @@
-// deno-lint-ignore-file no-import-prefix
-import { parser, ScheduleCancelRequest } from "@nktkas/hyperliquid/api/exchange";
-import { ApiRequestError } from "@nktkas/hyperliquid";
-import { assertRejects } from "jsr:@std/assert@1";
+import assert from "node:assert";
+import { parser, ScheduleCancelRequest } from "../../../src/api/exchange/~mod.ts";
+import { ApiRequestError } from "../../../src/mod.ts";
 import { runTest } from "./_t.ts";
 
 runTest({
   name: "scheduleCancel",
   codeTestFn: async (_t, exchClient) => {
-    await assertRejects(
+    await assert.rejects(
       async () => {
         await exchClient.scheduleCancel({ time: Date.now() + 30000 });
       },

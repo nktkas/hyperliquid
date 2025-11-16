@@ -1,14 +1,13 @@
-// deno-lint-ignore-file no-import-prefix
-import { CValidatorActionRequest, parser } from "@nktkas/hyperliquid/api/exchange";
-import { ApiRequestError } from "@nktkas/hyperliquid";
-import { assertRejects } from "jsr:@std/assert@1";
+import assert from "node:assert";
+import { CValidatorActionRequest, parser } from "../../../src/api/exchange/~mod.ts";
+import { ApiRequestError } from "../../../src/mod.ts";
 import { runTest } from "./_t.ts";
 
 runTest({
   name: "cValidatorAction",
   codeTestFn: async (t, exchClient) => {
-    await t.step("changeProfile", async () => {
-      await assertRejects(
+    await t.test("changeProfile", async () => {
+      await assert.rejects(
         async () => {
           await exchClient.cValidatorAction({
             changeProfile: {
@@ -27,8 +26,8 @@ runTest({
       );
     });
 
-    await t.step("register", async () => {
-      await assertRejects(
+    await t.test("register", async () => {
+      await assert.rejects(
         async () => {
           await exchClient.cValidatorAction({
             register: {
@@ -50,8 +49,8 @@ runTest({
       );
     });
 
-    await t.step("unregister", async () => {
-      await assertRejects(
+    await t.test("unregister", async () => {
+      await assert.rejects(
         async () => {
           await exchClient.cValidatorAction({ unregister: null });
         },

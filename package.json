@@ -43,11 +43,20 @@
   "bin": {
     "@nktkas/hyperliquid": "./dist/bin/cli.js"
   },
+  "files": [
+    "dist",
+    "bin",
+    "src",
+    "LICENSE",
+    "README.md",
+    "SECURITY.md"
+  ],
   "scripts": {
     "dev:build": "npx tsc",
     "dev:fmt": "npx deno fmt && npx sort-package-json",
     "dev:lint": "npx deno lint",
-    "dev:typecheck": "npx deno check --doc"
+    "dev:typecheck": "npx deno check",
+    "test": "node --test --test-concurrency=1"
   },
   "dependencies": {
     "@henrygd/semaphore": "0.1.0",
@@ -58,8 +67,14 @@
     "valibot": "1.1.0"
   },
   "devDependencies": {
-    "@types/node": "^24.10.1",
-    "typescript": "^5.9.3"
+    "@types/node": "^20.19.25",
+    "@types/ws": "^8.18.1",
+    "dotenv": "^17.2.3",
+    "ethers5": "npm:ethers@^5.8.0",
+    "ethers6": "npm:ethers@^6.15.0",
+    "typescript": "^5.9.3",
+    "viem": "^2.39.0",
+    "ws": "^8.18.3"
   },
   "engines": {
     "node": ">=20.19.0"

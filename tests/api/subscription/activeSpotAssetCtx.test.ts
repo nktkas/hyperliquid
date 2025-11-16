@@ -1,4 +1,4 @@
-import { ActiveSpotAssetCtxEvent } from "@nktkas/hyperliquid/api/subscription";
+import { ActiveSpotAssetCtxEvent } from "../../../src/api/subscription/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { collectEventsOverTime, runTest } from "./_t.ts";
 

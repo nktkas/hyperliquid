@@ -1,7 +1,7 @@
-// deno-lint-ignore-file no-import-prefix
+import test from "node:test";
+import assert from "node:assert";
 import { type Domain, PrivateKeyEIP712Signer, type Types } from "../../src/utils/_eip712.ts";
-import { Wallet } from "npm:ethers@6";
-import { assertEquals } from "jsr:@std/assert@1";
+import { Wallet } from "ethers6";
 
 const PRIVATE_KEY = "0x720fdd809048d0104b0b82ae70642b5dcfd5fd6870eeefc9c882004ab35573ae";
 const ethersWallet = new Wallet(PRIVATE_KEY);
@@ -32,12 +32,12 @@ async function assertSignTypedData(args: {
     primaryType,
   });
 
-  assertEquals(ethersHash, privKeyHash);
+  assert.strictEqual(ethersHash, privKeyHash);
 }
 
 // Tests atomic types: address, bool, uint8-256, int8-256, bytes1-32
-Deno.test("atomic_types", async (t) => {
-  await t.step("address", async () => {
+test("atomic_types", async (t) => {
+  await t.test("address", async () => {
     await assertSignTypedData({
       types: {
         TestAddress: [
@@ -49,8 +49,8 @@ Deno.test("atomic_types", async (t) => {
     });
   });
 
-  await t.step("bool", async (t) => {
-    await t.step("true", async () => {
+  await t.test("bool", async (t) => {
+    await t.test("true", async () => {
       await assertSignTypedData({
         types: {
           TestBool: [
@@ -62,7 +62,7 @@ Deno.test("atomic_types", async (t) => {
       });
     });
 
-    await t.step("false", async () => {
+    await t.test("false", async () => {
       await assertSignTypedData({
         types: {
           TestBool: [
@@ -75,7 +75,7 @@ Deno.test("atomic_types", async (t) => {
     });
   });
 
-  await t.step("uint", async (t) => {
+  await t.test("uint", async (t) => {
     // Generate all uint sizes: 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248, 256
     const uintSizes = Array.from({ length: 32 }, (_, i) => 8 + i * 8);
 
@@ -83,8 +83,8 @@ Deno.test("atomic_types", async (t) => {
       const maxValue = size <= 32 ? (2 ** size) - 1 : ((2n ** BigInt(size)) - 1n).toString();
       const medianValue = size <= 32 ? Math.floor((2 ** size) / 2) : ((2n ** BigInt(size)) / 2n).toString();
 
-      await t.step(`uint${size}`, async (t) => {
-        await t.step("max", async () => {
+      await t.test(`uint${size}`, async (t) => {
+        await t.test("max", async () => {
           await assertSignTypedData({
             types: {
               TestUint: [
@@ -96,7 +96,7 @@ Deno.test("atomic_types", async (t) => {
           });
         });
 
-        await t.step("median", async () => {
+        await t.test("median", async () => {
           await assertSignTypedData({
             types: {
               TestUint: [
@@ -108,7 +108,7 @@ Deno.test("atomic_types", async (t) => {
           });
         });
 
-        await t.step("min", async () => {
+        await t.test("min", async () => {
           await assertSignTypedData({
             types: {
               TestUint: [
@@ -123,7 +123,7 @@ Deno.test("atomic_types", async (t) => {
     }
   });
 
-  await t.step("int", async (t) => {
+  await t.test("int", async (t) => {
     // Generate all int sizes: 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248, 256
     const intSizes = Array.from({ length: 32 }, (_, i) => 8 + i * 8);
 
@@ -132,8 +132,8 @@ Deno.test("atomic_types", async (t) => {
       const medianValue = size <= 31 ? Math.floor(-(2 ** (size - 1)) / 2) : (-(2n ** BigInt(size - 1)) / 2n).toString();
       const maxValue = size <= 31 ? (2 ** (size - 1)) - 1 : ((2n ** BigInt(size - 1)) - 1n).toString();
 
-      await t.step(`int${size}`, async (t) => {
-        await t.step("max", async () => {
+      await t.test(`int${size}`, async (t) => {
+        await t.test("max", async () => {
           await assertSignTypedData({
             types: {
               TestInt: [
@@ -145,7 +145,7 @@ Deno.test("atomic_types", async (t) => {
           });
         });
 
-        await t.step("median", async () => {
+        await t.test("median", async () => {
           await assertSignTypedData({
             types: {
               TestInt: [
@@ -157,7 +157,7 @@ Deno.test("atomic_types", async (t) => {
           });
         });
 
-        await t.step("min", async () => {
+        await t.test("min", async () => {
           await assertSignTypedData({
             types: {
               TestInt: [
@@ -172,7 +172,7 @@ Deno.test("atomic_types", async (t) => {
     }
   });
 
-  await t.step("bytes_fixed", async (t) => {
+  await t.test("bytes_fixed", async (t) => {
     // Generate all bytes sizes: 1-32
     const bytesSizes = Array.from({ length: 32 }, (_, i) => i + 1);
 
@@ -180,8 +180,8 @@ Deno.test("atomic_types", async (t) => {
       const maxValue = "0x" + "ff".repeat(size);
       const medianValue = "0x" + "7f" + "ff".repeat(size - 1);
 
-      await t.step(`bytes${size}`, async (t) => {
-        await t.step("max", async () => {
+      await t.test(`bytes${size}`, async (t) => {
+        await t.test("max", async () => {
           await assertSignTypedData({
             types: {
               TestBytes: [
@@ -193,7 +193,7 @@ Deno.test("atomic_types", async (t) => {
           });
         });
 
-        await t.step("median", async () => {
+        await t.test("median", async () => {
           await assertSignTypedData({
             types: {
               TestBytes: [
@@ -205,7 +205,7 @@ Deno.test("atomic_types", async (t) => {
           });
         });
 
-        await t.step("empty", async () => {
+        await t.test("empty", async () => {
           await assertSignTypedData({
             types: {
               TestBytes: [
@@ -222,9 +222,9 @@ Deno.test("atomic_types", async (t) => {
 });
 
 // Tests dynamic types: string, bytes
-Deno.test("dynamic_types", async (t) => {
-  await t.step("string", async (t) => {
-    await t.step("normal", async () => {
+test("dynamic_types", async (t) => {
+  await t.test("string", async (t) => {
+    await t.test("normal", async () => {
       await assertSignTypedData({
         types: {
           TestString: [
@@ -236,7 +236,7 @@ Deno.test("dynamic_types", async (t) => {
       });
     });
 
-    await t.step("empty", async () => {
+    await t.test("empty", async () => {
       await assertSignTypedData({
         types: {
           TestString: [
@@ -248,7 +248,7 @@ Deno.test("dynamic_types", async (t) => {
       });
     });
 
-    await t.step("unicode", async () => {
+    await t.test("unicode", async () => {
       await assertSignTypedData({
         types: {
           TestString: [
@@ -261,8 +261,8 @@ Deno.test("dynamic_types", async (t) => {
     });
   });
 
-  await t.step("bytes_dynamic", async (t) => {
-    await t.step("empty", async () => {
+  await t.test("bytes_dynamic", async (t) => {
+    await t.test("empty", async () => {
       await assertSignTypedData({
         types: {
           TestBytes: [
@@ -274,7 +274,7 @@ Deno.test("dynamic_types", async (t) => {
       });
     });
 
-    await t.step("hex", async () => {
+    await t.test("hex", async () => {
       await assertSignTypedData({
         types: {
           TestBytes: [
@@ -286,7 +286,7 @@ Deno.test("dynamic_types", async (t) => {
       });
     });
 
-    await t.step("uint8array", async () => {
+    await t.test("uint8array", async () => {
       const bytesArray = new Uint8Array([72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100]);
 
       await assertSignTypedData({
@@ -303,10 +303,10 @@ Deno.test("dynamic_types", async (t) => {
 });
 
 // Tests reference types: arrays (fixed/dynamic, multidimensional) and structs (simple/nested/complex)
-Deno.test("reference_types", async (t) => {
-  await t.step("arrays", async (t) => {
-    await t.step("uint256", async (t) => {
-      await t.step("fixed", async () => {
+test("reference_types", async (t) => {
+  await t.test("arrays", async (t) => {
+    await t.test("uint256", async (t) => {
+      await t.test("fixed", async () => {
         await assertSignTypedData({
           types: {
             TestFixedArray: [
@@ -318,7 +318,7 @@ Deno.test("reference_types", async (t) => {
         });
       });
 
-      await t.step("dynamic", async () => {
+      await t.test("dynamic", async () => {
         await assertSignTypedData({
           types: {
             TestDynamicArray: [
@@ -330,7 +330,7 @@ Deno.test("reference_types", async (t) => {
         });
       });
 
-      await t.step("empty", async () => {
+      await t.test("empty", async () => {
         await assertSignTypedData({
           types: {
             TestEmptyArray: [
@@ -343,7 +343,7 @@ Deno.test("reference_types", async (t) => {
       });
     });
 
-    await t.step("string", async () => {
+    await t.test("string", async () => {
       await assertSignTypedData({
         types: {
           TestStringArray: [
@@ -355,7 +355,7 @@ Deno.test("reference_types", async (t) => {
       });
     });
 
-    await t.step("bool", async () => {
+    await t.test("bool", async () => {
       await assertSignTypedData({
         types: {
           TestBoolArray: [
@@ -367,7 +367,7 @@ Deno.test("reference_types", async (t) => {
       });
     });
 
-    await t.step("bytes", async () => {
+    await t.test("bytes", async () => {
       await assertSignTypedData({
         types: {
           TestBytesArray: [
@@ -379,7 +379,7 @@ Deno.test("reference_types", async (t) => {
       });
     });
 
-    await t.step("address", async () => {
+    await t.test("address", async () => {
       await assertSignTypedData({
         types: {
           TestAddressArray: [
@@ -397,8 +397,8 @@ Deno.test("reference_types", async (t) => {
       });
     });
 
-    await t.step("struct_arrays", async (t) => {
-      await t.step("dynamic", async () => {
+    await t.test("struct_arrays", async (t) => {
+      await t.test("dynamic", async () => {
         await assertSignTypedData({
           types: {
             Person: [
@@ -420,7 +420,7 @@ Deno.test("reference_types", async (t) => {
         });
       });
 
-      await t.step("fixed", async () => {
+      await t.test("fixed", async () => {
         await assertSignTypedData({
           types: {
             Person: [
@@ -442,8 +442,8 @@ Deno.test("reference_types", async (t) => {
       });
     });
 
-    await t.step("multidimensional", async (t) => {
-      await t.step("2d", async () => {
+    await t.test("multidimensional", async (t) => {
+      await t.test("2d", async () => {
         await assertSignTypedData({
           types: {
             Test2DArray: [
@@ -461,7 +461,7 @@ Deno.test("reference_types", async (t) => {
         });
       });
 
-      await t.step("3d", async () => {
+      await t.test("3d", async () => {
         await assertSignTypedData({
           types: {
             Test3DArray: [
@@ -478,7 +478,7 @@ Deno.test("reference_types", async (t) => {
         });
       });
 
-      await t.step("4d", async () => {
+      await t.test("4d", async () => {
         await assertSignTypedData({
           types: {
             Test4DArray: [
@@ -497,8 +497,8 @@ Deno.test("reference_types", async (t) => {
     });
   });
 
-  await t.step("structs", async (t) => {
-    await t.step("simple", async () => {
+  await t.test("structs", async (t) => {
+    await t.test("simple", async () => {
       await assertSignTypedData({
         types: {
           SimpleStruct: [
@@ -511,7 +511,7 @@ Deno.test("reference_types", async (t) => {
       });
     });
 
-    await t.step("nested", async () => {
+    await t.test("nested", async () => {
       await assertSignTypedData({
         types: {
           InnerStruct: [
@@ -531,7 +531,7 @@ Deno.test("reference_types", async (t) => {
       });
     });
 
-    await t.step("complex", async () => {
+    await t.test("complex", async () => {
       await assertSignTypedData({
         types: {
           InnerStruct: [
@@ -566,8 +566,8 @@ Deno.test("reference_types", async (t) => {
       });
     });
 
-    await t.step("empty_struct", async (t) => {
-      await t.step("zero_fields", async () => {
+    await t.test("empty_struct", async (t) => {
+      await t.test("zero_fields", async () => {
         await assertSignTypedData({
           types: {
             EmptyStruct: [],
@@ -577,7 +577,7 @@ Deno.test("reference_types", async (t) => {
         });
       });
 
-      await t.step("nested_empty", async () => {
+      await t.test("nested_empty", async () => {
         await assertSignTypedData({
           types: {
             EmptyStruct: [],
@@ -600,12 +600,12 @@ Deno.test("reference_types", async (t) => {
 });
 
 // Tests EIP-712 domain separator field variations: chainId, verifyingContract, version, name, salt, field combinations and ordering
-Deno.test("domain_separator", async (t) => {
-  await t.step("chain_id", async (t) => {
+test("domain_separator", async (t) => {
+  await t.test("chain_id", async (t) => {
     const chainIds = [0, 1, 5, 10, 56, 137, 250, 42161, 43114, 1337, 31337];
 
     for (const chainId of chainIds) {
-      await t.step(`chain_${chainId}`, async () => {
+      await t.test(`chain_${chainId}`, async () => {
         await assertSignTypedData({
           domain: {
             name: "Test",
@@ -625,8 +625,8 @@ Deno.test("domain_separator", async (t) => {
     }
   });
 
-  await t.step("verifying_contract", async (t) => {
-    await t.step("typical", async () => {
+  await t.test("verifying_contract", async (t) => {
+    await t.test("typical", async () => {
       await assertSignTypedData({
         domain: {
           name: "Test",
@@ -644,7 +644,7 @@ Deno.test("domain_separator", async (t) => {
       });
     });
 
-    await t.step("zero", async () => {
+    await t.test("zero", async () => {
       await assertSignTypedData({
         domain: {
           name: "Test",
@@ -662,7 +662,7 @@ Deno.test("domain_separator", async (t) => {
       });
     });
 
-    await t.step("max", async () => {
+    await t.test("max", async () => {
       await assertSignTypedData({
         domain: {
           name: "Test",
@@ -681,11 +681,11 @@ Deno.test("domain_separator", async (t) => {
     });
   });
 
-  await t.step("version", async (t) => {
+  await t.test("version", async (t) => {
     const versions = ["1", "2", "3", "4", ""];
 
     for (const version of versions) {
-      await t.step(`version_${version || "empty"}`, async () => {
+      await t.test(`version_${version || "empty"}`, async () => {
         await assertSignTypedData({
           domain: {
             name: "Test",
@@ -705,8 +705,8 @@ Deno.test("domain_separator", async (t) => {
     }
   });
 
-  await t.step("name", async (t) => {
-    await t.step("empty", async () => {
+  await t.test("name", async (t) => {
+    await t.test("empty", async () => {
       await assertSignTypedData({
         domain: {
           name: "",
@@ -724,7 +724,7 @@ Deno.test("domain_separator", async (t) => {
       });
     });
 
-    await t.step("unicode", async () => {
+    await t.test("unicode", async () => {
       await assertSignTypedData({
         domain: {
           name: "测试 🌍 тест",
@@ -742,7 +742,7 @@ Deno.test("domain_separator", async (t) => {
       });
     });
 
-    await t.step("long", async () => {
+    await t.test("long", async () => {
       const longName = "A".repeat(1000);
       await assertSignTypedData({
         domain: {
@@ -762,8 +762,8 @@ Deno.test("domain_separator", async (t) => {
     });
   });
 
-  await t.step("salt", async (t) => {
-    await t.step("zero", async () => {
+  await t.test("salt", async (t) => {
+    await t.test("zero", async () => {
       await assertSignTypedData({
         domain: {
           name: "Test",
@@ -782,7 +782,7 @@ Deno.test("domain_separator", async (t) => {
       });
     });
 
-    await t.step("max", async () => {
+    await t.test("max", async () => {
       await assertSignTypedData({
         domain: {
           name: "Test",
@@ -802,7 +802,7 @@ Deno.test("domain_separator", async (t) => {
     });
   });
 
-  await t.step("partial_fields", async (t) => {
+  await t.test("partial_fields", async (t) => {
     const fields = ["name", "version", "chainId", "verifyingContract", "salt"];
     const baseValues = {
       name: "Test",
@@ -814,7 +814,7 @@ Deno.test("domain_separator", async (t) => {
 
     for (let i = 1; i < (1 << fields.length); i++) {
       const combo = fields.filter((_, idx) => i & (1 << idx));
-      await t.step(`fields_${combo.join("_")}`, async () => {
+      await t.test(`fields_${combo.join("_")}`, async () => {
         const domain: Record<string, unknown> = {};
         for (const field of combo) {
           domain[field] = baseValues[field as keyof typeof baseValues];
@@ -834,7 +834,7 @@ Deno.test("domain_separator", async (t) => {
     }
   });
 
-  await t.step("field_order", async (t) => {
+  await t.test("field_order", async (t) => {
     const fields = ["name", "version", "chainId", "verifyingContract", "salt"];
     const baseValues = {
       name: "Test",
@@ -856,7 +856,7 @@ Deno.test("domain_separator", async (t) => {
     }
 
     for (const order of permutations(fields)) {
-      await t.step(`order_${order.join("_")}`, async () => {
+      await t.test(`order_${order.join("_")}`, async () => {
         const domain: Record<string, unknown> = {};
         for (const field of order) {
           domain[field] = baseValues[field as keyof typeof baseValues];
@@ -878,9 +878,9 @@ Deno.test("domain_separator", async (t) => {
 });
 
 // Tests structured data edge cases: extra message properties filtering and complex type combinations
-Deno.test("typed_structured_data", async (t) => {
-  await t.step("extra_message_properties", async (t) => {
-    await t.step("simple_struct", async () => {
+test("typed_structured_data", async (t) => {
+  await t.test("extra_message_properties", async (t) => {
+    await t.test("simple_struct", async () => {
       await assertSignTypedData({
         types: {
           Person: [
@@ -898,7 +898,7 @@ Deno.test("typed_structured_data", async (t) => {
       });
     });
 
-    await t.step("nested_struct", async () => {
+    await t.test("nested_struct", async () => {
       await assertSignTypedData({
         types: {
           Address: [
@@ -923,7 +923,7 @@ Deno.test("typed_structured_data", async (t) => {
       });
     });
 
-    await t.step("array_elements", async () => {
+    await t.test("array_elements", async () => {
       await assertSignTypedData({
         types: {
           Item: [
@@ -954,7 +954,7 @@ Deno.test("typed_structured_data", async (t) => {
     });
   });
 
-  await t.step("type_combinations", async () => {
+  await t.test("type_combinations", async () => {
     await assertSignTypedData({
       types: {
         // Nested struct with atomic types
@@ -1039,8 +1039,8 @@ Deno.test("typed_structured_data", async (t) => {
 });
 
 // Tests type aliases: uint (uint256) and int (int256)
-Deno.test("type_aliases", async (t) => {
-  await t.step("uint", async () => {
+test("type_aliases", async (t) => {
+  await t.test("uint", async () => {
     await assertSignTypedData({
       types: {
         TestUintAlias: [
@@ -1052,7 +1052,7 @@ Deno.test("type_aliases", async (t) => {
     });
   });
 
-  await t.step("int", async () => {
+  await t.test("int", async () => {
     await assertSignTypedData({
       types: {
         TestIntAlias: [
@@ -1072,8 +1072,8 @@ Deno.test("type_aliases", async (t) => {
 });
 
 // Tests that message field ordering doesn't affect signature generation (types define canonical order)
-Deno.test("field_ordering", async (t) => {
-  await t.step("inverted_message_order", async () => {
+test("field_ordering", async (t) => {
+  await t.test("inverted_message_order", async () => {
     // Types define order: name, age, active
     // Message provides: active, age, name (inverted)
     await assertSignTypedData({
@@ -1093,7 +1093,7 @@ Deno.test("field_ordering", async (t) => {
     });
   });
 
-  await t.step("random_message_order", async () => {
+  await t.test("random_message_order", async () => {
     // Types define order: field1, field2, field3, field4, field5
     // Message provides: field3, field1, field5, field2, field4
     await assertSignTypedData({
@@ -1117,7 +1117,7 @@ Deno.test("field_ordering", async (t) => {
     });
   });
 
-  await t.step("nested_struct_ordering", async () => {
+  await t.test("nested_struct_ordering", async () => {
     await assertSignTypedData({
       types: {
         Address: [
@@ -1146,8 +1146,8 @@ Deno.test("field_ordering", async (t) => {
 });
 
 // Tests complex multidimensional arrays with various data types
-Deno.test("multidimensional_complex_arrays", async (t) => {
-  await t.step("string_2d_arrays", async () => {
+test("multidimensional_complex_arrays", async (t) => {
+  await t.test("string_2d_arrays", async () => {
     await assertSignTypedData({
       types: {
         TestString2D: [
@@ -1166,7 +1166,7 @@ Deno.test("multidimensional_complex_arrays", async (t) => {
     });
   });
 
-  await t.step("bytes_2d_arrays", async () => {
+  await t.test("bytes_2d_arrays", async () => {
     await assertSignTypedData({
       types: {
         TestBytes2D: [
@@ -1184,7 +1184,7 @@ Deno.test("multidimensional_complex_arrays", async (t) => {
     });
   });
 
-  await t.step("struct_2d_arrays", async () => {
+  await t.test("struct_2d_arrays", async () => {
     await assertSignTypedData({
       types: {
         Point: [
@@ -1213,7 +1213,7 @@ Deno.test("multidimensional_complex_arrays", async (t) => {
     });
   });
 
-  await t.step("string_3d_arrays", async () => {
+  await t.test("string_3d_arrays", async () => {
     await assertSignTypedData({
       types: {
         TestString3D: [
@@ -1236,7 +1236,7 @@ Deno.test("multidimensional_complex_arrays", async (t) => {
     });
   });
 
-  await t.step("struct_4d_arrays", async () => {
+  await t.test("struct_4d_arrays", async () => {
     await assertSignTypedData({
       types: {
         Point: [
@@ -1270,7 +1270,7 @@ Deno.test("multidimensional_complex_arrays", async (t) => {
     });
   });
 
-  await t.step("mixed_multidimensional", async () => {
+  await t.test("mixed_multidimensional", async () => {
     await assertSignTypedData({
       types: {
         Item: [
@@ -1302,8 +1302,8 @@ Deno.test("multidimensional_complex_arrays", async (t) => {
 });
 
 // Tests combinations of fixed and dynamic arrays with different types
-Deno.test("mixed_array_types", async (t) => {
-  await t.step("dynamic_static_mix", async () => {
+test("mixed_array_types", async (t) => {
+  await t.test("dynamic_static_mix", async () => {
     await assertSignTypedData({
       types: {
         TestMixedArrays: [
@@ -1328,7 +1328,7 @@ Deno.test("mixed_array_types", async (t) => {
     });
   });
 
-  await t.step("atomic_types_arrays", async () => {
+  await t.test("atomic_types_arrays", async () => {
     await assertSignTypedData({
       types: {
         TestAtomicArrays: [
@@ -1357,7 +1357,7 @@ Deno.test("mixed_array_types", async (t) => {
     });
   });
 
-  await t.step("struct_array_combinations", async () => {
+  await t.test("struct_array_combinations", async () => {
     await assertSignTypedData({
       types: {
         Person: [
@@ -1392,7 +1392,7 @@ Deno.test("mixed_array_types", async (t) => {
     });
   });
 
-  await t.step("bytes_variations", async () => {
+  await t.test("bytes_variations", async () => {
     await assertSignTypedData({
       types: {
         TestBytesVariations: [

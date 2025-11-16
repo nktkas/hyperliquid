@@ -1,6 +1,6 @@
-// deno-lint-ignore no-import-prefix
-import { assertEquals, assertThrows } from "jsr:@std/assert@1";
-import { formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
+import test from "node:test";
+import assert from "node:assert";
+import { formatPrice, formatSize } from "../../src/utils/mod.ts";
 
 const REFERENCE_PERPS_DATA = [
   {
@@ -61,113 +61,113 @@ const REFERENCE_SPOTS_DATA = [
   },
 ];
 
-Deno.test("formatPrice", async (t) => {
-  await t.step("integer bypasses sig figs limit", () => {
-    assertEquals(formatPrice("1234567", 0, true), "1234567");
+test("formatPrice", async (t) => {
+  await t.test("integer bypasses sig figs limit", () => {
+    assert.strictEqual(formatPrice("1234567", 0, true), "1234567");
   });
 
-  await t.step("5 sig figs truncation", () => {
-    assertEquals(formatPrice("12345.6", 0, true), "12345");
-    assertEquals(formatPrice("0.00123456", 0, true), "0.001234");
+  await t.test("5 sig figs truncation", () => {
+    assert.strictEqual(formatPrice("12345.6", 0, true), "12345");
+    assert.strictEqual(formatPrice("0.00123456", 0, true), "0.001234");
   });
 
-  await t.step("perp decimal limit (6 - szDecimals)", () => {
-    assertEquals(formatPrice("0.1234567", 0, true), "0.12345");
-    assertEquals(formatPrice("123.456", 5, true), "123.4");
+  await t.test("perp decimal limit (6 - szDecimals)", () => {
+    assert.strictEqual(formatPrice("0.1234567", 0, true), "0.12345");
+    assert.strictEqual(formatPrice("123.456", 5, true), "123.4");
   });
 
-  await t.step("spot decimal limit (8 - szDecimals)", () => {
-    assertEquals(formatPrice("0.000123456", 0, false), "0.00012345");
-    assertEquals(formatPrice("0.0001234", 3, false), "0.00012");
+  await t.test("spot decimal limit (8 - szDecimals)", () => {
+    assert.strictEqual(formatPrice("0.000123456", 0, false), "0.00012345");
+    assert.strictEqual(formatPrice("0.0001234", 3, false), "0.00012");
   });
 
-  await t.step("normalization", async (t) => {
-    await t.step("trailing zeros", () => {
-      assertEquals(formatPrice("1.1000", 0, true), "1.1");
+  await t.test("normalization", async (t) => {
+    await t.test("trailing zeros", () => {
+      assert.strictEqual(formatPrice("1.1000", 0, true), "1.1");
     });
 
-    await t.step("leading zeros", () => {
-      assertEquals(formatPrice("00.123", 0, true), "0.123");
+    await t.test("leading zeros", () => {
+      assert.strictEqual(formatPrice("00.123", 0, true), "0.123");
     });
   });
 
-  await t.step("edge cases", () => {
+  await t.test("edge cases", () => {
     // Zero doesn't become empty string
-    assertEquals(formatPrice("0", 0, true), "0");
+    assert.strictEqual(formatPrice("0", 0, true), "0");
     // Negative numbers supported
-    assertEquals(formatPrice("-123.456", 0, true), "-123.45");
+    assert.strictEqual(formatPrice("-123.456", 0, true), "-123.45");
   });
 
-  await t.step("invalid input throws", () => {
-    assertThrows(() => formatPrice("0x1A", 0, true)); // Hex
-    assertThrows(() => formatPrice("1.23e5", 0, true)); // Scientific notation
-    assertThrows(() => formatPrice("abc", 0, true)); // Invalid string
+  await t.test("invalid input throws", () => {
+    assert.throws(() => formatPrice("0x1A", 0, true)); // Hex
+    assert.throws(() => formatPrice("1.23e5", 0, true)); // Scientific notation
+    assert.throws(() => formatPrice("abc", 0, true)); // Invalid string
   });
 
-  await t.step("reference validation", async (t) => {
-    await t.step("perpetuals", async (t) => {
+  await t.test("reference validation", async (t) => {
+    await t.test("perpetuals", async (t) => {
       for (const { asset, szDecimals, minPrice } of REFERENCE_PERPS_DATA) {
-        await t.step(`${asset} (szDecimals=${szDecimals})`, () => {
+        await t.test(`${asset} (szDecimals=${szDecimals})`, () => {
           const formatted = formatPrice(minPrice, szDecimals, true);
-          assertEquals(formatted, minPrice);
+          assert.strictEqual(formatted, minPrice);
         });
       }
     });
 
-    await t.step("spots", async (t) => {
+    await t.test("spots", async (t) => {
       for (const { asset, szDecimals, minPrice } of REFERENCE_SPOTS_DATA) {
-        await t.step(`${asset} (szDecimals=${szDecimals})`, () => {
+        await t.test(`${asset} (szDecimals=${szDecimals})`, () => {
           const formatted = formatPrice(minPrice, szDecimals, false);
-          assertEquals(formatted, minPrice);
+          assert.strictEqual(formatted, minPrice);
         });
       }
     });
   });
 });
 
-Deno.test("formatSize", async (t) => {
-  await t.step("truncates to szDecimals", () => {
-    assertEquals(formatSize("123.456789", 2), "123.45");
+test("formatSize", async (t) => {
+  await t.test("truncates to szDecimals", () => {
+    assert.strictEqual(formatSize("123.456789", 2), "123.45");
   });
 
-  await t.step("normalization", async (t) => {
-    await t.step("trailing zeros", () => {
-      assertEquals(formatSize("1.0000", 4), "1");
+  await t.test("normalization", async (t) => {
+    await t.test("trailing zeros", () => {
+      assert.strictEqual(formatSize("1.0000", 4), "1");
     });
 
-    await t.step("leading zeros", () => {
-      assertEquals(formatSize("00.123", 3), "0.123");
+    await t.test("leading zeros", () => {
+      assert.strictEqual(formatSize("00.123", 3), "0.123");
     });
   });
 
-  await t.step("edge cases", () => {
+  await t.test("edge cases", () => {
     // Zero doesn't become empty string
-    assertEquals(formatSize("0", 0), "0");
+    assert.strictEqual(formatSize("0", 0), "0");
     // Negative numbers supported
-    assertEquals(formatSize("-10.5", 1), "-10.5");
+    assert.strictEqual(formatSize("-10.5", 1), "-10.5");
   });
 
-  await t.step("invalid input throws", () => {
-    assertThrows(() => formatSize("0xFF", 0)); // Hex
-    assertThrows(() => formatSize("5e-3", 0)); // Scientific notation
-    assertThrows(() => formatSize("invalid", 0)); // Invalid string
+  await t.test("invalid input throws", () => {
+    assert.throws(() => formatSize("0xFF", 0)); // Hex
+    assert.throws(() => formatSize("5e-3", 0)); // Scientific notation
+    assert.throws(() => formatSize("invalid", 0)); // Invalid string
   });
 
-  await t.step("reference validation", async (t) => {
-    await t.step("perpetuals", async (t) => {
+  await t.test("reference validation", async (t) => {
+    await t.test("perpetuals", async (t) => {
       for (const { asset, szDecimals, minSize } of REFERENCE_PERPS_DATA) {
-        await t.step(`${asset} (szDecimals=${szDecimals})`, () => {
+        await t.test(`${asset} (szDecimals=${szDecimals})`, () => {
           const formatted = formatSize(minSize, szDecimals);
-          assertEquals(formatted, minSize);
+          assert.strictEqual(formatted, minSize);
         });
       }
     });
 
-    await t.step("spots", async (t) => {
+    await t.test("spots", async (t) => {
       for (const { asset, szDecimals, minSize } of REFERENCE_SPOTS_DATA) {
-        await t.step(`${asset} (szDecimals=${szDecimals})`, () => {
+        await t.test(`${asset} (szDecimals=${szDecimals})`, () => {
           const formatted = formatSize(minSize, szDecimals);
-          assertEquals(formatted, minSize);
+          assert.strictEqual(formatted, minSize);
         });
       }
     });

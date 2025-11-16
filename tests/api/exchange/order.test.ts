@@ -1,6 +1,7 @@
-import { OrderRequest, OrderSuccessResponse, parser } from "@nktkas/hyperliquid/api/exchange";
+import { OrderRequest, OrderSuccessResponse, parser } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { allMids, formatPrice, formatSize, randomCloid, runTest, symbolConverter, topUpPerp } from "./_t.ts";
+import { allMids, randomCloid, runTest, symbolConverter, topUpPerp } from "./_t.ts";
+import { formatPrice, formatSize } from "../../../src/utils/mod.ts";
 
 runTest({
   name: "order",

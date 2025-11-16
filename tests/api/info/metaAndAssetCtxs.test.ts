@@ -1,4 +1,4 @@
-import { MetaAndAssetCtxsRequest, MetaAndAssetCtxsResponse, parser } from "@nktkas/hyperliquid/api/info";
+import { MetaAndAssetCtxsRequest, MetaAndAssetCtxsResponse, parser } from "../../../src/api/info/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { runTest } from "./_t.ts";
 

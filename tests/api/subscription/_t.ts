@@ -1,23 +1,22 @@
-// deno-lint-ignore-file no-import-prefix
-import { type Args, parseArgs } from "jsr:@std/cli@1/parse-args";
-import { type ExchangeClient, InfoClient, SubscriptionClient, WebSocketTransport } from "@nktkas/hyperliquid";
+import test, { type TestContext } from "node:test";
+import { type ExchangeClient, InfoClient, SubscriptionClient, WebSocketTransport } from "../../../src/mod.ts";
 import { cleanupTempExchangeClient, createTempExchangeClient } from "../exchange/_t.ts";
 
 // —————————— Arguments ——————————
 
-const cliArgs = parseArgs(Deno.args, { default: { wait: 0 }, string: ["_"] }) as Args<{ wait: number }>;
+const WAIT = 5000;
 
 // —————————— Functions ——————————
 
 export function runTest(options: {
   name: string;
   mode: "api" | "rpc";
-  fn: (t: Deno.TestContext, client: SubscriptionClient) => Promise<void>;
+  fn: (t: TestContext, client: SubscriptionClient) => Promise<void>;
 }): void {
   const { name, mode, fn } = options;
 
-  Deno.test(name, async (t) => {
-    await new Promise((r) => setTimeout(r, cliArgs.wait)); // delay to avoid rate limits
+  test(name, async (t) => {
+    await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
     // —————————— Preparation ——————————
 
@@ -39,14 +38,14 @@ export function runTest(options: {
 export function runTestWithExchange(options: {
   name: string;
   fn: (
-    t: Deno.TestContext,
+    t: TestContext,
     client: { subs: SubscriptionClient; exch: ExchangeClient; info: InfoClient },
   ) => Promise<void>;
 }): void {
   const { name, fn } = options;
 
-  Deno.test(name, async (t) => {
-    await new Promise((r) => setTimeout(r, cliArgs.wait)); // delay to avoid rate limits
+  test(name, async (t) => {
+    await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
     // —————————— Preparation ——————————
 
@@ -71,17 +70,15 @@ export function runTestWithExchange(options: {
 
 // —————————— Utils ——————————
 
-export { createTWAP, formatPrice, formatSize, openOrder, randomCloid } from "../exchange/_t.ts";
+export { createTWAP, openOrder, randomCloid } from "../exchange/_t.ts";
 
 export function collectEventsOverTime<T>(
-  // deno-lint-ignore no-explicit-any
-  fn: (cb: (event: T) => void) => any,
+  fn: (cb: (event: T) => void) => unknown,
   durationMs: number,
 ): Promise<T[]> {
-  // deno-lint-ignore no-async-promise-executor
-  return new Promise(async (resolve) => {
+  return new Promise((resolve) => {
     const data: T[] = [];
-    await fn((event) => data.push(event));
+    fn((event) => data.push(event));
     setTimeout(() => resolve(data), durationMs);
   });
 }

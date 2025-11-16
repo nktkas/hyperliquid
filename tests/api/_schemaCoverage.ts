@@ -36,9 +36,11 @@ export interface CoverageOptions {
 }
 
 export class SchemaCoverageError extends Error {
-  constructor(message: string, public issues?: CoverageIssue[]) {
+  issues?: CoverageIssue[];
+  constructor(message: string, issues?: CoverageIssue[]) {
     super(message);
     this.name = "SchemaCoverageError";
+    this.issues = issues;
   }
 }
 

@@ -1,4 +1,4 @@
-import { AllMidsRequest, AllMidsResponse, parser } from "@nktkas/hyperliquid/api/info";
+import { AllMidsRequest, AllMidsResponse, parser } from "../../../src/api/info/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { runTest } from "./_t.ts";
 

@@ -1,4 +1,4 @@
-import { parser, TxDetailsRequest, TxDetailsResponse } from "@nktkas/hyperliquid/api/info";
+import { parser, TxDetailsRequest, TxDetailsResponse } from "../../../src/api/info/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { runTest } from "./_t.ts";
 

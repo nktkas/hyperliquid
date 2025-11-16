@@ -1,4 +1,4 @@
-import { MarginTableRequest, MarginTableResponse, parser } from "@nktkas/hyperliquid/api/info";
+import { MarginTableRequest, MarginTableResponse, parser } from "../../../src/api/info/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { runTest } from "./_t.ts";
 

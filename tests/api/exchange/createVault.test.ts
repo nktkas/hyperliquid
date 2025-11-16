@@ -1,13 +1,12 @@
-// deno-lint-ignore-file no-import-prefix
-import { CreateVaultRequest, parser } from "@nktkas/hyperliquid/api/exchange";
-import { ApiRequestError } from "@nktkas/hyperliquid";
-import { assertRejects } from "jsr:@std/assert@1";
+import assert from "node:assert";
+import { CreateVaultRequest, parser } from "../../../src/api/exchange/~mod.ts";
+import { ApiRequestError } from "../../../src/mod.ts";
 import { runTest } from "./_t.ts";
 
 runTest({
   name: "createVault",
   codeTestFn: async (_t, exchClient) => {
-    await assertRejects(
+    await assert.rejects(
       async () => {
         await exchClient.createVault({
           name: "test",

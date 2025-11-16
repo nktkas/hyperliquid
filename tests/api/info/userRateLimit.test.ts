@@ -1,4 +1,4 @@
-import { parser, UserRateLimitRequest, UserRateLimitResponse } from "@nktkas/hyperliquid/api/info";
+import { parser, UserRateLimitRequest, UserRateLimitResponse } from "../../../src/api/info/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { runTest } from "./_t.ts";
 

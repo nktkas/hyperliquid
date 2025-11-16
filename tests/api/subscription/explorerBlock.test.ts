@@ -1,4 +1,4 @@
-import { ExplorerBlockEvent } from "@nktkas/hyperliquid/api/subscription";
+import { ExplorerBlockEvent } from "../../../src/api/subscription/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { collectEventsOverTime, runTest } from "./_t.ts";
 

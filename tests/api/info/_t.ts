@@ -1,54 +1,42 @@
-// deno-lint-ignore-file no-import-prefix
-import { type Args, parseArgs } from "jsr:@std/cli@1/parse-args";
-import { HttpTransport, InfoClient } from "@nktkas/hyperliquid";
+import test, { type TestContext } from "node:test";
+import { execFileSync } from "node:child_process";
+import { HttpTransport, InfoClient } from "../../../src/mod.ts";
 
 // —————————— Arguments ——————————
 
-const cliArgs = parseArgs(Deno.args, { default: { wait: 0 }, string: ["_"] }) as Args<{ wait: number }>;
+const WAIT = 5000;
 
-// —————————— Clients ——————————
+// —————————— Preparation ——————————
 
 const transport = new HttpTransport({ isTestnet: true });
-const infoClient = new InfoClient({ transport });
+const client = new InfoClient({ transport });
 
-// —————————— Functions ——————————
+// —————————— Test ——————————
 
 export function runTest(options: {
   name: string;
-  codeTestFn: (t: Deno.TestContext, client: InfoClient) => Promise<void>;
-  cliTestFn?: (t: Deno.TestContext, runCommand: (args: string[]) => Promise<string>) => Promise<void>;
+  codeTestFn: (t: TestContext, client: InfoClient) => Promise<void>;
+  cliTestFn?: (t: TestContext, runCommand: (args: string[]) => string) => Promise<void>;
 }): void {
   const { name, codeTestFn, cliTestFn } = options;
 
-  Deno.test(name, async (t) => {
-    await new Promise((r) => setTimeout(r, cliArgs.wait)); // delay to avoid rate limits
+  test(name, async (t) => {
+    await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
-    await t.step("code", async (t) => {
-      await codeTestFn(t, infoClient);
+    await t.test("code", async (t) => {
+      await codeTestFn(t, client);
     });
 
-    await t.step({
-      name: "cli",
-      fn: async (t) => {
-        await cliTestFn!(t, async (args: string[]) => {
-          const command = new Deno.Command("deno", {
-            args: ["run", "-A", "bin/cli.ts", "--offline", ...args],
-            stdout: "piped",
-            stderr: "piped",
-          });
-          const { stdout, stderr } = await command.output();
-          const error = new TextDecoder().decode(stderr);
-          if (error !== "") {
-            throw new Error(`Command failed with error: ${error}`);
-          }
-          const output = new TextDecoder().decode(stdout);
-          if (output.startsWith("Hyperliquid CLI")) {
-            throw new Error(`Invalid command argument(s)`);
-          }
-          return output;
+    await t.test("cli", { skip: !cliTestFn }, async (t) => {
+      await cliTestFn!(t, (args) => {
+        const output = execFileSync("node", ["bin/cli.ts", "--offline", ...args], {
+          encoding: "utf8",
         });
-      },
-      ignore: cliTestFn === undefined,
+        if (output.startsWith("Hyperliquid CLI")) {
+          throw new Error(`Invalid command argument(s)`);
+        }
+        return output;
+      });
     });
   });
 }

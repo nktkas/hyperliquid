@@ -1,4 +1,4 @@
-import { parser, SpotDeployStateRequest, SpotDeployStateResponse } from "@nktkas/hyperliquid/api/info";
+import { parser, SpotDeployStateRequest, SpotDeployStateResponse } from "../../../src/api/info/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { runTest } from "./_t.ts";
 

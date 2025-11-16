@@ -1,4 +1,4 @@
-import { parser, UserFeesRequest, UserFeesResponse } from "@nktkas/hyperliquid/api/info";
+import { parser, UserFeesRequest, UserFeesResponse } from "../../../src/api/info/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { runTest } from "./_t.ts";
 

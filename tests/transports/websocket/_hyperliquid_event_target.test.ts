@@ -1,9 +1,9 @@
-// deno-lint-ignore-file no-import-prefix
-import { assert, assertEquals, assertFalse } from "jsr:@std/assert@1";
+import test from "node:test";
+import assert from "node:assert";
 import { HyperliquidEventTarget } from "../../../src/transport/websocket/_hyperliquid_event_target.ts";
 
-Deno.test("HyperliquidEventTarget", async (t) => {
-  await t.step("HyperliquidMsg => dispatch event with msg.channel name", () => {
+test("HyperliquidEventTarget", async (t) => {
+  await t.test("HyperliquidMsg => dispatch event with msg.channel name", () => {
     const fakeWs = new EventTarget() as WebSocket;
     const eventTarget = new HyperliquidEventTarget(fakeWs);
 
@@ -16,10 +16,10 @@ Deno.test("HyperliquidEventTarget", async (t) => {
     const event = new MessageEvent("message", { data: '{"channel":"test","data":{"foo":"bar"}}' });
     fakeWs.dispatchEvent(event);
 
-    assertEquals(receivedMsg, { foo: "bar" });
+    assert.deepStrictEqual(receivedMsg, { foo: "bar" });
   });
 
-  await t.step("isExplorerBlockMsg => dispatch event '_explorerBlock'", () => {
+  await t.test("isExplorerBlockMsg => dispatch event '_explorerBlock'", () => {
     const fakeWs = new EventTarget() as WebSocket;
     const eventTarget = new HyperliquidEventTarget(fakeWs);
 
@@ -44,11 +44,11 @@ Deno.test("HyperliquidEventTarget", async (t) => {
 
     assert(Array.isArray(receivedMsg), "Should be an array of block details");
     const firstBlock = receivedMsg[0];
-    assertEquals(firstBlock.height, 123);
-    assertEquals(firstBlock.numTxs, 42);
+    assert.strictEqual(firstBlock.height, 123);
+    assert.strictEqual(firstBlock.numTxs, 42);
   });
 
-  await t.step("isExplorerTxsMsg => dispatch event '_explorerTxs'", () => {
+  await t.test("isExplorerTxsMsg => dispatch event '_explorerTxs'", () => {
     const fakeWs = new EventTarget() as WebSocket;
     const eventTarget = new HyperliquidEventTarget(fakeWs);
 
@@ -74,11 +74,11 @@ Deno.test("HyperliquidEventTarget", async (t) => {
 
     assert(Array.isArray(receivedMsg), "Should be an array of transaction details");
     const firstTx = receivedMsg[0];
-    assertEquals(firstTx.block, 234);
-    assertEquals(firstTx.user, "0x0000000000000000000000000000000000000000");
+    assert.strictEqual(firstTx.block, 234);
+    assert.strictEqual(firstTx.user, "0x0000000000000000000000000000000000000000");
   });
 
-  await t.step("Invalid JSON => no event dispatched, no crash", () => {
+  await t.test("Invalid JSON => no event dispatched, no crash", () => {
     const fakeWs = new EventTarget() as WebSocket;
     const eventTarget = new HyperliquidEventTarget(fakeWs);
 
@@ -90,10 +90,10 @@ Deno.test("HyperliquidEventTarget", async (t) => {
     const event = new MessageEvent("message", { data: "{ invalid json ... " });
     fakeWs.dispatchEvent(event);
 
-    assertFalse(triggered);
+    assert.ok(!triggered);
   });
 
-  await t.step("Unrecognized message shape => no event dispatched", () => {
+  await t.test("Unrecognized message shape => no event dispatched", () => {
     const fakeWs = new EventTarget() as WebSocket;
     const eventTarget = new HyperliquidEventTarget(fakeWs);
 
@@ -105,6 +105,6 @@ Deno.test("HyperliquidEventTarget", async (t) => {
     const event = new MessageEvent("message", { data: '{"foo":"bar"}' });
     fakeWs.dispatchEvent(event);
 
-    assertFalse(triggered);
+    assert.ok(!triggered);
   });
 });

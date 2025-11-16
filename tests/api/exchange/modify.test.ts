@@ -1,4 +1,4 @@
-import { ModifyRequest, parser, SuccessResponse } from "@nktkas/hyperliquid/api/exchange";
+import { ModifyRequest, parser, SuccessResponse } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { openOrder, runTest } from "./_t.ts";
 

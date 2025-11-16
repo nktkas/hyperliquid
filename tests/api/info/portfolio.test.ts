@@ -1,4 +1,4 @@
-import { parser, PortfolioRequest, PortfolioResponse } from "@nktkas/hyperliquid/api/info";
+import { parser, PortfolioRequest, PortfolioResponse } from "../../../src/api/info/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { runTest } from "./_t.ts";
 

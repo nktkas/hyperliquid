@@ -1,4 +1,4 @@
-import { parser, SuccessResponse, Withdraw3Request } from "@nktkas/hyperliquid/api/exchange";
+import { parser, SuccessResponse, Withdraw3Request } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { runTest, topUpPerp } from "./_t.ts";
 

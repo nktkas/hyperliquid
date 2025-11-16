@@ -1,4 +1,4 @@
-import { parser, TwapCancelRequest, TwapCancelSuccessResponse } from "@nktkas/hyperliquid/api/exchange";
+import { parser, TwapCancelRequest, TwapCancelSuccessResponse } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { createTWAP, runTest } from "./_t.ts";
 

@@ -1,11 +1,11 @@
-import { ApproveAgentRequest, parser, SuccessResponse } from "@nktkas/hyperliquid/api/exchange";
+import { ApproveAgentRequest, parser, SuccessResponse } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { randomAddress, runTest } from "./_t.ts";
 
 runTest({
   name: "approveAgent",
   codeTestFn: async (t, exchClient) => {
-    await t.step("with 'agentName'", async () => {
+    await t.test("with 'agentName'", async () => {
       const data = await Promise.all([
         exchClient.approveAgent({
           agentAddress: randomAddress(),
@@ -17,7 +17,7 @@ runTest({
 
     await new Promise((r) => setTimeout(r, 5000)); // waiting to avoid error `ApiRequestError: User has pending agent removal`
 
-    await t.step("without 'agentName'", async () => {
+    await t.test("without 'agentName'", async () => {
       const data = await Promise.all([
         exchClient.approveAgent({
           agentAddress: randomAddress(),

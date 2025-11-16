@@ -8,28 +8,20 @@ Welcome, and thank you for taking time in contributing to SDK! You can contribut
 
 ## Testing
 
-You can run most tests with the following command:
-
 ```bash
-deno test -A
+npm run test
 ```
 
-However, for complete testing, you will need a private key from a testnet account with funds (~100 usdc-perps, ~3
-usdc-spot, ~0.0000001 hype-spot):
-
-```bash
-deno test -A -- YOUR_PRIVATE_KEY
-```
+Set `PRIVATE_KEY` env for complete tests. Required testnet balance: ~100 usdc-perps, ~3 usdc-spot, ~0.0000001 hype-spot.
 
 ## Coding Guidelines
 
 - **Style**: After making all changes, run:
-  - [`deno fmt`](https://docs.deno.com/runtime/reference/cli/fmt/) to format your code.
-  - [`deno lint`](https://docs.deno.com/runtime/reference/cli/lint/) to check for linting errors.
-  - [`deno check --doc`](https://docs.deno.com/runtime/reference/cli/check/) to ensure there are no type errors (try not
-    to ignore errors).
-- **Dependencies**: Try to use small and easily auditable dependencies (e.g.
-  [@noble](https://github.com/paulmillr/noble-hashes) or [deno @std](https://docs.deno.com/runtime/reference/std/)).
+  - `npm run dev:fmt` to format code.
+  - `npm run dev:lint` to check lint.
+  - `npm run dev:typecheck` to check typescript.
+- **Dependencies**: Use small and easily auditable dependencies from npm (e.g.
+  [@noble/hashes](https://www.npmjs.com/package/@noble/hashes)).
 - **Testing**: Write tests for any new functionality.
 - **Docs**: Update or add JSDoc comments where appropriate.
 
@@ -49,3 +41,10 @@ deno test -A -- YOUR_PRIVATE_KEY
 7. Run [`deno fmt`](https://docs.deno.com/runtime/reference/cli/fmt/),
    [`deno lint`](https://docs.deno.com/runtime/reference/cli/lint/), and
    [`deno check --doc`](https://docs.deno.com/runtime/reference/cli/check/) to ensure code quality.
+
+### Update API schemas/types
+
+1. Go to `src/api/[exchange|info|subscription]/[methodName].ts`
+2. Update the [valibot](https://valibot.dev/) schemas in the "Schemas" section (types are inferred from schemas).
+3. Run the test at `tests/api/[exchange|info|subscription]/[methodName].ts` to check the schemas against the actual API
+   response.

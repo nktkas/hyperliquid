@@ -2,7 +2,7 @@ import {
   parser,
   UserNonFundingLedgerUpdatesRequest,
   UserNonFundingLedgerUpdatesResponse,
-} from "@nktkas/hyperliquid/api/info";
+} from "../../../src/api/info/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { runTest } from "./_t.ts";
 

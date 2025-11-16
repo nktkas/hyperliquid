@@ -1,14 +1,13 @@
-// deno-lint-ignore-file no-import-prefix
-import { CSignerActionRequest, parser } from "@nktkas/hyperliquid/api/exchange";
-import { ApiRequestError } from "@nktkas/hyperliquid";
-import { assertRejects } from "jsr:@std/assert@1";
+import assert from "node:assert";
+import { CSignerActionRequest, parser } from "../../../src/api/exchange/~mod.ts";
+import { ApiRequestError } from "../../../src/mod.ts";
 import { runTest } from "./_t.ts";
 
 runTest({
   name: "cSignerAction",
   codeTestFn: async (t, exchClient) => {
-    await t.step("jailSelf", async () => {
-      await assertRejects(
+    await t.test("jailSelf", async () => {
+      await assert.rejects(
         async () => {
           await exchClient.cSignerAction({ jailSelf: null });
         },
@@ -17,8 +16,8 @@ runTest({
       );
     });
 
-    await t.step("unjailSelf", async () => {
-      await assertRejects(
+    await t.test("unjailSelf", async () => {
+      await assert.rejects(
         async () => {
           await exchClient.cSignerAction({ unjailSelf: null });
         },

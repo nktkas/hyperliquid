@@ -1,4 +1,4 @@
-import { parser, SuccessResponse, UpdateLeverageRequest } from "@nktkas/hyperliquid/api/exchange";
+import { parser, SuccessResponse, UpdateLeverageRequest } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { runTest, symbolConverter } from "./_t.ts";
 

@@ -1,4 +1,4 @@
-import { parser, SpotSendRequest, SuccessResponse } from "@nktkas/hyperliquid/api/exchange";
+import { parser, SpotSendRequest, SuccessResponse } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { runTest, topUpSpot } from "./_t.ts";
 

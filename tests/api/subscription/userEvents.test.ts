@@ -1,5 +1,5 @@
-import { UserEventsEvent } from "@nktkas/hyperliquid/api/subscription";
-import { getWalletAddress } from "@nktkas/hyperliquid/signing";
+import { UserEventsEvent } from "../../../src/api/subscription/~mod.ts";
+import { getWalletAddress } from "../../../src/signing/mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { collectEventsOverTime, createTWAP, runTestWithExchange } from "./_t.ts";
 

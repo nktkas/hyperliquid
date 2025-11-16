@@ -1,14 +1,13 @@
-// deno-lint-ignore-file no-import-prefix
-import { parser, SpotDeployRequest } from "@nktkas/hyperliquid/api/exchange";
-import { ApiRequestError } from "@nktkas/hyperliquid";
-import { assertRejects } from "jsr:@std/assert@1";
+import assert from "node:assert";
+import { parser, SpotDeployRequest } from "../../../src/api/exchange/~mod.ts";
+import { ApiRequestError } from "../../../src/mod.ts";
 import { runTest } from "./_t.ts";
 
 runTest({
   name: "spotDeploy",
   codeTestFn: async (t, exchClient) => {
-    await t.step("registerToken2", async () => {
-      await assertRejects(
+    await t.test("registerToken2", async () => {
+      await assert.rejects(
         async () => {
           await exchClient.spotDeploy({
             registerToken2: {
@@ -26,8 +25,8 @@ runTest({
       );
     });
 
-    await t.step("userGenesis", async () => {
-      await assertRejects(
+    await t.test("userGenesis", async () => {
+      await assert.rejects(
         async () => {
           await exchClient.spotDeploy({
             userGenesis: {
@@ -43,8 +42,8 @@ runTest({
       );
     });
 
-    await t.step("genesis", async () => {
-      await assertRejects(
+    await t.test("genesis", async () => {
+      await assert.rejects(
         async () => {
           await exchClient.spotDeploy({
             genesis: {
@@ -59,8 +58,8 @@ runTest({
       );
     });
 
-    await t.step("registerSpot", async () => {
-      await assertRejects(
+    await t.test("registerSpot", async () => {
+      await assert.rejects(
         async () => {
           await exchClient.spotDeploy({
             registerSpot: {
@@ -73,8 +72,8 @@ runTest({
       );
     });
 
-    await t.step("registerHyperliquidity", async () => {
-      await assertRejects(
+    await t.test("registerHyperliquidity", async () => {
+      await assert.rejects(
         async () => {
           await exchClient.spotDeploy({
             registerHyperliquidity: {
@@ -91,8 +90,8 @@ runTest({
       );
     });
 
-    await t.step("setDeployerTradingFeeShare", async () => {
-      await assertRejects(
+    await t.test("setDeployerTradingFeeShare", async () => {
+      await assert.rejects(
         async () => {
           await exchClient.spotDeploy({
             setDeployerTradingFeeShare: {
@@ -106,8 +105,8 @@ runTest({
       );
     });
 
-    await t.step("enableQuoteToken", async () => {
-      await assertRejects(
+    await t.test("enableQuoteToken", async () => {
+      await assert.rejects(
         async () => {
           await exchClient.spotDeploy({
             enableQuoteToken: {

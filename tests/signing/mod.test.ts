@@ -1,8 +1,8 @@
-// deno-lint-ignore-file no-import-prefix
-import { assert } from "jsr:@std/assert@1";
-import { privateKeyToAccount } from "npm:viem@2/accounts";
-import { ethers } from "npm:ethers@6";
-import { ethers as ethersV5 } from "npm:ethers@5";
+import test from "node:test";
+import assert from "node:assert";
+import { privateKeyToAccount } from "viem/accounts";
+import { Wallet as WalletV5 } from "ethers5";
+import { Wallet as WalletV6 } from "ethers6";
 import {
   type AbstractWallet,
   createL1ActionHash,
@@ -222,15 +222,15 @@ const MULTI_SIG_ACTION_SIGNATURE = {
 
 // —————————— Test ——————————
 
-Deno.test("Signature Generation Tests", async (t) => {
+test("Signature Generation Tests", async (t) => {
   const viemWallet = privateKeyToAccount(PRIVATE_KEY);
-  const ethersWallet = new ethers.Wallet(PRIVATE_KEY);
-  const ethersV5Wallet = new ethersV5.Wallet(PRIVATE_KEY);
+  const ethersWallet = new WalletV6(PRIVATE_KEY);
+  const ethersV5Wallet = new WalletV5(PRIVATE_KEY);
 
-  await t.step("L1 Action Signatures", async (t) => {
-    await t.step("Action Hash", async (t) => {
-      await t.step("should generate matching action hashes", async (t) => {
-        await t.step("without vaultAddress + expiresAfter", () => {
+  await t.test("L1 Action Signatures", async (t) => {
+    await t.test("Action Hash", async (t) => {
+      await t.test("should generate matching action hashes", async (t) => {
+        await t.test("without vaultAddress + expiresAfter", () => {
           const actionHash = createL1ActionHash({
             action: L1_ACTION_SIGNATURE.data.action,
             nonce: L1_ACTION_SIGNATURE.data.nonce,
@@ -240,7 +240,7 @@ Deno.test("Signature Generation Tests", async (t) => {
             `Hash does not match, expected: ${L1_ACTION_SIGNATURE.actionHash.withoutVaultAddressAndExpiresAfter}, got: ${actionHash}`,
           );
         });
-        await t.step("with vaultAddress", () => {
+        await t.test("with vaultAddress", () => {
           const actionHash = createL1ActionHash({
             action: L1_ACTION_SIGNATURE.data.action,
             nonce: L1_ACTION_SIGNATURE.data.nonce,
@@ -251,7 +251,7 @@ Deno.test("Signature Generation Tests", async (t) => {
             `Hash does not match, expected: ${L1_ACTION_SIGNATURE.actionHash.withVaultAddress}, got: ${actionHash}`,
           );
         });
-        await t.step("with expiresAfter", () => {
+        await t.test("with expiresAfter", () => {
           const actionHash = createL1ActionHash({
             action: L1_ACTION_SIGNATURE.data.action,
             nonce: L1_ACTION_SIGNATURE.data.nonce,
@@ -262,7 +262,7 @@ Deno.test("Signature Generation Tests", async (t) => {
             `Hash does not match, expected: ${L1_ACTION_SIGNATURE.actionHash.withExpiresAfter}, got: ${actionHash}`,
           );
         });
-        await t.step("with vaultAddress + expiresAfter", () => {
+        await t.test("with vaultAddress + expiresAfter", () => {
           const actionHash = createL1ActionHash({
             action: L1_ACTION_SIGNATURE.data.action,
             nonce: L1_ACTION_SIGNATURE.data.nonce,
@@ -277,10 +277,10 @@ Deno.test("Signature Generation Tests", async (t) => {
       });
     });
 
-    await t.step("Signatures", async (t) => {
-      await t.step("should generate matching signatures", async (t) => {
-        await t.step("in mainnet", async (t) => {
-          await t.step("without vaultAddress + expiresAfter", async (t) => {
+    await t.test("Signatures", async (t) => {
+      await t.test("should generate matching signatures", async (t) => {
+        await t.test("in mainnet", async (t) => {
+          await t.test("without vaultAddress + expiresAfter", async (t) => {
             const fn = async (wallet: AbstractWallet) => {
               const signature = await signL1Action({
                 wallet,
@@ -305,11 +305,11 @@ Deno.test("Signature Generation Tests", async (t) => {
               );
             };
 
-            await t.step("Viem", async () => await fn(viemWallet));
-            await t.step("Ethers", async () => await fn(ethersWallet));
-            await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+            await t.test("Viem", async () => await fn(viemWallet));
+            await t.test("Ethers", async () => await fn(ethersWallet));
+            await t.test("Ethers v5", async () => await fn(ethersV5Wallet));
           });
-          await t.step("with vaultAddress", async (t) => {
+          await t.test("with vaultAddress", async (t) => {
             const fn = async (wallet: AbstractWallet) => {
               const signature = await signL1Action({
                 wallet,
@@ -332,11 +332,11 @@ Deno.test("Signature Generation Tests", async (t) => {
               );
             };
 
-            await t.step("Viem", async () => await fn(viemWallet));
-            await t.step("Ethers", async () => await fn(ethersWallet));
-            await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+            await t.test("Viem", async () => await fn(viemWallet));
+            await t.test("Ethers", async () => await fn(ethersWallet));
+            await t.test("Ethers v5", async () => await fn(ethersV5Wallet));
           });
-          await t.step("with expiresAfter", async (t) => {
+          await t.test("with expiresAfter", async (t) => {
             const fn = async (wallet: AbstractWallet) => {
               const signature = await signL1Action({
                 wallet,
@@ -359,11 +359,11 @@ Deno.test("Signature Generation Tests", async (t) => {
               );
             };
 
-            await t.step("Viem", async () => await fn(viemWallet));
-            await t.step("Ethers", async () => await fn(ethersWallet));
-            await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+            await t.test("Viem", async () => await fn(viemWallet));
+            await t.test("Ethers", async () => await fn(ethersWallet));
+            await t.test("Ethers v5", async () => await fn(ethersV5Wallet));
           });
-          await t.step("with vaultAddress + expiresAfter", async (t) => {
+          await t.test("with vaultAddress + expiresAfter", async (t) => {
             const fn = async (wallet: AbstractWallet) => {
               const signature = await signL1Action({
                 wallet,
@@ -390,14 +390,14 @@ Deno.test("Signature Generation Tests", async (t) => {
               );
             };
 
-            await t.step("Viem", async () => await fn(viemWallet));
-            await t.step("Ethers", async () => await fn(ethersWallet));
-            await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+            await t.test("Viem", async () => await fn(viemWallet));
+            await t.test("Ethers", async () => await fn(ethersWallet));
+            await t.test("Ethers v5", async () => await fn(ethersV5Wallet));
           });
         });
 
-        await t.step("in testnet", async (t) => {
-          await t.step("without vaultAddress + expiresAfter", async (t) => {
+        await t.test("in testnet", async (t) => {
+          await t.test("without vaultAddress + expiresAfter", async (t) => {
             const fn = async (wallet: AbstractWallet) => {
               const signature = await signL1Action({
                 wallet,
@@ -422,11 +422,11 @@ Deno.test("Signature Generation Tests", async (t) => {
               );
             };
 
-            await t.step("Viem", async () => await fn(viemWallet));
-            await t.step("Ethers", async () => await fn(ethersWallet));
-            await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+            await t.test("Viem", async () => await fn(viemWallet));
+            await t.test("Ethers", async () => await fn(ethersWallet));
+            await t.test("Ethers v5", async () => await fn(ethersV5Wallet));
           });
-          await t.step("with vaultAddress", async (t) => {
+          await t.test("with vaultAddress", async (t) => {
             const fn = async (wallet: AbstractWallet) => {
               const signature = await signL1Action({
                 wallet,
@@ -449,11 +449,11 @@ Deno.test("Signature Generation Tests", async (t) => {
               );
             };
 
-            await t.step("Viem", async () => await fn(viemWallet));
-            await t.step("Ethers", async () => await fn(ethersWallet));
-            await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+            await t.test("Viem", async () => await fn(viemWallet));
+            await t.test("Ethers", async () => await fn(ethersWallet));
+            await t.test("Ethers v5", async () => await fn(ethersV5Wallet));
           });
-          await t.step("with expiresAfter", async (t) => {
+          await t.test("with expiresAfter", async (t) => {
             const fn = async (wallet: AbstractWallet) => {
               const signature = await signL1Action({
                 wallet,
@@ -476,11 +476,11 @@ Deno.test("Signature Generation Tests", async (t) => {
               );
             };
 
-            await t.step("Viem", async () => await fn(viemWallet));
-            await t.step("Ethers", async () => await fn(ethersWallet));
-            await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+            await t.test("Viem", async () => await fn(viemWallet));
+            await t.test("Ethers", async () => await fn(ethersWallet));
+            await t.test("Ethers v5", async () => await fn(ethersV5Wallet));
           });
-          await t.step("with vaultAddress + expiresAfter", async (t) => {
+          await t.test("with vaultAddress + expiresAfter", async (t) => {
             const fn = async (wallet: AbstractWallet) => {
               const signature = await signL1Action({
                 wallet,
@@ -507,17 +507,17 @@ Deno.test("Signature Generation Tests", async (t) => {
               );
             };
 
-            await t.step("Viem", async () => await fn(viemWallet));
-            await t.step("Ethers", async () => await fn(ethersWallet));
-            await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+            await t.test("Viem", async () => await fn(viemWallet));
+            await t.test("Ethers", async () => await fn(ethersWallet));
+            await t.test("Ethers v5", async () => await fn(ethersV5Wallet));
           });
         });
       });
     });
   });
 
-  await t.step("User-Signed Action Signatures", async (t) => {
-    await t.step("should generate matching signatures", async (t) => {
+  await t.test("User-Signed Action Signatures", async (t) => {
+    await t.test("should generate matching signatures", async (t) => {
       const fn = async (wallet: AbstractWallet) => {
         const signature = await signUserSignedAction({
           wallet,
@@ -542,16 +542,16 @@ Deno.test("Signature Generation Tests", async (t) => {
         );
       };
 
-      await t.step("Viem", async () => await fn(viemWallet));
-      await t.step("Ethers", async () => await fn(ethersWallet));
-      await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+      await t.test("Viem", async () => await fn(viemWallet));
+      await t.test("Ethers", async () => await fn(ethersWallet));
+      await t.test("Ethers v5", async () => await fn(ethersV5Wallet));
     });
   });
 
-  await t.step("Multi-Sig Action Signatures", async (t) => {
-    await t.step("should generate matching signatures", async (t) => {
-      await t.step("in mainnet", async (t) => {
-        await t.step("without vaultAddress + expiresAfter", async (t) => {
+  await t.test("Multi-Sig Action Signatures", async (t) => {
+    await t.test("should generate matching signatures", async (t) => {
+      await t.test("in mainnet", async (t) => {
+        await t.test("without vaultAddress + expiresAfter", async (t) => {
           const fn = async (wallet: AbstractWallet) => {
             const signature = await signMultiSigAction({
               wallet,
@@ -576,12 +576,12 @@ Deno.test("Signature Generation Tests", async (t) => {
             );
           };
 
-          await t.step("Viem", async () => await fn(viemWallet));
-          await t.step("Ethers", async () => await fn(ethersWallet));
-          await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+          await t.test("Viem", async () => await fn(viemWallet));
+          await t.test("Ethers", async () => await fn(ethersWallet));
+          await t.test("Ethers v5", async () => await fn(ethersV5Wallet));
         });
 
-        await t.step("with vaultAddress", async (t) => {
+        await t.test("with vaultAddress", async (t) => {
           const fn = async (wallet: AbstractWallet) => {
             const signature = await signMultiSigAction({
               wallet,
@@ -607,12 +607,12 @@ Deno.test("Signature Generation Tests", async (t) => {
             );
           };
 
-          await t.step("Viem", async () => await fn(viemWallet));
-          await t.step("Ethers", async () => await fn(ethersWallet));
-          await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+          await t.test("Viem", async () => await fn(viemWallet));
+          await t.test("Ethers", async () => await fn(ethersWallet));
+          await t.test("Ethers v5", async () => await fn(ethersV5Wallet));
         });
 
-        await t.step("with expiresAfter", async (t) => {
+        await t.test("with expiresAfter", async (t) => {
           const fn = async (wallet: AbstractWallet) => {
             const signature = await signMultiSigAction({
               wallet,
@@ -638,12 +638,12 @@ Deno.test("Signature Generation Tests", async (t) => {
             );
           };
 
-          await t.step("Viem", async () => await fn(viemWallet));
-          await t.step("Ethers", async () => await fn(ethersWallet));
-          await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+          await t.test("Viem", async () => await fn(viemWallet));
+          await t.test("Ethers", async () => await fn(ethersWallet));
+          await t.test("Ethers v5", async () => await fn(ethersV5Wallet));
         });
 
-        await t.step("with vaultAddress + expiresAfter", async (t) => {
+        await t.test("with vaultAddress + expiresAfter", async (t) => {
           const fn = async (wallet: AbstractWallet) => {
             const signature = await signMultiSigAction({
               wallet,
@@ -670,14 +670,14 @@ Deno.test("Signature Generation Tests", async (t) => {
             );
           };
 
-          await t.step("Viem", async () => await fn(viemWallet));
-          await t.step("Ethers", async () => await fn(ethersWallet));
-          await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+          await t.test("Viem", async () => await fn(viemWallet));
+          await t.test("Ethers", async () => await fn(ethersWallet));
+          await t.test("Ethers v5", async () => await fn(ethersV5Wallet));
         });
       });
 
-      await t.step("in testnet", async (t) => {
-        await t.step("without vaultAddress + expiresAfter", async (t) => {
+      await t.test("in testnet", async (t) => {
+        await t.test("without vaultAddress + expiresAfter", async (t) => {
           const fn = async (wallet: AbstractWallet) => {
             const signature = await signMultiSigAction({
               wallet,
@@ -702,12 +702,12 @@ Deno.test("Signature Generation Tests", async (t) => {
             );
           };
 
-          await t.step("Viem", async () => await fn(viemWallet));
-          await t.step("Ethers", async () => await fn(ethersWallet));
-          await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+          await t.test("Viem", async () => await fn(viemWallet));
+          await t.test("Ethers", async () => await fn(ethersWallet));
+          await t.test("Ethers v5", async () => await fn(ethersV5Wallet));
         });
 
-        await t.step("with vaultAddress", async (t) => {
+        await t.test("with vaultAddress", async (t) => {
           const fn = async (wallet: AbstractWallet) => {
             const signature = await signMultiSigAction({
               wallet,
@@ -733,12 +733,12 @@ Deno.test("Signature Generation Tests", async (t) => {
             );
           };
 
-          await t.step("Viem", async () => await fn(viemWallet));
-          await t.step("Ethers", async () => await fn(ethersWallet));
-          await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+          await t.test("Viem", async () => await fn(viemWallet));
+          await t.test("Ethers", async () => await fn(ethersWallet));
+          await t.test("Ethers v5", async () => await fn(ethersV5Wallet));
         });
 
-        await t.step("with expiresAfter", async (t) => {
+        await t.test("with expiresAfter", async (t) => {
           const fn = async (wallet: AbstractWallet) => {
             const signature = await signMultiSigAction({
               wallet,
@@ -764,12 +764,12 @@ Deno.test("Signature Generation Tests", async (t) => {
             );
           };
 
-          await t.step("Viem", async () => await fn(viemWallet));
-          await t.step("Ethers", async () => await fn(ethersWallet));
-          await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+          await t.test("Viem", async () => await fn(viemWallet));
+          await t.test("Ethers", async () => await fn(ethersWallet));
+          await t.test("Ethers v5", async () => await fn(ethersV5Wallet));
         });
 
-        await t.step("with vaultAddress + expiresAfter", async (t) => {
+        await t.test("with vaultAddress + expiresAfter", async (t) => {
           const fn = async (wallet: AbstractWallet) => {
             const signature = await signMultiSigAction({
               wallet,
@@ -796,9 +796,9 @@ Deno.test("Signature Generation Tests", async (t) => {
             );
           };
 
-          await t.step("Viem", async () => await fn(viemWallet));
-          await t.step("Ethers", async () => await fn(ethersWallet));
-          await t.step("Ethers v5", async () => await fn(ethersV5Wallet));
+          await t.test("Viem", async () => await fn(viemWallet));
+          await t.test("Ethers", async () => await fn(ethersWallet));
+          await t.test("Ethers v5", async () => await fn(ethersV5Wallet));
         });
       });
     });

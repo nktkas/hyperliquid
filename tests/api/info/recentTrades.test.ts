@@ -1,4 +1,4 @@
-import { parser, RecentTradesRequest, RecentTradesResponse } from "@nktkas/hyperliquid/api/info";
+import { parser, RecentTradesRequest, RecentTradesResponse } from "../../../src/api/info/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { runTest } from "./_t.ts";
 

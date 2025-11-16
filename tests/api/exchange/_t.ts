@@ -1,20 +1,19 @@
-// deno-lint-ignore-file no-import-prefix
-import { type Args, parseArgs } from "jsr:@std/cli@1/parse-args";
-import { generatePrivateKey } from "npm:viem@2/accounts";
-import { BigNumber } from "npm:bignumber.js@9";
-import { ExchangeClient, HttpTransport, InfoClient, MultiSignClient } from "@nktkas/hyperliquid";
-import { SymbolConverter } from "@nktkas/hyperliquid/utils";
+import "dotenv/config";
+import process from "node:process";
+import test, { type TestContext } from "node:test";
+import { execFileSync } from "node:child_process";
+import { ExchangeClient, HttpTransport, InfoClient, MultiSignClient } from "../../../src/mod.ts";
 import { getWalletAddress } from "../../../src/signing/mod.ts";
+import { formatPrice, formatSize, SymbolConverter } from "../../../src/utils/mod.ts";
 
 // —————————— Arguments ——————————
 
-const cliArgs = parseArgs(Deno.args, { default: { wait: 0 }, string: ["_"] }) as Args<{ wait: number }>;
-const PRIVATE_KEY = cliArgs._[0] as `0x${string}`;
+const WAIT = 5000;
+const PRIVATE_KEY = process.env.PRIVATE_KEY as `0x${string}` | undefined;
 
 // —————————— Preparation ——————————
 
 const transport = new HttpTransport({ isTestnet: true, timeout: 30_000 });
-const mainExchClient = new ExchangeClient({ wallet: PRIVATE_KEY, transport });
 const infoClient = new InfoClient({ transport });
 
 export const symbolConverter = await SymbolConverter.create({ transport });
@@ -24,60 +23,56 @@ export const allMids = await infoClient.allMids();
 
 export function runTest(options: {
   name: string;
-  codeTestFn: (
-    t: Deno.TestContext,
-    exchClient: ExchangeClient | MultiSignClient,
-  ) => Promise<void>;
-  cliTestFn?: (
-    t: Deno.TestContext,
-    runCommand: (args: string[]) => Promise<string>,
-  ) => Promise<void>;
+  codeTestFn: (t: TestContext, exchClient: ExchangeClient | MultiSignClient) => Promise<void>;
+  cliTestFn?: (t: TestContext, runCommand: (args: string[]) => string) => Promise<void>;
 }): void {
   const { name, codeTestFn, cliTestFn } = options;
 
   if (!PRIVATE_KEY || !/^0x[a-fA-F0-9]{64}$/.test(PRIVATE_KEY)) {
-    throw new Error("Please provide a valid private key (0x-prefixed 64 hex characters) as an argument");
+    throw new Error("Provide a valid private key (0x-prefixed 64 hex characters) as an argument");
   }
 
-  Deno.test(name, async (t) => {
-    await new Promise((r) => setTimeout(r, cliArgs.wait)); // delay to avoid rate limits
+  test(name, async (t) => {
+    await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
-    for (const clientType of ["user", "multisig"] as const) {
-      const exchClient = await createTempExchangeClient(clientType);
-      await t.step(clientType, async (t) => await codeTestFn(t, exchClient))
-        .finally(async () => {
-          await cleanupTempExchangeClient(exchClient);
-        });
-    }
-
-    await t.step({
-      name: "cli",
-      fn: async (t) => {
-        await cliTestFn!(t, async (args: string[]) => {
-          const command = new Deno.Command("deno", {
-            args: ["run", "-A", "bin/cli.ts", "--offline", "--private-key", PRIVATE_KEY, ...args],
+    await t.test("code", async (t) => {
+      for (const clientType of ["user", "multisig"] as const) {
+        const exchClient = await createTempExchangeClient(clientType);
+        await t.test(clientType, async (t) => await codeTestFn(t, exchClient))
+          .finally(async () => {
+            await cleanupTempExchangeClient(exchClient);
           });
-          const { stdout, stderr } = await command.output();
+      }
+    });
 
-          const error = new TextDecoder().decode(stderr);
-          if (error !== "") throw new Error(`Command failed with error: ${error}`);
-
-          const output = new TextDecoder().decode(stdout);
-          if (output.startsWith("Hyperliquid CLI")) throw new Error(`Invalid command argument(s)`);
-
-          return JSON.parse(output);
+    await t.test("cli", { skip: cliTestFn === undefined }, async (t) => {
+      await cliTestFn!(t, (args) => {
+        const output = execFileSync("node", ["bin/cli.ts", "--offline", "--private-key", PRIVATE_KEY, ...args], {
+          encoding: "utf8",
         });
-      },
-      ignore: cliTestFn === undefined,
+        if (output.startsWith("Hyperliquid CLI")) {
+          throw new Error(`Invalid command argument(s)`);
+        }
+        return JSON.parse(output);
+      });
     });
   });
 }
 
 // —————————— Helper functions ——————————
 
+function getMainExchangeClient(): ExchangeClient {
+  if (!PRIVATE_KEY || !/^0x[a-fA-F0-9]{64}$/.test(PRIVATE_KEY)) {
+    throw new Error("Provide a valid private key (0x-prefixed 64 hex characters) as an argument");
+  }
+  return new ExchangeClient({ wallet: PRIVATE_KEY, transport });
+}
+
 export async function createTempExchangeClient(type: "user" | "multisig"): Promise<ExchangeClient | MultiSignClient> {
+  const mainExchClient = getMainExchangeClient();
+
   // Create temporary account
-  const tempExchClient = new ExchangeClient({ wallet: generatePrivateKey(), transport });
+  const tempExchClient = new ExchangeClient({ wallet: randomPrivateKey(), transport });
   const tempAddress = await getWalletAddress(tempExchClient.wallet);
 
   // Activate account
@@ -106,6 +101,7 @@ export async function createTempExchangeClient(type: "user" | "multisig"): Promi
 }
 
 export async function cleanupTempExchangeClient(client: ExchangeClient | MultiSignClient): Promise<void> {
+  const mainExchClient = getMainExchangeClient();
   const mainUser = await getWalletAddress(mainExchClient.wallet);
   const tempUser = client instanceof MultiSignClient ? client.multiSigUser : await getWalletAddress(client.wallet);
 
@@ -127,9 +123,7 @@ export async function cleanupTempExchangeClient(client: ExchangeClient | MultiSi
   await Promise.all(webData2.clearinghouseState.assetPositions.map(async (pos) => {
     const id = symbolConverter.getAssetId(pos.position.coin)!;
     const szDecimals = symbolConverter.getSzDecimals(pos.position.coin)!;
-    const px = new BigNumber(pos.position.entryPx)
-      .times(pos.position.positionValue.startsWith("-") ? 1.05 : 0.95)
-      .toString();
+    const px = Number(pos.position.entryPx) * (pos.position.positionValue.startsWith("-") ? 1.05 : 0.95);
     await client.order({
       orders: [{
         a: id,
@@ -151,7 +145,7 @@ export async function cleanupTempExchangeClient(client: ExchangeClient | MultiSi
     });
   await infoClient.spotClearinghouseState({ user: tempUser })
     .then(async (state) => {
-      const usdcBalance = parseFloat(state.balances.find((b) => b.coin === "USDC")?.total ?? "0");
+      const usdcBalance = Number(state.balances.find((b) => b.coin === "USDC")?.total ?? "0");
       if (usdcBalance > 0) {
         await client.spotSend({
           destination: mainUser,
@@ -162,37 +156,18 @@ export async function cleanupTempExchangeClient(client: ExchangeClient | MultiSi
     });
 }
 
-export function formatPrice(
-  price: BigNumber.Value,
-  szDecimals: number,
-  isPerp: boolean = true,
-  roundingMode: BigNumber.RoundingMode = BigNumber.ROUND_HALF_UP,
-): string {
-  const priceBN = new BigNumber(price);
-  if (priceBN.isInteger()) return priceBN.toString();
-
-  const maxDecimals = isPerp ? 6 : 8;
-  const maxAllowedDecimals = Math.max(maxDecimals - szDecimals, 0);
-
-  return priceBN
-    .precision(5, roundingMode)
-    .toFixed(maxAllowedDecimals, roundingMode);
-}
-
-export function formatSize(
-  size: BigNumber.Value,
-  szDecimals: number,
-  roundingMode: BigNumber.RoundingMode = BigNumber.ROUND_HALF_UP,
-): string {
-  return new BigNumber(size).toFixed(szDecimals, roundingMode);
-}
-
 export function randomCloid(): `0x${string}` {
   return `0x${Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
 }
 
 export function randomAddress(): `0x${string}` {
   return `0x${Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
+}
+
+function randomPrivateKey(): `0x${string}` {
+  const key = new Uint8Array(32);
+  crypto.getRandomValues(key);
+  return `0x${Array.from(key).map((b) => b.toString(16).padStart(2, "0")).join("")}`;
 }
 
 export async function openOrder(
@@ -221,9 +196,9 @@ export async function openOrder(
   const midPx = allMids[symbol];
 
   // Calculate order parameters
-  const pxDown = formatPrice(new BigNumber(midPx).times(1 - slippage), szDecimals);
-  const pxUp = formatPrice(new BigNumber(midPx).times(1 + slippage), szDecimals);
-  const sz = formatSize(new BigNumber(11).div(midPx), szDecimals);
+  const pxDown = formatPrice(Number(midPx) * (1 - slippage), szDecimals);
+  const pxUp = formatPrice(Number(midPx) * (1 + slippage), szDecimals);
+  const sz = formatSize(11 / Number(midPx), szDecimals);
 
   let executionPx: string;
   if (type === "market") {
@@ -281,7 +256,7 @@ export async function createTWAP(
   const midPx = allMids[symbol];
 
   // Calculate order parameters
-  const sz = formatSize(new BigNumber(55).div(midPx), szDecimals);
+  const sz = formatSize(55 / Number(midPx), szDecimals);
 
   // Place TWAP order
   const result = await client.twapOrder({
@@ -308,6 +283,7 @@ export async function createTWAP(
 }
 
 export async function topUpPerp(client: ExchangeClient, amount: string) {
+  const mainExchClient = getMainExchangeClient();
   const tempUser = client instanceof MultiSignClient ? client.multiSigUser : await getWalletAddress(client.wallet);
   await mainExchClient.usdSend({ destination: tempUser, amount });
 }
@@ -318,6 +294,7 @@ export async function topUpSpot(client: ExchangeClient, token: "USDC" | "HYPE", 
     HYPE: "0x7317beb7cceed72ef0b346074cc8e7ab",
   } as const;
 
+  const mainExchClient = getMainExchangeClient();
   const tempUser = client instanceof MultiSignClient ? client.multiSigUser : await getWalletAddress(client.wallet);
   await mainExchClient.spotSend({
     destination: tempUser,

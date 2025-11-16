@@ -1,4 +1,4 @@
-import { parser, PerpDexLimitsRequest, PerpDexLimitsResponse } from "@nktkas/hyperliquid/api/info";
+import { parser, PerpDexLimitsRequest, PerpDexLimitsResponse } from "../../../src/api/info/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { runTest } from "./_t.ts";
 

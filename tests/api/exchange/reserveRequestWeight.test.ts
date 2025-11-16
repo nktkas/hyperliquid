@@ -1,4 +1,4 @@
-import { parser, ReserveRequestWeightRequest, SuccessResponse } from "@nktkas/hyperliquid/api/exchange";
+import { parser, ReserveRequestWeightRequest, SuccessResponse } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { runTest } from "./_t.ts";
 

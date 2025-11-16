@@ -1,17 +1,17 @@
-// deno-lint-ignore-file no-import-prefix
-import { assert, assertEquals, assertRejects } from "jsr:@std/assert@1";
+import test from "node:test";
+import assert from "node:assert";
+import type { ReconnectingWebSocket } from "@nktkas/rews";
 import {
   WebSocketAsyncRequest,
   WebSocketRequestError,
 } from "../../../src/transport/websocket/_websocket_async_request.ts";
 import { HyperliquidEventTarget } from "../../../src/transport/websocket/_hyperliquid_event_target.ts";
-import type { ReconnectingWebSocket } from "@nktkas/rews";
 
 // @ts-ignore: Mocking WebSocket for testing purposes
 class MockWebSocket extends EventTarget implements ReconnectingWebSocket {
   sentMessages: string[] = [];
   readyState = WebSocket.CONNECTING;
-  terminateSignal = new AbortController().signal;
+  terminationSignal = new AbortController().signal;
 
   send(data: string): void {
     this.sentMessages.push(data);
@@ -28,22 +28,22 @@ class MockWebSocket extends EventTarget implements ReconnectingWebSocket {
   }
 }
 
-Deno.test("WebSocketAsyncRequest", async (t) => {
-  await t.step("request()", async (t) => {
-    await t.step("method === post", async (t) => {
-      await t.step("basic", async () => {
+test("WebSocketAsyncRequest", async (t) => {
+  await t.test("request()", async (t) => {
+    await t.test("method === post", async (t) => {
+      await t.test("basic", async () => {
         const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
         const hlEvents = new HyperliquidEventTarget(mockSocket);
         const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
         // Check request
         const promise = wsRequester.request("post", { foo: "bar" });
-        assertEquals(mockSocket.sentMessages.length, 1);
+        assert.strictEqual(mockSocket.sentMessages.length, 1);
 
         const sent = JSON.parse(mockSocket.sentMessages[0]);
-        assertEquals(sent.method, "post");
-        assertEquals(typeof sent.id, "number");
-        assertEquals(sent.request.foo, "bar");
+        assert.strictEqual(sent.method, "post");
+        assert.strictEqual(typeof sent.id, "number");
+        assert.strictEqual(sent.request.foo, "bar");
 
         // Check response
         const mockMessage = {
@@ -56,10 +56,10 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
         mockSocket.mockMessage(mockMessage);
 
         const result = await promise;
-        assertEquals(result, mockMessage.data.response.payload.data);
+        assert.strictEqual(result, mockMessage.data.response.payload.data);
       });
 
-      await t.step("type === info", async () => {
+      await t.test("type === info", async () => {
         const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
         const hlEvents = new HyperliquidEventTarget(mockSocket);
         const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
@@ -77,10 +77,10 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
         mockSocket.mockMessage(response);
 
         const result = await promise;
-        assertEquals(result, "InfoResponseData");
+        assert.strictEqual(result, "InfoResponseData");
       });
 
-      await t.step("type === action", async () => {
+      await t.test("type === action", async () => {
         const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
         const hlEvents = new HyperliquidEventTarget(mockSocket);
         const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
@@ -98,11 +98,11 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
         mockSocket.mockMessage(response);
 
         const result = await promise;
-        assertEquals(result, { action: "DoAction", params: { key: "value" } });
+        assert.deepStrictEqual(result, { action: "DoAction", params: { key: "value" } });
       });
     });
 
-    await t.step("method === subscribe", async () => {
+    await t.test("method === subscribe", async () => {
       const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
       const hlEvents = new HyperliquidEventTarget(mockSocket);
       const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
@@ -111,10 +111,10 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
 
       // Check subscription request
       const promise = wsRequester.request("subscribe", payload);
-      assertEquals(mockSocket.sentMessages.length, 1);
+      assert.strictEqual(mockSocket.sentMessages.length, 1);
 
       const sent = JSON.parse(mockSocket.sentMessages[0]);
-      assertEquals(sent.method, "subscribe");
+      assert.strictEqual(sent.method, "subscribe");
 
       // Check response
       mockSocket.mockMessage({
@@ -126,13 +126,13 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
       });
 
       const resolvedData = await promise as Record<string, unknown>;
-      assertEquals(resolvedData.method, "subscribe");
-      assertEquals(resolvedData.subscription, payload);
+      assert.strictEqual(resolvedData.method, "subscribe");
+      assert.deepStrictEqual(resolvedData.subscription, payload);
     });
 
-    await t.step("rejects", async (t) => {
-      await t.step("method === post", async (t) => {
-        await t.step("error in the `error` channel", async () => {
+    await t.test("rejects", async (t) => {
+      await t.test("method === post", async (t) => {
+        await t.test("error in the `error` channel", async () => {
           const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
           const hlEvents = new HyperliquidEventTarget(mockSocket);
           const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
@@ -146,10 +146,10 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
           };
           mockSocket.mockMessage(mockMessage);
 
-          await assertRejects(() => promise, WebSocketRequestError, mockMessage.data);
+          await assert.rejects(() => promise, WebSocketRequestError, mockMessage.data);
         });
 
-        await t.step("error in the response payload", async () => {
+        await t.test("error in the response payload", async () => {
           const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
           const hlEvents = new HyperliquidEventTarget(mockSocket);
           const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
@@ -166,12 +166,12 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
           };
           mockSocket.mockMessage(mockMessage);
 
-          await assertRejects(() => promise, WebSocketRequestError, "Operation failed");
+          await assert.rejects(() => promise, WebSocketRequestError, "Operation failed");
         });
       });
 
-      await t.step("method === subscription", async (t) => {
-        await t.step("subscription error", async () => {
+      await t.test("method === subscription", async (t) => {
+        await t.test("subscription error", async () => {
           const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
           const hlEvents = new HyperliquidEventTarget(mockSocket);
           const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
@@ -185,10 +185,10 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
           };
           mockSocket.mockMessage(mockMessage);
 
-          await assertRejects(() => promise, WebSocketRequestError, mockMessage.data);
+          await assert.rejects(() => promise, WebSocketRequestError, mockMessage.data);
         });
 
-        await t.step("Already subscribed", async () => {
+        await t.test("Already subscribed", async () => {
           const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
           const hlEvents = new HyperliquidEventTarget(mockSocket);
           const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
@@ -202,10 +202,10 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
           };
           mockSocket.mockMessage(mockMessage);
 
-          await assertRejects(() => promise, WebSocketRequestError, mockMessage.data);
+          await assert.rejects(() => promise, WebSocketRequestError, mockMessage.data);
         });
 
-        await t.step("Invalid subscription", async () => {
+        await t.test("Invalid subscription", async () => {
           const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
           const hlEvents = new HyperliquidEventTarget(mockSocket);
           const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
@@ -219,10 +219,10 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
           };
           mockSocket.mockMessage(mockMessage);
 
-          await assertRejects(() => promise, WebSocketRequestError, mockMessage.data);
+          await assert.rejects(() => promise, WebSocketRequestError, mockMessage.data);
         });
 
-        await t.step("Already unsubscribed", async () => {
+        await t.test("Already unsubscribed", async () => {
           const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
           const hlEvents = new HyperliquidEventTarget(mockSocket);
           const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
@@ -236,27 +236,27 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
           };
           mockSocket.mockMessage(mockMessage);
 
-          await assertRejects(() => promise, WebSocketRequestError, mockMessage.data);
+          await assert.rejects(() => promise, WebSocketRequestError, mockMessage.data);
         });
       });
 
-      await t.step("rejects pending requests when WebSocket connection closes", async () => {
+      await t.test("rejects pending requests when WebSocket connection closes", async () => {
         const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
         const hlEvents = new HyperliquidEventTarget(mockSocket);
         const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
         const p1 = wsRequester.request("post", { foo: "bar1" });
         const p2 = wsRequester.request("subscribe", { sub: "bar2" });
-        assertEquals(mockSocket.sentMessages.length, 2);
+        assert.strictEqual(mockSocket.sentMessages.length, 2);
 
         mockSocket.close();
 
-        await assertRejects(() => p1, WebSocketRequestError, "WebSocket connection closed.");
-        await assertRejects(() => p2, WebSocketRequestError, "WebSocket connection closed.");
+        await assert.rejects(() => p1, WebSocketRequestError, "WebSocket connection closed.");
+        await assert.rejects(() => p2, WebSocketRequestError, "WebSocket connection closed.");
       });
 
-      await t.step("follows AbortSignal", async (t) => {
-        await t.step("rejects immediately if aborted before call", async () => {
+      await t.test("follows AbortSignal", async (t) => {
+        await t.test("rejects immediately if aborted before call", async () => {
           const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
           const hlEvents = new HyperliquidEventTarget(mockSocket);
           const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
@@ -266,27 +266,27 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
 
           const promise = wsRequester.request("post", { foo: "bar" }, controller.signal);
 
-          await assertRejects(() => promise, Error, "Aborted pre-emptively");
+          await assert.rejects(() => promise, Error, "Aborted pre-emptively");
         });
 
-        await t.step("rejects if aborted after sending request", async () => {
+        await t.test("rejects if aborted after sending request", async () => {
           const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
           const hlEvents = new HyperliquidEventTarget(mockSocket);
           const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
 
           const controller = new AbortController();
           const promise = wsRequester.request("post", { foo: "bar" }, controller.signal);
-          assertEquals(mockSocket.sentMessages.length, 1);
+          assert.strictEqual(mockSocket.sentMessages.length, 1);
 
           controller.abort(new Error("Aborted after sending"));
 
-          await assertRejects(() => promise, Error, "Aborted after sending");
+          await assert.rejects(() => promise, Error, "Aborted after sending");
         });
       });
     });
   });
 
-  await t.step("requestToId()", () => {
+  await t.test("requestToId()", () => {
     /**
      * We'll confirm:
      * - Hex strings like '0xABC123' become '0xabc123'
@@ -310,23 +310,23 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
     const parsed = JSON.parse(strId);
 
     // Keys should be sorted by ASCII: "Z" > "arr" > "boolVal" > "nested" > "textVal"
-    assertEquals(Object.keys(parsed), ["Z", "arr", "boolVal", "nested", "textVal"]);
+    assert.deepStrictEqual(Object.keys(parsed), ["Z", "arr", "boolVal", "nested", "textVal"]);
 
     // Check hex transformations
-    assertEquals(parsed.Z, "0xabc123");
+    assert.strictEqual(parsed.Z, "0xabc123");
     // The array's string element should also be lowercased if it's hex
-    assertEquals(parsed.arr[1], "0xf00d");
+    assert.strictEqual(parsed.arr[1], "0xf00d");
     // The nested hex should also be lowercased
-    assertEquals(parsed.nested.hexString, "0xffffff");
+    assert.strictEqual(parsed.nested.hexString, "0xffffff");
 
     // Non-hex data is unchanged
     assert(parsed.boolVal);
-    assertEquals(parsed.textVal, "SOME Text Not Hex");
-    assertEquals(parsed.nested.aNumber, 123);
-    assertEquals(parsed.nested.randomStr, "NotHex0123");
+    assert.strictEqual(parsed.textVal, "SOME Text Not Hex");
+    assert.strictEqual(parsed.nested.aNumber, 123);
+    assert.strictEqual(parsed.nested.randomStr, "NotHex0123");
   });
 
-  await t.step("invalid JSON messages are ignored", async () => {
+  await t.test("invalid JSON messages are ignored", async () => {
     const mockSocket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
     const hlEvents = new HyperliquidEventTarget(mockSocket);
     const wsRequester = new WebSocketAsyncRequest(mockSocket, hlEvents);
@@ -349,6 +349,6 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
     mockSocket.mockMessage(validResponse);
 
     const result = await promise;
-    assertEquals(result, "Success");
+    assert.strictEqual(result, "Success");
   });
 });

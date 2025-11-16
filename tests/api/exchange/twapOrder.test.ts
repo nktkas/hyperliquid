@@ -1,6 +1,7 @@
-import { parser, TwapOrderRequest, TwapOrderSuccessResponse } from "@nktkas/hyperliquid/api/exchange";
+import { parser, TwapOrderRequest, TwapOrderSuccessResponse } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { allMids, formatSize, runTest, symbolConverter } from "./_t.ts";
+import { allMids, runTest, symbolConverter } from "./_t.ts";
+import { formatSize } from "../../../src/utils/mod.ts";
 
 runTest({
   name: "twapOrder",

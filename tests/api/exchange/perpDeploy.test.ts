@@ -1,14 +1,13 @@
-// deno-lint-ignore-file no-import-prefix
-import { parser, PerpDeployRequest } from "@nktkas/hyperliquid/api/exchange";
-import { ApiRequestError } from "@nktkas/hyperliquid";
-import { assertRejects } from "jsr:@std/assert@1";
+import assert from "node:assert";
+import { parser, PerpDeployRequest } from "../../../src/api/exchange/~mod.ts";
+import { ApiRequestError } from "../../../src/mod.ts";
 import { runTest } from "./_t.ts";
 
 runTest({
   name: "perpDeploy",
   codeTestFn: async (t, exchClient) => {
-    await t.step("registerAsset", async () => {
-      await assertRejects(
+    await t.test("registerAsset", async () => {
+      await assert.rejects(
         async () => {
           await exchClient.perpDeploy({
             registerAsset: {
@@ -30,8 +29,8 @@ runTest({
       );
     });
 
-    await t.step("setOracle", async () => {
-      await assertRejects(
+    await t.test("setOracle", async () => {
+      await assert.rejects(
         async () => {
           await exchClient.perpDeploy({
             setOracle: {
@@ -47,8 +46,8 @@ runTest({
       );
     });
 
-    await t.step("setFundingMultipliers", async () => {
-      await assertRejects(
+    await t.test("setFundingMultipliers", async () => {
+      await assert.rejects(
         async () => {
           await exchClient.perpDeploy({
             setFundingMultipliers: [["TEST0", "1"]],
@@ -59,8 +58,8 @@ runTest({
       );
     });
 
-    await t.step("haltTrading", async () => {
-      await assertRejects(
+    await t.test("haltTrading", async () => {
+      await assert.rejects(
         async () => {
           await exchClient.perpDeploy({
             haltTrading: {
@@ -74,8 +73,8 @@ runTest({
       );
     });
 
-    await t.step("setMarginTableIds", async () => {
-      await assertRejects(
+    await t.test("setMarginTableIds", async () => {
+      await assert.rejects(
         async () => {
           await exchClient.perpDeploy({
             setMarginTableIds: [["TEST0", 1]],
@@ -86,8 +85,8 @@ runTest({
       );
     });
 
-    await t.step("setFeeRecipient", async () => {
-      await assertRejects(
+    await t.test("setFeeRecipient", async () => {
+      await assert.rejects(
         async () => {
           await exchClient.perpDeploy({
             setFeeRecipient: {
@@ -101,8 +100,8 @@ runTest({
       );
     });
 
-    await t.step("setOpenInterestCaps", async () => {
-      await assertRejects(
+    await t.test("setOpenInterestCaps", async () => {
+      await assert.rejects(
         async () => {
           await exchClient.perpDeploy({
             setOpenInterestCaps: [["TEST0", 1]],
@@ -113,8 +112,8 @@ runTest({
       );
     });
 
-    await t.step("setOpenInterestCaps", async () => {
-      await assertRejects(
+    await t.test("setOpenInterestCaps", async () => {
+      await assert.rejects(
         async () => {
           await exchClient.perpDeploy({
             setSubDeployers: {

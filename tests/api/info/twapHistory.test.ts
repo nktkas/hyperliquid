@@ -1,4 +1,4 @@
-import { parser, TwapHistoryRequest, TwapHistoryResponse } from "@nktkas/hyperliquid/api/info";
+import { parser, TwapHistoryRequest, TwapHistoryResponse } from "../../../src/api/info/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { runTest } from "./_t.ts";
 

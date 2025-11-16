@@ -1,4 +1,4 @@
-import { WebData2Event } from "@nktkas/hyperliquid/api/subscription";
+import { WebData2Event } from "../../../src/api/subscription/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { collectEventsOverTime, runTest } from "./_t.ts";
 

@@ -1,13 +1,12 @@
-// deno-lint-ignore-file no-import-prefix
-import { parser, VaultModifyRequest } from "@nktkas/hyperliquid/api/exchange";
-import { ApiRequestError } from "@nktkas/hyperliquid";
-import { assertRejects } from "jsr:@std/assert@1";
+import assert from "node:assert";
+import { parser, VaultModifyRequest } from "../../../src/api/exchange/~mod.ts";
+import { ApiRequestError } from "../../../src/mod.ts";
 import { runTest } from "./_t.ts";
 
 runTest({
   name: "vaultModify",
   codeTestFn: async (_t, exchClient) => {
-    await assertRejects(
+    await assert.rejects(
       async () => {
         await exchClient.vaultModify({
           vaultAddress: "0x457ab3acf4a4e01156ce269545a9d3d05fff2f0b",

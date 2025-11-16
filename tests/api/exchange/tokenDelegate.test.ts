@@ -1,4 +1,4 @@
-import { parser, SuccessResponse, TokenDelegateRequest } from "@nktkas/hyperliquid/api/exchange";
+import { parser, SuccessResponse, TokenDelegateRequest } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { runTest, topUpSpot } from "./_t.ts";
 

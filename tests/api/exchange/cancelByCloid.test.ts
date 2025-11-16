@@ -1,4 +1,4 @@
-import { CancelByCloidRequest, CancelSuccessResponse, parser } from "@nktkas/hyperliquid/api/exchange";
+import { CancelByCloidRequest, CancelSuccessResponse, parser } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
 import { openOrder, randomCloid, runTest } from "./_t.ts";
 
