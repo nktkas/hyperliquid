@@ -25,10 +25,7 @@ runtimes, written in TypeScript.
 
 ## Installation
 
-> [!NOTE]
-> While this library is in TypeScript, it can also be used in JavaScript and supports ESM/CommonJS.
-
-### Node.js v20+ (choose your package manager)
+### Node.js 20+ (choose your package manager)
 
 ```
 npm i @nktkas/hyperliquid
@@ -38,9 +35,11 @@ pnpm add @nktkas/hyperliquid
 yarn add @nktkas/hyperliquid
 ```
 
-If you are using a version of **Node.js lower than v22** and intend to use [`WebSocketTransport`](#websocket-transport),
-you need to install the [`ws`](https://www.npmjs.com/package/ws) package and pass the `WebSocket` class to the
-constructor:
+<details>
+<summary>Note for Node.js versions below 22</summary>
+
+Node.js 22+ includes native `WebSocket`. For earlier versions using [`WebSocketTransport`](#websocket-transport),
+install [`ws`](https://www.npmjs.com/package/ws) package and pass the class:
 
 ```ts
 import WebSocket from "ws"; // install `ws` package
@@ -53,7 +52,9 @@ const transport = new hl.WebSocketTransport({
 });
 ```
 
-### Deno v2.0+
+</details>
+
+### Deno 2.0+
 
 ```
 deno add jsr:@nktkas/hyperliquid
@@ -69,13 +70,13 @@ The SDK is fully browser-compatible; integrate it via CDN or bundle it with your
 </script>
 ```
 
-### React Native v0.74.5 / Expo v51
+### React Native
 
 For React Native, you need to import polyfills before importing the SDK:
 
 ```ts
-import "fast-text-encoding"; // `TextEncoder` (utf-8)
-import "event-target-polyfill"; // `EventTarget`, `Event`
+import "fast-text-encoding"; // TextEncoder (utf-8)
+import "event-target-polyfill"; // EventTarget, Event
 import * as hl from "@nktkas/hyperliquid";
 ```
 
