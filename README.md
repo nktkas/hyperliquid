@@ -5,7 +5,7 @@
 [![Downloads](https://img.shields.io/npm/dm/@nktkas/hyperliquid.svg)](https://www.npmjs.com/package/@nktkas/hyperliquid)
 [![jsr](https://jsr.io/badges/@nktkas/hyperliquid)](https://jsr.io/@nktkas/hyperliquid)
 [![coveralls](https://img.shields.io/coverallsCoverage/github/nktkas/hyperliquid)](https://coveralls.io/github/nktkas/hyperliquid)
-[![bundlephobia](https://img.shields.io/bundlephobia/minzip/@nktkas/hyperliquid)](https://bundlephobia.com/package/@nktkas/hyperliquid)
+[![bundlejs](https://img.shields.io/bundlejs/size/@nktkas/hyperliquid)](https://bundlejs.com/?q=@nktkas/hyperliquid)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/nktkas/hyperliquid)
 
 Unofficial [Hyperliquid API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api) SDK for all major JS
