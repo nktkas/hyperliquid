@@ -128,6 +128,7 @@ export {
   type AbstractEthersV6Signer,
   type AbstractViemJsonRpcAccount,
   type AbstractViemLocalAccount,
+  AbstractWalletError,
   getWalletAddress,
   getWalletChainId,
 } from "./_signTypedData.ts";

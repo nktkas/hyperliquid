@@ -45,7 +45,7 @@ export interface Subscription {
   resubscribeSignal: AbortSignal;
 }
 
-/** Thrown when a transport layer error occurs. */
+/** Thrown when an error occurs at the transport level (e.g., timeout). */
 export class TransportError extends HyperliquidError {
   constructor(message?: string, options?: ErrorOptions) {
     super(message, options);

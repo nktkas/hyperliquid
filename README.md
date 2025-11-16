@@ -726,17 +726,19 @@ class WebSocketTransport {
 All SDK errors extend from `HyperliquidError` base class for unified error handling:
 
 ```ts
-import { ApiRequestError, HyperliquidError, SchemaError, TransportError } from "@nktkas/hyperliquid";
+import { AbstractWalletError, ApiRequestError, HyperliquidError, SchemaError, TransportError } from "@nktkas/hyperliquid";
 
 try {
     await exchClient.order({ ... });
 } catch (error) {
     if (error instanceof SchemaError) {
-        // Invalid data format (before sending request)
+        // Invalid input data format
     } else if (error instanceof ApiRequestError) {
-        // API returned error (e.g., insufficient funds)
+        // Exchange API returned error (e.g., insufficient funds)
     } else if (error instanceof TransportError) {
-        // Network/connection failure (e.g., timeout)
+        // Network-related error (e.g., timeout)
+    } else if (error instanceof AbstractWalletError) {
+        // Wallet-related error (e.g., failed to get address)
     } else if (error instanceof HyperliquidError) {
         // Some other Hyperliquid SDK error
     }

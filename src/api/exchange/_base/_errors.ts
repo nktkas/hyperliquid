@@ -8,7 +8,7 @@ import type { AnyResponse, AnySuccessResponse } from "./_types.ts";
 
 type AnyErrorResponse = ErrorResponse | CancelResponse | OrderResponse | TwapOrderResponse | TwapCancelResponse;
 
-/** Thrown when an API request fails. */
+/** Thrown when Exchange API returns an error response (e.g., insufficient funds). */
 export class ApiRequestError extends HyperliquidError {
   response: AnyErrorResponse;
   constructor(response: AnyErrorResponse) {

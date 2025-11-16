@@ -132,7 +132,7 @@ function formatDecimal(numStr: string): string {
     .replace(/\.$/, ""); // Remove lone decimal point
 }
 
-/** Thrown when a schema validation error occurs.  */
+/** Thrown when validating invalid data.  */
 export class SchemaError extends HyperliquidError {
   constructor(message: string) {
     super(message);
