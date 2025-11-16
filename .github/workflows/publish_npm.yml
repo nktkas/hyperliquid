@@ -8,6 +8,7 @@ jobs:
 
     permissions:
       id-token: write
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -17,7 +18,7 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Install dependencies
-        run: npm ci
+        run: npm i
 
       - name: Build package
         run: npm run dev:build
@@ -46,6 +47,4 @@ jobs:
           echo "Publishing version $VERSION with tag $TAG"
 
       - name: Publish package
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --provenance --tag ${{ steps.version.outputs.tag }}
+        run: npm publish --tag ${{ steps.version.outputs.tag }}
