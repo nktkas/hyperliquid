@@ -20,7 +20,7 @@
     }
   },
   "publish": {
-    "exclude": [".github", "tests", "tsconfig.json"]
+    "exclude": [".github", "node_modules", "tests", "tsconfig.json"]
   },
   "license": "MIT"
 }
