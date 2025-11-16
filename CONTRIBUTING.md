@@ -17,9 +17,9 @@ Set `PRIVATE_KEY` env for complete tests. Required testnet balance: ~100 usdc-pe
 ## Coding Guidelines
 
 - **Style**: After making all changes, run:
-  - `npm run dev:fmt` to format code.
-  - `npm run dev:lint` to check lint.
-  - `npm run dev:typecheck` to check typescript.
+  - `npm run fmt` to format code.
+  - `npm run lint` to check lint.
+  - `npm run typecheck` to check typescript.
 - **Dependencies**: Use small and easily auditable dependencies from npm (e.g.
   [@noble/hashes](https://www.npmjs.com/package/@noble/hashes)).
 - **Testing**: Write tests for any new functionality.

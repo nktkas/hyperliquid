@@ -1,4 +1,6 @@
-// @ts-ignore: @types/node
+#!/usr/bin/env node
+
+// @ts-types="npm:@types/node"
 import process from "node:process";
 import * as v from "valibot";
 import * as hl from "../src/mod.ts";

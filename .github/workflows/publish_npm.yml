@@ -21,7 +21,7 @@ jobs:
         run: npm i
 
       - name: Build package
-        run: npm run dev:build
+        run: npm run build
 
       - name: Get package version and determine tag
         id: version

@@ -33,7 +33,7 @@
   "sideEffects": false,
   "type": "module",
   "exports": {
-    ".": "./dist/mod.js",
+    ".": "./dist/src/mod.js",
     "./signing": "./dist/src/signing/mod.js",
     "./utils": "./dist/src/utils/mod.js",
     "./api/exchange": "./dist/src/api/exchange/~mod.js",
@@ -52,11 +52,11 @@
     "SECURITY.md"
   ],
   "scripts": {
-    "dev:build": "npx tsc",
-    "dev:fmt": "npx deno fmt && npx sort-package-json",
-    "dev:lint": "npx deno lint",
-    "dev:typecheck": "npx deno check",
-    "test": "node --test --test-concurrency=1"
+    "build": "npx tsc",
+    "fmt": "npx deno fmt && npx sort-package-json",
+    "lint": "npx deno lint",
+    "test": "npx deno test -A",
+    "typecheck": "npx deno check"
   },
   "dependencies": {
     "@henrygd/semaphore": "0.1.0",

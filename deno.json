@@ -9,6 +9,8 @@
     "./api/info": "./src/api/info/~mod.ts",
     "./api/subscription": "./src/api/subscription/~mod.ts"
   },
+  "nodeModulesDir": "auto",
+  "lock": false,
   "fmt": {
     "lineWidth": 120
   },
@@ -18,8 +20,7 @@
     }
   },
   "publish": {
-    "exclude": [".github", "tests"]
+    "exclude": [".github", "tests", "tsconfig.json"]
   },
-  "license": "MIT",
-  "lock": false
+  "license": "MIT"
 }
