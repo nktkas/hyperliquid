@@ -28,13 +28,27 @@ export function runTest(options: {
     });
 
     await t.test("cli", { skip: !cliTestFn }, async (t) => {
+      // @ts-ignore: Deno is not defined in Node.js
+      const isDeno = typeof globalThis.Deno !== "undefined";
+      const command = isDeno ? "deno" : "node";
+      const extraArgs = isDeno ? ["run", "-A"] : [];
+
       await cliTestFn!(t, (args) => {
-        const output = execFileSync("node", ["bin/cli.ts", "--offline", ...args], {
-          encoding: "utf8",
-        });
+        const output = execFileSync(
+          command,
+          [
+            ...extraArgs,
+            "bin/cli.ts",
+            "--offline",
+            ...args,
+          ],
+          { encoding: "utf8" },
+        );
+
         if (output.startsWith("Hyperliquid CLI")) {
           throw new Error(`Invalid command argument(s)`);
         }
+
         return output;
       });
     });
