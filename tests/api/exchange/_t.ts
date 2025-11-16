@@ -28,11 +28,7 @@ export function runTest(options: {
 }): void {
   const { name, codeTestFn, cliTestFn } = options;
 
-  if (!PRIVATE_KEY || !/^0x[a-fA-F0-9]{64}$/.test(PRIVATE_KEY)) {
-    throw new Error("Provide a valid private key (0x-prefixed 64 hex characters) as an argument");
-  }
-
-  test(name, async (t) => {
+  test(name, { skip: !PRIVATE_KEY }, async (t) => {
     await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
     await t.test("code", async (t) => {
@@ -47,7 +43,7 @@ export function runTest(options: {
 
     await t.test("cli", { skip: cliTestFn === undefined }, async (t) => {
       await cliTestFn!(t, (args) => {
-        const output = execFileSync("node", ["bin/cli.ts", "--offline", "--private-key", PRIVATE_KEY, ...args], {
+        const output = execFileSync("node", ["bin/cli.ts", "--offline", "--private-key", PRIVATE_KEY!, ...args], {
           encoding: "utf8",
         });
         if (output.startsWith("Hyperliquid CLI")) {
@@ -61,15 +57,8 @@ export function runTest(options: {
 
 // —————————— Helper functions ——————————
 
-function getMainExchangeClient(): ExchangeClient {
-  if (!PRIVATE_KEY || !/^0x[a-fA-F0-9]{64}$/.test(PRIVATE_KEY)) {
-    throw new Error("Provide a valid private key (0x-prefixed 64 hex characters) as an argument");
-  }
-  return new ExchangeClient({ wallet: PRIVATE_KEY, transport });
-}
-
 export async function createTempExchangeClient(type: "user" | "multisig"): Promise<ExchangeClient | MultiSignClient> {
-  const mainExchClient = getMainExchangeClient();
+  const mainExchClient = new ExchangeClient({ wallet: PRIVATE_KEY!, transport });
 
   // Create temporary account
   const tempExchClient = new ExchangeClient({ wallet: randomPrivateKey(), transport });
@@ -101,7 +90,7 @@ export async function createTempExchangeClient(type: "user" | "multisig"): Promi
 }
 
 export async function cleanupTempExchangeClient(client: ExchangeClient | MultiSignClient): Promise<void> {
-  const mainExchClient = getMainExchangeClient();
+  const mainExchClient = new ExchangeClient({ wallet: PRIVATE_KEY!, transport });
   const mainUser = await getWalletAddress(mainExchClient.wallet);
   const tempUser = client instanceof MultiSignClient ? client.multiSigUser : await getWalletAddress(client.wallet);
 
@@ -283,7 +272,7 @@ export async function createTWAP(
 }
 
 export async function topUpPerp(client: ExchangeClient, amount: string) {
-  const mainExchClient = getMainExchangeClient();
+  const mainExchClient = new ExchangeClient({ wallet: PRIVATE_KEY!, transport });
   const tempUser = client instanceof MultiSignClient ? client.multiSigUser : await getWalletAddress(client.wallet);
   await mainExchClient.usdSend({ destination: tempUser, amount });
 }
@@ -294,7 +283,7 @@ export async function topUpSpot(client: ExchangeClient, token: "USDC" | "HYPE", 
     HYPE: "0x7317beb7cceed72ef0b346074cc8e7ab",
   } as const;
 
-  const mainExchClient = getMainExchangeClient();
+  const mainExchClient = new ExchangeClient({ wallet: PRIVATE_KEY!, transport });
   const tempUser = client instanceof MultiSignClient ? client.multiSigUser : await getWalletAddress(client.wallet);
   await mainExchClient.spotSend({
     destination: tempUser,
