@@ -67,7 +67,7 @@
     "valibot": "1.1.0"
   },
   "devDependencies": {
-    "@types/node": "^20.19.25",
+    "@types/node": "^24.10.1",
     "@types/ws": "^8.18.1",
     "dotenv": "^17.2.3",
     "ethers5": "npm:ethers@^5.8.0",
