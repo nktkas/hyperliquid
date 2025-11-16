@@ -5,6 +5,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    environment: FOR_RUN_TESTS
 
     steps:
       - uses: actions/checkout@v4
