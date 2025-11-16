@@ -38,9 +38,7 @@ Set `PRIVATE_KEY` env for complete tests. Required testnet balance: ~100 usdc-pe
 6. Update docs:
    - Update the [`API Reference`](/README.md#api-reference) section in [`README.md`](/README.md)
    - Update the helper message (function `printHelp`) in [`bin/cli.ts`](/bin/cli.ts).
-7. Run [`deno fmt`](https://docs.deno.com/runtime/reference/cli/fmt/),
-   [`deno lint`](https://docs.deno.com/runtime/reference/cli/lint/), and
-   [`deno check --doc`](https://docs.deno.com/runtime/reference/cli/check/) to ensure code quality.
+7. Run `npm run fmt`, `npm run lint`, and `npm run typecheck` to ensure code quality.
 
 ### Update API schemas/types
 
