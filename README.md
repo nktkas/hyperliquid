@@ -1,11 +1,12 @@
 # Hyperliquid API TypeScript SDK
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-[![npm](https://img.shields.io/npm/v/@nktkas/hyperliquid?style=flat-square&color=blue)](https://www.npmjs.com/package/@nktkas/hyperliquid)
-[![Downloads](https://img.shields.io/npm/dm/@nktkas/hyperliquid.svg?style=flat-square)](https://www.npmjs.com/package/@nktkas/hyperliquid)
-[![jsr](https://jsr.io/badges/@nktkas/hyperliquid?style=flat-square)](https://jsr.io/@nktkas/hyperliquid)
-[![coveralls](https://img.shields.io/coverallsCoverage/github/nktkas/hyperliquid?style=flat-square)](https://coveralls.io/github/nktkas/hyperliquid)
-[![bundlephobia](https://img.shields.io/bundlephobia/minzip/@nktkas/hyperliquid?style=flat-square)](https://bundlephobia.com/package/@nktkas/hyperliquid)
+[![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
+[![npm](https://img.shields.io/npm/v/@nktkas/hyperliquid?color=blue)](https://www.npmjs.com/package/@nktkas/hyperliquid)
+[![Downloads](https://img.shields.io/npm/dm/@nktkas/hyperliquid.svg)](https://www.npmjs.com/package/@nktkas/hyperliquid)
+[![jsr](https://jsr.io/badges/@nktkas/hyperliquid)](https://jsr.io/@nktkas/hyperliquid)
+[![coveralls](https://img.shields.io/coverallsCoverage/github/nktkas/hyperliquid)](https://coveralls.io/github/nktkas/hyperliquid)
+[![bundlephobia](https://img.shields.io/bundlephobia/minzip/@nktkas/hyperliquid)](https://bundlephobia.com/package/@nktkas/hyperliquid)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/nktkas/hyperliquid)
 
 Unofficial [Hyperliquid API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api) SDK for all major JS
 runtimes, written in TypeScript.
