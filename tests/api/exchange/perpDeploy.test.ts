@@ -112,7 +112,7 @@ runTest({
       );
     });
 
-    await t.test("setOpenInterestCaps", async () => {
+    await t.test("setSubDeployers", async () => {
       await assert.rejects(
         async () => {
           await exchClient.perpDeploy({
@@ -123,6 +123,21 @@ runTest({
                 user: "0x0000000000000000000000000000000000000000",
                 allowed: true,
               }],
+            },
+          });
+        },
+        ApiRequestError,
+        "Invalid perp deployer",
+      );
+    });
+
+    await t.test("setFeeScale", async () => {
+      await assert.rejects(
+        async () => {
+          await exchClient.perpDeploy({
+            setFeeScale: {
+              dex: "test",
+              scale: "2.5",
             },
           });
         },
