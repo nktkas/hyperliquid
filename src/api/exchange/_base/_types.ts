@@ -86,3 +86,20 @@ export type ExtractRequestOptions<T extends { action: Record<string, unknown> }>
   }
   & Omit<T, "action" | "nonce" | "signature">
 >;
+
+export type ExcludeErrorResponse<T> = T extends { status: "err" } ? never // Response with error status
+  : T extends { response: { data: { statuses: ReadonlyArray<infer S> } } } // Responses with multiple statuses
+    ? Exclude<S, { error: unknown }> extends never ? never
+    : Prettify<
+      Omit<T, "response"> & {
+        response: Prettify<Omit<T["response"], "data"> & { data: { statuses: Array<Exclude<S, { error: unknown }>> } }>;
+      }
+    >
+  : T extends { response: { data: { status: infer S } } } // Responses with single status
+    ? S extends { error: unknown } ? never
+    : Prettify<
+      Omit<T, "response"> & {
+        response: Prettify<Omit<T["response"], "data"> & { data: { status: Exclude<S, { error: unknown }> } }>;
+      }
+    >
+  : T;

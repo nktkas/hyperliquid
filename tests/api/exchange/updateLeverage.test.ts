@@ -1,6 +1,6 @@
-import { parser, SuccessResponse, UpdateLeverageRequest } from "../../../src/api/exchange/~mod.ts";
+import { parser, UpdateLeverageRequest, UpdateLeverageResponse } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { runTest, symbolConverter } from "./_t.ts";
+import { excludeErrorResponse, runTest, symbolConverter } from "./_t.ts";
 
 runTest({
   name: "updateLeverage",
@@ -12,7 +12,7 @@ runTest({
         leverage: 1,
       }),
     ]);
-    schemaCoverage(SuccessResponse, data);
+    schemaCoverage(excludeErrorResponse(UpdateLeverageResponse), data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

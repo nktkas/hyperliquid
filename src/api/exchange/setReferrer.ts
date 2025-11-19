@@ -1,20 +1,13 @@
 import * as v from "valibot";
-import { type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
 
-/**
- * Set a referral code.
- * @see null
- */
+import { UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
+
+/** Set a referral code. */
 export const SetReferrerRequest = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
@@ -56,15 +49,37 @@ export const SetReferrerRequest = /* @__PURE__ */ (() => {
 })();
 export type SetReferrerRequest = v.InferOutput<typeof SetReferrerRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/** Successful response without specific data or error response. */
+export const SetReferrerResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type SetReferrerResponse = v.InferOutput<typeof SetReferrerResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode setReferrer} function. */
 export type SetReferrerParameters = ExtractRequestAction<v.InferInput<typeof SetReferrerRequest>>;
+
 /** Request options for the {@linkcode setReferrer} function. */
 export type SetReferrerOptions = ExtractRequestOptions<v.InferInput<typeof SetReferrerRequest>>;
+
+/** Successful variant of {@linkcode SetReferrerResponse} without errors. */
+export type SetReferrerSuccessResponse = ExcludeErrorResponse<SetReferrerResponse>;
 
 /**
  * Set a referral code.
@@ -76,12 +91,11 @@ export type SetReferrerOptions = ExtractRequestOptions<v.InferInput<typeof SetRe
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  * @throws {TransportError} When the transport layer throws an error.
  *
- * @see null
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { setReferrer } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -96,7 +110,7 @@ export async function setReferrer(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<SetReferrerParameters>,
   opts?: SetReferrerOptions,
-): Promise<SuccessResponse> {
+): Promise<SetReferrerSuccessResponse> {
   const request = parser(SetReferrerRequest)({
     action: {
       type: "setReferrer",

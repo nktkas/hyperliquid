@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { parser, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { UnsignedInteger } from "../_base.ts";
 
 /**
  * Request exchange system status information.
@@ -43,7 +45,12 @@ export const ExchangeStatusResponse = /* @__PURE__ */ (() => {
 })();
 export type ExchangeStatusResponse = v.InferOutput<typeof ExchangeStatusResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /**
  * Request exchange system status information.

@@ -1,17 +1,12 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 import { PlaceOrderParamsSchema } from "../_common_schemas.ts";
-
-// -------------------- Schemas --------------------
 
 /**
  * Modify an order.
@@ -67,15 +62,40 @@ export const ModifyRequest = /* @__PURE__ */ (() => {
 })();
 export type ModifyRequest = v.InferOutput<typeof ModifyRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order
+ */
+export const ModifyResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type ModifyResponse = v.InferOutput<typeof ModifyResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode modify} function. */
 export type ModifyParameters = ExtractRequestAction<v.InferInput<typeof ModifyRequest>>;
+
 /** Request options for the {@linkcode modify} function. */
 export type ModifyOptions = ExtractRequestOptions<v.InferInput<typeof ModifyRequest>>;
+
+/** Successful variant of {@linkcode ModifyResponse} without errors. */
+export type ModifySuccessResponse = ExcludeErrorResponse<ModifyResponse>;
 
 /**
  * Modify an order.
@@ -92,7 +112,7 @@ export type ModifyOptions = ExtractRequestOptions<v.InferInput<typeof ModifyRequ
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { modify } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -118,7 +138,7 @@ export async function modify(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<ModifyParameters>,
   opts?: ModifyOptions,
-): Promise<SuccessResponse> {
+): Promise<ModifySuccessResponse> {
   const request = parser(ModifyRequest)({
     action: {
       type: "modify",

@@ -1,16 +1,11 @@
 import * as v from "valibot";
-import { type DeepImmutable, Hex, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeUserSignedAction,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  getSignatureChainId,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Hex, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Transfer native token from staking into the user's spot account.
@@ -66,15 +61,41 @@ export const CWithdrawRequest = /* @__PURE__ */ (() => {
 })();
 export type CWithdrawRequest = v.InferOutput<typeof CWithdrawRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#withdraw-from-staking
+ */
+export const CWithdrawResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type CWithdrawResponse = v.InferOutput<typeof CWithdrawResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeUserSignedAction,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  getSignatureChainId,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode cWithdraw} function. */
 export type CWithdrawParameters = ExtractRequestAction<v.InferInput<typeof CWithdrawRequest>>;
+
 /** Request options for the {@linkcode cWithdraw} function. */
 export type CWithdrawOptions = ExtractRequestOptions<v.InferInput<typeof CWithdrawRequest>>;
+
+/** Successful variant of {@linkcode CWithdrawResponse} without errors. */
+export type CWithdrawSuccessResponse = ExcludeErrorResponse<CWithdrawResponse>;
 
 /** EIP-712 types for the {@linkcode cWithdraw} function. */
 export const CWithdrawTypes = {
@@ -100,7 +121,7 @@ export const CWithdrawTypes = {
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { cWithdraw } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -115,7 +136,7 @@ export async function cWithdraw(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<CWithdrawParameters>,
   opts?: CWithdrawOptions,
-): Promise<SuccessResponse> {
+): Promise<CWithdrawSuccessResponse> {
   const request = parser(CWithdrawRequest)({
     action: {
       type: "cWithdraw",

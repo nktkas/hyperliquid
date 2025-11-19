@@ -1,15 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, Percent, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Percent, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Deploying HIP-1 and HIP-2 assets.
@@ -288,15 +284,40 @@ export const SpotDeployRequest = /* @__PURE__ */ (() => {
 })();
 export type SpotDeployRequest = v.InferOutput<typeof SpotDeployRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
+ */
+export const SpotDeployResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type SpotDeployResponse = v.InferOutput<typeof SpotDeployResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode spotDeploy} function. */
 export type SpotDeployParameters = ExtractRequestAction<v.InferInput<typeof SpotDeployRequest>>;
+
 /** Request options for the {@linkcode spotDeploy} function. */
 export type SpotDeployOptions = ExtractRequestOptions<v.InferInput<typeof SpotDeployRequest>>;
+
+/** Successful variant of {@linkcode SpotDeployResponse} without errors. */
+export type SpotDeploySuccessResponse = ExcludeErrorResponse<SpotDeployResponse>;
 
 /**
  * Deploying HIP-1 and HIP-2 assets.
@@ -313,7 +334,7 @@ export type SpotDeployOptions = ExtractRequestOptions<v.InferInput<typeof SpotDe
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { spotDeploy } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -338,7 +359,7 @@ export async function spotDeploy(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<SpotDeployParameters>,
   opts?: SpotDeployOptions,
-): Promise<SuccessResponse> {
+): Promise<SpotDeploySuccessResponse> {
   const request = parser(SpotDeployRequest)({
     action: {
       type: "spotDeploy",

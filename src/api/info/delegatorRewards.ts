@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request user staking rewards.
@@ -61,7 +63,12 @@ export const DelegatorRewardsResponse = /* @__PURE__ */ (() => {
 })();
 export type DelegatorRewardsResponse = v.InferOutput<typeof DelegatorRewardsResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode delegatorRewards} function. */
 export type DelegatorRewardsParameters = Omit<v.InferInput<typeof DelegatorRewardsRequest>, "type">;

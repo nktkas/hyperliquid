@@ -1,9 +1,16 @@
 import { getSemaphore } from "@henrygd/semaphore";
-import { getWalletAddress, signL1Action, signMultiSigAction, signUserSignedAction } from "../../../signing/mod.ts";
+import { Hex, type MaybePromise, parser } from "../../_base.ts";
+import {
+  type AbstractWallet,
+  getWalletAddress,
+  getWalletChainId,
+  signL1Action,
+  signMultiSigAction,
+  signUserSignedAction,
+} from "../../../signing/mod.ts";
 import { assertSuccessResponse } from "./_errors.ts";
 import type { AnyResponse, AnySuccessResponse, ExchangeRequestConfig, MultiSignRequestConfig } from "./_types.ts";
 import { globalNonceManager } from "./_nonce.ts";
-import { getSignatureChainId } from "./_helpers.ts";
 
 export async function executeL1Action<T extends AnySuccessResponse>(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
@@ -240,5 +247,29 @@ export async function executeMultiSigAction<T extends AnySuccessResponse>(
   } finally {
     // Release semaphore if used
     sem?.release();
+  }
+}
+
+/** Get the signature chain ID from the config value / function or from the wallet. */
+export async function getSignatureChainId(
+  config:
+    | {
+      wallet: AbstractWallet;
+      signatureChainId?: string | (() => MaybePromise<string>);
+    }
+    | {
+      signers: readonly AbstractWallet[];
+      signatureChainId?: string | (() => MaybePromise<string>);
+    },
+): Promise<`0x${string}`> {
+  if ("signatureChainId" in config && config.signatureChainId) {
+    const signatureChainId = typeof config.signatureChainId === "string"
+      ? config.signatureChainId
+      : await config.signatureChainId();
+    return parser(Hex)(signatureChainId);
+  } else if ("wallet" in config) {
+    return await getWalletChainId(config.wallet);
+  } else {
+    return await getWalletChainId(config.signers[0]);
   }
 }

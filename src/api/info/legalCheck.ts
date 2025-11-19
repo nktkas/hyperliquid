@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address } from "../_base.ts";
 
 /**
  * Request legal verification status of a user.
@@ -55,7 +57,12 @@ export const LegalCheckResponse = /* @__PURE__ */ (() => {
 })();
 export type LegalCheckResponse = v.InferOutput<typeof LegalCheckResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode legalCheck} function. */
 export type LegalCheckParameters = Omit<v.InferInput<typeof LegalCheckRequest>, "type">;

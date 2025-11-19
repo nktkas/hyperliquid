@@ -2,9 +2,11 @@ import "dotenv/config";
 import process from "node:process";
 import test, { type TestContext } from "node:test";
 import { execFileSync } from "node:child_process";
+import type * as v from "valibot";
 import { ExchangeClient, HttpTransport, InfoClient, MultiSignClient } from "../../../src/mod.ts";
 import { getWalletAddress } from "../../../src/signing/mod.ts";
 import { formatPrice, formatSize, SymbolConverter } from "../../../src/utils/mod.ts";
+import type { ExcludeErrorResponse } from "../../../src/api/exchange/_base/_types.ts";
 
 // —————————— Arguments ——————————
 
@@ -306,4 +308,92 @@ export async function topUpSpot(client: ExchangeClient, token: "USDC" | "HYPE", 
     token: `${token}:${tokenAddresses[token]}`,
     amount,
   });
+}
+
+type InferOutputWithoutErrors<T> = T extends v.GenericSchema<unknown, infer O> ? ExcludeErrorResponse<O> : never;
+
+export function excludeErrorResponse<T extends v.GenericSchema>(
+  schema: T,
+): v.GenericSchema<v.InferInput<T>, InferOutputWithoutErrors<T>> {
+  const getPipeEntries = (s: v.GenericSchema): Record<string, v.GenericSchema> | null => {
+    if ("pipe" in s && Array.isArray(s.pipe) && "entries" in s.pipe[0] && typeof s.pipe[0].entries === "object") {
+      return s.pipe[0].entries;
+    }
+    return null;
+  };
+
+  const getPipeBase = (s: v.GenericSchema): v.GenericSchema | null => {
+    if ("pipe" in s && Array.isArray(s.pipe)) {
+      return s.pipe[0];
+    }
+    return null;
+  };
+
+  const removeErrorFromUnion = (unionSchema: v.GenericSchema): void => {
+    if (
+      "type" in unionSchema && unionSchema.type === "union" && "options" in unionSchema &&
+      Array.isArray(unionSchema.options)
+    ) {
+      const filtered = unionSchema.options.filter((opt) =>
+        !("entries" in opt && typeof opt.entries === "object" && "error" in opt.entries)
+      );
+      if (filtered.length > 0) {
+        unionSchema.options = filtered;
+      }
+    }
+  };
+
+  const s = schema;
+
+  // Case 1: Remove ErrorResponse from top-level union[SuccessResponse, ErrorResponse]
+  const topBase = getPipeBase(s);
+  if (
+    topBase && "type" in topBase && topBase.type === "union" && "options" in topBase && Array.isArray(topBase.options)
+  ) {
+    const filtered = topBase.options.filter((opt) => {
+      const optEntries = getPipeEntries(opt);
+      if (optEntries && "status" in optEntries) {
+        const statusSchema = optEntries.status;
+        const statusBase = getPipeBase(statusSchema);
+        if (statusBase && statusBase.type === "literal" && "literal" in statusBase && statusBase.literal === "err") {
+          return false; // Remove ErrorResponse
+        }
+      }
+      return true;
+    });
+    if (filtered.length > 0 && filtered.length < topBase.options.length) {
+      topBase.options = filtered;
+      return schema as v.GenericSchema<v.InferInput<T>, InferOutputWithoutErrors<T>>;
+    }
+  }
+
+  // Case 2 & 3: Remove error from response.data.statuses or response.data.status
+  const topEntries = getPipeEntries(s);
+  if (topEntries && "response" in topEntries) {
+    const responseEntries = getPipeEntries(topEntries.response);
+    if (responseEntries && "data" in responseEntries) {
+      const dataEntries = getPipeEntries(responseEntries.data);
+      if (dataEntries) {
+        // Case 2: Remove error from statuses array union
+        if ("statuses" in dataEntries) {
+          const statusesSchema = dataEntries.statuses;
+          const statusesBase = getPipeBase(statusesSchema);
+          if (statusesBase && "item" in statusesBase && typeof statusesBase.item === "object") {
+            removeErrorFromUnion(statusesBase.item as v.GenericSchema);
+          }
+        }
+
+        // Case 3: Remove error from single status union
+        if ("status" in dataEntries) {
+          const statusSchema = dataEntries.status;
+          const statusBase = getPipeBase(statusSchema);
+          if (statusBase) {
+            removeErrorFromUnion(statusBase);
+          }
+        }
+      }
+    }
+  }
+
+  return schema as v.GenericSchema<v.InferInput<T>, InferOutputWithoutErrors<T>>;
 }

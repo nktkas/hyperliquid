@@ -1,19 +1,14 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeUserSignedAction,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  getSignatureChainId,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /** Signers configuration for {@linkcode ConvertToMultiSigUserRequest}. */
-export const ConvertToMultiSigUserRequestSigners = /* @__PURE__ */ (() => {
+const ConvertToMultiSigUserRequestSigners = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([
       v.object({
@@ -37,7 +32,6 @@ export const ConvertToMultiSigUserRequestSigners = /* @__PURE__ */ (() => {
     v.description("Signers configuration for `ConvertToMultiSigUserRequest`"),
   );
 })();
-export type ConvertToMultiSigUserRequestSigners = v.InferOutput<typeof ConvertToMultiSigUserRequestSigners>;
 
 /**
  * Convert a single-signature account to a multi-signature account or vice versa.
@@ -111,15 +105,41 @@ export const ConvertToMultiSigUserRequest = /* @__PURE__ */ (() => {
 })();
 export type ConvertToMultiSigUserRequest = v.InferOutput<typeof ConvertToMultiSigUserRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig
+ */
+export const ConvertToMultiSigUserResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type ConvertToMultiSigUserResponse = v.InferOutput<typeof ConvertToMultiSigUserResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeUserSignedAction,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  getSignatureChainId,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode convertToMultiSigUser} function. */
 export type ConvertToMultiSigUserParameters = ExtractRequestAction<v.InferInput<typeof ConvertToMultiSigUserRequest>>;
+
 /** Request options for the {@linkcode convertToMultiSigUser} function. */
 export type ConvertToMultiSigUserOptions = ExtractRequestOptions<v.InferInput<typeof ConvertToMultiSigUserRequest>>;
+
+/** Successful variant of {@linkcode ConvertToMultiSigUserResponse} without errors. */
+export type ConvertToMultiSigUserSuccessResponse = ExcludeErrorResponse<ConvertToMultiSigUserResponse>;
 
 /** EIP-712 types for the {@linkcode convertToMultiSigUser} function. */
 export const ConvertToMultiSigUserTypes = {
@@ -145,7 +165,7 @@ export const ConvertToMultiSigUserTypes = {
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { convertToMultiSigUser } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -172,7 +192,7 @@ export async function convertToMultiSigUser(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<ConvertToMultiSigUserParameters>,
   opts?: ConvertToMultiSigUserOptions,
-): Promise<SuccessResponse> {
+): Promise<ConvertToMultiSigUserSuccessResponse> {
   const request = parser(ConvertToMultiSigUserRequest)({
     action: {
       type: "convertToMultiSigUser",

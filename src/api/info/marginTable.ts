@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request margin table data.
@@ -70,7 +72,12 @@ export const MarginTableResponse = /* @__PURE__ */ (() => {
 
 export type MarginTableResponse = v.InferOutput<typeof MarginTableResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode marginTable} function. */
 export type MarginTableParameters = Omit<v.InferInput<typeof MarginTableRequest>, "type">;

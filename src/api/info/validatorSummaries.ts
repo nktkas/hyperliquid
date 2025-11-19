@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request validator summaries.
@@ -125,7 +127,12 @@ export const ValidatorSummariesResponse = /* @__PURE__ */ (() => {
 })();
 export type ValidatorSummariesResponse = v.InferOutput<typeof ValidatorSummariesResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /**
  * Request validator summaries.

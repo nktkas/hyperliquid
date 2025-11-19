@@ -1,6 +1,6 @@
-import { parser, TwapOrderRequest, TwapOrderSuccessResponse } from "../../../src/api/exchange/~mod.ts";
+import { parser, TwapOrderRequest, TwapOrderResponse } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { allMids, runTest, symbolConverter } from "./_t.ts";
+import { allMids, excludeErrorResponse, runTest, symbolConverter } from "./_t.ts";
 import { formatSize } from "../../../src/utils/mod.ts";
 
 runTest({
@@ -28,7 +28,7 @@ runTest({
         },
       }),
     ]);
-    schemaCoverage(TwapOrderSuccessResponse, data);
+    schemaCoverage(excludeErrorResponse(TwapOrderResponse), data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

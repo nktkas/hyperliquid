@@ -1,10 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, UnsignedInteger } from "../_base.ts";
 import { TwapStateSchema, TwapStatusSchema } from "../_common_schemas.ts";
-
-// -------------------- Schemas --------------------
 
 /**
  * Request twap history of a user.
@@ -62,7 +63,12 @@ export const TwapHistoryResponse = /* @__PURE__ */ (() => {
 })();
 export type TwapHistoryResponse = v.InferOutput<typeof TwapHistoryResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode twapHistory} function. */
 export type TwapHistoryParameters = Omit<v.InferInput<typeof TwapHistoryRequest>, "type">;

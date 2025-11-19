@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { Decimal, Integer, UnsignedDecimal, UnsignedInteger } from "../../src/api/_base.ts"; // Hack to avoid importing into every test
+import { Decimal, Integer, UnsignedDecimal, UnsignedInteger } from "../../src/api/_base.ts"; // HACK: to avoid importing into every test
 
 export type IssueType =
   | "BRANCH_UNCOVERED"
@@ -272,30 +272,15 @@ function checkCoverage(
     }
   } // Handle tuple schemas
   else if (
-    schema.type === "tuple" || schema.type === "strict_tuple" || schema.type === "looseTuple" ||
-    schema.type === "loose_tuple"
+    schema.type === "tuple" ||
+    schema.type === "strict_tuple" ||
+    schema.type === "loose_tuple" ||
+    schema.type === "tuple_with_rest"
   ) {
     const tupleSchema = schema as
       | v.TupleSchema<v.GenericSchema[], v.ErrorMessage<v.GenericIssue>>
-      | v.LooseTupleSchema<v.GenericSchema[], v.ErrorMessage<v.GenericIssue>>;
-    const arrays = samples.filter(Array.isArray);
-
-    tupleSchema.items.forEach((itemSchema, idx) => {
-      const itemSamples = arrays
-        .filter((arr) => arr.length > idx)
-        .map((arr) => arr[idx]);
-
-      if (itemSamples.length) {
-        issues.push(...checkCoverage(itemSchema, itemSamples, options, `${path}/items/${idx}`));
-      }
-    });
-  } // Handle tupleWithRest schemas
-  else if (schema.type === "tupleWithRest" || schema.type === "tuple_with_rest") {
-    const tupleSchema = schema as v.TupleWithRestSchema<
-      v.GenericSchema[],
-      v.GenericSchema,
-      v.ErrorMessage<v.GenericIssue>
-    >;
+      | v.LooseTupleSchema<v.GenericSchema[], v.ErrorMessage<v.GenericIssue>>
+      | v.TupleWithRestSchema<v.GenericSchema[], v.GenericSchema, v.ErrorMessage<v.GenericIssue>>;
     const arrays = samples.filter(Array.isArray);
 
     // Check fixed tuple items
@@ -309,37 +294,44 @@ function checkCoverage(
       }
     });
 
-    // Check rest items
-    const restItems: unknown[] = [];
-    arrays.forEach((arr) => {
-      if (arr.length > tupleSchema.items.length) {
-        restItems.push(...arr.slice(tupleSchema.items.length));
-      }
-    });
+    // Check rest items (only for tuple_with_rest)
+    if ("rest" in tupleSchema && tupleSchema.rest) {
+      const restItems: unknown[] = [];
+      arrays.forEach((arr) => {
+        if (arr.length > tupleSchema.items.length) {
+          restItems.push(...arr.slice(tupleSchema.items.length));
+        }
+      });
 
-    if (restItems.length && tupleSchema.rest) {
-      issues.push(...checkCoverage(tupleSchema.rest, restItems, options, `${path}/rest`));
+      if (restItems.length) {
+        issues.push(...checkCoverage(tupleSchema.rest, restItems, options, `${path}/rest`));
+      }
     }
   } // Handle object schemas
   else if (
     schema.type === "object" ||
-    schema.type === "strict_object" || schema.type === "strictObject" ||
-    schema.type === "looseObject" || schema.type === "loose_object"
+    schema.type === "strict_object" ||
+    schema.type === "loose_object" ||
+    schema.type === "object_with_rest"
   ) {
     const objectSchema = schema as
       | v.ObjectSchema<v.ObjectEntries, v.ErrorMessage<v.GenericIssue>>
       | v.StrictObjectSchema<v.ObjectEntries, v.ErrorMessage<v.GenericIssue>>
-      | v.LooseObjectSchema<v.ObjectEntries, v.ErrorMessage<v.GenericIssue>>;
+      | v.LooseObjectSchema<v.ObjectEntries, v.ErrorMessage<v.GenericIssue>>
+      | v.ObjectWithRestSchema<v.ObjectEntries, v.GenericSchema, v.ErrorMessage<v.GenericIssue>>;
     const objects = samples.filter((s): s is Record<string, unknown> => typeof s === "object" && s !== null);
 
+    const isObjectWithRest = schema.type === "object_with_rest";
+
+    // Check defined entries
     for (const [key, propSchema] of Object.entries(objectSchema.entries)) {
       const propPath = `${path}/properties/${key}`;
       const propSamples = objects
         .filter((obj) => key in obj)
         .map((obj) => obj[key]);
 
-      // For optional/nullish properties, check both presence and absence
-      if (propSchema.type === "optional" || propSchema.type === "nullish") {
+      // For optional/nullish properties (not applicable to object_with_rest)
+      if (!isObjectWithRest && (propSchema.type === "optional" || propSchema.type === "nullish")) {
         const hasUndefined = objects.some((obj) => !(key in obj) || obj[key] === undefined);
         const hasNull = propSchema.type === "nullish" ? objects.some((obj) => key in obj && obj[key] === null) : false;
         const hasDefined = propSamples.some((val) =>
@@ -391,43 +383,29 @@ function checkCoverage(
         }
       }
     }
-  } // Handle objectWithRest schemas
-  else if (schema.type === "objectWithRest" || schema.type === "object_with_rest") {
-    const objectSchema = schema as v.ObjectWithRestSchema<
-      v.ObjectEntries,
-      v.GenericSchema,
-      v.ErrorMessage<v.GenericIssue>
-    >;
-    const objects = samples.filter((s): s is Record<string, unknown> => typeof s === "object" && s !== null);
 
-    // Check defined entries
-    for (const [key, propSchema] of Object.entries(objectSchema.entries)) {
-      const propPath = `${path}/properties/${key}`;
-      const propSamples = objects
-        .filter((obj) => key in obj)
-        .map((obj) => obj[key]);
+    // Check rest values (only for object_with_rest)
+    if (isObjectWithRest && "rest" in objectSchema && objectSchema.rest) {
+      const definedKeys = new Set(Object.keys(objectSchema.entries));
+      const restValues: unknown[] = [];
+      objects.forEach((obj) => {
+        Object.entries(obj).forEach(([key, value]) => {
+          if (!definedKeys.has(key)) {
+            restValues.push(value);
+          }
+        });
+      });
 
-      if (propSamples.length) {
-        issues.push(...checkCoverage(propSchema, propSamples, options, propPath));
+      if (restValues.length) {
+        issues.push(...checkCoverage(objectSchema.rest, restValues, options, `${path}/rest`));
       }
     }
-
-    // Check rest values
-    const definedKeys = new Set(Object.keys(objectSchema.entries));
-    const restValues: unknown[] = [];
-    objects.forEach((obj) => {
-      Object.entries(obj).forEach(([key, value]) => {
-        if (!definedKeys.has(key)) {
-          restValues.push(value);
-        }
-      });
-    });
-
-    if (restValues.length && objectSchema.rest) {
-      issues.push(...checkCoverage(objectSchema.rest, restValues, options, `${path}/rest`));
-    }
   } // Handle collection schemas (record, map, set)
-  else if (schema.type === "record" || schema.type === "map" || schema.type === "set") {
+  else if (
+    schema.type === "record" ||
+    schema.type === "map" ||
+    schema.type === "set"
+  ) {
     const collectionSchema = schema as
       | v.RecordSchema<v.GenericSchema<string, string | number>, v.GenericSchema, v.ErrorMessage<v.GenericIssue>>
       | v.MapSchema<v.GenericSchema, v.GenericSchema, v.ErrorMessage<v.GenericIssue>>
@@ -468,7 +446,9 @@ function checkCoverage(
     });
   } // Handle wrapper schemas (nullable, optional, nullish, undefinedable)
   else if (
-    schema.type === "nullable" || schema.type === "optional" || schema.type === "nullish" ||
+    schema.type === "nullable" ||
+    schema.type === "optional" ||
+    schema.type === "nullish" ||
     schema.type === "undefinedable"
   ) {
     const wrapperSchema = schema as
@@ -528,9 +508,9 @@ function checkCoverage(
     }
   } // Handle nonNullable schemas
   else if (
-    schema.type === "nonNullable" || schema.type === "non_nullable" ||
-    schema.type === "nonNullish" || schema.type === "non_nullish" ||
-    schema.type === "nonOptional" || schema.type === "non_optional"
+    schema.type === "non_nullable" ||
+    schema.type === "non_nullish" ||
+    schema.type === "non_optional"
   ) {
     const nonSchema = schema as
       | v.NonNullableSchema<v.GenericSchema, v.ErrorMessage<v.GenericIssue>>

@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request user referral.
@@ -274,7 +276,12 @@ export const ReferralResponse = /* @__PURE__ */ (() => {
 })();
 export type ReferralResponse = v.InferOutput<typeof ReferralResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode referral} function. */
 export type ReferralParameters = Omit<v.InferInput<typeof ReferralRequest>, "type">;

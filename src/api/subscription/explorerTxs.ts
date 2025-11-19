@@ -1,9 +1,10 @@
 import * as v from "valibot";
-import { Address, Hex, parser, UnsignedInteger } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_types.ts";
-import type { Subscription } from "../../transport/base.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, UnsignedInteger } from "../_base.ts";
 
 /** Subscription to explorer transaction events (RPC endpoint). */
 export const ExplorerTxsRequest = /* @__PURE__ */ (() => {
@@ -72,7 +73,13 @@ export const ExplorerTxsEvent = /* @__PURE__ */ (() => {
 })();
 export type ExplorerTxsEvent = v.InferOutput<typeof ExplorerTxsEvent>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
+import type { Subscription } from "../../transport/base.ts";
 
 /** Request parameters for the {@linkcode explorerTxs} function. */
 export type ExplorerTxsParameters = Omit<v.InferInput<typeof ExplorerTxsRequest>, "type">;

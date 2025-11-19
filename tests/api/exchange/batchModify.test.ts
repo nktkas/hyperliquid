@@ -1,6 +1,6 @@
-import { BatchModifyRequest, OrderSuccessResponse, parser } from "../../../src/api/exchange/~mod.ts";
+import { BatchModifyRequest, BatchModifyResponse, parser } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { openOrder, runTest } from "./_t.ts";
+import { excludeErrorResponse, openOrder, runTest } from "./_t.ts";
 
 runTest({
   name: "batchModify",
@@ -97,7 +97,7 @@ runTest({
         });
       })(),
     ]);
-    schemaCoverage(OrderSuccessResponse, data);
+    schemaCoverage(excludeErrorResponse(BatchModifyResponse), data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

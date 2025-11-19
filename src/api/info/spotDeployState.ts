@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request spot deploy state.
@@ -154,7 +156,12 @@ export const SpotDeployStateResponse = /* @__PURE__ */ (() => {
 })();
 export type SpotDeployStateResponse = v.InferOutput<typeof SpotDeployStateResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode spotDeployState} function. */
 export type SpotDeployStateParameters = Omit<v.InferInput<typeof SpotDeployStateRequest>, "type">;

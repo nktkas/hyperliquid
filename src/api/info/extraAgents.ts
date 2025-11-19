@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request user extra agents.
@@ -62,7 +64,12 @@ export const ExtraAgentsResponse = /* @__PURE__ */ (() => {
 })();
 export type ExtraAgentsResponse = v.InferOutput<typeof ExtraAgentsResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode extraAgents} function. */
 export type ExtraAgentsParameters = Omit<v.InferInput<typeof ExtraAgentsRequest>, "type">;

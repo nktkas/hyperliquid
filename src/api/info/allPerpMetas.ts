@@ -1,10 +1,10 @@
 import * as v from "valibot";
-import { parser } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
+
+// ============================================================
+// API Schemas
+// ============================================================
 
 import { MetaResponse } from "./meta.ts";
-
-// -------------------- Schemas --------------------
 
 /**
  * Request trading metadata for all DEXes.
@@ -36,7 +36,12 @@ export const AllPerpMetasResponse = /* @__PURE__ */ (() => {
 })();
 export type AllPerpMetasResponse = v.InferOutput<typeof AllPerpMetasResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode allPerpMetas} function. */
 export type AllPerpMetasParameters = Omit<v.InferInput<typeof AllPerpMetasRequest>, "type">;

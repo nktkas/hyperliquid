@@ -1,6 +1,6 @@
-import { parser, SuccessResponse, Withdraw3Request } from "../../../src/api/exchange/~mod.ts";
+import { parser, Withdraw3Request, Withdraw3Response } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { runTest, topUpPerp } from "./_t.ts";
+import { excludeErrorResponse, runTest, topUpPerp } from "./_t.ts";
 
 runTest({
   name: "withdraw3",
@@ -17,7 +17,7 @@ runTest({
         destination: "0x0000000000000000000000000000000000000001",
       }),
     ]);
-    schemaCoverage(SuccessResponse, data);
+    schemaCoverage(excludeErrorResponse(Withdraw3Response), data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

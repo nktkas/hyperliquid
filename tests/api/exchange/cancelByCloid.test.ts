@@ -1,6 +1,6 @@
-import { CancelByCloidRequest, CancelSuccessResponse, parser } from "../../../src/api/exchange/~mod.ts";
+import { CancelByCloidRequest, CancelByCloidResponse, parser } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { openOrder, randomCloid, runTest } from "./_t.ts";
+import { excludeErrorResponse, openOrder, randomCloid, runTest } from "./_t.ts";
 
 runTest({
   name: "cancelByCloid",
@@ -14,7 +14,7 @@ runTest({
     const data = await Promise.all([
       exchClient.cancelByCloid({ cancels: [{ asset: order.a, cloid: order.cloid }] }),
     ]);
-    schemaCoverage(CancelSuccessResponse, data);
+    schemaCoverage(excludeErrorResponse(CancelByCloidResponse), data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

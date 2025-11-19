@@ -1,9 +1,10 @@
 import * as v from "valibot";
-import { type DeepImmutable, parser, UnsignedDecimal } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_types.ts";
-import type { Subscription } from "../../transport/base.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { UnsignedDecimal } from "../_base.ts";
 
 /** Subscription to mid price events for all coins. */
 export const AllMidsRequest = /* @__PURE__ */ (() => {
@@ -45,7 +46,13 @@ export const AllMidsEvent = /* @__PURE__ */ (() => {
 })();
 export type AllMidsEvent = v.InferOutput<typeof AllMidsEvent>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
+import type { Subscription } from "../../transport/base.ts";
 
 /** Request parameters for the {@linkcode allMids} function. */
 export type AllMidsParameters = Omit<v.InferInput<typeof AllMidsRequest>, "type">;

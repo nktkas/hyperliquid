@@ -1,6 +1,6 @@
-import { ModifyRequest, parser, SuccessResponse } from "../../../src/api/exchange/~mod.ts";
+import { ModifyRequest, ModifyResponse, parser } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { openOrder, runTest } from "./_t.ts";
+import { excludeErrorResponse, openOrder, runTest } from "./_t.ts";
 
 runTest({
   name: "modify",
@@ -24,7 +24,7 @@ runTest({
         },
       }),
     ]);
-    schemaCoverage(SuccessResponse, data);
+    schemaCoverage(excludeErrorResponse(ModifyResponse), data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

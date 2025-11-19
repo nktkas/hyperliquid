@@ -1,15 +1,11 @@
 import * as v from "valibot";
-import { type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Configure block type for EVM transactions.
@@ -55,15 +51,40 @@ export const EvmUserModifyRequest = /* @__PURE__ */ (() => {
 })();
 export type EvmUserModifyRequest = v.InferOutput<typeof EvmUserModifyRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/hyperevm/dual-block-architecture
+ */
+export const EvmUserModifyResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type EvmUserModifyResponse = v.InferOutput<typeof EvmUserModifyResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode evmUserModify} function. */
 export type EvmUserModifyParameters = ExtractRequestAction<v.InferInput<typeof EvmUserModifyRequest>>;
+
 /** Request options for the {@linkcode evmUserModify} function. */
 export type EvmUserModifyOptions = ExtractRequestOptions<v.InferInput<typeof EvmUserModifyRequest>>;
+
+/** Successful variant of {@linkcode EvmUserModifyResponse} without errors. */
+export type EvmUserModifySuccessResponse = ExcludeErrorResponse<EvmUserModifyResponse>;
 
 /**
  * Configure block type for EVM transactions.
@@ -80,7 +101,7 @@ export type EvmUserModifyOptions = ExtractRequestOptions<v.InferInput<typeof Evm
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { evmUserModify } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -95,7 +116,7 @@ export async function evmUserModify(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<EvmUserModifyParameters>,
   opts?: EvmUserModifyOptions,
-): Promise<SuccessResponse> {
+): Promise<EvmUserModifySuccessResponse> {
   const request = parser(EvmUserModifyRequest)({
     action: {
       type: "evmUserModify",

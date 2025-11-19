@@ -1,16 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, Percent, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeUserSignedAction,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  getSignatureChainId,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, Percent, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Approve a maximum fee rate for a builder.
@@ -71,15 +66,41 @@ export const ApproveBuilderFeeRequest = /* @__PURE__ */ (() => {
 })();
 export type ApproveBuilderFeeRequest = v.InferOutput<typeof ApproveBuilderFeeRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-a-builder-fee
+ */
+export const ApproveBuilderFeeResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type ApproveBuilderFeeResponse = v.InferOutput<typeof ApproveBuilderFeeResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeUserSignedAction,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  getSignatureChainId,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode approveBuilderFee} function. */
 export type ApproveBuilderFeeParameters = ExtractRequestAction<v.InferInput<typeof ApproveBuilderFeeRequest>>;
+
 /** Request options for the {@linkcode approveBuilderFee} function. */
 export type ApproveBuilderFeeOptions = ExtractRequestOptions<v.InferInput<typeof ApproveBuilderFeeRequest>>;
+
+/** Successful variant of {@linkcode ApproveBuilderFeeResponse} without errors. */
+export type ApproveBuilderFeeSuccessResponse = ExcludeErrorResponse<ApproveBuilderFeeResponse>;
 
 /** EIP-712 types for the {@linkcode approveBuilderFee} function. */
 export const ApproveBuilderFeeTypes = {
@@ -106,7 +127,7 @@ export const ApproveBuilderFeeTypes = {
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { approveBuilderFee } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -121,7 +142,7 @@ export async function approveBuilderFee(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<ApproveBuilderFeeParameters>,
   opts?: ApproveBuilderFeeOptions,
-): Promise<SuccessResponse> {
+): Promise<ApproveBuilderFeeSuccessResponse> {
   const request = parser(ApproveBuilderFeeRequest)({
     action: {
       type: "approveBuilderFee",

@@ -1,20 +1,15 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, TokenId, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeUserSignedAction,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  getSignatureChainId,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, TokenId, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Transfer tokens between different perp DEXs, spot balance, users, and/or sub-accounts.
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset-testnet-only
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset
  */
 export const SendAssetRequest = /* @__PURE__ */ (() => {
   return v.pipe(
@@ -91,15 +86,41 @@ export const SendAssetRequest = /* @__PURE__ */ (() => {
 })();
 export type SendAssetRequest = v.InferOutput<typeof SendAssetRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset
+ */
+export const SendAssetResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type SendAssetResponse = v.InferOutput<typeof SendAssetResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeUserSignedAction,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  getSignatureChainId,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode sendAsset} function. */
 export type SendAssetParameters = ExtractRequestAction<v.InferInput<typeof SendAssetRequest>>;
+
 /** Request options for the {@linkcode sendAsset} function. */
 export type SendAssetOptions = ExtractRequestOptions<v.InferInput<typeof SendAssetRequest>>;
+
+/** Successful variant of {@linkcode SendAssetResponse} without errors. */
+export type SendAssetSuccessResponse = ExcludeErrorResponse<SendAssetResponse>;
 
 /** EIP-712 types for the {@linkcode sendAsset} function. */
 export const SendAssetTypes = {
@@ -125,12 +146,12 @@ export const SendAssetTypes = {
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  * @throws {TransportError} When the transport layer throws an error.
  *
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset-testnet-only
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { sendAsset } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -151,7 +172,7 @@ export async function sendAsset(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<SendAssetParameters>,
   opts?: SendAssetOptions,
-): Promise<SuccessResponse> {
+): Promise<SendAssetSuccessResponse> {
   const request = parser(SendAssetRequest)({
     action: {
       type: "sendAsset",

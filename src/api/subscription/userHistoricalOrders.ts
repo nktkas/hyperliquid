@@ -1,11 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_types.ts";
-import type { Subscription } from "../../transport/base.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, UnsignedInteger } from "../_base.ts";
 import { DetailedOrderSchema, OrderProcessingStatusSchema } from "../_common_schemas.ts";
-
-// -------------------- Schemas --------------------
 
 /** Subscription to user historical orders for a specific user. */
 export const UserHistoricalOrdersRequest = /* @__PURE__ */ (() => {
@@ -68,7 +68,13 @@ export const UserHistoricalOrdersEvent = /* @__PURE__ */ (() => {
 })();
 export type UserHistoricalOrdersEvent = v.InferOutput<typeof UserHistoricalOrdersEvent>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
+import type { Subscription } from "../../transport/base.ts";
 
 /** Request parameters for the {@linkcode userHistoricalOrders} function. */
 export type UserHistoricalOrdersParameters = Omit<v.InferInput<typeof UserHistoricalOrdersRequest>, "type">;

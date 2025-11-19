@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, Decimal, type DeepImmutable, Hex, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Decimal, Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request user non-funding ledger updates.
@@ -487,7 +489,12 @@ export const UserNonFundingLedgerUpdatesResponse = /* @__PURE__ */ (() => {
 })();
 export type UserNonFundingLedgerUpdatesResponse = v.InferOutput<typeof UserNonFundingLedgerUpdatesResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode userNonFundingLedgerUpdates} function. */
 export type UserNonFundingLedgerUpdatesParameters = Omit<

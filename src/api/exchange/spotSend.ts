@@ -1,16 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, TokenId, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeUserSignedAction,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  getSignatureChainId,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, TokenId, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Send spot assets to another address.
@@ -76,15 +71,41 @@ export const SpotSendRequest = /* @__PURE__ */ (() => {
 })();
 export type SpotSendRequest = v.InferOutput<typeof SpotSendRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-spot-transfer
+ */
+export const SpotSendResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type SpotSendResponse = v.InferOutput<typeof SpotSendResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeUserSignedAction,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  getSignatureChainId,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode spotSend} function. */
 export type SpotSendParameters = ExtractRequestAction<v.InferInput<typeof SpotSendRequest>>;
+
 /** Request options for the {@linkcode spotSend} function. */
 export type SpotSendOptions = ExtractRequestOptions<v.InferInput<typeof SpotSendRequest>>;
+
+/** Successful variant of {@linkcode SpotSendResponse} without errors. */
+export type SpotSendSuccessResponse = ExcludeErrorResponse<SpotSendResponse>;
 
 /** EIP-712 types for the {@linkcode spotSend} function. */
 export const SpotSendTypes = {
@@ -112,7 +133,7 @@ export const SpotSendTypes = {
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { spotSend } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -131,7 +152,7 @@ export async function spotSend(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<SpotSendParameters>,
   opts?: SpotSendOptions,
-): Promise<SuccessResponse> {
+): Promise<SpotSendSuccessResponse> {
   const request = parser(SpotSendRequest)({
     action: {
       type: "spotSend",

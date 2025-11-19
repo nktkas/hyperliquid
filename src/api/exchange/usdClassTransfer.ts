@@ -1,16 +1,11 @@
 import * as v from "valibot";
-import { type DeepImmutable, Hex, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeUserSignedAction,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  getSignatureChainId,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Transfer funds between Spot account and Perp account.
@@ -71,15 +66,41 @@ export const UsdClassTransferRequest = /* @__PURE__ */ (() => {
 })();
 export type UsdClassTransferRequest = v.InferOutput<typeof UsdClassTransferRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa
+ */
+export const UsdClassTransferResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type UsdClassTransferResponse = v.InferOutput<typeof UsdClassTransferResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeUserSignedAction,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  getSignatureChainId,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode usdClassTransfer} function. */
 export type UsdClassTransferParameters = ExtractRequestAction<v.InferInput<typeof UsdClassTransferRequest>>;
+
 /** Request options for the {@linkcode usdClassTransfer} function. */
 export type UsdClassTransferOptions = ExtractRequestOptions<v.InferInput<typeof UsdClassTransferRequest>>;
+
+/** Successful variant of {@linkcode UsdClassTransferResponse} without errors. */
+export type UsdClassTransferSuccessResponse = ExcludeErrorResponse<UsdClassTransferResponse>;
 
 /** EIP-712 types for the {@linkcode usdClassTransfer} function. */
 export const UsdClassTransferTypes = {
@@ -106,7 +127,7 @@ export const UsdClassTransferTypes = {
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { usdClassTransfer } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -121,7 +142,7 @@ export async function usdClassTransfer(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<UsdClassTransferParameters>,
   opts?: UsdClassTransferOptions,
-): Promise<SuccessResponse> {
+): Promise<UsdClassTransferSuccessResponse> {
   const request = parser(UsdClassTransferRequest)({
     action: {
       type: "usdClassTransfer",

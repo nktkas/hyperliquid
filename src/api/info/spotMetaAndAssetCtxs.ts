@@ -1,10 +1,11 @@
 import * as v from "valibot";
-import { parser, UnsignedDecimal } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { UnsignedDecimal } from "../_base.ts";
 import { SpotMetaResponse } from "./spotMeta.ts";
-
-// -------------------- Schemas --------------------
 
 /**
  * Request spot metadata and asset contexts.
@@ -90,7 +91,12 @@ export const SpotMetaAndAssetCtxsResponse = /* @__PURE__ */ (() => {
 })();
 export type SpotMetaAndAssetCtxsResponse = v.InferOutput<typeof SpotMetaAndAssetCtxsResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /**
  * Request spot metadata and asset contexts.

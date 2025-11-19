@@ -7,7 +7,7 @@
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  * import { order } from "@nktkas/hyperliquid/api/exchange";
  * //       ^^^^^
  * //       same name as in `ExchangeClient`

@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address } from "../_base.ts";
 
 /**
  * Request builder fee approval.
@@ -46,7 +48,12 @@ export const MaxBuilderFeeResponse = /* @__PURE__ */ (() => {
 
 export type MaxBuilderFeeResponse = v.InferOutput<typeof MaxBuilderFeeResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode maxBuilderFee} function. */
 export type MaxBuilderFeeParameters = Omit<v.InferInput<typeof MaxBuilderFeeRequest>, "type">;

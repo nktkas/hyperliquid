@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, Decimal, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Decimal, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request user portfolio.
@@ -73,7 +75,12 @@ export const PortfolioResponse = /* @__PURE__ */ (() => {
 })();
 export type PortfolioResponse = v.InferOutput<typeof PortfolioResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode portfolio} function. */
 export type PortfolioParameters = Omit<v.InferInput<typeof PortfolioRequest>, "type">;

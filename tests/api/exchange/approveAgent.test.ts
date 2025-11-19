@@ -1,6 +1,6 @@
-import { ApproveAgentRequest, parser, SuccessResponse } from "../../../src/api/exchange/~mod.ts";
+import { ApproveAgentRequest, ApproveAgentResponse, parser } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { randomAddress, runTest } from "./_t.ts";
+import { excludeErrorResponse, randomAddress, runTest } from "./_t.ts";
 
 runTest({
   name: "approveAgent",
@@ -12,7 +12,7 @@ runTest({
           agentName: "agentName",
         }),
       ]);
-      schemaCoverage(SuccessResponse, data);
+      schemaCoverage(excludeErrorResponse(ApproveAgentResponse), data);
     });
 
     await new Promise((r) => setTimeout(r, 5000)); // waiting to avoid error `ApiRequestError: User has pending agent removal`
@@ -24,7 +24,7 @@ runTest({
           agentName: null,
         }),
       ]);
-      schemaCoverage(SuccessResponse, data);
+      schemaCoverage(excludeErrorResponse(ApproveAgentResponse), data);
     });
   },
   cliTestFn: async (_t, runCommand) => {

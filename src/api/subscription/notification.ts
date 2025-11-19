@@ -1,9 +1,10 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_types.ts";
-import type { Subscription } from "../../transport/base.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address } from "../_base.ts";
 
 /** Subscription to notification events for a specific user. */
 export const NotificationRequest = /* @__PURE__ */ (() => {
@@ -40,7 +41,13 @@ export const NotificationEvent = /* @__PURE__ */ (() => {
 })();
 export type NotificationEvent = v.InferOutput<typeof NotificationEvent>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
+import type { Subscription } from "../../transport/base.ts";
 
 /** Request parameters for the {@linkcode notification} function. */
 export type NotificationParameters = Omit<v.InferInput<typeof NotificationRequest>, "type">;

@@ -50,62 +50,6 @@ import { vaultModify } from "./vaultModify.ts";
 import { vaultTransfer } from "./vaultTransfer.ts";
 import { withdraw3 } from "./withdraw3.ts";
 
-export type { AgentEnableDexAbstractionOptions } from "./agentEnableDexAbstraction.ts";
-export type { ApproveAgentOptions, ApproveAgentParameters } from "./approveAgent.ts";
-export type { ApproveBuilderFeeOptions, ApproveBuilderFeeParameters } from "./approveBuilderFee.ts";
-export type { BatchModifyOptions, BatchModifyParameters } from "./batchModify.ts";
-export type { CancelOptions, CancelParameters } from "./cancel.ts";
-export type { CancelByCloidOptions, CancelByCloidParameters } from "./cancelByCloid.ts";
-export type { CDepositOptions, CDepositParameters } from "./cDeposit.ts";
-export type { ClaimRewardsOptions } from "./claimRewards.ts";
-export type { ConvertToMultiSigUserOptions, ConvertToMultiSigUserParameters } from "./convertToMultiSigUser.ts";
-export type { CreateSubAccountOptions, CreateSubAccountParameters } from "./createSubAccount.ts";
-export type { CreateVaultOptions, CreateVaultParameters } from "./createVault.ts";
-export type { CSignerActionOptions, CSignerActionParameters } from "./cSignerAction.ts";
-export type { CValidatorActionOptions, CValidatorActionParameters } from "./cValidatorAction.ts";
-export type { CWithdrawOptions, CWithdrawParameters } from "./cWithdraw.ts";
-export type { EvmUserModifyOptions, EvmUserModifyParameters } from "./evmUserModify.ts";
-export type { LinkStakingUserOptions, LinkStakingUserParameters } from "./linkStakingUser.ts";
-export type { ModifyOptions, ModifyParameters } from "./modify.ts";
-export type { MultiSigOptions, MultiSigParameters } from "./multiSig.ts";
-export type { OrderOptions, OrderParameters } from "./order.ts";
-export type { NoopOptions } from "./noop.ts";
-export type { PerpDeployOptions, PerpDeployParameters } from "./perpDeploy.ts";
-export type { RegisterReferrerOptions, RegisterReferrerParameters } from "./registerReferrer.ts";
-export type { ReserveRequestWeightOptions, ReserveRequestWeightParameters } from "./reserveRequestWeight.ts";
-export type { ScheduleCancelOptions, ScheduleCancelParameters } from "./scheduleCancel.ts";
-export type { SendAssetOptions, SendAssetParameters } from "./sendAsset.ts";
-export type { SetDisplayNameOptions, SetDisplayNameParameters } from "./setDisplayName.ts";
-export type { SetReferrerOptions, SetReferrerParameters } from "./setReferrer.ts";
-export type { SpotDeployOptions, SpotDeployParameters } from "./spotDeploy.ts";
-export type { SpotSendOptions, SpotSendParameters } from "./spotSend.ts";
-export type { SpotUserOptions, SpotUserParameters } from "./spotUser.ts";
-export type { SubAccountModifyOptions, SubAccountModifyParameters } from "./subAccountModify.ts";
-export type { SubAccountSpotTransferOptions, SubAccountSpotTransferParameters } from "./subAccountSpotTransfer.ts";
-export type { SubAccountTransferOptions, SubAccountTransferParameters } from "./subAccountTransfer.ts";
-export type { TokenDelegateOptions, TokenDelegateParameters } from "./tokenDelegate.ts";
-export type { TwapCancelOptions, TwapCancelParameters } from "./twapCancel.ts";
-export type { TwapOrderOptions, TwapOrderParameters } from "./twapOrder.ts";
-export type { UpdateIsolatedMarginOptions, UpdateIsolatedMarginParameters } from "./updateIsolatedMargin.ts";
-export type { UpdateLeverageOptions, UpdateLeverageParameters } from "./updateLeverage.ts";
-export type { UsdClassTransferOptions, UsdClassTransferParameters } from "./usdClassTransfer.ts";
-export type { UsdSendOptions, UsdSendParameters } from "./usdSend.ts";
-export type { UserDexAbstractionExchangeOptions, UserDexAbstractionExchangeParameters } from "./userDexAbstraction.ts";
-export type { VaultDistributeOptions, VaultDistributeParameters } from "./vaultDistribute.ts";
-export type { VaultModifyOptions, VaultModifyParameters } from "./vaultModify.ts";
-export type { VaultTransferOptions, VaultTransferParameters } from "./vaultTransfer.ts";
-export type { Withdraw3Options, Withdraw3Parameters } from "./withdraw3.ts";
-
-export type { CancelSuccessResponse } from "./cancel.ts";
-export type { CreateSubAccountResponse } from "./createSubAccount.ts";
-export type { CreateVaultResponse } from "./createVault.ts";
-export type { OrderSuccessResponse } from "./order.ts";
-export type { TwapCancelSuccessResponse } from "./twapCancel.ts";
-export type { TwapOrderSuccessResponse } from "./twapOrder.ts";
-export type { ErrorResponse, SuccessResponse } from "./_base/mod.ts";
-
-export { ApiRequestError, type ExchangeRequestConfig, type MultiSignRequestConfig } from "./_base/mod.ts";
-
 /**
  * A client for interacting with the Hyperliquid Exchange API.
  * @typeParam T The transport (extends {@linkcode IRequestTransport}) used to connect to the Hyperliquid API.
@@ -148,7 +92,7 @@ export class ExchangeClient<
    * @example via [ethers.js v6](https://docs.ethers.org/v6/api/wallet/#Wallet) or [ethers.js v5](https://docs.ethers.org/v5/api/signer/#Wallet)
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
-   * import { ethers } from "npm:ethers";
+   * import { ethers } from "ethers";
    *
    * const wallet = new ethers.Wallet("0x...");
    *
@@ -159,7 +103,7 @@ export class ExchangeClient<
    * @example via an external wallet (e.g. MetaMask) with [viem](https://viem.sh/docs/clients/wallet)
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
-   * import { createWalletClient, custom } from "npm:viem";
+   * import { createWalletClient, custom } from "viem";
    *
    * const ethereum = (window as any).ethereum;
    * const [account] = await ethereum.request({ method: "eth_requestAccounts" }) as `0x${string}`[];
@@ -193,7 +137,7 @@ export class ExchangeClient<
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    * @throws {TransportError} When the transport layer throws an error.
    *
-   * @see null
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction-agent
    * @example
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
@@ -205,7 +149,9 @@ export class ExchangeClient<
    * await client.agentEnableDexAbstraction();
    * ```
    */
-  agentEnableDexAbstraction(...args: OmitFirst<OverloadedParameters<typeof agentEnableDexAbstraction>>) {
+  agentEnableDexAbstraction(
+    ...args: OmitFirst<OverloadedParameters<typeof agentEnableDexAbstraction>>
+  ): ReturnType<typeof agentEnableDexAbstraction> {
     return agentEnableDexAbstraction(this, ...args);
   }
 
@@ -230,7 +176,9 @@ export class ExchangeClient<
    * await client.approveAgent({ agentAddress: "0x...", agentName: "..." });
    * ```
    */
-  approveAgent(...args: OmitFirst<OverloadedParameters<typeof approveAgent>>) {
+  approveAgent(
+    ...args: OmitFirst<OverloadedParameters<typeof approveAgent>>
+  ): ReturnType<typeof approveAgent> {
     return approveAgent(this, ...args);
   }
 
@@ -255,7 +203,9 @@ export class ExchangeClient<
    * await client.approveBuilderFee({ maxFeeRate: "0.01%", builder: "0x..." });
    * ```
    */
-  approveBuilderFee(...args: OmitFirst<OverloadedParameters<typeof approveBuilderFee>>) {
+  approveBuilderFee(
+    ...args: OmitFirst<OverloadedParameters<typeof approveBuilderFee>>
+  ): ReturnType<typeof approveBuilderFee> {
     return approveBuilderFee(this, ...args);
   }
 
@@ -294,7 +244,9 @@ export class ExchangeClient<
    * });
    * ```
    */
-  batchModify(...args: OmitFirst<OverloadedParameters<typeof batchModify>>) {
+  batchModify(
+    ...args: OmitFirst<OverloadedParameters<typeof batchModify>>
+  ): ReturnType<typeof batchModify> {
     return batchModify(this, ...args);
   }
 
@@ -323,7 +275,9 @@ export class ExchangeClient<
    * });
    * ```
    */
-  cancel(...args: OmitFirst<OverloadedParameters<typeof cancel>>) {
+  cancel(
+    ...args: OmitFirst<OverloadedParameters<typeof cancel>>
+  ): ReturnType<typeof cancel> {
     return cancel(this, ...args);
   }
 
@@ -352,7 +306,9 @@ export class ExchangeClient<
    * });
    * ```
    */
-  cancelByCloid(...args: OmitFirst<OverloadedParameters<typeof cancelByCloid>>) {
+  cancelByCloid(
+    ...args: OmitFirst<OverloadedParameters<typeof cancelByCloid>>
+  ): ReturnType<typeof cancelByCloid> {
     return cancelByCloid(this, ...args);
   }
 
@@ -377,7 +333,9 @@ export class ExchangeClient<
    * await client.cDeposit({ wei: 1 * 1e8 });
    * ```
    */
-  cDeposit(...args: OmitFirst<OverloadedParameters<typeof cDeposit>>) {
+  cDeposit(
+    ...args: OmitFirst<OverloadedParameters<typeof cDeposit>>
+  ): ReturnType<typeof cDeposit> {
     return cDeposit(this, ...args);
   }
 
@@ -389,7 +347,6 @@ export class ExchangeClient<
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    * @throws {TransportError} When the transport layer throws an error.
    *
-   * @see null
    * @example
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
@@ -401,7 +358,9 @@ export class ExchangeClient<
    * await client.claimRewards();
    * ```
    */
-  claimRewards(...args: OmitFirst<OverloadedParameters<typeof claimRewards>>) {
+  claimRewards(
+    ...args: OmitFirst<OverloadedParameters<typeof claimRewards>>
+  ): ReturnType<typeof claimRewards> {
     return claimRewards(this, ...args);
   }
 
@@ -436,7 +395,9 @@ export class ExchangeClient<
    * await client.convertToMultiSigUser({ signers: null });
    * ```
    */
-  convertToMultiSigUser(...args: OmitFirst<OverloadedParameters<typeof convertToMultiSigUser>>) {
+  convertToMultiSigUser(
+    ...args: OmitFirst<OverloadedParameters<typeof convertToMultiSigUser>>
+  ): ReturnType<typeof convertToMultiSigUser> {
     return convertToMultiSigUser(this, ...args);
   }
 
@@ -449,7 +410,6 @@ export class ExchangeClient<
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    * @throws {TransportError} When the transport layer throws an error.
    *
-   * @see null
    * @example
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
@@ -461,7 +421,9 @@ export class ExchangeClient<
    * const data = await client.createSubAccount({ name: "..." });
    * ```
    */
-  createSubAccount(...args: OmitFirst<OverloadedParameters<typeof createSubAccount>>) {
+  createSubAccount(
+    ...args: OmitFirst<OverloadedParameters<typeof createSubAccount>>
+  ): ReturnType<typeof createSubAccount> {
     return createSubAccount(this, ...args);
   }
 
@@ -474,7 +436,6 @@ export class ExchangeClient<
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    * @throws {TransportError} When the transport layer throws an error.
    *
-   * @see null
    * @example
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
@@ -490,7 +451,9 @@ export class ExchangeClient<
    * });
    * ```
    */
-  createVault(...args: OmitFirst<OverloadedParameters<typeof createVault>>) {
+  createVault(
+    ...args: OmitFirst<OverloadedParameters<typeof createVault>>
+  ): ReturnType<typeof createVault> {
     return createVault(this, ...args);
   }
 
@@ -503,7 +466,6 @@ export class ExchangeClient<
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    * @throws {TransportError} When the transport layer throws an error.
    *
-   * @see null
    * @example
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
@@ -520,7 +482,9 @@ export class ExchangeClient<
    * await client.cSignerAction({ unjailSelf: null });
    * ```
    */
-  cSignerAction(...args: OmitFirst<OverloadedParameters<typeof cSignerAction>>) {
+  cSignerAction(
+    ...args: OmitFirst<OverloadedParameters<typeof cSignerAction>>
+  ): ReturnType<typeof cSignerAction> {
     return cSignerAction(this, ...args);
   }
 
@@ -533,7 +497,6 @@ export class ExchangeClient<
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    * @throws {TransportError} When the transport layer throws an error.
    *
-   * @see null
    * @example
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
@@ -576,7 +539,9 @@ export class ExchangeClient<
    * await client.cValidatorAction({ unregister: null });
    * ```
    */
-  cValidatorAction(...args: OmitFirst<OverloadedParameters<typeof cValidatorAction>>) {
+  cValidatorAction(
+    ...args: OmitFirst<OverloadedParameters<typeof cValidatorAction>>
+  ): ReturnType<typeof cValidatorAction> {
     return cValidatorAction(this, ...args);
   }
 
@@ -601,7 +566,9 @@ export class ExchangeClient<
    * await client.cWithdraw({ wei: 1 * 1e8 });
    * ```
    */
-  cWithdraw(...args: OmitFirst<OverloadedParameters<typeof cWithdraw>>) {
+  cWithdraw(
+    ...args: OmitFirst<OverloadedParameters<typeof cWithdraw>>
+  ): ReturnType<typeof cWithdraw> {
     return cWithdraw(this, ...args);
   }
 
@@ -626,7 +593,9 @@ export class ExchangeClient<
    * await client.evmUserModify({ usingBigBlocks: true });
    * ```
    */
-  evmUserModify(...args: OmitFirst<OverloadedParameters<typeof evmUserModify>>) {
+  evmUserModify(
+    ...args: OmitFirst<OverloadedParameters<typeof evmUserModify>>
+  ): ReturnType<typeof evmUserModify> {
     return evmUserModify(this, ...args);
   }
 
@@ -651,7 +620,9 @@ export class ExchangeClient<
    * await client.linkStakingUser({ user: "0x...", isFinalize: false });
    * ```
    */
-  linkStakingUser(...args: OmitFirst<OverloadedParameters<typeof linkStakingUser>>) {
+  linkStakingUser(
+    ...args: OmitFirst<OverloadedParameters<typeof linkStakingUser>>
+  ): ReturnType<typeof linkStakingUser> {
     return linkStakingUser(this, ...args);
   }
 
@@ -687,7 +658,9 @@ export class ExchangeClient<
    * });
    * ```
    */
-  modify(...args: OmitFirst<OverloadedParameters<typeof modify>>) {
+  modify(
+    ...args: OmitFirst<OverloadedParameters<typeof modify>>
+  ): ReturnType<typeof modify> {
     return modify(this, ...args);
   }
 
@@ -706,7 +679,7 @@ export class ExchangeClient<
    * import * as hl from "@nktkas/hyperliquid";
    * import { signL1Action } from "@nktkas/hyperliquid/signing";
    * import { parser, ScheduleCancelRequest } from "@nktkas/hyperliquid/api/exchange";
-   * import { privateKeyToAccount } from "npm:viem/accounts";
+   * import { privateKeyToAccount } from "viem/accounts";
    *
    * const wallet = privateKeyToAccount("0x..."); // viem, ethers or private key
    * const multiSigUser = "0x...";
@@ -753,7 +726,9 @@ export class ExchangeClient<
    * });
    * ```
    */
-  multiSig(...args: OmitFirst<OverloadedParameters<typeof multiSig>>) {
+  multiSig(
+    ...args: OmitFirst<OverloadedParameters<typeof multiSig>>
+  ): ReturnType<typeof multiSig> {
     return multiSig(this, ...args);
   }
 
@@ -791,7 +766,9 @@ export class ExchangeClient<
    * });
    * ```
    */
-  order(...args: OmitFirst<OverloadedParameters<typeof order>>) {
+  order(
+    ...args: OmitFirst<OverloadedParameters<typeof order>>
+  ): ReturnType<typeof order> {
     return order(this, ...args);
   }
 
@@ -816,7 +793,9 @@ export class ExchangeClient<
    * await client.noop();
    * ```
    */
-  noop(...args: OmitFirst<OverloadedParameters<typeof noop>>) {
+  noop(
+    ...args: OmitFirst<OverloadedParameters<typeof noop>>
+  ): ReturnType<typeof noop> {
     return noop(this, ...args);
   }
 
@@ -854,7 +833,9 @@ export class ExchangeClient<
    * });
    * ```
    */
-  perpDeploy(...args: OmitFirst<OverloadedParameters<typeof perpDeploy>>) {
+  perpDeploy(
+    ...args: OmitFirst<OverloadedParameters<typeof perpDeploy>>
+  ): ReturnType<typeof perpDeploy> {
     return perpDeploy(this, ...args);
   }
 
@@ -867,7 +848,6 @@ export class ExchangeClient<
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    * @throws {TransportError} When the transport layer throws an error.
    *
-   * @see null
    * @example
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
@@ -879,7 +859,9 @@ export class ExchangeClient<
    * await client.registerReferrer({ code: "..." });
    * ```
    */
-  registerReferrer(...args: OmitFirst<OverloadedParameters<typeof registerReferrer>>) {
+  registerReferrer(
+    ...args: OmitFirst<OverloadedParameters<typeof registerReferrer>>
+  ): ReturnType<typeof registerReferrer> {
     return registerReferrer(this, ...args);
   }
 
@@ -904,7 +886,9 @@ export class ExchangeClient<
    * await client.reserveRequestWeight({ weight: 10 });
    * ```
    */
-  reserveRequestWeight(...args: OmitFirst<OverloadedParameters<typeof reserveRequestWeight>>) {
+  reserveRequestWeight(
+    ...args: OmitFirst<OverloadedParameters<typeof reserveRequestWeight>>
+  ): ReturnType<typeof reserveRequestWeight> {
     return reserveRequestWeight(this, ...args);
   }
 
@@ -929,7 +913,9 @@ export class ExchangeClient<
    * await client.scheduleCancel({ time: Date.now() + 10_000 });
    * ```
    */
-  scheduleCancel(...args: OmitFirst<OverloadedParameters<typeof scheduleCancel>>) {
+  scheduleCancel(
+    ...args: OmitFirst<OverloadedParameters<typeof scheduleCancel>>
+  ): ReturnType<typeof scheduleCancel> {
     return scheduleCancel(
       this,
       // @ts-ignore: TypeScript can't resolve overloaded signatures from parameter unions
@@ -946,7 +932,7 @@ export class ExchangeClient<
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    * @throws {TransportError} When the transport layer throws an error.
    *
-   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset-testnet-only
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset
    * @example
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
@@ -964,7 +950,9 @@ export class ExchangeClient<
    * });
    * ```
    */
-  sendAsset(...args: OmitFirst<OverloadedParameters<typeof sendAsset>>) {
+  sendAsset(
+    ...args: OmitFirst<OverloadedParameters<typeof sendAsset>>
+  ): ReturnType<typeof sendAsset> {
     return sendAsset(this, ...args);
   }
 
@@ -977,7 +965,6 @@ export class ExchangeClient<
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    * @throws {TransportError} When the transport layer throws an error.
    *
-   * @see null
    * @example
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
@@ -989,7 +976,9 @@ export class ExchangeClient<
    * await client.setDisplayName({ displayName: "..." });
    * ```
    */
-  setDisplayName(...args: OmitFirst<OverloadedParameters<typeof setDisplayName>>) {
+  setDisplayName(
+    ...args: OmitFirst<OverloadedParameters<typeof setDisplayName>>
+  ): ReturnType<typeof setDisplayName> {
     return setDisplayName(this, ...args);
   }
 
@@ -1002,7 +991,6 @@ export class ExchangeClient<
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    * @throws {TransportError} When the transport layer throws an error.
    *
-   * @see null
    * @example
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
@@ -1014,7 +1002,9 @@ export class ExchangeClient<
    * await client.setReferrer({ code: "..." });
    * ```
    */
-  setReferrer(...args: OmitFirst<OverloadedParameters<typeof setReferrer>>) {
+  setReferrer(
+    ...args: OmitFirst<OverloadedParameters<typeof setReferrer>>
+  ): ReturnType<typeof setReferrer> {
     return setReferrer(this, ...args);
   }
 
@@ -1049,7 +1039,9 @@ export class ExchangeClient<
    * });
    * ```
    */
-  spotDeploy(...args: OmitFirst<OverloadedParameters<typeof spotDeploy>>) {
+  spotDeploy(
+    ...args: OmitFirst<OverloadedParameters<typeof spotDeploy>>
+  ): ReturnType<typeof spotDeploy> {
     return spotDeploy(this, ...args);
   }
 
@@ -1078,7 +1070,9 @@ export class ExchangeClient<
    * });
    * ```
    */
-  spotSend(...args: OmitFirst<OverloadedParameters<typeof spotSend>>) {
+  spotSend(
+    ...args: OmitFirst<OverloadedParameters<typeof spotSend>>
+  ): ReturnType<typeof spotSend> {
     return spotSend(this, ...args);
   }
 
@@ -1091,7 +1085,6 @@ export class ExchangeClient<
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    * @throws {TransportError} When the transport layer throws an error.
    *
-   * @see null
    * @example
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
@@ -1103,7 +1096,9 @@ export class ExchangeClient<
    * await client.spotUser({ toggleSpotDusting: { optOut: false } });
    * ```
    */
-  spotUser(...args: OmitFirst<OverloadedParameters<typeof spotUser>>) {
+  spotUser(
+    ...args: OmitFirst<OverloadedParameters<typeof spotUser>>
+  ): ReturnType<typeof spotUser> {
     return spotUser(this, ...args);
   }
 
@@ -1116,7 +1111,6 @@ export class ExchangeClient<
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    * @throws {TransportError} When the transport layer throws an error.
    *
-   * @see null
    * @example
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
@@ -1128,7 +1122,9 @@ export class ExchangeClient<
    * await client.subAccountModify({ subAccountUser: "0x...", name: "..." });
    * ```
    */
-  subAccountModify(...args: OmitFirst<OverloadedParameters<typeof subAccountModify>>) {
+  subAccountModify(
+    ...args: OmitFirst<OverloadedParameters<typeof subAccountModify>>
+  ): ReturnType<typeof subAccountModify> {
     return subAccountModify(this, ...args);
   }
 
@@ -1141,7 +1137,6 @@ export class ExchangeClient<
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    * @throws {TransportError} When the transport layer throws an error.
    *
-   * @see null
    * @example
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
@@ -1158,7 +1153,9 @@ export class ExchangeClient<
    * });
    * ```
    */
-  subAccountSpotTransfer(...args: OmitFirst<OverloadedParameters<typeof subAccountSpotTransfer>>) {
+  subAccountSpotTransfer(
+    ...args: OmitFirst<OverloadedParameters<typeof subAccountSpotTransfer>>
+  ): ReturnType<typeof subAccountSpotTransfer> {
     return subAccountSpotTransfer(this, ...args);
   }
 
@@ -1171,7 +1168,6 @@ export class ExchangeClient<
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    * @throws {TransportError} When the transport layer throws an error.
    *
-   * @see null
    * @example
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
@@ -1183,7 +1179,9 @@ export class ExchangeClient<
    * await client.subAccountTransfer({ subAccountUser: "0x...", isDeposit: true, usd: 1 * 1e6 });
    * ```
    */
-  subAccountTransfer(...args: OmitFirst<OverloadedParameters<typeof subAccountTransfer>>) {
+  subAccountTransfer(
+    ...args: OmitFirst<OverloadedParameters<typeof subAccountTransfer>>
+  ): ReturnType<typeof subAccountTransfer> {
     return subAccountTransfer(this, ...args);
   }
 
@@ -1208,7 +1206,9 @@ export class ExchangeClient<
    * await client.tokenDelegate({ validator: "0x...", isUndelegate: true, wei: 1 * 1e8 });
    * ```
    */
-  tokenDelegate(...args: OmitFirst<OverloadedParameters<typeof tokenDelegate>>) {
+  tokenDelegate(
+    ...args: OmitFirst<OverloadedParameters<typeof tokenDelegate>>
+  ): ReturnType<typeof tokenDelegate> {
     return tokenDelegate(this, ...args);
   }
 
@@ -1233,7 +1233,9 @@ export class ExchangeClient<
    * const data = await client.twapCancel({ a: 0, t: 1 });
    * ```
    */
-  twapCancel(...args: OmitFirst<OverloadedParameters<typeof twapCancel>>) {
+  twapCancel(
+    ...args: OmitFirst<OverloadedParameters<typeof twapCancel>>
+  ): ReturnType<typeof twapCancel> {
     return twapCancel(this, ...args);
   }
 
@@ -1267,7 +1269,9 @@ export class ExchangeClient<
    * });
    * ```
    */
-  twapOrder(...args: OmitFirst<OverloadedParameters<typeof twapOrder>>) {
+  twapOrder(
+    ...args: OmitFirst<OverloadedParameters<typeof twapOrder>>
+  ): ReturnType<typeof twapOrder> {
     return twapOrder(this, ...args);
   }
 
@@ -1292,7 +1296,9 @@ export class ExchangeClient<
    * await client.updateIsolatedMargin({ asset: 0, isBuy: true, ntli: 1 * 1e6 });
    * ```
    */
-  updateIsolatedMargin(...args: OmitFirst<OverloadedParameters<typeof updateIsolatedMargin>>) {
+  updateIsolatedMargin(
+    ...args: OmitFirst<OverloadedParameters<typeof updateIsolatedMargin>>
+  ): ReturnType<typeof updateIsolatedMargin> {
     return updateIsolatedMargin(this, ...args);
   }
 
@@ -1317,7 +1323,9 @@ export class ExchangeClient<
    * await client.updateLeverage({ asset: 0, isCross: true, leverage: 5 });
    * ```
    */
-  updateLeverage(...args: OmitFirst<OverloadedParameters<typeof updateLeverage>>) {
+  updateLeverage(
+    ...args: OmitFirst<OverloadedParameters<typeof updateLeverage>>
+  ): ReturnType<typeof updateLeverage> {
     return updateLeverage(this, ...args);
   }
 
@@ -1342,7 +1350,9 @@ export class ExchangeClient<
    * await client.usdClassTransfer({ amount: "1", toPerp: true });
    * ```
    */
-  usdClassTransfer(...args: OmitFirst<OverloadedParameters<typeof usdClassTransfer>>) {
+  usdClassTransfer(
+    ...args: OmitFirst<OverloadedParameters<typeof usdClassTransfer>>
+  ): ReturnType<typeof usdClassTransfer> {
     return usdClassTransfer(this, ...args);
   }
 
@@ -1367,7 +1377,9 @@ export class ExchangeClient<
    * await client.usdSend({ destination: "0x...", amount: "1" });
    * ```
    */
-  usdSend(...args: OmitFirst<OverloadedParameters<typeof usdSend>>) {
+  usdSend(
+    ...args: OmitFirst<OverloadedParameters<typeof usdSend>>
+  ): ReturnType<typeof usdSend> {
     return usdSend(this, ...args);
   }
 
@@ -1380,7 +1392,6 @@ export class ExchangeClient<
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    * @throws {TransportError} When the transport layer throws an error.
    *
-   * @see null
    * @example
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
@@ -1392,7 +1403,9 @@ export class ExchangeClient<
    * await client.userDexAbstraction({ user: "0x...", enabled: true });
    * ```
    */
-  userDexAbstraction(...args: OmitFirst<OverloadedParameters<typeof userDexAbstraction>>) {
+  userDexAbstraction(
+    ...args: OmitFirst<OverloadedParameters<typeof userDexAbstraction>>
+  ): ReturnType<typeof userDexAbstraction> {
     return userDexAbstraction(this, ...args);
   }
 
@@ -1405,7 +1418,6 @@ export class ExchangeClient<
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    * @throws {TransportError} When the transport layer throws an error.
    *
-   * @see null
    * @example
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
@@ -1417,7 +1429,9 @@ export class ExchangeClient<
    * await client.vaultDistribute({ vaultAddress: "0x...", usd: 10 * 1e6 });
    * ```
    */
-  vaultDistribute(...args: OmitFirst<OverloadedParameters<typeof vaultDistribute>>) {
+  vaultDistribute(
+    ...args: OmitFirst<OverloadedParameters<typeof vaultDistribute>>
+  ): ReturnType<typeof vaultDistribute> {
     return vaultDistribute(this, ...args);
   }
 
@@ -1430,7 +1444,6 @@ export class ExchangeClient<
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    * @throws {TransportError} When the transport layer throws an error.
    *
-   * @see null
    * @example
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
@@ -1446,7 +1459,9 @@ export class ExchangeClient<
    * });
    * ```
    */
-  vaultModify(...args: OmitFirst<OverloadedParameters<typeof vaultModify>>) {
+  vaultModify(
+    ...args: OmitFirst<OverloadedParameters<typeof vaultModify>>
+  ): ReturnType<typeof vaultModify> {
     return vaultModify(this, ...args);
   }
 
@@ -1471,7 +1486,9 @@ export class ExchangeClient<
    * await client.vaultTransfer({ vaultAddress: "0x...", isDeposit: true, usd: 10 * 1e6 });
    * ```
    */
-  vaultTransfer(...args: OmitFirst<OverloadedParameters<typeof vaultTransfer>>) {
+  vaultTransfer(
+    ...args: OmitFirst<OverloadedParameters<typeof vaultTransfer>>
+  ): ReturnType<typeof vaultTransfer> {
     return vaultTransfer(this, ...args);
   }
 
@@ -1496,7 +1513,9 @@ export class ExchangeClient<
    * await client.withdraw3({ destination: "0x...", amount: "1" });
    * ```
    */
-  withdraw3(...args: OmitFirst<OverloadedParameters<typeof withdraw3>>) {
+  withdraw3(
+    ...args: OmitFirst<OverloadedParameters<typeof withdraw3>>
+  ): ReturnType<typeof withdraw3> {
     return withdraw3(this, ...args);
   }
 }
@@ -1565,3 +1584,57 @@ export class MultiSignClient<
     });
   }
 }
+
+export type * from "./agentEnableDexAbstraction.ts";
+export type * from "./approveAgent.ts";
+export type * from "./approveBuilderFee.ts";
+export type * from "./batchModify.ts";
+export type * from "./cancel.ts";
+export type * from "./cancelByCloid.ts";
+export type * from "./cDeposit.ts";
+export type * from "./claimRewards.ts";
+export type * from "./convertToMultiSigUser.ts";
+export type * from "./createSubAccount.ts";
+export type * from "./createVault.ts";
+export type * from "./cSignerAction.ts";
+export type * from "./cValidatorAction.ts";
+export type * from "./cWithdraw.ts";
+export type * from "./evmUserModify.ts";
+export type * from "./linkStakingUser.ts";
+export type * from "./modify.ts";
+export type * from "./multiSig.ts";
+export type * from "./order.ts";
+export type * from "./noop.ts";
+export type * from "./perpDeploy.ts";
+export type * from "./registerReferrer.ts";
+export type * from "./reserveRequestWeight.ts";
+export type * from "./scheduleCancel.ts";
+export type * from "./sendAsset.ts";
+export type * from "./setDisplayName.ts";
+export type * from "./setReferrer.ts";
+export type * from "./spotDeploy.ts";
+export type * from "./spotSend.ts";
+export type * from "./spotUser.ts";
+export type * from "./subAccountModify.ts";
+export type * from "./subAccountSpotTransfer.ts";
+export type * from "./subAccountTransfer.ts";
+export type * from "./tokenDelegate.ts";
+export type * from "./twapCancel.ts";
+export type * from "./twapOrder.ts";
+export type * from "./updateIsolatedMargin.ts";
+export type * from "./updateLeverage.ts";
+export type * from "./usdClassTransfer.ts";
+export type * from "./usdSend.ts";
+export type {
+  UserDexAbstractionOptions as UserDexAbstractionExchangeOptions,
+  UserDexAbstractionParameters as UserDexAbstractionExchangeParameters,
+  UserDexAbstractionRequest as UserDexAbstractionExchangeRequest,
+  UserDexAbstractionResponse as UserDexAbstractionExchangeResponse,
+  UserDexAbstractionSuccessResponse as UserDexAbstractionExchangeSuccessResponse,
+} from "./userDexAbstraction.ts";
+export type * from "./vaultDistribute.ts";
+export type * from "./vaultModify.ts";
+export type * from "./vaultTransfer.ts";
+export type * from "./withdraw3.ts";
+
+export { ApiRequestError, type ExchangeRequestConfig, type MultiSignRequestConfig } from "./_base/mod.ts";

@@ -2,7 +2,9 @@
 import * as v from "valibot";
 import { HyperliquidError } from "../_base.ts";
 
-// -------------------- Types --------------------
+// ============================================================
+// Types
+// ============================================================
 
 export type MaybePromise<T> = T | Promise<T>;
 
@@ -34,7 +36,9 @@ export type OverloadedParameters<T> = T extends {
   : T extends (...args: infer A) => unknown ? A
   : never;
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
 
 export const UnsignedDecimal = /* @__PURE__ */ (() => {
   return v.pipe(

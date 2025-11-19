@@ -1,15 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Deposit or withdraw from a vault.
@@ -65,15 +61,40 @@ export const VaultTransferRequest = /* @__PURE__ */ (() => {
 })();
 export type VaultTransferRequest = v.InferOutput<typeof VaultTransferRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-a-vault
+ */
+export const VaultTransferResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type VaultTransferResponse = v.InferOutput<typeof VaultTransferResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode vaultTransfer} function. */
 export type VaultTransferParameters = ExtractRequestAction<v.InferInput<typeof VaultTransferRequest>>;
+
 /** Request options for the {@linkcode vaultTransfer} function. */
 export type VaultTransferOptions = ExtractRequestOptions<v.InferInput<typeof VaultTransferRequest>>;
+
+/** Successful variant of {@linkcode VaultTransferResponse} without errors. */
+export type VaultTransferSuccessResponse = ExcludeErrorResponse<VaultTransferResponse>;
 
 /**
  * Deposit or withdraw from a vault.
@@ -90,7 +111,7 @@ export type VaultTransferOptions = ExtractRequestOptions<v.InferInput<typeof Vau
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { vaultTransfer } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -105,7 +126,7 @@ export async function vaultTransfer(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<VaultTransferParameters>,
   opts?: VaultTransferOptions,
-): Promise<SuccessResponse> {
+): Promise<VaultTransferSuccessResponse> {
   const request = parser(VaultTransferRequest)({
     action: {
       type: "vaultTransfer",

@@ -1,11 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_types.ts";
-import type { Subscription } from "../../transport/base.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address } from "../_base.ts";
 import { BalanceSchema } from "../_common_schemas.ts";
-
-// -------------------- Schemas --------------------
 
 /** Subscription to spot state events for a specific user. */
 export const SpotStateRequest = /* @__PURE__ */ (() => {
@@ -53,7 +53,13 @@ export const SpotStateEvent = /* @__PURE__ */ (() => {
 })();
 export type SpotStateEvent = v.InferOutput<typeof SpotStateEvent>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
+import type { Subscription } from "../../transport/base.ts";
 
 /** Request parameters for the {@linkcode spotState} function. */
 export type SpotStateParameters = Omit<v.InferInput<typeof SpotStateRequest>, "type">;

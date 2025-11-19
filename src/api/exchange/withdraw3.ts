@@ -1,16 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeUserSignedAction,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  getSignatureChainId,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Initiate a withdrawal request.
@@ -71,15 +66,41 @@ export const Withdraw3Request = /* @__PURE__ */ (() => {
 })();
 export type Withdraw3Request = v.InferOutput<typeof Withdraw3Request>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#initiate-a-withdrawal-request
+ */
+export const Withdraw3Response = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type Withdraw3Response = v.InferOutput<typeof Withdraw3Response>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeUserSignedAction,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  getSignatureChainId,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode withdraw3} function. */
 export type Withdraw3Parameters = ExtractRequestAction<v.InferInput<typeof Withdraw3Request>>;
+
 /** Request options for the {@linkcode withdraw3} function. */
 export type Withdraw3Options = ExtractRequestOptions<v.InferInput<typeof Withdraw3Request>>;
+
+/** Successful variant of {@linkcode Withdraw3Response} without errors. */
+export type Withdraw3SuccessResponse = ExcludeErrorResponse<Withdraw3Response>;
 
 /** EIP-712 types for the {@linkcode withdraw3} function. */
 export const Withdraw3Types = {
@@ -106,7 +127,7 @@ export const Withdraw3Types = {
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { withdraw3 } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -121,7 +142,7 @@ export async function withdraw3(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<Withdraw3Parameters>,
   opts?: Withdraw3Options,
-): Promise<SuccessResponse> {
+): Promise<Withdraw3SuccessResponse> {
   const request = parser(Withdraw3Request)({
     action: {
       type: "withdraw3",

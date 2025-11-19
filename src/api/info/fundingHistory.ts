@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Decimal, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Decimal, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request funding history.
@@ -76,7 +78,12 @@ export const FundingHistoryResponse = /* @__PURE__ */ (() => {
 })();
 export type FundingHistoryResponse = v.InferOutput<typeof FundingHistoryResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode fundingHistory} function. */
 export type FundingHistoryParameters = Omit<v.InferInput<typeof FundingHistoryRequest>, "type">;

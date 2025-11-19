@@ -1,10 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address } from "../_base.ts";
 import { WebData2Event } from "../subscription/webData2.ts";
-
-// -------------------- Schemas --------------------
 
 /**
  * Request comprehensive user and market data.
@@ -41,7 +42,12 @@ export const WebData2Response = /* @__PURE__ */ (() => {
 })();
 export type WebData2Response = v.InferOutput<typeof WebData2Response>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode webData2} function. */
 export type WebData2Parameters = Omit<v.InferInput<typeof WebData2Request>, "type">;

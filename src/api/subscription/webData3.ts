@@ -1,13 +1,13 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_types.ts";
-import type { Subscription } from "../../transport/base.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 import { DetailedOrderSchema } from "../_common_schemas.ts";
 import { MetaAndAssetCtxsResponse } from "../info/metaAndAssetCtxs.ts";
 import { ClearinghouseStateResponse } from "../info/clearinghouseState.ts";
-
-// -------------------- Schemas --------------------
 
 /** Subscription to comprehensive user and market data events. */
 export const WebData3Request = /* @__PURE__ */ (() => {
@@ -136,7 +136,13 @@ export const WebData3Event = /* @__PURE__ */ (() => {
 })();
 export type WebData3Event = v.InferOutput<typeof WebData3Event>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
+import type { Subscription } from "../../transport/base.ts";
 
 /** Request parameters for the {@linkcode webData3} function. */
 export type WebData3Parameters = Omit<v.InferInput<typeof WebData3Request>, "type">;

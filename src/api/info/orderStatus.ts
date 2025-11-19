@@ -1,10 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, UnsignedInteger } from "../_base.ts";
 import { DetailedOrderSchema, OrderProcessingStatusSchema } from "../_common_schemas.ts";
-
-// -------------------- Schemas --------------------
 
 /**
  * Request order status.
@@ -82,7 +83,12 @@ export const OrderStatusResponse = /* @__PURE__ */ (() => {
 })();
 export type OrderStatusResponse = v.InferOutput<typeof OrderStatusResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode orderStatus} function. */
 export type OrderStatusParameters = Omit<v.InferInput<typeof OrderStatusRequest>, "type">;

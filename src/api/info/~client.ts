@@ -69,81 +69,6 @@ import { vaultDetails } from "./vaultDetails.ts";
 import { vaultSummaries } from "./vaultSummaries.ts";
 import { webData2 } from "./webData2.ts";
 
-export type { ActiveAssetDataParameters, ActiveAssetDataResponse } from "./activeAssetData.ts";
-export type { AlignedQuoteTokenInfoParameters, AlignedQuoteTokenInfoResponse } from "./alignedQuoteTokenInfo.ts";
-export type { AllMidsParameters, AllMidsResponse } from "./allMids.ts";
-export type { AllPerpMetasParameters, AllPerpMetasResponse } from "./allPerpMetas.ts";
-export type { BlockDetailsParameters, BlockDetailsResponse } from "./blockDetails.ts";
-export type { CandleSnapshotParameters, CandleSnapshotResponse } from "./candleSnapshot.ts";
-export type { ClearinghouseStateParameters, ClearinghouseStateResponse } from "./clearinghouseState.ts";
-export type { DelegationsParameters, DelegationsResponse } from "./delegations.ts";
-export type { DelegatorHistoryParameters, DelegatorHistoryResponse } from "./delegatorHistory.ts";
-export type { DelegatorRewardsParameters, DelegatorRewardsResponse } from "./delegatorRewards.ts";
-export type { DelegatorSummaryParameters, DelegatorSummaryResponse } from "./delegatorSummary.ts";
-export type { ExchangeStatusResponse } from "./exchangeStatus.ts";
-export type { ExtraAgentsParameters, ExtraAgentsResponse } from "./extraAgents.ts";
-export type { FrontendOpenOrdersParameters, FrontendOpenOrdersResponse } from "./frontendOpenOrders.ts";
-export type { FundingHistoryParameters, FundingHistoryResponse } from "./fundingHistory.ts";
-export type { GossipRootIpsResponse } from "./gossipRootIps.ts";
-export type { HistoricalOrdersParameters, HistoricalOrdersResponse } from "./historicalOrders.ts";
-export type { IsVipParameters, IsVipResponse } from "./isVip.ts";
-export type { L2BookParameters, L2BookResponse } from "./l2Book.ts";
-export type { LeadingVaultsParameters, LeadingVaultsResponse } from "./leadingVaults.ts";
-export type { LegalCheckParameters, LegalCheckResponse } from "./legalCheck.ts";
-export type { LiquidatableResponse } from "./liquidatable.ts";
-export type { MarginTableParameters, MarginTableResponse } from "./marginTable.ts";
-export type { MaxBuilderFeeParameters, MaxBuilderFeeResponse } from "./maxBuilderFee.ts";
-export type { MaxMarketOrderNtlsParameters, MaxMarketOrderNtlsResponse } from "./maxMarketOrderNtls.ts";
-export type { MetaParameters, MetaResponse } from "./meta.ts";
-export type { MetaAndAssetCtxsParameters, MetaAndAssetCtxsResponse } from "./metaAndAssetCtxs.ts";
-export type { OpenOrdersParameters, OpenOrdersResponse } from "./openOrders.ts";
-export type { OrderStatusParameters, OrderStatusResponse } from "./orderStatus.ts";
-export type { PerpDeployAuctionStatusResponse } from "./perpDeployAuctionStatus.ts";
-export type { PerpDexLimitsParameters, PerpDexLimitsResponse } from "./perpDexLimits.ts";
-export type { PerpDexsResponse } from "./perpDexs.ts";
-export type { PerpsAtOpenInterestCapParameters, PerpsAtOpenInterestCapResponse } from "./perpsAtOpenInterestCap.ts";
-export type { PortfolioParameters, PortfolioResponse } from "./portfolio.ts";
-export type { PredictedFundingsResponse } from "./predictedFundings.ts";
-export type { PreTransferCheckParameters, PreTransferCheckResponse } from "./preTransferCheck.ts";
-export type { RecentTradesParameters, RecentTradesResponse } from "./recentTrades.ts";
-export type { ReferralParameters, ReferralResponse } from "./referral.ts";
-export type { SpotClearinghouseStateParameters, SpotClearinghouseStateResponse } from "./spotClearinghouseState.ts";
-export type { SpotDeployStateParameters, SpotDeployStateResponse } from "./spotDeployState.ts";
-export type { SpotMetaResponse } from "./spotMeta.ts";
-export type { SpotMetaAndAssetCtxsResponse } from "./spotMetaAndAssetCtxs.ts";
-export type { SpotPairDeployAuctionStatusResponse } from "./spotPairDeployAuctionStatus.ts";
-export type { SubAccountsParameters, SubAccountsResponse } from "./subAccounts.ts";
-export type { SubAccounts2Parameters, SubAccounts2Response } from "./subAccounts2.ts";
-export type { TokenDetailsParameters, TokenDetailsResponse } from "./tokenDetails.ts";
-export type { TwapHistoryParameters, TwapHistoryResponse } from "./twapHistory.ts";
-export type { TxDetailsParameters, TxDetailsResponse } from "./txDetails.ts";
-export type { UserDetailsParameters, UserDetailsResponse } from "./userDetails.ts";
-export type { UserDexAbstractionInfoParameters, UserDexAbstractionInfoResponse } from "./userDexAbstraction.ts";
-export type { UserFeesParameters, UserFeesResponse } from "./userFees.ts";
-export type { UserFillsParameters, UserFillsResponse } from "./userFills.ts";
-export type { UserFillsByTimeParameters, UserFillsByTimeResponse } from "./userFillsByTime.ts";
-export type { UserFundingParameters, UserFundingResponse } from "./userFunding.ts";
-export type {
-  UserNonFundingLedgerUpdatesParameters,
-  UserNonFundingLedgerUpdatesResponse,
-} from "./userNonFundingLedgerUpdates.ts";
-export type { UserRateLimitParameters, UserRateLimitResponse } from "./userRateLimit.ts";
-export type { UserRoleParameters, UserRoleResponse } from "./userRole.ts";
-export type { UserToMultiSigSignersParameters, UserToMultiSigSignersResponse } from "./userToMultiSigSigners.ts";
-export type { UserTwapSliceFillsParameters, UserTwapSliceFillsResponse } from "./userTwapSliceFills.ts";
-export type {
-  UserTwapSliceFillsByTimeParameters,
-  UserTwapSliceFillsByTimeResponse,
-} from "./userTwapSliceFillsByTime.ts";
-export type { UserVaultEquitiesParameters, UserVaultEquitiesResponse } from "./userVaultEquities.ts";
-export type { ValidatorL1VotesResponse } from "./validatorL1Votes.ts";
-export type { ValidatorSummariesResponse } from "./validatorSummaries.ts";
-export type { VaultDetailsParameters, VaultDetailsResponse } from "./vaultDetails.ts";
-export type { VaultSummariesResponse } from "./vaultSummaries.ts";
-export type { WebData2Parameters, WebData2Response } from "./webData2.ts";
-
-export type { InfoRequestConfig } from "./_types.ts";
-
 /**
  * A client for interacting with the Hyperliquid Info API.
  * @typeParam T - The transport (extends {@linkcode IRequestTransport}) used to connect to the Hyperliquid API.
@@ -186,7 +111,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.activeAssetData({ user: "0x...", coin: "ETH" });
    * ```
    */
-  activeAssetData(...args: OmitFirst<OverloadedParameters<typeof activeAssetData>>) {
+  activeAssetData(
+    ...args: OmitFirst<OverloadedParameters<typeof activeAssetData>>
+  ): ReturnType<typeof activeAssetData> {
     return activeAssetData(this, ...args);
   }
 
@@ -209,7 +136,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.alignedQuoteTokenInfo({ token: 1328 });
    * ```
    */
-  alignedQuoteTokenInfo(...args: OmitFirst<OverloadedParameters<typeof alignedQuoteTokenInfo>>) {
+  alignedQuoteTokenInfo(
+    ...args: OmitFirst<OverloadedParameters<typeof alignedQuoteTokenInfo>>
+  ): ReturnType<typeof alignedQuoteTokenInfo> {
     return alignedQuoteTokenInfo(this, ...args);
   }
 
@@ -232,7 +161,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.allMids();
    * ```
    */
-  allMids(...args: OmitFirst<OverloadedParameters<typeof allMids>>) {
+  allMids(
+    ...args: OmitFirst<OverloadedParameters<typeof allMids>>
+  ): ReturnType<typeof allMids> {
     return allMids(
       this,
       // @ts-ignore: TypeScript can't resolve overloaded signatures from parameter unions
@@ -258,7 +189,7 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.allPerpMetas();
    * ```
    */
-  allPerpMetas() {
+  allPerpMetas(): ReturnType<typeof allPerpMetas> {
     return allPerpMetas(this);
   }
 
@@ -284,7 +215,7 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
   blockDetails(
     this: T extends { request(endpoint: "explorer", ...args: unknown[]): unknown } ? InfoRequestConfig<T> : never,
     ...args: OmitFirst<OverloadedParameters<typeof blockDetails>>
-  ) {
+  ): ReturnType<typeof blockDetails> {
     return blockDetails(this, ...args);
   }
 
@@ -311,7 +242,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * });
    * ```
    */
-  candleSnapshot(...args: OmitFirst<OverloadedParameters<typeof candleSnapshot>>) {
+  candleSnapshot(
+    ...args: OmitFirst<OverloadedParameters<typeof candleSnapshot>>
+  ): ReturnType<typeof candleSnapshot> {
     return candleSnapshot(this, ...args);
   }
 
@@ -334,7 +267,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.clearinghouseState({ user: "0x..." });
    * ```
    */
-  clearinghouseState(...args: OmitFirst<OverloadedParameters<typeof clearinghouseState>>) {
+  clearinghouseState(
+    ...args: OmitFirst<OverloadedParameters<typeof clearinghouseState>>
+  ): ReturnType<typeof clearinghouseState> {
     return clearinghouseState(this, ...args);
   }
 
@@ -357,7 +292,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.delegations({ user: "0x..." });
    * ```
    */
-  delegations(...args: OmitFirst<OverloadedParameters<typeof delegations>>) {
+  delegations(
+    ...args: OmitFirst<OverloadedParameters<typeof delegations>>
+  ): ReturnType<typeof delegations> {
     return delegations(this, ...args);
   }
 
@@ -380,7 +317,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.delegatorHistory({ user: "0x..." });
    * ```
    */
-  delegatorHistory(...args: OmitFirst<OverloadedParameters<typeof delegatorHistory>>) {
+  delegatorHistory(
+    ...args: OmitFirst<OverloadedParameters<typeof delegatorHistory>>
+  ): ReturnType<typeof delegatorHistory> {
     return delegatorHistory(this, ...args);
   }
 
@@ -403,7 +342,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.delegatorRewards({ user: "0x..." });
    * ```
    */
-  delegatorRewards(...args: OmitFirst<OverloadedParameters<typeof delegatorRewards>>) {
+  delegatorRewards(
+    ...args: OmitFirst<OverloadedParameters<typeof delegatorRewards>>
+  ): ReturnType<typeof delegatorRewards> {
     return delegatorRewards(this, ...args);
   }
 
@@ -426,7 +367,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.delegatorSummary({ user: "0x..." });
    * ```
    */
-  delegatorSummary(...args: OmitFirst<OverloadedParameters<typeof delegatorSummary>>) {
+  delegatorSummary(
+    ...args: OmitFirst<OverloadedParameters<typeof delegatorSummary>>
+  ): ReturnType<typeof delegatorSummary> {
     return delegatorSummary(this, ...args);
   }
 
@@ -448,7 +391,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.exchangeStatus();
    * ```
    */
-  exchangeStatus(...args: OmitFirst<OverloadedParameters<typeof exchangeStatus>>) {
+  exchangeStatus(
+    ...args: OmitFirst<OverloadedParameters<typeof exchangeStatus>>
+  ): ReturnType<typeof exchangeStatus> {
     return exchangeStatus(this, ...args);
   }
 
@@ -471,7 +416,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.extraAgents({ user: "0x..." });
    * ```
    */
-  extraAgents(...args: OmitFirst<OverloadedParameters<typeof extraAgents>>) {
+  extraAgents(
+    ...args: OmitFirst<OverloadedParameters<typeof extraAgents>>
+  ): ReturnType<typeof extraAgents> {
     return extraAgents(this, ...args);
   }
 
@@ -494,7 +441,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.frontendOpenOrders({ user: "0x..." });
    * ```
    */
-  frontendOpenOrders(...args: OmitFirst<OverloadedParameters<typeof frontendOpenOrders>>) {
+  frontendOpenOrders(
+    ...args: OmitFirst<OverloadedParameters<typeof frontendOpenOrders>>
+  ): ReturnType<typeof frontendOpenOrders> {
     return frontendOpenOrders(this, ...args);
   }
 
@@ -520,7 +469,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * });
    * ```
    */
-  fundingHistory(...args: OmitFirst<OverloadedParameters<typeof fundingHistory>>) {
+  fundingHistory(
+    ...args: OmitFirst<OverloadedParameters<typeof fundingHistory>>
+  ): ReturnType<typeof fundingHistory> {
     return fundingHistory(this, ...args);
   }
 
@@ -542,7 +493,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.gossipRootIps();
    * ```
    */
-  gossipRootIps(...args: OmitFirst<OverloadedParameters<typeof gossipRootIps>>) {
+  gossipRootIps(
+    ...args: OmitFirst<OverloadedParameters<typeof gossipRootIps>>
+  ): ReturnType<typeof gossipRootIps> {
     return gossipRootIps(this, ...args);
   }
 
@@ -565,7 +518,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.historicalOrders({ user: "0x..." });
    * ```
    */
-  historicalOrders(...args: OmitFirst<OverloadedParameters<typeof historicalOrders>>) {
+  historicalOrders(
+    ...args: OmitFirst<OverloadedParameters<typeof historicalOrders>>
+  ): ReturnType<typeof historicalOrders> {
     return historicalOrders(this, ...args);
   }
 
@@ -588,7 +543,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.isVip({ user: "0x..." });
    * ```
    */
-  isVip(...args: OmitFirst<OverloadedParameters<typeof isVip>>) {
+  isVip(
+    ...args: OmitFirst<OverloadedParameters<typeof isVip>>
+  ): ReturnType<typeof isVip> {
     return isVip(this, ...args);
   }
 
@@ -611,7 +568,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.l2Book({ coin: "ETH", nSigFigs: 2 });
    * ```
    */
-  l2Book(...args: OmitFirst<OverloadedParameters<typeof l2Book>>) {
+  l2Book(
+    ...args: OmitFirst<OverloadedParameters<typeof l2Book>>
+  ): ReturnType<typeof l2Book> {
     return l2Book(this, ...args);
   }
 
@@ -634,7 +593,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.leadingVaults({ user: "0x..." });
    * ```
    */
-  leadingVaults(...args: OmitFirst<OverloadedParameters<typeof leadingVaults>>) {
+  leadingVaults(
+    ...args: OmitFirst<OverloadedParameters<typeof leadingVaults>>
+  ): ReturnType<typeof leadingVaults> {
     return leadingVaults(this, ...args);
   }
 
@@ -657,7 +618,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.legalCheck({ user: "0x..." });
    * ```
    */
-  legalCheck(...args: OmitFirst<OverloadedParameters<typeof legalCheck>>) {
+  legalCheck(
+    ...args: OmitFirst<OverloadedParameters<typeof legalCheck>>
+  ): ReturnType<typeof legalCheck> {
     return legalCheck(this, ...args);
   }
 
@@ -679,7 +642,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.liquidatable();
    * ```
    */
-  liquidatable(...args: OmitFirst<OverloadedParameters<typeof liquidatable>>) {
+  liquidatable(
+    ...args: OmitFirst<OverloadedParameters<typeof liquidatable>>
+  ): ReturnType<typeof liquidatable> {
     return liquidatable(this, ...args);
   }
 
@@ -702,7 +667,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.marginTable({ id: 1 });
    * ```
    */
-  marginTable(...args: OmitFirst<OverloadedParameters<typeof marginTable>>) {
+  marginTable(
+    ...args: OmitFirst<OverloadedParameters<typeof marginTable>>
+  ): ReturnType<typeof marginTable> {
     return marginTable(this, ...args);
   }
 
@@ -725,7 +692,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.maxBuilderFee({ user: "0x...", builder: "0x..." });
    * ```
    */
-  maxBuilderFee(...args: OmitFirst<OverloadedParameters<typeof maxBuilderFee>>) {
+  maxBuilderFee(
+    ...args: OmitFirst<OverloadedParameters<typeof maxBuilderFee>>
+  ): ReturnType<typeof maxBuilderFee> {
     return maxBuilderFee(this, ...args);
   }
 
@@ -747,7 +716,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.maxMarketOrderNtls();
    * ```
    */
-  maxMarketOrderNtls(...args: OmitFirst<OverloadedParameters<typeof maxMarketOrderNtls>>) {
+  maxMarketOrderNtls(
+    ...args: OmitFirst<OverloadedParameters<typeof maxMarketOrderNtls>>
+  ): ReturnType<typeof maxMarketOrderNtls> {
     return maxMarketOrderNtls(this, ...args);
   }
 
@@ -770,7 +741,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.meta();
    * ```
    */
-  meta(...args: OmitFirst<OverloadedParameters<typeof meta>>) {
+  meta(
+    ...args: OmitFirst<OverloadedParameters<typeof meta>>
+  ): ReturnType<typeof meta> {
     return meta(
       this,
       // @ts-ignore: TypeScript can't resolve overloaded signatures from parameter unions
@@ -796,7 +769,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.metaAndAssetCtxs();
    * ```
    */
-  metaAndAssetCtxs(...args: OmitFirst<OverloadedParameters<typeof metaAndAssetCtxs>>) {
+  metaAndAssetCtxs(
+    ...args: OmitFirst<OverloadedParameters<typeof metaAndAssetCtxs>>
+  ): ReturnType<typeof metaAndAssetCtxs> {
     return metaAndAssetCtxs(
       this,
       // @ts-ignore: TypeScript can't resolve overloaded signatures from parameter unions
@@ -823,7 +798,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.openOrders({ user: "0x..." });
    * ```
    */
-  openOrders(...args: OmitFirst<OverloadedParameters<typeof openOrders>>) {
+  openOrders(
+    ...args: OmitFirst<OverloadedParameters<typeof openOrders>>
+  ): ReturnType<typeof openOrders> {
     return openOrders(this, ...args);
   }
 
@@ -846,7 +823,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.orderStatus({ user: "0x...", oid: 12345 });
    * ```
    */
-  orderStatus(...args: OmitFirst<OverloadedParameters<typeof orderStatus>>) {
+  orderStatus(
+    ...args: OmitFirst<OverloadedParameters<typeof orderStatus>>
+  ): ReturnType<typeof orderStatus> {
     return orderStatus(this, ...args);
   }
 
@@ -868,7 +847,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.perpDeployAuctionStatus();
    * ```
    */
-  perpDeployAuctionStatus(...args: OmitFirst<OverloadedParameters<typeof perpDeployAuctionStatus>>) {
+  perpDeployAuctionStatus(
+    ...args: OmitFirst<OverloadedParameters<typeof perpDeployAuctionStatus>>
+  ): ReturnType<typeof perpDeployAuctionStatus> {
     return perpDeployAuctionStatus(this, ...args);
   }
 
@@ -891,7 +872,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.perpDexLimits({ dex: "test" });
    * ```
    */
-  perpDexLimits(...args: OmitFirst<OverloadedParameters<typeof perpDexLimits>>) {
+  perpDexLimits(
+    ...args: OmitFirst<OverloadedParameters<typeof perpDexLimits>>
+  ): ReturnType<typeof perpDexLimits> {
     return perpDexLimits(this, ...args);
   }
 
@@ -913,7 +896,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.perpDexs();
    * ```
    */
-  perpDexs(...args: OmitFirst<OverloadedParameters<typeof perpDexs>>) {
+  perpDexs(
+    ...args: OmitFirst<OverloadedParameters<typeof perpDexs>>
+  ): ReturnType<typeof perpDexs> {
     return perpDexs(this, ...args);
   }
 
@@ -936,7 +921,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.perpsAtOpenInterestCap();
    * ```
    */
-  perpsAtOpenInterestCap(...args: OmitFirst<OverloadedParameters<typeof perpsAtOpenInterestCap>>) {
+  perpsAtOpenInterestCap(
+    ...args: OmitFirst<OverloadedParameters<typeof perpsAtOpenInterestCap>>
+  ): ReturnType<typeof perpsAtOpenInterestCap> {
     return perpsAtOpenInterestCap(
       this,
       // @ts-ignore: TypeScript can't resolve overloaded signatures from parameter unions
@@ -963,7 +950,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.portfolio({ user: "0x..." });
    * ```
    */
-  portfolio(...args: OmitFirst<OverloadedParameters<typeof portfolio>>) {
+  portfolio(
+    ...args: OmitFirst<OverloadedParameters<typeof portfolio>>
+  ): ReturnType<typeof portfolio> {
     return portfolio(this, ...args);
   }
 
@@ -985,7 +974,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.predictedFundings();
    * ```
    */
-  predictedFundings(...args: OmitFirst<OverloadedParameters<typeof predictedFundings>>) {
+  predictedFundings(
+    ...args: OmitFirst<OverloadedParameters<typeof predictedFundings>>
+  ): ReturnType<typeof predictedFundings> {
     return predictedFundings(this, ...args);
   }
 
@@ -1008,7 +999,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.preTransferCheck({ user: "0x...", source: "0x..." });
    * ```
    */
-  preTransferCheck(...args: OmitFirst<OverloadedParameters<typeof preTransferCheck>>) {
+  preTransferCheck(
+    ...args: OmitFirst<OverloadedParameters<typeof preTransferCheck>>
+  ): ReturnType<typeof preTransferCheck> {
     return preTransferCheck(this, ...args);
   }
 
@@ -1031,7 +1024,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.recentTrades({ coin: "ETH" });
    * ```
    */
-  recentTrades(...args: OmitFirst<OverloadedParameters<typeof recentTrades>>) {
+  recentTrades(
+    ...args: OmitFirst<OverloadedParameters<typeof recentTrades>>
+  ): ReturnType<typeof recentTrades> {
     return recentTrades(this, ...args);
   }
 
@@ -1054,7 +1049,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.referral({ user: "0x..." });
    * ```
    */
-  referral(...args: OmitFirst<OverloadedParameters<typeof referral>>) {
+  referral(
+    ...args: OmitFirst<OverloadedParameters<typeof referral>>
+  ): ReturnType<typeof referral> {
     return referral(this, ...args);
   }
 
@@ -1077,7 +1074,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.spotClearinghouseState({ user: "0x..." });
    * ```
    */
-  spotClearinghouseState(...args: OmitFirst<OverloadedParameters<typeof spotClearinghouseState>>) {
+  spotClearinghouseState(
+    ...args: OmitFirst<OverloadedParameters<typeof spotClearinghouseState>>
+  ): ReturnType<typeof spotClearinghouseState> {
     return spotClearinghouseState(this, ...args);
   }
 
@@ -1100,7 +1099,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.spotDeployState({ user: "0x..." });
    * ```
    */
-  spotDeployState(...args: OmitFirst<OverloadedParameters<typeof spotDeployState>>) {
+  spotDeployState(
+    ...args: OmitFirst<OverloadedParameters<typeof spotDeployState>>
+  ): ReturnType<typeof spotDeployState> {
     return spotDeployState(this, ...args);
   }
 
@@ -1122,7 +1123,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.spotMeta();
    * ```
    */
-  spotMeta(...args: OmitFirst<OverloadedParameters<typeof spotMeta>>) {
+  spotMeta(
+    ...args: OmitFirst<OverloadedParameters<typeof spotMeta>>
+  ): ReturnType<typeof spotMeta> {
     return spotMeta(this, ...args);
   }
 
@@ -1144,7 +1147,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.spotMetaAndAssetCtxs();
    * ```
    */
-  spotMetaAndAssetCtxs(...args: OmitFirst<OverloadedParameters<typeof spotMetaAndAssetCtxs>>) {
+  spotMetaAndAssetCtxs(
+    ...args: OmitFirst<OverloadedParameters<typeof spotMetaAndAssetCtxs>>
+  ): ReturnType<typeof spotMetaAndAssetCtxs> {
     return spotMetaAndAssetCtxs(this, ...args);
   }
 
@@ -1166,7 +1171,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.spotPairDeployAuctionStatus();
    * ```
    */
-  spotPairDeployAuctionStatus(...args: OmitFirst<OverloadedParameters<typeof spotPairDeployAuctionStatus>>) {
+  spotPairDeployAuctionStatus(
+    ...args: OmitFirst<OverloadedParameters<typeof spotPairDeployAuctionStatus>>
+  ): ReturnType<typeof spotPairDeployAuctionStatus> {
     return spotPairDeployAuctionStatus(this, ...args);
   }
 
@@ -1189,7 +1196,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.subAccounts({ user: "0x..." });
    * ```
    */
-  subAccounts(...args: OmitFirst<OverloadedParameters<typeof subAccounts>>) {
+  subAccounts(
+    ...args: OmitFirst<OverloadedParameters<typeof subAccounts>>
+  ): ReturnType<typeof subAccounts> {
     return subAccounts(this, ...args);
   }
 
@@ -1212,7 +1221,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.subAccounts2({ user: "0x..." });
    * ```
    */
-  subAccounts2(...args: OmitFirst<OverloadedParameters<typeof subAccounts2>>) {
+  subAccounts2(
+    ...args: OmitFirst<OverloadedParameters<typeof subAccounts2>>
+  ): ReturnType<typeof subAccounts2> {
     return subAccounts2(this, ...args);
   }
 
@@ -1235,7 +1246,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.tokenDetails({ tokenId: "0x..." });
    * ```
    */
-  tokenDetails(...args: OmitFirst<OverloadedParameters<typeof tokenDetails>>) {
+  tokenDetails(
+    ...args: OmitFirst<OverloadedParameters<typeof tokenDetails>>
+  ): ReturnType<typeof tokenDetails> {
     return tokenDetails(this, ...args);
   }
 
@@ -1258,7 +1271,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.twapHistory({ user: "0x..." });
    * ```
    */
-  twapHistory(...args: OmitFirst<OverloadedParameters<typeof twapHistory>>) {
+  twapHistory(
+    ...args: OmitFirst<OverloadedParameters<typeof twapHistory>>
+  ): ReturnType<typeof twapHistory> {
     return twapHistory(this, ...args);
   }
 
@@ -1284,7 +1299,7 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
   txDetails(
     this: T extends { request(endpoint: "explorer", ...args: unknown[]): unknown } ? InfoRequestConfig<T> : never,
     ...args: OmitFirst<OverloadedParameters<typeof txDetails>>
-  ) {
+  ): ReturnType<typeof txDetails> {
     return txDetails(this, ...args);
   }
 
@@ -1310,7 +1325,7 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
   userDetails(
     this: T extends { request(endpoint: "explorer", ...args: unknown[]): unknown } ? InfoRequestConfig<T> : never,
     ...args: OmitFirst<OverloadedParameters<typeof userDetails>>
-  ) {
+  ): ReturnType<typeof userDetails> {
     return userDetails(this, ...args);
   }
 
@@ -1333,7 +1348,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.userDexAbstraction({ user: "0x..." });
    * ```
    */
-  userDexAbstraction(...args: OmitFirst<OverloadedParameters<typeof userDexAbstraction>>) {
+  userDexAbstraction(
+    ...args: OmitFirst<OverloadedParameters<typeof userDexAbstraction>>
+  ): ReturnType<typeof userDexAbstraction> {
     return userDexAbstraction(this, ...args);
   }
 
@@ -1356,7 +1373,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.userFees({ user: "0x..." });
    * ```
    */
-  userFees(...args: OmitFirst<OverloadedParameters<typeof userFees>>) {
+  userFees(
+    ...args: OmitFirst<OverloadedParameters<typeof userFees>>
+  ): ReturnType<typeof userFees> {
     return userFees(this, ...args);
   }
 
@@ -1379,7 +1398,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.userFills({ user: "0x..." });
    * ```
    */
-  userFills(...args: OmitFirst<OverloadedParameters<typeof userFills>>) {
+  userFills(
+    ...args: OmitFirst<OverloadedParameters<typeof userFills>>
+  ): ReturnType<typeof userFills> {
     return userFills(this, ...args);
   }
 
@@ -1405,7 +1426,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * });
    * ```
    */
-  userFillsByTime(...args: OmitFirst<OverloadedParameters<typeof userFillsByTime>>) {
+  userFillsByTime(
+    ...args: OmitFirst<OverloadedParameters<typeof userFillsByTime>>
+  ): ReturnType<typeof userFillsByTime> {
     return userFillsByTime(this, ...args);
   }
 
@@ -1431,7 +1454,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * });
    * ```
    */
-  userFunding(...args: OmitFirst<OverloadedParameters<typeof userFunding>>) {
+  userFunding(
+    ...args: OmitFirst<OverloadedParameters<typeof userFunding>>
+  ): ReturnType<typeof userFunding> {
     return userFunding(this, ...args);
   }
 
@@ -1457,7 +1482,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * });
    * ```
    */
-  userNonFundingLedgerUpdates(...args: OmitFirst<OverloadedParameters<typeof userNonFundingLedgerUpdates>>) {
+  userNonFundingLedgerUpdates(
+    ...args: OmitFirst<OverloadedParameters<typeof userNonFundingLedgerUpdates>>
+  ): ReturnType<typeof userNonFundingLedgerUpdates> {
     return userNonFundingLedgerUpdates(this, ...args);
   }
 
@@ -1480,7 +1507,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.userRateLimit({ user: "0x..." });
    * ```
    */
-  userRateLimit(...args: OmitFirst<OverloadedParameters<typeof userRateLimit>>) {
+  userRateLimit(
+    ...args: OmitFirst<OverloadedParameters<typeof userRateLimit>>
+  ): ReturnType<typeof userRateLimit> {
     return userRateLimit(this, ...args);
   }
 
@@ -1503,7 +1532,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.userRole({ user: "0x..." });
    * ```
    */
-  userRole(...args: OmitFirst<OverloadedParameters<typeof userRole>>) {
+  userRole(
+    ...args: OmitFirst<OverloadedParameters<typeof userRole>>
+  ): ReturnType<typeof userRole> {
     return userRole(this, ...args);
   }
 
@@ -1526,7 +1557,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.userToMultiSigSigners({ user: "0x..." });
    * ```
    */
-  userToMultiSigSigners(...args: OmitFirst<OverloadedParameters<typeof userToMultiSigSigners>>) {
+  userToMultiSigSigners(
+    ...args: OmitFirst<OverloadedParameters<typeof userToMultiSigSigners>>
+  ): ReturnType<typeof userToMultiSigSigners> {
     return userToMultiSigSigners(this, ...args);
   }
 
@@ -1549,7 +1582,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.userTwapSliceFills({ user: "0x..." });
    * ```
    */
-  userTwapSliceFills(...args: OmitFirst<OverloadedParameters<typeof userTwapSliceFills>>) {
+  userTwapSliceFills(
+    ...args: OmitFirst<OverloadedParameters<typeof userTwapSliceFills>>
+  ): ReturnType<typeof userTwapSliceFills> {
     return userTwapSliceFills(this, ...args);
   }
 
@@ -1575,7 +1610,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * });
    * ```
    */
-  userTwapSliceFillsByTime(...args: OmitFirst<OverloadedParameters<typeof userTwapSliceFillsByTime>>) {
+  userTwapSliceFillsByTime(
+    ...args: OmitFirst<OverloadedParameters<typeof userTwapSliceFillsByTime>>
+  ): ReturnType<typeof userTwapSliceFillsByTime> {
     return userTwapSliceFillsByTime(this, ...args);
   }
 
@@ -1598,7 +1635,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.userVaultEquities({ user: "0x..." });
    * ```
    */
-  userVaultEquities(...args: OmitFirst<OverloadedParameters<typeof userVaultEquities>>) {
+  userVaultEquities(
+    ...args: OmitFirst<OverloadedParameters<typeof userVaultEquities>>
+  ): ReturnType<typeof userVaultEquities> {
     return userVaultEquities(this, ...args);
   }
 
@@ -1620,7 +1659,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.validatorL1Votes();
    * ```
    */
-  validatorL1Votes(...args: OmitFirst<OverloadedParameters<typeof validatorL1Votes>>) {
+  validatorL1Votes(
+    ...args: OmitFirst<OverloadedParameters<typeof validatorL1Votes>>
+  ): ReturnType<typeof validatorL1Votes> {
     return validatorL1Votes(this, ...args);
   }
 
@@ -1642,7 +1683,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.validatorSummaries();
    * ```
    */
-  validatorSummaries(...args: OmitFirst<OverloadedParameters<typeof validatorSummaries>>) {
+  validatorSummaries(
+    ...args: OmitFirst<OverloadedParameters<typeof validatorSummaries>>
+  ): ReturnType<typeof validatorSummaries> {
     return validatorSummaries(this, ...args);
   }
 
@@ -1665,7 +1708,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.vaultDetails({ vaultAddress: "0x..." });
    * ```
    */
-  vaultDetails(...args: OmitFirst<OverloadedParameters<typeof vaultDetails>>) {
+  vaultDetails(
+    ...args: OmitFirst<OverloadedParameters<typeof vaultDetails>>
+  ): ReturnType<typeof vaultDetails> {
     return vaultDetails(this, ...args);
   }
 
@@ -1687,7 +1732,9 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.vaultSummaries();
    * ```
    */
-  vaultSummaries(...args: OmitFirst<OverloadedParameters<typeof vaultSummaries>>) {
+  vaultSummaries(
+    ...args: OmitFirst<OverloadedParameters<typeof vaultSummaries>>
+  ): ReturnType<typeof vaultSummaries> {
     return vaultSummaries(this, ...args);
   }
 
@@ -1710,7 +1757,82 @@ export class InfoClient<T extends IRequestTransport = IRequestTransport> impleme
    * const data = await client.webData2({ user: "0x..." });
    * ```
    */
-  webData2(...args: OmitFirst<OverloadedParameters<typeof webData2>>) {
+  webData2(
+    ...args: OmitFirst<OverloadedParameters<typeof webData2>>
+  ): ReturnType<typeof webData2> {
     return webData2(this, ...args);
   }
 }
+
+export type * from "./activeAssetData.ts";
+export type * from "./alignedQuoteTokenInfo.ts";
+export type * from "./allMids.ts";
+export type * from "./allPerpMetas.ts";
+export type * from "./blockDetails.ts";
+export type * from "./candleSnapshot.ts";
+export type * from "./clearinghouseState.ts";
+export type * from "./delegations.ts";
+export type * from "./delegatorHistory.ts";
+export type * from "./delegatorRewards.ts";
+export type * from "./delegatorSummary.ts";
+export type * from "./exchangeStatus.ts";
+export type * from "./extraAgents.ts";
+export type * from "./frontendOpenOrders.ts";
+export type * from "./fundingHistory.ts";
+export type * from "./gossipRootIps.ts";
+export type * from "./historicalOrders.ts";
+export type * from "./isVip.ts";
+export type * from "./l2Book.ts";
+export type * from "./leadingVaults.ts";
+export type * from "./legalCheck.ts";
+export type * from "./liquidatable.ts";
+export type * from "./marginTable.ts";
+export type * from "./maxBuilderFee.ts";
+export type * from "./maxMarketOrderNtls.ts";
+export type * from "./meta.ts";
+export type * from "./metaAndAssetCtxs.ts";
+export type * from "./openOrders.ts";
+export type * from "./orderStatus.ts";
+export type * from "./perpDeployAuctionStatus.ts";
+export type * from "./perpDexLimits.ts";
+export type * from "./perpDexs.ts";
+export type * from "./perpsAtOpenInterestCap.ts";
+export type * from "./portfolio.ts";
+export type * from "./predictedFundings.ts";
+export type * from "./preTransferCheck.ts";
+export type * from "./recentTrades.ts";
+export type * from "./referral.ts";
+export type * from "./spotClearinghouseState.ts";
+export type * from "./spotDeployState.ts";
+export type * from "./spotMeta.ts";
+export type * from "./spotMetaAndAssetCtxs.ts";
+export type * from "./spotPairDeployAuctionStatus.ts";
+export type * from "./subAccounts.ts";
+export type * from "./subAccounts2.ts";
+export type * from "./tokenDetails.ts";
+export type * from "./twapHistory.ts";
+export type * from "./txDetails.ts";
+export type * from "./userDetails.ts";
+export type {
+  UserDexAbstractionParameters as UserDexAbstractionInfoParameters,
+  UserDexAbstractionRequest as UserDexAbstractionInfoRequest,
+  UserDexAbstractionResponse as UserDexAbstractionInfoResponse,
+} from "./userDexAbstraction.ts";
+export type * from "./userFees.ts";
+export type * from "./userFills.ts";
+export type * from "./userFillsByTime.ts";
+export type * from "./userFunding.ts";
+export type * from "./userNonFundingLedgerUpdates.ts";
+export type * from "./userRateLimit.ts";
+export type * from "./userRole.ts";
+export type * from "./userToMultiSigSigners.ts";
+export type * from "./userTwapSliceFills.ts";
+export type * from "./userTwapSliceFillsByTime.ts";
+export type * from "./userVaultEquities.ts";
+export type * from "./validatorL1Votes.ts";
+export type * from "./validatorSummaries.ts";
+export type * from "./vaultDetails.ts";
+export type * from "./vaultSummaries.ts";
+export type * from "./webData2.ts";
+
+export type { InfoRequestConfig } from "./_types.ts";

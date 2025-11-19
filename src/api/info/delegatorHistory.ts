@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request user staking history.
@@ -116,7 +118,12 @@ export const DelegatorHistoryResponse = /* @__PURE__ */ (() => {
 })();
 export type DelegatorHistoryResponse = v.InferOutput<typeof DelegatorHistoryResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode delegatorHistory} function. */
 export type DelegatorHistoryParameters = Omit<v.InferInput<typeof DelegatorHistoryRequest>, "type">;

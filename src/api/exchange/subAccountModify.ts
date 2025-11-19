@@ -1,20 +1,13 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
 
-/**
- * Modify a sub-account's.
- * @see null
- */
+import { Address, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
+
+/** Modify a sub-account's. */
 export const SubAccountModifyRequest = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
@@ -61,15 +54,37 @@ export const SubAccountModifyRequest = /* @__PURE__ */ (() => {
 })();
 export type SubAccountModifyRequest = v.InferOutput<typeof SubAccountModifyRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/** Successful response without specific data or error response. */
+export const SubAccountModifyResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type SubAccountModifyResponse = v.InferOutput<typeof SubAccountModifyResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode subAccountModify} function. */
 export type SubAccountModifyParameters = ExtractRequestAction<v.InferInput<typeof SubAccountModifyRequest>>;
+
 /** Request options for the {@linkcode subAccountModify} function. */
 export type SubAccountModifyOptions = ExtractRequestOptions<v.InferInput<typeof SubAccountModifyRequest>>;
+
+/** Successful variant of {@linkcode SubAccountModifyResponse} without errors. */
+export type SubAccountModifySuccessResponse = ExcludeErrorResponse<SubAccountModifyResponse>;
 
 /**
  * Modify a sub-account's.
@@ -81,12 +96,11 @@ export type SubAccountModifyOptions = ExtractRequestOptions<v.InferInput<typeof 
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  * @throws {TransportError} When the transport layer throws an error.
  *
- * @see null
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { subAccountModify } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -101,7 +115,7 @@ export async function subAccountModify(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<SubAccountModifyParameters>,
   opts?: SubAccountModifyOptions,
-): Promise<SuccessResponse> {
+): Promise<SubAccountModifySuccessResponse> {
   const request = parser(SubAccountModifyRequest)({
     action: {
       type: "subAccountModify",

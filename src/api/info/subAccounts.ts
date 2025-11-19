@@ -1,11 +1,12 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address } from "../_base.ts";
 import { ClearinghouseStateResponse } from "./clearinghouseState.ts";
 import { SpotClearinghouseStateResponse } from "./spotClearinghouseState.ts";
-
-// -------------------- Schemas --------------------
 
 /**
  * Request user sub-accounts.
@@ -71,7 +72,12 @@ export const SubAccountsResponse = /* @__PURE__ */ (() => {
 })();
 export type SubAccountsResponse = v.InferOutput<typeof SubAccountsResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode subAccounts} function. */
 export type SubAccountsParameters = Omit<v.InferInput<typeof SubAccountsRequest>, "type">;

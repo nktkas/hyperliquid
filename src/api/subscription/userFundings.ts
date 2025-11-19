@@ -1,9 +1,10 @@
 import * as v from "valibot";
-import { Address, Decimal, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_types.ts";
-import type { Subscription } from "../../transport/base.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Decimal, UnsignedInteger } from "../_base.ts";
 
 /** Subscription to user funding events for a specific user. */
 export const UserFundingsRequest = /* @__PURE__ */ (() => {
@@ -87,7 +88,13 @@ export const UserFundingsEvent = /* @__PURE__ */ (() => {
 })();
 export type UserFundingsEvent = v.InferOutput<typeof UserFundingsEvent>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
+import type { Subscription } from "../../transport/base.ts";
 
 /** Request parameters for the {@linkcode userFundings} function. */
 export type UserFundingsParameters = Omit<v.InferInput<typeof UserFundingsRequest>, "type">;

@@ -1,15 +1,11 @@
 import * as v from "valibot";
-import { type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Reserve additional rate-limited actions for a fee.
@@ -55,15 +51,40 @@ export const ReserveRequestWeightRequest = /* @__PURE__ */ (() => {
 })();
 export type ReserveRequestWeightRequest = v.InferOutput<typeof ReserveRequestWeightRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#reserve-additional-actions
+ */
+export const ReserveRequestWeightResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type ReserveRequestWeightResponse = v.InferOutput<typeof ReserveRequestWeightResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode reserveRequestWeight} function. */
 export type ReserveRequestWeightParameters = ExtractRequestAction<v.InferInput<typeof ReserveRequestWeightRequest>>;
+
 /** Request options for the {@linkcode reserveRequestWeight} function. */
 export type ReserveRequestWeightOptions = ExtractRequestOptions<v.InferInput<typeof ReserveRequestWeightRequest>>;
+
+/** Successful variant of {@linkcode ReserveRequestWeightResponse} without errors. */
+export type ReserveRequestWeightSuccessResponse = ExcludeErrorResponse<ReserveRequestWeightResponse>;
 
 /**
  * Reserve additional rate-limited actions for a fee.
@@ -80,7 +101,7 @@ export type ReserveRequestWeightOptions = ExtractRequestOptions<v.InferInput<typ
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { reserveRequestWeight } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -95,7 +116,7 @@ export async function reserveRequestWeight(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<ReserveRequestWeightParameters>,
   opts?: ReserveRequestWeightOptions,
-): Promise<SuccessResponse> {
+): Promise<ReserveRequestWeightSuccessResponse> {
   const request = parser(ReserveRequestWeightRequest)({
     action: {
       type: "reserveRequestWeight",

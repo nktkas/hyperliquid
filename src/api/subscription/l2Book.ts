@@ -1,11 +1,11 @@
 import * as v from "valibot";
-import { type DeepImmutable, Integer, parser, UnsignedInteger } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_types.ts";
-import type { Subscription } from "../../transport/base.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Integer, UnsignedInteger } from "../_base.ts";
 import { L2BookLevelSchema } from "../_common_schemas.ts";
-
-// -------------------- Schemas --------------------
 
 /** Subscription to L2 order book events for a specific asset. */
 export const L2BookRequest = /* @__PURE__ */ (() => {
@@ -72,7 +72,13 @@ export const L2BookEvent = /* @__PURE__ */ (() => {
 })();
 export type L2BookEvent = v.InferOutput<typeof L2BookEvent>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
+import type { Subscription } from "../../transport/base.ts";
 
 /** Request parameters for the {@linkcode l2Book} function. */
 export type L2BookParameters = Omit<v.InferInput<typeof L2BookRequest>, "type">;

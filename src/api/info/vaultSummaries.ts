@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request a list of vaults less than 2 hours old.
@@ -102,7 +104,12 @@ export const VaultSummariesResponse = /* @__PURE__ */ (() => {
 })();
 export type VaultSummariesResponse = v.InferOutput<typeof VaultSummariesResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /**
  * Request a list of vaults less than 2 hours old.

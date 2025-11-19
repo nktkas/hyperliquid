@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address } from "../_base.ts";
 
 /**
  * Request user role.
@@ -83,7 +85,12 @@ export const UserRoleResponse = /* @__PURE__ */ (() => {
 })();
 export type UserRoleResponse = v.InferOutput<typeof UserRoleResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode userRole} function. */
 export type UserRoleParameters = Omit<v.InferInput<typeof UserRoleRequest>, "type">;

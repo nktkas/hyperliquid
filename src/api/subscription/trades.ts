@@ -1,11 +1,10 @@
 import * as v from "valibot";
-import { type DeepImmutable, parser } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_types.ts";
-import type { Subscription } from "../../transport/base.ts";
+
+// ============================================================
+// API Schemas
+// ============================================================
 
 import { RecentTradesResponse } from "../info/recentTrades.ts";
-
-// -------------------- Schemas --------------------
 
 /** Subscription to trade events for a specific asset. */
 export const TradesRequest = /* @__PURE__ */ (() => {
@@ -33,7 +32,13 @@ export const TradesEvent = /* @__PURE__ */ (() => {
 })();
 export type TradesEvent = v.InferOutput<typeof TradesEvent>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
+import type { Subscription } from "../../transport/base.ts";
 
 /** Request parameters for the {@linkcode trades} function. */
 export type TradesParameters = Omit<v.InferInput<typeof TradesRequest>, "type">;

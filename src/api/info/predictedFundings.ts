@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Decimal, parser, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Decimal, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request predicted funding rates.
@@ -86,7 +88,12 @@ export const PredictedFundingsResponse = /* @__PURE__ */ (() => {
 })();
 export type PredictedFundingsResponse = v.InferOutput<typeof PredictedFundingsResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /**
  * Request predicted funding rates.

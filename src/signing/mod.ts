@@ -5,7 +5,7 @@
  * ```ts
  * import { signL1Action } from "@nktkas/hyperliquid/signing";
  * import { CancelRequest, parser } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  *
@@ -32,7 +32,7 @@
  * ```ts
  * import { signUserSignedAction } from "@nktkas/hyperliquid/signing";
  * import { ApproveAgentRequest, ApproveAgentTypes, parser } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  *
@@ -60,7 +60,7 @@
  * ```ts
  * import { signL1Action, signMultiSigAction } from "@nktkas/hyperliquid/signing";
  * import { MultiSigRequest, parser, ScheduleCancelRequest } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const multiSigUser = "0x...";
@@ -203,7 +203,7 @@ function toUint64Bytes(n: bigint | number | string): Uint8Array {
  * ```ts
  * import { signL1Action } from "@nktkas/hyperliquid/signing";
  * import { CancelRequest, parser } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  *
@@ -280,7 +280,7 @@ export async function signL1Action(args: {
  * ```ts
  * import { signUserSignedAction } from "@nktkas/hyperliquid/signing";
  * import { ApproveAgentRequest, ApproveAgentTypes, parser } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  *
@@ -361,7 +361,7 @@ export async function signUserSignedAction(args: {
  * ```ts
  * import { signL1Action, signMultiSigAction } from "@nktkas/hyperliquid/signing";
  * import { MultiSigRequest, parser, ScheduleCancelRequest } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const multiSigUser = "0x...";

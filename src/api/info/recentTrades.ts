@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request recent trades.
@@ -86,7 +88,12 @@ export const RecentTradesResponse = /* @__PURE__ */ (() => {
 })();
 export type RecentTradesResponse = v.InferOutput<typeof RecentTradesResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode recentTrades} function. */
 export type RecentTradesParameters = Omit<v.InferInput<typeof RecentTradesRequest>, "type">;

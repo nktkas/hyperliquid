@@ -1,6 +1,6 @@
-import { OrderRequest, OrderSuccessResponse, parser } from "../../../src/api/exchange/~mod.ts";
+import { OrderRequest, OrderResponse, parser } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { allMids, randomCloid, runTest, symbolConverter, topUpPerp } from "./_t.ts";
+import { allMids, excludeErrorResponse, randomCloid, runTest, symbolConverter, topUpPerp } from "./_t.ts";
 import { formatPrice, formatSize } from "../../../src/utils/mod.ts";
 
 runTest({
@@ -72,7 +72,7 @@ runTest({
         grouping: "na",
       }),
     ]);
-    schemaCoverage(OrderSuccessResponse, data);
+    schemaCoverage(excludeErrorResponse(OrderResponse), data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

@@ -1,15 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Deploying HIP-3 assets.
@@ -308,15 +304,40 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
 })();
 export type PerpDeployRequest = v.InferOutput<typeof PerpDeployRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-3-assets
+ */
+export const PerpDeployResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type PerpDeployResponse = v.InferOutput<typeof PerpDeployResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode perpDeploy} function. */
 export type PerpDeployParameters = ExtractRequestAction<v.InferInput<typeof PerpDeployRequest>>;
+
 /** Request options for the {@linkcode perpDeploy} function. */
 export type PerpDeployOptions = ExtractRequestOptions<v.InferInput<typeof PerpDeployRequest>>;
+
+/** Successful variant of {@linkcode PerpDeployResponse} without errors. */
+export type PerpDeploySuccessResponse = ExcludeErrorResponse<PerpDeployResponse>;
 
 /**
  * Deploying HIP-3 assets.
@@ -333,7 +354,7 @@ export type PerpDeployOptions = ExtractRequestOptions<v.InferInput<typeof PerpDe
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { perpDeploy } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -361,7 +382,7 @@ export async function perpDeploy(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<PerpDeployParameters>,
   opts?: PerpDeployOptions,
-): Promise<SuccessResponse> {
+): Promise<PerpDeploySuccessResponse> {
   const request = parser(PerpDeployRequest)({
     action: {
       type: "perpDeploy",

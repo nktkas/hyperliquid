@@ -1,20 +1,13 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
 
-/**
- * Distribute funds from a vault between followers.
- * @see null
- */
+import { Address, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
+
+/** Distribute funds from a vault between followers. */
 export const VaultDistributeRequest = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
@@ -67,15 +60,37 @@ export const VaultDistributeRequest = /* @__PURE__ */ (() => {
 })();
 export type VaultDistributeRequest = v.InferOutput<typeof VaultDistributeRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/** Successful response without specific data or error response. */
+export const VaultDistributeResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type VaultDistributeResponse = v.InferOutput<typeof VaultDistributeResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode vaultDistribute} function. */
 export type VaultDistributeParameters = ExtractRequestAction<v.InferInput<typeof VaultDistributeRequest>>;
+
 /** Request options for the {@linkcode vaultDistribute} function. */
 export type VaultDistributeOptions = ExtractRequestOptions<v.InferInput<typeof VaultDistributeRequest>>;
+
+/** Successful variant of {@linkcode VaultDistributeResponse} without errors. */
+export type VaultDistributeSuccessResponse = ExcludeErrorResponse<VaultDistributeResponse>;
 
 /**
  * Distribute funds from a vault between followers.
@@ -87,12 +102,11 @@ export type VaultDistributeOptions = ExtractRequestOptions<v.InferInput<typeof V
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  * @throws {TransportError} When the transport layer throws an error.
  *
- * @see null
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { vaultDistribute } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -107,7 +121,7 @@ export async function vaultDistribute(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<VaultDistributeParameters>,
   opts?: VaultDistributeOptions,
-): Promise<SuccessResponse> {
+): Promise<VaultDistributeSuccessResponse> {
   const request = parser(VaultDistributeRequest)({
     action: {
       type: "vaultDistribute",

@@ -1,11 +1,11 @@
 import * as v from "valibot";
-import { Address, Decimal, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_types.ts";
-import type { Subscription } from "../../transport/base.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Decimal, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 import { FillSchema, TwapFillSchema, TwapStateSchema, TwapStatusSchema } from "../_common_schemas.ts";
-
-// -------------------- Schemas --------------------
 
 /** Subscription to user events for a specific user. */
 export const UserEventsRequest = /* @__PURE__ */ (() => {
@@ -233,7 +233,13 @@ export const UserEventsEvent = /* @__PURE__ */ (() => {
 })();
 export type UserEventsEvent = v.InferOutput<typeof UserEventsEvent>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
+import type { Subscription } from "../../transport/base.ts";
 
 /** Request parameters for the {@linkcode userEvents} function. */
 export type UserEventsParameters = Omit<v.InferInput<typeof UserEventsRequest>, "type">;

@@ -1,11 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_types.ts";
-import type { Subscription } from "../../transport/base.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address } from "../_base.ts";
 import { ActiveAssetDataResponse } from "../info/activeAssetData.ts";
-
-// -------------------- Schemas --------------------
 
 /** Subscription to active asset data events for a specific user and coin. */
 export const ActiveAssetDataRequest = /* @__PURE__ */ (() => {
@@ -38,7 +38,13 @@ export const ActiveAssetDataEvent = /* @__PURE__ */ (() => {
 })();
 export type ActiveAssetDataEvent = v.InferOutput<typeof ActiveAssetDataEvent>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
+import type { Subscription } from "../../transport/base.ts";
 
 /** Request parameters for the {@linkcode activeAssetData} function. */
 export type ActiveAssetDataParameters = Omit<v.InferInput<typeof ActiveAssetDataRequest>, "type">;

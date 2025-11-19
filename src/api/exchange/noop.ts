@@ -1,14 +1,11 @@
 import * as v from "valibot";
-import { parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * This action does not do anything (no operation), but causes the nonce to be marked as used.
@@ -49,13 +46,36 @@ export const NoopRequest = /* @__PURE__ */ (() => {
 })();
 export type NoopRequest = v.InferOutput<typeof NoopRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#invalidate-pending-nonce-noop
+ */
+export const NoopResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type NoopResponse = v.InferOutput<typeof NoopResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Request options for the {@linkcode noop} function. */
 export type NoopOptions = ExtractRequestOptions<v.InferInput<typeof NoopRequest>>;
+
+/** Successful variant of {@linkcode NoopResponse} without errors. */
+export type NoopSuccessResponse = ExcludeErrorResponse<NoopResponse>;
 
 /**
  * This action does not do anything (no operation), but causes the nonce to be marked as used.
@@ -72,7 +92,7 @@ export type NoopOptions = ExtractRequestOptions<v.InferInput<typeof NoopRequest>
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { noop } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -83,7 +103,7 @@ export type NoopOptions = ExtractRequestOptions<v.InferInput<typeof NoopRequest>
 export async function noop(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   opts?: NoopOptions,
-): Promise<SuccessResponse> {
+): Promise<NoopSuccessResponse> {
   const request = parser(NoopRequest)({
     action: {
       type: "noop",

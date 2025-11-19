@@ -1,18 +1,15 @@
 import * as v from "valibot";
-import { parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Enable HIP-3 DEX abstraction.
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction-agent
  */
 export const AgentEnableDexAbstractionRequest = /* @__PURE__ */ (() => {
   return v.pipe(
@@ -49,15 +46,38 @@ export const AgentEnableDexAbstractionRequest = /* @__PURE__ */ (() => {
 })();
 export type AgentEnableDexAbstractionRequest = v.InferOutput<typeof AgentEnableDexAbstractionRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction-agent
+ */
+export const AgentEnableDexAbstractionResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type AgentEnableDexAbstractionResponse = v.InferOutput<typeof AgentEnableDexAbstractionResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Request options for the {@linkcode agentEnableDexAbstraction} function. */
 export type AgentEnableDexAbstractionOptions = ExtractRequestOptions<
   v.InferInput<typeof AgentEnableDexAbstractionRequest>
 >;
+
+/** Successful variant of {@linkcode AgentEnableDexAbstractionResponse} without errors. */
+export type AgentEnableDexAbstractionSuccessResponse = ExcludeErrorResponse<AgentEnableDexAbstractionResponse>;
 
 /**
  * Enable HIP-3 DEX abstraction.
@@ -69,12 +89,12 @@ export type AgentEnableDexAbstractionOptions = ExtractRequestOptions<
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  * @throws {TransportError} When the transport layer throws an error.
  *
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction-agent
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { agentEnableDexAbstraction } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -85,7 +105,7 @@ export type AgentEnableDexAbstractionOptions = ExtractRequestOptions<
 export async function agentEnableDexAbstraction(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   opts?: AgentEnableDexAbstractionOptions,
-): Promise<SuccessResponse> {
+): Promise<AgentEnableDexAbstractionSuccessResponse> {
   const request = parser(AgentEnableDexAbstractionRequest)({
     action: {
       type: "agentEnableDexAbstraction",

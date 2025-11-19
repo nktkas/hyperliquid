@@ -1,9 +1,10 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
-import type { IRequestTransport } from "../../transport/base.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request block details by block height.
@@ -125,7 +126,13 @@ export const BlockDetailsResponse = /* @__PURE__ */ (() => {
 })();
 export type BlockDetailsResponse = v.InferOutput<typeof BlockDetailsResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
+import type { IRequestTransport } from "../../transport/base.ts";
 
 /** Request parameters for the {@linkcode blockDetails} function. */
 export type BlockDetailsParameters = Omit<v.InferInput<typeof BlockDetailsRequest>, "type">;

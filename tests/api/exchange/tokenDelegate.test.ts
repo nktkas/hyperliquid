@@ -1,6 +1,6 @@
-import { parser, SuccessResponse, TokenDelegateRequest } from "../../../src/api/exchange/~mod.ts";
+import { parser, TokenDelegateRequest, TokenDelegateResponse } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { runTest, topUpSpot } from "./_t.ts";
+import { excludeErrorResponse, runTest, topUpSpot } from "./_t.ts";
 
 runTest({
   name: "tokenDelegate",
@@ -19,7 +19,7 @@ runTest({
         isUndelegate: false,
       }),
     ]);
-    schemaCoverage(SuccessResponse, data);
+    schemaCoverage(excludeErrorResponse(TokenDelegateResponse), data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

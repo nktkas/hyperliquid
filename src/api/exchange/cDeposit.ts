@@ -1,16 +1,11 @@
 import * as v from "valibot";
-import { type DeepImmutable, Hex, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeUserSignedAction,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  getSignatureChainId,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Hex, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Transfer native token from the user spot account into staking for delegating to validators.
@@ -66,15 +61,41 @@ export const CDepositRequest = /* @__PURE__ */ (() => {
 })();
 export type CDepositRequest = v.InferOutput<typeof CDepositRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-into-staking
+ */
+export const CDepositResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type CDepositResponse = v.InferOutput<typeof CDepositResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeUserSignedAction,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  getSignatureChainId,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode cDeposit} function. */
 export type CDepositParameters = ExtractRequestAction<v.InferInput<typeof CDepositRequest>>;
+
 /** Request options for the {@linkcode cDeposit} function. */
 export type CDepositOptions = ExtractRequestOptions<v.InferInput<typeof CDepositRequest>>;
+
+/** Successful variant of {@linkcode CDepositResponse} without errors. */
+export type CDepositSuccessResponse = ExcludeErrorResponse<CDepositResponse>;
 
 /** EIP-712 types for the {@linkcode cDeposit} function. */
 export const CDepositTypes = {
@@ -100,7 +121,7 @@ export const CDepositTypes = {
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { cDeposit } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -115,7 +136,7 @@ export async function cDeposit(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<CDepositParameters>,
   opts?: CDepositOptions,
-): Promise<SuccessResponse> {
+): Promise<CDepositSuccessResponse> {
   const request = parser(CDepositRequest)({
     action: {
       type: "cDeposit",

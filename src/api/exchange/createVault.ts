@@ -1,20 +1,13 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
 
-/**
- * Create a vault.
- * @see null
- */
+import { Address, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature } from "./_base/mod.ts";
+
+/** Create a vault. */
 export const CreateVaultRequest = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
@@ -76,40 +69,62 @@ export type CreateVaultRequest = v.InferOutput<typeof CreateVaultRequest>;
 /** Response for creating a vault. */
 export const CreateVaultResponse = /* @__PURE__ */ (() => {
   return v.pipe(
-    v.object({
-      /** Successful status. */
-      status: v.pipe(
-        v.literal("ok"),
-        v.description("Successful status."),
-      ),
-      /** Response details. */
-      response: v.pipe(
+    v.union([
+      v.pipe(
         v.object({
-          /** Type of response. */
-          type: v.pipe(
-            v.literal("createVault"),
-            v.description("Type of response."),
+          /** Successful status. */
+          status: v.pipe(
+            v.literal("ok"),
+            v.description("Successful status."),
           ),
-          /** Vault address. */
-          data: v.pipe(
-            Address,
-            v.description("Vault address."),
+          /** Response details. */
+          response: v.pipe(
+            v.object({
+              /** Type of response. */
+              type: v.pipe(
+                v.literal("createVault"),
+                v.description("Type of response."),
+              ),
+              /** Vault address. */
+              data: v.pipe(
+                Address,
+                v.description("Vault address."),
+              ),
+            }),
+            v.description("Response details."),
           ),
         }),
-        v.description("Response details."),
+        v.description("Successful response for creating a vault"),
       ),
-    }),
+      ErrorResponse,
+    ]),
     v.description("Response for creating a vault."),
   );
 })();
 export type CreateVaultResponse = v.InferOutput<typeof CreateVaultResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode createVault} function. */
 export type CreateVaultParameters = ExtractRequestAction<v.InferInput<typeof CreateVaultRequest>>;
+
 /** Request options for the {@linkcode createVault} function. */
 export type CreateVaultOptions = ExtractRequestOptions<v.InferInput<typeof CreateVaultRequest>>;
+
+/** Successful variant of {@linkcode CreateVaultResponse} without errors. */
+export type CreateVaultSuccessResponse = ExcludeErrorResponse<CreateVaultResponse>;
 
 /**
  * Create a vault.
@@ -121,12 +136,11 @@ export type CreateVaultOptions = ExtractRequestOptions<v.InferInput<typeof Creat
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  * @throws {TransportError} When the transport layer throws an error.
  *
- * @see null
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { createVault } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -145,7 +159,7 @@ export async function createVault(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<CreateVaultParameters>,
   opts?: CreateVaultOptions,
-): Promise<CreateVaultResponse> {
+): Promise<CreateVaultSuccessResponse> {
   const request = parser(CreateVaultRequest)({
     action: {
       type: "createVault",

@@ -1,10 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, UnsignedInteger } from "../_base.ts";
 import { DetailedOrderSchema, OrderProcessingStatusSchema } from "../_common_schemas.ts";
-
-// -------------------- Schemas --------------------
 
 /**
  * Request user historical orders.
@@ -57,7 +58,12 @@ export const HistoricalOrdersResponse = /* @__PURE__ */ (() => {
 })();
 export type HistoricalOrdersResponse = v.InferOutput<typeof HistoricalOrdersResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode historicalOrders} function. */
 export type HistoricalOrdersParameters = Omit<v.InferInput<typeof HistoricalOrdersRequest>, "type">;

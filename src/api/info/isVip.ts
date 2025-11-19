@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address } from "../_base.ts";
 
 /**
  * Request to check if a user is a VIP.
@@ -39,7 +41,12 @@ export const IsVipResponse = /* @__PURE__ */ (() => {
 })();
 export type IsVipResponse = v.InferOutput<typeof IsVipResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode isVip} function. */
 export type IsVipParameters = Omit<v.InferInput<typeof IsVipRequest>, "type">;

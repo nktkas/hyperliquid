@@ -1,10 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address } from "../_base.ts";
 import { FillSchema } from "../_common_schemas.ts";
-
-// -------------------- Schemas --------------------
 
 /**
  * Request array of user fills.
@@ -46,7 +47,12 @@ export const UserFillsResponse = /* @__PURE__ */ (() => {
 })();
 export type UserFillsResponse = v.InferOutput<typeof UserFillsResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode userFills} function. */
 export type UserFillsParameters = Omit<v.InferInput<typeof UserFillsRequest>, "type">;

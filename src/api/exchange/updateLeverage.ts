@@ -1,15 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Update cross or isolated leverage on a coin.
@@ -70,15 +66,40 @@ export const UpdateLeverageRequest = /* @__PURE__ */ (() => {
 })();
 export type UpdateLeverageRequest = v.InferOutput<typeof UpdateLeverageRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-leverage
+ */
+export const UpdateLeverageResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type UpdateLeverageResponse = v.InferOutput<typeof UpdateLeverageResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode updateLeverage} function. */
 export type UpdateLeverageParameters = ExtractRequestAction<v.InferInput<typeof UpdateLeverageRequest>>;
+
 /** Request options for the {@linkcode updateLeverage} function. */
 export type UpdateLeverageOptions = ExtractRequestOptions<v.InferInput<typeof UpdateLeverageRequest>>;
+
+/** Successful variant of {@linkcode UpdateLeverageResponse} without errors. */
+export type UpdateLeverageSuccessResponse = ExcludeErrorResponse<UpdateLeverageResponse>;
 
 /**
  * Update cross or isolated leverage on a coin.
@@ -95,7 +116,7 @@ export type UpdateLeverageOptions = ExtractRequestOptions<v.InferInput<typeof Up
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { updateLeverage } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -110,7 +131,7 @@ export async function updateLeverage(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<UpdateLeverageParameters>,
   opts?: UpdateLeverageOptions,
-): Promise<SuccessResponse> {
+): Promise<UpdateLeverageSuccessResponse> {
   const request = parser(UpdateLeverageRequest)({
     action: {
       type: "updateLeverage",

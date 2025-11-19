@@ -1,20 +1,13 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
 
-/**
- * Transfer between sub-accounts (perpetual).
- * @see null
- */
+import { Address, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
+
+/** Transfer between sub-accounts (perpetual). */
 export const SubAccountTransferRequest = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
@@ -65,15 +58,37 @@ export const SubAccountTransferRequest = /* @__PURE__ */ (() => {
 })();
 export type SubAccountTransferRequest = v.InferOutput<typeof SubAccountTransferRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/** Successful response without specific data or error response. */
+export const SubAccountTransferResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type SubAccountTransferResponse = v.InferOutput<typeof SubAccountTransferResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode subAccountTransfer} function. */
 export type SubAccountTransferParameters = ExtractRequestAction<v.InferInput<typeof SubAccountTransferRequest>>;
+
 /** Request options for the {@linkcode subAccountTransfer} function. */
 export type SubAccountTransferOptions = ExtractRequestOptions<v.InferInput<typeof SubAccountTransferRequest>>;
+
+/** Successful variant of {@linkcode SubAccountTransferResponse} without errors. */
+export type SubAccountTransferSuccessResponse = ExcludeErrorResponse<SubAccountTransferResponse>;
 
 /**
  * Transfer between sub-accounts (perpetual).
@@ -85,12 +100,11 @@ export type SubAccountTransferOptions = ExtractRequestOptions<v.InferInput<typeo
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  * @throws {TransportError} When the transport layer throws an error.
  *
- * @see null
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { subAccountTransfer } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -105,7 +119,7 @@ export async function subAccountTransfer(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<SubAccountTransferParameters>,
   opts?: SubAccountTransferOptions,
-): Promise<SuccessResponse> {
+): Promise<SubAccountTransferSuccessResponse> {
   const request = parser(SubAccountTransferRequest)({
     action: {
       type: "subAccountTransfer",

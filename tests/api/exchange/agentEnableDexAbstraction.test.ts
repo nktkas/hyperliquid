@@ -1,6 +1,10 @@
-import { AgentEnableDexAbstractionRequest, parser, SuccessResponse } from "../../../src/api/exchange/~mod.ts";
+import {
+  AgentEnableDexAbstractionRequest,
+  AgentEnableDexAbstractionResponse,
+  parser,
+} from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { runTest } from "./_t.ts";
+import { excludeErrorResponse, runTest } from "./_t.ts";
 
 runTest({
   name: "agentEnableDexAbstraction",
@@ -8,7 +12,7 @@ runTest({
     const data = await Promise.all([
       exchClient.agentEnableDexAbstraction(),
     ]);
-    schemaCoverage(SuccessResponse, data);
+    schemaCoverage(excludeErrorResponse(AgentEnableDexAbstractionResponse), data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["exchange", "agentEnableDexAbstraction"]);

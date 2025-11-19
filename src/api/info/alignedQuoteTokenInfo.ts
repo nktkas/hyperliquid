@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request supply, rate, and pending payment information for an aligned quote token.
@@ -81,7 +83,12 @@ export const AlignedQuoteTokenInfoResponse = /* @__PURE__ */ (() => {
 })();
 export type AlignedQuoteTokenInfoResponse = v.InferOutput<typeof AlignedQuoteTokenInfoResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode alignedQuoteTokenInfo} function. */
 export type AlignedQuoteTokenInfoParameters = Omit<v.InferInput<typeof AlignedQuoteTokenInfoRequest>, "type">;

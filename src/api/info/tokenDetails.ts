@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request token details.
@@ -138,7 +140,12 @@ export const TokenDetailsResponse = /* @__PURE__ */ (() => {
 })();
 export type TokenDetailsResponse = v.InferOutput<typeof TokenDetailsResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode tokenDetails} function. */
 export type TokenDetailsParameters = Omit<v.InferInput<typeof TokenDetailsRequest>, "type">;

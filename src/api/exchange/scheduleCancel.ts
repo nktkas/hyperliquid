@@ -1,15 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Schedule a cancel-all operation at a future time.
@@ -69,15 +65,40 @@ export const ScheduleCancelRequest = /* @__PURE__ */ (() => {
 })();
 export type ScheduleCancelRequest = v.InferOutput<typeof ScheduleCancelRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#schedule-cancel-dead-mans-switch
+ */
+export const ScheduleCancelResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type ScheduleCancelResponse = v.InferOutput<typeof ScheduleCancelResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode scheduleCancel} function. */
 export type ScheduleCancelParameters = ExtractRequestAction<v.InferInput<typeof ScheduleCancelRequest>>;
+
 /** Request options for the {@linkcode scheduleCancel} function. */
 export type ScheduleCancelOptions = ExtractRequestOptions<v.InferInput<typeof ScheduleCancelRequest>>;
+
+/** Successful variant of {@linkcode ScheduleCancelResponse} without errors. */
+export type ScheduleCancelSuccessResponse = ExcludeErrorResponse<ScheduleCancelResponse>;
 
 /**
  * Schedule a cancel-all operation at a future time.
@@ -94,7 +115,7 @@ export type ScheduleCancelOptions = ExtractRequestOptions<v.InferInput<typeof Sc
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { scheduleCancel } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -109,18 +130,18 @@ export async function scheduleCancel(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params?: DeepImmutable<ScheduleCancelParameters>,
   opts?: ScheduleCancelOptions,
-): Promise<SuccessResponse>;
+): Promise<ScheduleCancelSuccessResponse>;
 export async function scheduleCancel(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   opts?: ScheduleCancelOptions,
-): Promise<SuccessResponse>;
+): Promise<ScheduleCancelSuccessResponse>;
 export async function scheduleCancel(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   paramsOrOpts?:
     | DeepImmutable<ScheduleCancelParameters>
     | ScheduleCancelOptions,
   maybeOpts?: ScheduleCancelOptions,
-): Promise<SuccessResponse> {
+): Promise<ScheduleCancelSuccessResponse> {
   const isFirstArgParams = paramsOrOpts && "time" in paramsOrOpts;
   const params = isFirstArgParams ? paramsOrOpts : {};
   const opts = isFirstArgParams ? maybeOpts : paramsOrOpts as ScheduleCancelOptions;

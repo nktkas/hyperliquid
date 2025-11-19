@@ -1,11 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_types.ts";
-import type { Subscription } from "../../transport/base.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, UnsignedInteger } from "../_base.ts";
 import { TwapStateSchema, TwapStatusSchema } from "../_common_schemas.ts";
-
-// -------------------- Schemas --------------------
 
 /** Subscription to user TWAP history events for a specific user. */
 export const UserTwapHistoryRequest = /* @__PURE__ */ (() => {
@@ -73,7 +73,13 @@ export const UserTwapHistoryEvent = /* @__PURE__ */ (() => {
 })();
 export type UserTwapHistoryEvent = v.InferOutput<typeof UserTwapHistoryEvent>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
+import type { Subscription } from "../../transport/base.ts";
 
 /** Request parameters for the {@linkcode userTwapHistory} function. */
 export type UserTwapHistoryParameters = Omit<v.InferInput<typeof UserTwapHistoryRequest>, "type">;

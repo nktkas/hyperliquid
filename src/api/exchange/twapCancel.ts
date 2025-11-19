@@ -1,15 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, UnsignedInteger } from "../_base.ts";
+import { Signature } from "./_base/mod.ts";
 
 /**
  * Cancel a TWAP order.
@@ -65,7 +61,10 @@ export const TwapCancelRequest = /* @__PURE__ */ (() => {
 })();
 export type TwapCancelRequest = v.InferOutput<typeof TwapCancelRequest>;
 
-/** Response for canceling a TWAP order. */
+/**
+ * Response for canceling a TWAP order.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order
+ */
 export const TwapCancelResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
@@ -111,49 +110,28 @@ export const TwapCancelResponse = /* @__PURE__ */ (() => {
 })();
 export type TwapCancelResponse = v.InferOutput<typeof TwapCancelResponse>;
 
-/** Successful variant of {@linkcode TwapCancelResponse} without errors. */
-export const TwapCancelSuccessResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Successful status. */
-      status: v.pipe(
-        v.literal("ok"),
-        v.description("Successful status."),
-      ),
-      /** Response details. */
-      response: v.pipe(
-        v.object({
-          /** Type of response. */
-          type: v.pipe(
-            v.literal("twapCancel"),
-            v.description("Type of response."),
-          ),
-          /** Specific data. */
-          data: v.pipe(
-            v.object({
-              /** Status of the operation. */
-              status: v.pipe(
-                v.string(),
-                v.description("Status of the operation."),
-              ),
-            }),
-            v.description("Specific data."),
-          ),
-        }),
-        v.description("Response details."),
-      ),
-    }),
-    v.description("Successful variant of `TwapCancelResponse` without errors."),
-  );
-})();
-export type TwapCancelSuccessResponse = v.InferOutput<typeof TwapCancelSuccessResponse>;
+// ============================================================
+// Execution Logic
+// ============================================================
 
-// -------------------- Function --------------------
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode twapCancel} function. */
 export type TwapCancelParameters = ExtractRequestAction<v.InferInput<typeof TwapCancelRequest>>;
+
 /** Request options for the {@linkcode twapCancel} function. */
 export type TwapCancelOptions = ExtractRequestOptions<v.InferInput<typeof TwapCancelRequest>>;
+
+/** Successful variant of {@linkcode TwapCancelResponse} without errors. */
+export type TwapCancelSuccessResponse = ExcludeErrorResponse<TwapCancelResponse>;
 
 /**
  * Cancel a TWAP order.
@@ -170,7 +148,7 @@ export type TwapCancelOptions = ExtractRequestOptions<v.InferInput<typeof TwapCa
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { twapCancel } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`

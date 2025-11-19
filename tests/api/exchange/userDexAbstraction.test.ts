@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { parser, UserDexAbstractionExchangeRequest } from "../../../src/api/exchange/~mod.ts";
+import { parser, UserDexAbstractionRequest } from "../../../src/api/exchange/~mod.ts";
 import { ApiRequestError } from "../../../src/mod.ts";
 import { runTest } from "./_t.ts";
 
@@ -26,6 +26,6 @@ runTest({
       "--enabled",
       "true",
     ]);
-    parser(UserDexAbstractionExchangeRequest)(data);
+    parser(UserDexAbstractionRequest)(data);
   },
 });

@@ -145,7 +145,9 @@ export class SubscriptionClient<
    * const sub = await client.activeAssetCtx({ coin: "ETH" }, (data) => console.log(data));
    * ```
    */
-  activeAssetCtx(...args: OmitFirst<OverloadedParameters<typeof activeAssetCtx>>) {
+  activeAssetCtx(
+    ...args: OmitFirst<OverloadedParameters<typeof activeAssetCtx>>
+  ): ReturnType<typeof activeAssetCtx> {
     return activeAssetCtx(this, ...args);
   }
 
@@ -168,7 +170,9 @@ export class SubscriptionClient<
    * const sub = await client.activeAssetData({ coin: "ETH", user: "0x..." }, (data) => console.log(data));
    * ```
    */
-  activeAssetData(...args: OmitFirst<OverloadedParameters<typeof activeAssetData>>) {
+  activeAssetData(
+    ...args: OmitFirst<OverloadedParameters<typeof activeAssetData>>
+  ): ReturnType<typeof activeAssetData> {
     return activeAssetData(this, ...args);
   }
 
@@ -191,7 +195,9 @@ export class SubscriptionClient<
    * const sub = await client.activeSpotAssetCtx({ coin: "@1" }, (data) => console.log(data));
    * ```
    */
-  activeSpotAssetCtx(...args: OmitFirst<OverloadedParameters<typeof activeSpotAssetCtx>>) {
+  activeSpotAssetCtx(
+    ...args: OmitFirst<OverloadedParameters<typeof activeSpotAssetCtx>>
+  ): ReturnType<typeof activeSpotAssetCtx> {
     return activeSpotAssetCtx(this, ...args);
   }
 
@@ -214,7 +220,9 @@ export class SubscriptionClient<
    * const sub = await client.allMids((data) => console.log(data));
    * ```
    */
-  allMids(...args: OmitFirst<OverloadedParameters<typeof allMids>>) {
+  allMids(
+    ...args: OmitFirst<OverloadedParameters<typeof allMids>>
+  ): ReturnType<typeof allMids> {
     return allMids(
       this,
       // @ts-ignore: TypeScript can't resolve overloaded signatures from parameter unions
@@ -241,7 +249,9 @@ export class SubscriptionClient<
    * const sub = await client.assetCtxs((data) => console.log(data));
    * ```
    */
-  assetCtxs(...args: OmitFirst<OverloadedParameters<typeof assetCtxs>>) {
+  assetCtxs(
+    ...args: OmitFirst<OverloadedParameters<typeof assetCtxs>>
+  ): ReturnType<typeof assetCtxs> {
     return assetCtxs(
       this,
       // @ts-ignore: TypeScript can't resolve overloaded signatures from parameter unions
@@ -268,7 +278,9 @@ export class SubscriptionClient<
    * const sub = await client.bbo({ coin: "ETH" }, (data) => console.log(data));
    * ```
    */
-  bbo(...args: OmitFirst<OverloadedParameters<typeof bbo>>) {
+  bbo(
+    ...args: OmitFirst<OverloadedParameters<typeof bbo>>
+  ): ReturnType<typeof bbo> {
     return bbo(this, ...args);
   }
 
@@ -291,7 +303,9 @@ export class SubscriptionClient<
    * const sub = await client.candle({ coin: "ETH", interval: "1h" }, (data) => console.log(data));
    * ```
    */
-  candle(...args: OmitFirst<OverloadedParameters<typeof candle>>) {
+  candle(
+    ...args: OmitFirst<OverloadedParameters<typeof candle>>
+  ): ReturnType<typeof candle> {
     return candle(this, ...args);
   }
 
@@ -314,7 +328,9 @@ export class SubscriptionClient<
    * const sub = await client.clearinghouseState({ user: "0x..." }, (data) => console.log(data));
    * ```
    */
-  clearinghouseState(...args: OmitFirst<OverloadedParameters<typeof clearinghouseState>>) {
+  clearinghouseState(
+    ...args: OmitFirst<OverloadedParameters<typeof clearinghouseState>>
+  ): ReturnType<typeof clearinghouseState> {
     return clearinghouseState(this, ...args);
   }
 
@@ -337,7 +353,9 @@ export class SubscriptionClient<
    * const sub = await client.explorerBlock((data) => console.log(data));
    * ```
    */
-  explorerBlock(...args: OmitFirst<OverloadedParameters<typeof explorerBlock>>) {
+  explorerBlock(
+    ...args: OmitFirst<OverloadedParameters<typeof explorerBlock>>
+  ): ReturnType<typeof explorerBlock> {
     return explorerBlock(this, ...args);
   }
 
@@ -360,7 +378,9 @@ export class SubscriptionClient<
    * const sub = await client.explorerTxs((data) => console.log(data));
    * ```
    */
-  explorerTxs(...args: OmitFirst<OverloadedParameters<typeof explorerTxs>>) {
+  explorerTxs(
+    ...args: OmitFirst<OverloadedParameters<typeof explorerTxs>>
+  ): ReturnType<typeof explorerTxs> {
     return explorerTxs(this, ...args);
   }
 
@@ -383,7 +403,9 @@ export class SubscriptionClient<
    * const sub = await client.l2Book({ coin: "ETH" }, (data) => console.log(data));
    * ```
    */
-  l2Book(...args: OmitFirst<OverloadedParameters<typeof l2Book>>) {
+  l2Book(
+    ...args: OmitFirst<OverloadedParameters<typeof l2Book>>
+  ): ReturnType<typeof l2Book> {
     return l2Book(this, ...args);
   }
 
@@ -406,7 +428,9 @@ export class SubscriptionClient<
    * const sub = await client.notification({ user: "0x..." }, (data) => console.log(data));
    * ```
    */
-  notification(...args: OmitFirst<OverloadedParameters<typeof notification>>) {
+  notification(
+    ...args: OmitFirst<OverloadedParameters<typeof notification>>
+  ): ReturnType<typeof notification> {
     return notification(this, ...args);
   }
 
@@ -429,7 +453,9 @@ export class SubscriptionClient<
    * const sub = await client.openOrders({ user: "0x..." }, (data) => console.log(data));
    * ```
    */
-  openOrders(...args: OmitFirst<OverloadedParameters<typeof openOrders>>) {
+  openOrders(
+    ...args: OmitFirst<OverloadedParameters<typeof openOrders>>
+  ): ReturnType<typeof openOrders> {
     return openOrders(this, ...args);
   }
 
@@ -452,7 +478,9 @@ export class SubscriptionClient<
    * const sub = await client.orderUpdates({ user: "0x..." }, (data) => console.log(data));
    * ```
    */
-  orderUpdates(...args: OmitFirst<OverloadedParameters<typeof orderUpdates>>) {
+  orderUpdates(
+    ...args: OmitFirst<OverloadedParameters<typeof orderUpdates>>
+  ): ReturnType<typeof orderUpdates> {
     return orderUpdates(this, ...args);
   }
 
@@ -475,7 +503,9 @@ export class SubscriptionClient<
    * const sub = await client.spotState({ user: "0x..." }, (data) => console.log(data));
    * ```
    */
-  spotState(...args: OmitFirst<OverloadedParameters<typeof spotState>>) {
+  spotState(
+    ...args: OmitFirst<OverloadedParameters<typeof spotState>>
+  ): ReturnType<typeof spotState> {
     return spotState(this, ...args);
   }
 
@@ -498,7 +528,9 @@ export class SubscriptionClient<
    * const sub = await client.trades({ coin: "ETH" }, (data) => console.log(data));
    * ```
    */
-  trades(...args: OmitFirst<OverloadedParameters<typeof trades>>) {
+  trades(
+    ...args: OmitFirst<OverloadedParameters<typeof trades>>
+  ): ReturnType<typeof trades> {
     return trades(this, ...args);
   }
 
@@ -522,7 +554,9 @@ export class SubscriptionClient<
    * const sub = await client.userEvents({ user: "0x..." }, (data) => console.log(data));
    * ```
    */
-  userEvents(...args: OmitFirst<OverloadedParameters<typeof userEvents>>) {
+  userEvents(
+    ...args: OmitFirst<OverloadedParameters<typeof userEvents>>
+  ): ReturnType<typeof userEvents> {
     return userEvents(this, ...args);
   }
 
@@ -545,7 +579,9 @@ export class SubscriptionClient<
    * const sub = await client.userFills({ user: "0x..." }, (data) => console.log(data));
    * ```
    */
-  userFills(...args: OmitFirst<OverloadedParameters<typeof userFills>>) {
+  userFills(
+    ...args: OmitFirst<OverloadedParameters<typeof userFills>>
+  ): ReturnType<typeof userFills> {
     return userFills(this, ...args);
   }
 
@@ -568,7 +604,9 @@ export class SubscriptionClient<
    * const sub = await client.userFundings({ user: "0x..." }, (data) => console.log(data));
    * ```
    */
-  userFundings(...args: OmitFirst<OverloadedParameters<typeof userFundings>>) {
+  userFundings(
+    ...args: OmitFirst<OverloadedParameters<typeof userFundings>>
+  ): ReturnType<typeof userFundings> {
     return userFundings(this, ...args);
   }
 
@@ -592,7 +630,9 @@ export class SubscriptionClient<
    * const sub = await client.userHistoricalOrders({ user: "0x..." }, (data) => console.log(data));
    * ```
    */
-  userHistoricalOrders(...args: OmitFirst<OverloadedParameters<typeof userHistoricalOrders>>) {
+  userHistoricalOrders(
+    ...args: OmitFirst<OverloadedParameters<typeof userHistoricalOrders>>
+  ): ReturnType<typeof userHistoricalOrders> {
     return userHistoricalOrders(this, ...args);
   }
 
@@ -615,7 +655,9 @@ export class SubscriptionClient<
    * const sub = await client.userNonFundingLedgerUpdates({ user: "0x..." }, (data) => console.log(data));
    * ```
    */
-  userNonFundingLedgerUpdates(...args: OmitFirst<OverloadedParameters<typeof userNonFundingLedgerUpdates>>) {
+  userNonFundingLedgerUpdates(
+    ...args: OmitFirst<OverloadedParameters<typeof userNonFundingLedgerUpdates>>
+  ): ReturnType<typeof userNonFundingLedgerUpdates> {
     return userNonFundingLedgerUpdates(this, ...args);
   }
 
@@ -638,7 +680,9 @@ export class SubscriptionClient<
    * const sub = await client.userTwapHistory({ user: "0x..." }, (data) => console.log(data));
    * ```
    */
-  userTwapHistory(...args: OmitFirst<OverloadedParameters<typeof userTwapHistory>>) {
+  userTwapHistory(
+    ...args: OmitFirst<OverloadedParameters<typeof userTwapHistory>>
+  ): ReturnType<typeof userTwapHistory> {
     return userTwapHistory(this, ...args);
   }
 
@@ -661,7 +705,9 @@ export class SubscriptionClient<
    * const sub = await client.userTwapSliceFills({ user: "0x..." }, (data) => console.log(data));
    * ```
    */
-  userTwapSliceFills(...args: OmitFirst<OverloadedParameters<typeof userTwapSliceFills>>) {
+  userTwapSliceFills(
+    ...args: OmitFirst<OverloadedParameters<typeof userTwapSliceFills>>
+  ): ReturnType<typeof userTwapSliceFills> {
     return userTwapSliceFills(this, ...args);
   }
 
@@ -684,7 +730,9 @@ export class SubscriptionClient<
    * const sub = await client.webData2({ user: "0x..." }, (data) => console.log(data));
    * ```
    */
-  webData2(...args: OmitFirst<OverloadedParameters<typeof webData2>>) {
+  webData2(
+    ...args: OmitFirst<OverloadedParameters<typeof webData2>>
+  ): ReturnType<typeof webData2> {
     return webData2(this, ...args);
   }
 
@@ -707,7 +755,9 @@ export class SubscriptionClient<
    * const sub = await client.webData3({ user: "0x..." }, (data) => console.log(data));
    * ```
    */
-  webData3(...args: OmitFirst<OverloadedParameters<typeof webData3>>) {
+  webData3(
+    ...args: OmitFirst<OverloadedParameters<typeof webData3>>
+  ): ReturnType<typeof webData3> {
     return webData3(this, ...args);
   }
 }

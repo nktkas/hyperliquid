@@ -1,8 +1,8 @@
 import * as v from "valibot";
-import { parser } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
 
 /**
  * Request gossip root IPs.
@@ -34,7 +34,12 @@ export const GossipRootIpsResponse = /* @__PURE__ */ (() => {
 })();
 export type GossipRootIpsResponse = v.InferOutput<typeof GossipRootIpsResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /**
  * Request gossip root IPs.

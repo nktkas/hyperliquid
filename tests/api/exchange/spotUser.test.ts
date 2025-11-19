@@ -1,6 +1,6 @@
-import { parser, SpotUserRequest, SuccessResponse } from "../../../src/api/exchange/~mod.ts";
+import { parser, SpotUserRequest, SpotUserResponse } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { runTest } from "./_t.ts";
+import { excludeErrorResponse, runTest } from "./_t.ts";
 
 runTest({
   name: "spotUser",
@@ -8,7 +8,7 @@ runTest({
     const data = await Promise.all([
       exchClient.spotUser({ toggleSpotDusting: { optOut: true } }),
     ]);
-    schemaCoverage(SuccessResponse, data);
+    schemaCoverage(excludeErrorResponse(SpotUserResponse), data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["exchange", "spotUser", "--optOut", "true"]);

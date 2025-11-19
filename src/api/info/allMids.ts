@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { type DeepImmutable, parser, UnsignedDecimal } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { UnsignedDecimal } from "../_base.ts";
 
 /**
  * Request mid coin prices.
@@ -39,7 +41,12 @@ export const AllMidsResponse = /* @__PURE__ */ (() => {
 })();
 export type AllMidsResponse = v.InferOutput<typeof AllMidsResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode allMids} function. */
 export type AllMidsParameters = Omit<v.InferInput<typeof AllMidsRequest>, "type">;

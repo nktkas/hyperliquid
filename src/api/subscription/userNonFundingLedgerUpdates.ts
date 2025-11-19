@@ -1,11 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_types.ts";
-import type { Subscription } from "../../transport/base.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address } from "../_base.ts";
 import { UserNonFundingLedgerUpdatesResponse } from "../info/userNonFundingLedgerUpdates.ts";
-
-// -------------------- Schemas --------------------
 
 /** Subscription to user non-funding ledger updates for a specific user. */
 export const UserNonFundingLedgerUpdatesRequest = /* @__PURE__ */ (() => {
@@ -49,7 +49,13 @@ export const UserNonFundingLedgerUpdatesEvent = /* @__PURE__ */ (() => {
 })();
 export type UserNonFundingLedgerUpdatesEvent = v.InferOutput<typeof UserNonFundingLedgerUpdatesEvent>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
+import type { Subscription } from "../../transport/base.ts";
 
 /** Request parameters for the {@linkcode userNonFundingLedgerUpdates} function. */
 export type UserNonFundingLedgerUpdatesParameters = Omit<

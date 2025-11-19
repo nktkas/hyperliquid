@@ -1,6 +1,6 @@
-import { parser, SetDisplayNameRequest, SuccessResponse } from "../../../src/api/exchange/~mod.ts";
+import { parser, SetDisplayNameRequest, SetDisplayNameResponse } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { runTest } from "./_t.ts";
+import { excludeErrorResponse, runTest } from "./_t.ts";
 
 runTest({
   name: "setDisplayName",
@@ -8,7 +8,7 @@ runTest({
     const data = await Promise.all([
       exchClient.setDisplayName({ displayName: "" }),
     ]);
-    schemaCoverage(SuccessResponse, data);
+    schemaCoverage(excludeErrorResponse(SetDisplayNameResponse), data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["exchange", "setDisplayName", "--displayName", "test"]);

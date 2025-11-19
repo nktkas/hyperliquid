@@ -1,20 +1,13 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
 
-/**
- * Action related to validator management.
- * @see null
- */
+import { Address, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
+
+/** Action related to validator management. */
 export const CValidatorActionRequest = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
@@ -180,15 +173,37 @@ export const CValidatorActionRequest = /* @__PURE__ */ (() => {
 })();
 export type CValidatorActionRequest = v.InferOutput<typeof CValidatorActionRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/** Successful response without specific data or error response. */
+export const CValidatorActionResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type CValidatorActionResponse = v.InferOutput<typeof CValidatorActionResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode CValidatorAction} function. */
 export type CValidatorActionParameters = ExtractRequestAction<v.InferInput<typeof CValidatorActionRequest>>;
+
 /** Request options for the {@linkcode CValidatorAction} function. */
 export type CValidatorActionOptions = ExtractRequestOptions<v.InferInput<typeof CValidatorActionRequest>>;
+
+/** Successful variant of {@linkcode CValidatorActionResponse} without errors. */
+export type CValidatorActionSuccessResponse = ExcludeErrorResponse<CValidatorActionResponse>;
 
 /**
  * Action related to validator management.
@@ -200,12 +215,11 @@ export type CValidatorActionOptions = ExtractRequestOptions<v.InferInput<typeof 
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  * @throws {TransportError} When the transport layer throws an error.
  *
- * @see null
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { cValidatorAction } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -256,7 +270,7 @@ export async function cValidatorAction(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<CValidatorActionParameters>,
   opts?: CValidatorActionOptions,
-): Promise<SuccessResponse> {
+): Promise<CValidatorActionSuccessResponse> {
   const request = parser(CValidatorActionRequest)({
     action: {
       type: "CValidatorAction",

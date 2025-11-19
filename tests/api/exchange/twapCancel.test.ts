@@ -1,6 +1,6 @@
-import { parser, TwapCancelRequest, TwapCancelSuccessResponse } from "../../../src/api/exchange/~mod.ts";
+import { parser, TwapCancelRequest, TwapCancelResponse } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { createTWAP, runTest } from "./_t.ts";
+import { createTWAP, excludeErrorResponse, runTest } from "./_t.ts";
 
 runTest({
   name: "twapCancel",
@@ -14,7 +14,7 @@ runTest({
     const data = await Promise.all([
       exchClient.twapCancel({ a: twap.a, t: twap.twapId }),
     ]);
-    schemaCoverage(TwapCancelSuccessResponse, data);
+    schemaCoverage(excludeErrorResponse(TwapCancelResponse), data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["exchange", "twapCancel", "--a", "0", "--t", "0"]);

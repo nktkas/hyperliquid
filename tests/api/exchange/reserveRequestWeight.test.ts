@@ -1,6 +1,6 @@
-import { parser, ReserveRequestWeightRequest, SuccessResponse } from "../../../src/api/exchange/~mod.ts";
+import { parser, ReserveRequestWeightRequest, ReserveRequestWeightResponse } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { runTest } from "./_t.ts";
+import { excludeErrorResponse, runTest } from "./_t.ts";
 
 runTest({
   name: "reserveRequestWeight",
@@ -8,7 +8,7 @@ runTest({
     const data = await Promise.all([
       exchClient.reserveRequestWeight({ weight: 1 }),
     ]);
-    schemaCoverage(SuccessResponse, data);
+    schemaCoverage(excludeErrorResponse(ReserveRequestWeightResponse), data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["exchange", "reserveRequestWeight", "--weight", "1"]);

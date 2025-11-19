@@ -1,10 +1,11 @@
 import * as v from "valibot";
-import { Decimal, type DeepImmutable, parser, UnsignedDecimal } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Decimal, UnsignedDecimal } from "../_base.ts";
 import { MetaResponse } from "./meta.ts";
-
-// -------------------- Schemas --------------------
 
 /**
  * Request metadata and asset contexts.
@@ -105,7 +106,12 @@ export const MetaAndAssetCtxsResponse = /* @__PURE__ */ (() => {
 })();
 export type MetaAndAssetCtxsResponse = v.InferOutput<typeof MetaAndAssetCtxsResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode metaAndAssetCtxs} function. */
 export type MetaAndAssetCtxsParameters = Omit<v.InferInput<typeof MetaAndAssetCtxsRequest>, "type">;

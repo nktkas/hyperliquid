@@ -1,20 +1,13 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
 
-/**
- * Create a sub-account.
- * @see null
- */
+import { Address, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature } from "./_base/mod.ts";
+
+/** Create a sub-account. */
 export const CreateSubAccountRequest = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
@@ -59,40 +52,62 @@ export type CreateSubAccountRequest = v.InferOutput<typeof CreateSubAccountReque
 /** Response for creating a sub-account. */
 export const CreateSubAccountResponse = /* @__PURE__ */ (() => {
   return v.pipe(
-    v.object({
-      /** Successful status. */
-      status: v.pipe(
-        v.literal("ok"),
-        v.description("Successful status."),
-      ),
-      /** Response details. */
-      response: v.pipe(
+    v.union([
+      v.pipe(
         v.object({
-          /** Type of response. */
-          type: v.pipe(
-            v.literal("createSubAccount"),
-            v.description("Type of response."),
+          /** Successful status. */
+          status: v.pipe(
+            v.literal("ok"),
+            v.description("Successful status."),
           ),
-          /** Sub-account address. */
-          data: v.pipe(
-            Address,
-            v.description("Sub-account address."),
+          /** Response details. */
+          response: v.pipe(
+            v.object({
+              /** Type of response. */
+              type: v.pipe(
+                v.literal("createSubAccount"),
+                v.description("Type of response."),
+              ),
+              /** Sub-account address. */
+              data: v.pipe(
+                Address,
+                v.description("Sub-account address."),
+              ),
+            }),
+            v.description("Response details."),
           ),
         }),
-        v.description("Response details."),
+        v.description("Successful response for creating a sub-account"),
       ),
-    }),
+      ErrorResponse,
+    ]),
     v.description("Response for creating a sub-account."),
   );
 })();
 export type CreateSubAccountResponse = v.InferOutput<typeof CreateSubAccountResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode createSubAccount} function. */
 export type CreateSubAccountParameters = ExtractRequestAction<v.InferInput<typeof CreateSubAccountRequest>>;
+
 /** Request options for the {@linkcode createSubAccount} function. */
 export type CreateSubAccountOptions = ExtractRequestOptions<v.InferInput<typeof CreateSubAccountRequest>>;
+
+/** Successful variant of {@linkcode CreateSubAccountResponse} without errors. */
+export type CreateSubAccountSuccessResponse = ExcludeErrorResponse<CreateSubAccountResponse>;
 
 /**
  * Create a sub-account.
@@ -104,12 +119,11 @@ export type CreateSubAccountOptions = ExtractRequestOptions<v.InferInput<typeof 
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  * @throws {TransportError} When the transport layer throws an error.
  *
- * @see null
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { createSubAccount } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -124,7 +138,7 @@ export async function createSubAccount(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<CreateSubAccountParameters>,
   opts?: CreateSubAccountOptions,
-): Promise<CreateSubAccountResponse> {
+): Promise<CreateSubAccountSuccessResponse> {
   const request = parser(CreateSubAccountRequest)({
     action: {
       type: "createSubAccount",

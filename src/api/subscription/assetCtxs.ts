@@ -1,9 +1,10 @@
 import * as v from "valibot";
-import { Decimal, type DeepImmutable, parser, UnsignedDecimal } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_types.ts";
-import type { Subscription } from "../../transport/base.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Decimal, UnsignedDecimal } from "../_base.ts";
 
 /** Subscription to context events for all perpetual assets. */
 export const AssetCtxsRequest = /* @__PURE__ */ (() => {
@@ -102,7 +103,13 @@ export const AssetCtxsEvent = /* @__PURE__ */ (() => {
 })();
 export type AssetCtxsEvent = v.InferOutput<typeof AssetCtxsEvent>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
+import type { Subscription } from "../../transport/base.ts";
 
 /** Request parameters for the {@linkcode assetCtxs} function. */
 export type AssetCtxsParameters = Omit<v.InferInput<typeof AssetCtxsRequest>, "type">;

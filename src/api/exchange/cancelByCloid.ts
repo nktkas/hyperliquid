@@ -1,15 +1,12 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, UnsignedInteger } from "../_base.ts";
+import { Signature } from "./_base/mod.ts";
+import { CancelResponse } from "./cancel.ts";
 
 /**
  * Cancel order(s) by cloid.
@@ -71,15 +68,35 @@ export const CancelByCloidRequest = /* @__PURE__ */ (() => {
 })();
 export type CancelByCloidRequest = v.InferOutput<typeof CancelByCloidRequest>;
 
-import { CancelSuccessResponse } from "./cancel.ts";
-export { CancelSuccessResponse };
+/**
+ * Response for order cancellation.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid
+ */
+export const CancelByCloidResponse = CancelResponse;
+export type CancelByCloidResponse = CancelResponse;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode cancelByCloid} function. */
 export type CancelByCloidParameters = ExtractRequestAction<v.InferInput<typeof CancelByCloidRequest>>;
+
 /** Request options for the {@linkcode cancelByCloid} function. */
 export type CancelByCloidOptions = ExtractRequestOptions<v.InferInput<typeof CancelByCloidRequest>>;
+
+/** Successful variant of {@linkcode CancelByCloidResponse} without errors. */
+export type CancelByCloidSuccessResponse = ExcludeErrorResponse<CancelByCloidResponse>;
 
 /**
  * Cancel order(s) by cloid.
@@ -96,7 +113,7 @@ export type CancelByCloidOptions = ExtractRequestOptions<v.InferInput<typeof Can
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { cancelByCloid } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -115,7 +132,7 @@ export async function cancelByCloid(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<CancelByCloidParameters>,
   opts?: CancelByCloidOptions,
-): Promise<CancelSuccessResponse> {
+): Promise<CancelByCloidSuccessResponse> {
   const request = parser(CancelByCloidRequest)({
     action: {
       type: "cancelByCloid",

@@ -1,6 +1,6 @@
-import { parser, SendAssetRequest, SuccessResponse } from "../../../src/api/exchange/~mod.ts";
+import { parser, SendAssetRequest, SendAssetResponse } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { runTest } from "./_t.ts";
+import { excludeErrorResponse, runTest } from "./_t.ts";
 
 runTest({
   name: "sendAsset",
@@ -15,7 +15,7 @@ runTest({
         fromSubAccount: "",
       }),
     ]);
-    schemaCoverage(SuccessResponse, data);
+    schemaCoverage(excludeErrorResponse(SendAssetResponse), data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

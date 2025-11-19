@@ -1,16 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeUserSignedAction,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  getSignatureChainId,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Send usd to another address.
@@ -71,15 +66,41 @@ export const UsdSendRequest = /* @__PURE__ */ (() => {
 })();
 export type UsdSendRequest = v.InferOutput<typeof UsdSendRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-usdc-transfer
+ */
+export const UsdSendResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type UsdSendResponse = v.InferOutput<typeof UsdSendResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeUserSignedAction,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  getSignatureChainId,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode usdSend} function. */
 export type UsdSendParameters = ExtractRequestAction<v.InferInput<typeof UsdSendRequest>>;
+
 /** Request options for the {@linkcode usdSend} function. */
 export type UsdSendOptions = ExtractRequestOptions<v.InferInput<typeof UsdSendRequest>>;
+
+/** Successful variant of {@linkcode UsdSendResponse} without errors. */
+export type UsdSendSuccessResponse = ExcludeErrorResponse<UsdSendResponse>;
 
 /** EIP-712 types for the {@linkcode usdSend} function. */
 export const UsdSendTypes = {
@@ -106,7 +127,7 @@ export const UsdSendTypes = {
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { usdSend } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -121,7 +142,7 @@ export async function usdSend(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<UsdSendParameters>,
   opts?: UsdSendOptions,
-): Promise<SuccessResponse> {
+): Promise<UsdSendSuccessResponse> {
   const request = parser(UsdSendRequest)({
     action: {
       type: "usdSend",

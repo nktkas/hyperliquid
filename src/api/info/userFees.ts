@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, Decimal, type DeepImmutable, parser, UnsignedDecimal } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Decimal, UnsignedDecimal } from "../_base.ts";
 
 /**
  * Request user fees.
@@ -293,7 +295,12 @@ export const UserFeesResponse = /* @__PURE__ */ (() => {
 })();
 export type UserFeesResponse = v.InferOutput<typeof UserFeesResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode userFees} function. */
 export type UserFeesParameters = Omit<v.InferInput<typeof UserFeesRequest>, "type">;

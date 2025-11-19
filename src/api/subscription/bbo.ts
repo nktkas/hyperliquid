@@ -1,11 +1,11 @@
 import * as v from "valibot";
-import { type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_types.ts";
-import type { Subscription } from "../../transport/base.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { UnsignedInteger } from "../_base.ts";
 import { L2BookLevelSchema } from "../_common_schemas.ts";
-
-// -------------------- Schemas --------------------
 
 /** Subscription to best bid and offer events for a specific asset. */
 export const BboRequest = /* @__PURE__ */ (() => {
@@ -52,7 +52,13 @@ export const BboEvent = /* @__PURE__ */ (() => {
 })();
 export type BboEvent = v.InferOutput<typeof BboEvent>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
+import type { Subscription } from "../../transport/base.ts";
 
 /** Request parameters for the {@linkcode bbo} function. */
 export type BboParameters = Omit<v.InferInput<typeof BboRequest>, "type">;

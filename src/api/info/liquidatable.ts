@@ -1,8 +1,8 @@
 import * as v from "valibot";
-import { parser } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
 
 /**
  * Request liquidatable.
@@ -32,7 +32,12 @@ export const LiquidatableResponse = /* @__PURE__ */ (() => {
 })();
 export type LiquidatableResponse = v.InferOutput<typeof LiquidatableResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /**
  * Request liquidatable.

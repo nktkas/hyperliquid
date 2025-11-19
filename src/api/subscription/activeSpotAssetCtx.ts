@@ -1,9 +1,10 @@
 import * as v from "valibot";
-import { type DeepImmutable, parser, UnsignedDecimal } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_types.ts";
-import type { Subscription } from "../../transport/base.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { UnsignedDecimal } from "../_base.ts";
 
 /** Subscription to context events for a specific spot asset. */
 export const ActiveSpotAssetCtxRequest = /* @__PURE__ */ (() => {
@@ -86,7 +87,13 @@ export const ActiveSpotAssetCtxEvent = /* @__PURE__ */ (() => {
 })();
 export type ActiveSpotAssetCtxEvent = v.InferOutput<typeof ActiveSpotAssetCtxEvent>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
+import type { Subscription } from "../../transport/base.ts";
 
 /** Request parameters for the {@linkcode activeSpotAssetCtx} function. */
 export type ActiveSpotAssetCtxParameters = Omit<v.InferInput<typeof ActiveSpotAssetCtxRequest>, "type">;

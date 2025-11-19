@@ -1,11 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
-import type { IRequestTransport } from "../../transport/base.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address } from "../_base.ts";
 import { TxDetailsResponse } from "./txDetails.ts";
-
-// -------------------- Schemas --------------------
 
 /**
  * Request array of user transaction details.
@@ -53,7 +53,13 @@ export const UserDetailsResponse = /* @__PURE__ */ (() => {
 })();
 export type UserDetailsResponse = v.InferOutput<typeof UserDetailsResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
+import type { IRequestTransport } from "../../transport/base.ts";
 
 /** Request parameters for the {@linkcode userDetails} function. */
 export type UserDetailsParameters = Omit<v.InferInput<typeof UserDetailsRequest>, "type">;

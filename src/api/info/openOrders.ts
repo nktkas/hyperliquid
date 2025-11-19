@@ -1,10 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address } from "../_base.ts";
 import { OrderSchema } from "../_common_schemas.ts";
-
-// -------------------- Schemas --------------------
 
 /**
  * Request open orders.
@@ -46,7 +47,12 @@ export const OpenOrdersResponse = /* @__PURE__ */ (() => {
 })();
 export type OpenOrdersResponse = v.InferOutput<typeof OpenOrdersResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode openOrders} function. */
 export type OpenOrdersParameters = Omit<v.InferInput<typeof OpenOrdersRequest>, "type">;

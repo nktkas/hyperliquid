@@ -1,20 +1,13 @@
 import * as v from "valibot";
-import { type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
 
-/**
- * Create a referral code.
- * @see null
- */
+import { UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
+
+/** Create a referral code. */
 export const RegisterReferrerRequest = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
@@ -56,15 +49,37 @@ export const RegisterReferrerRequest = /* @__PURE__ */ (() => {
 })();
 export type RegisterReferrerRequest = v.InferOutput<typeof RegisterReferrerRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/** Successful response without specific data or error response. */
+export const RegisterReferrerResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type RegisterReferrerResponse = v.InferOutput<typeof RegisterReferrerResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode registerReferrer} function. */
 export type RegisterReferrerParameters = ExtractRequestAction<v.InferInput<typeof RegisterReferrerRequest>>;
+
 /** Request options for the {@linkcode registerReferrer} function. */
 export type RegisterReferrerOptions = ExtractRequestOptions<v.InferInput<typeof RegisterReferrerRequest>>;
+
+/** Successful variant of {@linkcode RegisterReferrerResponse} without errors. */
+export type RegisterReferrerSuccessResponse = ExcludeErrorResponse<RegisterReferrerResponse>;
 
 /**
  * Create a referral code.
@@ -76,12 +91,11 @@ export type RegisterReferrerOptions = ExtractRequestOptions<v.InferInput<typeof 
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  * @throws {TransportError} When the transport layer throws an error.
  *
- * @see null
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { registerReferrer } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -96,7 +110,7 @@ export async function registerReferrer(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<RegisterReferrerParameters>,
   opts?: RegisterReferrerOptions,
-): Promise<SuccessResponse> {
+): Promise<RegisterReferrerSuccessResponse> {
   const request = parser(RegisterReferrerRequest)({
     action: {
       type: "registerReferrer",

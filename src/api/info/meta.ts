@@ -1,10 +1,11 @@
 import * as v from "valibot";
-import { type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { UnsignedInteger } from "../_base.ts";
 import { MarginTableResponse } from "./marginTable.ts";
-
-// -------------------- Schemas --------------------
 
 /**
  * Request trading metadata.
@@ -111,7 +112,12 @@ export const MetaResponse = /* @__PURE__ */ (() => {
 })();
 export type MetaResponse = v.InferOutput<typeof MetaResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode meta} function. */
 export type MetaParameters = Omit<v.InferInput<typeof MetaRequest>, "type">;

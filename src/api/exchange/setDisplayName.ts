@@ -1,20 +1,13 @@
 import * as v from "valibot";
-import { type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
 
-/**
- * Set the display name in the leaderboard.
- * @see null
- */
+import { UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
+
+/** Set the display name in the leaderboard. */
 export const SetDisplayNameRequest = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
@@ -62,15 +55,37 @@ export const SetDisplayNameRequest = /* @__PURE__ */ (() => {
 })();
 export type SetDisplayNameRequest = v.InferOutput<typeof SetDisplayNameRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/** Successful response without specific data or error response. */
+export const SetDisplayNameResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type SetDisplayNameResponse = v.InferOutput<typeof SetDisplayNameResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode setDisplayName} function. */
 export type SetDisplayNameParameters = ExtractRequestAction<v.InferInput<typeof SetDisplayNameRequest>>;
+
 /** Request options for the {@linkcode setDisplayName} function. */
 export type SetDisplayNameOptions = ExtractRequestOptions<v.InferInput<typeof SetDisplayNameRequest>>;
+
+/** Successful variant of {@linkcode SetDisplayNameResponse} without errors. */
+export type SetDisplayNameSuccessResponse = ExcludeErrorResponse<SetDisplayNameResponse>;
 
 /**
  * Set the display name in the leaderboard.
@@ -82,12 +97,11 @@ export type SetDisplayNameOptions = ExtractRequestOptions<v.InferInput<typeof Se
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  * @throws {TransportError} When the transport layer throws an error.
  *
- * @see null
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { setDisplayName } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -102,7 +116,7 @@ export async function setDisplayName(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<SetDisplayNameParameters>,
   opts?: SetDisplayNameOptions,
-): Promise<SuccessResponse> {
+): Promise<SetDisplayNameSuccessResponse> {
   const request = parser(SetDisplayNameRequest)({
     action: {
       type: "setDisplayName",

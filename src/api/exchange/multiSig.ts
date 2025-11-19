@@ -1,57 +1,52 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeMultiSigAction,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  getSignatureChainId,
-  Signature,
-} from "./_base/mod.ts";
 
-import { ApproveAgentRequest } from "./approveAgent.ts";
-import { ApproveBuilderFeeRequest } from "./approveBuilderFee.ts";
-import { BatchModifyRequest } from "./batchModify.ts";
-import { CancelRequest, CancelSuccessResponse } from "./cancel.ts";
-import { CancelByCloidRequest } from "./cancelByCloid.ts";
-import { ClaimRewardsRequest } from "./claimRewards.ts";
-import { CDepositRequest } from "./cDeposit.ts";
-import { ConvertToMultiSigUserRequest } from "./convertToMultiSigUser.ts";
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, UnsignedInteger } from "../_base.ts";
+import { Signature } from "./_base/mod.ts";
+import { ApproveAgentRequest, ApproveAgentResponse } from "./approveAgent.ts";
+import { ApproveBuilderFeeRequest, ApproveBuilderFeeResponse } from "./approveBuilderFee.ts";
+import { BatchModifyRequest, BatchModifyResponse } from "./batchModify.ts";
+import { CancelRequest, CancelResponse } from "./cancel.ts";
+import { CancelByCloidRequest, CancelByCloidResponse } from "./cancelByCloid.ts";
+import { ClaimRewardsRequest, ClaimRewardsResponse } from "./claimRewards.ts";
+import { CDepositRequest, CDepositResponse } from "./cDeposit.ts";
+import { ConvertToMultiSigUserRequest, ConvertToMultiSigUserResponse } from "./convertToMultiSigUser.ts";
 import { CreateSubAccountRequest, CreateSubAccountResponse } from "./createSubAccount.ts";
 import { CreateVaultRequest, CreateVaultResponse } from "./createVault.ts";
-import { CSignerActionRequest } from "./cSignerAction.ts";
-import { CValidatorActionRequest } from "./cValidatorAction.ts";
-import { CWithdrawRequest } from "./cWithdraw.ts";
-import { EvmUserModifyRequest } from "./evmUserModify.ts";
-import { ModifyRequest } from "./modify.ts";
-import { NoopRequest } from "./noop.ts";
-import { OrderRequest, OrderSuccessResponse } from "./order.ts";
-import { RegisterReferrerRequest } from "./registerReferrer.ts";
-import { ReserveRequestWeightRequest } from "./reserveRequestWeight.ts";
-import { ScheduleCancelRequest } from "./scheduleCancel.ts";
-import { SetDisplayNameRequest } from "./setDisplayName.ts";
-import { SetReferrerRequest } from "./setReferrer.ts";
-import { SpotDeployRequest } from "./spotDeploy.ts";
-import { SubAccountModifyRequest } from "./subAccountModify.ts";
-import { TokenDelegateRequest } from "./tokenDelegate.ts";
-import { TwapOrderRequest, TwapOrderSuccessResponse } from "./twapOrder.ts";
-import { UsdClassTransferRequest } from "./usdClassTransfer.ts";
-import { VaultDistributeRequest } from "./vaultDistribute.ts";
-import { Withdraw3Request } from "./withdraw3.ts";
-import { PerpDeployRequest } from "./perpDeploy.ts";
-import { SendAssetRequest } from "./sendAsset.ts";
-import { SpotSendRequest } from "./spotSend.ts";
-import { SpotUserRequest } from "./spotUser.ts";
-import { SubAccountSpotTransferRequest } from "./subAccountSpotTransfer.ts";
-import { SubAccountTransferRequest } from "./subAccountTransfer.ts";
-import { TwapCancelRequest, TwapCancelSuccessResponse } from "./twapCancel.ts";
-import { UpdateIsolatedMarginRequest } from "./updateIsolatedMargin.ts";
-import { UpdateLeverageRequest } from "./updateLeverage.ts";
-import { UsdSendRequest } from "./usdSend.ts";
-import { VaultModifyRequest } from "./vaultModify.ts";
-import { VaultTransferRequest } from "./vaultTransfer.ts";
-
-// -------------------- Schemas --------------------
+import { CSignerActionRequest, CSignerActionResponse } from "./cSignerAction.ts";
+import { CValidatorActionRequest, CValidatorActionResponse } from "./cValidatorAction.ts";
+import { CWithdrawRequest, CWithdrawResponse } from "./cWithdraw.ts";
+import { EvmUserModifyRequest, EvmUserModifyResponse } from "./evmUserModify.ts";
+import { ModifyRequest, ModifyResponse } from "./modify.ts";
+import { NoopRequest, NoopResponse } from "./noop.ts";
+import { OrderRequest, OrderResponse } from "./order.ts";
+import { RegisterReferrerRequest, RegisterReferrerResponse } from "./registerReferrer.ts";
+import { ReserveRequestWeightRequest, ReserveRequestWeightResponse } from "./reserveRequestWeight.ts";
+import { ScheduleCancelRequest, ScheduleCancelResponse } from "./scheduleCancel.ts";
+import { SetDisplayNameRequest, SetDisplayNameResponse } from "./setDisplayName.ts";
+import { SetReferrerRequest, SetReferrerResponse } from "./setReferrer.ts";
+import { SpotDeployRequest, SpotDeployResponse } from "./spotDeploy.ts";
+import { SubAccountModifyRequest, SubAccountModifyResponse } from "./subAccountModify.ts";
+import { TokenDelegateRequest, TokenDelegateResponse } from "./tokenDelegate.ts";
+import { TwapOrderRequest, TwapOrderResponse } from "./twapOrder.ts";
+import { UsdClassTransferRequest, UsdClassTransferResponse } from "./usdClassTransfer.ts";
+import { VaultDistributeRequest, VaultDistributeResponse } from "./vaultDistribute.ts";
+import { Withdraw3Request, Withdraw3Response } from "./withdraw3.ts";
+import { PerpDeployRequest, PerpDeployResponse } from "./perpDeploy.ts";
+import { SendAssetRequest, SendAssetResponse } from "./sendAsset.ts";
+import { SpotSendRequest, SpotSendResponse } from "./spotSend.ts";
+import { SpotUserRequest, SpotUserResponse } from "./spotUser.ts";
+import { SubAccountSpotTransferRequest, SubAccountSpotTransferResponse } from "./subAccountSpotTransfer.ts";
+import { SubAccountTransferRequest, SubAccountTransferResponse } from "./subAccountTransfer.ts";
+import { TwapCancelRequest, TwapCancelResponse } from "./twapCancel.ts";
+import { UpdateIsolatedMarginRequest, UpdateIsolatedMarginResponse } from "./updateIsolatedMargin.ts";
+import { UpdateLeverageRequest, UpdateLeverageResponse } from "./updateLeverage.ts";
+import { UsdSendRequest, UsdSendResponse } from "./usdSend.ts";
+import { VaultModifyRequest, VaultModifyResponse } from "./vaultModify.ts";
+import { VaultTransferRequest, VaultTransferResponse } from "./vaultTransfer.ts";
 
 /**
  * A multi-signature request.
@@ -172,25 +167,84 @@ export const MultiSigRequest = /* @__PURE__ */ (() => {
 })();
 export type MultiSigRequest = v.InferOutput<typeof MultiSigRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export {
-  CancelSuccessResponse,
-  CreateSubAccountResponse,
-  CreateVaultResponse,
-  OrderSuccessResponse,
-  SuccessResponse,
-  TwapCancelSuccessResponse,
-  TwapOrderSuccessResponse,
-};
+/**
+ * A response related to an action.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig
+ */
+export const MultiSigResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([
+      ApproveAgentResponse,
+      ApproveBuilderFeeResponse,
+      BatchModifyResponse,
+      CancelResponse,
+      CancelByCloidResponse,
+      CDepositResponse,
+      ClaimRewardsResponse,
+      ConvertToMultiSigUserResponse,
+      CreateSubAccountResponse,
+      CreateVaultResponse,
+      CSignerActionResponse,
+      CValidatorActionResponse,
+      CWithdrawResponse,
+      EvmUserModifyResponse,
+      ModifyResponse,
+      NoopResponse,
+      OrderResponse,
+      PerpDeployResponse,
+      RegisterReferrerResponse,
+      ReserveRequestWeightResponse,
+      ScheduleCancelResponse,
+      SendAssetResponse,
+      SetDisplayNameResponse,
+      SetReferrerResponse,
+      SpotDeployResponse,
+      SpotSendResponse,
+      SpotUserResponse,
+      SubAccountModifyResponse,
+      SubAccountSpotTransferResponse,
+      SubAccountTransferResponse,
+      TokenDelegateResponse,
+      TwapCancelResponse,
+      TwapOrderResponse,
+      UpdateIsolatedMarginResponse,
+      UpdateLeverageResponse,
+      UsdClassTransferResponse,
+      UsdSendResponse,
+      VaultDistributeResponse,
+      VaultModifyResponse,
+      VaultTransferResponse,
+      Withdraw3Response,
+    ]),
+    v.description("A response related to an action."),
+  );
+})();
+export type MultiSigResponse = v.InferOutput<typeof MultiSigResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeMultiSigAction,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  getSignatureChainId,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode multiSig} function. */
 export type MultiSigParameters =
   & ExtractRequestAction<v.InferInput<typeof MultiSigRequest>>
   & Pick<v.InferInput<typeof MultiSigRequest>, "nonce">;
+
 /** Request options for the {@linkcode multiSig} function. */
 export type MultiSigOptions = ExtractRequestOptions<v.InferInput<typeof MultiSigRequest>>;
+
+/** Successful variant of {@linkcode MultiSigResponse} without errors. */
+export type MultiSigSuccessResponse = ExcludeErrorResponse<MultiSigResponse>;
 
 /** EIP-712 types for the {@linkcode multiSig} function. */
 export const MultiSigTypes = {
@@ -217,7 +271,7 @@ export const MultiSigTypes = {
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { multiSig, parser, ScheduleCancelRequest } from "@nktkas/hyperliquid/api/exchange";
  * import { signL1Action } from "@nktkas/hyperliquid/signing";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const multiSigUser = "0x...";
@@ -266,20 +320,11 @@ export const MultiSigTypes = {
  * );
  * ```
  */
-export async function multiSig<
-  T extends
-    | SuccessResponse
-    | CancelSuccessResponse
-    | CreateSubAccountResponse
-    | CreateVaultResponse
-    | OrderSuccessResponse
-    | TwapOrderSuccessResponse
-    | TwapCancelSuccessResponse,
->(
+export async function multiSig(
   config: ExchangeRequestConfig,
   paramsAndNonce: DeepImmutable<MultiSigParameters>,
   opts?: MultiSigOptions,
-): Promise<T> {
+): Promise<MultiSigSuccessResponse> {
   const { nonce, ...params } = paramsAndNonce;
 
   const request = parser(MultiSigRequest)({

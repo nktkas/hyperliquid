@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request user rate limits.
@@ -60,7 +62,12 @@ export const UserRateLimitResponse = /* @__PURE__ */ (() => {
 })();
 export type UserRateLimitResponse = v.InferOutput<typeof UserRateLimitResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode userRateLimit} function. */
 export type UserRateLimitParameters = Omit<v.InferInput<typeof UserRateLimitRequest>, "type">;

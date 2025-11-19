@@ -1,12 +1,11 @@
 import * as v from "valibot";
-import { type DeepImmutable, parser } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_types.ts";
-import type { Subscription } from "../../transport/base.ts";
+
+// ============================================================
+// API Schemas
+// ============================================================
 
 import { CandleIntervalSchema } from "../_common_schemas.ts";
 import { CandleSnapshotResponse } from "../info/candleSnapshot.ts";
-
-// -------------------- Schemas --------------------
 
 /** Subscription to candlestick events for a specific asset and time interval. */
 export const CandleRequest = /* @__PURE__ */ (() => {
@@ -36,7 +35,13 @@ export const CandleEvent = /* @__PURE__ */ (() => {
 })();
 export type CandleEvent = v.InferOutput<typeof CandleEvent>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
+import type { Subscription } from "../../transport/base.ts";
 
 /** Request parameters for the {@linkcode candle} function. */
 export type CandleParameters = Omit<v.InferInput<typeof CandleRequest>, "type">;

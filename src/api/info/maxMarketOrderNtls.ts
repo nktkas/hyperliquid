@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { parser, UnsignedDecimal } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { UnsignedDecimal } from "../_base.ts";
 
 /**
  * Request maximum market order notionals.
@@ -40,7 +42,12 @@ export const MaxMarketOrderNtlsResponse = /* @__PURE__ */ (() => {
 })();
 export type MaxMarketOrderNtlsResponse = v.InferOutput<typeof MaxMarketOrderNtlsResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode maxMarketOrderNtls} function. */
 export type MaxMarketOrderNtlsParameters = Omit<v.InferInput<typeof MaxMarketOrderNtlsRequest>, "type">;

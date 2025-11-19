@@ -1,8 +1,8 @@
 import * as v from "valibot";
-import { type DeepImmutable, parser } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
 
 /**
  * Request perpetuals at open interest cap.
@@ -39,7 +39,12 @@ export const PerpsAtOpenInterestCapResponse = /* @__PURE__ */ (() => {
 })();
 export type PerpsAtOpenInterestCapResponse = v.InferOutput<typeof PerpsAtOpenInterestCapResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode perpsAtOpenInterestCap} function. */
 export type PerpsAtOpenInterestCapParameters = Omit<v.InferInput<typeof PerpsAtOpenInterestCapRequest>, "type">;

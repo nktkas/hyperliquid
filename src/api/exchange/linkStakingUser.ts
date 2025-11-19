@@ -1,16 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeUserSignedAction,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  getSignatureChainId,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Link staking and trading accounts for fee discount attribution.
@@ -87,15 +82,41 @@ export const LinkStakingUserRequest = /* @__PURE__ */ (() => {
 })();
 export type LinkStakingUserRequest = v.InferOutput<typeof LinkStakingUserRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/trading/fees#staking-linking
+ */
+export const LinkStakingUserResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type LinkStakingUserResponse = v.InferOutput<typeof LinkStakingUserResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeUserSignedAction,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  getSignatureChainId,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode linkStakingUser} function. */
 export type LinkStakingUserParameters = ExtractRequestAction<v.InferInput<typeof LinkStakingUserRequest>>;
+
 /** Request options for the {@linkcode linkStakingUser} function. */
 export type LinkStakingUserOptions = ExtractRequestOptions<v.InferInput<typeof LinkStakingUserRequest>>;
+
+/** Successful variant of {@linkcode LinkStakingUserResponse} without errors. */
+export type LinkStakingUserSuccessResponse = ExcludeErrorResponse<LinkStakingUserResponse>;
 
 /** EIP-712 types for the {@linkcode linkStakingUser} function. */
 export const LinkStakingUserTypes = {
@@ -122,7 +143,7 @@ export const LinkStakingUserTypes = {
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { linkStakingUser } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -137,7 +158,7 @@ export async function linkStakingUser(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<LinkStakingUserParameters>,
   opts?: LinkStakingUserOptions,
-): Promise<SuccessResponse> {
+): Promise<LinkStakingUserSuccessResponse> {
   const request = parser(LinkStakingUserRequest)({
     action: {
       type: "linkStakingUser",

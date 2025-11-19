@@ -1,6 +1,6 @@
-import { CancelRequest, CancelSuccessResponse, parser } from "../../../src/api/exchange/~mod.ts";
+import { CancelRequest, CancelResponse, parser } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { openOrder, runTest } from "./_t.ts";
+import { excludeErrorResponse, openOrder, runTest } from "./_t.ts";
 
 runTest({
   name: "cancel",
@@ -14,7 +14,7 @@ runTest({
     const data = await Promise.all([
       exchClient.cancel({ cancels: [{ a: order.a, o: order.oid }] }),
     ]);
-    schemaCoverage(CancelSuccessResponse, data);
+    schemaCoverage(excludeErrorResponse(CancelResponse), data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

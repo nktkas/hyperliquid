@@ -1,17 +1,13 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, UnsignedInteger } from "../_base.ts";
+import { Signature } from "./_base/mod.ts";
 import { PlaceOrderParamsSchema } from "../_common_schemas.ts";
-
-// -------------------- Schemas --------------------
+import { OrderResponse } from "./order.ts";
 
 /**
  * Modify multiple orders.
@@ -73,15 +69,35 @@ export const BatchModifyRequest = /* @__PURE__ */ (() => {
 })();
 export type BatchModifyRequest = v.InferOutput<typeof BatchModifyRequest>;
 
-import { OrderSuccessResponse } from "./order.ts";
-export { OrderSuccessResponse };
+/**
+ * Response for order placement and batch modifications.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-multiple-orders
+ */
+export const BatchModifyResponse = OrderResponse;
+export type BatchModifyResponse = OrderResponse;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode batchModify} function. */
 export type BatchModifyParameters = ExtractRequestAction<v.InferInput<typeof BatchModifyRequest>>;
+
 /** Request options for the {@linkcode batchModify} function. */
 export type BatchModifyOptions = ExtractRequestOptions<v.InferInput<typeof BatchModifyRequest>>;
+
+/** Successful variant of {@linkcode BatchModifyResponse} without errors. */
+export type BatchModifySuccessResponse = ExcludeErrorResponse<BatchModifyResponse>;
 
 /**
  * Modify multiple orders.
@@ -98,7 +114,7 @@ export type BatchModifyOptions = ExtractRequestOptions<v.InferInput<typeof Batch
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { batchModify } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -127,7 +143,7 @@ export async function batchModify(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<BatchModifyParameters>,
   opts?: BatchModifyOptions,
-): Promise<OrderSuccessResponse> {
+): Promise<BatchModifySuccessResponse> {
   const request = parser(BatchModifyRequest)({
     action: {
       type: "batchModify",

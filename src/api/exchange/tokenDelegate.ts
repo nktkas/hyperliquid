@@ -1,16 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeUserSignedAction,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  getSignatureChainId,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Delegate or undelegate native tokens to or from a validator.
@@ -76,15 +71,41 @@ export const TokenDelegateRequest = /* @__PURE__ */ (() => {
 })();
 export type TokenDelegateRequest = v.InferOutput<typeof TokenDelegateRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#delegate-or-undelegate-stake-from-validator
+ */
+export const TokenDelegateResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type TokenDelegateResponse = v.InferOutput<typeof TokenDelegateResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeUserSignedAction,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  getSignatureChainId,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode tokenDelegate} function. */
 export type TokenDelegateParameters = ExtractRequestAction<v.InferInput<typeof TokenDelegateRequest>>;
+
 /** Request options for the {@linkcode tokenDelegate} function. */
 export type TokenDelegateOptions = ExtractRequestOptions<v.InferInput<typeof TokenDelegateRequest>>;
+
+/** Successful variant of {@linkcode TokenDelegateResponse} without errors. */
+export type TokenDelegateSuccessResponse = ExcludeErrorResponse<TokenDelegateResponse>;
 
 /** EIP-712 types for the {@linkcode tokenDelegate} function. */
 export const TokenDelegateTypes = {
@@ -112,7 +133,7 @@ export const TokenDelegateTypes = {
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { tokenDelegate } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -127,7 +148,7 @@ export async function tokenDelegate(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<TokenDelegateParameters>,
   opts?: TokenDelegateOptions,
-): Promise<SuccessResponse> {
+): Promise<TokenDelegateSuccessResponse> {
   const request = parser(TokenDelegateRequest)({
     action: {
       type: "tokenDelegate",

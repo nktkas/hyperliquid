@@ -1,15 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, UnsignedInteger } from "../_base.ts";
+import { Signature } from "./_base/mod.ts";
 
 /**
  * Cancel order(s).
@@ -71,7 +67,10 @@ export const CancelRequest = /* @__PURE__ */ (() => {
 })();
 export type CancelRequest = v.InferOutput<typeof CancelRequest>;
 
-/** Response for order cancellation. */
+/**
+ * Response for order cancellation.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s
+ */
 export const CancelResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
@@ -119,49 +118,28 @@ export const CancelResponse = /* @__PURE__ */ (() => {
 })();
 export type CancelResponse = v.InferOutput<typeof CancelResponse>;
 
-/** Successful variant of {@linkcode CancelResponse} without errors. */
-export const CancelSuccessResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Successful status. */
-      status: v.pipe(
-        v.literal("ok"),
-        v.description("Successful status."),
-      ),
-      /** Response details. */
-      response: v.pipe(
-        v.object({
-          /** Type of response. */
-          type: v.pipe(
-            v.literal("cancel"),
-            v.description("Type of response."),
-          ),
-          /** Specific data. */
-          data: v.pipe(
-            v.object({
-              /** Array of success statuses. */
-              statuses: v.pipe(
-                v.array(v.literal("success")),
-                v.description("Array of success statuses."),
-              ),
-            }),
-            v.description("Specific data."),
-          ),
-        }),
-        v.description("Response details."),
-      ),
-    }),
-    v.description("Successful variant of `CancelResponse` without errors."),
-  );
-})();
-export type CancelSuccessResponse = v.InferOutput<typeof CancelSuccessResponse>;
+// ============================================================
+// Execution Logic
+// ============================================================
 
-// -------------------- Function --------------------
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode cancel} function. */
 export type CancelParameters = ExtractRequestAction<v.InferInput<typeof CancelRequest>>;
+
 /** Request options for the {@linkcode cancel} function. */
 export type CancelOptions = ExtractRequestOptions<v.InferInput<typeof CancelRequest>>;
+
+/** Successful variant of {@linkcode CancelResponse} without errors. */
+export type CancelSuccessResponse = ExcludeErrorResponse<CancelResponse>;
 
 /**
  * Cancel order(s).
@@ -178,7 +156,7 @@ export type CancelOptions = ExtractRequestOptions<v.InferInput<typeof CancelRequ
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { cancel } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`

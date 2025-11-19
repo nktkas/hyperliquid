@@ -1,22 +1,17 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeUserSignedAction,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  getSignatureChainId,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Enable/disable HIP-3 DEX abstraction.
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction
  */
-export const UserDexAbstractionExchangeRequest = /* @__PURE__ */ (() => {
+export const UserDexAbstractionRequest = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
       /** Action to perform. */
@@ -69,21 +64,47 @@ export const UserDexAbstractionExchangeRequest = /* @__PURE__ */ (() => {
     v.description("Enable/disable HIP-3 DEX abstraction."),
   );
 })();
-export type UserDexAbstractionExchangeRequest = v.InferOutput<typeof UserDexAbstractionExchangeRequest>;
+export type UserDexAbstractionRequest = v.InferOutput<typeof UserDexAbstractionRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction
+ */
+export const UserDexAbstractionResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type UserDexAbstractionResponse = v.InferOutput<typeof UserDexAbstractionResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeUserSignedAction,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  getSignatureChainId,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode userDexAbstraction} function. */
-export type UserDexAbstractionExchangeParameters = ExtractRequestAction<
-  v.InferInput<typeof UserDexAbstractionExchangeRequest>
+export type UserDexAbstractionParameters = ExtractRequestAction<
+  v.InferInput<typeof UserDexAbstractionRequest>
 >;
+
 /** Request options for the {@linkcode userDexAbstraction} function. */
-export type UserDexAbstractionExchangeOptions = ExtractRequestOptions<
-  v.InferInput<typeof UserDexAbstractionExchangeRequest>
+export type UserDexAbstractionOptions = ExtractRequestOptions<
+  v.InferInput<typeof UserDexAbstractionRequest>
 >;
+
+/** Successful variant of {@linkcode UserDexAbstractionResponse} without errors. */
+export type UserDexAbstractionSuccessResponse = ExcludeErrorResponse<UserDexAbstractionResponse>;
 
 /** EIP-712 types for the {@linkcode userDexAbstraction} function. */
 export const UserDexAbstractionTypes = {
@@ -105,12 +126,12 @@ export const UserDexAbstractionTypes = {
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  * @throws {TransportError} When the transport layer throws an error.
  *
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { userDexAbstraction } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -123,10 +144,10 @@ export const UserDexAbstractionTypes = {
  */
 export async function userDexAbstraction(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
-  params: DeepImmutable<UserDexAbstractionExchangeParameters>,
-  opts?: UserDexAbstractionExchangeOptions,
-): Promise<SuccessResponse> {
-  const request = parser(UserDexAbstractionExchangeRequest)({
+  params: DeepImmutable<UserDexAbstractionParameters>,
+  opts?: UserDexAbstractionOptions,
+): Promise<UserDexAbstractionSuccessResponse> {
+  const request = parser(UserDexAbstractionRequest)({
     action: {
       type: "userDexAbstraction",
       hyperliquidChain: config.transport.isTestnet ? "Testnet" : "Mainnet",

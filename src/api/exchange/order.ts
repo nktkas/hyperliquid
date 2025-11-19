@@ -1,17 +1,12 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
+import { Signature } from "./_base/mod.ts";
 import { PlaceOrderParamsSchema } from "../_common_schemas.ts";
-
-// -------------------- Schemas --------------------
 
 /**
  * Place an order(s).
@@ -100,7 +95,10 @@ export const OrderRequest = /* @__PURE__ */ (() => {
 })();
 export type OrderRequest = v.InferOutput<typeof OrderRequest>;
 
-/** Response for order placement and batch modifications. */
+/**
+ * Response for order placement and batch modifications.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-an-order
+ */
 export const OrderResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
@@ -193,98 +191,28 @@ export const OrderResponse = /* @__PURE__ */ (() => {
 })();
 export type OrderResponse = v.InferOutput<typeof OrderResponse>;
 
-/** Successful variant of {@linkcode OrderResponse} without errors. */
-export const OrderSuccessResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Successful status. */
-      status: v.pipe(
-        v.literal("ok"),
-        v.description("Successful status."),
-      ),
-      /** Response details. */
-      response: v.pipe(
-        v.object({
-          /** Type of response. */
-          type: v.pipe(
-            v.literal("order"),
-            v.description("Type of response."),
-          ),
-          /** Specific data. */
-          data: v.pipe(
-            v.object({
-              /** Array of successful order statuses. */
-              statuses: v.pipe(
-                v.array(
-                  v.union([
-                    v.object({
-                      /** Resting order status. */
-                      resting: v.pipe(
-                        v.object({
-                          /** Order ID. */
-                          oid: v.pipe(
-                            UnsignedInteger,
-                            v.description("Order ID."),
-                          ),
-                          /** Client Order ID. */
-                          cloid: v.pipe(
-                            v.optional(v.pipe(Hex, v.length(34))),
-                            v.description("Client Order ID."),
-                          ),
-                        }),
-                        v.description("Resting order status."),
-                      ),
-                    }),
-                    v.object({
-                      /** Filled order status. */
-                      filled: v.pipe(
-                        v.object({
-                          /** Total size filled. */
-                          totalSz: v.pipe(
-                            UnsignedDecimal,
-                            v.description("Total size filled."),
-                          ),
-                          /** Average price of fill. */
-                          avgPx: v.pipe(
-                            UnsignedDecimal,
-                            v.description("Average price of fill."),
-                          ),
-                          /** Order ID. */
-                          oid: v.pipe(
-                            UnsignedInteger,
-                            v.description("Order ID."),
-                          ),
-                          /** Client Order ID. */
-                          cloid: v.pipe(
-                            v.optional(v.pipe(Hex, v.length(34))),
-                            v.description("Client Order ID."),
-                          ),
-                        }),
-                        v.description("Filled order status."),
-                      ),
-                    }),
-                  ]),
-                ),
-                v.description("Array of successful order statuses."),
-              ),
-            }),
-            v.description("Specific data."),
-          ),
-        }),
-        v.description("Response details."),
-      ),
-    }),
-    v.description("Successful variant of `OrderResponse` without errors."),
-  );
-})();
-export type OrderSuccessResponse = v.InferOutput<typeof OrderSuccessResponse>;
+// ============================================================
+// Execution Logic
+// ============================================================
 
-// -------------------- Function --------------------
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode order} function. */
 export type OrderParameters = ExtractRequestAction<v.InferInput<typeof OrderRequest>>;
+
 /** Request options for the {@linkcode order} function. */
 export type OrderOptions = ExtractRequestOptions<v.InferInput<typeof OrderRequest>>;
+
+/** Successful variant of {@linkcode OrderResponse} without errors. */
+export type OrderSuccessResponse = ExcludeErrorResponse<OrderResponse>;
 
 /**
  * Place an order(s).
@@ -301,7 +229,7 @@ export type OrderOptions = ExtractRequestOptions<v.InferInput<typeof OrderReques
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { order } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`

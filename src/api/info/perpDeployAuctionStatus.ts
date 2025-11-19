@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request for the status of the perpetual deploy auction.
@@ -60,7 +62,12 @@ export const PerpDeployAuctionStatusResponse = /* @__PURE__ */ (() => {
 })();
 export type PerpDeployAuctionStatusResponse = v.InferOutput<typeof PerpDeployAuctionStatusResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /**
  * Request for the status of the perpetual deploy auction.

@@ -1,6 +1,6 @@
-import { parser, SuccessResponse, UsdSendRequest } from "../../../src/api/exchange/~mod.ts";
+import { parser, UsdSendRequest, UsdSendResponse } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { runTest } from "./_t.ts";
+import { excludeErrorResponse, runTest } from "./_t.ts";
 
 runTest({
   name: "usdSend",
@@ -11,7 +11,7 @@ runTest({
         amount: "1",
       }),
     ]);
-    schemaCoverage(SuccessResponse, data);
+    schemaCoverage(excludeErrorResponse(UsdSendResponse), data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

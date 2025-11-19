@@ -1,10 +1,11 @@
 import * as v from "valibot";
-import { type DeepImmutable, Integer, parser, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Integer, UnsignedInteger } from "../_base.ts";
 import { L2BookLevelSchema } from "../_common_schemas.ts";
-
-// -------------------- Schemas --------------------
 
 /**
  * Request L2 order book.
@@ -79,7 +80,12 @@ export const L2BookResponse = /* @__PURE__ */ (() => {
 })();
 export type L2BookResponse = v.InferOutput<typeof L2BookResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode l2Book} function. */
 export type L2BookParameters = Omit<v.InferInput<typeof L2BookRequest>, "type">;

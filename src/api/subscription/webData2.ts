@@ -1,15 +1,15 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { SubscriptionRequestConfig } from "./_types.ts";
-import type { Subscription } from "../../transport/base.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 import { DetailedOrderSchema, TwapStateSchema } from "../_common_schemas.ts";
 import { MetaAndAssetCtxsResponse } from "../info/metaAndAssetCtxs.ts";
 import { ClearinghouseStateResponse } from "../info/clearinghouseState.ts";
 import { SpotClearinghouseStateResponse } from "../info/spotClearinghouseState.ts";
 import { SpotMetaAndAssetCtxsResponse } from "../info/spotMetaAndAssetCtxs.ts";
-
-// -------------------- Schemas --------------------
 
 /** Subscription to comprehensive user and market data events. */
 export const WebData2Request = /* @__PURE__ */ (() => {
@@ -137,7 +137,13 @@ export const WebData2Event = /* @__PURE__ */ (() => {
 })();
 export type WebData2Event = v.InferOutput<typeof WebData2Event>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { SubscriptionRequestConfig } from "./_types.ts";
+import type { Subscription } from "../../transport/base.ts";
 
 /** Request parameters for the {@linkcode webData2} function. */
 export type WebData2Parameters = Omit<v.InferInput<typeof WebData2Request>, "type">;

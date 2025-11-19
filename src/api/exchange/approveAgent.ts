@@ -1,16 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Hex, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeUserSignedAction,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  getSignatureChainId,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Approve an agent to sign on behalf of the master account.
@@ -71,15 +66,41 @@ export const ApproveAgentRequest = /* @__PURE__ */ (() => {
 })();
 export type ApproveAgentRequest = v.InferOutput<typeof ApproveAgentRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet
+ */
+export const ApproveAgentResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type ApproveAgentResponse = v.InferOutput<typeof ApproveAgentResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeUserSignedAction,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  getSignatureChainId,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode approveAgent} function. */
 export type ApproveAgentParameters = ExtractRequestAction<v.InferInput<typeof ApproveAgentRequest>>;
+
 /** Request options for the {@linkcode approveAgent} function. */
 export type ApproveAgentOptions = ExtractRequestOptions<v.InferInput<typeof ApproveAgentRequest>>;
+
+/** Successful variant of {@linkcode ApproveAgentResponse} without errors. */
+export type ApproveAgentSuccessResponse = ExcludeErrorResponse<ApproveAgentResponse>;
 
 /** EIP-712 types for the {@linkcode approveAgent} function. */
 export const ApproveAgentTypes = {
@@ -106,7 +127,7 @@ export const ApproveAgentTypes = {
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { approveAgent } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -121,7 +142,7 @@ export async function approveAgent(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<ApproveAgentParameters>,
   opts?: ApproveAgentOptions,
-): Promise<SuccessResponse> {
+): Promise<ApproveAgentSuccessResponse> {
   const request = parser(ApproveAgentRequest)({
     action: {
       type: "approveAgent",

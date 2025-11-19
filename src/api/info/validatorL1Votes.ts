@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, Integer, parser } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Integer } from "../_base.ts";
 
 /**
  * Request validator L1 votes.
@@ -63,7 +65,12 @@ export const ValidatorL1VotesResponse = /* @__PURE__ */ (() => {
 })();
 export type ValidatorL1VotesResponse = v.InferOutput<typeof ValidatorL1VotesResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /**
  * Request validator L1 votes.

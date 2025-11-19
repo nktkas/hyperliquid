@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, ISO8601WithoutTimezone, parser, UnsignedDecimal } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, ISO8601WithoutTimezone, UnsignedDecimal } from "../_base.ts";
 
 /**
  * Request all perpetual dexs.
@@ -93,7 +95,12 @@ export const PerpDexsResponse = /* @__PURE__ */ (() => {
 })();
 export type PerpDexsResponse = v.InferOutput<typeof PerpDexsResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /**
  * Request all perpetual dexs.

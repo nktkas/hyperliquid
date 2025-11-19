@@ -1,6 +1,6 @@
-import { parser, SpotSendRequest, SuccessResponse } from "../../../src/api/exchange/~mod.ts";
+import { parser, SpotSendRequest, SpotSendResponse } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { runTest, topUpSpot } from "./_t.ts";
+import { excludeErrorResponse, runTest, topUpSpot } from "./_t.ts";
 
 runTest({
   name: "spotSend",
@@ -18,7 +18,7 @@ runTest({
         amount: "1",
       }),
     ]);
-    schemaCoverage(SuccessResponse, data);
+    schemaCoverage(excludeErrorResponse(SpotSendResponse), data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

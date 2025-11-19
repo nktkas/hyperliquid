@@ -1,10 +1,11 @@
 import * as v from "valibot";
-import { type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 import { CandleIntervalSchema } from "../_common_schemas.ts";
-
-// -------------------- Schemas --------------------
 
 /**
  * Request candlestick snapshots.
@@ -113,7 +114,12 @@ export const CandleSnapshotResponse = /* @__PURE__ */ (() => {
 })();
 export type CandleSnapshotResponse = v.InferOutput<typeof CandleSnapshotResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode candleSnapshot} function. */
 export type CandleSnapshotParameters = v.InferInput<typeof CandleSnapshotRequest>["req"];

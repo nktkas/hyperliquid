@@ -1,10 +1,11 @@
 import * as v from "valibot";
-import { Address, Decimal, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Decimal, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 import { PortfolioResponse } from "./portfolio.ts";
-
-// -------------------- Schemas --------------------
 
 /**
  * Request details of a vault.
@@ -233,7 +234,12 @@ export const VaultDetailsResponse = /* @__PURE__ */ (() => {
 })();
 export type VaultDetailsResponse = v.InferOutput<typeof VaultDetailsResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode vaultDetails} function. */
 export type VaultDetailsParameters = Omit<v.InferInput<typeof VaultDetailsRequest>, "type">;

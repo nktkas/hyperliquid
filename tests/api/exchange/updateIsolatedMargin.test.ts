@@ -1,6 +1,6 @@
-import { parser, SuccessResponse, UpdateIsolatedMarginRequest } from "../../../src/api/exchange/~mod.ts";
+import { parser, UpdateIsolatedMarginRequest, UpdateIsolatedMarginResponse } from "../../../src/api/exchange/~mod.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { openOrder, runTest, symbolConverter } from "./_t.ts";
+import { excludeErrorResponse, openOrder, runTest, symbolConverter } from "./_t.ts";
 
 runTest({
   name: "updateIsolatedMargin",
@@ -17,14 +17,14 @@ runTest({
       const data = await Promise.all([
         exchClient.updateIsolatedMargin({ asset: id, isBuy: true, ntli: 2 * 1e6 }),
       ]);
-      schemaCoverage(SuccessResponse, data);
+      schemaCoverage(excludeErrorResponse(UpdateIsolatedMarginResponse), data);
     });
 
     await t.test("Decrease isolated margin", async () => {
       const data = await Promise.all([
         exchClient.updateIsolatedMargin({ asset: id, isBuy: true, ntli: -1 * 1e6 }),
       ]);
-      schemaCoverage(SuccessResponse, data);
+      schemaCoverage(excludeErrorResponse(UpdateIsolatedMarginResponse), data);
     });
   },
   cliTestFn: async (_t, runCommand) => {

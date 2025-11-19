@@ -492,77 +492,69 @@ class ExchangeClient {
   });
 
   // Order & TWAP & Position
-  batchModify(params: BatchModifyParameters): Promise<OrderResponseSuccess>;
-  cancel(params: CancelParameters): Promise<CancelResponseSuccess>;
-  cancelByCloid(params: CancelByCloidParameters): Promise<CancelResponseSuccess>;
-  modify(params: ModifyParameters): Promise<SuccessResponse>;
-  order(params: OrderParameters): Promise<OrderResponseSuccess>;
-  scheduleCancel(params?: ScheduleCancelParameters): Promise<SuccessResponse>;
-  twapCancel(params: TwapCancelParameters): Promise<TwapCancelResponseSuccess>;
-  twapOrder(params: TwapOrderParameters): Promise<TwapOrderResponseSuccess>;
-  updateIsolatedMargin(params: UpdateIsolatedMarginParameters): Promise<SuccessResponse>;
-  updateLeverage(params: UpdateLeverageParameters): Promise<SuccessResponse>;
+  batchModify(params: BatchModifyParameters): Promise<BatchModifySuccessResponse>;
+  cancel(params: CancelParameters): Promise<CancelSuccessResponse>;
+  cancelByCloid(params: CancelByCloidParameters): Promise<CancelByCloidSuccessResponse>;
+  modify(params: ModifyParameters): Promise<ModifySuccessResponse>;
+  order(params: OrderParameters): Promise<OrderSuccessResponse>;
+  scheduleCancel(params?: ScheduleCancelParameters): Promise<ScheduleCancelSuccessResponse>;
+  twapCancel(params: TwapCancelParameters): Promise<TwapCancelSuccessResponse>;
+  twapOrder(params: TwapOrderParameters): Promise<TwapOrderSuccessResponse>;
+  updateIsolatedMargin(params: UpdateIsolatedMarginParameters): Promise<UpdateIsolatedMarginSuccessResponse>;
+  updateLeverage(params: UpdateLeverageParameters): Promise<UpdateLeverageSuccessResponse>;
 
   // Account
-  agentEnableDexAbstraction(): Promise<SuccessResponse>;
-  approveAgent(params: ApproveAgentParameters): Promise<SuccessResponse>;
-  approveBuilderFee(params: ApproveBuilderFeeParameters): Promise<SuccessResponse>;
-  evmUserModify(params: EvmUserModifyParameters): Promise<SuccessResponse>;
-  noop(): Promise<SuccessResponse>;
-  reserveRequestWeight(params: ReserveRequestWeightParameters): Promise<SuccessResponse>;
-  setDisplayName(params: SetDisplayNameParameters): Promise<SuccessResponse>;
-  spotUser(params: SpotUserParameters): Promise<SuccessResponse>;
-  userDexAbstraction(params: UserDexAbstractionExchangeParameters): Promise<UserDexAbstractionExchangeResponse>;
+  agentEnableDexAbstraction(): Promise<AgentEnableDexAbstractionSuccessResponse>;
+  approveAgent(params: ApproveAgentParameters): Promise<ApproveAgentSuccessResponse>;
+  approveBuilderFee(params: ApproveBuilderFeeParameters): Promise<ApproveBuilderFeeSuccessResponse>;
+  evmUserModify(params: EvmUserModifyParameters): Promise<EvmUserModifySuccessResponse>;
+  noop(): Promise<NoopSuccessResponse>;
+  reserveRequestWeight(params: ReserveRequestWeightParameters): Promise<ReserveRequestWeightSuccessResponse>;
+  setDisplayName(params: SetDisplayNameParameters): Promise<SetDisplayNameSuccessResponse>;
+  spotUser(params: SpotUserParameters): Promise<SpotUserSuccessResponse>;
+  userDexAbstraction(params: UserDexAbstractionExchangeParameters): Promise<UserDexAbstractionSuccessResponse>;
 
   // Fund Transfers
-  sendAsset(params: SendAssetParameters): Promise<SuccessResponse>;
-  spotSend(params: SpotSendParameters): Promise<SuccessResponse>;
-  usdClassTransfer(params: UsdClassTransferParameters): Promise<SuccessResponse>;
-  usdSend(params: UsdSendParameters): Promise<SuccessResponse>;
-  withdraw3(params: Withdraw3Parameters): Promise<SuccessResponse>;
+  sendAsset(params: SendAssetParameters): Promise<SendAssetSuccessResponse>;
+  spotSend(params: SpotSendParameters): Promise<SpotSendSuccessResponse>;
+  usdClassTransfer(params: UsdClassTransferParameters): Promise<UsdClassTransferSuccessResponse>;
+  usdSend(params: UsdSendParameters): Promise<UsdSendSuccessResponse>;
+  withdraw3(params: Withdraw3Parameters): Promise<Withdraw3SuccessResponse>;
 
   // Sub-Account
-  createSubAccount(params: CreateSubAccountParameters): Promise<CreateSubAccountResponse>;
-  subAccountModify(params: SubAccountModifyParameters): Promise<SuccessResponse>;
-  subAccountSpotTransfer(params: SubAccountSpotTransferParameters): Promise<SuccessResponse>;
-  subAccountTransfer(params: SubAccountTransferParameters): Promise<SuccessResponse>;
+  createSubAccount(params: CreateSubAccountParameters): Promise<CreateSubAccountSuccessResponse>;
+  subAccountModify(params: SubAccountModifyParameters): Promise<SubAccountModifySuccessResponse>;
+  subAccountSpotTransfer(params: SubAccountSpotTransferParameters): Promise<SubAccountSpotTransferSuccessResponse>;
+  subAccountTransfer(params: SubAccountTransferParameters): Promise<SubAccountTransferSuccessResponse>;
 
   // Referrer
-  claimRewards(): Promise<SuccessResponse>;
-  registerReferrer(params: RegisterReferrerParameters): Promise<SuccessResponse>;
-  setReferrer(params: SetReferrerParameters): Promise<SuccessResponse>;
+  claimRewards(): Promise<ClaimRewardsSuccessResponse>;
+  registerReferrer(params: RegisterReferrerParameters): Promise<RegisterReferrerSuccessResponse>;
+  setReferrer(params: SetReferrerParameters): Promise<SetReferrerSuccessResponse>;
 
   // Staking & Delegation
-  cDeposit(params: CDepositParameters): Promise<SuccessResponse>;
-  cWithdraw(params: CWithdrawParameters): Promise<SuccessResponse>;
-  linkStakingUser(params: LinkStakingUserParameters): Promise<SuccessResponse>;
-  tokenDelegate(params: TokenDelegateParameters): Promise<SuccessResponse>;
+  cDeposit(params: CDepositParameters): Promise<CDepositSuccessResponse>;
+  cWithdraw(params: CWithdrawParameters): Promise<CWithdrawSuccessResponse>;
+  linkStakingUser(params: LinkStakingUserParameters): Promise<LinkStakingUserSuccessResponse>;
+  tokenDelegate(params: TokenDelegateParameters): Promise<TokenDelegateSuccessResponse>;
 
   // Vault
-  createVault(params: CreateVaultParameters): Promise<CreateVaultResponse>;
-  vaultDistribute(params: VaultDistributeParameters): Promise<SuccessResponse>;
-  vaultModify(params: VaultModifyParameters): Promise<SuccessResponse>;
-  vaultTransfer(params: VaultTransferParameters): Promise<SuccessResponse>;
+  createVault(params: CreateVaultParameters): Promise<CreateVaultSuccessResponse>;
+  vaultDistribute(params: VaultDistributeParameters): Promise<VaultDistributeSuccessResponse>;
+  vaultModify(params: VaultModifyParameters): Promise<VaultModifySuccessResponse>;
+  vaultTransfer(params: VaultTransferParameters): Promise<VaultTransferSuccessResponse>;
 
   // Multi-Sign
-  convertToMultiSigUser(params: ConvertToMultiSigUserParameters): Promise<SuccessResponse>;
-  multiSig(params: MultiSigParameters): Promise<
-    | SuccessResponse
-    | CancelSuccessResponse
-    | CreateSubAccountResponse
-    | CreateVaultResponse
-    | OrderSuccessResponse
-    | TwapOrderSuccessResponse
-    | TwapCancelSuccessResponse
-  >;
+  convertToMultiSigUser(params: ConvertToMultiSigUserParameters): Promise<ConvertToMultiSigUserSuccessResponse>;
+  multiSig(params: MultiSigParameters): Promise<MultiSigSuccessResponse>;
 
   // Deploy Market
-  perpDeploy(params: PerpDeployParameters): Promise<SuccessResponse>;
-  spotDeploy(params: SpotDeployParameters): Promise<SuccessResponse>;
+  perpDeploy(params: PerpDeployParameters): Promise<PerpDeploySuccessResponse>;
+  spotDeploy(params: SpotDeployParameters): Promise<SpotDeploySuccessResponse>;
 
   // Validator Actions
-  cSignerAction(params: CSignerActionParameters): Promise<SuccessResponse>;
-  cValidatorAction(params: CValidatorActionParameters): Promise<SuccessResponse>;
+  cSignerAction(params: CSignerActionParameters): Promise<CSignerActionSuccessResponse>;
+  cValidatorAction(params: CValidatorActionParameters): Promise<CValidatorActionSuccessResponse>;
 }
 ```
 

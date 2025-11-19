@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, Decimal, type DeepImmutable, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Decimal, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request clearinghouse state.
@@ -239,7 +241,12 @@ export const ClearinghouseStateResponse = /* @__PURE__ */ (() => {
 })();
 export type ClearinghouseStateResponse = v.InferOutput<typeof ClearinghouseStateResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode clearinghouseState} function. */
 export type ClearinghouseStateParameters = Omit<v.InferInput<typeof ClearinghouseStateRequest>, "type">;

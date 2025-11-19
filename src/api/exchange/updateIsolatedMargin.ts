@@ -1,15 +1,11 @@
 import * as v from "valibot";
-import { Address, type DeepImmutable, Integer, parser, UnsignedInteger } from "../_base.ts";
-import {
-  type ExchangeRequestConfig,
-  executeL1Action,
-  type ExtractRequestAction,
-  type ExtractRequestOptions,
-  type MultiSignRequestConfig,
-  Signature,
-} from "./_base/mod.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Integer, UnsignedInteger } from "../_base.ts";
+import { ErrorResponse, Signature, SuccessResponse } from "./_base/mod.ts";
 
 /**
  * Add or remove margin from isolated position.
@@ -70,15 +66,40 @@ export const UpdateIsolatedMarginRequest = /* @__PURE__ */ (() => {
 })();
 export type UpdateIsolatedMarginRequest = v.InferOutput<typeof UpdateIsolatedMarginRequest>;
 
-import { SuccessResponse } from "./_base/mod.ts";
-export { SuccessResponse };
+/**
+ * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin
+ */
+export const UpdateIsolatedMarginResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.union([SuccessResponse, ErrorResponse]),
+    v.description("Successful response without specific data or error response."),
+  );
+})();
+export type UpdateIsolatedMarginResponse = v.InferOutput<typeof UpdateIsolatedMarginResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { type DeepImmutable, parser } from "../_base.ts";
+import {
+  type ExchangeRequestConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestAction,
+  type ExtractRequestOptions,
+  type MultiSignRequestConfig,
+} from "./_base/mod.ts";
 
 /** Action parameters for the {@linkcode updateIsolatedMargin} function. */
 export type UpdateIsolatedMarginParameters = ExtractRequestAction<v.InferInput<typeof UpdateIsolatedMarginRequest>>;
+
 /** Request options for the {@linkcode updateIsolatedMargin} function. */
 export type UpdateIsolatedMarginOptions = ExtractRequestOptions<v.InferInput<typeof UpdateIsolatedMarginRequest>>;
+
+/** Successful variant of {@linkcode UpdateIsolatedMarginResponse} without errors. */
+export type UpdateIsolatedMarginSuccessResponse = ExcludeErrorResponse<UpdateIsolatedMarginResponse>;
 
 /**
  * Add or remove margin from isolated position.
@@ -95,7 +116,7 @@ export type UpdateIsolatedMarginOptions = ExtractRequestOptions<v.InferInput<typ
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { updateIsolatedMargin } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
+ * import { privateKeyToAccount } from "viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
@@ -110,7 +131,7 @@ export async function updateIsolatedMargin(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
   params: DeepImmutable<UpdateIsolatedMarginParameters>,
   opts?: UpdateIsolatedMarginOptions,
-): Promise<SuccessResponse> {
+): Promise<UpdateIsolatedMarginSuccessResponse> {
   const request = parser(UpdateIsolatedMarginRequest)({
     action: {
       type: "updateIsolatedMargin",

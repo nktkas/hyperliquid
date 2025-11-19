@@ -1,8 +1,10 @@
 import * as v from "valibot";
-import { Address, Hex, Integer, parser, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
-import type { InfoRequestConfig } from "./_types.ts";
 
-// -------------------- Schemas --------------------
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Address, Hex, Integer, UnsignedDecimal, UnsignedInteger } from "../_base.ts";
 
 /**
  * Request spot trading metadata.
@@ -137,7 +139,12 @@ export const SpotMetaResponse = /* @__PURE__ */ (() => {
 })();
 export type SpotMetaResponse = v.InferOutput<typeof SpotMetaResponse>;
 
-// -------------------- Function --------------------
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { parser } from "../_base.ts";
+import type { InfoRequestConfig } from "./_types.ts";
 
 /**
  * Request spot trading metadata.
