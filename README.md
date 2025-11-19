@@ -575,6 +575,7 @@ class SubscriptionClient {
   bbo(params: WsBboParameters, listener: (data: WsBboEvent) => void);
   candle(params: WsCandleParameters, listener: (data: WsCandleEvent) => void);
   l2Book(params: WsL2BookParameters, listener: (data: WsL2BookEvent) => void);
+  spotAssetCtxs(listener: (data: WsSpotAssetCtxsEvent) => void);
   trades(params: WsTradesParameters, listener: (data: WsTradesEvent) => void);
 
   // Account

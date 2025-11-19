@@ -16,6 +16,7 @@ import { l2Book } from "./l2Book.ts";
 import { notification } from "./notification.ts";
 import { openOrders } from "./openOrders.ts";
 import { orderUpdates } from "./orderUpdates.ts";
+import { spotAssetCtxs } from "./spotAssetCtxs.ts";
 import { spotState } from "./spotState.ts";
 import { trades } from "./trades.ts";
 import { userEvents } from "./userEvents.ts";
@@ -69,6 +70,10 @@ export type {
   OrderUpdatesEvent as WsOrderUpdatesEvent,
   OrderUpdatesParameters as WsOrderUpdatesParameters,
 } from "./orderUpdates.ts";
+export type {
+  SpotAssetCtxsEvent as WsSpotAssetCtxsEvent,
+  SpotAssetCtxsParameters as WsSpotAssetCtxsParameters,
+} from "./spotAssetCtxs.ts";
 export type { SpotStateEvent as WsSpotStateEvent, SpotStateParameters as WsSpotStateParameters } from "./spotState.ts";
 export type { TradesEvent as WsTradesEvent, TradesParameters as WsTradesParameters } from "./trades.ts";
 export type {
@@ -482,6 +487,30 @@ export class SubscriptionClient<
     ...args: OmitFirst<OverloadedParameters<typeof orderUpdates>>
   ): ReturnType<typeof orderUpdates> {
     return orderUpdates(this, ...args);
+  }
+
+  /**
+   * Subscribe to context updates for all spot assets.
+   * @param listener - A callback function to be called when the event is received.
+   * @returns A request-promise that resolves with a {@link Subscription} object to manage the subscription lifecycle.
+   *
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport();
+   *
+   * const client = new hl.SubscriptionClient({ transport });
+   * const sub = await client.spotAssetCtxs((data) => console.log(data));
+   * ```
+   */
+  spotAssetCtxs(
+    ...args: OmitFirst<OverloadedParameters<typeof spotAssetCtxs>>
+  ): ReturnType<typeof spotAssetCtxs> {
+    return spotAssetCtxs(this, ...args);
   }
 
   /**

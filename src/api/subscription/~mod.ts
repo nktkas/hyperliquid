@@ -40,6 +40,7 @@ export * from "./l2Book.ts";
 export * from "./notification.ts";
 export * from "./openOrders.ts";
 export * from "./orderUpdates.ts";
+export * from "./spotAssetCtxs.ts";
 export * from "./spotState.ts";
 export * from "./trades.ts";
 export * from "./userEvents.ts";
