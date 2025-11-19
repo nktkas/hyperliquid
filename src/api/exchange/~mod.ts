@@ -81,6 +81,7 @@ export * from "./updateLeverage.ts";
 export * from "./usdClassTransfer.ts";
 export * from "./usdSend.ts";
 export * from "./userDexAbstraction.ts";
+export * from "./validatorL1Stream.ts";
 export * from "./vaultDistribute.ts";
 export * from "./vaultModify.ts";
 export * from "./vaultTransfer.ts";

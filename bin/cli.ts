@@ -260,6 +260,7 @@ Deploy Market:
 Validator Actions:
   cSignerAction           --jailSelf null | --unjailSelf null
   cValidatorAction        --changeProfile <json> | --register <json> | --unregister null
+  validatorL1Stream       --riskFreeRate <number>
 
 Other:
   convertToMultiSigUser   --authorizedUsers <json> --threshold <number>

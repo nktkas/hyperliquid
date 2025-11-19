@@ -555,6 +555,7 @@ class ExchangeClient {
   // Validator Actions
   cSignerAction(params: CSignerActionParameters): Promise<CSignerActionSuccessResponse>;
   cValidatorAction(params: CValidatorActionParameters): Promise<CValidatorActionSuccessResponse>;
+  validatorL1Stream(params: ValidatorL1StreamParameters): Promise<ValidatorL1StreamSuccessResponse>;
 }
 ```
 

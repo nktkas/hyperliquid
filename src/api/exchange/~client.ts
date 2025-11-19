@@ -45,6 +45,7 @@ import { updateLeverage } from "./updateLeverage.ts";
 import { usdClassTransfer } from "./usdClassTransfer.ts";
 import { usdSend } from "./usdSend.ts";
 import { userDexAbstraction } from "./userDexAbstraction.ts";
+import { validatorL1Stream } from "./validatorL1Stream.ts";
 import { vaultDistribute } from "./vaultDistribute.ts";
 import { vaultModify } from "./vaultModify.ts";
 import { vaultTransfer } from "./vaultTransfer.ts";
@@ -1410,6 +1411,33 @@ export class ExchangeClient<
   }
 
   /**
+   * Validator vote on risk-free rate for aligned quote asset.
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   * @returns Successful response without specific data.
+   *
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#validator-vote-on-risk-free-rate-for-aligned-quote-asset
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const pk = "0x..."; // viem, ethers or private key
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   *
+   * const client = new hl.ExchangeClient({ transport, wallet: pk });
+   * await client.validatorL1Stream({ riskFreeRate: "0.05" });
+   * ```
+   */
+  validatorL1Stream(
+    ...args: OmitFirst<OverloadedParameters<typeof validatorL1Stream>>
+  ): ReturnType<typeof validatorL1Stream> {
+    return validatorL1Stream(this, ...args);
+  }
+
+  /**
    * Distribute funds from a vault between followers.
    * @param params - Parameters specific to the API request.
    * @param opts - Request execution options.
@@ -1632,6 +1660,7 @@ export type {
   UserDexAbstractionResponse as UserDexAbstractionExchangeResponse,
   UserDexAbstractionSuccessResponse as UserDexAbstractionExchangeSuccessResponse,
 } from "./userDexAbstraction.ts";
+export type * from "./validatorL1Stream.ts";
 export type * from "./vaultDistribute.ts";
 export type * from "./vaultModify.ts";
 export type * from "./vaultTransfer.ts";
