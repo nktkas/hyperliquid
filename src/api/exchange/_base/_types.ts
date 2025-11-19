@@ -54,6 +54,15 @@ export interface ExchangeRequestConfig<
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#expires-after
    */
   defaultExpiresAfter?: number | (() => MaybePromise<number>);
+  /**
+   * A fixed nonce or a function that returns a nonce to be used for signing requests.
+   *
+   * Defaults to a global nonce manager that uses the current timestamp in milliseconds,
+   * and increments if the timestamp is not greater than the last nonce.
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/nonces-and-api-wallets#hyperliquid-nonces
+   */
+  nonceManager?: number | ((address: string) => MaybePromise<number>);
 }
 
 /** Configuration for Exchange API requests using multi-signature wallets. */

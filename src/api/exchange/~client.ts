@@ -65,6 +65,7 @@ export class ExchangeClient<
   signatureChainId?: string | (() => MaybePromise<string>);
   defaultVaultAddress?: string;
   defaultExpiresAfter?: number | (() => MaybePromise<number>);
+  nonceManager?: number | ((address: string) => MaybePromise<number>);
 
   /**
    * Initialises a new instance.
@@ -127,6 +128,7 @@ export class ExchangeClient<
     this.defaultVaultAddress = args.defaultVaultAddress;
     this.defaultExpiresAfter = args.defaultExpiresAfter;
     this.signatureChainId = args.signatureChainId;
+    this.nonceManager = args.nonceManager;
   }
 
   /**

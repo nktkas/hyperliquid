@@ -391,6 +391,7 @@ A client is an interface through which you can interact with the Hyperliquid API
 ```ts
 class InfoClient {
   constructor(args: {
+    /** The transport used to connect to the Hyperliquid API. */
     transport: HttpTransport | WebSocketTransport;
   });
 
@@ -485,10 +486,41 @@ class InfoClient {
 ```ts
 class ExchangeClient {
   constructor(args: {
+    /** The transport used to connect to the Hyperliquid Exchange API. */
     transport: HttpTransport | WebSocketTransport;
-    wallet: AbstractWallet | Hex; // viem, ethers or private key directly
+
+    /** The wallet used to sign requests (viem, ethers or private key directly). */
+    wallet: AbstractWallet | Hex;
+
+    /**
+     * The network that will be used to sign transactions.
+     * Must match the network of the {@link wallet}.
+     *
+     * Defaults to get chain id from wallet otherwise `0x1`.
+     */
+    signatureChainId?: Hex | (() => MaybePromise<Hex>);
+
+    /**
+     * Sets a default vaultAddress to be used if no vaultAddress is explicitly passed to a method.
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#subaccounts-and-vaults
+     */
     defaultVaultAddress?: Hex; // Vault address used by default if not provided in method call
-    signatureChainId?: Hex | (() => MaybePromise<Hex>); // Chain ID used for signing (default: get chain id from wallet otherwise `0x1`)
+
+    /**
+     * Sets a default expiresAfter to be used if no expiresAfter is explicitly passed to a method.
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#expires-after
+     */
+    defaultExpiresAfter?: number | (() => MaybePromise<number>);
+
+    /**
+     * A fixed nonce or a function that returns a nonce to be used for signing requests.
+     *
+     * Defaults to a global nonce manager that uses the current timestamp in milliseconds,
+     * and increments if the timestamp is not greater than the last nonce.
+     *
+     * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/nonces-and-api-wallets#hyperliquid-nonces
+     */
+    nonceManager?: number | ((address: string) => MaybePromise<number>);
   });
 
   // Order & TWAP & Position
@@ -564,6 +596,7 @@ class ExchangeClient {
 ```ts
 class SubscriptionClient {
   constructor(args: {
+    /** The transport used to connect to the Hyperliquid API. */
     transport: WebSocketTransport;
   });
 

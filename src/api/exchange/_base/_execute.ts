@@ -10,7 +10,7 @@ import {
 } from "../../../signing/mod.ts";
 import { assertSuccessResponse } from "./_errors.ts";
 import type { AnyResponse, AnySuccessResponse, ExchangeRequestConfig, MultiSignRequestConfig } from "./_types.ts";
-import { globalNonceManager } from "./_nonce.ts";
+import { getNonce } from "./_nonce.ts";
 
 export async function executeL1Action<T extends AnySuccessResponse>(
   config: ExchangeRequestConfig | MultiSignRequestConfig,
@@ -35,7 +35,7 @@ export async function executeL1Action<T extends AnySuccessResponse>(
 
   // Main logic
   try {
-    const nonce = globalNonceManager.getNonce();
+    const nonce = await getNonce(config, walletAddress);
 
     // Multi-signature request
     if ("signers" in config) {
@@ -137,7 +137,7 @@ export async function executeUserSignedAction<T extends AnySuccessResponse>(
 
   // Main logic
   try {
-    const nonce = globalNonceManager.getNonce();
+    const nonce = await getNonce(config, walletAddress);
     if ("time" in action) request.action.time = nonce;
     if ("nonce" in action) request.action.nonce = nonce;
 
