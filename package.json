@@ -1,6 +1,6 @@
 {
   "name": "@nktkas/hyperliquid",
-  "version": "0.26.0",
+  "version": "0.27.0",
   "description": "Unofficial Hyperliquid API SDK for all major JS runtimes, written in TypeScript.",
   "keywords": [
     "api",
