@@ -15,8 +15,7 @@ runTest({
           amount: "1",
         });
       },
-      ApiRequestError,
-      "Invalid sub-account transfer from",
+      (e) => e instanceof ApiRequestError && e.message.includes("Invalid sub-account transfer from"),
     );
   },
   cliTestFn: async (_t, runCommand) => {

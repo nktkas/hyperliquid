@@ -123,7 +123,10 @@ test("WebSocketTransport", async (t) => {
 
         // Test
         const promise = transport.request("info", { key: "value" });
-        await assert.rejects(() => promise, WebSocketRequestError, "Request failed:");
+        await assert.rejects(
+          () => promise,
+          (e) => e instanceof WebSocketRequestError && e.message.includes("Request failed:"),
+        );
 
         // Clean up
         await transport.close();
@@ -140,7 +143,6 @@ test("WebSocketTransport", async (t) => {
         await assert.rejects(
           () => promise,
           (e) => e instanceof WebSocketRequestError && e.cause instanceof Error && e.cause.message === "Aborted",
-          "Unknown error while making a WebSocket request:",
         );
 
         // Clean up
@@ -163,7 +165,6 @@ test("WebSocketTransport", async (t) => {
             e instanceof WebSocketRequestError &&
             e.cause instanceof DOMException &&
             e.cause.message === "signal timed out",
-          "Unknown error while making a WebSocket request:",
         );
 
         // Clean up
@@ -415,7 +416,10 @@ test("WebSocketTransport", async (t) => {
         // Test
         const alreadyAborted = AbortSignal.abort(new Error("Already aborted"));
         const promise = transport.ready(alreadyAborted);
-        await assert.rejects(() => promise, Error, "Already aborted");
+        await assert.rejects(
+          () => promise,
+          (e) => e instanceof Error && e.message === "Already aborted",
+        );
 
         // Clean up
         await transport.close();
@@ -430,7 +434,10 @@ test("WebSocketTransport", async (t) => {
         const promise = transport.ready(controller.signal);
         controller.abort(new Error("Aborted later"));
 
-        await assert.rejects(() => promise, Error, "Aborted later");
+        await assert.rejects(
+          () => promise,
+          (e) => e instanceof Error && e.message === "Aborted later",
+        );
 
         // Clean up
         await transport.close();
@@ -444,7 +451,10 @@ test("WebSocketTransport", async (t) => {
       // Test
       await transport.close();
       const promise = transport.ready();
-      await assert.rejects(() => promise, Error, "TERMINATED_BY_USER");
+      await assert.rejects(
+        () => promise,
+        (e) => e instanceof Error && e.message.includes("TERMINATED_BY_USER"),
+      );
     });
   });
 
@@ -471,7 +481,10 @@ test("WebSocketTransport", async (t) => {
         // Test
         const aborted = AbortSignal.abort(new Error("Already aborted close"));
         const promise = transport.close(aborted);
-        await assert.rejects(() => promise, Error, "Already aborted close");
+        await assert.rejects(
+          () => promise,
+          (e) => e instanceof Error && e.message === "Already aborted close",
+        );
 
         // Clean up
         await transport.close();
@@ -487,7 +500,10 @@ test("WebSocketTransport", async (t) => {
         const promise = transport.close(controller.signal);
         controller.abort(new Error("Close aborted"));
 
-        await assert.rejects(() => promise, Error, "Close aborted");
+        await assert.rejects(
+          () => promise,
+          (e) => e instanceof Error && e.message === "Close aborted",
+        );
 
         // Clean up
         await transport.close();

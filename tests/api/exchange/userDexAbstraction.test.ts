@@ -13,8 +13,9 @@ runTest({
           enabled: true,
         });
       },
-      ApiRequestError,
-      "Sub-account 0xcb3f0bd249a89e45e86a44bcfc7113e4ffe84cd1 is not registered to",
+      (e) =>
+        e instanceof ApiRequestError &&
+        e.message.includes("Sub-account 0xcb3f0bd249a89e45e86a44bcfc7113e4ffe84cd1 is not registered to"),
     );
   },
   cliTestFn: async (_t, runCommand) => {

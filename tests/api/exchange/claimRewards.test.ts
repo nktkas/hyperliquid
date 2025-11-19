@@ -10,8 +10,7 @@ runTest({
       async () => {
         await exchClient.claimRewards();
       },
-      ApiRequestError,
-      "No rewards to claim",
+      (e) => e instanceof ApiRequestError && e.message.includes("No rewards to claim"),
     );
   },
   cliTestFn: async (_t, runCommand) => {

@@ -10,8 +10,8 @@ runTest({
       async () => {
         await exchClient.registerReferrer({ code: "TEST" });
       },
-      ApiRequestError,
-      "Cannot generate referral code until enough volume traded",
+      (e) =>
+        e instanceof ApiRequestError && e.message.includes("Cannot generate referral code until enough volume traded"),
     );
   },
   cliTestFn: async (_t, runCommand) => {

@@ -13,8 +13,7 @@ runTest({
           isFinalize: false,
         });
       },
-      ApiRequestError,
-      "Staking link error",
+      (e) => e instanceof ApiRequestError && e.message.includes("Staking link error"),
     );
   },
   cliTestFn: async (_t, runCommand) => {

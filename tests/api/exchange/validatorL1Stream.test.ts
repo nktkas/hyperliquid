@@ -10,8 +10,7 @@ runTest({
       async () => {
         await exchClient.validatorL1Stream({ riskFreeRate: "0.05" });
       },
-      ApiRequestError,
-      "Unknown validator",
+      (e) => e instanceof ApiRequestError && e.message.includes("Unknown validator"),
     );
   },
   cliTestFn: async (_t, runCommand) => {

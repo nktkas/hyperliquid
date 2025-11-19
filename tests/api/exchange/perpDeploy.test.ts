@@ -24,8 +24,7 @@ runTest({
             },
           });
         },
-        ApiRequestError,
-        "Invalid perp deployer",
+        (e) => e instanceof ApiRequestError && e.message.includes("Invalid perp deployer"),
       );
     });
 
@@ -41,8 +40,7 @@ runTest({
             },
           });
         },
-        ApiRequestError,
-        "Invalid perp deployer",
+        (e) => e instanceof ApiRequestError && e.message.includes("Invalid perp deployer"),
       );
     });
 
@@ -53,8 +51,7 @@ runTest({
             setFundingMultipliers: [["TEST0", "1"]],
           });
         },
-        ApiRequestError,
-        "Unknown coin TEST0",
+        (e) => e instanceof ApiRequestError && e.message.includes("Unknown coin TEST0"),
       );
     });
 
@@ -68,8 +65,7 @@ runTest({
             },
           });
         },
-        ApiRequestError,
-        "Unknown coin TEST0",
+        (e) => e instanceof ApiRequestError && e.message.includes("Unknown coin TEST0"),
       );
     });
 
@@ -80,8 +76,7 @@ runTest({
             setMarginTableIds: [["TEST0", 1]],
           });
         },
-        ApiRequestError,
-        "Unknown coin TEST0",
+        (e) => e instanceof ApiRequestError && e.message.includes("Unknown coin TEST0"),
       );
     });
 
@@ -95,8 +90,7 @@ runTest({
             },
           });
         },
-        ApiRequestError,
-        "Invalid perp deployer",
+        (e) => e instanceof ApiRequestError && e.message.includes("Invalid perp deployer"),
       );
     });
 
@@ -107,8 +101,7 @@ runTest({
             setOpenInterestCaps: [["TEST0", 1]],
           });
         },
-        ApiRequestError,
-        "Unknown coin TEST0",
+        (e) => e instanceof ApiRequestError && e.message.includes("Unknown coin TEST0"),
       );
     });
 
@@ -126,8 +119,7 @@ runTest({
             },
           });
         },
-        ApiRequestError,
-        "Invalid perp deployer",
+        (e) => e instanceof ApiRequestError && e.message.includes("Invalid perp deployer"),
       );
     });
 
@@ -141,8 +133,7 @@ runTest({
             },
           });
         },
-        ApiRequestError,
-        "Invalid perp deployer",
+        (e) => e instanceof ApiRequestError && e.message.includes("Invalid perp deployer"),
       );
     });
   },

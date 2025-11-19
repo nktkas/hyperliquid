@@ -11,8 +11,7 @@ runTest({
         async () => {
           await exchClient.cSignerAction({ jailSelf: null });
         },
-        ApiRequestError,
-        "Signer invalid or inactive for current epoch",
+        (e) => e instanceof ApiRequestError && e.message.includes("Signer invalid or inactive for current epoch"),
       );
     });
 
@@ -21,8 +20,7 @@ runTest({
         async () => {
           await exchClient.cSignerAction({ unjailSelf: null });
         },
-        ApiRequestError,
-        "Signer invalid or inactive for current epoch",
+        (e) => e instanceof ApiRequestError && e.message.includes("Signer invalid or inactive for current epoch"),
       );
     });
   },

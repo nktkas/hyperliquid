@@ -14,8 +14,7 @@ runTest({
           alwaysCloseOnWithdraw: null,
         });
       },
-      ApiRequestError,
-      "Only leader can perform this vault action",
+      (e) => e instanceof ApiRequestError && e.message.includes("Only leader can perform this vault action"),
     );
   },
   cliTestFn: async (_t, runCommand) => {

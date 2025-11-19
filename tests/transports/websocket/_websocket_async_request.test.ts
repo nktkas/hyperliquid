@@ -146,7 +146,10 @@ test("WebSocketAsyncRequest", async (t) => {
           };
           mockSocket.mockMessage(mockMessage);
 
-          await assert.rejects(() => promise, WebSocketRequestError, mockMessage.data);
+          await assert.rejects(
+            () => promise,
+            (e) => e instanceof WebSocketRequestError && e.message === mockMessage.data,
+          );
         });
 
         await t.test("error in the response payload", async () => {
@@ -166,7 +169,10 @@ test("WebSocketAsyncRequest", async (t) => {
           };
           mockSocket.mockMessage(mockMessage);
 
-          await assert.rejects(() => promise, WebSocketRequestError, "Operation failed");
+          await assert.rejects(
+            () => promise,
+            (e) => e instanceof WebSocketRequestError && e.message === "Operation failed",
+          );
         });
       });
 
@@ -185,7 +191,10 @@ test("WebSocketAsyncRequest", async (t) => {
           };
           mockSocket.mockMessage(mockMessage);
 
-          await assert.rejects(() => promise, WebSocketRequestError, mockMessage.data);
+          await assert.rejects(
+            () => promise,
+            (e) => e instanceof WebSocketRequestError && e.message === mockMessage.data,
+          );
         });
 
         await t.test("Already subscribed", async () => {
@@ -202,7 +211,10 @@ test("WebSocketAsyncRequest", async (t) => {
           };
           mockSocket.mockMessage(mockMessage);
 
-          await assert.rejects(() => promise, WebSocketRequestError, mockMessage.data);
+          await assert.rejects(
+            () => promise,
+            (e) => e instanceof WebSocketRequestError && e.message === mockMessage.data,
+          );
         });
 
         await t.test("Invalid subscription", async () => {
@@ -219,7 +231,10 @@ test("WebSocketAsyncRequest", async (t) => {
           };
           mockSocket.mockMessage(mockMessage);
 
-          await assert.rejects(() => promise, WebSocketRequestError, mockMessage.data);
+          await assert.rejects(
+            () => promise,
+            (e) => e instanceof WebSocketRequestError && e.message === mockMessage.data,
+          );
         });
 
         await t.test("Already unsubscribed", async () => {
@@ -236,7 +251,10 @@ test("WebSocketAsyncRequest", async (t) => {
           };
           mockSocket.mockMessage(mockMessage);
 
-          await assert.rejects(() => promise, WebSocketRequestError, mockMessage.data);
+          await assert.rejects(
+            () => promise,
+            (e) => e instanceof WebSocketRequestError && e.message === mockMessage.data,
+          );
         });
       });
 
@@ -251,8 +269,14 @@ test("WebSocketAsyncRequest", async (t) => {
 
         mockSocket.close();
 
-        await assert.rejects(() => p1, WebSocketRequestError, "WebSocket connection closed.");
-        await assert.rejects(() => p2, WebSocketRequestError, "WebSocket connection closed.");
+        await assert.rejects(
+          () => p1,
+          (e) => e instanceof WebSocketRequestError && e.message === "WebSocket connection closed.",
+        );
+        await assert.rejects(
+          () => p2,
+          (e) => e instanceof WebSocketRequestError && e.message === "WebSocket connection closed.",
+        );
       });
 
       await t.test("follows AbortSignal", async (t) => {
@@ -266,7 +290,10 @@ test("WebSocketAsyncRequest", async (t) => {
 
           const promise = wsRequester.request("post", { foo: "bar" }, controller.signal);
 
-          await assert.rejects(() => promise, Error, "Aborted pre-emptively");
+          await assert.rejects(
+            () => promise,
+            (e) => e instanceof Error && e.message === "Aborted pre-emptively",
+          );
         });
 
         await t.test("rejects if aborted after sending request", async () => {
@@ -280,7 +307,10 @@ test("WebSocketAsyncRequest", async (t) => {
 
           controller.abort(new Error("Aborted after sending"));
 
-          await assert.rejects(() => promise, Error, "Aborted after sending");
+          await assert.rejects(
+            () => promise,
+            (e) => e instanceof Error && e.message === "Aborted after sending",
+          );
         });
       });
     });

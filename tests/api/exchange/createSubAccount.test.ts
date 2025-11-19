@@ -10,8 +10,8 @@ runTest({
       async () => {
         await exchClient.createSubAccount({ name: String(Date.now()) });
       },
-      ApiRequestError,
-      "Cannot create sub-accounts until enough volume traded",
+      (e) =>
+        e instanceof ApiRequestError && e.message.includes("Cannot create sub-accounts until enough volume traded"),
     );
   },
   cliTestFn: async (_t, runCommand) => {

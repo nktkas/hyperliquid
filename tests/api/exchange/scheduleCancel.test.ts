@@ -10,8 +10,9 @@ runTest({
       async () => {
         await exchClient.scheduleCancel({ time: Date.now() + 30000 });
       },
-      ApiRequestError,
-      "Cannot set scheduled cancel time until enough volume traded",
+      (e) =>
+        e instanceof ApiRequestError &&
+        e.message.includes("Cannot set scheduled cancel time until enough volume traded"),
     );
   },
   cliTestFn: async (_t, runCommand) => {

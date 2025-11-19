@@ -21,8 +21,7 @@ runTest({
             },
           });
         },
-        ApiRequestError,
-        "Unknown validator",
+        (e) => e instanceof ApiRequestError && e.message.includes("Unknown validator"),
       );
     });
 
@@ -44,8 +43,7 @@ runTest({
             },
           });
         },
-        ApiRequestError,
-        "Validator has delegations disabled",
+        (e) => e instanceof ApiRequestError && e.message.includes("Validator has delegations disabled"),
       );
     });
 
@@ -54,8 +52,7 @@ runTest({
         async () => {
           await exchClient.cValidatorAction({ unregister: null });
         },
-        ApiRequestError,
-        "Action disabled on this chain",
+        (e) => e instanceof ApiRequestError && e.message.includes("Action disabled on this chain"),
       );
     });
   },

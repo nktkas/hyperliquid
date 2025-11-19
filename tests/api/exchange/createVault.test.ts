@@ -15,8 +15,7 @@ runTest({
           nonce: Date.now(),
         });
       },
-      ApiRequestError,
-      "Insufficient balance to create vault",
+      (e) => e instanceof ApiRequestError && e.message.includes("Insufficient balance to create vault"),
     );
   },
   cliTestFn: async (_t, runCommand) => {

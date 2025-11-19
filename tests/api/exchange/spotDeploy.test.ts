@@ -21,7 +21,7 @@ runTest({
             },
           });
         },
-        ApiRequestError,
+        (e) => e instanceof ApiRequestError,
       );
     });
 
@@ -37,8 +37,7 @@ runTest({
             },
           });
         },
-        ApiRequestError,
-        "Genesis error:",
+        (e) => e instanceof ApiRequestError && e.message.includes("Genesis error:"),
       );
     });
 
@@ -53,8 +52,7 @@ runTest({
             },
           });
         },
-        ApiRequestError,
-        "Genesis error:",
+        (e) => e instanceof ApiRequestError && e.message.includes("Genesis error:"),
       );
     });
 
@@ -67,8 +65,7 @@ runTest({
             },
           });
         },
-        ApiRequestError,
-        "Error deploying spot:",
+        (e) => e instanceof ApiRequestError && e.message.includes("Error deploying spot:"),
       );
     });
 
@@ -85,8 +82,7 @@ runTest({
             },
           });
         },
-        ApiRequestError,
-        "Error deploying spot:",
+        (e) => e instanceof ApiRequestError && e.message.includes("Error deploying spot:"),
       );
     });
 
@@ -100,8 +96,7 @@ runTest({
             },
           });
         },
-        ApiRequestError,
-        "Error deploying spot:",
+        (e) => e instanceof ApiRequestError && e.message.includes("Error deploying spot:"),
       );
     });
 
@@ -114,8 +109,7 @@ runTest({
             },
           });
         },
-        ApiRequestError,
-        "Error deploying spot:",
+        (e) => e instanceof ApiRequestError && e.message.includes("Error deploying spot:"),
       );
     });
   },

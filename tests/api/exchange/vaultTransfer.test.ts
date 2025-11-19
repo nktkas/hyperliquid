@@ -14,8 +14,7 @@ runTest({
           usd: 5 * 1e6,
         });
       },
-      ApiRequestError,
-      "Cannot withdraw with zero balance in vault",
+      (e) => e instanceof ApiRequestError && e.message.includes("Cannot withdraw with zero balance in vault"),
     );
   },
   cliTestFn: async (_t, runCommand) => {
