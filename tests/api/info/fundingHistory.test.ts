@@ -15,6 +15,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "fundingHistory", "--coin", "ETH", "--startTime", "1725991126328"]);
-    parser(FundingHistoryRequest)(JSON.parse(data));
+    parser(FundingHistoryRequest)(data);
   },
 });

@@ -15,6 +15,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "perpDeployAuctionStatus"]);
-    parser(PerpDeployAuctionStatusRequest)(JSON.parse(data));
+    parser(PerpDeployAuctionStatusRequest)(data);
   },
 });

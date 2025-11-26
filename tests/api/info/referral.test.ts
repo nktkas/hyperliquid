@@ -18,6 +18,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "referral", "--user", "0x0000000000000000000000000000000000000001"]);
-    parser(ReferralRequest)(JSON.parse(data));
+    parser(ReferralRequest)(data);
   },
 });

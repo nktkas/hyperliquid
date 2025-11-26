@@ -12,6 +12,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "allPerpMetas"]);
-    parser(AllPerpMetasRequest)(JSON.parse(data));
+    parser(AllPerpMetasRequest)(data);
   },
 });

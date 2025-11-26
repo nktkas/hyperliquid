@@ -22,6 +22,6 @@ runTest({
       "--vaultAddress",
       "0x1719884eb866cb12b2287399b15f7db5e7d775ea",
     ]);
-    parser(VaultDetailsRequest)(JSON.parse(data));
+    parser(VaultDetailsRequest)(data);
   },
 });

@@ -22,6 +22,6 @@ runTest({
       "--startTime",
       "1725991238683",
     ]);
-    parser(UserFundingRequest)(JSON.parse(data));
+    parser(UserFundingRequest)(data);
   },
 });

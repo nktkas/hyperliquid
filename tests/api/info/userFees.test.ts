@@ -18,6 +18,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "userFees", "--user", "0xe973105a27e17350500926ae664dfcfe6006d924"]);
-    parser(UserFeesRequest)(JSON.parse(data));
+    parser(UserFeesRequest)(data);
   },
 });

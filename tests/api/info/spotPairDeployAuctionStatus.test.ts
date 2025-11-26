@@ -19,6 +19,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "spotPairDeployAuctionStatus"]);
-    parser(SpotPairDeployAuctionStatusRequest)(JSON.parse(data));
+    parser(SpotPairDeployAuctionStatusRequest)(data);
   },
 });

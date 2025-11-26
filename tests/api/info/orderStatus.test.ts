@@ -77,6 +77,6 @@ runTest({
       "--oid",
       "27379010444",
     ]);
-    parser(OrderStatusRequest)(JSON.parse(data));
+    parser(OrderStatusRequest)(data);
   },
 });

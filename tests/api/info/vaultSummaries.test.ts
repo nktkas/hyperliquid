@@ -18,6 +18,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "vaultSummaries"]);
-    parser(VaultSummariesRequest)(JSON.parse(data));
+    parser(VaultSummariesRequest)(data);
   },
 });

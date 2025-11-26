@@ -30,6 +30,6 @@ runTest({
       "--startTime",
       "1725991238683",
     ]);
-    parser(UserTwapSliceFillsByTimeRequest)(JSON.parse(data));
+    parser(UserTwapSliceFillsByTimeRequest)(data);
   },
 });

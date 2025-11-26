@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { UnsignedInteger } from "../_base.ts";
+import { ISO8601WithoutTimezone, UnsignedInteger } from "../_base.ts";
 import { MarginTableResponse } from "./marginTable.ts";
 
 /**
@@ -80,6 +80,16 @@ export const MetaResponse = /* @__PURE__ */ (() => {
                   v.union([v.literal("strictIsolated"), v.literal("noCross")]),
                 ),
                 v.description("Trading margin mode constraint."),
+              ),
+              /** Indicates if growth mode is enabled. */
+              growthMode: v.pipe(
+                v.optional(v.literal("enabled")),
+                v.description("Indicates if growth mode is enabled."),
+              ),
+              /** Timestamp of the last growth mode change. */
+              lastGrowthModeChangeTime: v.pipe(
+                v.optional(ISO8601WithoutTimezone),
+                v.description("Timestamp of the last growth mode change."),
               ),
             }),
             v.description("Trading universe parameters for perpetual asset."),

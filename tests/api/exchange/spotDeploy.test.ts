@@ -39,7 +39,7 @@ runTest({
           });
         },
         ApiRequestError,
-        "Genesis error:",
+        "Error deploying spot",
       );
     });
 
@@ -55,7 +55,7 @@ runTest({
           });
         },
         ApiRequestError,
-        "Genesis error:",
+        "Error deploying spot",
       );
     });
 

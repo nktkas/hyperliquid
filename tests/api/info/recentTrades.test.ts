@@ -16,6 +16,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "recentTrades", "--coin", "ETH"]);
-    parser(RecentTradesRequest)(JSON.parse(data));
+    parser(RecentTradesRequest)(data);
   },
 });

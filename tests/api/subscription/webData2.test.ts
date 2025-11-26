@@ -33,6 +33,10 @@ runTest({
       ),
     ]);
     schemaCoverage(WebData2Event, data.flat(), {
+      ignoreDefinedTypes: [
+        "#/properties/meta/properties/universe/items/properties/growthMode",
+        "#/properties/meta/properties/universe/items/properties/lastGrowthModeChangeTime",
+      ],
       ignoreBranches: {
         "#/properties/openOrders/items/properties/orderType": [0, 4, 5],
         "#/properties/openOrders/items/properties/tif/wrapped": [1, 3, 4],

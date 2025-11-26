@@ -12,6 +12,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "maxMarketOrderNtls"]);
-    parser(MaxMarketOrderNtlsRequest)(JSON.parse(data));
+    parser(MaxMarketOrderNtlsRequest)(data);
   },
 });

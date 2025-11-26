@@ -39,6 +39,6 @@ runTest({
       "--startTime",
       "1757440693681",
     ]);
-    parser(CandleSnapshotRequest)(JSON.parse(data));
+    parser(CandleSnapshotRequest)(data);
   },
 });

@@ -12,6 +12,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "validatorSummaries"]);
-    parser(ValidatorSummariesRequest)(JSON.parse(data));
+    parser(ValidatorSummariesRequest)(data);
   },
 });

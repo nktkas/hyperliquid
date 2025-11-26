@@ -12,6 +12,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "blockDetails", "--height", "300836507"]);
-    parser(BlockDetailsRequest)(JSON.parse(data));
+    parser(BlockDetailsRequest)(data);
   },
 });

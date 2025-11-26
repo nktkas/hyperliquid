@@ -14,7 +14,7 @@ const client = new InfoClient({ transport });
 export function runTest(options: {
   name: string;
   codeTestFn: (t: Deno.TestContext, client: InfoClient) => Promise<void>;
-  cliTestFn?: (t: Deno.TestContext, runCommand: (args: string[]) => string | Promise<string>) => Promise<void>;
+  cliTestFn?: (t: Deno.TestContext, runCommand: (args: string[]) => unknown | Promise<unknown>) => Promise<void>;
 }): void {
   const { name, codeTestFn, cliTestFn } = options;
 

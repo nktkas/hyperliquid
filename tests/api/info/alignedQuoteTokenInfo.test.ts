@@ -12,6 +12,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "alignedQuoteTokenInfo", "--token", "1328"]);
-    parser(AlignedQuoteTokenInfoRequest)(JSON.parse(data));
+    parser(AlignedQuoteTokenInfoRequest)(data);
   },
 });

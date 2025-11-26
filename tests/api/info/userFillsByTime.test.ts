@@ -26,6 +26,6 @@ runTest({
       "--startTime",
       "1725991229384",
     ]);
-    parser(UserFillsByTimeRequest)(JSON.parse(data));
+    parser(UserFillsByTimeRequest)(data);
   },
 });

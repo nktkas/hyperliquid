@@ -17,6 +17,6 @@ runTest({
       "--user",
       "0xe019d6167E7e324aEd003d94098496b6d986aB05",
     ]);
-    parser(LeadingVaultsRequest)(JSON.parse(data));
+    parser(LeadingVaultsRequest)(data);
   },
 });

@@ -8,11 +8,12 @@ runTest({
     const data = await Promise.all([
       client.metaAndAssetCtxs(),
       client.metaAndAssetCtxs({ dex: "gato" }),
+      client.metaAndAssetCtxs({ dex: "meng" }),
     ]);
     schemaCoverage(MetaAndAssetCtxsResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "metaAndAssetCtxs"]);
-    parser(MetaAndAssetCtxsRequest)(JSON.parse(data));
+    parser(MetaAndAssetCtxsRequest)(data);
   },
 });

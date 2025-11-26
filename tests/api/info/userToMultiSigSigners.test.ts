@@ -18,6 +18,6 @@ runTest({
       "--user",
       "0x7A8b673a176a430b80cfCDfdFB6b10ED55010Ebb",
     ]);
-    parser(UserToMultiSigSignersRequest)(JSON.parse(data));
+    parser(UserToMultiSigSignersRequest)(data);
   },
 });

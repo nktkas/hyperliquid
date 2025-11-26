@@ -20,6 +20,6 @@ runTest({
       "--coin",
       "BTC",
     ]);
-    parser(ActiveAssetDataRequest)(JSON.parse(data));
+    parser(ActiveAssetDataRequest)(data);
   },
 });

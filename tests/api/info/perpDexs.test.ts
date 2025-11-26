@@ -16,6 +16,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "perpDexs"]);
-    parser(PerpDexsRequest)(JSON.parse(data));
+    parser(PerpDexsRequest)(data);
   },
 });

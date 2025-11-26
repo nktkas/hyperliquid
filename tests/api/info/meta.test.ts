@@ -8,11 +8,12 @@ runTest({
     const data = await Promise.all([
       client.meta(),
       client.meta({ dex: "gato" }),
+      client.meta({ dex: "meng" }),
     ]);
     schemaCoverage(MetaResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "meta"]);
-    parser(MetaRequest)(JSON.parse(data));
+    parser(MetaRequest)(data);
   },
 });

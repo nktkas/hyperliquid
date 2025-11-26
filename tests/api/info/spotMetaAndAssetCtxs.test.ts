@@ -12,6 +12,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "spotMetaAndAssetCtxs"]);
-    parser(SpotMetaAndAssetCtxsRequest)(JSON.parse(data));
+    parser(SpotMetaAndAssetCtxsRequest)(data);
   },
 });

@@ -14,6 +14,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "gossipRootIps"]);
-    parser(GossipRootIpsRequest)(JSON.parse(data));
+    parser(GossipRootIpsRequest)(data);
   },
 });

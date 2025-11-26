@@ -12,6 +12,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "userDetails", "--user", "0x9150749C4cec13Dc7c1555D0d664F08d4d81Be83"]);
-    parser(UserDetailsRequest)(JSON.parse(data));
+    parser(UserDetailsRequest)(data);
   },
 });

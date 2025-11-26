@@ -13,6 +13,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "l2Book", "--coin", "ETH"]);
-    parser(L2BookRequest)(JSON.parse(data));
+    parser(L2BookRequest)(data);
   },
 });

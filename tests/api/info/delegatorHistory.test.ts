@@ -17,6 +17,6 @@ runTest({
       "--user",
       "0xedc88158266c50628a9ffbaa1db2635376577eea",
     ]);
-    parser(DelegatorHistoryRequest)(JSON.parse(data));
+    parser(DelegatorHistoryRequest)(data);
   },
 });

@@ -14,6 +14,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "liquidatable"]);
-    parser(LiquidatableRequest)(JSON.parse(data));
+    parser(LiquidatableRequest)(data);
   },
 });

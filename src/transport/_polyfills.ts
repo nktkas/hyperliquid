@@ -6,7 +6,7 @@
 export const Promise_ = /* @__PURE__ */ (() => {
   return {
     /** @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/withResolvers */
-    withResolvers: <T>() => {
+    withResolvers: Promise.withResolvers ? <T>() => Promise.withResolvers<T>() : <T>() => {
       let resolve!: (value: T | PromiseLike<T>) => void;
       let reject!: (reason?: any) => void;
       const promise = new Promise<T>((res, rej) => (resolve = res, reject = rej));
@@ -18,7 +18,7 @@ export const Promise_ = /* @__PURE__ */ (() => {
 export const AbortSignal_ = /* @__PURE__ */ (() => {
   return {
     /** @see https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal/any_static */
-    any: ((signals: AbortSignal[]) => {
+    any: AbortSignal.any ? (signals: AbortSignal[]) => AbortSignal.any(signals) : (signals: AbortSignal[]) => {
       const controller = new AbortController();
       for (const signal of signals) {
         if (signal.aborted) {
@@ -32,14 +32,14 @@ export const AbortSignal_ = /* @__PURE__ */ (() => {
         );
       }
       return controller.signal;
-    }),
+    },
 
     /** @see https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal/timeout_static */
-    timeout: ((ms: number) => {
+    timeout: AbortSignal.timeout ? (ms: number) => AbortSignal.timeout(ms) : (ms: number) => {
       const controller = new AbortController();
-      setTimeout(() => controller.abort(new DOMException("signal timed out", "TimeoutError")), ms);
+      setTimeout(() => controller.abort(new DOMException("Signal timed out.", "TimeoutError")), ms);
       return controller.signal;
-    }),
+    },
   };
 })();
 

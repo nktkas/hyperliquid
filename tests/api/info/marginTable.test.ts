@@ -12,6 +12,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "marginTable", "--id", "1"]);
-    parser(MarginTableRequest)(JSON.parse(data));
+    parser(MarginTableRequest)(data);
   },
 });

@@ -18,6 +18,6 @@ runTest({
       "--user",
       "0xedc88158266c50628a9ffbaa1db2635376577eea",
     ]);
-    parser(DelegatorRewardsRequest)(JSON.parse(data));
+    parser(DelegatorRewardsRequest)(data);
   },
 });

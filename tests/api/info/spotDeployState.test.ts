@@ -30,6 +30,6 @@ runTest({
       "--user",
       "0x051dbfc562d44e4a01ebb986da35a47ab4f346db",
     ]);
-    parser(SpotDeployStateRequest)(JSON.parse(data));
+    parser(SpotDeployStateRequest)(data);
   },
 });

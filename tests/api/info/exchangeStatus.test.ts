@@ -14,6 +14,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "exchangeStatus"]);
-    parser(ExchangeStatusRequest)(JSON.parse(data));
+    parser(ExchangeStatusRequest)(data);
   },
 });

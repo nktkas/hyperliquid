@@ -18,6 +18,6 @@ runTest({
       "--hash",
       "0x8f1b2b67eda04ecbc7b00411ee669b010c0041e8f52c9ff5c3609d9ef7e66c71",
     ]);
-    parser(TxDetailsRequest)(JSON.parse(data));
+    parser(TxDetailsRequest)(data);
   },
 });

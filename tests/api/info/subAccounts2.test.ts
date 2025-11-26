@@ -22,6 +22,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "subAccounts2", "--user", "0x563C175E6f11582f65D6d9E360A618699DEe14a9"]);
-    parser(SubAccounts2Request)(JSON.parse(data));
+    parser(SubAccounts2Request)(data);
   },
 });

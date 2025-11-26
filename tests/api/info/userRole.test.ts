@@ -16,6 +16,6 @@ runTest({
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand(["info", "userRole", "--user", "0x941a505ACc11F5f3A12b5eF0d414A8Bff45c5e77"]);
-    parser(UserRoleRequest)(JSON.parse(data));
+    parser(UserRoleRequest)(data);
   },
 });

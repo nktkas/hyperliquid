@@ -13,6 +13,12 @@ runTest({
         },
         10_000,
       ),
+      collectEventsOverTime<UserHistoricalOrdersEvent>(
+        async (cb) => {
+          await client.userHistoricalOrders({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" }, cb);
+        },
+        10_000,
+      ),
     ]);
     schemaCoverage(UserHistoricalOrdersEvent, data.flat(), {
       ignoreEmptyArray: ["#/properties/orderHistory/items/properties/order/properties/children"],
