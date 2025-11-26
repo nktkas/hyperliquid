@@ -7,44 +7,30 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      id-token: write
       contents: read
+      id-token: write
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: "24.x"
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Install dependencies
-        run: npm i
 
       - name: Build package
-        run: npm run build
+        run: npx deno run -A .github/scripts/build_npm.ts
 
-      - name: Get package version and determine tag
-        id: version
+      - name: Determine npm tag
+        id: tag
         run: |
-          # Read version from package.json
-          VERSION=$(node -p "require('./package.json').version")
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-          # Determine npm tag based on version
-          if [[ "$VERSION" =~ -alpha ]]; then
-              TAG="alpha"
-          elif [[ "$VERSION" =~ -beta ]]; then
-              TAG="beta"
-          elif [[ "$VERSION" =~ -rc ]]; then
-              TAG="rc"
-          elif [[ "$VERSION" =~ - ]]; then
-              TAG="prerelease"
-          else
-              TAG="latest"
-          fi
-
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-          echo "Publishing version $VERSION with tag $TAG"
+          # Read version from deno.json
+          VERSION=$(node -p "require('./deno.json').version")
+          # Extract tag (alpha, beta, rc) from version string if present
+          TAG=$(echo "$VERSION" | sed -n 's/.*-\(alpha\|beta\|rc\).*/\1/p')
+          # If no known tag found but version contains hyphen, use "prerelease"
+          [[ -z "$TAG" && "$VERSION" == *-* ]] && TAG="prerelease"
+          # Default to "latest" if no tag determined
+          echo "value=${TAG:-latest}" >> $GITHUB_OUTPUT
 
       - name: Publish package
-        run: npm publish --tag ${{ steps.version.outputs.tag }}
+        working-directory: ./build/npm
+        run: npm publish --tag ${{ steps.tag.outputs.value }}

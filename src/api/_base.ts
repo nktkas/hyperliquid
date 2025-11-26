@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-explicit-any ban-types
-import * as v from "valibot";
+import * as v from "@valibot/valibot";
 import { HyperliquidError } from "../_base.ts";
 
 // ============================================================

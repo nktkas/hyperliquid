@@ -1,4 +1,4 @@
-import * as v from "valibot";
+import * as v from "@valibot/valibot";
 
 // ============================================================
 // API Schemas
@@ -271,7 +271,7 @@ export const MultiSigTypes = {
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { multiSig, parser, ScheduleCancelRequest } from "@nktkas/hyperliquid/api/exchange";
  * import { signL1Action } from "@nktkas/hyperliquid/signing";
- * import { privateKeyToAccount } from "viem/accounts";
+ * import { privateKeyToAccount } from "npm:viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const multiSigUser = "0x...";

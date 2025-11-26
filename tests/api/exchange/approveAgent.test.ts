@@ -5,7 +5,7 @@ import { excludeErrorResponse, randomAddress, runTest } from "./_t.ts";
 runTest({
   name: "approveAgent",
   codeTestFn: async (t, exchClient) => {
-    await t.test("with 'agentName'", async () => {
+    await t.step("with 'agentName'", async () => {
       const data = await Promise.all([
         exchClient.approveAgent({
           agentAddress: randomAddress(),
@@ -17,7 +17,7 @@ runTest({
 
     await new Promise((r) => setTimeout(r, 5000)); // waiting to avoid error `ApiRequestError: User has pending agent removal`
 
-    await t.test("without 'agentName'", async () => {
+    await t.step("without 'agentName'", async () => {
       const data = await Promise.all([
         exchClient.approveAgent({
           agentAddress: randomAddress(),

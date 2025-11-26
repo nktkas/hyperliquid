@@ -1,4 +1,4 @@
-import * as v from "valibot";
+import * as v from "@valibot/valibot";
 import { Decimal, Integer, UnsignedDecimal, UnsignedInteger } from "../../src/api/_base.ts"; // HACK: to avoid importing into every test
 
 export type IssueType =

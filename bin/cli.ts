@@ -1,6 +1,7 @@
 #!/usr/bin/env node
+// @ts-ignore: Ignore missing TS types when building npm
 import process from "node:process";
-import * as v from "valibot";
+import * as v from "@valibot/valibot";
 import * as hl from "../src/mod.ts";
 import { type Args, parseArgs, transformArgs } from "./_utils.ts";
 

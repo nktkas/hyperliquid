@@ -1,8 +1,6 @@
-import "dotenv/config";
-import process from "node:process";
-import test, { type TestContext } from "node:test";
-import { execFileSync } from "node:child_process";
-import type * as v from "valibot";
+// deno-lint-ignore-file no-import-prefix
+import "jsr:@std/dotenv@^0.225.5/load";
+import type * as v from "@valibot/valibot";
 import { ExchangeClient, HttpTransport, InfoClient, MultiSignClient } from "../../../src/mod.ts";
 import { getWalletAddress } from "../../../src/signing/mod.ts";
 import { formatPrice, formatSize, SymbolConverter } from "../../../src/utils/mod.ts";
@@ -11,7 +9,7 @@ import type { ExcludeErrorResponse } from "../../../src/api/exchange/_base/_type
 // —————————— Arguments ——————————
 
 const WAIT = 5000;
-const PRIVATE_KEY = process.env.PRIVATE_KEY as `0x${string}` | undefined;
+const PRIVATE_KEY = Deno.env.get("PRIVATE_KEY") as `0x${string}` | undefined;
 
 // —————————— Preparation ——————————
 
@@ -25,50 +23,44 @@ export const allMids = await infoClient.allMids();
 
 export function runTest(options: {
   name: string;
-  codeTestFn: (t: TestContext, exchClient: ExchangeClient | MultiSignClient) => Promise<void>;
-  cliTestFn?: (t: TestContext, runCommand: (args: string[]) => string) => Promise<void>;
+  codeTestFn: (t: Deno.TestContext, exchClient: ExchangeClient | MultiSignClient) => Promise<void>;
+  cliTestFn?: (t: Deno.TestContext, runCommand: (args: string[]) => string | Promise<string>) => Promise<void>;
 }): void {
   const { name, codeTestFn, cliTestFn } = options;
 
-  test(name, { skip: !PRIVATE_KEY }, async (t) => {
+  Deno.test(name, { ignore: !PRIVATE_KEY }, async (t) => {
     await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
-    await t.test("code", async (t) => {
+    await t.step("code", async (t) => {
       for (const clientType of ["user", "multisig"] as const) {
         const exchClient = await createTempExchangeClient(clientType);
-        await t.test(clientType, async (t) => await codeTestFn(t, exchClient))
+        await t.step(clientType, async (t) => await codeTestFn(t, exchClient))
           .finally(async () => {
             await cleanupTempExchangeClient(exchClient);
           });
       }
     });
 
-    await t.test("cli", { skip: cliTestFn === undefined }, async (t) => {
-      // @ts-ignore: Deno is not defined in Node.js
-      const isDeno = typeof globalThis.Deno !== "undefined";
-      const command = isDeno ? "deno" : "node";
-      const extraArgs = isDeno ? ["run", "-A"] : [];
+    await t.step({
+      name: "cli",
+      ignore: !cliTestFn,
+      fn: async () => {
+        await cliTestFn!(t, async (args) => {
+          const command = new Deno.Command("deno", {
+            args: ["run", "-A", "bin/cli.ts", "--offline", "--private-key", PRIVATE_KEY!, ...args],
+            stdout: "piped",
+            stderr: "piped",
+          });
+          const { stdout } = await command.output();
+          const output = new TextDecoder().decode(stdout);
 
-      await cliTestFn!(t, (args) => {
-        const output = execFileSync(
-          command,
-          [
-            ...extraArgs,
-            "bin/cli.ts",
-            "--offline",
-            "--private-key",
-            PRIVATE_KEY!,
-            ...args,
-          ],
-          { encoding: "utf8" },
-        );
+          if (output.startsWith("Hyperliquid CLI")) {
+            throw new Error(`Invalid command argument(s)`);
+          }
 
-        if (output.startsWith("Hyperliquid CLI")) {
-          throw new Error(`Invalid command argument(s)`);
-        }
-
-        return JSON.parse(output);
-      });
+          return JSON.parse(output);
+        });
+      },
     });
   });
 }

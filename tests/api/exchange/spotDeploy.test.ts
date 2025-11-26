@@ -1,4 +1,5 @@
-import assert from "node:assert";
+// deno-lint-ignore-file no-import-prefix
+import { assertRejects } from "jsr:@std/assert@1";
 import { parser, SpotDeployRequest } from "../../../src/api/exchange/~mod.ts";
 import { ApiRequestError } from "../../../src/mod.ts";
 import { runTest } from "./_t.ts";
@@ -6,8 +7,8 @@ import { runTest } from "./_t.ts";
 runTest({
   name: "spotDeploy",
   codeTestFn: async (t, exchClient) => {
-    await t.test("registerToken2", async () => {
-      await assert.rejects(
+    await t.step("registerToken2", async () => {
+      await assertRejects(
         async () => {
           await exchClient.spotDeploy({
             registerToken2: {
@@ -21,12 +22,12 @@ runTest({
             },
           });
         },
-        (e) => e instanceof ApiRequestError,
+        ApiRequestError,
       );
     });
 
-    await t.test("userGenesis", async () => {
-      await assert.rejects(
+    await t.step("userGenesis", async () => {
+      await assertRejects(
         async () => {
           await exchClient.spotDeploy({
             userGenesis: {
@@ -37,12 +38,13 @@ runTest({
             },
           });
         },
-        (e) => e instanceof ApiRequestError && e.message.includes("Genesis error:"),
+        ApiRequestError,
+        "Genesis error:",
       );
     });
 
-    await t.test("genesis", async () => {
-      await assert.rejects(
+    await t.step("genesis", async () => {
+      await assertRejects(
         async () => {
           await exchClient.spotDeploy({
             genesis: {
@@ -52,12 +54,13 @@ runTest({
             },
           });
         },
-        (e) => e instanceof ApiRequestError && e.message.includes("Genesis error:"),
+        ApiRequestError,
+        "Genesis error:",
       );
     });
 
-    await t.test("registerSpot", async () => {
-      await assert.rejects(
+    await t.step("registerSpot", async () => {
+      await assertRejects(
         async () => {
           await exchClient.spotDeploy({
             registerSpot: {
@@ -65,12 +68,13 @@ runTest({
             },
           });
         },
-        (e) => e instanceof ApiRequestError && e.message.includes("Error deploying spot:"),
+        ApiRequestError,
+        "Error deploying spot:",
       );
     });
 
-    await t.test("registerHyperliquidity", async () => {
-      await assert.rejects(
+    await t.step("registerHyperliquidity", async () => {
+      await assertRejects(
         async () => {
           await exchClient.spotDeploy({
             registerHyperliquidity: {
@@ -82,12 +86,13 @@ runTest({
             },
           });
         },
-        (e) => e instanceof ApiRequestError && e.message.includes("Error deploying spot:"),
+        ApiRequestError,
+        "Error deploying spot:",
       );
     });
 
-    await t.test("setDeployerTradingFeeShare", async () => {
-      await assert.rejects(
+    await t.step("setDeployerTradingFeeShare", async () => {
+      await assertRejects(
         async () => {
           await exchClient.spotDeploy({
             setDeployerTradingFeeShare: {
@@ -96,12 +101,13 @@ runTest({
             },
           });
         },
-        (e) => e instanceof ApiRequestError && e.message.includes("Error deploying spot:"),
+        ApiRequestError,
+        "Error deploying spot:",
       );
     });
 
-    await t.test("enableQuoteToken", async () => {
-      await assert.rejects(
+    await t.step("enableQuoteToken", async () => {
+      await assertRejects(
         async () => {
           await exchClient.spotDeploy({
             enableQuoteToken: {
@@ -109,7 +115,8 @@ runTest({
             },
           });
         },
-        (e) => e instanceof ApiRequestError && e.message.includes("Error deploying spot:"),
+        ApiRequestError,
+        "Error deploying spot:",
       );
     });
   },

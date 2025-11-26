@@ -1,4 +1,4 @@
-import * as v from "valibot";
+import * as v from "@valibot/valibot";
 
 // ============================================================
 // API Schemas
@@ -106,7 +106,7 @@ export type VaultDistributeSuccessResponse = ExcludeErrorResponse<VaultDistribut
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { vaultDistribute } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "viem/accounts";
+ * import { privateKeyToAccount } from "npm:viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`

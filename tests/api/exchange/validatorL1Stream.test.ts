@@ -1,4 +1,5 @@
-import assert from "node:assert";
+// deno-lint-ignore-file no-import-prefix
+import { assertRejects } from "jsr:@std/assert@1";
 import { parser, ValidatorL1StreamRequest } from "../../../src/api/exchange/~mod.ts";
 import { ApiRequestError } from "../../../src/mod.ts";
 import { runTest } from "./_t.ts";
@@ -6,11 +7,12 @@ import { runTest } from "./_t.ts";
 runTest({
   name: "validatorL1Stream",
   codeTestFn: async (_t, exchClient) => {
-    await assert.rejects(
+    await assertRejects(
       async () => {
         await exchClient.validatorL1Stream({ riskFreeRate: "0.05" });
       },
-      (e) => e instanceof ApiRequestError && e.message.includes("Unknown validator"),
+      ApiRequestError,
+      "Unknown validator",
     );
   },
   cliTestFn: async (_t, runCommand) => {

@@ -94,7 +94,7 @@ export class ExchangeClient<
    * @example via [ethers.js v6](https://docs.ethers.org/v6/api/wallet/#Wallet) or [ethers.js v5](https://docs.ethers.org/v5/api/signer/#Wallet)
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
-   * import { ethers } from "ethers";
+   * import { ethers } from "npm:ethers";
    *
    * const wallet = new ethers.Wallet("0x...");
    *
@@ -105,7 +105,7 @@ export class ExchangeClient<
    * @example via an external wallet (e.g. MetaMask) with [viem](https://viem.sh/docs/clients/wallet)
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
-   * import { createWalletClient, custom } from "viem";
+   * import { createWalletClient, custom } from "npm:viem";
    *
    * const ethereum = (window as any).ethereum;
    * const [account] = await ethereum.request({ method: "eth_requestAccounts" }) as `0x${string}`[];
@@ -682,7 +682,7 @@ export class ExchangeClient<
    * import * as hl from "@nktkas/hyperliquid";
    * import { signL1Action } from "@nktkas/hyperliquid/signing";
    * import { parser, ScheduleCancelRequest } from "@nktkas/hyperliquid/api/exchange";
-   * import { privateKeyToAccount } from "viem/accounts";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
    *
    * const wallet = privateKeyToAccount("0x..."); // viem, ethers or private key
    * const multiSigUser = "0x...";

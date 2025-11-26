@@ -1,4 +1,4 @@
-import * as v from "valibot";
+import * as v from "@valibot/valibot";
 import { Hex } from "../../_base.ts";
 
 /** ECDSA signature components for Ethereum typed data. */

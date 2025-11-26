@@ -1,4 +1,5 @@
-import assert from "node:assert";
+// deno-lint-ignore-file no-import-prefix
+import { assertRejects } from "jsr:@std/assert@1";
 import { parser, VaultModifyRequest } from "../../../src/api/exchange/~mod.ts";
 import { ApiRequestError } from "../../../src/mod.ts";
 import { runTest } from "./_t.ts";
@@ -6,7 +7,7 @@ import { runTest } from "./_t.ts";
 runTest({
   name: "vaultModify",
   codeTestFn: async (_t, exchClient) => {
-    await assert.rejects(
+    await assertRejects(
       async () => {
         await exchClient.vaultModify({
           vaultAddress: "0x457ab3acf4a4e01156ce269545a9d3d05fff2f0b",
@@ -14,7 +15,8 @@ runTest({
           alwaysCloseOnWithdraw: null,
         });
       },
-      (e) => e instanceof ApiRequestError && e.message.includes("Only leader can perform this vault action"),
+      ApiRequestError,
+      "Only leader can perform this vault action",
     );
   },
   cliTestFn: async (_t, runCommand) => {

@@ -1,6 +1,7 @@
 {
   "name": "@nktkas/hyperliquid",
   "version": "0.27.0",
+  "license": "MIT",
   "exports": {
     ".": "./src/mod.ts",
     "./signing": "./src/signing/mod.ts",
@@ -9,8 +10,6 @@
     "./api/info": "./src/api/info/~mod.ts",
     "./api/subscription": "./src/api/subscription/~mod.ts"
   },
-  "nodeModulesDir": "auto",
-  "lock": false,
   "fmt": {
     "lineWidth": 120
   },
@@ -20,7 +19,15 @@
     }
   },
   "publish": {
-    "exclude": [".github", "tests", "tsconfig.json"]
+    "exclude": [".github", "tests"]
   },
-  "license": "MIT"
+  "imports": {
+    "@henrygd/semaphore": "jsr:@henrygd/semaphore@0.1.0",
+    "@nktkas/rews": "jsr:@nktkas/rews@^1.2.1",
+    "@noble/hashes": "jsr:@noble/hashes@^2.0.1",
+    "@noble/secp256k1": "jsr:@noble/secp256k1@^3.0.0",
+    "@std/msgpack": "jsr:@std/msgpack@^1.0.3",
+    "@valibot/valibot": "jsr:@valibot/valibot@1.2.0"
+  },
+  "lock": false
 }

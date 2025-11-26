@@ -1,5 +1,3 @@
-import test, { type TestContext } from "node:test";
-import { execFileSync } from "node:child_process";
 import { HttpTransport, InfoClient } from "../../../src/mod.ts";
 
 // —————————— Arguments ——————————
@@ -15,42 +13,38 @@ const client = new InfoClient({ transport });
 
 export function runTest(options: {
   name: string;
-  codeTestFn: (t: TestContext, client: InfoClient) => Promise<void>;
-  cliTestFn?: (t: TestContext, runCommand: (args: string[]) => string) => Promise<void>;
+  codeTestFn: (t: Deno.TestContext, client: InfoClient) => Promise<void>;
+  cliTestFn?: (t: Deno.TestContext, runCommand: (args: string[]) => string | Promise<string>) => Promise<void>;
 }): void {
   const { name, codeTestFn, cliTestFn } = options;
 
-  test(name, async (t) => {
+  Deno.test(name, async (t) => {
     await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
-    await t.test("code", async (t) => {
+    await t.step("code", async (t) => {
       await codeTestFn(t, client);
     });
 
-    await t.test("cli", { skip: !cliTestFn }, async (t) => {
-      // @ts-ignore: Deno is not defined in Node.js
-      const isDeno = typeof globalThis.Deno !== "undefined";
-      const command = isDeno ? "deno" : "node";
-      const extraArgs = isDeno ? ["run", "-A"] : [];
+    await t.step({
+      name: "cli",
+      ignore: !cliTestFn,
+      fn: async () => {
+        await cliTestFn!(t, async (args) => {
+          const command = new Deno.Command("deno", {
+            args: ["run", "-A", "bin/cli.ts", "--offline", ...args],
+            stdout: "piped",
+            stderr: "piped",
+          });
+          const { stdout } = await command.output();
+          const output = new TextDecoder().decode(stdout);
 
-      await cliTestFn!(t, (args) => {
-        const output = execFileSync(
-          command,
-          [
-            ...extraArgs,
-            "bin/cli.ts",
-            "--offline",
-            ...args,
-          ],
-          { encoding: "utf8" },
-        );
+          if (output.startsWith("Hyperliquid CLI")) {
+            throw new Error(`Invalid command argument(s)`);
+          }
 
-        if (output.startsWith("Hyperliquid CLI")) {
-          throw new Error(`Invalid command argument(s)`);
-        }
-
-        return output;
-      });
+          return JSON.parse(output);
+        });
+      },
     });
   });
 }

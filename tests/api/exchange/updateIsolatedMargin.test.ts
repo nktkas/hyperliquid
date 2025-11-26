@@ -13,14 +13,14 @@ runTest({
 
     // —————————— Test ——————————
 
-    await t.test("Increase isolated margin", async () => {
+    await t.step("Increase isolated margin", async () => {
       const data = await Promise.all([
         exchClient.updateIsolatedMargin({ asset: id, isBuy: true, ntli: 2 * 1e6 }),
       ]);
       schemaCoverage(excludeErrorResponse(UpdateIsolatedMarginResponse), data);
     });
 
-    await t.test("Decrease isolated margin", async () => {
+    await t.step("Decrease isolated margin", async () => {
       const data = await Promise.all([
         exchClient.updateIsolatedMargin({ asset: id, isBuy: true, ntli: -1 * 1e6 }),
       ]);

@@ -1,4 +1,4 @@
-import * as v from "valibot";
+import * as v from "@valibot/valibot";
 import { CustomEvent_ } from "../_polyfills.ts";
 
 /** Response to subscribe to or unsubscribe from an event. */

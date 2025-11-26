@@ -6,22 +6,31 @@ Welcome, and thank you for taking time in contributing to SDK! You can contribut
 - Report bugs
 - Review code
 
+## Dev Environment Setup
+
+If you want to read or modify the SDK code, set up your development environment as follows:
+
+1. Install [Deno](https://deno.com).
+2. Use [VSCode Deno LSP](https://marketplace.visualstudio.com/items?itemName=denoland.vscode-deno) or a
+   [similar extension](https://docs.deno.com/runtime/getting_started/setup_your_environment/) if you are using a
+   different editor.
+
 ## Testing
 
 ```bash
-npm run test
+deno test -A
 ```
 
-Set `PRIVATE_KEY` env for complete tests. Required testnet balance: ~100 usdc-perps, ~3 usdc-spot, ~0.0000001 hype-spot.
+Optional: Set `PRIVATE_KEY` env for complete tests. Required testnet balance: ~100 usdc-perps, ~3 usdc-spot, ~0.0000001
+hype-spot.
 
 ## Coding Guidelines
 
-- **Style**: After making all changes, run:
-  - `npm run fmt` to format code.
-  - `npm run lint` to check lint.
-  - `npm run typecheck` to check typescript.
-- **Dependencies**: Use small and easily auditable dependencies from npm (e.g.
-  [@noble/hashes](https://www.npmjs.com/package/@noble/hashes)).
+- **Style**: After making all changes, run: [`deno fmt`](https://docs.deno.com/runtime/reference/cli/fmt/) >
+  [`deno lint`](https://docs.deno.com/runtime/reference/cli/lint/) >
+  [`deno check`](https://docs.deno.com/runtime/reference/cli/check/)
+- **Dependencies**: Use small and easily auditable dependencies (e.g.
+  [@noble/hashes](https://www.npmjs.com/package/@noble/hashes) or [@std](https://jsr.io/@std)).
 - **Testing**: Write tests for any new functionality.
 - **Docs**: Update or add JSDoc comments where appropriate.
 
@@ -38,7 +47,6 @@ Set `PRIVATE_KEY` env for complete tests. Required testnet balance: ~100 usdc-pe
 6. Update docs:
    - Update the [`API Reference`](/README.md#api-reference) section in [`README.md`](/README.md)
    - Update the helper message (function `printHelp`) in [`bin/cli.ts`](/bin/cli.ts).
-7. Run `npm run fmt`, `npm run lint`, and `npm run typecheck` to ensure code quality.
 
 ### Update API schemas/types
 

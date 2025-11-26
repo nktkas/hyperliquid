@@ -3,7 +3,7 @@
  * Supports ethers.js (v5 and v6) and viem wallets.
  */
 
-import * as v from "valibot";
+import * as v from "@valibot/valibot";
 import { HyperliquidError } from "../_base.ts";
 
 // -------------------- Ethers V6 --------------------

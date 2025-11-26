@@ -1,39 +1,39 @@
-import test from "node:test";
-import assert from "node:assert";
+// deno-lint-ignore-file no-import-prefix
+import { assertEquals, assertNotEquals } from "jsr:@std/assert@1";
 import { HttpTransport } from "../../src/mod.ts";
 import { SymbolConverter } from "../../src/utils/mod.ts";
 
-test("SymbolConverter", async (t) => {
-  await t.test("perpetuals", async (t) => {
+Deno.test("SymbolConverter", async (t) => {
+  await t.step("perpetuals", async (t) => {
     const transport = new HttpTransport();
     const converter = await SymbolConverter.create({ transport });
 
-    await t.test("getAssetId", () => {
+    await t.step("getAssetId", () => {
       const btcId = converter.getAssetId("BTC");
       const ethId = converter.getAssetId("ETH");
 
-      assert.strictEqual(btcId, 0, `BTC asset ID should be 0, but got ${btcId}`);
-      assert.strictEqual(ethId, 1, `ETH asset ID should be 1, but got ${ethId}`);
+      assertEquals(btcId, 0, `BTC asset ID should be 0, but got ${btcId}`);
+      assertEquals(ethId, 1, `ETH asset ID should be 1, but got ${ethId}`);
     });
 
-    await t.test("getSzDecimals", () => {
+    await t.step("getSzDecimals", () => {
       const btcDecimals = converter.getSzDecimals("BTC");
       const ethDecimals = converter.getSzDecimals("ETH");
 
-      assert.strictEqual(btcDecimals, 5, `BTC size decimals should be 5, but got ${btcDecimals}`);
-      assert.strictEqual(ethDecimals, 4, `ETH size decimals should be 4, but got ${ethDecimals}`);
+      assertEquals(btcDecimals, 5, `BTC size decimals should be 5, but got ${btcDecimals}`);
+      assertEquals(ethDecimals, 4, `ETH size decimals should be 4, but got ${ethDecimals}`);
     });
 
-    await t.test("non-existent symbol", () => {
+    await t.step("non-existent symbol", () => {
       const nonExistentId = converter.getAssetId("NONEXISTENT");
       const nonExistentDecimals = converter.getSzDecimals("NONEXISTENT");
 
-      assert.strictEqual(
+      assertEquals(
         nonExistentId,
         undefined,
         `NONEXISTENT asset ID should be undefined, but got ${nonExistentId}`,
       );
-      assert.strictEqual(
+      assertEquals(
         nonExistentDecimals,
         undefined,
         `NONEXISTENT size decimals should be undefined, but got ${nonExistentDecimals}`,
@@ -41,36 +41,36 @@ test("SymbolConverter", async (t) => {
     });
   });
 
-  await t.test("spot markets", async (t) => {
+  await t.step("spot markets", async (t) => {
     const transport = new HttpTransport();
     const converter = await SymbolConverter.create({ transport });
 
-    await t.test("getAssetId", () => {
+    await t.step("getAssetId", () => {
       const purrUsdcId = converter.getAssetId("PURR/USDC");
       const hypeUsdcId = converter.getAssetId("HYPE/USDC");
 
-      assert.strictEqual(purrUsdcId, 10000, `PURR/USDC asset ID should be 10000, but got ${purrUsdcId}`);
-      assert.strictEqual(hypeUsdcId, 10107, `HYPE/USDC asset ID should be 10107, but got ${hypeUsdcId}`);
+      assertEquals(purrUsdcId, 10000, `PURR/USDC asset ID should be 10000, but got ${purrUsdcId}`);
+      assertEquals(hypeUsdcId, 10107, `HYPE/USDC asset ID should be 10107, but got ${hypeUsdcId}`);
     });
 
-    await t.test("getSzDecimals", () => {
+    await t.step("getSzDecimals", () => {
       const purrUsdcDecimals = converter.getSzDecimals("PURR/USDC");
       const hypeUsdcDecimals = converter.getSzDecimals("HYPE/USDC");
 
-      assert.strictEqual(purrUsdcDecimals, 0, `PURR/USDC size decimals should be 0, but got ${purrUsdcDecimals}`);
-      assert.strictEqual(hypeUsdcDecimals, 2, `HYPE/USDC size decimals should be 2, but got ${hypeUsdcDecimals}`);
+      assertEquals(purrUsdcDecimals, 0, `PURR/USDC size decimals should be 0, but got ${purrUsdcDecimals}`);
+      assertEquals(hypeUsdcDecimals, 2, `HYPE/USDC size decimals should be 2, but got ${hypeUsdcDecimals}`);
     });
 
-    await t.test("non-existent pair", () => {
+    await t.step("non-existent pair", () => {
       const noneExistentId = converter.getAssetId("NONE/EXISTENT");
       const noneExistentDecimals = converter.getSzDecimals("NONE/EXISTENT");
 
-      assert.strictEqual(
+      assertEquals(
         noneExistentId,
         undefined,
         `NONE/EXISTENT asset ID should be undefined, but got ${noneExistentId}`,
       );
-      assert.strictEqual(
+      assertEquals(
         noneExistentDecimals,
         undefined,
         `NONE/EXISTENT size decimals should be undefined, but got ${noneExistentDecimals}`,
@@ -78,36 +78,36 @@ test("SymbolConverter", async (t) => {
     });
   });
 
-  await t.test("spot pair IDs", async (t) => {
+  await t.step("spot pair IDs", async (t) => {
     const transport = new HttpTransport();
     const converter = await SymbolConverter.create({ transport });
 
-    await t.test("existing pair", () => {
+    await t.step("existing pair", () => {
       const hypeUsdcPairId = converter.getSpotPairId("HYPE/USDC");
       const purrUsdcPairId = converter.getSpotPairId("PURR/USDC");
 
-      assert.strictEqual(
+      assertEquals(
         hypeUsdcPairId,
         "@107",
         `HYPE/USDC spot pair ID should be @107, but got ${hypeUsdcPairId}`,
       );
-      assert.strictEqual(
+      assertEquals(
         purrUsdcPairId,
         "PURR/USDC",
         `PURR/USDC spot pair ID should be PURR/USDC, but got ${purrUsdcPairId}`,
       );
     });
 
-    await t.test("non-existent pair", () => {
+    await t.step("non-existent pair", () => {
       const noneExistentPairId = converter.getSpotPairId("NONE/EXISTENT");
       const btcPairId = converter.getSpotPairId("BTC"); // not a spot market
 
-      assert.strictEqual(
+      assertEquals(
         noneExistentPairId,
         undefined,
         `NONE/EXISTENT spot pair ID should be undefined, but got ${noneExistentPairId}`,
       );
-      assert.strictEqual(
+      assertEquals(
         btcPairId,
         undefined,
         `BTC spot pair ID should be undefined, but got ${btcPairId}`,
@@ -115,7 +115,7 @@ test("SymbolConverter", async (t) => {
     });
   });
 
-  await t.test("reload", async () => {
+  await t.step("reload", async () => {
     const transport = new HttpTransport();
     const converter = await SymbolConverter.create({ transport });
 
@@ -126,44 +126,44 @@ test("SymbolConverter", async (t) => {
     await converter.reload();
     const btcIdAfter = converter.getAssetId("BTC");
 
-    assert.notStrictEqual(
+    assertNotEquals(
       btcIdBefore,
       btcIdAfter,
       `BTC asset ID should change after reload from ${btcIdBefore} to ${btcIdAfter}`,
     );
   });
 
-  await t.test("builder dex", async (t) => {
+  await t.step("builder dex", async (t) => {
     const transport = new HttpTransport({ isTestnet: true });
 
-    await t.test("dexs: false", async () => {
+    await t.step("dexs: false", async () => {
       const converter = await SymbolConverter.create({ transport, dexs: false });
 
       const testAbcId = converter.getAssetId("test:ABC");
       const unitEsId = converter.getAssetId("unit:ES");
 
-      assert.strictEqual(testAbcId, undefined, `test:ABC asset ID should be undefined, but got ${testAbcId}`);
-      assert.strictEqual(unitEsId, undefined, `unit:ES asset ID should be undefined, but got ${unitEsId}`);
+      assertEquals(testAbcId, undefined, `test:ABC asset ID should be undefined, but got ${testAbcId}`);
+      assertEquals(unitEsId, undefined, `unit:ES asset ID should be undefined, but got ${unitEsId}`);
     });
 
-    await t.test("dexs: [specific dex]", async () => {
+    await t.step("dexs: [specific dex]", async () => {
       const converter = await SymbolConverter.create({ transport, dexs: ["test"] });
 
       const testAbcId = converter.getAssetId("test:ABC");
       const unitEsId = converter.getAssetId("unit:ES");
 
-      assert.strictEqual(testAbcId, 110000, `test:ABC asset ID should be 110000, but got ${testAbcId}`);
-      assert.strictEqual(unitEsId, undefined, `unit:ES asset ID should be undefined, but got ${unitEsId}`);
+      assertEquals(testAbcId, 110000, `test:ABC asset ID should be 110000, but got ${testAbcId}`);
+      assertEquals(unitEsId, undefined, `unit:ES asset ID should be undefined, but got ${unitEsId}`);
     });
 
-    await t.test("dexs: true", async () => {
+    await t.step("dexs: true", async () => {
       const converter = await SymbolConverter.create({ transport, dexs: true });
 
       const testAbcId = converter.getAssetId("test:ABC");
       const unitEsId = converter.getAssetId("unit:ES");
 
-      assert.strictEqual(testAbcId, 110000, `test:ABC asset ID should be 110000, but got ${testAbcId}`);
-      assert.strictEqual(unitEsId, 120000, `unit:ES asset ID should be 120000, but got ${unitEsId}`);
+      assertEquals(testAbcId, 110000, `test:ABC asset ID should be 110000, but got ${testAbcId}`);
+      assertEquals(unitEsId, 120000, `unit:ES asset ID should be 120000, but got ${unitEsId}`);
     });
   });
 });

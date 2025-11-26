@@ -1,4 +1,4 @@
-import * as v from "valibot";
+import * as v from "@valibot/valibot";
 import { Address, Decimal, Hex, UnsignedDecimal, UnsignedInteger } from "./_base.ts";
 
 /**

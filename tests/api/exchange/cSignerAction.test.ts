@@ -1,4 +1,5 @@
-import assert from "node:assert";
+// deno-lint-ignore-file no-import-prefix
+import { assertRejects } from "jsr:@std/assert@1";
 import { CSignerActionRequest, parser } from "../../../src/api/exchange/~mod.ts";
 import { ApiRequestError } from "../../../src/mod.ts";
 import { runTest } from "./_t.ts";
@@ -6,21 +7,23 @@ import { runTest } from "./_t.ts";
 runTest({
   name: "cSignerAction",
   codeTestFn: async (t, exchClient) => {
-    await t.test("jailSelf", async () => {
-      await assert.rejects(
+    await t.step("jailSelf", async () => {
+      await assertRejects(
         async () => {
           await exchClient.cSignerAction({ jailSelf: null });
         },
-        (e) => e instanceof ApiRequestError && e.message.includes("Signer invalid or inactive for current epoch"),
+        ApiRequestError,
+        "Signer invalid or inactive for current epoch",
       );
     });
 
-    await t.test("unjailSelf", async () => {
-      await assert.rejects(
+    await t.step("unjailSelf", async () => {
+      await assertRejects(
         async () => {
           await exchClient.cSignerAction({ unjailSelf: null });
         },
-        (e) => e instanceof ApiRequestError && e.message.includes("Signer invalid or inactive for current epoch"),
+        ApiRequestError,
+        "Signer invalid or inactive for current epoch",
       );
     });
   },

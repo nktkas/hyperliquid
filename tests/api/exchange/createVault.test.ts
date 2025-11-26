@@ -1,4 +1,5 @@
-import assert from "node:assert";
+// deno-lint-ignore-file no-import-prefix
+import { assertRejects } from "jsr:@std/assert@1";
 import { CreateVaultRequest, parser } from "../../../src/api/exchange/~mod.ts";
 import { ApiRequestError } from "../../../src/mod.ts";
 import { runTest } from "./_t.ts";
@@ -6,7 +7,7 @@ import { runTest } from "./_t.ts";
 runTest({
   name: "createVault",
   codeTestFn: async (_t, exchClient) => {
-    await assert.rejects(
+    await assertRejects(
       async () => {
         await exchClient.createVault({
           name: "test",
@@ -15,7 +16,8 @@ runTest({
           nonce: Date.now(),
         });
       },
-      (e) => e instanceof ApiRequestError && e.message.includes("Insufficient balance to create vault"),
+      ApiRequestError,
+      "Insufficient balance to create vault",
     );
   },
   cliTestFn: async (_t, runCommand) => {

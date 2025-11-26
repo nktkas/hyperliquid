@@ -1,4 +1,3 @@
-import test, { type TestContext } from "node:test";
 import { type ExchangeClient, InfoClient, SubscriptionClient, WebSocketTransport } from "../../../src/mod.ts";
 import { cleanupTempExchangeClient, createTempExchangeClient } from "../exchange/_t.ts";
 
@@ -11,11 +10,11 @@ const WAIT = 5000;
 export function runTest(options: {
   name: string;
   mode: "api" | "rpc";
-  fn: (t: TestContext, client: SubscriptionClient) => Promise<void>;
+  fn: (t: Deno.TestContext, client: SubscriptionClient) => Promise<void>;
 }): void {
   const { name, mode, fn } = options;
 
-  test(name, async (t) => {
+  Deno.test(name, async (t) => {
     await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
     // —————————— Preparation ——————————
@@ -38,13 +37,13 @@ export function runTest(options: {
 export function runTestWithExchange(options: {
   name: string;
   fn: (
-    t: TestContext,
+    t: Deno.TestContext,
     client: { subs: SubscriptionClient; exch: ExchangeClient; info: InfoClient },
   ) => Promise<void>;
 }): void {
   const { name, fn } = options;
 
-  test(name, async (t) => {
+  Deno.test(name, async (t) => {
     await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
     // —————————— Preparation ——————————
