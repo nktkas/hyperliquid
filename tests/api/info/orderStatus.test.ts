@@ -1,6 +1,7 @@
-import { OrderStatusRequest, OrderStatusResponse, parser } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { OrderStatusRequest, OrderStatusResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "orderStatus",
@@ -38,32 +39,32 @@ runTest({
     ]);
     schemaCoverage(OrderStatusResponse, data, {
       ignoreEmptyArray: ["#/variant/0/properties/order/properties/order/properties/children"],
-      ignoreBranches: {
+      ignorePicklistValues: {
         "#/variant/0/properties/order/properties/status": [
-          3,
-          5,
-          6,
-          7,
-          8,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
+          "triggered",
+          "marginCanceled",
+          "vaultWithdrawalCanceled",
+          "openInterestCapCanceled",
+          "selfTradeCanceled",
+          "siblingFilledCanceled",
+          "delistedCanceled",
+          "liquidatedCanceled",
+          "scheduledCancel",
+          "tickRejected",
+          "minTradeNtlRejected",
+          "perpMarginRejected",
+          "reduceOnlyRejected",
+          "badAloPxRejected",
+          "iocCancelRejected",
+          "badTriggerPxRejected",
+          "marketOrderNoLiquidityRejected",
+          "positionIncreaseAtOpenInterestCapRejected",
+          "positionFlipAtOpenInterestCapRejected",
+          "tooAggressiveAtOpenInterestCapRejected",
+          "openInterestIncreaseRejected",
+          "insufficientSpotBalanceRejected",
+          "oracleRejected",
+          "perpMaxPositionRejected",
         ],
       },
     });
@@ -72,11 +73,9 @@ runTest({
     const data = await runCommand([
       "info",
       "orderStatus",
-      "--user",
-      "0x563C175E6f11582f65D6d9E360A618699DEe14a9",
-      "--oid",
-      "27379010444",
+      "--user=0x563C175E6f11582f65D6d9E360A618699DEe14a9",
+      "--oid=27379010444",
     ]);
-    parser(OrderStatusRequest)(data);
+    v.parse(OrderStatusRequest, data);
   },
 });

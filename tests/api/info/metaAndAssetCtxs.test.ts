@@ -1,6 +1,7 @@
-import { MetaAndAssetCtxsRequest, MetaAndAssetCtxsResponse, parser } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { MetaAndAssetCtxsRequest, MetaAndAssetCtxsResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "metaAndAssetCtxs",
@@ -13,7 +14,10 @@ runTest({
     schemaCoverage(MetaAndAssetCtxsResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "metaAndAssetCtxs"]);
-    parser(MetaAndAssetCtxsRequest)(data);
+    const data = await runCommand([
+      "info",
+      "metaAndAssetCtxs",
+    ]);
+    v.parse(MetaAndAssetCtxsRequest, data);
   },
 });

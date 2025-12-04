@@ -1,15 +1,16 @@
-import { parser, SpotSendRequest, SpotSendResponse } from "../../../src/api/exchange/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { SpotSendRequest, SpotSendResponse } from "@nktkas/hyperliquid/api/exchange";
 import { excludeErrorResponse, runTest, topUpSpot } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "spotSend",
   codeTestFn: async (_t, exchClient) => {
-    // —————————— Prepare ——————————
+    // ========== Prepare ==========
 
     await topUpSpot(exchClient, "USDC", "2");
 
-    // —————————— Test ——————————
+    // ========== Test ==========
 
     const data = await Promise.all([
       exchClient.spotSend({
@@ -24,13 +25,10 @@ runTest({
     const data = await runCommand([
       "exchange",
       "spotSend",
-      "--destination",
-      "0x0000000000000000000000000000000000000001",
-      "--token",
-      "USDC:0xeb62eee3685fc4c43992febcd9e75443",
-      "--amount",
-      "1",
+      "--destination=0x0000000000000000000000000000000000000001",
+      "--token=USDC:0xeb62eee3685fc4c43992febcd9e75443",
+      "--amount=1",
     ]);
-    parser(SpotSendRequest)(data);
+    v.parse(SpotSendRequest, data);
   },
 });

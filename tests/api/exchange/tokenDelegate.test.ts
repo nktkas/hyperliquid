@@ -1,16 +1,17 @@
-import { parser, TokenDelegateRequest, TokenDelegateResponse } from "../../../src/api/exchange/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { TokenDelegateRequest, TokenDelegateResponse } from "@nktkas/hyperliquid/api/exchange";
 import { excludeErrorResponse, runTest, topUpSpot } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "tokenDelegate",
   codeTestFn: async (_t, exchClient) => {
-    // —————————— Prepare ——————————
+    // ========== Prepare ==========
 
     await topUpSpot(exchClient, "HYPE", "0.00000001");
     await exchClient.cDeposit({ wei: 1 });
 
-    // —————————— Test ——————————
+    // ========== Test ==========
 
     const data = await Promise.all([
       exchClient.tokenDelegate({
@@ -25,13 +26,10 @@ runTest({
     const data = await runCommand([
       "exchange",
       "tokenDelegate",
-      "--validator",
-      "0xa012b9040d83c5cbad9e6ea73c525027b755f596",
-      "--wei",
-      "1",
-      "--isUndelegate",
-      "false",
+      "--validator=0xa012b9040d83c5cbad9e6ea73c525027b755f596",
+      "--wei=1",
+      "--isUndelegate=false",
     ]);
-    parser(TokenDelegateRequest)(data);
+    v.parse(TokenDelegateRequest, data);
   },
 });

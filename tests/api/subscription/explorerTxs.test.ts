@@ -1,20 +1,15 @@
-import { ExplorerTxsEvent } from "../../../src/api/subscription/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { ExplorerTxsEvent } from "@nktkas/hyperliquid/api/subscription";
 import { collectEventsOverTime, runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "explorerTxs",
   mode: "rpc",
   fn: async (_t, client) => {
-    const data = await Promise.all([
-      collectEventsOverTime<ExplorerTxsEvent>(
-        async (cb) => {
-          await client.explorerTxs(cb);
-        },
-        10_000,
-      ),
-    ]);
-    schemaCoverage(ExplorerTxsEvent, data.flat(), {
+    const data = await collectEventsOverTime<ExplorerTxsEvent>(async (cb) => {
+      await client.explorerTxs(cb);
+    }, 10_000);
+    schemaCoverage(ExplorerTxsEvent, data, {
       ignoreDefinedTypes: ["#/items/properties/error"],
     });
   },

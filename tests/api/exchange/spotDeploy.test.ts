@@ -1,8 +1,9 @@
 // deno-lint-ignore-file no-import-prefix
+import * as v from "@valibot/valibot";
 import { assertRejects } from "jsr:@std/assert@1";
-import { parser, SpotDeployRequest } from "../../../src/api/exchange/~mod.ts";
-import { ApiRequestError } from "../../../src/mod.ts";
+import { SpotDeployRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest } from "./_t.ts";
+import { ApiRequestError } from "@nktkas/hyperliquid";
 
 runTest({
   name: "spotDeploy",
@@ -119,22 +120,37 @@ runTest({
         "Error deploying spot:",
       );
     });
+
+    await t.step("enableAlignedQuoteToken", async () => {
+      await assertRejects(
+        async () => {
+          await exchClient.spotDeploy({
+            enableAlignedQuoteToken: {
+              token: 0,
+            },
+          });
+        },
+        ApiRequestError,
+        "Error deploying spot:",
+      );
+    });
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([
       "exchange",
       "spotDeploy",
-      "--registerToken2",
-      JSON.stringify({
-        spec: {
-          name: "TestToken",
-          szDecimals: 8,
-          weiDecimals: 8,
-        },
-        maxGas: 1000000,
-        fullName: "TestToken (TT)",
-      }),
+      `--registerToken2=${
+        JSON.stringify({
+          spec: {
+            name: "TestToken",
+            szDecimals: 8,
+            weiDecimals: 8,
+          },
+          maxGas: 1000000,
+          fullName: "TestToken (TT)",
+        })
+      }`,
     ]);
-    parser(SpotDeployRequest)(data);
+    v.parse(SpotDeployRequest, data);
   },
 });

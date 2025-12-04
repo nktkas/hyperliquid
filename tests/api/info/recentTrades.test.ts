@@ -1,6 +1,7 @@
-import { parser, RecentTradesRequest, RecentTradesResponse } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { RecentTradesRequest, RecentTradesResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "recentTrades",
@@ -9,13 +10,17 @@ runTest({
       client.recentTrades({ coin: "ETH" }),
     ]);
     schemaCoverage(RecentTradesResponse, data, {
-      ignoreBranches: {
-        "#/items/properties/side": [0, 1],
+      ignorePicklistValues: {
+        "#/items/properties/side": ["A", "B"],
       },
     });
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "recentTrades", "--coin", "ETH"]);
-    parser(RecentTradesRequest)(data);
+    const data = await runCommand([
+      "info",
+      "recentTrades",
+      "--coin=ETH",
+    ]);
+    v.parse(RecentTradesRequest, data);
   },
 });

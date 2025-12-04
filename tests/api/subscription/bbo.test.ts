@@ -1,31 +1,16 @@
-import { BboEvent } from "../../../src/api/subscription/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { BboEvent } from "@nktkas/hyperliquid/api/subscription";
 import { collectEventsOverTime, runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "bbo",
   mode: "api",
   fn: async (_t, client) => {
-    const data = await Promise.all([
-      collectEventsOverTime<BboEvent>(
-        async (cb) => {
-          await client.bbo({ coin: "BTC" }, cb);
-        },
-        60_000,
-      ),
-      collectEventsOverTime<BboEvent>(
-        async (cb) => {
-          await client.bbo({ coin: "ETH" }, cb);
-        },
-        60_000,
-      ),
-      collectEventsOverTime<BboEvent>(
-        async (cb) => {
-          await client.bbo({ coin: "SOL" }, cb);
-        },
-        60_000,
-      ),
-    ]);
-    schemaCoverage(BboEvent, data.flat());
+    const data = await collectEventsOverTime<BboEvent>(async (cb) => {
+      await client.bbo({ coin: "BTC" }, cb);
+      await client.bbo({ coin: "ETH" }, cb);
+      await client.bbo({ coin: "SOL" }, cb);
+    }, 60_000);
+    schemaCoverage(BboEvent, data);
   },
 });

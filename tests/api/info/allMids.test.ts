@@ -1,6 +1,7 @@
-import { AllMidsRequest, AllMidsResponse, parser } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { AllMidsRequest, AllMidsResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "allMids",
@@ -11,7 +12,10 @@ runTest({
     schemaCoverage(AllMidsResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "allMids"]);
-    parser(AllMidsRequest)(data);
+    const data = await runCommand([
+      "info",
+      "allMids",
+    ]);
+    v.parse(AllMidsRequest, data);
   },
 });

@@ -1,15 +1,16 @@
-import { CancelRequest, CancelResponse, parser } from "../../../src/api/exchange/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { CancelRequest, CancelResponse } from "@nktkas/hyperliquid/api/exchange";
 import { excludeErrorResponse, openOrder, runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "cancel",
   codeTestFn: async (_t, exchClient) => {
-    // —————————— Prepare ——————————
+    // ========== Prepare ==========
 
     const order = await openOrder(exchClient, "limit");
 
-    // —————————— Test ——————————
+    // ========== Test ==========
 
     const data = await Promise.all([
       exchClient.cancel({ cancels: [{ a: order.a, o: order.oid }] }),
@@ -20,9 +21,8 @@ runTest({
     const data = await runCommand([
       "exchange",
       "cancel",
-      "--cancels",
-      JSON.stringify([{ a: 0, o: 0 }]),
+      `--cancels=${JSON.stringify([{ a: 0, o: 0 }])}`,
     ]);
-    parser(CancelRequest)(data);
+    v.parse(CancelRequest, data);
   },
 });

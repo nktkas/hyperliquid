@@ -1,4 +1,4 @@
-name: Publish Package to JSR
+name: publish to jsr
 on:
   workflow_dispatch:
 
@@ -11,7 +11,7 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Publish package
         run: npx jsr publish --allow-slow-types --allow-dirty

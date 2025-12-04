@@ -1,6 +1,7 @@
-import { parser, TxDetailsRequest, TxDetailsResponse } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { TxDetailsRequest, TxDetailsResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "txDetails",
@@ -15,9 +16,8 @@ runTest({
     const data = await runCommand([
       "info",
       "txDetails",
-      "--hash",
-      "0x8f1b2b67eda04ecbc7b00411ee669b010c0041e8f52c9ff5c3609d9ef7e66c71",
+      "--hash=0x8f1b2b67eda04ecbc7b00411ee669b010c0041e8f52c9ff5c3609d9ef7e66c71",
     ]);
-    parser(TxDetailsRequest)(data);
+    v.parse(TxDetailsRequest, data);
   },
 });

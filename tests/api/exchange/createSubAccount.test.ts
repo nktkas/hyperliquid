@@ -1,8 +1,9 @@
 // deno-lint-ignore-file no-import-prefix
+import * as v from "@valibot/valibot";
 import { assertRejects } from "jsr:@std/assert@1";
-import { CreateSubAccountRequest, parser } from "../../../src/api/exchange/~mod.ts";
-import { ApiRequestError } from "../../../src/mod.ts";
+import { CreateSubAccountRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest } from "./_t.ts";
+import { ApiRequestError } from "@nktkas/hyperliquid";
 
 runTest({
   name: "createSubAccount",
@@ -16,7 +17,11 @@ runTest({
     );
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["exchange", "createSubAccount", "--name", "12345"]);
-    parser(CreateSubAccountRequest)(data);
+    const data = await runCommand([
+      "exchange",
+      "createSubAccount",
+      "--name=12345",
+    ]);
+    v.parse(CreateSubAccountRequest, data);
   },
 });

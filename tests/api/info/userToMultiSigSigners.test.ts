@@ -1,6 +1,7 @@
-import { parser, UserToMultiSigSignersRequest, UserToMultiSigSignersResponse } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { UserToMultiSigSignersRequest, UserToMultiSigSignersResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "userToMultiSigSigners",
@@ -15,9 +16,8 @@ runTest({
     const data = await runCommand([
       "info",
       "userToMultiSigSigners",
-      "--user",
-      "0x7A8b673a176a430b80cfCDfdFB6b10ED55010Ebb",
+      "--user=0x7A8b673a176a430b80cfCDfdFB6b10ED55010Ebb",
     ]);
-    parser(UserToMultiSigSignersRequest)(data);
+    v.parse(UserToMultiSigSignersRequest, data);
   },
 });

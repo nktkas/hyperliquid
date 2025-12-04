@@ -1,8 +1,9 @@
 // deno-lint-ignore-file no-import-prefix
+import * as v from "@valibot/valibot";
 import { assertRejects } from "jsr:@std/assert@1";
-import { CValidatorActionRequest, parser } from "../../../src/api/exchange/~mod.ts";
-import { ApiRequestError } from "../../../src/mod.ts";
+import { CValidatorActionRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest } from "./_t.ts";
+import { ApiRequestError } from "@nktkas/hyperliquid";
 
 runTest({
   name: "cValidatorAction",
@@ -64,20 +65,21 @@ runTest({
     const data = await runCommand([
       "exchange",
       "cValidatorAction",
-      "--register",
-      JSON.stringify({
-        profile: {
-          node_ip: { Ip: "1.2.3.4" },
-          name: "...",
-          description: "...",
-          delegations_disabled: true,
-          commission_bps: 1,
-          signer: "0x0000000000000000000000000000000000000001",
-        },
-        unjailed: false,
-        initial_wei: 1,
-      }),
+      `--register=${
+        JSON.stringify({
+          profile: {
+            node_ip: { Ip: "1.2.3.4" },
+            name: "...",
+            description: "...",
+            delegations_disabled: true,
+            commission_bps: 1,
+            signer: "0x0000000000000000000000000000000000000001",
+          },
+          unjailed: false,
+          initial_wei: 1,
+        })
+      }`,
     ]);
-    parser(CValidatorActionRequest)(data);
+    v.parse(CValidatorActionRequest, data);
   },
 });

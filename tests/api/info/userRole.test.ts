@@ -1,6 +1,7 @@
-import { parser, UserRoleRequest, UserRoleResponse } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { UserRoleRequest, UserRoleResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "userRole",
@@ -15,7 +16,11 @@ runTest({
     schemaCoverage(UserRoleResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "userRole", "--user", "0x941a505ACc11F5f3A12b5eF0d414A8Bff45c5e77"]);
-    parser(UserRoleRequest)(data);
+    const data = await runCommand([
+      "info",
+      "userRole",
+      "--user=0x941a505ACc11F5f3A12b5eF0d414A8Bff45c5e77",
+    ]);
+    v.parse(UserRoleRequest, data);
   },
 });

@@ -1,6 +1,7 @@
-import { BlockDetailsRequest, BlockDetailsResponse, parser } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { BlockDetailsRequest, BlockDetailsResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "blockDetails",
@@ -11,7 +12,11 @@ runTest({
     schemaCoverage(BlockDetailsResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "blockDetails", "--height", "300836507"]);
-    parser(BlockDetailsRequest)(data);
+    const data = await runCommand([
+      "info",
+      "blockDetails",
+      "--height=300836507",
+    ]);
+    v.parse(BlockDetailsRequest, data);
   },
 });

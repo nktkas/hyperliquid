@@ -41,12 +41,10 @@ hype-spot.
 1. Create a file with the method name in the appropriate directory:
    `src/api/[exchange|info|subscription]/[methodName].ts`
 2. Implement the logic related to the new API (using ready-made patterns from other method files).
-3. Update the `~client.ts` file to include the new method.
-4. Add the raw function export to `~mod.ts`.
+3. Update the `client.ts` file to include the new method.
+4. Add the raw function export to `mod.ts`.
 5. Create a test (use patterns from other tests) and run the test.
-6. Update docs:
-   - Update the [`API Reference`](/README.md#api-reference) section in [`README.md`](/README.md)
-   - Update the helper message (function `printHelp`) in [`bin/cli.ts`](/bin/cli.ts).
+6. Update the helper message (function `printHelp`) in [`bin/cli.ts`](/bin/cli.ts).
 
 ### Update API schemas/types
 

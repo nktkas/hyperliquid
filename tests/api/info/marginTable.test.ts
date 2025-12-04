@@ -1,6 +1,7 @@
-import { MarginTableRequest, MarginTableResponse, parser } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { MarginTableRequest, MarginTableResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "marginTable",
@@ -11,7 +12,11 @@ runTest({
     schemaCoverage(MarginTableResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "marginTable", "--id", "1"]);
-    parser(MarginTableRequest)(data);
+    const data = await runCommand([
+      "info",
+      "marginTable",
+      "--id=1",
+    ]);
+    v.parse(MarginTableRequest, data);
   },
 });

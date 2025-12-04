@@ -1,6 +1,7 @@
-import { parser, UsdClassTransferRequest, UsdClassTransferResponse } from "../../../src/api/exchange/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { UsdClassTransferRequest, UsdClassTransferResponse } from "@nktkas/hyperliquid/api/exchange";
 import { excludeErrorResponse, runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "usdClassTransfer",
@@ -11,7 +12,12 @@ runTest({
     schemaCoverage(excludeErrorResponse(UsdClassTransferResponse), data);
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["exchange", "usdClassTransfer", "--amount", "1", "--toPerp", "false"]);
-    parser(UsdClassTransferRequest)(data);
+    const data = await runCommand([
+      "exchange",
+      "usdClassTransfer",
+      "--amount=1",
+      "--toPerp=false",
+    ]);
+    v.parse(UsdClassTransferRequest, data);
   },
 });

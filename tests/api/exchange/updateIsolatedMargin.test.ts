@@ -1,17 +1,18 @@
-import { parser, UpdateIsolatedMarginRequest, UpdateIsolatedMarginResponse } from "../../../src/api/exchange/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { UpdateIsolatedMarginRequest, UpdateIsolatedMarginResponse } from "@nktkas/hyperliquid/api/exchange";
 import { excludeErrorResponse, openOrder, runTest, symbolConverter } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "updateIsolatedMargin",
   codeTestFn: async (t, exchClient) => {
-    // —————————— Prepare ——————————
+    // ========== Prepare ==========
 
     const id = symbolConverter.getAssetId("ETH")!;
     await exchClient.updateLeverage({ asset: id, isCross: false, leverage: 1 });
     await openOrder(exchClient, "market", "ETH");
 
-    // —————————— Test ——————————
+    // ========== Test ==========
 
     await t.step("Increase isolated margin", async () => {
       const data = await Promise.all([
@@ -31,13 +32,10 @@ runTest({
     const data = await runCommand([
       "exchange",
       "updateIsolatedMargin",
-      "--asset",
-      "0",
-      "--isBuy",
-      "true",
-      "--ntli",
-      "1",
+      "--asset=0",
+      "--isBuy=true",
+      "--ntli=1",
     ]);
-    parser(UpdateIsolatedMarginRequest)(data);
+    v.parse(UpdateIsolatedMarginRequest, data);
   },
 });

@@ -1,13 +1,20 @@
-import { type IRequestTransport, TransportError } from "../base.ts";
+import { TransportError } from "../../_errors.ts";
 import { AbortSignal_ } from "../_polyfills.ts";
-
-type MaybePromise<T> = T | Promise<T>;
 
 /** Error thrown when an HTTP request fails. */
 export class HttpRequestError extends TransportError {
+  /** The HTTP response that caused the error. */
   response?: Response;
+  /** The response body text. */
   body?: string;
 
+  /**
+   * Creates a new HTTP request error.
+   * @param args - The error arguments.
+   * @param args.response - The HTTP response that caused the error.
+   * @param args.body - The response body text.
+   * @param options - The error options.
+   */
   constructor(args?: { response?: Response; body?: string }, options?: ErrorOptions) {
     const { response, body } = args ?? {};
 
@@ -16,7 +23,7 @@ export class HttpRequestError extends TransportError {
       message = `${response.status} ${response.statusText}`.trim();
       if (body) message += ` - ${body}`;
     } else {
-      message = `Unknown error while making an HTTP request: ${options?.cause}`;
+      message = `Unknown HTTP request error: ${options?.cause}`;
     }
 
     super(message, options);
@@ -29,57 +36,54 @@ export class HttpRequestError extends TransportError {
 /** Configuration options for the HTTP transport layer. */
 export interface HttpTransportOptions {
   /**
-   * Specifies whether to use the testnet API endpoints from the {@linkcode server} property.
+   * Indicates this transport uses testnet endpoint.
    * @default false
    */
   isTestnet?: boolean;
+
   /**
    * Request timeout in ms. Set to `null` to disable.
    * @default 10_000
    */
   timeout?: number | null;
+
   /**
-   * Custom server to use for API requests.
-   * @default `https://api.hyperliquid.xyz` for mainnet and `https://api.hyperliquid-testnet.xyz` for testnet.
+   * Custom API URL for requests.
+   * @default `https://api.hyperliquid.xyz` for mainnet, `https://api.hyperliquid-testnet.xyz` for testnet.
    */
-  server?: {
-    mainnet?: { api?: string | URL; rpc?: string | URL };
-    testnet?: { api?: string | URL; rpc?: string | URL };
-  };
+  apiUrl?: string | URL;
+
+  /**
+   * Custom RPC URL for explorer requests.
+   * @default `https://rpc.hyperliquid.xyz` for mainnet, `https://rpc.hyperliquid-testnet.xyz` for testnet.
+   */
+  rpcUrl?: string | URL;
+
   /** A custom [`RequestInit`](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit) that is merged with a fetch request. */
   fetchOptions?: Omit<RequestInit, "body" | "method">;
-  /**
-   * A callback function that is called before the request is sent.
-   * @param request - An original request to send.
-   * @returns If returned a [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request), it will replace the original request.
-   */
-  onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>;
-  /**
-   * A callback function that is called after the response is received.
-   * @param response - An original response to process.
-   * @returns If returned a [`Response`](https://developer.mozilla.org/en-US/docs/Web/API/Response/Response), it will replace the original response.
-   */
-  onResponse?: (response: Response) => MaybePromise<Response | void | null | undefined>;
-  /**
-   * A callback function that is called when an error occurs during fetching.
-   * @param error - The error that occurred.
-   * @returns If returned an [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error), it will be thrown instead of the original error (still wraps an error in {@linkcode HttpRequestError}).
-   */
-  onError?: (error: unknown) => MaybePromise<Error | void | null | undefined>;
 }
 
-/** HTTP implementation of the REST transport interface. */
-export class HttpTransport implements IRequestTransport, HttpTransportOptions {
+/** Mainnet API URL. */
+export const MAINNET_API_URL = "https://api.hyperliquid.xyz";
+/** Testnet API URL. */
+export const TESTNET_API_URL = "https://api.hyperliquid-testnet.xyz";
+/** Mainnet RPC URL. */
+export const MAINNET_RPC_URL = "https://rpc.hyperliquid.xyz";
+/** Testnet RPC URL. */
+export const TESTNET_RPC_URL = "https://rpc.hyperliquid-testnet.xyz";
+
+/**
+ * HTTP transport for Hyperliquid API.
+ *
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint
+ */
+export class HttpTransport implements HttpTransportOptions {
   isTestnet: boolean;
   timeout: number | null;
-  server: {
-    mainnet: { api: string | URL; rpc: string | URL };
-    testnet: { api: string | URL; rpc: string | URL };
-  };
+  apiUrl: string | URL;
+  rpcUrl: string | URL;
   fetchOptions: Omit<RequestInit, "body" | "method">;
-  onRequest?: (request: Request) => MaybePromise<Request | void | null | undefined>;
-  onResponse?: (response: Response) => MaybePromise<Response | void | null | undefined>;
-  onError?: (error: unknown) => MaybePromise<Error | void | null | undefined>;
 
   /**
    * Creates a new HTTP transport instance.
@@ -88,27 +92,18 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
   constructor(options?: HttpTransportOptions) {
     this.isTestnet = options?.isTestnet ?? false;
     this.timeout = options?.timeout === undefined ? 10_000 : options.timeout;
-    this.server = {
-      mainnet: {
-        api: options?.server?.mainnet?.api ?? "https://api.hyperliquid.xyz",
-        rpc: options?.server?.mainnet?.rpc ?? "https://rpc.hyperliquid.xyz",
-      },
-      testnet: {
-        api: options?.server?.testnet?.api ?? "https://api.hyperliquid-testnet.xyz",
-        rpc: options?.server?.testnet?.rpc ?? "https://rpc.hyperliquid-testnet.xyz",
-      },
-    };
+    this.apiUrl = options?.apiUrl ?? (this.isTestnet ? TESTNET_API_URL : MAINNET_API_URL);
+    this.rpcUrl = options?.rpcUrl ?? (this.isTestnet ? TESTNET_RPC_URL : MAINNET_RPC_URL);
     this.fetchOptions = options?.fetchOptions ?? {};
-    this.onRequest = options?.onRequest;
-    this.onResponse = options?.onResponse;
-    this.onError = options?.onError;
   }
 
   /**
-   * Sends a request to the Hyperliquid API via fetch.
+   * Sends a request to the Hyperliquid API via [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
+   *
    * @param endpoint - The API endpoint to send the request to.
    * @param payload - The payload to send with the request.
-   * @param signal - An [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) can be used to cancel the request by calling [`abort()`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort) on the corresponding [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController).
+   * @param signal - [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to cancel the request.
+   *
    * @returns A promise that resolves with parsed JSON response body.
    *
    * @throws {HttpRequestError} Thrown when the HTTP request fails.
@@ -116,11 +111,8 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
   async request<T>(endpoint: "info" | "exchange" | "explorer", payload: unknown, signal?: AbortSignal): Promise<T> {
     try {
       // Construct a Request
-      const url = new URL(
-        endpoint,
-        this.server[this.isTestnet ? "testnet" : "mainnet"][endpoint === "explorer" ? "rpc" : "api"],
-      );
-      const init = mergeRequestInit(
+      const url = new URL(endpoint, endpoint === "explorer" ? this.rpcUrl : this.apiUrl);
+      const init = this._mergeRequestInit(
         {
           body: JSON.stringify(payload),
           headers: {
@@ -134,29 +126,9 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
         this.fetchOptions,
         { signal },
       );
-      let request = new Request(url, init);
-
-      // Call the onRequest callback, if provided
-      if (this.onRequest) {
-        const customRequest = await this.onRequest(request);
-        if (customRequest instanceof Request) request = customRequest;
-      }
 
       // Send the Request and wait for a Response
-      let response = await fetch(request)
-        .catch(async (error) => {
-          if (this.onError) {
-            const customError = await this.onError(error);
-            if (customError instanceof Error) error = customError;
-          }
-          throw error;
-        });
-
-      // Call the onResponse callback, if provided
-      if (this.onResponse) {
-        const customResponse = await this.onResponse(response);
-        if (customResponse instanceof Response) response = customResponse;
-      }
+      const response = await fetch(url, init);
 
       // Validate the Response
       if (!response.ok || !response.headers.get("Content-Type")?.includes("application/json")) {
@@ -180,39 +152,33 @@ export class HttpTransport implements IRequestTransport, HttpTransportOptions {
       throw new HttpRequestError(undefined, { cause: error });
     }
   }
-}
 
-/** Merges multiple `HeadersInit` into one [`Headers`](https://developer.mozilla.org/en-US/docs/Web/API/Headers/Headers). */
-function mergeHeadersInit(...inits: HeadersInit[]): Headers {
-  if (inits.length === 0 || inits.length === 1) {
-    return new Headers(inits[0] as HeadersInit | undefined);
-  }
-
-  const merged = new Headers();
-  for (const headers of inits) {
-    const iterator = Symbol.iterator in headers ? headers : Object.entries(headers);
-    for (const [key, value] of iterator) {
-      merged.set(key, value);
+  /** Merges multiple `HeadersInit` into one [`Headers`](https://developer.mozilla.org/en-US/docs/Web/API/Headers/Headers). */
+  protected _mergeHeadersInit(...inits: HeadersInit[]): Headers {
+    const merged = new Headers();
+    for (const headers of inits) {
+      const entries = Symbol.iterator in headers ? headers : Object.entries(headers);
+      for (const [key, value] of entries) {
+        merged.set(key, value);
+      }
     }
-  }
-  return merged;
-}
-
-/** Merges multiple [`RequestInit`](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit) into one [`RequestInit`](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit). */
-function mergeRequestInit(...inits: RequestInit[]): RequestInit {
-  const merged = inits.reduce((acc, init) => ({ ...acc, ...init }), {});
-
-  const headersList = inits.map((init) => init.headers)
-    .filter((headers) => typeof headers === "object");
-  if (headersList.length > 0) {
-    merged.headers = mergeHeadersInit(...headersList);
+    return merged;
   }
 
-  const signals = inits.map((init) => init.signal)
-    .filter((signal) => signal instanceof AbortSignal);
-  if (signals.length > 0) {
-    merged.signal = signals.length > 1 ? AbortSignal_.any(signals) : signals[0];
-  }
+  /** Merges multiple [`RequestInit`](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit) into one [`RequestInit`](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit). */
+  protected _mergeRequestInit(...inits: RequestInit[]): RequestInit {
+    const merged: RequestInit = {};
+    const headersList: HeadersInit[] = [];
+    const signals: AbortSignal[] = [];
 
-  return merged;
+    for (const init of inits) {
+      Object.assign(merged, init);
+      if (init.headers) headersList.push(init.headers);
+      if (init.signal) signals.push(init.signal);
+    }
+    if (headersList.length > 0) merged.headers = this._mergeHeadersInit(...headersList);
+    if (signals.length > 0) merged.signal = signals.length > 1 ? AbortSignal_.any(signals) : signals[0];
+
+    return merged;
+  }
 }

@@ -1,6 +1,7 @@
-import { ApproveBuilderFeeRequest, ApproveBuilderFeeResponse, parser } from "../../../src/api/exchange/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { ApproveBuilderFeeRequest, ApproveBuilderFeeResponse } from "@nktkas/hyperliquid/api/exchange";
 import { excludeErrorResponse, runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "approveBuilderFee",
@@ -17,11 +18,9 @@ runTest({
     const data = await runCommand([
       "exchange",
       "approveBuilderFee",
-      "--maxFeeRate",
-      "0.001%",
-      "--builder",
-      "0xe019d6167E7e324aEd003d94098496b6d986aB05",
+      "--maxFeeRate=0.001%",
+      "--builder=0xe019d6167E7e324aEd003d94098496b6d986aB05",
     ]);
-    parser(ApproveBuilderFeeRequest)(data);
+    v.parse(ApproveBuilderFeeRequest, data);
   },
 });

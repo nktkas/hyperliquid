@@ -1,0 +1,163 @@
+import * as v from "@valibot/valibot";
+
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { Decimal, UnsignedDecimal } from "../../_schemas.ts";
+import { MetaResponse } from "./meta.ts";
+
+/**
+ * Request metadata and asset contexts.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-asset-contexts-includes-mark-price-current-funding-open-interest-etc
+ */
+export const MetaAndAssetCtxsRequest = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.object({
+      /** Type of request. */
+      type: v.pipe(
+        v.literal("metaAndAssetCtxs"),
+        v.description("Type of request."),
+      ),
+      /** DEX name (empty string for main dex). */
+      dex: v.pipe(
+        v.optional(v.string()),
+        v.description("DEX name (empty string for main dex)."),
+      ),
+    }),
+    v.description("Request metadata and asset contexts."),
+  );
+})();
+export type MetaAndAssetCtxsRequest = v.InferOutput<typeof MetaAndAssetCtxsRequest>;
+
+/**
+ * Metadata and context for perpetual assets.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-asset-contexts-includes-mark-price-current-funding-open-interest-etc
+ */
+export const MetaAndAssetCtxsResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.tuple([
+      MetaResponse,
+      /** Array of contexts for each perpetual asset. */
+      v.pipe(
+        v.array(
+          /** Context for a specific perpetual asset. */
+          v.pipe(
+            v.object({
+              /** Previous day's closing price. */
+              prevDayPx: v.pipe(
+                UnsignedDecimal,
+                v.description("Previous day's closing price."),
+              ),
+              /** Daily notional volume. */
+              dayNtlVlm: v.pipe(
+                UnsignedDecimal,
+                v.description("Daily notional volume."),
+              ),
+              /** Mark price. */
+              markPx: v.pipe(
+                UnsignedDecimal,
+                v.description("Mark price."),
+              ),
+              /** Mid price. */
+              midPx: v.pipe(
+                v.nullable(UnsignedDecimal),
+                v.description("Mid price."),
+              ),
+              /** Funding rate. */
+              funding: v.pipe(
+                Decimal,
+                v.description("Funding rate."),
+              ),
+              /** Total open interest. */
+              openInterest: v.pipe(
+                UnsignedDecimal,
+                v.description("Total open interest."),
+              ),
+              /** Premium price. */
+              premium: v.pipe(
+                v.nullable(Decimal),
+                v.description("Premium price."),
+              ),
+              /** Oracle price. */
+              oraclePx: v.pipe(
+                UnsignedDecimal,
+                v.description("Oracle price."),
+              ),
+              /** Array of impact prices. */
+              impactPxs: v.pipe(
+                v.nullable(v.array(v.string())),
+                v.description("Array of impact prices."),
+              ),
+              /** Daily volume in base currency. */
+              dayBaseVlm: v.pipe(
+                UnsignedDecimal,
+                v.description("Daily volume in base currency."),
+              ),
+            }),
+            v.description("Context for a specific perpetual asset."),
+          ),
+        ),
+        v.description("Array of contexts for each perpetual asset."),
+      ),
+    ]),
+    v.description("Metadata and context for perpetual assets."),
+  );
+})();
+export type MetaAndAssetCtxsResponse = v.InferOutput<typeof MetaAndAssetCtxsResponse>;
+
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import type { InfoConfig } from "./_types.ts";
+
+/** Request parameters for the {@linkcode metaAndAssetCtxs} function. */
+export type MetaAndAssetCtxsParameters = Omit<v.InferInput<typeof MetaAndAssetCtxsRequest>, "type">;
+
+/**
+ * Request metadata and asset contexts.
+ *
+ * @param config - General configuration for Info API requests.
+ * @param signal - [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to cancel the request.
+ *
+ * @returns Metadata and context for perpetual assets.
+ *
+ * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {TransportError} When the transport layer throws an error.
+ *
+ * @example
+ * ```ts
+ * import { HttpTransport } from "@nktkas/hyperliquid";
+ * import { metaAndAssetCtxs } from "@nktkas/hyperliquid/api/info";
+ *
+ * const transport = new HttpTransport(); // or `WebSocketTransport`
+ *
+ * const data = await metaAndAssetCtxs({ transport });
+ * ```
+ *
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-asset-contexts-includes-mark-price-current-funding-open-interest-etc
+ */
+export function metaAndAssetCtxs(
+  config: InfoConfig,
+  params?: MetaAndAssetCtxsParameters,
+  signal?: AbortSignal,
+): Promise<MetaAndAssetCtxsResponse>;
+export function metaAndAssetCtxs(
+  config: InfoConfig,
+  signal?: AbortSignal,
+): Promise<MetaAndAssetCtxsResponse>;
+export function metaAndAssetCtxs(
+  config: InfoConfig,
+  paramsOrSignal?: MetaAndAssetCtxsParameters | AbortSignal,
+  maybeSignal?: AbortSignal,
+): Promise<MetaAndAssetCtxsResponse> {
+  const params = paramsOrSignal instanceof AbortSignal ? {} : paramsOrSignal;
+  const signal = paramsOrSignal instanceof AbortSignal ? paramsOrSignal : maybeSignal;
+
+  const request = v.parse(MetaAndAssetCtxsRequest, {
+    type: "metaAndAssetCtxs",
+    ...params,
+  });
+  return config.transport.request("info", request, signal);
+}

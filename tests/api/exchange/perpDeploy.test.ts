@@ -1,12 +1,36 @@
 // deno-lint-ignore-file no-import-prefix
+import * as v from "@valibot/valibot";
 import { assertRejects } from "jsr:@std/assert@1";
-import { parser, PerpDeployRequest } from "../../../src/api/exchange/~mod.ts";
-import { ApiRequestError } from "../../../src/mod.ts";
+import { PerpDeployRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest } from "./_t.ts";
+import { ApiRequestError } from "@nktkas/hyperliquid";
 
 runTest({
   name: "perpDeploy",
   codeTestFn: async (t, exchClient) => {
+    await t.step("registerAsset2", async () => {
+      await assertRejects(
+        async () => {
+          await exchClient.perpDeploy({
+            registerAsset2: {
+              maxGas: 1000000000000,
+              assetRequest: {
+                coin: "1",
+                szDecimals: 1,
+                oraclePx: "1",
+                marginTableId: 1,
+                marginMode: "noCross",
+              },
+              dex: "test",
+              schema: null,
+            },
+          });
+        },
+        ApiRequestError,
+        "Invalid perp deployer",
+      );
+    });
+
     await t.step("registerAsset", async () => {
       await assertRejects(
         async () => {
@@ -132,6 +156,18 @@ runTest({
       );
     });
 
+    await t.step("setMarginModes", async () => {
+      await assertRejects(
+        async () => {
+          await exchClient.perpDeploy({
+            setMarginModes: [["TEST0", "noCross"]],
+          });
+        },
+        ApiRequestError,
+        "Unknown coin TEST0",
+      );
+    });
+
     await t.step("setFeeScale", async () => {
       await assertRejects(
         async () => {
@@ -146,25 +182,38 @@ runTest({
         "Invalid perp deployer",
       );
     });
+
+    await t.step("setGrowthModes", async () => {
+      await assertRejects(
+        async () => {
+          await exchClient.perpDeploy({
+            setGrowthModes: [["TEST0", true]],
+          });
+        },
+        ApiRequestError,
+        "Unknown coin TEST0",
+      );
+    });
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([
       "exchange",
       "perpDeploy",
-      "--registerAsset",
-      JSON.stringify({
-        maxGas: 1000000000000,
-        assetRequest: {
-          coin: "1",
-          szDecimals: 1,
-          oraclePx: "1",
-          marginTableId: 1,
-          onlyIsolated: true,
-        },
-        dex: "test",
-        schema: null,
-      }),
+      `--registerAsset=${
+        JSON.stringify({
+          maxGas: 1000000000000,
+          assetRequest: {
+            coin: "1",
+            szDecimals: 1,
+            oraclePx: "1",
+            marginTableId: 1,
+            onlyIsolated: true,
+          },
+          dex: "test",
+          schema: null,
+        })
+      }`,
     ]);
-    parser(PerpDeployRequest)(data);
+    v.parse(PerpDeployRequest, data);
   },
 });

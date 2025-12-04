@@ -1,6 +1,7 @@
-import { parser, SpotDeployStateRequest, SpotDeployStateResponse } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { SpotDeployStateRequest, SpotDeployStateResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "spotDeployState",
@@ -27,9 +28,8 @@ runTest({
     const data = await runCommand([
       "info",
       "spotDeployState",
-      "--user",
-      "0x051dbfc562d44e4a01ebb986da35a47ab4f346db",
+      "--user=0x051dbfc562d44e4a01ebb986da35a47ab4f346db",
     ]);
-    parser(SpotDeployStateRequest)(data);
+    v.parse(SpotDeployStateRequest, data);
   },
 });

@@ -1,6 +1,7 @@
-import { AlignedQuoteTokenInfoRequest, AlignedQuoteTokenInfoResponse, parser } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { AlignedQuoteTokenInfoRequest, AlignedQuoteTokenInfoResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "alignedQuoteTokenInfo",
@@ -11,7 +12,11 @@ runTest({
     schemaCoverage(AlignedQuoteTokenInfoResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "alignedQuoteTokenInfo", "--token", "1328"]);
-    parser(AlignedQuoteTokenInfoRequest)(data);
+    const data = await runCommand([
+      "info",
+      "alignedQuoteTokenInfo",
+      "--token=1328",
+    ]);
+    v.parse(AlignedQuoteTokenInfoRequest, data);
   },
 });

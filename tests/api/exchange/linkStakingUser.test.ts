@@ -1,8 +1,9 @@
 // deno-lint-ignore-file no-import-prefix
+import * as v from "@valibot/valibot";
 import { assertRejects } from "jsr:@std/assert@1";
-import { LinkStakingUserRequest, parser } from "../../../src/api/exchange/~mod.ts";
-import { ApiRequestError } from "../../../src/mod.ts";
+import { LinkStakingUserRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest } from "./_t.ts";
+import { ApiRequestError } from "@nktkas/hyperliquid";
 
 runTest({
   name: "linkStakingUser",
@@ -22,11 +23,9 @@ runTest({
     const data = await runCommand([
       "exchange",
       "linkStakingUser",
-      "--user",
-      "0x0000000000000000000000000000000000000001",
-      "--isFinalize",
-      "false",
+      "--user=0x0000000000000000000000000000000000000001",
+      "--isFinalize=false",
     ]);
-    parser(LinkStakingUserRequest)(data);
+    v.parse(LinkStakingUserRequest, data);
   },
 });

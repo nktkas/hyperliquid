@@ -1,6 +1,7 @@
-import { DelegatorRewardsRequest, DelegatorRewardsResponse, parser } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { DelegatorRewardsRequest, DelegatorRewardsResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "delegatorRewards",
@@ -15,9 +16,8 @@ runTest({
     const data = await runCommand([
       "info",
       "delegatorRewards",
-      "--user",
-      "0xedc88158266c50628a9ffbaa1db2635376577eea",
+      "--user=0xedc88158266c50628a9ffbaa1db2635376577eea",
     ]);
-    parser(DelegatorRewardsRequest)(data);
+    v.parse(DelegatorRewardsRequest, data);
   },
 });

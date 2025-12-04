@@ -1,6 +1,7 @@
-import { ExchangeStatusRequest, ExchangeStatusResponse, parser } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { ExchangeStatusRequest, ExchangeStatusResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "exchangeStatus",
@@ -13,7 +14,10 @@ runTest({
     });
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "exchangeStatus"]);
-    parser(ExchangeStatusRequest)(data);
+    const data = await runCommand([
+      "info",
+      "exchangeStatus",
+    ]);
+    v.parse(ExchangeStatusRequest, data);
   },
 });

@@ -1,15 +1,16 @@
-import { parser, Withdraw3Request, Withdraw3Response } from "../../../src/api/exchange/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { Withdraw3Request, Withdraw3Response } from "@nktkas/hyperliquid/api/exchange";
 import { excludeErrorResponse, runTest, topUpPerp } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "withdraw3",
   codeTestFn: async (_t, exchClient) => {
-    // —————————— Prepare ——————————
+    // ========== Prepare ==========
 
     await topUpPerp(exchClient, "2");
 
-    // —————————— Test ——————————
+    // ========== Test ==========
 
     const data = await Promise.all([
       exchClient.withdraw3({
@@ -23,11 +24,9 @@ runTest({
     const data = await runCommand([
       "exchange",
       "withdraw3",
-      "--amount",
-      "2",
-      "--destination",
-      "0x0000000000000000000000000000000000000001",
+      "--amount=2",
+      "--destination=0x0000000000000000000000000000000000000001",
     ]);
-    parser(Withdraw3Request)(data);
+    v.parse(Withdraw3Request, data);
   },
 });

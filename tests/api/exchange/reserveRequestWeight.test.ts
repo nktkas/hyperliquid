@@ -1,6 +1,7 @@
-import { parser, ReserveRequestWeightRequest, ReserveRequestWeightResponse } from "../../../src/api/exchange/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { ReserveRequestWeightRequest, ReserveRequestWeightResponse } from "@nktkas/hyperliquid/api/exchange";
 import { excludeErrorResponse, runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "reserveRequestWeight",
@@ -11,7 +12,11 @@ runTest({
     schemaCoverage(excludeErrorResponse(ReserveRequestWeightResponse), data);
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["exchange", "reserveRequestWeight", "--weight", "1"]);
-    parser(ReserveRequestWeightRequest)(data);
+    const data = await runCommand([
+      "exchange",
+      "reserveRequestWeight",
+      "--weight=1",
+    ]);
+    v.parse(ReserveRequestWeightRequest, data);
   },
 });

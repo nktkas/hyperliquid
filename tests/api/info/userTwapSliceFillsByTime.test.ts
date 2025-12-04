@@ -1,10 +1,7 @@
-import {
-  parser,
-  UserTwapSliceFillsByTimeRequest,
-  UserTwapSliceFillsByTimeResponse,
-} from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { UserTwapSliceFillsByTimeRequest, UserTwapSliceFillsByTimeResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "userTwapSliceFillsByTime",
@@ -25,11 +22,9 @@ runTest({
     const data = await runCommand([
       "info",
       "userTwapSliceFillsByTime",
-      "--user",
-      "0x563C175E6f11582f65D6d9E360A618699DEe14a9",
-      "--startTime",
-      "1725991238683",
+      "--user=0x563C175E6f11582f65D6d9E360A618699DEe14a9",
+      "--startTime=1725991238683",
     ]);
-    parser(UserTwapSliceFillsByTimeRequest)(data);
+    v.parse(UserTwapSliceFillsByTimeRequest, data);
   },
 });

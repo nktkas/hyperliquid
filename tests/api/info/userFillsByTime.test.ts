@@ -1,6 +1,7 @@
-import { parser, UserFillsByTimeRequest, UserFillsByTimeResponse } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { UserFillsByTimeRequest, UserFillsByTimeResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "userFillsByTime",
@@ -21,11 +22,9 @@ runTest({
     const data = await runCommand([
       "info",
       "userFillsByTime",
-      "--user",
-      "0x563C175E6f11582f65D6d9E360A618699DEe14a9",
-      "--startTime",
-      "1725991229384",
+      "--user=0x563C175E6f11582f65D6d9E360A618699DEe14a9",
+      "--startTime=1725991229384",
     ]);
-    parser(UserFillsByTimeRequest)(data);
+    v.parse(UserFillsByTimeRequest, data);
   },
 });

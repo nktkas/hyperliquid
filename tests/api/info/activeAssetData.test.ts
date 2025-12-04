@@ -1,6 +1,7 @@
-import { ActiveAssetDataRequest, ActiveAssetDataResponse, parser } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { ActiveAssetDataRequest, ActiveAssetDataResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "activeAssetData",
@@ -15,11 +16,9 @@ runTest({
     const data = await runCommand([
       "info",
       "activeAssetData",
-      "--user",
-      "0x563C175E6f11582f65D6d9E360A618699DEe14a9",
-      "--coin",
-      "BTC",
+      "--user=0x563C175E6f11582f65D6d9E360A618699DEe14a9",
+      "--coin=BTC",
     ]);
-    parser(ActiveAssetDataRequest)(data);
+    v.parse(ActiveAssetDataRequest, data);
   },
 });

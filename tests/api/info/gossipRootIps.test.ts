@@ -1,6 +1,7 @@
-import { GossipRootIpsRequest, GossipRootIpsResponse, parser } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { GossipRootIpsRequest, GossipRootIpsResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "gossipRootIps",
@@ -13,7 +14,10 @@ runTest({
     });
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "gossipRootIps"]);
-    parser(GossipRootIpsRequest)(data);
+    const data = await runCommand([
+      "info",
+      "gossipRootIps",
+    ]);
+    v.parse(GossipRootIpsRequest, data);
   },
 });

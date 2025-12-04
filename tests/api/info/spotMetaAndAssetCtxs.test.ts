@@ -1,6 +1,7 @@
-import { parser, SpotMetaAndAssetCtxsRequest, SpotMetaAndAssetCtxsResponse } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { SpotMetaAndAssetCtxsRequest, SpotMetaAndAssetCtxsResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "spotMetaAndAssetCtxs",
@@ -11,7 +12,10 @@ runTest({
     schemaCoverage(SpotMetaAndAssetCtxsResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "spotMetaAndAssetCtxs"]);
-    parser(SpotMetaAndAssetCtxsRequest)(data);
+    const data = await runCommand([
+      "info",
+      "spotMetaAndAssetCtxs",
+    ]);
+    v.parse(SpotMetaAndAssetCtxsRequest, data);
   },
 });

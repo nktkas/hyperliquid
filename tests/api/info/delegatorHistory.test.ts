@@ -1,6 +1,7 @@
-import { DelegatorHistoryRequest, DelegatorHistoryResponse, parser } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { DelegatorHistoryRequest, DelegatorHistoryResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "delegatorHistory",
@@ -14,9 +15,8 @@ runTest({
     const data = await runCommand([
       "info",
       "delegatorHistory",
-      "--user",
-      "0xedc88158266c50628a9ffbaa1db2635376577eea",
+      "--user=0xedc88158266c50628a9ffbaa1db2635376577eea",
     ]);
-    parser(DelegatorHistoryRequest)(data);
+    v.parse(DelegatorHistoryRequest, data);
   },
 });

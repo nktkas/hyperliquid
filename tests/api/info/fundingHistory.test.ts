@@ -1,6 +1,7 @@
-import { FundingHistoryRequest, FundingHistoryResponse, parser } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { FundingHistoryRequest, FundingHistoryResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "fundingHistory",
@@ -14,7 +15,12 @@ runTest({
     schemaCoverage(FundingHistoryResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "fundingHistory", "--coin", "ETH", "--startTime", "1725991126328"]);
-    parser(FundingHistoryRequest)(data);
+    const data = await runCommand([
+      "info",
+      "fundingHistory",
+      "--coin=ETH",
+      "--startTime=1725991126328",
+    ]);
+    v.parse(FundingHistoryRequest, data);
   },
 });

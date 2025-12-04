@@ -1,8 +1,9 @@
 // deno-lint-ignore-file no-import-prefix
+import * as v from "@valibot/valibot";
 import { assertRejects } from "jsr:@std/assert@1";
-import { ClaimRewardsRequest, parser } from "../../../src/api/exchange/~mod.ts";
-import { ApiRequestError } from "../../../src/mod.ts";
+import { ClaimRewardsRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest } from "./_t.ts";
+import { ApiRequestError } from "@nktkas/hyperliquid";
 
 runTest({
   name: "claimRewards",
@@ -16,7 +17,10 @@ runTest({
     );
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["exchange", "claimRewards"]);
-    parser(ClaimRewardsRequest)(data);
+    const data = await runCommand([
+      "exchange",
+      "claimRewards",
+    ]);
+    v.parse(ClaimRewardsRequest, data);
   },
 });

@@ -1,6 +1,7 @@
-import { MetaRequest, MetaResponse, parser } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { MetaRequest, MetaResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "meta",
@@ -13,7 +14,10 @@ runTest({
     schemaCoverage(MetaResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "meta"]);
-    parser(MetaRequest)(data);
+    const data = await runCommand([
+      "info",
+      "meta",
+    ]);
+    v.parse(MetaRequest, data);
   },
 });

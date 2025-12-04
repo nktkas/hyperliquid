@@ -1,8 +1,9 @@
 // deno-lint-ignore-file no-import-prefix
+import * as v from "@valibot/valibot";
 import { assertRejects } from "jsr:@std/assert@1";
-import { parser, VaultTransferRequest } from "../../../src/api/exchange/~mod.ts";
-import { ApiRequestError } from "../../../src/mod.ts";
+import { VaultTransferRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest } from "./_t.ts";
+import { ApiRequestError } from "@nktkas/hyperliquid";
 
 runTest({
   name: "vaultTransfer",
@@ -23,13 +24,10 @@ runTest({
     const data = await runCommand([
       "exchange",
       "vaultTransfer",
-      "--vaultAddress",
-      "0x457ab3acf4a4e01156ce269545a9d3d05fff2f0b",
-      "--isDeposit",
-      "false",
-      "--usd",
-      "5000000",
+      "--vaultAddress=0x457ab3acf4a4e01156ce269545a9d3d05fff2f0b",
+      "--isDeposit=false",
+      "--usd=5000000",
     ]);
-    parser(VaultTransferRequest)(data);
+    v.parse(VaultTransferRequest, data);
   },
 });

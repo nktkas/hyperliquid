@@ -1,8 +1,9 @@
 // deno-lint-ignore-file no-import-prefix
+import * as v from "@valibot/valibot";
 import { assertRejects } from "jsr:@std/assert@1";
-import { parser, SubAccountSpotTransferRequest } from "../../../src/api/exchange/~mod.ts";
-import { ApiRequestError } from "../../../src/mod.ts";
+import { SubAccountSpotTransferRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest } from "./_t.ts";
+import { ApiRequestError } from "@nktkas/hyperliquid";
 
 runTest({
   name: "subAccountSpotTransfer",
@@ -24,15 +25,11 @@ runTest({
     const data = await runCommand([
       "exchange",
       "subAccountSpotTransfer",
-      "--subAccountUser",
-      "0xcb3f0bd249a89e45e86a44bcfc7113e4ffe84cd1",
-      "--isDeposit",
-      "true",
-      "--token",
-      "USDC:0xeb62eee3685fc4c43992febcd9e75443",
-      "--amount",
-      "1",
+      "--subAccountUser=0xcb3f0bd249a89e45e86a44bcfc7113e4ffe84cd1",
+      "--isDeposit=true",
+      "--token=USDC:0xeb62eee3685fc4c43992febcd9e75443",
+      "--amount=1",
     ]);
-    parser(SubAccountSpotTransferRequest)(data);
+    v.parse(SubAccountSpotTransferRequest, data);
   },
 });

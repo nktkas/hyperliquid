@@ -1,11 +1,25 @@
 #!/usr/bin/env node
+
+/**
+ * Command-line interface for interacting with Hyperliquid API.
+ *
+ * @example
+ * ```sh
+ * npx @nktkas/hyperliquid <endpoint> <method> [options]
+ * ```
+ */
+
 // @ts-ignore: Ignore missing TS types when building npm
 import process from "node:process";
-import * as v from "@valibot/valibot";
-import * as hl from "../src/mod.ts";
-import { type Args, parseArgs, transformArgs } from "./_utils.ts";
+import { type Args, extractArgs, transformArgs } from "./_utils.ts";
+import { ExchangeClient, HttpTransport, InfoClient } from "../src/mod.ts";
+import { PrivateKeySigner } from "../src/signing/mod.ts";
 
-function transformParams(method: string, params: Args) {
+// ============================================================
+// Execute
+// ============================================================
+
+function transformParams(method: string, params: Args<false>) {
   switch (method) {
     case "spotUser": {
       return { toggleSpotDusting: { ...params } };
@@ -19,67 +33,57 @@ function transformParams(method: string, params: Args) {
   }
 }
 
-class EchoTransport implements hl.IRequestTransport {
-  isTestnet: boolean;
+class EchoTransport extends HttpTransport {
   constructor(isTestnet: boolean) {
-    this.isTestnet = isTestnet;
+    super({ isTestnet });
   }
-  request<T>(_: "info" | "exchange" | "explorer", payload: unknown): Promise<T> {
+  override request<T>(_: string, payload: unknown): Promise<T> {
     return new Promise((resolve) => resolve({ status: "ok", response: payload } as T));
   }
 }
-async function executeEndpointMethod(
-  endpoint: string,
-  method: string,
-  args: Args,
-): Promise<unknown> {
+
+/** Execute CLI command on info/exchange endpoint */
+async function executeEndpointMethod(endpoint: string, method: string, args: Args<false>): Promise<unknown> {
+  // Parse CLI flags
   const isTestnet = "testnet" in args;
   const timeout = Number(args.timeout) || undefined;
   const isOffline = "offline" in args;
 
-  const transport = isOffline ? new EchoTransport(isTestnet) : new hl.HttpTransport({ isTestnet, timeout });
-  let client: hl.InfoClient | hl.ExchangeClient;
+  // Create transport (echo for offline, http for online)
+  const transport = isOffline ? new EchoTransport(isTestnet) : new HttpTransport({ isTestnet, timeout });
+  let client: InfoClient | ExchangeClient;
 
-  if (endpoint === "info") {
-    client = new hl.InfoClient({ transport });
+  // Create client based on endpoint
+  switch (endpoint) {
+    case "info":
+      client = new InfoClient({ transport });
+      break;
+    case "exchange": {
+      const wallet = new PrivateKeySigner(args["private-key"] as `0x${string}`);
+      delete args["private-key"]; // remove before uncontrolled transfer of arguments (just in case)
 
-    if (!(method in client)) {
-      throw new Error(`CLI does not support the "${method}" method in the "${endpoint}" endpoint`);
+      const defaultVaultAddress = args.vault as `0x${string}` | undefined;
+
+      client = new ExchangeClient({ transport, wallet, defaultVaultAddress });
+      break;
     }
-  } else if (endpoint === "exchange") {
-    const pk = v.parse(
-      v.pipe(v.string(), v.hexadecimal()),
-      args["private-key"],
-      { message: 'Invalid format "private-key": Expected 32-byte hexadecimal string' },
-    );
-    delete args["private-key"]; // just in case
-
-    const defaultVaultAddress = v.parse(
-      v.optional(v.pipe(v.string(), v.hexadecimal())),
-      args.vault,
-      { message: 'Invalid format "vault": Expected 20-byte hexadecimal string OR nothing' },
-    );
-
-    client = new hl.ExchangeClient({ transport, wallet: pk, defaultVaultAddress });
-
-    if (!(method in client)) {
-      throw new Error(`CLI does not support the "${method}" method in the "${endpoint}" endpoint`);
-    }
-  } else {
-    throw new Error(`Invalid endpoint "${endpoint}". Use "info" or "exchange"`);
+    default:
+      throw new Error(`Invalid endpoint "${endpoint}". Use "info" or "exchange"`);
   }
 
-  if (isOffline) {
-    // @ts-ignore - dynamic method access
-    const response = await client[method](transformParams(method, args));
-    return response.response;
-  } else {
-    // @ts-ignore - dynamic method access
-    return await client[method](transformParams(method, args));
-  }
+  // Check if method exists on client
+  if (!(method in client)) throw new Error(`Unknown "${method}" method for "${endpoint}" endpoint`);
+
+  // Execute method and return result
+  const params = transformParams(method, args);
+  // @ts-expect-error: dynamic method access
+  const response = await client[method](params);
+  return isOffline ? response.response : response; // for offline mode, we want to see the request payload, not the wrapper
 }
 
-// ──────────────────── Main ────────────────────
+// ============================================================
+// CLI
+// ============================================================
 
 function printHelp() {
   console.log(`Hyperliquid CLI
@@ -118,8 +122,6 @@ Market Data:
   maxMarketOrderNtls      (no params)
   meta                    [--dex <string>]
   metaAndAssetCtxs        [--dex <string>]
-  perpDexLimits           --dex <string>
-  perpDexs                (no params)
   perpsAtOpenInterestCap  [--dex <string>]
   predictedFundings       (no params)
   recentTrades            --coin <string>
@@ -175,6 +177,11 @@ Vault:
   userVaultEquities       --user <address>
   vaultDetails            --vaultAddress <address> [--user <address>]
   vaultSummaries          (no params)
+
+DEX:
+  perpDexLimits           --dex <string>
+  perpDexs                (no params)
+  perpDexStatus           --dex <string>
 
 Deploy Market:
   perpDeployAuctionStatus      (no params)
@@ -251,16 +258,12 @@ Vault:
   vaultTransfer           --vaultAddress <address> --isDeposit <bool> --usd <number>
 
 Deploy Market:
-  perpDeploy              --registerAsset <json> | --setOracle <json> | --setFundingMultipliers <json> |
-                          --haltTrading <json> | --setMarginTableIds <json> | --setFeeRecipient <json> |
-                          --setOpenInterestCaps <json> | --setSubDeployers <json> | --setFeeScale <json>
-  spotDeploy              --genesis <json> | --registerHyperliquidity <json> | --registerSpot <json> |
-                          --registerToken2 <json> | --setDeployerTradingFeeShare <json> | --userGenesis <json> |
-                          --enableQuoteToken <json>
+  perpDeploy              --<action> <json>
+  spotDeploy              --<action> <json>
 
 Validator Actions:
   cSignerAction           --jailSelf null | --unjailSelf null
-  cValidatorAction        --changeProfile <json> | --register <json> | --unregister null
+  cValidatorAction        --<action> <json>
   validatorL1Stream       --riskFreeRate <number>
 
 Other:
@@ -282,13 +285,13 @@ Examples:
   npx @nktkas/hyperliquid info candleSnapshot --coin BTC --interval 1h --startTime 1700000000000
 
   # Place a limit order
-  npx @nktkas/hyperliquid exchange order --private-key 0x... --orders '[{\\"a\\":0,\\"b\\":true,\\"p\\":30000,\\"s\\":0.1,\\"r\\":false,\\"t\\":{\\"limit\\":{\\"tif\\":\\"Gtc\\"}}}]'
+  npx @nktkas/hyperliquid exchange order --private-key 0x... --orders '[{\"a\":0,\"b\":true,\"p\":30000,\"s\":0.1,\"r\":false,\"t\":{\"limit\":{\"tif\":\"Gtc\"}}}]'
 
   # Modify an existing order
-  npx @nktkas/hyperliquid exchange modify --private-key 0x... --oid 12345 --order '{\\"a\\":0,\\"b\\":true,\\"p\\":31000,\\"s\\":0.1,\\"r\\":false,\\"t\\":{\\"limit\\":{\\"tif\\":\\"Gtc\\"}}}'
+  npx @nktkas/hyperliquid exchange modify --private-key 0x... --oid 12345 --order '{\"a\":0,\"b\":true,\"p\":31000,\"s\":0.1,\"r\":false,\"t\":{\"limit\":{\"tif\":\"Gtc\"}}}'
 
   # Cancel orders
-  npx @nktkas/hyperliquid exchange cancel --private-key 0x... --cancels '[{\\"a\\":0,\\"o\\":12345}]'
+  npx @nktkas/hyperliquid exchange cancel --private-key 0x... --cancels '[{\"a\":0,\"o\":12345}]'
 
   # Update leverage
   npx @nktkas/hyperliquid exchange updateLeverage --private-key 0x... --asset 0 --isCross true --leverage 5
@@ -303,18 +306,20 @@ Examples:
   npx @nktkas/hyperliquid exchange createVault --private-key 0x... --name "My Vault" --description "Test vault" --initialUsd 1000`);
 }
 
-const rawArgs = parseArgs(process.argv.slice(2), {
-  flags: ["testnet", "help", "h", "offline"],
-});
-const args = transformArgs(rawArgs, {
-  number: "string",
-});
-const [endpoint, method] = args._;
+// ============================================================
+// Entry
+// ============================================================
 
+const rawArgs = extractArgs(process.argv.slice(2), {
+  flags: ["testnet", "help", "h", "offline"],
+  collect: false,
+});
+const args = transformArgs(rawArgs, { number: "string" });
+const [endpoint, method] = args._;
 if (args.help || args.h || !endpoint || !method) {
   printHelp();
 } else {
   executeEndpointMethod(endpoint, method, args)
     .then((result) => console.log(JSON.stringify(result)))
-    .catch((error) => console.error("Error:", error instanceof Error ? error.message : String(error)));
+    .catch((error) => console.error(error));
 }

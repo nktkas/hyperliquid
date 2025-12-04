@@ -1,6 +1,7 @@
-import { parser, UpdateLeverageRequest, UpdateLeverageResponse } from "../../../src/api/exchange/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { UpdateLeverageRequest, UpdateLeverageResponse } from "@nktkas/hyperliquid/api/exchange";
 import { excludeErrorResponse, runTest, symbolConverter } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "updateLeverage",
@@ -18,13 +19,10 @@ runTest({
     const data = await runCommand([
       "exchange",
       "updateLeverage",
-      "--asset",
-      "0",
-      "--isCross",
-      "true",
-      "--leverage",
-      "1",
+      "--asset=0",
+      "--isCross=true",
+      "--leverage=1",
     ]);
-    parser(UpdateLeverageRequest)(data);
+    v.parse(UpdateLeverageRequest, data);
   },
 });

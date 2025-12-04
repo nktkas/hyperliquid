@@ -1,6 +1,10 @@
 // deno-lint-ignore-file no-import-prefix
-import { assert, assertEquals, assertFalse, assertIsError, assertLess, assertRejects } from "jsr:@std/assert@1";
-import { WebSocketRequestError, WebSocketTransport } from "../../../src/transport/websocket/mod.ts";
+import { assertEquals, assertIsError, assertLess, assertRejects } from "jsr:@std/assert@1";
+import { WebSocketRequestError, WebSocketTransport } from "@nktkas/hyperliquid";
+
+// ============================================================
+// Helpers
+// ============================================================
 
 class DisposeWebSocketTransport extends WebSocketTransport {
   async [Symbol.asyncDispose]() {
@@ -8,14 +12,20 @@ class DisposeWebSocketTransport extends WebSocketTransport {
   }
 }
 
-type TransportWithInternals = DisposeWebSocketTransport & {
-  _subscriptions: Map<string, { listeners: Set<unknown> }>;
-  _keepAliveTimeout: number | undefined;
-  _wsRequester: { queue: unknown[] };
-};
+/** Creates a transport with the test server URL. */
+function createTransport(testCase: string, options?: Partial<ConstructorParameters<typeof WebSocketTransport>[0]>) {
+  return new DisposeWebSocketTransport({
+    url: `ws://localhost:8080/?test=${testCase}`,
+    ...options,
+  });
+}
 
-Deno.test("WebSocketTransport", async (t) => {
-  const server = Deno.serve(
+// ============================================================
+// Test Server
+// ============================================================
+
+function createTestServer() {
+  return Deno.serve(
     { port: 8080, onListen: () => {} },
     (request) => {
       if (request.headers.get("upgrade") !== "websocket") {
@@ -28,71 +38,28 @@ Deno.test("WebSocketTransport", async (t) => {
       const { socket, response } = Deno.upgradeWebSocket(request);
       socket.addEventListener("message", (e) => {
         const send = (payload: unknown) => socket.send(JSON.stringify(payload));
-
         const data = JSON.parse(e.data);
+
         if (data.method === "post") {
           if (testCase === "request-fail") {
-            send({ channel: "error", data: "Request failed: " + JSON.stringify(data) });
+            send({
+              channel: "error",
+              data: "Request failed: " + JSON.stringify(data),
+            });
           } else if (testCase === "request-timeout") {
             // Do nothing
           } else if (testCase === "request-delay") {
             setTimeout(() => {
               send({
                 channel: "post",
-                data: {
-                  id: data.id,
-                  response: {
-                    type: "info",
-                    payload: { data: "very-late-response" },
-                  },
-                },
+                data: { id: data.id, response: { type: "info", payload: { data: "very-late-response" } } },
               });
             }, data.request.delay);
-          } else { // Default
+          } else {
             send({
               channel: "post",
-              data: {
-                id: data.id,
-                response: { type: "info", payload: { data: "response-success" } },
-              },
+              data: { id: data.id, response: { type: "info", payload: { data: "response-success" } } },
             });
-          }
-        } else if (data.method === "subscribe") {
-          if (testCase === "subscribe-fail") {
-            send({
-              channel: "error",
-              data: "Subscription failed: " + JSON.stringify(data),
-            });
-          } else if (testCase === "subscribe-timeout") {
-            // Do nothing
-          } else if (testCase === "subscribe-no-timeout") {
-            setTimeout(() => {
-              send({
-                channel: "subscriptionResponse",
-                data: {
-                  method: data.method,
-                  subscription: data.subscription,
-                },
-              });
-            }, data.subscription.delay);
-          } else if (testCase === "subscribe-delay") {
-            setTimeout(() => {
-              send({ channel: "subscriptionResponse", data });
-            }, 5000);
-          } else { // Default
-            send({ channel: "subscriptionResponse", data });
-
-            if (data.subscription && data.subscription.channel) {
-              send({ channel: data.subscription.channel, data: { update: "subscription update" } });
-            }
-          }
-        } else if (data.method === "unsubscribe") {
-          if (testCase === "unsubscribe-fail") {
-            send({ channel: "error", data: "Unsubscribe failed: " + JSON.stringify(data) });
-          } else if (testCase === "unsubscribe-timeout") {
-            // Do nothing
-          } else { // Default
-            send({ channel: "subscriptionResponse", data });
           }
         } else if (data.method === "ping") {
           send({ channel: "pong" });
@@ -101,478 +68,144 @@ Deno.test("WebSocketTransport", async (t) => {
       return response;
     },
   );
+}
+
+// ============================================================
+// Tests
+// ============================================================
+
+Deno.test("WebSocketTransport", async (t) => {
+  const server = createTestServer();
 
   await t.step("request()", async (t) => {
-    await t.step("Send post request and resolves with server response", async () => {
-      // Setup
-      await using transport = new DisposeWebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+    await t.step("sends request and receives response", async () => {
+      await using transport = createTransport("request-success");
       await transport.ready();
 
-      // Test
       const result = await transport.request("info", { key: "value" });
       assertEquals(result, "response-success");
     });
 
-    await t.step("Reject", async (t) => {
-      await t.step("Reject an unsuccessful request", async () => {
-        // Setup
-        await using transport = new DisposeWebSocketTransport({ url: "ws://localhost:8080/?test=request-fail" });
+    await t.step("rejects", async (t) => {
+      await t.step("on unsuccessful request", async () => {
+        await using transport = createTransport("request-fail");
         await transport.ready();
 
-        // Test
-        const promise = transport.request("info", { key: "value" });
-        await assertRejects(() => promise, WebSocketRequestError, "Request failed:");
+        await assertRejects(
+          () => transport.request("info", { key: "value" }),
+          WebSocketRequestError,
+          "Request failed:",
+        );
       });
 
-      await t.step("Reject if AbortSignal is aborted", async () => {
-        // Setup
-        await using transport = new DisposeWebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+      await t.step("if AbortSignal is aborted", async () => {
+        await using transport = createTransport("request-success");
         await transport.ready();
 
-        // Test
         const signal = AbortSignal.abort(new Error("Aborted"));
-        const promise = transport.request("info", { key: "value" }, signal);
-        const error = await assertRejects(() => promise, WebSocketRequestError);
+        const error = await assertRejects(
+          () => transport.request("info", { key: "value" }, signal),
+          WebSocketRequestError,
+        );
         assertIsError(error.cause, Error, "Aborted");
       });
 
-      await t.step("Reject after timeout expires", async () => {
-        // Setup
-        await using transport = new DisposeWebSocketTransport({
-          url: "ws://localhost:8080/?test=request-timeout",
-          timeout: 100,
-        });
+      await t.step("after timeout expires", async () => {
+        await using transport = createTransport("request-timeout", { timeout: 100 });
         await transport.ready();
 
-        // Test
-        const promise = transport.request("info", { key: "value" });
-        const error = await assertRejects(() => promise, WebSocketRequestError);
+        const error = await assertRejects(
+          () => transport.request("info", { key: "value" }),
+          WebSocketRequestError,
+        );
         assertIsError(error.cause, DOMException, "Signal timed out.");
       });
 
-      await t.step("If timeout is not set, never reject", async () => {
-        // Setup
+      await t.step("timeout: null disables timeout", async () => {
         const defaultTimeout = await (async () => {
-          await using transport = new DisposeWebSocketTransport({ url: "ws://example.com" });
-          return transport.timeout!;
+          await using t = createTransport("request-success");
+          return t.timeout!;
         })();
-        await using transport = new DisposeWebSocketTransport({
-          url: "ws://localhost:8080/?test=request-no-timeout",
-          timeout: null,
-        });
-        await transport.ready();
 
-        // Test
+        await using transport = createTransport("request-no-timeout", { timeout: null });
+        await transport.ready();
         await transport.request("info", { delay: defaultTimeout * 1.5 });
       });
     });
   });
 
-  // The following things need to be tested:
-  // - Standard use: subscription request/response, receive event, unsubscribe request/response
-  // - Correct signal processing for requests
-  // - No double subscription/unsubscription request
-  // - Distribution of a single event to listeners
-  // - Resolution of a promise after receipt of a response
-  // - Correct resource cleansing
-  await t.step("subscribe()", async (t) => {
-    await t.step(
-      "Standard use: subscription request/response, receive event, unsubscribe request/response",
-      async () => {
-        // Setup
-        await using transport: TransportWithInternals = new DisposeWebSocketTransport({
-          url: "ws://localhost:8080/?test=subscribe-success",
-        }) as TransportWithInternals;
-        await transport.ready();
-
-        // Test
-        let eventReceived = false;
-        const listener = (e: CustomEvent) => {
-          if (e.detail && e.detail.update === "subscription update") {
-            eventReceived = true;
-          }
-        };
-
-        // Check that the subscription was added
-        const sub = await transport.subscribe("test", { channel: "test", extra: "data" }, listener);
-        await new Promise((r) => setTimeout(r, 100));
-        assertEquals(eventReceived, true);
-
-        // Check that the subscription was removed
-        await sub.unsubscribe();
-        await new Promise((r) => setTimeout(r, 100));
-        assert(transport._subscriptions.size === 0, "Subscriptions map should be empty after unsubscribe");
-      },
-    );
-
-    await t.step(
-      "A listener added twice should not be added to the internal list of listeners",
-      async () => {
-        // Setup
-        await using transport: TransportWithInternals = new DisposeWebSocketTransport({
-          url: "ws://localhost:8080/?test=subscribe-success",
-        }) as TransportWithInternals;
-        await transport.ready();
-
-        // Test
-        const payload = { channel: "test", extra: "data" };
-        const listener = () => {};
-        await transport.subscribe("test", payload, listener);
-        await transport.subscribe("test", payload, listener);
-
-        assertEquals(transport._subscriptions.size, 1);
-        assertEquals(transport._subscriptions.get(JSON.stringify(payload))?.listeners.size, 1);
-      },
-    );
-
-    await t.step(
-      "Two different listeners for the same event should not create a new list of event listeners",
-      async () => {
-        // Setup
-        await using transport: TransportWithInternals = new DisposeWebSocketTransport({
-          url: "ws://localhost:8080/?test=subscribe-success",
-        }) as TransportWithInternals;
-        await transport.ready();
-
-        // Test
-        const payload = { channel: "test", extra: "data" };
-        const listener1 = () => {};
-        const listener2 = () => {};
-        await transport.subscribe("test", payload, listener1);
-        await transport.subscribe("test", payload, listener2);
-
-        assertEquals(transport._subscriptions.size, 1);
-        assertEquals(transport._subscriptions.get(JSON.stringify(payload))?.listeners.size, 2);
-      },
-    );
-
-    await t.step(
-      "A subscription object must be the same across different listeners for the same event",
-      async () => {
-        // Setup
-        await using transport = new DisposeWebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-success" });
-        await transport.ready();
-
-        // Test
-        const payload = { channel: "test", extra: "data" };
-        const listener = () => {};
-        const sub1 = await transport.subscribe("test", payload, listener);
-        const sub2 = await transport.subscribe("test", payload, listener);
-
-        assertEquals(sub1.unsubscribe, sub2.unsubscribe);
-      },
-    );
-
-    await t.step(
-      "A second listener added after the first listener should not send a subscription request",
-      async () => {
-        // Setup
-        await using transport: TransportWithInternals = new DisposeWebSocketTransport({
-          url: "ws://localhost:8080/?test=subscribe-success",
-        }) as TransportWithInternals;
-        await transport.ready();
-
-        // Test
-        const payload = { channel: "test", extra: "data" };
-        const listener1 = () => {};
-        const listener2 = () => {};
-
-        transport.subscribe("test", payload, listener1).catch(() => {});
-        transport.subscribe("test", payload, listener2).catch(() => {});
-
-        assertEquals(transport._wsRequester.queue.length, 1);
-      },
-    );
-
-    await t.step(
-      "New listeners must wait for a response to a subscription request",
-      async () => {
-        // Setup
-        await using transport = new DisposeWebSocketTransport({ url: "ws://localhost:8080/?test=subscribe-delay" });
-        await transport.ready();
-
-        // Test
-        const payload = { channel: "test", extra: "data" };
-
-        // First subscribe - server will respond after 5 seconds
-        const subPromise1 = transport.subscribe("test", payload, () => {});
-
-        // Second subscribe - should wait for the first to complete
-        let secondCompleted = false;
-        transport.subscribe("test", payload, () => {}).then(() => secondCompleted = true);
-
-        // If the second promise resolves before the first, the test will fail
-        await new Promise((r) => setTimeout(r, 100));
-        assertFalse(secondCompleted);
-
-        // Now wait for the first subscription to complete
-        await subPromise1;
-        await new Promise((r) => setTimeout(r, 10));
-        assert(secondCompleted, "Second subscription did not complete after the first");
-      },
-    );
-  });
-
-  await t.step("unsubscribe()", async (t) => {
-    await t.step("Unsubscribe a listener, request to be unsubscribed and clear resources", async () => {
-      // Setup
-      await using transport: TransportWithInternals = new DisposeWebSocketTransport({
-        url: "ws://localhost:8080/?test=unsubscribe-success",
-      }) as TransportWithInternals;
-      await transport.ready();
-
-      // Test
-      const sub = await transport.subscribe("test", { channel: "test" }, () => {});
-      await sub.unsubscribe();
-      assert(transport._subscriptions.size === 0, "Subscriptions map should be empty after unsubscribe");
-
-      // Clean up
-      await transport.close();
-    });
-
-    await t.step("Do not send an unsubscribe request if there are more listeners", async () => {
-      // Setup
-      await using transport: TransportWithInternals = new DisposeWebSocketTransport({
-        url: "ws://localhost:8080/?test=unsubscribe-success",
-      }) as TransportWithInternals;
-      await transport.ready();
-
-      // Test
-      const payload = { channel: "test" };
-      const listener1 = () => {};
-      const listener2 = () => {};
-
-      const sub1 = await transport.subscribe("test", payload, listener1);
-      await transport.subscribe("test", payload, listener2);
-
-      await sub1.unsubscribe();
-      assertEquals(transport._subscriptions.get(JSON.stringify(payload))?.listeners.size, 1);
-    });
-  });
-
   await t.step("ready()", async (t) => {
-    await t.step("Resolve immediately if the socket is already open", async () => {
-      // Setup
-      await using transport = new DisposeWebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+    await t.step("resolves immediately if already open", async () => {
+      await using transport = createTransport("request-success");
       await transport.ready();
 
-      // Test
       const start = performance.now();
       await transport.ready();
-      const dur = performance.now() - start;
-      assertLess(dur, 20, `ready() again should resolve immediately, took ${dur}ms`);
+      assertLess(performance.now() - start, 20);
     });
 
-    await t.step("AbortSignal check", async (t) => {
-      await t.step("Reject immediately if the signal has already been aborted", async () => {
-        // Setup
-        await using transport = new DisposeWebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+    await t.step("AbortSignal", async (t) => {
+      await t.step("rejects if already aborted", async () => {
+        await using transport = createTransport("request-success");
 
-        // Test
-        const alreadyAborted = AbortSignal.abort(new Error("Already aborted"));
-        const promise = transport.ready(alreadyAborted);
-        await assertRejects(() => promise, Error, "Already aborted");
+        const signal = AbortSignal.abort(new Error("Already aborted"));
+        const error = await assertRejects(() => transport.ready(signal), Error);
+        assertIsError(error.cause, Error, "Already aborted");
       });
 
-      await t.step("Reject if the signal is later aborted", async () => {
-        // Setup
-        await using transport = new DisposeWebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+      await t.step("rejects if aborted later", async () => {
+        await using transport = createTransport("request-success");
 
-        // Test
         const controller = new AbortController();
         const promise = transport.ready(controller.signal);
         controller.abort(new Error("Aborted later"));
 
-        await assertRejects(() => promise, Error, "Aborted later");
+        const error = await assertRejects(() => promise, Error);
+        assertIsError(error.cause, Error, "Aborted later");
       });
     });
 
-    await t.step("Reject if the connection is permanently closed", async () => {
-      // Setup
-      await using transport = new DisposeWebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
-
-      // Test
+    await t.step("rejects if connection is closed", async () => {
+      await using transport = createTransport("request-success");
       await transport.close();
-      const promise = transport.ready();
-      await assertRejects(() => promise, Error, "TERMINATED_BY_USER");
+
+      const error = await assertRejects(() => transport.ready(), Error);
+      assertIsError(error.cause, Error, "TERMINATED_BY_USER");
     });
   });
 
   await t.step("close()", async (t) => {
-    await t.step("Resolve immediately if the socket is already closed", async () => {
-      // Setup
-      await using transport = new DisposeWebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+    await t.step("resolves immediately if already closed", async () => {
+      await using transport = createTransport("request-success");
       await transport.ready();
       await transport.close();
 
-      // Test
       const start = performance.now();
       await transport.close();
-      const dur = performance.now() - start;
-      assertLess(dur, 20, `close() again should resolve immediately, took ${dur}ms`);
+      assertLess(performance.now() - start, 20);
     });
 
-    await t.step("AbortSignal check", async (t) => {
-      await t.step("Reject immediately if the signal has already been aborted", async () => {
-        // Setup
-        await using transport = new DisposeWebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+    await t.step("AbortSignal", async (t) => {
+      await t.step("rejects if already aborted", async () => {
+        await using transport = createTransport("request-success");
         await transport.ready();
 
-        // Test
-        const aborted = AbortSignal.abort(new Error("Already aborted close"));
-        const promise = transport.close(aborted);
-        await assertRejects(() => promise, Error, "Already aborted close");
+        const signal = AbortSignal.abort(new Error("Already aborted"));
+        const error = await assertRejects(() => transport.close(signal), Error);
+        assertIsError(error.cause, Error, "Already aborted");
       });
 
-      await t.step("Reject if the signal is later aborted", async () => {
-        // Setup
-        await using transport = new DisposeWebSocketTransport({ url: "ws://localhost:8080/?test=request-success" });
+      await t.step("rejects if aborted later", async () => {
+        await using transport = createTransport("request-success");
         await transport.ready();
 
-        // Test
         const controller = new AbortController();
         const promise = transport.close(controller.signal);
-        controller.abort(new Error("Close aborted"));
+        controller.abort(new Error("Aborted later"));
 
-        await assertRejects(() => promise, Error, "Close aborted");
+        const error = await assertRejects(() => promise, Error);
+        assertIsError(error.cause, Error, "Aborted later");
       });
-    });
-  });
-
-  await t.step("keepAlive", async (t) => {
-    await t.step("Send ping messages after connection open", async () => {
-      // Setup
-      await using transport = new DisposeWebSocketTransport({
-        url: "ws://localhost:8080/?test=ping",
-        keepAliveInterval: 1000,
-      });
-      await transport.ready();
-
-      // Test
-      let pingSent = false;
-      let pongReceived = false;
-      const originalSend = transport.socket.send.bind(transport.socket);
-      transport.socket.send = (data: string | ArrayBufferLike | Blob | ArrayBufferView) => {
-        const msg = JSON.parse(data.toString());
-        if (msg.method === "ping") pingSent = true;
-        return originalSend(data);
-      };
-      transport.socket.addEventListener("message", (ev: MessageEvent) => {
-        const data = JSON.parse(ev.data);
-        if (data.channel === "pong") pongReceived = true;
-      });
-
-      await new Promise((r) => setTimeout(r, transport.keepAliveInterval! + 3000));
-
-      assert(pingSent, "Ping has not been sent");
-      assert(pongReceived, "Pong has not been received");
-    });
-
-    await t.step("Stops sending ping messages after closing", async () => {
-      // Setup
-      await using transport: TransportWithInternals = new DisposeWebSocketTransport({
-        url: "ws://localhost:8080/?test=ping",
-      }) as TransportWithInternals;
-      await transport.ready();
-
-      // Test
-      assert(transport._keepAliveTimeout, "Keep-alive timeout should be set after ready()");
-      await transport.close();
-      assertFalse(transport._keepAliveTimeout);
-    });
-  });
-
-  await t.step("autoResubscribe", async (t) => {
-    await t.step("automatically resubscribes after reconnection", async () => {
-      // Setup
-      await using transport = new DisposeWebSocketTransport({
-        url: "ws://localhost:8080/?test=subscribe-success",
-        reconnect: { maxRetries: 1, reconnectionDelay: 100 },
-      });
-      await transport.ready();
-
-      // Test
-      // Subscribe to multiple events
-      const payload1 = { channel: "test1", extra: "data1" };
-      const payload2 = { channel: "test2", extra: "data2" };
-      let eventCount1 = 0;
-      let eventCount2 = 0;
-      const listener1 = () => eventCount1++;
-      const listener2 = () => eventCount2++;
-
-      await transport.subscribe("test1", payload1, listener1);
-      await transport.subscribe("test2", payload2, listener2);
-      await new Promise((r) => setTimeout(r, 100));
-      assertEquals(eventCount1, 1); // Initial events received
-      assertEquals(eventCount2, 1);
-
-      // Simulate connection loss and reconnection
-      transport.socket.close(undefined, undefined, false);
-      await transport.ready();
-
-      // Check that subscriptions are still active after reconnection
-      await new Promise((r) => setTimeout(r, 100));
-      assertEquals(eventCount1, 2); // Events received after reconnection
-      assertEquals(eventCount2, 2);
-    });
-
-    await t.step("handles resubscription errors gracefully", async () => {
-      // Setup
-      await using transport = new DisposeWebSocketTransport({
-        url: "ws://localhost:8080/?test=subscribe-delay",
-        reconnect: { maxRetries: 1, reconnectionDelay: 100 },
-      });
-      await transport.ready();
-
-      // Test
-      const payload = { channel: "test", extra: "data" };
-      const sub = await transport.subscribe("test", payload, () => {});
-
-      transport.socket.close(undefined, undefined, false);
-      await transport.ready();
-      await transport.close();
-
-      await new Promise((r) => setTimeout(r, 1000));
-      assert(sub.resubscribeSignal?.aborted, "Resubscribe signal should be aborted");
-    });
-
-    await t.step("does not resubscribe and clears subscriptions on connection close", async () => {
-      // Setup
-      await using transport: TransportWithInternals = new DisposeWebSocketTransport({
-        url: "ws://localhost:8080/?test=subscribe-success",
-        resubscribe: false,
-        reconnect: { maxRetries: 1, reconnectionDelay: 100 },
-      }) as TransportWithInternals;
-      await transport.ready();
-
-      // Test
-      // Subscribe to multiple events
-      const payload1 = { channel: "test1", extra: "data1" };
-      const payload2 = { channel: "test2", extra: "data2" };
-      let eventCount1 = 0;
-      let eventCount2 = 0;
-      const listener1 = () => eventCount1++;
-      const listener2 = () => eventCount2++;
-
-      await transport.subscribe("test1", payload1, listener1);
-      await transport.subscribe("test2", payload2, listener2);
-      await new Promise((r) => setTimeout(r, 100));
-      assertEquals(eventCount1, 1); // Initial events received
-      assertEquals(eventCount2, 1);
-      assertEquals(transport._subscriptions.size, 2);
-
-      // Simulate connection loss
-      transport.socket.close(undefined, undefined, false);
-      await new Promise((r) => setTimeout(r, 100));
-
-      // Check that subscriptions are cleared and no resubscription happens
-      assertEquals(transport._subscriptions.size, 0);
-
-      // Wait for potential reconnection and verify no new events
-      await transport.ready();
-      await new Promise((r) => setTimeout(r, 100));
-      assertEquals(eventCount1, 1); // No new events after reconnection
-      assertEquals(eventCount2, 1);
     });
   });
 

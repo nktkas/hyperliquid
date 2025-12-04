@@ -1,6 +1,7 @@
-import { parser, ValidatorSummariesRequest, ValidatorSummariesResponse } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { ValidatorSummariesRequest, ValidatorSummariesResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "validatorSummaries",
@@ -11,7 +12,10 @@ runTest({
     schemaCoverage(ValidatorSummariesResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "validatorSummaries"]);
-    parser(ValidatorSummariesRequest)(data);
+    const data = await runCommand([
+      "info",
+      "validatorSummaries",
+    ]);
+    v.parse(ValidatorSummariesRequest, data);
   },
 });

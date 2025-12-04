@@ -1,6 +1,7 @@
-import { parser, UserFeesRequest, UserFeesResponse } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { UserFeesRequest, UserFeesResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "userFees",
@@ -17,7 +18,11 @@ runTest({
     });
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "userFees", "--user", "0xe973105a27e17350500926ae664dfcfe6006d924"]);
-    parser(UserFeesRequest)(data);
+    const data = await runCommand([
+      "info",
+      "userFees",
+      "--user=0xe973105a27e17350500926ae664dfcfe6006d924",
+    ]);
+    v.parse(UserFeesRequest, data);
   },
 });

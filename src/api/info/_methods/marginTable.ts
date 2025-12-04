@@ -1,0 +1,117 @@
+import * as v from "@valibot/valibot";
+
+// ============================================================
+// API Schemas
+// ============================================================
+
+import { UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+
+/**
+ * Request margin table data.
+ */
+export const MarginTableRequest = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.object({
+      /** Type of request. */
+      type: v.pipe(
+        v.literal("marginTable"),
+        v.description("Type of request."),
+      ),
+      /** Margin requirements table. */
+      id: v.pipe(
+        UnsignedInteger,
+        v.description("Margin requirements table."),
+      ),
+    }),
+    v.description("Request margin table data."),
+  );
+})();
+
+export type MarginTableRequest = v.InferOutput<typeof MarginTableRequest>;
+
+/**
+ * Margin requirements table with multiple tiers.
+ */
+export const MarginTableResponse = /* @__PURE__ */ (() => {
+  return v.pipe(
+    v.object({
+      /** Description of the margin table. */
+      description: v.pipe(
+        v.string(),
+        v.description("Description of the margin table."),
+      ),
+      /** Array of margin tiers defining leverage limits. */
+      marginTiers: v.pipe(
+        v.array(
+          /** Individual tier in a margin requirements table. */
+          v.pipe(
+            v.object({
+              /** Lower position size boundary for this tier. */
+              lowerBound: v.pipe(
+                UnsignedDecimal,
+                v.description("Lower position size boundary for this tier."),
+              ),
+              /** Maximum allowed leverage for this tier. */
+              maxLeverage: v.pipe(
+                UnsignedInteger,
+                v.minValue(1),
+                v.description("Maximum allowed leverage for this tier."),
+              ),
+            }),
+            v.description("Individual tier in a margin requirements table."),
+          ),
+        ),
+        v.description("Array of margin tiers defining leverage limits."),
+      ),
+    }),
+    v.description("Margin requirements table with multiple tiers."),
+  );
+})();
+
+export type MarginTableResponse = v.InferOutput<typeof MarginTableResponse>;
+
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import type { InfoConfig } from "./_types.ts";
+
+/** Request parameters for the {@linkcode marginTable} function. */
+export type MarginTableParameters = Omit<v.InferInput<typeof MarginTableRequest>, "type">;
+
+/**
+ * Request margin table data.
+ *
+ * @param config - General configuration for Info API requests.
+ * @param params - Parameters specific to the API request.
+ * @param signal - [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to cancel the request.
+ *
+ * @returns Margin requirements table with multiple tiers.
+ *
+ * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {TransportError} When the transport layer throws an error.
+ *
+ * @example
+ * ```ts
+ * import { HttpTransport } from "@nktkas/hyperliquid";
+ * import { marginTable } from "@nktkas/hyperliquid/api/info";
+ *
+ * const transport = new HttpTransport(); // or `WebSocketTransport`
+ *
+ * const data = await marginTable(
+ *   { transport },
+ *   { id: 1 },
+ * );
+ * ```
+ */
+export function marginTable(
+  config: InfoConfig,
+  params: MarginTableParameters,
+  signal?: AbortSignal,
+): Promise<MarginTableResponse> {
+  const request = v.parse(MarginTableRequest, {
+    type: "marginTable",
+    ...params,
+  });
+  return config.transport.request("info", request, signal);
+}

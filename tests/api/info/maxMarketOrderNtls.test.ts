@@ -1,6 +1,7 @@
-import { MaxMarketOrderNtlsRequest, MaxMarketOrderNtlsResponse, parser } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { MaxMarketOrderNtlsRequest, MaxMarketOrderNtlsResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "maxMarketOrderNtls",
@@ -11,7 +12,10 @@ runTest({
     schemaCoverage(MaxMarketOrderNtlsResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "maxMarketOrderNtls"]);
-    parser(MaxMarketOrderNtlsRequest)(data);
+    const data = await runCommand([
+      "info",
+      "maxMarketOrderNtls",
+    ]);
+    v.parse(MaxMarketOrderNtlsRequest, data);
   },
 });

@@ -1,5 +1,5 @@
 import * as v from "@valibot/valibot";
-import { Decimal, Integer, UnsignedDecimal, UnsignedInteger } from "../../src/api/_base.ts"; // HACK: to avoid importing into every test
+import { Decimal, Integer, UnsignedDecimal, UnsignedInteger } from "../../src/api/_schemas.ts"; // HACK: to avoid importing into every test
 
 export type IssueType =
   | "BRANCH_UNCOVERED"

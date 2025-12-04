@@ -1,20 +1,15 @@
-import { UserFundingsEvent } from "../../../src/api/subscription/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { UserFundingsEvent } from "@nktkas/hyperliquid/api/subscription";
 import { collectEventsOverTime, runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "userFundings",
   mode: "api",
   fn: async (_t, client) => {
-    const data = await Promise.all([
-      collectEventsOverTime<UserFundingsEvent>(
-        async (cb) => {
-          await client.userFundings({ user: "0xe019d6167E7e324aEd003d94098496b6d986aB05" }, cb);
-        },
-        10_000,
-      ),
-    ]);
-    schemaCoverage(UserFundingsEvent, data.flat(), {
+    const data = await collectEventsOverTime<UserFundingsEvent>(async (cb) => {
+      await client.userFundings({ user: "0xe019d6167E7e324aEd003d94098496b6d986aB05" }, cb);
+    }, 10_000);
+    schemaCoverage(UserFundingsEvent, data, {
       ignoreUndefinedTypes: ["#/properties/isSnapshot"],
     });
   },

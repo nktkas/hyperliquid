@@ -1,6 +1,7 @@
-import { EvmUserModifyRequest, EvmUserModifyResponse, parser } from "../../../src/api/exchange/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { EvmUserModifyRequest, EvmUserModifyResponse } from "@nktkas/hyperliquid/api/exchange";
 import { excludeErrorResponse, runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "evmUserModify",
@@ -11,7 +12,11 @@ runTest({
     schemaCoverage(excludeErrorResponse(EvmUserModifyResponse), data);
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["exchange", "evmUserModify", "--usingBigBlocks", "true"]);
-    parser(EvmUserModifyRequest)(data);
+    const data = await runCommand([
+      "exchange",
+      "evmUserModify",
+      "--usingBigBlocks=true",
+    ]);
+    v.parse(EvmUserModifyRequest, data);
   },
 });

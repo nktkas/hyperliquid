@@ -1,8 +1,9 @@
 // deno-lint-ignore-file no-import-prefix
+import * as v from "@valibot/valibot";
 import { assertRejects } from "jsr:@std/assert@1";
-import { CreateVaultRequest, parser } from "../../../src/api/exchange/~mod.ts";
-import { ApiRequestError } from "../../../src/mod.ts";
+import { CreateVaultRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest } from "./_t.ts";
+import { ApiRequestError } from "@nktkas/hyperliquid";
 
 runTest({
   name: "createVault",
@@ -24,15 +25,11 @@ runTest({
     const data = await runCommand([
       "exchange",
       "createVault",
-      "--name",
-      "test",
-      "--description",
-      "1234567890",
-      "--initialUsd",
-      "100000000",
-      "--nonce",
-      "1234567890",
+      "--name=test",
+      "--description=1234567890",
+      "--initialUsd=100000000",
+      "--nonce=1234567890",
     ]);
-    parser(CreateVaultRequest)(data);
+    v.parse(CreateVaultRequest, data);
   },
 });

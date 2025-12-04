@@ -1,8 +1,9 @@
 // deno-lint-ignore-file no-import-prefix
+import * as v from "@valibot/valibot";
 import { assertRejects } from "jsr:@std/assert@1";
-import { parser, ScheduleCancelRequest } from "../../../src/api/exchange/~mod.ts";
-import { ApiRequestError } from "../../../src/mod.ts";
+import { ScheduleCancelRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest } from "./_t.ts";
+import { ApiRequestError } from "@nktkas/hyperliquid";
 
 runTest({
   name: "scheduleCancel",
@@ -16,7 +17,11 @@ runTest({
     );
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["exchange", "scheduleCancel", "--time", "170000000000"]);
-    parser(ScheduleCancelRequest)(data);
+    const data = await runCommand([
+      "exchange",
+      "scheduleCancel",
+      "--time=170000000000",
+    ]);
+    v.parse(ScheduleCancelRequest, data);
   },
 });

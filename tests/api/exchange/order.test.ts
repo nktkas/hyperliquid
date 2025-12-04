@@ -1,12 +1,13 @@
-import { OrderRequest, OrderResponse, parser } from "../../../src/api/exchange/~mod.ts";
+import * as v from "@valibot/valibot";
+import { OrderRequest, OrderResponse } from "@nktkas/hyperliquid/api/exchange";
+import { formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
+import { allMids, excludeErrorResponse, runTest, symbolConverter, topUpPerp } from "./_t.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { allMids, excludeErrorResponse, randomCloid, runTest, symbolConverter, topUpPerp } from "./_t.ts";
-import { formatPrice, formatSize } from "../../../src/utils/mod.ts";
 
 runTest({
   name: "order",
   codeTestFn: async (_t, exchClient) => {
-    // —————————— Prepare ——————————
+    // ========== Prepare ==========
 
     await topUpPerp(exchClient, "20");
 
@@ -18,7 +19,7 @@ runTest({
     const pxDown = formatPrice(parseFloat(midPx) * 0.95, szDecimals);
     const sz = formatSize(15 / parseFloat(midPx), szDecimals);
 
-    // —————————— Test ——————————
+    // ========== Test ==========
 
     const data = await Promise.all([
       // resting
@@ -42,7 +43,7 @@ runTest({
           s: sz,
           r: false,
           t: { limit: { tif: "Gtc" } },
-          c: randomCloid(),
+          c: "0x17a5a40306205a0c6d60c7264153781c",
         }],
         grouping: "na",
       }),
@@ -67,7 +68,7 @@ runTest({
           s: sz,
           r: false,
           t: { limit: { tif: "Gtc" } },
-          c: randomCloid(),
+          c: "0x17a5a40306205a0c6d60c7264153781c",
         }],
         grouping: "na",
       }),
@@ -78,16 +79,17 @@ runTest({
     const data = await runCommand([
       "exchange",
       "order",
-      "--orders",
-      JSON.stringify([{
-        a: 0,
-        b: true,
-        p: "1",
-        s: "1",
-        r: false,
-        t: { limit: { tif: "Gtc" } },
-      }]),
+      `--orders=${
+        JSON.stringify([{
+          a: 0,
+          b: true,
+          p: "1",
+          s: "1",
+          r: false,
+          t: { limit: { tif: "Gtc" } },
+        }])
+      }`,
     ]);
-    parser(OrderRequest)(data);
+    v.parse(OrderRequest, data);
   },
 });

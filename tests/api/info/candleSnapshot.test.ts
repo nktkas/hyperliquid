@@ -1,6 +1,7 @@
-import { CandleSnapshotRequest, CandleSnapshotResponse, parser } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { CandleSnapshotRequest, CandleSnapshotResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "candleSnapshot",
@@ -9,21 +10,23 @@ runTest({
       client.candleSnapshot({ coin: "ETH", interval: "15m", startTime: Date.now() - 1000 * 60 * 60 * 24 }),
     ]);
     schemaCoverage(CandleSnapshotResponse, data, {
-      ignoreBranches: {
+      ignorePicklistValues: {
         "#/items/properties/i": [
-          0,
-          1,
-          2,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
+          "1m",
+          "3m",
+          "5m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "4h",
+          "6h",
+          "8h",
+          "12h",
+          "1d",
+          "3d",
+          "1w",
+          "1M",
         ],
       },
     });
@@ -32,13 +35,10 @@ runTest({
     const data = await runCommand([
       "info",
       "candleSnapshot",
-      "--coin",
-      "ETH",
-      "--interval",
-      "15m",
-      "--startTime",
-      "1757440693681",
+      "--coin=ETH",
+      "--interval=15m",
+      "--startTime=1757440693681",
     ]);
-    parser(CandleSnapshotRequest)(data);
+    v.parse(CandleSnapshotRequest, data);
   },
 });

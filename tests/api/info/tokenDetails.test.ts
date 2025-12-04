@@ -1,6 +1,7 @@
-import { parser, TokenDetailsRequest, TokenDetailsResponse } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { TokenDetailsRequest, TokenDetailsResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "tokenDetails",
@@ -23,7 +24,11 @@ runTest({
     });
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "tokenDetails", "--tokenId", "0x3d8a82efa63e86d54a1922c2afdac61e"]);
-    parser(TokenDetailsRequest)(data);
+    const data = await runCommand([
+      "info",
+      "tokenDetails",
+      "--tokenId=0x3d8a82efa63e86d54a1922c2afdac61e",
+    ]);
+    v.parse(TokenDetailsRequest, data);
   },
 });

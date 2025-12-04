@@ -1,6 +1,7 @@
-import { parser, PerpsAtOpenInterestCapRequest, PerpsAtOpenInterestCapResponse } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { PerpsAtOpenInterestCapRequest, PerpsAtOpenInterestCapResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "perpsAtOpenInterestCap",
@@ -11,7 +12,10 @@ runTest({
     schemaCoverage(PerpsAtOpenInterestCapResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "perpsAtOpenInterestCap"]);
-    parser(PerpsAtOpenInterestCapRequest)(data);
+    const data = await runCommand([
+      "info",
+      "perpsAtOpenInterestCap",
+    ]);
+    v.parse(PerpsAtOpenInterestCapRequest, data);
   },
 });

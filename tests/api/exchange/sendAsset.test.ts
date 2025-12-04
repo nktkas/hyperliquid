@@ -1,6 +1,7 @@
-import { parser, SendAssetRequest, SendAssetResponse } from "../../../src/api/exchange/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { SendAssetRequest, SendAssetResponse } from "@nktkas/hyperliquid/api/exchange";
 import { excludeErrorResponse, runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "sendAsset",
@@ -21,17 +22,12 @@ runTest({
     const data = await runCommand([
       "exchange",
       "sendAsset",
-      "--destination",
-      "0x0000000000000000000000000000000000000001",
-      "--sourceDex",
-      "",
-      "--destinationDex",
-      "test",
-      "--token",
-      "USDC:0xeb62eee3685fc4c43992febcd9e75443",
-      "--amount",
-      "1",
+      "--destination=0x0000000000000000000000000000000000000001",
+      "--sourceDex=",
+      "--destinationDex=test",
+      "--token=USDC:0xeb62eee3685fc4c43992febcd9e75443",
+      "--amount=1",
     ]);
-    parser(SendAssetRequest)(data);
+    v.parse(SendAssetRequest, data);
   },
 });

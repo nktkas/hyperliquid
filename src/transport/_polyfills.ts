@@ -1,7 +1,4 @@
 // deno-lint-ignore-file no-explicit-any
-/**
- * Polyfills for Node.js < 22 and React Native
- */
 
 export const Promise_ = /* @__PURE__ */ (() => {
   return {
@@ -46,10 +43,10 @@ export const AbortSignal_ = /* @__PURE__ */ (() => {
 /** @see https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent */
 export const CustomEvent_ = /* @__PURE__ */ (() => {
   return globalThis.CustomEvent || class<T> extends Event {
-    readonly detail: T;
+    readonly detail: T | null;
     constructor(type: string, eventInitDict?: CustomEventInit<T>) {
       super(type, eventInitDict);
-      this.detail = eventInitDict?.detail ?? null as T;
+      this.detail = eventInitDict?.detail ?? null;
     }
   };
 })();

@@ -1,6 +1,7 @@
-import { parser, ValidatorL1VotesRequest, ValidatorL1VotesResponse } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { ValidatorL1VotesRequest, ValidatorL1VotesResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "validatorL1Votes",
@@ -16,7 +17,10 @@ runTest({
     });
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "validatorL1Votes"]);
-    parser(ValidatorL1VotesRequest)(data);
+    const data = await runCommand([
+      "info",
+      "validatorL1Votes",
+    ]);
+    v.parse(ValidatorL1VotesRequest, data);
   },
 });

@@ -1,6 +1,7 @@
-import { parser, PerpDeployAuctionStatusRequest, PerpDeployAuctionStatusResponse } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { PerpDeployAuctionStatusRequest, PerpDeployAuctionStatusResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "perpDeployAuctionStatus",
@@ -14,7 +15,10 @@ runTest({
     });
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "perpDeployAuctionStatus"]);
-    parser(PerpDeployAuctionStatusRequest)(data);
+    const data = await runCommand([
+      "info",
+      "perpDeployAuctionStatus",
+    ]);
+    v.parse(PerpDeployAuctionStatusRequest, data);
   },
 });

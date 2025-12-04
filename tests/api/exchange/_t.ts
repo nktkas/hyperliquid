@@ -1,17 +1,24 @@
 // deno-lint-ignore-file no-import-prefix
 import "jsr:@std/dotenv@^0.225.5/load";
 import type * as v from "@valibot/valibot";
-import { ExchangeClient, HttpTransport, InfoClient, MultiSignClient } from "../../../src/mod.ts";
-import { getWalletAddress } from "../../../src/signing/mod.ts";
-import { formatPrice, formatSize, SymbolConverter } from "../../../src/utils/mod.ts";
-import type { ExcludeErrorResponse } from "../../../src/api/exchange/_base/_types.ts";
+import { generatePrivateKey, privateKeyToAccount } from "npm:viem@2/accounts";
+import { ExchangeClient, HttpTransport, InfoClient } from "@nktkas/hyperliquid";
+import { getWalletAddress } from "@nktkas/hyperliquid/signing";
+import { formatPrice, formatSize, SymbolConverter } from "@nktkas/hyperliquid/utils";
+import type { ExcludeErrorResponse } from "../../../src/api/exchange/_methods/_base/errors.ts";
 
-// —————————— Arguments ——————————
+// =============================================================
+// Arguments
+// =============================================================
 
 const WAIT = 5000;
-const PRIVATE_KEY = Deno.env.get("PRIVATE_KEY") as `0x${string}` | undefined;
 
-// —————————— Preparation ——————————
+const PRIVATE_KEY = Deno.env.get("PRIVATE_KEY") as `0x${string}` | undefined;
+const MAIN_WALLET = PRIVATE_KEY ? privateKeyToAccount(PRIVATE_KEY) : undefined;
+
+// =============================================================
+// Preparation
+// =============================================================
 
 const transport = new HttpTransport({ isTestnet: true, timeout: 30_000 });
 const infoClient = new InfoClient({ transport });
@@ -19,18 +26,41 @@ const infoClient = new InfoClient({ transport });
 export const symbolConverter = await SymbolConverter.create({ transport });
 export const allMids = await infoClient.allMids();
 
-// —————————— Test ——————————
+// =============================================================
+// Test
+// =============================================================
+
+/**
+ * Help function to run SDK CLI commands
+ * @throws {Error} When CLI returns an error message
+ */
+async function runCLICommand(args: string[]): Promise<string> {
+  const command = new Deno.Command("deno", {
+    args: ["run", "-A", "bin/cli.ts", "--offline", "--private-key", PRIVATE_KEY!, ...args],
+    stdout: "piped",
+    stderr: "piped",
+  });
+  const { stdout } = await command.output();
+  const output = new TextDecoder().decode(stdout);
+
+  if (output.startsWith("Hyperliquid CLI")) {
+    throw new Error(`Invalid command argument(s)`);
+  }
+
+  return JSON.parse(output);
+}
 
 export function runTest(options: {
   name: string;
-  codeTestFn: (t: Deno.TestContext, exchClient: ExchangeClient | MultiSignClient) => Promise<void>;
+  codeTestFn: (t: Deno.TestContext, exchClient: ExchangeClient) => Promise<void>;
   cliTestFn?: (t: Deno.TestContext, runCommand: (args: string[]) => string | Promise<string>) => Promise<void>;
 }): void {
   const { name, codeTestFn, cliTestFn } = options;
 
-  Deno.test(name, { ignore: !PRIVATE_KEY }, async (t) => {
+  Deno.test(name, { ignore: !MAIN_WALLET }, async (t) => {
     await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
+    // Test related to client interaction
     await t.step("code", async (t) => {
       for (const clientType of ["user", "multisig"] as const) {
         const exchClient = await createTempExchangeClient(clientType);
@@ -41,81 +71,69 @@ export function runTest(options: {
       }
     });
 
+    // Test related to CLI interaction
     await t.step({
       name: "cli",
       ignore: !cliTestFn,
       fn: async () => {
-        await cliTestFn!(t, async (args) => {
-          const command = new Deno.Command("deno", {
-            args: ["run", "-A", "bin/cli.ts", "--offline", "--private-key", PRIVATE_KEY!, ...args],
-            stdout: "piped",
-            stderr: "piped",
-          });
-          const { stdout } = await command.output();
-          const output = new TextDecoder().decode(stdout);
-
-          if (output.startsWith("Hyperliquid CLI")) {
-            throw new Error(`Invalid command argument(s)`);
-          }
-
-          return JSON.parse(output);
-        });
+        await cliTestFn!(t, runCLICommand);
       },
     });
   });
 }
 
-// —————————— Helper functions ——————————
+// =============================================================
+// Helpers
+// =============================================================
 
-export async function createTempExchangeClient(type: "user" | "multisig"): Promise<ExchangeClient | MultiSignClient> {
-  const mainExchClient = new ExchangeClient({ wallet: PRIVATE_KEY!, transport });
+export async function createTempExchangeClient(type: "user" | "multisig"): Promise<ExchangeClient> {
+  const mainExchClient = new ExchangeClient({ wallet: MAIN_WALLET!, transport });
 
   // Create temporary account
-  const tempExchClient = new ExchangeClient({ wallet: randomPrivateKey(), transport });
-  const tempAddress = await getWalletAddress(tempExchClient.wallet);
+  const tempWallet = privateKeyToAccount(generatePrivateKey());
+  const tempExchClient = new ExchangeClient({ wallet: tempWallet, transport });
 
   // Activate account
-  await mainExchClient.usdSend({ destination: tempAddress, amount: "2" });
+  await mainExchClient.usdSend({ destination: tempWallet.address, amount: "2" });
 
   if (type === "user") {
-    // Return as ExchangeClient
+    // Return as single-wallet ExchangeClient
     return tempExchClient;
   } else {
     // Convert to MultiSigUser
-    const mainAddress = await getWalletAddress(mainExchClient.wallet);
     await tempExchClient.convertToMultiSigUser({
       signers: {
-        authorizedUsers: [mainAddress],
+        authorizedUsers: [MAIN_WALLET!.address],
         threshold: 1,
       },
     });
 
-    // Return as MultiSignClient
-    return new MultiSignClient({
-      multiSigUser: tempAddress,
-      signers: [mainExchClient.wallet],
+    // Return as multi-sig ExchangeClient
+    return new ExchangeClient({
+      multiSigUser: tempWallet.address,
+      wallet: [MAIN_WALLET!],
       transport,
     });
   }
 }
 
-export async function cleanupTempExchangeClient(client: ExchangeClient | MultiSignClient): Promise<void> {
-  const mainExchClient = new ExchangeClient({ wallet: PRIVATE_KEY!, transport });
-  const mainUser = await getWalletAddress(mainExchClient.wallet);
-  const tempUser = client instanceof MultiSignClient ? client.multiSigUser : await getWalletAddress(client.wallet);
+export async function cleanupTempExchangeClient(tempClient: ExchangeClient): Promise<void> {
+  const tempUser = "multiSigUser" in tempClient.config_
+    ? tempClient.config_.multiSigUser
+    : await getWalletAddress(tempClient.config_.wallet);
 
   const webData2 = await infoClient.webData2({ user: tempUser });
 
   // Cancel all open orders
   const cancels = webData2.openOrders.map((o) => ({ a: symbolConverter.getAssetId(o.coin)!, o: o.oid }));
   if (cancels.length > 0) {
-    await client.cancel({ cancels }).catch(() => undefined);
+    await tempClient.cancel({ cancels }).catch(() => undefined);
   }
 
   // Cancel all running TWAPs
   for (const [twapId, state] of webData2.twapStates) {
     const id = symbolConverter.getAssetId(state.coin)!;
-    await client.twapCancel({ a: id, t: twapId }).catch(() => undefined);
+    await tempClient.twapCancel({ a: id, t: twapId }).catch(() => undefined);
   }
 
   // Close all positions
@@ -123,7 +141,7 @@ export async function cleanupTempExchangeClient(client: ExchangeClient | MultiSi
     const id = symbolConverter.getAssetId(pos.position.coin)!;
     const szDecimals = symbolConverter.getSzDecimals(pos.position.coin)!;
     const px = Number(pos.position.entryPx) * (pos.position.positionValue.startsWith("-") ? 1.05 : 0.95);
-    await client.order({
+    await tempClient.order({
       orders: [{
         a: id,
         b: false,
@@ -139,34 +157,20 @@ export async function cleanupTempExchangeClient(client: ExchangeClient | MultiSi
   // Withdraw all funds back to main account
   await infoClient.clearinghouseState({ user: tempUser })
     .then(async (state) => {
-      await client.usdSend({ destination: mainUser, amount: state.withdrawable })
+      await tempClient.usdSend({ destination: MAIN_WALLET!.address, amount: state.withdrawable })
         .catch(() => undefined);
     });
   await infoClient.spotClearinghouseState({ user: tempUser })
     .then(async (state) => {
       const usdcBalance = Number(state.balances.find((b) => b.coin === "USDC")?.total ?? "0");
       if (usdcBalance > 0) {
-        await client.spotSend({
-          destination: mainUser,
+        await tempClient.spotSend({
+          destination: MAIN_WALLET!.address,
           token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
           amount: usdcBalance,
         }).catch(() => undefined);
       }
     });
-}
-
-export function randomCloid(): `0x${string}` {
-  return `0x${Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
-}
-
-export function randomAddress(): `0x${string}` {
-  return `0x${Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
-}
-
-function randomPrivateKey(): `0x${string}` {
-  const key = new Uint8Array(32);
-  crypto.getRandomValues(key);
-  return `0x${Array.from(key).map((b) => b.toString(16).padStart(2, "0")).join("")}`;
 }
 
 export async function openOrder(
@@ -215,7 +219,7 @@ export async function openOrder(
       s: sz,
       r: false,
       t: { limit: { tif: "Gtc" } },
-      c: randomCloid(),
+      c: "0x17a5a40306205a0c6d60c7264153781c",
     }],
     grouping: "na",
   });
@@ -282,8 +286,10 @@ export async function createTWAP(
 }
 
 export async function topUpPerp(client: ExchangeClient, amount: string) {
-  const mainExchClient = new ExchangeClient({ wallet: PRIVATE_KEY!, transport });
-  const tempUser = client instanceof MultiSignClient ? client.multiSigUser : await getWalletAddress(client.wallet);
+  const mainExchClient = new ExchangeClient({ wallet: MAIN_WALLET!, transport });
+  const tempUser = "multiSigUser" in client.config_
+    ? client.config_.multiSigUser
+    : await getWalletAddress(client.config_.wallet);
   await mainExchClient.usdSend({ destination: tempUser, amount });
 }
 
@@ -293,14 +299,20 @@ export async function topUpSpot(client: ExchangeClient, token: "USDC" | "HYPE", 
     HYPE: "0x7317beb7cceed72ef0b346074cc8e7ab",
   } as const;
 
-  const mainExchClient = new ExchangeClient({ wallet: PRIVATE_KEY!, transport });
-  const tempUser = client instanceof MultiSignClient ? client.multiSigUser : await getWalletAddress(client.wallet);
+  const mainExchClient = new ExchangeClient({ wallet: MAIN_WALLET!, transport });
+  const tempUser = "multiSigUser" in client.config_
+    ? client.config_.multiSigUser
+    : await getWalletAddress(client.config_.wallet);
   await mainExchClient.spotSend({
     destination: tempUser,
     token: `${token}:${tokenAddresses[token]}`,
     amount,
   });
 }
+
+// =============================================================
+// Schema Modifier
+// =============================================================
 
 type InferOutputWithoutErrors<T> = T extends v.GenericSchema<unknown, infer O> ? ExcludeErrorResponse<O> : never;
 

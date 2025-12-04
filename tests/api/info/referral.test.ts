@@ -1,6 +1,7 @@
-import { parser, ReferralRequest, ReferralResponse } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { ReferralRequest, ReferralResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "referral",
@@ -17,7 +18,11 @@ runTest({
     });
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "referral", "--user", "0x0000000000000000000000000000000000000001"]);
-    parser(ReferralRequest)(data);
+    const data = await runCommand([
+      "info",
+      "referral",
+      "--user=0x0000000000000000000000000000000000000001",
+    ]);
+    v.parse(ReferralRequest, data);
   },
 });

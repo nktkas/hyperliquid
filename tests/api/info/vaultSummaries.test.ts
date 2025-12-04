@@ -1,6 +1,7 @@
-import { parser, VaultSummariesRequest, VaultSummariesResponse } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { VaultSummariesRequest, VaultSummariesResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "vaultSummaries",
@@ -10,14 +11,19 @@ runTest({
     ]);
     schemaCoverage(VaultSummariesResponse, data, {
       ignoreEmptyArray: ["#"],
+      ignorePicklistValues: {
+        "#/items/properties/relationship/variant/0/properties/type": ["normal", "child"],
+      },
       ignoreBranches: {
         "#/items/properties/relationship": [1],
-        "#/items/properties/relationship/variant/0/properties/type": [1],
       },
     });
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "vaultSummaries"]);
-    parser(VaultSummariesRequest)(data);
+    const data = await runCommand([
+      "info",
+      "vaultSummaries",
+    ]);
+    v.parse(VaultSummariesRequest, data);
   },
 });

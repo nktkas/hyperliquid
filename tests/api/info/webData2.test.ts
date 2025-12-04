@@ -1,6 +1,7 @@
-import { parser, WebData2Request, WebData2Response } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { WebData2Request, WebData2Response } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "webData2",
@@ -15,11 +16,13 @@ runTest({
       ignoreDefinedTypes: [
         "#/properties/meta/properties/universe/items/properties/growthMode",
         "#/properties/meta/properties/universe/items/properties/lastGrowthModeChangeTime",
+        "#/properties/agentAddress",
+        "#/properties/agentValidUntil",
       ],
-      ignoreBranches: {
-        "#/properties/openOrders/items/properties/orderType": [0, 4, 5],
-        "#/properties/openOrders/items/properties/tif/wrapped": [1, 3, 4],
-        "#/properties/meta/properties/universe/items/properties/marginMode": [1],
+      ignorePicklistValues: {
+        "#/properties/openOrders/items/properties/orderType": ["Market", "Take Profit Market", "Take Profit Limit"],
+        "#/properties/openOrders/items/properties/tif/wrapped": ["Ioc", "FrontendMarket", "LiquidationMarket"],
+        "#/properties/meta/properties/universe/items/properties/marginMode": ["strictIsolated", "noCross"],
       },
       ignoreEmptyArray: [
         "#/properties/twapStates",
@@ -30,7 +33,11 @@ runTest({
     });
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "webData2", "--user", "0x563C175E6f11582f65D6d9E360A618699DEe14a9"]);
-    parser(WebData2Request)(data);
+    const data = await runCommand([
+      "info",
+      "webData2",
+      "--user=0x563C175E6f11582f65D6d9E360A618699DEe14a9",
+    ]);
+    v.parse(WebData2Request, data);
   },
 });

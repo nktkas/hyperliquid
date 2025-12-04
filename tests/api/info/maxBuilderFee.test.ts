@@ -1,6 +1,7 @@
-import { MaxBuilderFeeRequest, MaxBuilderFeeResponse, parser } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { MaxBuilderFeeRequest, MaxBuilderFeeResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "maxBuilderFee",
@@ -17,11 +18,9 @@ runTest({
     const data = await runCommand([
       "info",
       "maxBuilderFee",
-      "--user",
-      "0xe019d6167E7e324aEd003d94098496b6d986aB05",
-      "--builder",
-      "0xe019d6167E7e324aEd003d94098496b6d986aB05",
+      "--user=0xe019d6167E7e324aEd003d94098496b6d986aB05",
+      "--builder=0xe019d6167E7e324aEd003d94098496b6d986aB05",
     ]);
-    parser(MaxBuilderFeeRequest)(data);
+    v.parse(MaxBuilderFeeRequest, data);
   },
 });

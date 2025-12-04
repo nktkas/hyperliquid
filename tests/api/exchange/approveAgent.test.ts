@@ -1,6 +1,7 @@
-import { ApproveAgentRequest, ApproveAgentResponse, parser } from "../../../src/api/exchange/~mod.ts";
+import * as v from "@valibot/valibot";
+import { ApproveAgentRequest, ApproveAgentResponse } from "@nktkas/hyperliquid/api/exchange";
+import { excludeErrorResponse, runTest } from "./_t.ts";
 import { schemaCoverage } from "../_schemaCoverage.ts";
-import { excludeErrorResponse, randomAddress, runTest } from "./_t.ts";
 
 runTest({
   name: "approveAgent",
@@ -31,9 +32,12 @@ runTest({
     const data = await runCommand([
       "exchange",
       "approveAgent",
-      "--agentAddress",
-      "0x0000000000000000000000000000000000000000",
+      "--agentAddress=0x0000000000000000000000000000000000000000",
     ]);
-    parser(ApproveAgentRequest)(data);
+    v.parse(ApproveAgentRequest, data);
   },
 });
+
+function randomAddress(): `0x${string}` {
+  return `0x${Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
+}

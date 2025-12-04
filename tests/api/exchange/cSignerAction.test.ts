@@ -1,8 +1,9 @@
 // deno-lint-ignore-file no-import-prefix
+import * as v from "@valibot/valibot";
 import { assertRejects } from "jsr:@std/assert@1";
-import { CSignerActionRequest, parser } from "../../../src/api/exchange/~mod.ts";
-import { ApiRequestError } from "../../../src/mod.ts";
+import { CSignerActionRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest } from "./_t.ts";
+import { ApiRequestError } from "@nktkas/hyperliquid";
 
 runTest({
   name: "cSignerAction",
@@ -28,7 +29,11 @@ runTest({
     });
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["exchange", "cSignerAction", "--jailSelf", "null"]);
-    parser(CSignerActionRequest)(data);
+    const data = await runCommand([
+      "exchange",
+      "cSignerAction",
+      "--jailSelf=null",
+    ]);
+    v.parse(CSignerActionRequest, data);
   },
 });

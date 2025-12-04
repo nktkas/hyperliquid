@@ -1,6 +1,7 @@
-import { parser, SpotUserRequest, SpotUserResponse } from "../../../src/api/exchange/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { SpotUserRequest, SpotUserResponse } from "@nktkas/hyperliquid/api/exchange";
 import { excludeErrorResponse, runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "spotUser",
@@ -11,7 +12,11 @@ runTest({
     schemaCoverage(excludeErrorResponse(SpotUserResponse), data);
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["exchange", "spotUser", "--optOut", "true"]);
-    parser(SpotUserRequest)(data);
+    const data = await runCommand([
+      "exchange",
+      "spotUser",
+      "--optOut=true",
+    ]);
+    v.parse(SpotUserRequest, data);
   },
 });

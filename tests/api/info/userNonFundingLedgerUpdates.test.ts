@@ -1,10 +1,7 @@
-import {
-  parser,
-  UserNonFundingLedgerUpdatesRequest,
-  UserNonFundingLedgerUpdatesResponse,
-} from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { UserNonFundingLedgerUpdatesRequest, UserNonFundingLedgerUpdatesResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "userNonFundingLedgerUpdates",
@@ -16,8 +13,8 @@ runTest({
       }),
     ]);
     schemaCoverage(UserNonFundingLedgerUpdatesResponse, data, {
-      ignoreBranches: {
-        "#/items/properties/delta/variant/3/properties/leverageType": [0],
+      ignorePicklistValues: {
+        "#/items/properties/delta/variant/3/properties/leverageType": ["Cross", "Isolated"],
       },
     });
   },
@@ -25,11 +22,9 @@ runTest({
     const data = await runCommand([
       "info",
       "userNonFundingLedgerUpdates",
-      "--user",
-      "0x563C175E6f11582f65D6d9E360A618699DEe14a9",
-      "--startTime",
-      "1725991238683",
+      "--user=0x563C175E6f11582f65D6d9E360A618699DEe14a9",
+      "--startTime=1725991238683",
     ]);
-    parser(UserNonFundingLedgerUpdatesRequest)(data);
+    v.parse(UserNonFundingLedgerUpdatesRequest, data);
   },
 });

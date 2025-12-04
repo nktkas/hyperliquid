@@ -1,8 +1,9 @@
 // deno-lint-ignore-file no-import-prefix
+import * as v from "@valibot/valibot";
 import { assertRejects } from "jsr:@std/assert@1";
-import { parser, ValidatorL1StreamRequest } from "../../../src/api/exchange/~mod.ts";
-import { ApiRequestError } from "../../../src/mod.ts";
+import { ValidatorL1StreamRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest } from "./_t.ts";
+import { ApiRequestError } from "@nktkas/hyperliquid";
 
 runTest({
   name: "validatorL1Stream",
@@ -16,7 +17,11 @@ runTest({
     );
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["exchange", "validatorL1Stream", "--riskFreeRate", "0.05"]);
-    parser(ValidatorL1StreamRequest)(data);
+    const data = await runCommand([
+      "exchange",
+      "validatorL1Stream",
+      "--riskFreeRate=0.05",
+    ]);
+    v.parse(ValidatorL1StreamRequest, data);
   },
 });

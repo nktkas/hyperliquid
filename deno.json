@@ -6,9 +6,9 @@
     ".": "./src/mod.ts",
     "./signing": "./src/signing/mod.ts",
     "./utils": "./src/utils/mod.ts",
-    "./api/exchange": "./src/api/exchange/~mod.ts",
-    "./api/info": "./src/api/info/~mod.ts",
-    "./api/subscription": "./src/api/subscription/~mod.ts"
+    "./api/exchange": "./src/api/exchange/mod.ts",
+    "./api/info": "./src/api/info/mod.ts",
+    "./api/subscription": "./src/api/subscription/mod.ts"
   },
   "fmt": {
     "lineWidth": 120
@@ -22,10 +22,9 @@
     "exclude": [".github", "tests"]
   },
   "imports": {
-    "@henrygd/semaphore": "jsr:@henrygd/semaphore@0.1.0",
     "@nktkas/rews": "jsr:@nktkas/rews@^1.2.1",
     "@noble/hashes": "jsr:@noble/hashes@^2.0.1",
-    "@noble/secp256k1": "jsr:@noble/secp256k1@^3.0.0",
+    "@paulmillr/micro-eth-signer": "jsr:@paulmillr/micro-eth-signer@^0.18.1",
     "@std/msgpack": "jsr:@std/msgpack@^1.0.3",
     "@valibot/valibot": "jsr:@valibot/valibot@1.2.0"
   },

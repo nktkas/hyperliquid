@@ -1,6 +1,7 @@
-import { parser, UsdSendRequest, UsdSendResponse } from "../../../src/api/exchange/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { UsdSendRequest, UsdSendResponse } from "@nktkas/hyperliquid/api/exchange";
 import { excludeErrorResponse, runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "usdSend",
@@ -17,11 +18,9 @@ runTest({
     const data = await runCommand([
       "exchange",
       "usdSend",
-      "--destination",
-      "0x0000000000000000000000000000000000000001",
-      "--amount",
-      "1",
+      "--destination=0x0000000000000000000000000000000000000001",
+      "--amount=1",
     ]);
-    parser(UsdSendRequest)(data);
+    v.parse(UsdSendRequest, data);
   },
 });

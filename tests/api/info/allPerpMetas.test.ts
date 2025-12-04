@@ -1,6 +1,7 @@
-import { AllPerpMetasRequest, AllPerpMetasResponse, parser } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { AllPerpMetasRequest, AllPerpMetasResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "allPerpMetas",
@@ -11,7 +12,10 @@ runTest({
     schemaCoverage(AllPerpMetasResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "allPerpMetas"]);
-    parser(AllPerpMetasRequest)(data);
+    const data = await runCommand([
+      "info",
+      "allPerpMetas",
+    ]);
+    v.parse(AllPerpMetasRequest, data);
   },
 });

@@ -1,6 +1,7 @@
-import { parser, VaultDetailsRequest, VaultDetailsResponse } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { VaultDetailsRequest, VaultDetailsResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "vaultDetails",
@@ -19,9 +20,8 @@ runTest({
     const data = await runCommand([
       "info",
       "vaultDetails",
-      "--vaultAddress",
-      "0x1719884eb866cb12b2287399b15f7db5e7d775ea",
+      "--vaultAddress=0x1719884eb866cb12b2287399b15f7db5e7d775ea",
     ]);
-    parser(VaultDetailsRequest)(data);
+    v.parse(VaultDetailsRequest, data);
   },
 });

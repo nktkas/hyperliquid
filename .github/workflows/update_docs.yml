@@ -1,0 +1,19 @@
+name: update documentation
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  update-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: denoland/setup-deno@v2
+
+      - name: Update OpenAPI specs and sync to GitBook
+        env:
+          GITBOOK_TOKEN: ${{ secrets.GITBOOK_TOKEN }}
+          GITBOOK_ORG_ID: ${{ secrets.GITBOOK_ORG_ID }}
+        run: deno run -A docs/.scripts/updateOpenAPI.ts

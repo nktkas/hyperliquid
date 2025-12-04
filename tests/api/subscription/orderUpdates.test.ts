@@ -1,54 +1,51 @@
-import { OrderUpdatesEvent } from "../../../src/api/subscription/~mod.ts";
-import { getWalletAddress } from "../../../src/signing/mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { OrderUpdatesEvent } from "@nktkas/hyperliquid/api/subscription";
+import { getWalletAddress } from "@nktkas/hyperliquid/signing";
 import { collectEventsOverTime, openOrder, runTestWithExchange } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTestWithExchange({
   name: "orderUpdates",
   fn: async (_t, client) => {
-    const data = await Promise.all([
-      collectEventsOverTime<OrderUpdatesEvent>(
-        async (cb) => {
-          const user = await getWalletAddress(client.exch.wallet);
-          await client.subs.orderUpdates({ user }, cb);
-          await openOrder(client.exch, "limit");
-        },
-        10_000,
-      ),
-    ]);
-    schemaCoverage(OrderUpdatesEvent, data.flat(), {
-      ignoreBranches: {
-        "#/items/properties/order/properties/side": [1],
+    const data = await collectEventsOverTime<OrderUpdatesEvent>(async (cb) => {
+      const user = await getWalletAddress(
+        "multiSigUser" in client.exch.config_ ? client.exch.config_.wallet[0] : client.exch.config_.wallet,
+      );
+      await client.subs.orderUpdates({ user }, cb);
+      await openOrder(client.exch, "limit");
+    }, 10_000);
+    schemaCoverage(OrderUpdatesEvent, data, {
+      ignorePicklistValues: {
         "#/items/properties/status": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
+          "filled",
+          "canceled",
+          "triggered",
+          "rejected",
+          "reduceOnlyCanceled",
+          "marginCanceled",
+          "vaultWithdrawalCanceled",
+          "openInterestCapCanceled",
+          "selfTradeCanceled",
+          "siblingFilledCanceled",
+          "delistedCanceled",
+          "liquidatedCanceled",
+          "scheduledCancel",
+          "tickRejected",
+          "minTradeNtlRejected",
+          "perpMarginRejected",
+          "reduceOnlyRejected",
+          "badAloPxRejected",
+          "iocCancelRejected",
+          "badTriggerPxRejected",
+          "marketOrderNoLiquidityRejected",
+          "positionIncreaseAtOpenInterestCapRejected",
+          "positionFlipAtOpenInterestCapRejected",
+          "tooAggressiveAtOpenInterestCapRejected",
+          "openInterestIncreaseRejected",
+          "insufficientSpotBalanceRejected",
+          "oracleRejected",
+          "perpMaxPositionRejected",
         ],
+        "#/items/properties/order/properties/side": ["A"],
       },
       ignoreDefinedTypes: [
         "#/items/properties/order/properties/cloid",

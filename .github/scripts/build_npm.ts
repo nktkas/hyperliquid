@@ -14,10 +14,9 @@ import denoJson from "../../deno.json" with { type: "json" };
 async function modifyImports() {
   // Define mappings from jsr to npm
   const jsr2npm = {
-    "jsr:@henrygd/semaphore": "npm:@henrygd/semaphore",
     "jsr:@nktkas/rews": "npm:@nktkas/rews",
     "jsr:@noble/hashes": "npm:@noble/hashes",
-    "jsr:@noble/secp256k1": "npm:@noble/secp256k1",
+    "jsr:@paulmillr/micro-eth-signer": "npm:micro-eth-signer",
     // "jsr:@std/msgpack": "...", // No npm equivalent available
     "jsr:@valibot/valibot": "npm:valibot",
   };
@@ -51,7 +50,7 @@ try {
     package: {
       name: "@nktkas/hyperliquid",
       version: denoJson.version,
-      description: "Unofficial Hyperliquid API SDK for all major JS runtimes, written in TypeScript.",
+      description: "Hyperliquid API SDK for all major JS runtimes, written in TypeScript.",
       keywords: [
         "api",
         "library",

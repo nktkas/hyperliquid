@@ -1,12 +1,13 @@
-import { parser, TwapOrderRequest, TwapOrderResponse } from "../../../src/api/exchange/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { TwapOrderRequest, TwapOrderResponse } from "@nktkas/hyperliquid/api/exchange";
+import { formatSize } from "@nktkas/hyperliquid/utils";
 import { allMids, excludeErrorResponse, runTest, symbolConverter } from "./_t.ts";
-import { formatSize } from "../../../src/utils/mod.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "twapOrder",
   codeTestFn: async (_t, exchClient) => {
-    // —————————— Prepare ——————————
+    // ========== Prepare ==========
 
     const id = symbolConverter.getAssetId("ETH")!;
     const szDecimals = symbolConverter.getSzDecimals("ETH")!;
@@ -14,7 +15,7 @@ runTest({
 
     const sz = formatSize(60 / parseFloat(midPx), szDecimals);
 
-    // —————————— Test ——————————
+    // ========== Test ==========
 
     const data = await Promise.all([
       exchClient.twapOrder({
@@ -34,19 +35,13 @@ runTest({
     const data = await runCommand([
       "exchange",
       "twapOrder",
-      "--a",
-      "0",
-      "--b",
-      "true",
-      "--s",
-      "0",
-      "--r",
-      "false",
-      "--m",
-      "5",
-      "--t",
-      "false",
+      "--a=0",
+      "--b=true",
+      "--s=0",
+      "--r=false",
+      "--m=5",
+      "--t=false",
     ]);
-    parser(TwapOrderRequest)(data);
+    v.parse(TwapOrderRequest, data);
   },
 });

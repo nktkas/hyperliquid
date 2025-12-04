@@ -1,6 +1,7 @@
-import { parser, PerpDexLimitsRequest, PerpDexLimitsResponse } from "../../../src/api/info/~mod.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import * as v from "@valibot/valibot";
+import { PerpDexLimitsRequest, PerpDexLimitsResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
+import { schemaCoverage } from "../_schemaCoverage.ts";
 
 runTest({
   name: "perpDexLimits",
@@ -12,7 +13,11 @@ runTest({
     schemaCoverage(PerpDexLimitsResponse, data);
   },
   cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand(["info", "perpDexLimits", "--dex", "vntls"]);
-    parser(PerpDexLimitsRequest)(data);
+    const data = await runCommand([
+      "info",
+      "perpDexLimits",
+      "--dex=vntls",
+    ]);
+    v.parse(PerpDexLimitsRequest, data);
   },
 });
