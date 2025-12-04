@@ -105,8 +105,9 @@ const state = await client.clearinghouseState({ user: "0x..." });
 //    ^? { marginSummary: {...}, assetPositions: [...], withdrawable: string }
 ```
 
-{% hint style="info" %} Every method has fully typed parameters and responses. No more guessing what the API returns. {%
-endhint %}
+<!-- deno-fmt-ignore-start -->
+{% hint style="info" %} Every method has fully typed parameters and responses. No more guessing what the API returns. {% endhint %}
+<!-- deno-fmt-ignore-end -->
 
 ### Place Orders
 
@@ -145,87 +146,3 @@ await client.l2Book({ coin: "ETH" }, (book) => {
   //          ^? { coin: string, time: number, levels: [...] }
 });
 ```
-
----
-
-## Getting Started
-
-<table data-view="cards">
-  <thead>
-    <tr>
-      <th></th>
-      <th></th>
-      <th data-hidden data-card-target data-type="content-ref"></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>Installation</strong></td>
-      <td>Requirements and setup</td>
-      <td><a href="getting-started/installation.md">installation.md</a></td>
-    </tr>
-    <tr>
-      <td><strong>Quick Start</strong></td>
-      <td>First API call in 5 minutes</td>
-      <td><a href="getting-started/quick-start.md">quick-start.md</a></td>
-    </tr>
-  </tbody>
-</table>
-
-## Core Concepts
-
-<table data-view="cards">
-  <thead>
-    <tr>
-      <th></th>
-      <th></th>
-      <th data-hidden data-card-target data-type="content-ref"></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>Transports</strong></td>
-      <td>HTTP and WebSocket configuration</td>
-      <td><a href="core-concepts/transports.md">transports.md</a></td>
-    </tr>
-    <tr>
-      <td><strong>Clients</strong></td>
-      <td>InfoClient, ExchangeClient, SubscriptionClient</td>
-      <td><a href="core-concepts/clients.md">clients.md</a></td>
-    </tr>
-    <tr>
-      <td><strong>Error Handling</strong></td>
-      <td>Error types and recovery</td>
-      <td><a href="core-concepts/error-handling.md">error-handling.md</a></td>
-    </tr>
-  </tbody>
-</table>
-
-## Utilities
-
-<table data-view="cards">
-  <thead>
-    <tr>
-      <th></th>
-      <th></th>
-      <th data-hidden data-card-target data-type="content-ref"></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>Formatting</strong></td>
-      <td>Price and size formatting</td>
-      <td><a href="utilities/formatting.md">formatting.md</a></td>
-    </tr>
-    <tr>
-      <td><strong>Signing</strong></td>
-      <td>Low-level signing</td>
-      <td><a href="utilities/signing.md">signing.md</a></td>
-    </tr>
-    <tr>
-      <td><strong>Symbol Converter</strong></td>
-      <td>Asset symbols to IDs conversion</td>
-      <td><a href="utilities/symbol-converter.md">symbol-converter.md</a></td>
-    </tr>
-  </tbody>
-</table>
