@@ -10,14 +10,33 @@ Get started with the SDK in just a few lines of code.
 
 First, create a [Transport](/core-concepts/transports) — the layer that handles communication with Hyperliquid servers.
 
+{% tabs %}
+
+{% tab title="HttpTransport" %}
+
+Use [`HttpTransport`](/core-concepts/transports#httptransport) for simple requests.
+
 ```ts
 import { HttpTransport } from "@nktkas/hyperliquid";
 
 const transport = new HttpTransport();
 ```
 
-{% hint style="tip" %} Use `HttpTransport` for simple requests. Use `WebSocketTransport` for subscriptions or lower
-latency. {% endhint %}
+{% endtab %}
+
+{% tab title="WebSocketTransport" %}
+
+Use [`WebSocketTransport`](/core-concepts/transports#websockettransport) for subscriptions or lower latency.
+
+```ts
+import { WebSocketTransport } from "@nktkas/hyperliquid";
+
+const transport = new WebSocketTransport();
+```
+
+{% endtab %}
+
+{% endtabs %}
 
 {% endstep %}
 
