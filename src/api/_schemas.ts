@@ -3,7 +3,8 @@ import * as v from "@valibot/valibot";
 export const UnsignedDecimal = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([v.string(), v.number()]),
-    v.toString(),
+    v.transform(String),
+    v.string(),
     v.transform((value) => formatDecimalString(value)),
     v.regex(/^[0-9]+(\.[0-9]+)?$/),
   );
@@ -13,7 +14,8 @@ export type UnsignedDecimal = v.InferOutput<typeof UnsignedDecimal>;
 export const Decimal = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([v.string(), v.number()]),
-    v.toString(),
+    v.transform(String),
+    v.string(),
     v.transform((value) => formatDecimalString(value)),
     v.regex(/^-?[0-9]+(\.[0-9]+)?$/),
   );
@@ -23,7 +25,8 @@ export type Decimal = v.InferOutput<typeof Decimal>;
 export const Integer = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([v.string(), v.number()]),
-    v.toNumber(),
+    v.transform(Number),
+    v.number(),
     v.integer(),
     v.safeInteger(),
   );
@@ -33,7 +36,8 @@ export type Integer = v.InferOutput<typeof Integer>;
 export const UnsignedInteger = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([v.string(), v.number()]),
-    v.toNumber(),
+    v.transform(Number),
+    v.number(),
     v.integer(),
     v.safeInteger(),
     v.minValue(0),

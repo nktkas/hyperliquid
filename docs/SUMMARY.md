@@ -13,12 +13,6 @@
 - [Clients](core-concepts/clients.md)
 - [Error Handling](core-concepts/error-handling.md)
 
-## Utilities
-
-- [Symbol Converter](utilities/symbol-converter.md)
-- [Formatting](utilities/formatting.md)
-- [Signing](utilities/signing.md)
-
 ## API Reference
 
 - Info Methods
@@ -1544,6 +1538,12 @@
           kind: openapi
           spec: hl-subscription-webData3
     ```
+
+## Utilities
+
+- [Symbol Converter](utilities/symbol-converter.md)
+- [Formatting](utilities/formatting.md)
+- [Signing](utilities/signing.md)
 
 ## Other
 
