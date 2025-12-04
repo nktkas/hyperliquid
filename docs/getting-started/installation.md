@@ -4,29 +4,49 @@ Install the SDK via your package manager or a `<script>` tag.
 
 ## Package Manager
 
-::: code-group
+{% tabs %}
 
-```sh [npm]
+{% tab title="npm" %}
+
+```sh
 npm i @nktkas/hyperliquid
 ```
 
-```sh [pnpm]
+{% endtab %}
+
+{% tab title="pnpm" %}
+
+```sh
 pnpm add @nktkas/hyperliquid
 ```
 
-```sh [yarn]
+{% endtab %}
+
+{% tab title="yarn" %}
+
+```sh
 yarn add @nktkas/hyperliquid
 ```
 
-```sh [bun]
+{% endtab %}
+
+{% tab title="bun" %}
+
+```sh
 bun add @nktkas/hyperliquid
 ```
 
-```sh [deno]
+{% endtab %}
+
+{% tab title="deno" %}
+
+```sh
 deno add jsr:@nktkas/hyperliquid
 ```
 
-:::
+{% endtab %}
+
+{% endtabs %}
 
 ## CDN
 
@@ -41,7 +61,7 @@ Simply add a `<script type="module">` tag to the bottom of your HTML file with t
 
 ## Platform Requirements
 
-::: info Node.js Requires **Node.js 20** or higher.
+{% hint style="info" %} Node.js Requires **Node.js 20** or higher.
 
 Node.js 22+ includes native WebSocket support. For earlier versions, install the `ws` package if you plan to use
 `WebSocketTransport`:
@@ -61,10 +81,10 @@ const transport = new hl.WebSocketTransport({
 });
 ```
 
-:::
+{% endhint %}
 
-::: info React Native React Native requires polyfills for `TextEncoder` and `EventTarget`. Install and import them
-before the SDK:
+{% hint style="info" %} React Native React Native requires polyfills for `TextEncoder` and `EventTarget`. Install and
+import them before the SDK:
 
 ```sh
 npm install fast-text-encoding event-target-polyfill
@@ -76,4 +96,4 @@ import "event-target-polyfill";
 import * as hl from "@nktkas/hyperliquid";
 ```
 
-:::
+{% endhint %}

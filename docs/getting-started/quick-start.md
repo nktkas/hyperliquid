@@ -12,8 +12,8 @@ import { HttpTransport } from "@nktkas/hyperliquid";
 const transport = new HttpTransport();
 ```
 
-::: tip Use [`HttpTransport`](/core-concepts/transports#httptransport) for simple requests. Use
-[`WebSocketTransport`](/core-concepts/transports#websockettransport) for subscriptions or lower latency. :::
+{% hint style="tip" %} Use [`HttpTransport`](/core-concepts/transports#httptransport) for simple requests. Use
+[`WebSocketTransport`](/core-concepts/transports#websockettransport) for subscriptions or lower latency. {% endhint %}
 
 ## 2. Create a Client
 

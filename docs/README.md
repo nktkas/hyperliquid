@@ -2,29 +2,49 @@
 
 A TypeScript SDK for the [Hyperliquid API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api).
 
-::: code-group
+{% tabs %}
 
-```sh [npm]
+{% tab title="npm" %}
+
+```sh
 npm i @nktkas/hyperliquid
 ```
 
-```sh [pnpm]
+{% endtab %}
+
+{% tab title="pnpm" %}
+
+```sh
 pnpm add @nktkas/hyperliquid
 ```
 
-```sh [yarn]
+{% endtab %}
+
+{% tab title="yarn" %}
+
+```sh
 yarn add @nktkas/hyperliquid
 ```
 
-```sh [bun]
+{% endtab %}
+
+{% tab title="bun" %}
+
+```sh
 bun add @nktkas/hyperliquid
 ```
 
-```sh [deno]
+{% endtab %}
+
+{% tab title="deno" %}
+
+```sh
 deno add jsr:@nktkas/hyperliquid
 ```
 
-:::
+{% endtab %}
+
+{% endtabs %}
 
 <table data-view="cards">
   <thead>
@@ -85,7 +105,8 @@ const state = await client.clearinghouseState({ user: "0x..." });
 //    ^? { marginSummary: {...}, assetPositions: [...], withdrawable: string }
 ```
 
-::: info Every method has fully typed parameters and responses. No more guessing what the API returns. :::
+{% hint style="info" %} Every method has fully typed parameters and responses. No more guessing what the API returns. {%
+endhint %}
 
 ### Place Orders
 
