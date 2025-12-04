@@ -19,7 +19,7 @@
     }
   },
   "publish": {
-    "exclude": [".github", "tests"]
+    "exclude": [".github", "docs", "tests"]
   },
   "imports": {
     "@nktkas/rews": "jsr:@nktkas/rews@^1.2.1",
