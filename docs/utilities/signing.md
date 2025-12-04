@@ -111,19 +111,22 @@ for trading on behalf of a vault.
 [Expiration time](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#expires-after) of
 the action in milliseconds since epoch.
 
-> [!IMPORTANT]
-> The action hash depends on key order. Use valibot schema to guarantee correct order:
->
-> ```ts
-> import { CancelByCloidRequest } from "@nktkas/hyperliquid/api/exchange";
-> import * as v from "valibot";
->
-> const action = v.parse(CancelByCloid.entries.action, {
->   cancels: [{ cloid: 12345, asset: 0 }],
->   type: "cancel",
-> });
-> // => { type, cancels: [{ asset, cloid }] }
-> ```
+{% hint style="warning" %}
+
+The action hash depends on key order. Use valibot schema to guarantee correct order:
+
+```ts
+import { CancelByCloidRequest } from "@nktkas/hyperliquid/api/exchange";
+import * as v from "valibot";
+
+const action = v.parse(CancelByCloid.entries.action, {
+  cancels: [{ cloid: 12345, asset: 0 }],
+  type: "cancel",
+});
+// => { type, cancels: [{ asset, cloid }] }
+```
+
+{% endhint %}
 
 ## signUserSignedAction
 

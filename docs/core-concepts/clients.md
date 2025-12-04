@@ -108,8 +108,8 @@ const wallet2 = privateKeyToAccount("0x...");
 
 const client = new ExchangeClient({
   transport: new HttpTransport(),
-  wallet: [wallet1, wallet2],
-  multiSigUser: "0x...", // the multi-sig account address
+  wallet: [wallet1, wallet2], // any number of wallets
+  multiSigUser: "0x...", // multi-sig account address
 });
 ```
 
@@ -128,11 +128,12 @@ The transport used to send requests.
 
 The wallet(s) used to sign requests. Supports:
 
-- [viem accounts](https://viem.sh/docs/accounts/local) (`privateKeyToAccount`, etc.)
+- [viem accounts](https://viem.sh/docs/accounts/local)
 - [ethers Wallet](https://docs.ethers.org/v6/api/wallet/)
 - Any object with `address` and `signTypedData` method
 
-For multi-sig, pass an array of wallets. The first wallet is the leader.
+For multi-sig, pass an array of wallets. The first wallet is the
+[leader](https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig).
 
 #### multiSigUser (required for multi-sig)
 
@@ -143,7 +144,7 @@ The multi-signature account address. Required when `wallet` is an array.
 #### signatureChainId (optional)
 
 - **Type:** `` `0x${string}` `` | `(() => MaybePromise<`0x${string}`>)`
-- **Default:** Wallet's chain ID
+- **Default:** Wallet's connected chain ID
 
 Custom chain ID for EIP-712 signing.
 

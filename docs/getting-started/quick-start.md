@@ -2,7 +2,11 @@
 
 Get started with the SDK in just a few lines of code.
 
-## 1. Set up Transport
+{% stepper %}
+
+{% step %}
+
+### Set up Transport
 
 First, create a [Transport](/core-concepts/transports) — the layer that handles communication with Hyperliquid servers.
 
@@ -12,15 +16,21 @@ import { HttpTransport } from "@nktkas/hyperliquid";
 const transport = new HttpTransport();
 ```
 
-{% hint style="tip" %} Use [`HttpTransport`](/core-concepts/transports#httptransport) for simple requests. Use
-[`WebSocketTransport`](/core-concepts/transports#websockettransport) for subscriptions or lower latency. {% endhint %}
+{% hint style="tip" %} Use `HttpTransport` for simple requests. Use `WebSocketTransport` for subscriptions or lower
+latency. {% endhint %}
 
-## 2. Create a Client
+{% endstep %}
+
+{% step %}
+
+### Create a Client
 
 Next, create a [Client](/core-concepts/clients) with your transport. The SDK provides three clients for different
 purposes:
 
-### 2.a InfoClient — Read Data
+{% tabs %}
+
+{% tab title="InfoClient" %}
 
 Use [`InfoClient`](/core-concepts/clients#infoclient) to query market data, account state, and other read-only
 information.
@@ -37,7 +47,9 @@ const mids = await client.allMids();
 // => { "BTC": "97000.5", "ETH": "3500.25", ... }
 ```
 
-### 2.b ExchangeClient — Execute Actions
+{% endtab %}
+
+{% tab title="ExchangeClient" %}
 
 Use [`ExchangeClient`](/core-concepts/clients#exchangeclient) to place orders, transfer funds, and perform other actions
 that require signing.
@@ -68,7 +80,9 @@ const result = await client.order({
 // => { status: "ok", response: { type: "order", data: { statuses: [...] } } }
 ```
 
-### 2.c SubscriptionClient — Real-time Updates
+{% endtab %}
+
+{% tab title="SubscriptionClient" %}
 
 Use [`SubscriptionClient`](/core-concepts/clients#subscriptionclient) to subscribe to live market data via WebSocket.
 
@@ -87,3 +101,11 @@ const subscription = await client.allMids((data) => {
 // Later: unsubscribe
 await subscription.unsubscribe();
 ```
+
+{% endtab %}
+
+{% endtabs %}
+
+{% endstep %}
+
+{% endstepper %}
