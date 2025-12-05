@@ -11,10 +11,7 @@ jobs:
       - uses: denoland/setup-deno@v2
 
       - name: deno fmt
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-          deno fmt --check
+        run: deno fmt --check
 
       - name: deno lint
         run: deno lint
