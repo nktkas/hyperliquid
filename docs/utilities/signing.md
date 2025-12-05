@@ -119,7 +119,7 @@ The action hash depends on key order. Use valibot schema to guarantee correct or
 import { CancelByCloidRequest } from "@nktkas/hyperliquid/api/exchange";
 import * as v from "valibot";
 
-const action = v.parse(CancelByCloid.entries.action, {
+const action = v.parse(CancelByCloidRequest.entries.action, {
   cancels: [{ cloid: 12345, asset: 0 }],
   type: "cancel",
 });
