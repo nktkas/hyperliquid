@@ -2,7 +2,13 @@
 import "jsr:@std/dotenv@^0.225.5/load";
 import type * as v from "@valibot/valibot";
 import { generatePrivateKey, privateKeyToAccount } from "npm:viem@2/accounts";
-import { ExchangeClient, HttpTransport, InfoClient } from "@nktkas/hyperliquid";
+import {
+  ExchangeClient,
+  type ExchangeMultiSigConfig,
+  type ExchangeSingleWalletConfig,
+  HttpTransport,
+  InfoClient,
+} from "@nktkas/hyperliquid";
 import { getWalletAddress } from "@nktkas/hyperliquid/signing";
 import { formatPrice, formatSize, SymbolConverter } from "@nktkas/hyperliquid/utils";
 import type { ExcludeErrorResponse } from "../../../src/api/exchange/_methods/_base/errors.ts";
@@ -52,7 +58,10 @@ async function runCLICommand(args: string[]): Promise<string> {
 
 export function runTest(options: {
   name: string;
-  codeTestFn: (t: Deno.TestContext, exchClient: ExchangeClient) => Promise<void>;
+  codeTestFn: (
+    t: Deno.TestContext,
+    exchClient: ExchangeClient<ExchangeSingleWalletConfig | ExchangeMultiSigConfig>,
+  ) => Promise<void>;
   cliTestFn?: (t: Deno.TestContext, runCommand: (args: string[]) => string | Promise<string>) => Promise<void>;
 }): void {
   const { name, codeTestFn, cliTestFn } = options;
@@ -86,7 +95,9 @@ export function runTest(options: {
 // Helpers
 // =============================================================
 
-export async function createTempExchangeClient(type: "user" | "multisig"): Promise<ExchangeClient> {
+export async function createTempExchangeClient(
+  type: "user" | "multisig",
+): Promise<ExchangeClient<ExchangeSingleWalletConfig | ExchangeMultiSigConfig>> {
   const mainExchClient = new ExchangeClient({ wallet: MAIN_WALLET!, transport });
 
   // Create temporary account
@@ -111,13 +122,15 @@ export async function createTempExchangeClient(type: "user" | "multisig"): Promi
     // Return as multi-sig ExchangeClient
     return new ExchangeClient({
       multiSigUser: tempWallet.address,
-      wallet: [MAIN_WALLET!],
+      signers: [MAIN_WALLET!],
       transport,
     });
   }
 }
 
-export async function cleanupTempExchangeClient(tempClient: ExchangeClient): Promise<void> {
+export async function cleanupTempExchangeClient(
+  tempClient: ExchangeClient<ExchangeSingleWalletConfig | ExchangeMultiSigConfig>,
+): Promise<void> {
   const tempUser = "multiSigUser" in tempClient.config_
     ? tempClient.config_.multiSigUser
     : await getWalletAddress(tempClient.config_.wallet);
@@ -174,7 +187,7 @@ export async function cleanupTempExchangeClient(tempClient: ExchangeClient): Pro
 }
 
 export async function openOrder(
-  client: ExchangeClient,
+  client: ExchangeClient<ExchangeSingleWalletConfig | ExchangeMultiSigConfig>,
   type: "market" | "limit",
   symbol: string = "ETH",
   side: "buy" | "sell" = "buy",
@@ -240,16 +253,10 @@ export async function openOrder(
 }
 
 export async function createTWAP(
-  client: ExchangeClient,
+  client: ExchangeClient<ExchangeSingleWalletConfig | ExchangeMultiSigConfig>,
   symbol: string = "ETH",
   side: "buy" | "sell" = "buy",
-): Promise<{
-  a: number;
-  b: boolean;
-  s: string;
-  twapId: number;
-  midPx: string;
-}> {
+): Promise<{ a: number; b: boolean; s: string; twapId: number; midPx: string }> {
   // Top-up account
   await topUpPerp(client, "60");
 
@@ -285,7 +292,10 @@ export async function createTWAP(
   };
 }
 
-export async function topUpPerp(client: ExchangeClient, amount: string) {
+export async function topUpPerp(
+  client: ExchangeClient<ExchangeSingleWalletConfig | ExchangeMultiSigConfig>,
+  amount: string,
+): Promise<void> {
   const mainExchClient = new ExchangeClient({ wallet: MAIN_WALLET!, transport });
   const tempUser = "multiSigUser" in client.config_
     ? client.config_.multiSigUser
@@ -293,7 +303,11 @@ export async function topUpPerp(client: ExchangeClient, amount: string) {
   await mainExchClient.usdSend({ destination: tempUser, amount });
 }
 
-export async function topUpSpot(client: ExchangeClient, token: "USDC" | "HYPE", amount: string) {
+export async function topUpSpot(
+  client: ExchangeClient<ExchangeSingleWalletConfig | ExchangeMultiSigConfig>,
+  token: "USDC" | "HYPE",
+  amount: string,
+): Promise<void> {
   const tokenAddresses = {
     USDC: "0xeb62eee3685fc4c43992febcd9e75443",
     HYPE: "0x7317beb7cceed72ef0b346074cc8e7ab",

@@ -103,12 +103,12 @@ const client = new ExchangeClient({ transport, wallet });
 import { ExchangeClient, HttpTransport } from "@nktkas/hyperliquid";
 import { privateKeyToAccount } from "viem/accounts";
 
-const wallet1 = privateKeyToAccount("0x...");
-const wallet2 = privateKeyToAccount("0x...");
+const signer1 = privateKeyToAccount("0x...");
+const signer2 = privateKeyToAccount("0x...");
 
 const client = new ExchangeClient({
   transport: new HttpTransport(),
-  wallet: [wallet1, wallet2], // any number of wallets
+  signers: [signer1, signer2], // any number of signers
   multiSigUser: "0x...", // multi-sig account address
 });
 ```
@@ -122,24 +122,28 @@ const client = new ExchangeClient({
 
 The transport used to send requests.
 
-#### wallet (required)
+#### wallet (required for single wallet)
 
-- **Type:** `AbstractWallet` | `AbstractWallet[]`
+- **Type:** `AbstractWallet`
 
-The wallet(s) used to sign requests. Supports:
+The wallet used to sign requests. Supports:
 
 - [viem accounts](https://viem.sh/docs/accounts/local)
 - [ethers Wallet](https://docs.ethers.org/v6/api/wallet/)
 - Any object with `address` and `signTypedData` method
 
-For multi-sig, pass an array of wallets. The first wallet is the
+#### signers (required for multi-sig)
+
+- **Type:** `[AbstractWallet, ...AbstractWallet[]]`
+
+Array of wallets for multi-sig signing. The first wallet is the
 [leader](https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig).
 
 #### multiSigUser (required for multi-sig)
 
 - **Type:** `` `0x${string}` ``
 
-The multi-signature account address. Required when `wallet` is an array.
+The multi-signature account address. Required when using `signers`.
 
 #### signatureChainId (optional)
 

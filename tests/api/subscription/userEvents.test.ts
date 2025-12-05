@@ -8,7 +8,7 @@ runTestWithExchange({
   fn: async (_t, client) => {
     const data = await collectEventsOverTime<UserEventsEvent>(async (cb) => {
       const user = await getWalletAddress(
-        "multiSigUser" in client.exch.config_ ? client.exch.config_.wallet[0] : client.exch.config_.wallet,
+        "multiSigUser" in client.exch.config_ ? client.exch.config_.signers[0] : client.exch.config_.wallet,
       );
       await client.subs.userEvents({ user }, cb);
       await createTWAP(client.exch);

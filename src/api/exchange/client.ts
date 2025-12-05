@@ -1,4 +1,4 @@
-import type { ExchangeConfig } from "./_methods/_base/execute.ts";
+import type { ExchangeConfig, ExchangeSingleWalletConfig } from "./_methods/_base/execute.ts";
 
 // =============================================================
 // Methods Imports
@@ -256,7 +256,7 @@ import {
 /**
  * A client for interacting with the Hyperliquid Exchange API.
  */
-export class ExchangeClient<C extends ExchangeConfig = ExchangeConfig> {
+export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfig> {
   config_: C;
 
   /**
@@ -290,15 +290,15 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeConfig> {
    * import { privateKeyToAccount } from "npm:viem/accounts";
    * import { ethers } from "npm:ethers";
    *
-   * const wallet1 = privateKeyToAccount("0x...");
-   * const wallet2 = new ethers.Wallet("0x...");
-   * // ... and more wallets
+   * const signer1 = privateKeyToAccount("0x...");
+   * const signer2 = new ethers.Wallet("0x...");
+   * // ... and more signers
    *
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    *
    * const client = new hl.ExchangeClient({
    *   transport,
-   *   wallet: [wallet1, wallet2],
+   *   signers: [signer1, signer2],
    *   multiSigUser: "0x...",
    * });
    * ```

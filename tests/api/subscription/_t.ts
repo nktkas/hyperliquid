@@ -1,4 +1,11 @@
-import { type ExchangeClient, InfoClient, SubscriptionClient, WebSocketTransport } from "@nktkas/hyperliquid";
+import {
+  type ExchangeClient,
+  type ExchangeMultiSigConfig,
+  type ExchangeSingleWalletConfig,
+  InfoClient,
+  SubscriptionClient,
+  WebSocketTransport,
+} from "@nktkas/hyperliquid";
 import { cleanupTempExchangeClient, createTempExchangeClient } from "../exchange/_t.ts";
 
 // =============================================================
@@ -42,7 +49,11 @@ export function runTestWithExchange(options: {
   name: string;
   fn: (
     t: Deno.TestContext,
-    client: { subs: SubscriptionClient; exch: ExchangeClient; info: InfoClient },
+    client: {
+      subs: SubscriptionClient;
+      exch: ExchangeClient<ExchangeSingleWalletConfig | ExchangeMultiSigConfig>;
+      info: InfoClient;
+    },
   ) => Promise<void>;
 }): void {
   const { name, fn } = options;

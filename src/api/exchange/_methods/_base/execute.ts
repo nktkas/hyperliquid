@@ -24,9 +24,15 @@ type MaybePromise<T> = T | Promise<T>;
 // deno-lint-ignore ban-types
 type Prettify<T> = { [K in keyof T]: T[K] } & {};
 
+/** Options for any execute functions. */
+interface BaseOptions {
+  /** [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to cancel a request. */
+  signal?: AbortSignal;
+}
+
 /** Extract request options from a request type (excludes action, nonce, signature). */
 export type ExtractRequestOptions<T extends { action: Record<string, unknown> }> = Prettify<
-  & { signal?: AbortSignal }
+  & BaseOptions
   & Omit<T, "action" | "nonce" | "signature">
 >;
 
@@ -75,7 +81,7 @@ export interface ExchangeMultiSigConfig<
   T extends HttpTransport | WebSocketTransport = HttpTransport | WebSocketTransport,
 > extends BaseConfig<T> {
   /** Array of wallets for multi-sig. First wallet is the leader. */
-  wallet: readonly [AbstractWallet, ...AbstractWallet[]];
+  signers: readonly [AbstractWallet, ...AbstractWallet[]];
   /** The multi-signature account address. */
   multiSigUser: `0x${string}`;
 }
@@ -124,9 +130,8 @@ export async function executeL1Action<T>(
     const signal = options?.signal;
 
     // Sign action (multi-sig or single wallet)
-    const [finalAction, signature] = isMultiSig(config)
-      ? await signMultiSigL1(config, action, walletAddress, nonce, vaultAddress, expiresAfter)
-      : [
+    const [finalAction, signature] = "wallet" in config
+      ? [
         action,
         await signL1Action({
           wallet: leader,
@@ -136,7 +141,8 @@ export async function executeL1Action<T>(
           vaultAddress,
           expiresAfter,
         }),
-      ];
+      ]
+      : await signMultiSigL1(config, action, walletAddress, nonce, vaultAddress, expiresAfter);
 
     // Send request and validate response
     const response = await transport.request("exchange", {
@@ -200,9 +206,9 @@ export async function executeUserSignedAction<T>(
     };
 
     // Sign action (multi-sig or single wallet)
-    const [finalAction, signature] = isMultiSig(config)
-      ? await signMultiSigUserSigned(config, fullAction, types, walletAddress, nonce)
-      : [fullAction, await signUserSignedAction({ wallet: leader, action: fullAction, types })];
+    const [finalAction, signature] = "wallet" in config
+      ? [fullAction, await signUserSignedAction({ wallet: leader, action: fullAction, types })]
+      : await signMultiSigUserSigned(config, fullAction, types, walletAddress, nonce);
 
     // Send request and validate response
     const response = await transport.request("exchange", {
@@ -216,7 +222,7 @@ export async function executeUserSignedAction<T>(
 }
 
 // =============================================================
-// Multi-sig signing (private)
+// Multi-sig signing
 // =============================================================
 
 /** Remove leading zeros from signature components (required by Hyperliquid). */
@@ -237,7 +243,7 @@ async function signMultiSigL1(
   vaultAddress?: `0x${string}`,
   expiresAfter?: number,
 ): Promise<[Record<string, unknown>, Signature]> {
-  const { transport: { isTestnet }, wallet: signers, multiSigUser } = config;
+  const { transport: { isTestnet }, signers, multiSigUser } = config;
   const multiSigUser_ = v.parse(Address, multiSigUser);
   const outerSigner_ = v.parse(Address, outerSigner);
 
@@ -259,7 +265,11 @@ async function signMultiSigL1(
     type: "multiSig",
     signatureChainId: await getSignatureChainId(config),
     signatures,
-    payload: { multiSigUser: multiSigUser_, outerSigner: outerSigner_, action },
+    payload: {
+      multiSigUser: multiSigUser_,
+      outerSigner: outerSigner_,
+      action,
+    },
   };
 
   // Sign the wrapper with the leader
@@ -283,7 +293,7 @@ async function signMultiSigUserSigned(
   outerSigner: `0x${string}`,
   nonce: number,
 ): Promise<[Record<string, unknown>, Signature]> {
-  const { wallet: signers, multiSigUser, transport: { isTestnet } } = config;
+  const { signers, multiSigUser, transport: { isTestnet } } = config;
   const multiSigUser_ = v.parse(Address, multiSigUser);
   const outerSigner_ = v.parse(Address, outerSigner);
 
@@ -291,7 +301,11 @@ async function signMultiSigUserSigned(
   const signatures = await Promise.all(signers.map(async (signer) => {
     const signature = await signUserSignedAction({
       wallet: signer,
-      action: { payloadMultiSigUser: multiSigUser_, outerSigner: outerSigner_, ...action },
+      action: {
+        payloadMultiSigUser: multiSigUser_,
+        outerSigner: outerSigner_,
+        ...action,
+      },
       types,
     });
     return trimSignature(signature);
@@ -302,7 +316,11 @@ async function signMultiSigUserSigned(
     type: "multiSig",
     signatureChainId: await getSignatureChainId(config),
     signatures,
-    payload: { multiSigUser: multiSigUser_, outerSigner: outerSigner_, action },
+    payload: {
+      multiSigUser: multiSigUser_,
+      outerSigner: outerSigner_,
+      action,
+    },
   };
 
   // Sign the wrapper with the leader
@@ -317,17 +335,12 @@ async function signMultiSigUserSigned(
 }
 
 // =============================================================
-// Helpers (private)
+// Helpers
 // =============================================================
 
-/** Type guard for multi-sig configuration. */
-function isMultiSig(config: ExchangeConfig): config is ExchangeMultiSigConfig {
-  return Array.isArray(config.wallet);
-}
-
-/** Get the leader wallet (first signer for multi-sig, or the single wallet). */
+/** Get the leader wallet (first signer for the single wallet, or multi-sig). */
 function getLeader(config: ExchangeConfig): AbstractWallet {
-  return isMultiSig(config) ? config.wallet[0] : config.wallet;
+  return "wallet" in config ? config.wallet : config.signers[0];
 }
 
 /** Resolve signature chain ID from config or wallet. */
