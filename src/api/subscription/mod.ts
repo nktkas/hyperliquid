@@ -28,6 +28,8 @@ export type { SubscriptionConfig } from "./_methods/_types.ts";
 export * from "./_methods/activeAssetCtx.ts";
 export * from "./_methods/activeAssetData.ts";
 export * from "./_methods/activeSpotAssetCtx.ts";
+export * from "./_methods/allDexsAssetCtxs.ts";
+export * from "./_methods/allDexsClearinghouseState.ts";
 export * from "./_methods/allMids.ts";
 export * from "./_methods/assetCtxs.ts";
 export * from "./_methods/bbo.ts";

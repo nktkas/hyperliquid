@@ -16,6 +16,12 @@ import {
   type ActiveSpotAssetCtxEvent,
   type ActiveSpotAssetCtxParameters,
 } from "./_methods/activeSpotAssetCtx.ts";
+import { allDexsAssetCtxs, type AllDexsAssetCtxsEvent } from "./_methods/allDexsAssetCtxs.ts";
+import {
+  allDexsClearinghouseState,
+  type AllDexsClearinghouseStateEvent,
+  type AllDexsClearinghouseStateParameters,
+} from "./_methods/allDexsClearinghouseState.ts";
 import { allMids, type AllMidsEvent, type AllMidsParameters } from "./_methods/allMids.ts";
 import { assetCtxs, type AssetCtxsEvent, type AssetCtxsParameters } from "./_methods/assetCtxs.ts";
 import { bbo, type BboEvent, type BboParameters } from "./_methods/bbo.ts";
@@ -110,6 +116,21 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     listener: (data: ActiveSpotAssetCtxEvent) => void,
   ): Promise<WebSocketSubscription> {
     return activeSpotAssetCtx(this.config_, params, listener);
+  }
+
+  /** @see {@link allDexsAssetCtxs} */
+  allDexsAssetCtxs(
+    listener: (data: AllDexsAssetCtxsEvent) => void,
+  ): Promise<WebSocketSubscription> {
+    return allDexsAssetCtxs(this.config_, listener);
+  }
+
+  /** @see {@link allDexsClearinghouseState} */
+  allDexsClearinghouseState(
+    params: AllDexsClearinghouseStateParameters,
+    listener: (data: AllDexsClearinghouseStateEvent) => void,
+  ): Promise<WebSocketSubscription> {
+    return allDexsClearinghouseState(this.config_, params, listener);
   }
 
   /** @see {@link allMids} */
@@ -330,6 +351,11 @@ export type {
   ActiveSpotAssetCtxEvent as ActiveSpotAssetCtxWsEvent,
   ActiveSpotAssetCtxParameters as ActiveSpotAssetCtxWsParameters,
 } from "./_methods/activeSpotAssetCtx.ts";
+export type { AllDexsAssetCtxsEvent as AllDexsAssetCtxsWsEvent } from "./_methods/allDexsAssetCtxs.ts";
+export type {
+  AllDexsClearinghouseStateEvent as AllDexsClearinghouseStateWsEvent,
+  AllDexsClearinghouseStateParameters as AllDexsClearinghouseStateWsParameters,
+} from "./_methods/allDexsClearinghouseState.ts";
 export type { AllMidsEvent as AllMidsWsEvent, AllMidsParameters as AllMidsWsParameters } from "./_methods/allMids.ts";
 export type {
   AssetCtxsEvent as AssetCtxsWsEvent,
