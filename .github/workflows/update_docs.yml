@@ -10,6 +10,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: main
       - uses: denoland/setup-deno@v2
 
       - name: Update OpenAPI specs and sync to GitBook
