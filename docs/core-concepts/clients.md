@@ -143,7 +143,7 @@ Array of wallets for multi-sig signing. The first wallet is the
 
 - **Type:** `` `0x${string}` ``
 
-The multi-signature account address. Required when using `signers`.
+The multi-signature account address.
 
 #### signatureChainId (optional)
 
