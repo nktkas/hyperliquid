@@ -20,14 +20,14 @@ const mids = await info.allMids();
 const currentPrice = parseFloat(mids["ETH"]);
 
 // Buy: set price above current (e.g., +1%)
-const buyPrice = (currentPrice * 1.01).toFixed(1);
+const buyPrice = currentPrice * 1.01;
 
 // Sell: set price below current (e.g., -1%)
-const sellPrice = (currentPrice * 0.99).toFixed(1);
+const sellPrice = currentPrice * 0.99;
 
 await exchange.order({
   orders: [{
-    a: 4, // ETH asset ID
+    a: 4,
     b: true,
     p: buyPrice,
     s: "0.1",

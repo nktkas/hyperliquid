@@ -128,8 +128,10 @@ The transport used to send requests.
 
 The wallet used to sign requests. Supports:
 
-- [viem accounts](https://viem.sh/docs/accounts/local)
-- [ethers Wallet](https://docs.ethers.org/v6/api/wallet/)
+- **viem:** [Local accounts](https://viem.sh/docs/accounts/local),
+  [JSON-RPC accounts](https://viem.sh/docs/accounts/jsonRpc)
+- **ethers:** [Wallet](https://docs.ethers.org/v6/api/wallet/),
+  [JsonRpcSigner](https://docs.ethers.org/v6/api/providers/jsonrpc/#JsonRpcSigner)
 - Any object with `address` and `signTypedData` method
 
 #### signers (required for multi-sig)

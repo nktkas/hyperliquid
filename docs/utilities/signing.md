@@ -253,7 +253,7 @@ The SDK accepts any wallet that implements `signTypedData`. Supported out of the
   [JSON-RPC accounts](https://viem.sh/docs/accounts/jsonRpc)
 - **ethers:** [Wallet](https://docs.ethers.org/v6/api/wallet/),
   [JsonRpcSigner](https://docs.ethers.org/v6/api/providers/jsonrpc/#JsonRpcSigner)
-- **SDK:** `PrivateKeySigner`
+- Any object with `address` and `signTypedData` method
 
 ```ts
 // viem
@@ -264,7 +264,7 @@ const wallet = privateKeyToAccount("0x...");
 import { Wallet } from "ethers";
 const wallet = new Wallet("0x...");
 
-// SDK (no dependencies)
+// SDK (no viem or ethers dependency)
 import { PrivateKeySigner } from "@nktkas/hyperliquid/signing";
 const wallet = new PrivateKeySigner("0x...");
 ```
