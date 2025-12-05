@@ -1294,6 +1294,28 @@
       spec:
         ref:
           kind: openapi
+          spec: hl-subscription-allDexsAssetCtxs
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-subscription-allDexsClearinghouseState
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
           spec: hl-subscription-allMids
     ```
   - ```yaml
