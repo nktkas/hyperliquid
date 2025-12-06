@@ -5,8 +5,8 @@ import { WebSocketAsyncRequest, WebSocketRequestError } from "./_postRequest.ts"
 /** Maximum number of subscriptions allowed by Hyperliquid. */
 const MAX_SUBSCRIPTIONS = 1000;
 
-/** Maximum number of subscriptions with user parameter allowed by Hyperliquid. */
-const MAX_USER_SUBSCRIPTIONS = 10;
+/** Maximum number of unique user subscriptions allowed by Hyperliquid. */
+const MAX_UNIQUE_USER_SUBSCRIPTIONS = 10;
 
 /** WebSocket subscription with failure signal. */
 export interface WebSocketSubscription {
@@ -86,13 +86,13 @@ export class WebSocketSubscriptionManager {
     // Initialize new subscription, if it doesn't exist
     let subscription = this._subscriptions.get(id);
     if (!subscription) {
-      // Check total subscription limits
+      // Check unique subscription limits
       if (this._subscriptions.size >= MAX_SUBSCRIPTIONS) {
         throw new WebSocketRequestError("Cannot subscribe to more than 1000 channels.");
       }
-      // Check user subscription limits
-      if (this._hasUserParam(payload) && this._countUserSubscriptions() >= MAX_USER_SUBSCRIPTIONS) {
-        throw new WebSocketRequestError("Cannot track more than 10 total users.");
+      // Check unique user subscription limits
+      if (this._hasUserParam(payload) && this._countUniqueUserSubscriptions() >= MAX_UNIQUE_USER_SUBSCRIPTIONS) {
+        throw new WebSocketRequestError("Cannot track more than 10 unique users.");
       }
 
       // Send subscription request
@@ -185,17 +185,19 @@ export class WebSocketSubscriptionManager {
     return typeof payload === "object" && payload !== null && "user" in payload;
   }
 
-  /** Counts the number of active subscriptions with user parameter. */
-  protected _countUserSubscriptions(): number {
-    let count = 0;
+  /** Counts the number of unique users across all active subscriptions. */
+  protected _countUniqueUserSubscriptions(): number {
+    const users = new Set<string>();
     for (const id of this._subscriptions.keys()) {
       try {
         const payload = JSON.parse(id);
-        if (this._hasUserParam(payload)) count++;
+        if (this._hasUserParam(payload)) {
+          users.add(payload.user);
+        }
       } catch {
         // Ignore parsing errors
       }
     }
-    return count;
+    return users.size;
   }
 }

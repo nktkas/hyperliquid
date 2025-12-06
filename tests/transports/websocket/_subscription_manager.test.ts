@@ -326,8 +326,8 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
     });
   });
 
-  await t.step("user subscription limit", async (t) => {
-    await t.step("rejects when exceeding 10 user subscriptions", async () => {
+  await t.step("unique user subscription limit", async (t) => {
+    await t.step("rejects when exceeding 10 unique user subscriptions", async () => {
       const { socket, manager } = createManager();
 
       // Subscribe to 10 users
@@ -343,7 +343,7 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
       await assertRejects(
         () => manager.subscribe("userEvents", payload11, () => {}),
         WebSocketRequestError,
-        "Cannot track more than 10 total users.",
+        "Cannot track more than 10 unique users.",
       );
     });
 
@@ -405,6 +405,27 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
       // Adding another listener to existing subscription should succeed
       const existingPayload = { type: "userEvents", user: "0x0000000000000000000000000000000000000000" };
       await manager.subscribe("userEvents", existingPayload, () => {});
+    });
+
+    await t.step("allows multiple subscriptions for same user", async () => {
+      const { socket, manager } = createManager();
+
+      // Subscribe to multiple channels for the same user (should count as 1 unique user)
+      const user = "0x0000000000000000000000000000000000000001";
+      for (let i = 0; i < 10; i++) {
+        const payload = { type: `channel${i}`, user };
+        const promise = manager.subscribe(`channel${i}`, payload, () => {});
+        socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+        await promise;
+      }
+
+      // Subscription for a second unique user should succeed (only 2 unique users total)
+      const newUserPayload = { type: "userEvents", user: "0x0000000000000000000000000000000000000002" };
+      const promise = manager.subscribe("userEvents", newUserPayload, () => {});
+      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", newUserPayload));
+      await promise;
+
+      assertEquals(manager._subscriptions.size, 11);
     });
   });
 
