@@ -100,7 +100,7 @@ export function allDexsClearinghouseState(
     ...params,
   });
   return config.transport.subscribe<AllDexsClearinghouseStateEvent>(payload.type, payload, (e) => {
-    if(e.detail.user === payload.user) {
+    if (e.detail.user === payload.user) {
       listener(e.detail);
     }
   });
