@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-import-prefix
 import { assertEquals, assertRejects } from "jsr:@std/assert@1";
 import type { ReconnectingWebSocket } from "@nktkas/rews";
-import { WebSocketAsyncRequest, WebSocketRequestError } from "../../../src/transport/websocket/_postRequest.ts";
+import { WebSocketPostRequest, WebSocketRequestError } from "../../../src/transport/websocket/_postRequest.ts";
 import { HyperliquidEventTarget } from "../../../src/transport/websocket/_hyperliquidEventTarget.ts";
 
 // ============================================================
@@ -37,14 +37,14 @@ class MockWebSocket extends EventTarget implements ReconnectingWebSocket {
   }
 }
 
-/** Creates a new WebSocketAsyncRequest with mock socket. */
+/** Creates a new WebSocketPostRequest with mock socket. */
 function createRequester(): {
   socket: MockWebSocket;
-  requester: WebSocketAsyncRequest;
+  requester: WebSocketPostRequest;
 } {
   const socket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
   const hlEvents = new HyperliquidEventTarget(socket);
-  const requester = new WebSocketAsyncRequest(socket, hlEvents);
+  const requester = new WebSocketPostRequest(socket, hlEvents);
   return { socket, requester };
 }
 
@@ -87,7 +87,7 @@ const RESPONSES = {
 // Tests
 // ============================================================
 
-Deno.test("WebSocketAsyncRequest", async (t) => {
+Deno.test("WebSocketPostRequest", async (t) => {
   await t.step("request()", async (t) => {
     await t.step("post", async (t) => {
       await t.step("sends request and receives info response", async () => {
@@ -274,7 +274,7 @@ Deno.test("WebSocketAsyncRequest", async (t) => {
       arr: [10, "0xF00D", false],
     };
 
-    const result = JSON.parse(WebSocketAsyncRequest.requestToId(input));
+    const result = JSON.parse(WebSocketPostRequest.requestToId(input));
 
     // Keys sorted alphabetically
     assertEquals(Object.keys(result), ["Z", "arr", "boolVal", "nested", "textVal"]);

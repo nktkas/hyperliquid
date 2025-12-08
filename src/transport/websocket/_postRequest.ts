@@ -33,10 +33,10 @@ export class WebSocketRequestError extends TransportError {
 }
 
 /**
- * Manages WebSocket requests to the Hyperliquid API.
+ * Manages WebSocket post requests to the Hyperliquid API.
  * Handles request creation, sending, and mapping responses to their corresponding requests.
  */
-export class WebSocketAsyncRequest {
+export class WebSocketPostRequest {
   protected socket: ReconnectingWebSocket;
   protected lastId = 0;
   protected queue: PendingRequest[] = [];
@@ -100,7 +100,7 @@ export class WebSocketAsyncRequest {
           "subscription" in parsedRequest &&
           typeof parsedRequest.subscription === "object" && parsedRequest.subscription !== null
         ) {
-          const id = WebSocketAsyncRequest.requestToId(parsedRequest);
+          const id = WebSocketPostRequest.requestToId(parsedRequest);
           this.queue.find((x) => x.id === id)
             ?.reject(new WebSocketRequestError(event.detail));
           return;
@@ -111,7 +111,7 @@ export class WebSocketAsyncRequest {
           event.detail.startsWith("Already subscribed") ||
           event.detail.startsWith("Invalid subscription")
         ) {
-          const id = WebSocketAsyncRequest.requestToId({
+          const id = WebSocketPostRequest.requestToId({
             method: "subscribe",
             subscription: parsedRequest,
           });
@@ -122,7 +122,7 @@ export class WebSocketAsyncRequest {
 
         // For `Already unsubscribed` requests
         if (event.detail.startsWith("Already unsubscribed")) {
-          const id = WebSocketAsyncRequest.requestToId({
+          const id = WebSocketPostRequest.requestToId({
             method: "unsubscribe",
             subscription: parsedRequest,
           });
@@ -132,7 +132,7 @@ export class WebSocketAsyncRequest {
         }
 
         // For unknown requests
-        const id = WebSocketAsyncRequest.requestToId(parsedRequest);
+        const id = WebSocketPostRequest.requestToId(parsedRequest);
         this.queue.find((x) => x.id === id)
           ?.reject(new WebSocketRequestError(event.detail));
       } catch {
@@ -183,7 +183,7 @@ export class WebSocketAsyncRequest {
       request = { method };
     } else {
       request = { method, subscription: payload };
-      id = WebSocketAsyncRequest.requestToId(request);
+      id = WebSocketPostRequest.requestToId(request);
     }
 
     // Send the request

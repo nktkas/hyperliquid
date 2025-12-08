@@ -2,7 +2,7 @@ import { TransportError } from "../../_errors.ts";
 import { AbortSignal_ } from "../_polyfills.ts";
 import { ReconnectingWebSocket, type ReconnectingWebSocketOptions } from "@nktkas/rews";
 import { HyperliquidEventTarget } from "./_hyperliquidEventTarget.ts";
-import { WebSocketAsyncRequest, WebSocketRequestError } from "./_postRequest.ts";
+import { WebSocketPostRequest, WebSocketRequestError } from "./_postRequest.ts";
 import { type WebSocketSubscription, WebSocketSubscriptionManager } from "./_subscriptionManager.ts";
 
 export { WebSocketRequestError };
@@ -74,7 +74,7 @@ export class WebSocketTransport implements WebSocketTransportOptions {
     this._subscriptionManager.resubscribe = value;
   }
 
-  protected _wsRequester: WebSocketAsyncRequest;
+  protected _wsRequester: WebSocketPostRequest;
   protected _hlEvents: HyperliquidEventTarget;
   protected _subscriptionManager: WebSocketSubscriptionManager;
   protected _keepAliveInterval: ReturnType<typeof setInterval> | undefined;
@@ -94,7 +94,7 @@ export class WebSocketTransport implements WebSocketTransportOptions {
     );
 
     this._hlEvents = new HyperliquidEventTarget(this.socket);
-    this._wsRequester = new WebSocketAsyncRequest(this.socket, this._hlEvents);
+    this._wsRequester = new WebSocketPostRequest(this.socket, this._hlEvents);
     this._subscriptionManager = new WebSocketSubscriptionManager(
       this.socket,
       this._wsRequester,

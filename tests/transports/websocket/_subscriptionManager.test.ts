@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-import-prefix
 import { assert, assertEquals, assertFalse, assertRejects } from "jsr:@std/assert@1";
 import type { ReconnectingWebSocket } from "@nktkas/rews";
-import { WebSocketAsyncRequest, WebSocketRequestError } from "../../../src/transport/websocket/_postRequest.ts";
+import { WebSocketPostRequest, WebSocketRequestError } from "../../../src/transport/websocket/_postRequest.ts";
 import { HyperliquidEventTarget } from "../../../src/transport/websocket/_hyperliquidEventTarget.ts";
 import { WebSocketSubscriptionManager } from "../../../src/transport/websocket/_subscriptionManager.ts";
 
@@ -47,13 +47,13 @@ type ManagerWithInternals = WebSocketSubscriptionManager & {
 /** Creates a new WebSocketSubscriptionManager with mock socket. */
 function createManager(resubscribe = true): {
   socket: MockWebSocket;
-  requester: WebSocketAsyncRequest & { queue: unknown[] };
+  requester: WebSocketPostRequest & { queue: unknown[] };
   hlEvents: HyperliquidEventTarget;
   manager: ManagerWithInternals;
 } {
   const socket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
   const hlEvents = new HyperliquidEventTarget(socket);
-  const requester = new WebSocketAsyncRequest(socket, hlEvents) as WebSocketAsyncRequest & { queue: unknown[] };
+  const requester = new WebSocketPostRequest(socket, hlEvents) as WebSocketPostRequest & { queue: unknown[] };
   const manager = new WebSocketSubscriptionManager(socket, requester, hlEvents, resubscribe) as ManagerWithInternals;
   return { socket, requester, hlEvents, manager };
 }

@@ -1,6 +1,6 @@
 import type { ReconnectingWebSocket } from "@nktkas/rews";
 import type { HyperliquidEventTarget } from "./_hyperliquidEventTarget.ts";
-import { WebSocketAsyncRequest, WebSocketRequestError } from "./_postRequest.ts";
+import { WebSocketPostRequest, WebSocketRequestError } from "./_postRequest.ts";
 
 /** Maximum number of subscriptions allowed by Hyperliquid. */
 const MAX_SUBSCRIPTIONS = 1000;
@@ -38,13 +38,13 @@ export class WebSocketSubscriptionManager {
   resubscribe: boolean;
 
   protected _socket: ReconnectingWebSocket;
-  protected _wsRequester: WebSocketAsyncRequest;
+  protected _wsRequester: WebSocketPostRequest;
   protected _hlEvents: HyperliquidEventTarget;
   protected _subscriptions: Map<string, SubscriptionState> = new Map();
 
   constructor(
     socket: ReconnectingWebSocket,
-    wsRequester: WebSocketAsyncRequest,
+    wsRequester: WebSocketPostRequest,
     hlEvents: HyperliquidEventTarget,
     resubscribe: boolean,
   ) {
@@ -81,7 +81,7 @@ export class WebSocketSubscriptionManager {
     listener: (data: CustomEvent<T>) => void,
   ): Promise<WebSocketSubscription> {
     // Create a unique identifier for the subscription
-    const id = WebSocketAsyncRequest.requestToId(payload);
+    const id = WebSocketPostRequest.requestToId(payload);
 
     // Initialize new subscription, if it doesn't exist
     let subscription = this._subscriptions.get(id);
