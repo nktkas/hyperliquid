@@ -40,6 +40,7 @@ import { orderUpdates, type OrderUpdatesEvent, type OrderUpdatesParameters } fro
 import { spotAssetCtxs, type SpotAssetCtxsEvent } from "./_methods/spotAssetCtxs.ts";
 import { spotState, type SpotStateEvent, type SpotStateParameters } from "./_methods/spotState.ts";
 import { trades, type TradesEvent, type TradesParameters } from "./_methods/trades.ts";
+import { twapStates, type TwapStatesEvent, type TwapStatesParameters } from "./_methods/twapStates.ts";
 import { userEvents, type UserEventsEvent, type UserEventsParameters } from "./_methods/userEvents.ts";
 import { userFills, type UserFillsEvent, type UserFillsParameters } from "./_methods/userFills.ts";
 import { userFundings, type UserFundingsEvent, type UserFundingsParameters } from "./_methods/userFundings.ts";
@@ -260,6 +261,14 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return trades(this.config_, params, listener);
   }
 
+  /** @see {@link twapStates} */
+  twapStates(
+    params: TwapStatesParameters,
+    listener: (data: TwapStatesEvent) => void,
+  ): Promise<WebSocketSubscription> {
+    return twapStates(this.config_, params, listener);
+  }
+
   /** @see {@link userEvents} */
   userEvents(
     params: UserEventsParameters,
@@ -388,6 +397,10 @@ export type {
   SpotStateParameters as SpotStateWsParameters,
 } from "./_methods/spotState.ts";
 export type { TradesEvent as TradesWsEvent, TradesParameters as TradesWsParameters } from "./_methods/trades.ts";
+export type {
+  TwapStatesEvent as TwapStatesWsEvent,
+  TwapStatesParameters as TwapStatesWsParameters,
+} from "./_methods/twapStates.ts";
 export type {
   UserEventsEvent as UserEventsWsEvent,
   UserEventsParameters as UserEventsWsParameters,

@@ -44,6 +44,7 @@ export * from "./_methods/orderUpdates.ts";
 export * from "./_methods/spotAssetCtxs.ts";
 export * from "./_methods/spotState.ts";
 export * from "./_methods/trades.ts";
+export * from "./_methods/twapStates.ts";
 export * from "./_methods/userEvents.ts";
 export * from "./_methods/userFills.ts";
 export * from "./_methods/userFundings.ts";
