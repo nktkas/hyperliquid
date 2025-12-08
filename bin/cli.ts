@@ -7,6 +7,16 @@
  * ```sh
  * npx @nktkas/hyperliquid <endpoint> <method> [options]
  * ```
+ *
+ * @example Info Endpoint
+ * ```sh
+ * npx @nktkas/hyperliquid info clearinghouseState --user 0x...
+ * ```
+ *
+ * @example Exchange Endpoint
+ * ```sh
+ * npx @nktkas/hyperliquid exchange withdraw3 --private-key 0x... --destination 0x... --amount 100.5
+ * ```
  */
 
 // @ts-ignore: Ignore missing TS types when building npm

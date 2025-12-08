@@ -1,3 +1,22 @@
+/**
+ * Utility functions for command-line argument parsing and transformation.
+ * More useful for working with proxy arguments.
+ *
+ * @example
+ * ```ts
+ * import { extractArgs, transformArgs } from "./_utils.ts";
+ *
+ * const args = ["info", "meta", "--user", "0x1234", "--limit", "10", "--verbose"];
+ * const rawArgs = extractArgs(args, { flags: ["verbose"] });
+ * // { _: ["info", "meta"], user: "0x1234", limit: "10", verbose: "true" }
+ *
+ * const typedArgs = transformArgs(rawArgs);
+ * // { _: ["info", "meta"], user: "0x1234", limit: 10, verbose: true }
+ * ```
+ *
+ * @module
+ */
+
 // ============================================================
 // Extract Args
 // ============================================================
