@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-import-prefix
-import { assertEquals, assertNotEquals } from "jsr:@std/assert@1";
+import { assertEquals } from "jsr:@std/assert@1";
 import { HttpTransport } from "@nktkas/hyperliquid";
 import { SymbolConverter } from "@nktkas/hyperliquid/utils";
 
@@ -77,16 +77,16 @@ Deno.test("SymbolConverter", async (t) => {
   });
 
   await t.step("reload()", async () => {
-    const freshConverter = await SymbolConverter.create({ transport });
+    const freshConverter = new SymbolConverter({ transport });
 
-    // Overwrite to verify reload works
-    freshConverter["nameToAssetId"].set("BTC", 9999);
-
+    // Before reload, mappings are empty
     const before = freshConverter.getAssetId("BTC");
+    assertEquals(before, undefined);
+
+    // After reload, mappings are populated
     await freshConverter.reload();
     const after = freshConverter.getAssetId("BTC");
-
-    assertNotEquals(before, after);
+    assertEquals(after, PERP_EXPECTATIONS.BTC.assetId);
   });
 
   await t.step("create({ dexs })", async (t) => {

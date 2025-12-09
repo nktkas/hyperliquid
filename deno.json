@@ -15,8 +15,15 @@
   },
   "lint": {
     "rules": {
+      "tags": ["recommended", "jsr"],
+      "include": [
+        "camelcase",
+        "no-sync-fn-in-async-fn",
+        "single-var-declarator"
+      ],
       "exclude": ["no-slow-types"]
-    }
+    },
+    "plugins": ["./.dev/lint_plugin.ts"]
   },
   "publish": {
     "exclude": [".github", "docs", "tests"]

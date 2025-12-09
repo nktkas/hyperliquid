@@ -396,7 +396,7 @@ if (import.meta.main) {
   const GITBOOK_ORG_ID = Deno.env.get("GITBOOK_ORG_ID");
 
   if (!GITBOOK_TOKEN || !GITBOOK_ORG_ID) {
-    throw new Error("GITBOOK_TOKEN and GITBOOK_ORG_ID must be set in environment variables.");
+    throw new Error("GITBOOK_TOKEN and GITBOOK_ORG_ID must be set in environment variables");
   }
 
   const schemas = getAllSchemas();

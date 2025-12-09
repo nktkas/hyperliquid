@@ -47,15 +47,21 @@ export interface SymbolConverterOptions {
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/asset-ids
  */
 export class SymbolConverter {
-  private readonly transport: HttpTransport | WebSocketTransport;
-  private readonly dexOption: string[] | boolean;
-  private readonly nameToAssetId = new Map<string, number>();
-  private readonly nameToSzDecimals = new Map<string, number>();
-  private readonly nameToSpotPairId = new Map<string, string>();
+  #transport: HttpTransport | WebSocketTransport;
+  #dexOption: string[] | boolean;
+  #nameToAssetId = new Map<string, number>();
+  #nameToSzDecimals = new Map<string, number>();
+  #nameToSpotPairId = new Map<string, string>();
 
-  private constructor(options: SymbolConverterOptions) {
-    this.transport = options.transport;
-    this.dexOption = options.dexs ?? false;
+  /**
+   * Creates a new SymbolConverter instance, but does not initialize it.
+   * Run {@link reload} to load asset data or use {@link create} to create and initialize in one step.
+   *
+   * @param options - Configuration options including transport and optional dex support.
+   */
+  constructor(options: SymbolConverterOptions) {
+    this.#transport = options.transport;
+    this.#dexOption = options.dexs ?? false;
   }
 
   /**
@@ -82,11 +88,12 @@ export class SymbolConverter {
 
   /**
    * Reload asset mappings from the API.
+   *
    * Useful for refreshing data when new assets are added.
    */
   async reload(): Promise<void> {
-    const config = { transport: this.transport };
-    const needDexs = this.dexOption === true || (Array.isArray(this.dexOption) && this.dexOption.length > 0);
+    const config = { transport: this.#transport };
+    const needDexs = this.#dexOption === true || (Array.isArray(this.#dexOption) && this.#dexOption.length > 0);
 
     const [perpMetaData, spotMetaData, perpDexsData] = await Promise.all([
       meta(config),
@@ -102,27 +109,27 @@ export class SymbolConverter {
       throw new Error("Invalid spot metadata response");
     }
 
-    this.nameToAssetId.clear();
-    this.nameToSzDecimals.clear();
-    this.nameToSpotPairId.clear();
+    this.#nameToAssetId.clear();
+    this.#nameToSzDecimals.clear();
+    this.#nameToSpotPairId.clear();
 
-    this.processDefaultPerps(perpMetaData);
-    this.processSpotAssets(spotMetaData);
+    this.#processDefaultPerps(perpMetaData);
+    this.#processSpotAssets(spotMetaData);
 
     // Only process builder dexs if dex support is enabled
     if (perpDexsData) {
-      await this.processBuilderDexs(perpDexsData);
+      await this.#processBuilderDexs(perpDexsData);
     }
   }
 
-  private processDefaultPerps(perpMetaData: MetaResponse): void {
+  #processDefaultPerps(perpMetaData: MetaResponse): void {
     perpMetaData.universe.forEach((asset, index) => {
-      this.nameToAssetId.set(asset.name, index);
-      this.nameToSzDecimals.set(asset.name, asset.szDecimals);
+      this.#nameToAssetId.set(asset.name, index);
+      this.#nameToSzDecimals.set(asset.name, asset.szDecimals);
     });
   }
 
-  private async processBuilderDexs(perpDexsData: PerpDexsResponse): Promise<void> {
+  async #processBuilderDexs(perpDexsData: PerpDexsResponse): Promise<void> {
     if (!perpDexsData || perpDexsData.length <= 1) return;
 
     const builderDexs = perpDexsData
@@ -134,34 +141,34 @@ export class SymbolConverter {
     if (builderDexs.length === 0) return;
 
     // Filter dexs based on the dexOption
-    const dexsToProcess = Array.isArray(this.dexOption)
-      ? builderDexs.filter((item) => (this.dexOption as string[]).includes(item.dex.name))
+    const dexsToProcess = Array.isArray(this.#dexOption)
+      ? builderDexs.filter((item) => (this.#dexOption as string[]).includes(item.dex.name))
       : builderDexs; // true means process all
 
     if (dexsToProcess.length === 0) return;
 
-    const config = { transport: this.transport };
+    const config = { transport: this.#transport };
     const results = await Promise.allSettled(
       dexsToProcess.map((item) => meta(config, { dex: item.dex.name })),
     );
 
     results.forEach((result, idx) => {
       if (result.status !== "fulfilled") return;
-      this.processBuilderDexResult(result.value, dexsToProcess[idx].index);
+      this.#processBuilderDexResult(result.value, dexsToProcess[idx].index);
     });
   }
 
-  private processBuilderDexResult(dexMeta: MetaResponse, perpDexIndex: number): void {
+  #processBuilderDexResult(dexMeta: MetaResponse, perpDexIndex: number): void {
     const offset = 100000 + perpDexIndex * 10000;
 
     dexMeta.universe.forEach((asset, index) => {
       const assetId = offset + index;
-      this.nameToAssetId.set(asset.name, assetId);
-      this.nameToSzDecimals.set(asset.name, asset.szDecimals);
+      this.#nameToAssetId.set(asset.name, assetId);
+      this.#nameToSzDecimals.set(asset.name, asset.szDecimals);
     });
   }
 
-  private processSpotAssets(spotMetaData: SpotMetaResponse): void {
+  #processSpotAssets(spotMetaData: SpotMetaResponse): void {
     const tokenMap = new Map<number, { name: string; szDecimals: number }>();
     spotMetaData.tokens.forEach((token) => {
       tokenMap.set(token.index, { name: token.name, szDecimals: token.szDecimals });
@@ -175,9 +182,9 @@ export class SymbolConverter {
 
       const assetId = 10000 + market.index;
       const baseQuoteKey = `${baseToken.name}/${quoteToken.name}`;
-      this.nameToAssetId.set(baseQuoteKey, assetId);
-      this.nameToSzDecimals.set(baseQuoteKey, baseToken.szDecimals);
-      this.nameToSpotPairId.set(baseQuoteKey, market.name);
+      this.#nameToAssetId.set(baseQuoteKey, assetId);
+      this.#nameToSzDecimals.set(baseQuoteKey, baseToken.szDecimals);
+      this.#nameToSpotPairId.set(baseQuoteKey, market.name);
     });
   }
 
@@ -190,7 +197,7 @@ export class SymbolConverter {
    * @example "BTC" → 0, "HYPE/USDC" → 10107, "test:ABC" → 110000
    */
   getAssetId(name: string): number | undefined {
-    return this.nameToAssetId.get(name);
+    return this.#nameToAssetId.get(name);
   }
 
   /**
@@ -202,7 +209,7 @@ export class SymbolConverter {
    * @example "BTC" → 5, "HYPE/USDC" → 2, "test:ABC" → 0
    */
   getSzDecimals(name: string): number | undefined {
-    return this.nameToSzDecimals.get(name);
+    return this.#nameToSzDecimals.get(name);
   }
 
   /**
@@ -213,6 +220,6 @@ export class SymbolConverter {
    * @example "HFUN/USDC" → "@2", "PURR/USDC" → "PURR/USDC"
    */
   getSpotPairId(name: string): string | undefined {
-    return this.nameToSpotPairId.get(name);
+    return this.#nameToSpotPairId.get(name);
   }
 }

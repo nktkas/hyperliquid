@@ -149,7 +149,7 @@ export class WebSocketPostRequest {
     // Throws all pending requests if the connection is dropped
     const handleClose = () => {
       this.queue.forEach(({ reject }) => {
-        reject(new WebSocketRequestError("WebSocket connection closed."));
+        reject(new WebSocketRequestError("WebSocket connection closed"));
       });
       this.queue = [];
     };

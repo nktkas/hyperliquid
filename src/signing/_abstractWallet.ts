@@ -217,25 +217,19 @@ export async function signTypedData(args: {
         message,
       }) as `0x${string}`;
     } catch (error) {
-      throw new AbstractWalletError("Failed to sign typed data with viem wallet. See cause for details.", {
-        cause: error,
-      });
+      throw new AbstractWalletError("Failed to sign typed data with viem wallet", { cause: error });
     }
   } else if (v.is(AbstractEthersV6SignerSchema, wallet)) {
     try {
       signature = await wallet.signTypedData(domain, types, message) as `0x${string}`;
     } catch (error) {
-      throw new AbstractWalletError("Failed to sign typed data with ethers v6 wallet. See cause for details.", {
-        cause: error,
-      });
+      throw new AbstractWalletError("Failed to sign typed data with ethers v6 wallet", { cause: error });
     }
   } else if (v.is(AbstractEthersV5SignerSchema, wallet)) {
     try {
       signature = await wallet._signTypedData(domain, types, message) as `0x${string}`;
     } catch (error) {
-      throw new AbstractWalletError("Failed to sign typed data with ethers v5 wallet. See cause for details.", {
-        cause: error,
-      });
+      throw new AbstractWalletError("Failed to sign typed data with ethers v5 wallet", { cause: error });
     }
   } else {
     throw new AbstractWalletError("Failed to sign typed data: unknown wallet");
@@ -262,9 +256,7 @@ export async function getWalletChainId(wallet: AbstractWallet): Promise<`0x${str
       const chainId = await wallet.getChainId() as number;
       return `0x${chainId.toString(16)}`;
     } catch (error) {
-      throw new AbstractWalletError("Failed to get chain ID from viem wallet. See cause for details.", {
-        cause: error,
-      });
+      throw new AbstractWalletError("Failed to get chain ID from viem wallet", { cause: error });
     }
   }
   if (v.is(AbstractEthersV6SignerSchema, wallet)) {
@@ -273,9 +265,7 @@ export async function getWalletChainId(wallet: AbstractWallet): Promise<`0x${str
         const network = await wallet.provider.getNetwork() as { chainId: number | bigint };
         return `0x${network.chainId.toString(16)}`;
       } catch (error) {
-        throw new AbstractWalletError("Failed to get chain ID from ethers v6 wallet. See cause for details.", {
-          cause: error,
-        });
+        throw new AbstractWalletError("Failed to get chain ID from ethers v6 wallet", { cause: error });
       }
     }
   }
@@ -285,9 +275,7 @@ export async function getWalletChainId(wallet: AbstractWallet): Promise<`0x${str
         const network = await wallet.provider.getNetwork() as { chainId: number | bigint };
         return `0x${network.chainId.toString(16)}`;
       } catch (error) {
-        throw new AbstractWalletError("Failed to get chain ID from ethers v5 wallet. See cause for details.", {
-          cause: error,
-        });
+        throw new AbstractWalletError("Failed to get chain ID from ethers v5 wallet", { cause: error });
       }
     }
   }
@@ -301,9 +289,7 @@ export async function getWalletAddress(wallet: AbstractWallet): Promise<`0x${str
       const addresses = await wallet.getAddresses() as `0x${string}`[];
       return addresses[0].toLowerCase() as `0x${string}`;
     } catch (error) {
-      throw new AbstractWalletError("Failed to get address from viem wallet. See cause for details.", {
-        cause: error,
-      });
+      throw new AbstractWalletError("Failed to get address from viem wallet", { cause: error });
     }
   }
   if (v.is(AbstractViemLocalAccountSchema, wallet)) {
@@ -314,9 +300,7 @@ export async function getWalletAddress(wallet: AbstractWallet): Promise<`0x${str
       const address = await wallet.getAddress() as string;
       return address.toLowerCase() as `0x${string}`;
     } catch (error) {
-      throw new AbstractWalletError("Failed to get address from ethers wallet. See cause for details.", {
-        cause: error,
-      });
+      throw new AbstractWalletError("Failed to get address from ethers wallet", { cause: error });
     }
   }
   throw new AbstractWalletError("Failed to get wallet address: unknown wallet");

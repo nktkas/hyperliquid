@@ -3,22 +3,22 @@
  * Uses lazy cleanup: removes entries when Date.now() > lastNonce.
  */
 class NonceManager {
-  private readonly map = new Map<string, number>();
+  #map = new Map<string, number>();
 
   getNonce(key: string): number {
     const now = Date.now();
-    this.cleanup(now);
+    this.#cleanup(now);
 
-    const lastNonce = this.map.get(key) ?? 0;
+    const lastNonce = this.#map.get(key) ?? 0;
     const nonce = now > lastNonce ? now : lastNonce + 1;
-    this.map.set(key, nonce);
+    this.#map.set(key, nonce);
     return nonce;
   }
 
-  private cleanup(now: number): void {
-    for (const [key, lastNonce] of this.map) {
+  #cleanup(now: number): void {
+    for (const [key, lastNonce] of this.#map) {
       if (now > lastNonce) {
-        this.map.delete(key);
+        this.#map.delete(key);
       }
     }
   }

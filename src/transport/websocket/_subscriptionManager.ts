@@ -88,11 +88,11 @@ export class WebSocketSubscriptionManager {
     if (!subscription) {
       // Check unique subscription limits
       if (this._subscriptions.size >= MAX_SUBSCRIPTIONS) {
-        throw new WebSocketRequestError("Cannot subscribe to more than 1000 channels.");
+        throw new WebSocketRequestError("Cannot subscribe to more than 1000 channels");
       }
       // Check unique user subscription limits
       if (this._hasUserParam(payload) && this._countUniqueUserSubscriptions() >= MAX_UNIQUE_USER_SUBSCRIPTIONS) {
-        throw new WebSocketRequestError("Cannot track more than 10 unique users.");
+        throw new WebSocketRequestError("Cannot track more than 10 unique users");
       }
 
       // Send subscription request
