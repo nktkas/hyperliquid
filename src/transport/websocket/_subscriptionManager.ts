@@ -38,18 +38,18 @@ export class WebSocketSubscriptionManager {
   resubscribe: boolean;
 
   protected _socket: ReconnectingWebSocket;
-  protected _wsRequester: WebSocketPostRequest;
+  protected _postRequest: WebSocketPostRequest;
   protected _hlEvents: HyperliquidEventTarget;
   protected _subscriptions: Map<string, SubscriptionState> = new Map();
 
   constructor(
     socket: ReconnectingWebSocket,
-    wsRequester: WebSocketPostRequest,
+    postRequest: WebSocketPostRequest,
     hlEvents: HyperliquidEventTarget,
     resubscribe: boolean,
   ) {
     this._socket = socket;
-    this._wsRequester = wsRequester;
+    this._postRequest = postRequest;
     this._hlEvents = hlEvents;
     this.resubscribe = resubscribe;
 
@@ -96,7 +96,7 @@ export class WebSocketSubscriptionManager {
       }
 
       // Send subscription request
-      const promise = this._wsRequester.request("subscribe", payload)
+      const promise = this._postRequest.request("subscribe", payload)
         .finally(() => subscription!.promiseFinished = true);
 
       // Cache subscription info
@@ -126,7 +126,7 @@ export class WebSocketSubscriptionManager {
 
           // If the socket is open, send unsubscription request
           if (this._socket.readyState === 1) { // OPEN
-            await this._wsRequester.request("unsubscribe", payload);
+            await this._postRequest.request("unsubscribe", payload);
           }
         }
       };
@@ -156,7 +156,7 @@ export class WebSocketSubscriptionManager {
       for (const [id, subscription] of this._subscriptions.entries()) {
         // reconnect only previously connected subscriptions to avoid double subscriptions due to message buffering
         if (subscription.promiseFinished) {
-          subscription.promise = this._wsRequester.request("subscribe", JSON.parse(id))
+          subscription.promise = this._postRequest.request("subscribe", JSON.parse(id))
             .catch((error) => subscription.failureController.abort(error))
             .finally(() => subscription.promiseFinished = true);
           subscription.promiseFinished = false;

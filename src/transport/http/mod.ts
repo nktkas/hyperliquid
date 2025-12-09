@@ -10,6 +10,7 @@ export class HttpRequestError extends TransportError {
 
   /**
    * Creates a new HTTP request error.
+   *
    * @param args - The error arguments.
    * @param args.response - The HTTP response that caused the error.
    * @param args.body - The response body text.
@@ -40,25 +41,21 @@ export interface HttpTransportOptions {
    * @default false
    */
   isTestnet?: boolean;
-
   /**
    * Request timeout in ms. Set to `null` to disable.
    * @default 10_000
    */
   timeout?: number | null;
-
   /**
    * Custom API URL for requests.
    * @default `https://api.hyperliquid.xyz` for mainnet, `https://api.hyperliquid-testnet.xyz` for testnet.
    */
   apiUrl?: string | URL;
-
   /**
    * Custom RPC URL for explorer requests.
    * @default `https://rpc.hyperliquid.xyz` for mainnet, `https://rpc.hyperliquid-testnet.xyz` for testnet.
    */
   rpcUrl?: string | URL;
-
   /** A custom [`RequestInit`](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit) that is merged with a fetch request. */
   fetchOptions?: Omit<RequestInit, "body" | "method">;
 }
@@ -78,15 +75,21 @@ export const TESTNET_RPC_URL = "https://rpc.hyperliquid-testnet.xyz";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint
  */
-export class HttpTransport implements HttpTransportOptions {
+export class HttpTransport {
+  /** Indicates this transport uses testnet endpoint. */
   isTestnet: boolean;
+  /** Request timeout in ms. Set to `null` to disable. */
   timeout: number | null;
+  /** Custom API URL for requests. */
   apiUrl: string | URL;
+  /** Custom RPC URL for explorer requests. */
   rpcUrl: string | URL;
+  /** A custom [`RequestInit`](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit) that is merged with a fetch request. */
   fetchOptions: Omit<RequestInit, "body" | "method">;
 
   /**
    * Creates a new HTTP transport instance.
+   *
    * @param options - Configuration options for the HTTP transport layer.
    */
   constructor(options?: HttpTransportOptions) {

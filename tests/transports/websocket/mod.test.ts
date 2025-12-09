@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-import-prefix
 import { assertEquals, assertIsError, assertLess, assertRejects } from "jsr:@std/assert@1";
-import { WebSocketRequestError, WebSocketTransport } from "@nktkas/hyperliquid";
+import { WebSocketTransport } from "@nktkas/hyperliquid";
 
 // ============================================================
 // Helpers
@@ -25,7 +25,7 @@ function createTransport(testCase: string, options?: Partial<ConstructorParamete
 // ============================================================
 
 function createTestServer() {
-  return Deno.serve(
+  const server = Deno.serve(
     { port: 8080, onListen: () => {} },
     (request) => {
       if (request.headers.get("upgrade") !== "websocket") {
@@ -63,11 +63,29 @@ function createTestServer() {
           }
         } else if (data.method === "ping") {
           send({ channel: "pong" });
+        } else if (data.method === "subscribe") {
+          send({
+            channel: "subscriptionResponse",
+            data: { method: "subscribe", subscription: data.subscription },
+          });
+
+          const eventChannel = (data.subscription && data.subscription.channel) || "test-channel";
+          send({ channel: eventChannel, data: { update: "subscription update" } });
+        } else if (data.method === "unsubscribe") {
+          send({
+            channel: "subscriptionResponse",
+            data: { method: "unsubscribe", subscription: data.subscription },
+          });
         }
       });
       return response;
     },
   );
+  return {
+    async [Symbol.asyncDispose]() {
+      await server.shutdown();
+    },
+  };
 }
 
 // ============================================================
@@ -75,63 +93,38 @@ function createTestServer() {
 // ============================================================
 
 Deno.test("WebSocketTransport", async (t) => {
-  const server = createTestServer();
+  await using _server = createTestServer();
 
-  await t.step("request()", async (t) => {
-    await t.step("sends request and receives response", async () => {
-      await using transport = createTransport("request-success");
-      await transport.ready();
+  await t.step("request() sends request and receives response", async () => {
+    await using transport = createTransport("request-success");
+    await transport.ready();
 
-      const result = await transport.request("info", { key: "value" });
-      assertEquals(result, "response-success");
-    });
+    const result = await transport.request("info", { key: "value" });
+    assertEquals(result, "response-success");
+  });
 
-    await t.step("rejects", async (t) => {
-      await t.step("on unsuccessful request", async () => {
-        await using transport = createTransport("request-fail");
-        await transport.ready();
+  await t.step("subscription() subscribes, receives event, unsubscribes", async () => {
+    await using transport = createTransport("request-success");
+    await transport.ready();
 
-        await assertRejects(
-          () => transport.request("info", { key: "value" }),
-          WebSocketRequestError,
-          "Request failed:",
-        );
-      });
+    const channel = "test-channel";
+    const payload = { channel, foo: "bar" };
 
-      await t.step("if AbortSignal is aborted", async () => {
-        await using transport = createTransport("request-success");
-        await transport.ready();
-
-        const signal = AbortSignal.abort(new Error("Aborted"));
-        const error = await assertRejects(
-          () => transport.request("info", { key: "value" }, signal),
-          WebSocketRequestError,
-        );
-        assertIsError(error.cause, Error, "Aborted");
-      });
-
-      await t.step("after timeout expires", async () => {
-        await using transport = createTransport("request-timeout", { timeout: 100 });
-        await transport.ready();
-
-        const error = await assertRejects(
-          () => transport.request("info", { key: "value" }),
-          WebSocketRequestError,
-        );
-        assertIsError(error.cause, DOMException, "Signal timed out.");
-      });
-
-      await t.step("timeout: null disables timeout", async () => {
-        const defaultTimeout = await (async () => {
-          await using t = createTransport("request-success");
-          return t.timeout!;
-        })();
-
-        await using transport = createTransport("request-no-timeout", { timeout: null });
-        await transport.ready();
-        await transport.request("info", { delay: defaultTimeout * 1.5 });
+    let received: unknown;
+    const eventPromise = new Promise<void>((resolve) => {
+      // Listener resolves promise on first event
+      transport.subscribe(channel, payload, (e) => {
+        received = e.detail;
+        resolve();
       });
     });
+
+    const subscription = await transport.subscribe(channel, payload, () => {});
+    await eventPromise;
+
+    assertEquals(received, { update: "subscription update" });
+
+    await subscription.unsubscribe();
   });
 
   await t.step("ready()", async (t) => {
@@ -144,25 +137,23 @@ Deno.test("WebSocketTransport", async (t) => {
       assertLess(performance.now() - start, 20);
     });
 
-    await t.step("AbortSignal", async (t) => {
-      await t.step("rejects if already aborted", async () => {
-        await using transport = createTransport("request-success");
+    await t.step("rejects if already aborted", async () => {
+      await using transport = createTransport("request-success");
 
-        const signal = AbortSignal.abort(new Error("Already aborted"));
-        const error = await assertRejects(() => transport.ready(signal), Error);
-        assertIsError(error.cause, Error, "Already aborted");
-      });
+      const signal = AbortSignal.abort(new Error("Already aborted"));
+      const error = await assertRejects(() => transport.ready(signal), Error);
+      assertIsError(error.cause, Error, "Already aborted");
+    });
 
-      await t.step("rejects if aborted later", async () => {
-        await using transport = createTransport("request-success");
+    await t.step("rejects if aborted later", async () => {
+      await using transport = createTransport("request-success");
 
-        const controller = new AbortController();
-        const promise = transport.ready(controller.signal);
-        controller.abort(new Error("Aborted later"));
+      const controller = new AbortController();
+      const promise = transport.ready(controller.signal);
+      controller.abort(new Error("Aborted later"));
 
-        const error = await assertRejects(() => promise, Error);
-        assertIsError(error.cause, Error, "Aborted later");
-      });
+      const error = await assertRejects(() => promise, Error);
+      assertIsError(error.cause, Error, "Aborted later");
     });
 
     await t.step("rejects if connection is closed", async () => {
@@ -185,30 +176,25 @@ Deno.test("WebSocketTransport", async (t) => {
       assertLess(performance.now() - start, 20);
     });
 
-    await t.step("AbortSignal", async (t) => {
-      await t.step("rejects if already aborted", async () => {
-        await using transport = createTransport("request-success");
-        await transport.ready();
+    await t.step("rejects if already aborted", async () => {
+      await using transport = createTransport("request-success");
+      await transport.ready();
 
-        const signal = AbortSignal.abort(new Error("Already aborted"));
-        const error = await assertRejects(() => transport.close(signal), Error);
-        assertIsError(error.cause, Error, "Already aborted");
-      });
+      const signal = AbortSignal.abort(new Error("Already aborted"));
+      const error = await assertRejects(() => transport.close(signal), Error);
+      assertIsError(error.cause, Error, "Already aborted");
+    });
 
-      await t.step("rejects if aborted later", async () => {
-        await using transport = createTransport("request-success");
-        await transport.ready();
+    await t.step("rejects if aborted later", async () => {
+      await using transport = createTransport("request-success");
+      await transport.ready();
 
-        const controller = new AbortController();
-        const promise = transport.close(controller.signal);
-        controller.abort(new Error("Aborted later"));
+      const controller = new AbortController();
+      const promise = transport.close(controller.signal);
+      controller.abort(new Error("Aborted later"));
 
-        const error = await assertRejects(() => promise, Error);
-        assertIsError(error.cause, Error, "Aborted later");
-      });
+      const error = await assertRejects(() => promise, Error);
+      assertIsError(error.cause, Error, "Aborted later");
     });
   });
-
-  await server.shutdown();
-  await new Promise((r) => setTimeout(r, 5000));
 });

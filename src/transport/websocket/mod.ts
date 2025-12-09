@@ -1,4 +1,3 @@
-import { TransportError } from "../../_errors.ts";
 import { AbortSignal_ } from "../_polyfills.ts";
 import { ReconnectingWebSocket, type ReconnectingWebSocketOptions } from "@nktkas/rews";
 import { HyperliquidEventTarget } from "./_hyperliquidEventTarget.ts";
@@ -15,7 +14,6 @@ export interface WebSocketTransportOptions {
    * @default false
    */
   isTestnet?: boolean;
-
   /**
    * Custom WebSocket endpoint for API and Subscription requests.
    * - Mainnet:
@@ -27,17 +25,13 @@ export interface WebSocketTransportOptions {
    * @default `wss://api.hyperliquid.xyz/ws` for mainnet, `wss://api.hyperliquid-testnet.xyz/ws` for testnet
    */
   url?: string | URL;
-
   /**
-   * Timeout for requests in ms.
-   * Set to `null` to disable.
+   * Timeout for requests in ms. Set to `null` to disable.
    * @default 10_000
    */
   timeout?: number | null;
-
   /** Reconnection policy configuration for closed connections. */
   reconnect?: ReconnectingWebSocketOptions;
-
   /**
    * Enable automatic re-subscription to Hyperliquid subscription after reconnection.
    * @default true
@@ -61,20 +55,27 @@ export const TESTNET_RPC_WS_URL = "wss://rpc.hyperliquid-testnet.xyz/ws";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/post-requests
  */
-export class WebSocketTransport implements WebSocketTransportOptions {
+export class WebSocketTransport {
+  /** Indicates this transport uses testnet endpoint. */
   readonly isTestnet: boolean;
-  timeout: number | null;
   /** The WebSocket that is used for communication. */
   readonly socket: ReconnectingWebSocket;
-
+  /** Enable automatic re-subscription to Hyperliquid subscription after reconnection. */
   get resubscribe(): boolean {
     return this._subscriptionManager.resubscribe;
   }
   set resubscribe(value: boolean) {
     this._subscriptionManager.resubscribe = value;
   }
+  /** Timeout for requests in ms. Set to `null` to disable. */
+  get timeout(): number | null {
+    return this._postRequest.timeout;
+  }
+  set timeout(value: number | null) {
+    this._postRequest.timeout = value;
+  }
 
-  protected _wsRequester: WebSocketPostRequest;
+  protected _postRequest: WebSocketPostRequest;
   protected _hlEvents: HyperliquidEventTarget;
   protected _subscriptionManager: WebSocketSubscriptionManager;
   protected _keepAliveInterval: ReturnType<typeof setInterval> | undefined;
@@ -86,7 +87,6 @@ export class WebSocketTransport implements WebSocketTransportOptions {
    */
   constructor(options?: WebSocketTransportOptions) {
     this.isTestnet = options?.isTestnet ?? false;
-    this.timeout = options?.timeout === undefined ? 10_000 : options.timeout;
 
     this.socket = new ReconnectingWebSocket(
       options?.url ?? (this.isTestnet ? TESTNET_API_WS_URL : MAINNET_API_WS_URL),
@@ -94,10 +94,14 @@ export class WebSocketTransport implements WebSocketTransportOptions {
     );
 
     this._hlEvents = new HyperliquidEventTarget(this.socket);
-    this._wsRequester = new WebSocketPostRequest(this.socket, this._hlEvents);
+    this._postRequest = new WebSocketPostRequest(
+      this.socket,
+      this._hlEvents,
+      options?.timeout === undefined ? 10_000 : options.timeout,
+    );
     this._subscriptionManager = new WebSocketSubscriptionManager(
       this.socket,
-      this._wsRequester,
+      this._postRequest,
       this._hlEvents,
       options?.resubscribe ?? true,
     );
@@ -105,22 +109,9 @@ export class WebSocketTransport implements WebSocketTransportOptions {
     this._initKeepAlive();
   }
 
-  protected _initKeepAlive(): void {
-    const start = () => {
-      if (this._keepAliveInterval) return;
-      this._keepAliveInterval = setInterval(() => {
-        this.socket.send('{"method":"ping"}');
-      }, 30_000);
-    };
-    const stop = () => {
-      clearInterval(this._keepAliveInterval);
-      this._keepAliveInterval = undefined;
-    };
-
-    this.socket.addEventListener("open", start);
-    this.socket.addEventListener("close", stop);
-    this.socket.addEventListener("error", stop);
-  }
+  // ============================================================
+  // Public methods
+  // ============================================================
 
   /**
    * Sends a request to the Hyperliquid API via WebSocket.
@@ -134,21 +125,8 @@ export class WebSocketTransport implements WebSocketTransportOptions {
    * @throws {WebSocketRequestError} - An error that occurs when a WebSocket request fails.
    */
   async request<T>(endpoint: "info" | "exchange", payload: unknown, signal?: AbortSignal): Promise<T> {
-    const timeoutSignal = this.timeout ? AbortSignal_.timeout(this.timeout) : undefined;
-    const combinedSignal = signal && timeoutSignal
-      ? AbortSignal_.any([signal, timeoutSignal])
-      : signal ?? timeoutSignal;
-
     const payload_ = { type: endpoint === "exchange" ? "action" : endpoint, payload };
-
-    return await this._wsRequester.request<T>("post", payload_, combinedSignal)
-      .catch((error) => {
-        if (error instanceof TransportError) throw error; // Re-throw known errors
-        throw new WebSocketRequestError(
-          `Unknown error while making a WebSocket request: ${error}`,
-          { cause: error },
-        );
-      });
+    return await this._postRequest.request<T>("post", payload_, signal);
   }
 
   /**
@@ -182,18 +160,22 @@ export class WebSocketTransport implements WebSocketTransportOptions {
    */
   ready(signal?: AbortSignal): Promise<void> {
     return new Promise((resolve, reject) => {
+      // Combine the provided signal with the socket's termination signal
       const combinedSignal = signal
         ? AbortSignal_.any([this.socket.terminationSignal, signal])
         : this.socket.terminationSignal;
 
+      // Check if already aborted
       if (combinedSignal.aborted) {
         return reject(
           new WebSocketRequestError("Failed to establish WebSocket connection", { cause: combinedSignal.reason }),
         );
       }
 
+      // Check if already open
       if (this.socket.readyState === ReconnectingWebSocket.OPEN) return resolve();
 
+      // Set up event listeners
       const handleOpen = () => {
         combinedSignal.removeEventListener("abort", handleAbort);
         resolve();
@@ -221,14 +203,17 @@ export class WebSocketTransport implements WebSocketTransportOptions {
    */
   close(signal?: AbortSignal): Promise<void> {
     return new Promise((resolve, reject) => {
+      // Check if already aborted
       if (signal?.aborted) {
         return reject(
           new WebSocketRequestError("Failed to close WebSocket connection", { cause: signal.reason }),
         );
       }
 
+      // Check if already closed
       if (this.socket.readyState === ReconnectingWebSocket.CLOSED) return resolve();
 
+      // Set up event listeners
       const handleClose = () => {
         signal?.removeEventListener("abort", handleAbort);
         resolve();
@@ -243,7 +228,29 @@ export class WebSocketTransport implements WebSocketTransportOptions {
       this.socket.addEventListener("error", handleClose, { once: true, signal });
       signal?.addEventListener("abort", handleAbort, { once: true });
 
+      // Initiate close
       this.socket.close();
     });
+  }
+
+  // ============================================================
+  // Keep-Alive Logic
+  // ============================================================
+
+  protected _initKeepAlive(): void {
+    const start = () => {
+      if (this._keepAliveInterval) return;
+      this._keepAliveInterval = setInterval(() => {
+        this.socket.send('{"method":"ping"}');
+      }, 30_000);
+    };
+    const stop = () => {
+      clearInterval(this._keepAliveInterval);
+      this._keepAliveInterval = undefined;
+    };
+
+    this.socket.addEventListener("open", start);
+    this.socket.addEventListener("close", stop);
+    this.socket.addEventListener("error", stop);
   }
 }

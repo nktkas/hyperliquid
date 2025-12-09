@@ -53,7 +53,7 @@ function createManager(resubscribe = true): {
 } {
   const socket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
   const hlEvents = new HyperliquidEventTarget(socket);
-  const requester = new WebSocketPostRequest(socket, hlEvents) as WebSocketPostRequest & { queue: unknown[] };
+  const requester = new WebSocketPostRequest(socket, hlEvents, 10_000) as WebSocketPostRequest & { queue: unknown[] };
   const manager = new WebSocketSubscriptionManager(socket, requester, hlEvents, resubscribe) as ManagerWithInternals;
   return { socket, requester, hlEvents, manager };
 }

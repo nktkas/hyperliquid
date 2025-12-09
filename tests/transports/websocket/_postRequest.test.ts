@@ -38,13 +38,13 @@ class MockWebSocket extends EventTarget implements ReconnectingWebSocket {
 }
 
 /** Creates a new WebSocketPostRequest with mock socket. */
-function createRequester(): {
+function createRequester(timeout: number | null = 10_000): {
   socket: MockWebSocket;
   requester: WebSocketPostRequest;
 } {
   const socket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
   const hlEvents = new HyperliquidEventTarget(socket);
-  const requester = new WebSocketPostRequest(socket, hlEvents);
+  const requester = new WebSocketPostRequest(socket, hlEvents, timeout);
   return { socket, requester };
 }
 
@@ -257,6 +257,27 @@ Deno.test("WebSocketPostRequest", async (t) => {
 
         controller.abort(new Error("Aborted after sending"));
         await assertRejects(() => promise, Error, "Aborted after sending");
+      });
+
+      await t.step("rejects after timeout expires", async () => {
+        const { requester } = createRequester(30);
+
+        const promise = requester.request("post", { foo: "bar" });
+
+        await assertRejects(() => promise, DOMException, "Signal timed out.");
+      });
+
+      await t.step("timeout: null disables timeout", async () => {
+        const { socket, requester } = createRequester(null);
+
+        const promise = requester.request("post", { foo: "bar" });
+        const sent = getLastSent(socket);
+
+        setTimeout(() => {
+          socket.mockMessage(RESPONSES.info(sent.id as number, "late-success"));
+        }, 50);
+
+        assertEquals(await promise, "late-success");
       });
     });
   });

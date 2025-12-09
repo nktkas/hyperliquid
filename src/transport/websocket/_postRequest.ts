@@ -1,5 +1,5 @@
 import { TransportError } from "../../_errors.ts";
-import { Promise_ } from "../_polyfills.ts";
+import { AbortSignal_, Promise_ } from "../_polyfills.ts";
 import type { ReconnectingWebSocket } from "@nktkas/rews";
 import type { HyperliquidEventTarget } from "./_hyperliquidEventTarget.ts";
 
@@ -37,16 +37,22 @@ export class WebSocketRequestError extends TransportError {
  * Handles request creation, sending, and mapping responses to their corresponding requests.
  */
 export class WebSocketPostRequest {
+  /** Timeout for requests in ms. Set to `null` to disable. */
+  timeout: number | null;
+
   protected socket: ReconnectingWebSocket;
   protected lastId = 0;
   protected queue: PendingRequest[] = [];
 
   /**
    * Creates a new WebSocket async request handler.
+   *
    * @param socket - WebSocket connection instance for sending requests to the Hyperliquid WebSocket API
    * @param hlEvents - Used to recognize Hyperliquid responses and match them with sent requests
+   * @param timeout - Timeout for requests in ms. Set to `null` to disable.
    */
-  constructor(socket: ReconnectingWebSocket, hlEvents: HyperliquidEventTarget) {
+  constructor(socket: ReconnectingWebSocket, hlEvents: HyperliquidEventTarget, timeout: number | null) {
+    this.timeout = timeout;
     this.socket = socket;
 
     // Monitor responses and match the pending request
@@ -153,6 +159,7 @@ export class WebSocketPostRequest {
 
   /**
    * Sends a request to the Hyperliquid API.
+   *
    * @returns A promise that resolves with the parsed JSON response body.
    */
   async request(method: "ping", signal?: AbortSignal): Promise<void>;
@@ -162,46 +169,59 @@ export class WebSocketPostRequest {
     payloadOrSignal?: unknown | AbortSignal,
     maybeSignal?: AbortSignal,
   ): Promise<T> {
-    const payload = payloadOrSignal instanceof AbortSignal ? undefined : payloadOrSignal;
-    const signal = payloadOrSignal instanceof AbortSignal ? payloadOrSignal : maybeSignal;
+    try {
+      const payload = payloadOrSignal instanceof AbortSignal ? undefined : payloadOrSignal;
+      const userSignal = payloadOrSignal instanceof AbortSignal ? payloadOrSignal : maybeSignal;
 
-    // Reject the request if the signal is aborted
-    if (signal?.aborted) return Promise.reject(signal.reason);
-    // or if the WebSocket connection is permanently closed
-    if (this.socket.terminationSignal.aborted) {
-      return Promise.reject(this.socket.terminationSignal.reason);
+      const timeoutSignal = this.timeout ? AbortSignal_.timeout(this.timeout) : undefined;
+      const signal = userSignal && timeoutSignal
+        ? AbortSignal_.any([userSignal, timeoutSignal])
+        : userSignal ?? timeoutSignal;
+
+      // Reject the request if the signal is aborted
+      if (signal?.aborted) return Promise.reject(signal.reason);
+      // or if the WebSocket connection is permanently closed
+      if (this.socket.terminationSignal.aborted) {
+        return Promise.reject(this.socket.terminationSignal.reason);
+      }
+
+      // Create a request
+      let id: string | number;
+      let request: SubscribeUnsubscribeRequest | PostRequest | PingRequest;
+      if (method === "post") {
+        id = ++this.lastId;
+        request = { method, id, request: payload };
+      } else if (method === "ping") {
+        id = "ping";
+        request = { method };
+      } else {
+        request = { method, subscription: payload };
+        id = WebSocketPostRequest.requestToId(request);
+      }
+
+      // Send the request
+      this.socket.send(JSON.stringify(request));
+
+      // Wait for a response
+      const { promise, resolve, reject } = Promise_.withResolvers<T>();
+      this.queue.push({ id, resolve, reject });
+
+      const onAbort = () => reject(signal?.reason);
+      signal?.addEventListener("abort", onAbort, { once: true });
+
+      return await promise.finally(() => {
+        const index = this.queue.findIndex((item) => item.id === id);
+        if (index !== -1) this.queue.splice(index, 1);
+
+        signal?.removeEventListener("abort", onAbort);
+      });
+    } catch (error) {
+      if (error instanceof TransportError) throw error; // Re-throw known errors
+      throw new WebSocketRequestError(
+        `Unknown error while making a WebSocket request: ${error}`,
+        { cause: error },
+      );
     }
-
-    // Create a request
-    let id: string | number;
-    let request: SubscribeUnsubscribeRequest | PostRequest | PingRequest;
-    if (method === "post") {
-      id = ++this.lastId;
-      request = { method, id, request: payload };
-    } else if (method === "ping") {
-      id = "ping";
-      request = { method };
-    } else {
-      request = { method, subscription: payload };
-      id = WebSocketPostRequest.requestToId(request);
-    }
-
-    // Send the request
-    this.socket.send(JSON.stringify(request));
-
-    // Wait for a response
-    const { promise, resolve, reject } = Promise_.withResolvers<T>();
-    this.queue.push({ id, resolve, reject });
-
-    const onAbort = () => reject(signal?.reason);
-    signal?.addEventListener("abort", onAbort, { once: true });
-
-    return await promise.finally(() => {
-      const index = this.queue.findIndex((item) => item.id === id);
-      if (index !== -1) this.queue.splice(index, 1);
-
-      signal?.removeEventListener("abort", onAbort);
-    });
   }
 
   /** Normalizes an object and then converts it to a string. */
