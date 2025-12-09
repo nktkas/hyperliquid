@@ -9,7 +9,9 @@ runTest({
     const data = await Promise.all([
       client.perpsAtOpenInterestCap(),
     ]);
-    schemaCoverage(PerpsAtOpenInterestCapResponse, data);
+    schemaCoverage(PerpsAtOpenInterestCapResponse, data, {
+      ignoreEmptyArray: ["#"],
+    });
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

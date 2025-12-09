@@ -16,6 +16,7 @@ runTest({
       ignoreDefinedTypes: [
         "#/properties/meta/properties/universe/items/properties/growthMode",
         "#/properties/meta/properties/universe/items/properties/lastGrowthModeChangeTime",
+        "#/properties/perpsAtOpenInterestCap",
       ],
       ignorePicklistValues: {
         "#/properties/openOrders/items/properties/orderType": ["Market", "Take Profit Market", "Take Profit Limit"],
@@ -24,9 +25,6 @@ runTest({
       },
       ignoreEmptyArray: [
         "#/properties/twapStates",
-      ],
-      ignoreUndefinedTypes: [
-        "#/properties/perpsAtOpenInterestCap",
       ],
     });
   },

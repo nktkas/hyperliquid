@@ -75,6 +75,11 @@ export const WebData3Event = /* @__PURE__ */ (() => {
             v.optional(v.boolean()),
             v.description("Whether DEX abstraction is enabled."),
           ),
+          /** Abstraction mode for the user account. */
+          abstraction: v.pipe(
+            v.optional(v.picklist(["dexAbstraction", "disabled"])),
+            v.description("Abstraction mode for the user account."),
+          ),
         }),
         v.description("User state information."),
       ),
