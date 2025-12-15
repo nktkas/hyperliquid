@@ -4,15 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedInteger } from "../../_schemas.ts";
-import {
-  ErrorResponse,
-  HyperliquidChain,
-  Nonce,
-  Signature,
-  SignatureChainId,
-  SuccessResponse,
-} from "./_base/schemas.ts";
+import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
+import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Delegate or undelegate native tokens to or from a validator.
@@ -30,9 +23,15 @@ export const TokenDelegateRequest = /* @__PURE__ */ (() => {
             v.description("Type of action."),
           ),
           /** Chain ID in hex format for EIP-712 signing. */
-          signatureChainId: SignatureChainId,
+          signatureChainId: v.pipe(
+            Hex,
+            v.description("Chain ID in hex format for EIP-712 signing."),
+          ),
           /** HyperLiquid network type. */
-          hyperliquidChain: HyperliquidChain,
+          hyperliquidChain: v.pipe(
+            HyperliquidChainSchema,
+            v.description("HyperLiquid network type."),
+          ),
           /** Validator address. */
           validator: v.pipe(
             Address,
@@ -41,6 +40,7 @@ export const TokenDelegateRequest = /* @__PURE__ */ (() => {
           /** Amount for delegate/undelegate (float * 1e8). */
           wei: v.pipe(
             UnsignedInteger,
+            v.minValue(1),
             v.description("Amount for delegate/undelegate (float * 1e8)."),
           ),
           /** `true` for undelegate, `false` for delegate. */
@@ -49,14 +49,23 @@ export const TokenDelegateRequest = /* @__PURE__ */ (() => {
             v.description("`true` for undelegate, `false` for delegate."),
           ),
           /** Nonce (timestamp in ms) used to prevent replay attacks. */
-          nonce: Nonce,
+          nonce: v.pipe(
+            UnsignedInteger,
+            v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+          ),
         }),
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
     }),
     v.description("Delegate or undelegate native tokens to or from a validator."),
   );

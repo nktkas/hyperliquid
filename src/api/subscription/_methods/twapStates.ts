@@ -4,7 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address, UnsignedInteger } from "../../_schemas.ts";
+import { TwapStateSchema } from "../../info/_methods/_base/commonSchemas.ts";
 
 /** Subscribe to TWAP states updates for a specific user. */
 export const TwapStatesRequest = /* @__PURE__ */ (() => {
@@ -42,66 +43,7 @@ export const TwapStatesEvent = /* @__PURE__ */ (() => {
       ),
       /** Array of tuples of TWAP ID and TWAP state. */
       states: v.pipe(
-        v.array(
-          v.tuple([
-            UnsignedInteger,
-            v.pipe(
-              v.object({
-                /** Asset symbol. */
-                coin: v.pipe(
-                  v.string(),
-                  v.description("Asset symbol."),
-                ),
-                /** Executed notional value. */
-                executedNtl: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Executed notional value."),
-                ),
-                /** Executed size. */
-                executedSz: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Executed size."),
-                ),
-                /** Duration in minutes. */
-                minutes: v.pipe(
-                  UnsignedInteger,
-                  v.description("Duration in minutes."),
-                ),
-                /** Indicates if the TWAP randomizes execution. */
-                randomize: v.pipe(
-                  v.boolean(),
-                  v.description("Indicates if the TWAP randomizes execution."),
-                ),
-                /** Indicates if the order is reduce-only. */
-                reduceOnly: v.pipe(
-                  v.boolean(),
-                  v.description("Indicates if the order is reduce-only."),
-                ),
-                /** Order side ("B" = Bid/Buy, "A" = Ask/Sell). */
-                side: v.pipe(
-                  v.picklist(["B", "A"]),
-                  v.description('Order side ("B" = Bid/Buy, "A" = Ask/Sell).'),
-                ),
-                /** Order size. */
-                sz: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Order size."),
-                ),
-                /** Start time of the TWAP order (in ms since epoch). */
-                timestamp: v.pipe(
-                  UnsignedInteger,
-                  v.description("Start time of the TWAP order (in ms since epoch)."),
-                ),
-                /** User address. */
-                user: v.pipe(
-                  Address,
-                  v.description("User address."),
-                ),
-              }),
-              v.description("State of the TWAP order."),
-            ),
-          ]),
-        ),
+        v.array(v.tuple([UnsignedInteger, TwapStateSchema])),
         v.description("Array of tuples of TWAP ID and TWAP state."),
       ),
     }),

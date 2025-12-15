@@ -22,7 +22,7 @@
  * @module
  */
 
-export type { InfoConfig } from "./_methods/_types.ts";
+export type { InfoConfig } from "./_methods/_base/types.ts";
 
 export * from "./_methods/activeAssetData.ts";
 export * from "./_methods/alignedQuoteTokenInfo.ts";

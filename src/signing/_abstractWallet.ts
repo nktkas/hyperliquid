@@ -28,18 +28,20 @@ export interface AbstractEthersV6Signer {
     | null;
 }
 
-const AbstractEthersV6SignerSchema = v.object({
-  signTypedData: v.pipe(
-    v.function(),
-    v.check((fn) => fn.length === 3),
-  ),
-  getAddress: v.function(),
-  provider: v.nullish(
-    v.object({
-      getNetwork: v.function(),
-    }),
-  ),
-});
+const AbstractEthersV6SignerSchema = /* @__PURE__ */ (() => {
+  return v.object({
+    signTypedData: v.pipe(
+      v.function(),
+      v.check((fn) => fn.length === 3, "Number of arguments must be 3"),
+    ),
+    getAddress: v.function(),
+    provider: v.nullish(
+      v.object({
+        getNetwork: v.function(),
+      }),
+    ),
+  });
+})();
 
 // =============================================================
 // Ethers V5
@@ -68,18 +70,20 @@ export interface AbstractEthersV5Signer {
     | null;
 }
 
-const AbstractEthersV5SignerSchema = v.object({
-  _signTypedData: v.pipe(
-    v.function(),
-    v.check((fn) => fn.length === 3),
-  ),
-  getAddress: v.function(),
-  provider: v.nullish(
-    v.object({
-      getNetwork: v.function(),
-    }),
-  ),
-});
+const AbstractEthersV5SignerSchema = /* @__PURE__ */ (() => {
+  return v.object({
+    _signTypedData: v.pipe(
+      v.function(),
+      v.check((fn) => fn.length === 3, "Number of arguments must be 3"),
+    ),
+    getAddress: v.function(),
+    provider: v.nullish(
+      v.object({
+        getNetwork: v.function(),
+      }),
+    ),
+  });
+})();
 
 // =============================================================
 // Viem
@@ -110,14 +114,16 @@ export interface AbstractViemJsonRpcAccount {
   getChainId(): Promise<number>;
 }
 
-const AbstractViemJsonRpcAccountSchema = v.object({
-  signTypedData: v.pipe(
-    v.function(),
-    v.check((fn) => fn.length === 1 || fn.length === 2),
-  ),
-  getAddresses: v.function(),
-  getChainId: v.function(),
-});
+const AbstractViemJsonRpcAccountSchema = /* @__PURE__ */ (() => {
+  return v.object({
+    signTypedData: v.pipe(
+      v.function(),
+      v.check((fn) => fn.length === 1 || fn.length === 2, "Number of arguments must be 1 or 2"),
+    ),
+    getAddresses: v.function(),
+    getChainId: v.function(),
+  });
+})();
 
 /** Abstract interface for a [viem Local Account](https://viem.sh/docs/accounts/local). */
 export interface AbstractViemLocalAccount {
@@ -143,13 +149,15 @@ export interface AbstractViemLocalAccount {
   address: `0x${string}`;
 }
 
-const AbstractViemLocalAccountSchema = v.object({
-  signTypedData: v.pipe(
-    v.function(),
-    v.check((fn) => fn.length === 1 || fn.length === 2),
-  ),
-  address: v.string(),
-});
+const AbstractViemLocalAccountSchema = /* @__PURE__ */ (() => {
+  return v.object({
+    signTypedData: v.pipe(
+      v.function(),
+      v.check((fn) => fn.length === 1 || fn.length === 2, "Number of arguments must be 1 or 2"),
+    ),
+    address: v.string(),
+  });
+})();
 
 // =============================================================
 // Abstract Signer

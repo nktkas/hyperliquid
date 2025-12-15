@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, Nonce, Signature, SuccessResponse } from "./_base/schemas.ts";
+import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
 
 /** Modify a vault's configuration. */
 export const VaultModifyRequest = /* @__PURE__ */ (() => {
@@ -24,23 +24,29 @@ export const VaultModifyRequest = /* @__PURE__ */ (() => {
             Address,
             v.description("Vault address."),
           ),
-          /** Allow deposits from followers (default: null). */
+          /** Allow deposits from followers. */
           allowDeposits: v.pipe(
-            v.optional(v.nullable(v.boolean()), null),
+            v.nullish(v.boolean(), null),
             v.description("Allow deposits from followers."),
           ),
-          /** Always close positions on withdrawal (default: null). */
+          /** Always close positions on withdrawal. */
           alwaysCloseOnWithdraw: v.pipe(
-            v.optional(v.nullable(v.boolean()), null),
+            v.nullish(v.boolean(), null),
             v.description("Always close positions on withdrawal."),
           ),
         }),
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
       /** Expiration time of the action. */
       expiresAfter: v.pipe(
         v.optional(UnsignedInteger),

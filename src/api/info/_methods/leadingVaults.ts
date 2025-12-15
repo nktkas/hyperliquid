@@ -34,22 +34,18 @@ export type LeadingVaultsRequest = v.InferOutput<typeof LeadingVaultsRequest>;
 export const LeadingVaultsResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.array(
-      /** Vault that a user is leading. */
-      v.pipe(
-        v.object({
-          /** Vault address. */
-          address: v.pipe(
-            Address,
-            v.description("Vault address."),
-          ),
-          /** Vault name. */
-          name: v.pipe(
-            v.string(),
-            v.description("Vault name."),
-          ),
-        }),
-        v.description("Vault that a user is leading."),
-      ),
+      v.object({
+        /** Vault address. */
+        address: v.pipe(
+          Address,
+          v.description("Vault address."),
+        ),
+        /** Vault name. */
+        name: v.pipe(
+          v.string(),
+          v.description("Vault name."),
+        ),
+      }),
     ),
     v.description("Array of leading vaults for a user."),
   );
@@ -60,7 +56,7 @@ export type LeadingVaultsResponse = v.InferOutput<typeof LeadingVaultsResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode leadingVaults} function. */
 export type LeadingVaultsParameters = Omit<v.InferInput<typeof LeadingVaultsRequest>, "type">;

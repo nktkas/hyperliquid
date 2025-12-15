@@ -38,7 +38,7 @@ export const UserToMultiSigSignersResponse = /* @__PURE__ */ (() => {
         /** Authorized users addresses. */
         authorizedUsers: v.pipe(
           v.array(Address),
-          v.minLength(1),
+          v.nonEmpty(),
           v.description("Authorized users addresses."),
         ),
         /** Threshold number of signatures required. */
@@ -58,7 +58,7 @@ export type UserToMultiSigSignersResponse = v.InferOutput<typeof UserToMultiSigS
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userToMultiSigSigners} function. */
 export type UserToMultiSigSignersParameters = Omit<v.InferInput<typeof UserToMultiSigSignersRequest>, "type">;

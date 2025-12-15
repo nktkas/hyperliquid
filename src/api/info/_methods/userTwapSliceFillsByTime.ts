@@ -60,7 +60,7 @@ export type UserTwapSliceFillsByTimeResponse = v.InferOutput<typeof UserTwapSlic
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userTwapSliceFillsByTime} function. */
 export type UserTwapSliceFillsByTimeParameters = Omit<v.InferInput<typeof UserTwapSliceFillsByTimeRequest>, "type">;

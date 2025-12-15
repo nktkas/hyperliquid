@@ -61,7 +61,7 @@ export type UserFillsByTimeResponse = v.InferOutput<typeof UserFillsByTimeRespon
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userFillsByTime} function. */
 export type UserFillsByTimeParameters = Omit<v.InferInput<typeof UserFillsByTimeRequest>, "type">;

@@ -4,7 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Decimal, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { PerpAssetCtxSchema, SpotAssetCtxSchema, TwapStateSchema } from "./_base/commonSchemas.ts";
 import { ClearinghouseStateResponse } from "./clearinghouseState.ts";
 import { MetaResponse } from "./meta.ts";
 import { SpotClearinghouseStateResponse } from "./spotClearinghouseState.ts";
@@ -41,16 +42,25 @@ export const WebData2Response = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
       /** Account summary for perpetual trading. */
-      clearinghouseState: ClearinghouseStateResponse,
+      clearinghouseState: v.pipe(
+        ClearinghouseStateResponse,
+        v.description("Account summary for perpetual trading."),
+      ),
       /** Array of leading vaults for a user. */
-      leadingVaults: LeadingVaultsResponse,
+      leadingVaults: v.pipe(
+        LeadingVaultsResponse,
+        v.description("Array of leading vaults for a user."),
+      ),
       /** Total equity in vaults. */
       totalVaultEquity: v.pipe(
         UnsignedDecimal,
         v.description("Total equity in vaults."),
       ),
       /** Array of open orders with additional display information. */
-      openOrders: FrontendOpenOrdersResponse,
+      openOrders: v.pipe(
+        FrontendOpenOrdersResponse,
+        v.description("Array of open orders with additional display information."),
+      ),
       /** Agent address if one exists. */
       agentAddress: v.pipe(
         v.nullable(Address),
@@ -67,67 +77,13 @@ export const WebData2Response = /* @__PURE__ */ (() => {
         v.description("Cumulative ledger value."),
       ),
       /** Metadata for perpetual assets. */
-      meta: MetaResponse,
+      meta: v.pipe(
+        MetaResponse,
+        v.description("Metadata for perpetual assets."),
+      ),
       /** Array of contexts for each perpetual asset. */
       assetCtxs: v.pipe(
-        v.array(
-          /** Context for a specific perpetual asset. */
-          v.pipe(
-            v.object({
-              /** Previous day's closing price. */
-              prevDayPx: v.pipe(
-                UnsignedDecimal,
-                v.description("Previous day's closing price."),
-              ),
-              /** Daily notional volume. */
-              dayNtlVlm: v.pipe(
-                UnsignedDecimal,
-                v.description("Daily notional volume."),
-              ),
-              /** Mark price. */
-              markPx: v.pipe(
-                UnsignedDecimal,
-                v.description("Mark price."),
-              ),
-              /** Mid price. */
-              midPx: v.pipe(
-                v.nullable(UnsignedDecimal),
-                v.description("Mid price."),
-              ),
-              /** Funding rate. */
-              funding: v.pipe(
-                Decimal,
-                v.description("Funding rate."),
-              ),
-              /** Total open interest. */
-              openInterest: v.pipe(
-                UnsignedDecimal,
-                v.description("Total open interest."),
-              ),
-              /** Premium price. */
-              premium: v.pipe(
-                v.nullable(Decimal),
-                v.description("Premium price."),
-              ),
-              /** Oracle price. */
-              oraclePx: v.pipe(
-                UnsignedDecimal,
-                v.description("Oracle price."),
-              ),
-              /** Array of impact prices. */
-              impactPxs: v.pipe(
-                v.nullable(v.array(v.string())),
-                v.description("Array of impact prices."),
-              ),
-              /** Daily volume in base currency. */
-              dayBaseVlm: v.pipe(
-                UnsignedDecimal,
-                v.description("Daily volume in base currency."),
-              ),
-            }),
-            v.description("Context for a specific perpetual asset."),
-          ),
-        ),
+        v.array(PerpAssetCtxSchema),
         v.description("Array of contexts for each perpetual asset."),
       ),
       /** Server timestamp (in ms since epoch). */
@@ -145,126 +101,19 @@ export const WebData2Response = /* @__PURE__ */ (() => {
         Address,
         v.description("User address."),
       ),
-      /** Array of TWAP states. */
+      /** Array of tuples containing TWAP order ID and its state. */
       twapStates: v.pipe(
-        v.array(
-          /** TWAP ID and state. */
-          v.pipe(
-            v.tuple([
-              UnsignedInteger,
-              v.pipe(
-                v.object({
-                  /** Asset symbol. */
-                  coin: v.pipe(
-                    v.string(),
-                    v.description("Asset symbol."),
-                  ),
-                  /** Executed notional value. */
-                  executedNtl: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Executed notional value."),
-                  ),
-                  /** Executed size. */
-                  executedSz: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Executed size."),
-                  ),
-                  /** Duration in minutes. */
-                  minutes: v.pipe(
-                    UnsignedInteger,
-                    v.description("Duration in minutes."),
-                  ),
-                  /** Indicates if the TWAP randomizes execution. */
-                  randomize: v.pipe(
-                    v.boolean(),
-                    v.description("Indicates if the TWAP randomizes execution."),
-                  ),
-                  /** Indicates if the order is reduce-only. */
-                  reduceOnly: v.pipe(
-                    v.boolean(),
-                    v.description("Indicates if the order is reduce-only."),
-                  ),
-                  /** Order side ("B" = Bid/Buy, "A" = Ask/Sell). */
-                  side: v.pipe(
-                    v.picklist(["B", "A"]),
-                    v.description('Order side ("B" = Bid/Buy, "A" = Ask/Sell).'),
-                  ),
-                  /** Order size. */
-                  sz: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Order size."),
-                  ),
-                  /** Start time of the TWAP order (in ms since epoch). */
-                  timestamp: v.pipe(
-                    UnsignedInteger,
-                    v.description("Start time of the TWAP order (in ms since epoch)."),
-                  ),
-                  /** User address. */
-                  user: v.pipe(
-                    Address,
-                    v.description("User address."),
-                  ),
-                }),
-                v.description("State of the TWAP order."),
-              ),
-            ]),
-            v.description("TWAP ID and state."),
-          ),
-        ),
-        v.description("Array of TWAP states."),
+        v.array(v.tuple([UnsignedInteger, TwapStateSchema])),
+        v.description("Array of tuples containing TWAP order ID and its state."),
       ),
       /** Account summary for spot trading. */
-      spotState: v.optional(SpotClearinghouseStateResponse),
+      spotState: v.pipe(
+        v.optional(SpotClearinghouseStateResponse),
+        v.description("Account summary for spot trading."),
+      ),
       /** Asset context for each spot asset. */
       spotAssetCtxs: v.pipe(
-        v.array(
-          /** Context for a specific spot asset. */
-          v.pipe(
-            v.object({
-              /** Previous day's closing price. */
-              prevDayPx: v.pipe(
-                UnsignedDecimal,
-                v.description("Previous day's closing price."),
-              ),
-              /** Daily notional volume. */
-              dayNtlVlm: v.pipe(
-                UnsignedDecimal,
-                v.description("Daily notional volume."),
-              ),
-              /** Mark price. */
-              markPx: v.pipe(
-                UnsignedDecimal,
-                v.description("Mark price."),
-              ),
-              /** Mid price. */
-              midPx: v.pipe(
-                v.nullable(UnsignedDecimal),
-                v.description("Mid price."),
-              ),
-              /** Circulating supply. */
-              circulatingSupply: v.pipe(
-                UnsignedDecimal,
-                v.description("Circulating supply."),
-              ),
-              /** Asset symbol. */
-              coin: v.pipe(
-                v.string(),
-                v.description("Asset symbol."),
-              ),
-              /** Total supply. */
-              totalSupply: v.pipe(
-                UnsignedDecimal,
-                v.description("Total supply."),
-              ),
-              /** Daily volume in base currency. */
-              dayBaseVlm: v.pipe(
-                UnsignedDecimal,
-                v.description("Daily volume in base currency."),
-              ),
-            }),
-            v.description("Context for a specific spot asset."),
-          ),
-        ),
+        v.array(SpotAssetCtxSchema),
         v.description("Asset context for each spot asset."),
       ),
       /** Whether the user has opted out of spot dusting. */
@@ -287,7 +136,7 @@ export type WebData2Response = v.InferOutput<typeof WebData2Response>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode webData2} function. */
 export type WebData2Parameters = Omit<v.InferInput<typeof WebData2Request>, "type">;

@@ -36,7 +36,7 @@ export type GossipRootIpsResponse = v.InferOutput<typeof GossipRootIpsResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /**
  * Request gossip root IPs.

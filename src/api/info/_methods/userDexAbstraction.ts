@@ -24,7 +24,7 @@ export const UserDexAbstractionRequest = /* @__PURE__ */ (() => {
         v.description("User address."),
       ),
     }),
-    v.description("Request user referral."),
+    v.description("Request user HIP-3 DEX abstraction state."),
   );
 })();
 export type UserDexAbstractionRequest = v.InferOutput<typeof UserDexAbstractionRequest>;
@@ -45,7 +45,7 @@ export type UserDexAbstractionResponse = v.InferOutput<typeof UserDexAbstraction
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userDexAbstraction} function. */
 export type UserDexAbstractionParameters = Omit<v.InferInput<typeof UserDexAbstractionRequest>, "type">;

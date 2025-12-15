@@ -46,58 +46,55 @@ export type UserFundingRequest = v.InferOutput<typeof UserFundingRequest>;
 export const UserFundingResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.array(
-      /** User funding ledger update. */
-      v.pipe(
-        v.object({
-          /** Timestamp of the update (in ms since epoch). */
-          time: v.pipe(
-            UnsignedInteger,
-            v.description("Timestamp of the update (in ms since epoch)."),
-          ),
-          /** L1 transaction hash. */
-          hash: v.pipe(
-            v.pipe(Hex, v.length(66)),
-            v.description("L1 transaction hash."),
-          ),
-          /** Update details. */
-          delta: v.pipe(
-            v.object({
-              /** Update type. */
-              type: v.pipe(
-                v.literal("funding"),
-                v.description("Update type."),
-              ),
-              /** Asset symbol. */
-              coin: v.pipe(
-                v.string(),
-                v.description("Asset symbol."),
-              ),
-              /** Amount transferred in USDC. */
-              usdc: v.pipe(
-                Decimal,
-                v.description("Amount transferred in USDC."),
-              ),
-              /** Signed position size. */
-              szi: v.pipe(
-                Decimal,
-                v.description("Signed position size."),
-              ),
-              /** Applied funding rate. */
-              fundingRate: v.pipe(
-                Decimal,
-                v.description("Applied funding rate."),
-              ),
-              /** Number of samples. */
-              nSamples: v.pipe(
-                v.nullable(UnsignedInteger),
-                v.description("Number of samples."),
-              ),
-            }),
-            v.description("Update details."),
-          ),
-        }),
-        v.description("User funding ledger update."),
-      ),
+      v.object({
+        /** Timestamp of the update (in ms since epoch). */
+        time: v.pipe(
+          UnsignedInteger,
+          v.description("Timestamp of the update (in ms since epoch)."),
+        ),
+        /** L1 transaction hash. */
+        hash: v.pipe(
+          Hex,
+          v.length(66),
+          v.description("L1 transaction hash."),
+        ),
+        /** Update details. */
+        delta: v.pipe(
+          v.object({
+            /** Update type. */
+            type: v.pipe(
+              v.literal("funding"),
+              v.description("Update type."),
+            ),
+            /** Asset symbol. */
+            coin: v.pipe(
+              v.string(),
+              v.description("Asset symbol."),
+            ),
+            /** Amount transferred in USDC. */
+            usdc: v.pipe(
+              Decimal,
+              v.description("Amount transferred in USDC."),
+            ),
+            /** Signed position size. */
+            szi: v.pipe(
+              Decimal,
+              v.description("Signed position size."),
+            ),
+            /** Applied funding rate. */
+            fundingRate: v.pipe(
+              Decimal,
+              v.description("Applied funding rate."),
+            ),
+            /** Number of samples. */
+            nSamples: v.pipe(
+              v.nullable(UnsignedInteger),
+              v.description("Number of samples."),
+            ),
+          }),
+          v.description("Update details."),
+        ),
+      }),
     ),
     v.description("Array of user funding ledger updates."),
   );
@@ -108,7 +105,7 @@ export type UserFundingResponse = v.InferOutput<typeof UserFundingResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userFunding} function. */
 export type UserFundingParameters = Omit<v.InferInput<typeof UserFundingRequest>, "type">;

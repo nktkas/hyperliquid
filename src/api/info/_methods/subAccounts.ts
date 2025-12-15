@@ -39,32 +39,34 @@ export const SubAccountsResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.nullable(
       v.array(
-        /** Sub-account details for a user. */
-        v.pipe(
-          v.object({
-            /** Sub-account name. */
-            name: v.pipe(
-              v.string(),
-              v.minLength(1),
-              v.description("Sub-account name."),
-            ),
-            /** Sub-account address. */
-            subAccountUser: v.pipe(
-              Address,
-              v.description("Sub-account address."),
-            ),
-            /** Master account address. */
-            master: v.pipe(
-              Address,
-              v.description("Master account address."),
-            ),
-            /** Perpetual trading clearinghouse state summary. */
-            clearinghouseState: ClearinghouseStateResponse,
-            /** Spot tokens clearinghouse state. */
-            spotState: SpotClearinghouseStateResponse,
-          }),
-          v.description("Sub-account details for a user."),
-        ),
+        v.object({
+          /** Sub-account name. */
+          name: v.pipe(
+            v.string(),
+            v.nonEmpty(),
+            v.description("Sub-account name."),
+          ),
+          /** Sub-account address. */
+          subAccountUser: v.pipe(
+            Address,
+            v.description("Sub-account address."),
+          ),
+          /** Master account address. */
+          master: v.pipe(
+            Address,
+            v.description("Master account address."),
+          ),
+          /** Perpetual trading clearinghouse state summary. */
+          clearinghouseState: v.pipe(
+            ClearinghouseStateResponse,
+            v.description("Perpetual trading clearinghouse state summary."),
+          ),
+          /** Spot tokens clearinghouse state. */
+          spotState: v.pipe(
+            SpotClearinghouseStateResponse,
+            v.description("Spot tokens clearinghouse state."),
+          ),
+        }),
       ),
     ),
     v.description("Array of user sub-account or null if the user does not have any sub-accounts."),
@@ -76,7 +78,7 @@ export type SubAccountsResponse = v.InferOutput<typeof SubAccountsResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode subAccounts} function. */
 export type SubAccountsParameters = Omit<v.InferInput<typeof SubAccountsRequest>, "type">;

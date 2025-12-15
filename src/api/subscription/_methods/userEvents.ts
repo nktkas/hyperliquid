@@ -34,131 +34,119 @@ export const UserEventsEvent = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([
       /** Event of array of user trade fills. */
-      v.pipe(
-        v.object({
-          /** Array of user trade fills. */
-          fills: UserFillsResponse,
-        }),
-        v.description("Event of array of user trade fills."),
-      ),
+      v.object({
+        /** Array of user trade fills. */
+        fills: v.pipe(
+          UserFillsResponse,
+          v.description("Array of user trade fills."),
+        ),
+      }),
       /** Event of user funding update. */
-      v.pipe(
-        v.object({
-          /** Funding update details. */
-          funding: v.pipe(
+      v.object({
+        /** Funding update details. */
+        funding: v.pipe(
+          v.object({
+            /** Asset symbol. */
+            coin: v.pipe(
+              v.string(),
+              v.description("Asset symbol."),
+            ),
+            /** Amount transferred in USDC. */
+            usdc: v.pipe(
+              Decimal,
+              v.description("Amount transferred in USDC."),
+            ),
+            /** Signed position size. */
+            szi: v.pipe(
+              Decimal,
+              v.description("Signed position size."),
+            ),
+            /** Applied funding rate. */
+            fundingRate: v.pipe(
+              Decimal,
+              v.description("Applied funding rate."),
+            ),
+            /** Number of samples. */
+            nSamples: v.pipe(
+              v.nullable(UnsignedInteger),
+              v.description("Number of samples."),
+            ),
+          }),
+          v.description("Funding update details."),
+        ),
+      }),
+      /** Event of user liquidation. */
+      v.object({
+        /** Liquidation details. */
+        liquidation: v.pipe(
+          v.object({
+            /** Unique liquidation ID. */
+            lid: v.pipe(
+              UnsignedInteger,
+              v.description("Unique liquidation ID."),
+            ),
+            /** Address of the liquidator. */
+            liquidator: v.pipe(
+              Address,
+              v.description("Address of the liquidator."),
+            ),
+            /** Address of the liquidated user. */
+            liquidated_user: v.pipe(
+              Address,
+              v.description("Address of the liquidated user."),
+            ),
+            /** Notional position size that was liquidated. */
+            liquidated_ntl_pos: v.pipe(
+              UnsignedDecimal,
+              v.description("Notional position size that was liquidated."),
+            ),
+            /** Account value at time of liquidation. */
+            liquidated_account_value: v.pipe(
+              UnsignedDecimal,
+              v.description("Account value at time of liquidation."),
+            ),
+          }),
+          v.description("Liquidation details."),
+        ),
+      }),
+      /** Event of array of non-user initiated order cancellations. */
+      v.object({
+        /** Array of non-user initiated order cancellations. */
+        nonUserCancel: v.pipe(
+          v.array(
+            /** Cancelled order not initiated by the user. */
             v.object({
-              /** Asset symbol. */
+              /** Asset symbol (e.g., BTC). */
               coin: v.pipe(
                 v.string(),
-                v.description("Asset symbol."),
+                v.description("Asset symbol (e.g., BTC)."),
               ),
-              /** Amount transferred in USDC. */
-              usdc: v.pipe(
-                Decimal,
-                v.description("Amount transferred in USDC."),
-              ),
-              /** Signed position size. */
-              szi: v.pipe(
-                Decimal,
-                v.description("Signed position size."),
-              ),
-              /** Applied funding rate. */
-              fundingRate: v.pipe(
-                Decimal,
-                v.description("Applied funding rate."),
-              ),
-              /** Number of samples. */
-              nSamples: v.pipe(
-                v.nullable(UnsignedInteger),
-                v.description("Number of samples."),
-              ),
-            }),
-            v.description("Funding update details."),
-          ),
-        }),
-        v.description("Event of user funding update."),
-      ),
-      /** Event of user liquidation. */
-      v.pipe(
-        v.object({
-          /** Liquidation details. */
-          liquidation: v.pipe(
-            v.object({
-              /** Unique liquidation ID. */
-              lid: v.pipe(
+              /** Order ID. */
+              oid: v.pipe(
                 UnsignedInteger,
-                v.description("Unique liquidation ID."),
-              ),
-              /** Address of the liquidator. */
-              liquidator: v.pipe(
-                Address,
-                v.description("Address of the liquidator."),
-              ),
-              /** Address of the liquidated user. */
-              liquidated_user: v.pipe(
-                Address,
-                v.description("Address of the liquidated user."),
-              ),
-              /** Notional position size that was liquidated. */
-              liquidated_ntl_pos: v.pipe(
-                UnsignedDecimal,
-                v.description("Notional position size that was liquidated."),
-              ),
-              /** Account value at time of liquidation. */
-              liquidated_account_value: v.pipe(
-                UnsignedDecimal,
-                v.description("Account value at time of liquidation."),
+                v.description("Order ID."),
               ),
             }),
-            v.description("Liquidation details."),
           ),
-        }),
-        v.description("Event of user liquidation."),
-      ),
-      /** Event of array of non-user initiated order cancellations. */
-      v.pipe(
-        v.object({
-          /** Array of non-user initiated order cancellations. */
-          nonUserCancel: v.pipe(
-            v.array(
-              /** Cancelled order not initiated by the user. */
-              v.pipe(
-                v.object({
-                  /** Asset symbol (e.g., BTC). */
-                  coin: v.pipe(
-                    v.string(),
-                    v.description("Asset symbol (e.g., BTC)."),
-                  ),
-                  /** Order ID. */
-                  oid: v.pipe(
-                    UnsignedInteger,
-                    v.description("Order ID."),
-                  ),
-                }),
-                v.description("Cancelled order not initiated by the user."),
-              ),
-            ),
-            v.description("Array of non-user initiated order cancellations."),
-          ),
-        }),
-        v.description("Event of array of non-user initiated order cancellations."),
-      ),
+          v.description("Array of non-user initiated order cancellations."),
+        ),
+      }),
       /** Event of a TWAP history entry. */
-      v.pipe(
-        v.object({
-          /** Array of user's TWAP history. */
-          twapHistory: TwapHistoryResponse,
-        }),
-        v.description("Event of a TWAP history entry."),
-      ),
+      v.object({
+        /** Array of user's TWAP history. */
+        twapHistory: v.pipe(
+          TwapHistoryResponse,
+          v.description("Array of user's TWAP history."),
+        ),
+      }),
       /** Event of TWAP slice fills. */
-      v.pipe(
-        v.object({
-          /** Array of user's twap slice fills. */
-          twapSliceFills: UserTwapSliceFillsResponse,
-        }),
-        v.description("Event of TWAP slice fills."),
-      ),
+      v.object({
+        /** Array of user's twap slice fills. */
+        twapSliceFills: v.pipe(
+          UserTwapSliceFillsResponse,
+          v.description("Array of user's twap slice fills."),
+        ),
+      }),
     ]),
     v.description("Event of one of possible user events."),
   );

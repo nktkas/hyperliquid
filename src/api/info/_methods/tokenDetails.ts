@@ -20,7 +20,8 @@ export const TokenDetailsRequest = /* @__PURE__ */ (() => {
       ),
       /** Token ID. */
       tokenId: v.pipe(
-        v.pipe(Hex, v.length(34)),
+        Hex,
+        v.length(34),
         v.description("Token ID."),
       ),
     }),
@@ -144,7 +145,7 @@ export type TokenDetailsResponse = v.InferOutput<typeof TokenDetailsResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode tokenDetails} function. */
 export type TokenDetailsParameters = Omit<v.InferInput<typeof TokenDetailsRequest>, "type">;

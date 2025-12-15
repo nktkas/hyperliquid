@@ -36,7 +36,7 @@ export const L2BookRequest = /* @__PURE__ */ (() => {
 })();
 export type L2BookRequest = v.InferOutput<typeof L2BookRequest>;
 
-const L2BookLevel = /* @__PURE__ */ (() => {
+const L2BookLevelSchema = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
       /** Price. */
@@ -75,7 +75,7 @@ export const L2BookEvent = /* @__PURE__ */ (() => {
       ),
       /** Bid and ask levels (index 0 = bids, index 1 = asks). */
       levels: v.pipe(
-        v.tuple([v.array(L2BookLevel), v.array(L2BookLevel)]),
+        v.tuple([v.array(L2BookLevelSchema), v.array(L2BookLevelSchema)]),
         v.description("Bid and ask levels (index 0 = bids, index 1 = asks)."),
       ),
     }),

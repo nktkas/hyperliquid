@@ -4,7 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address, Cloid, UnsignedInteger } from "../../_schemas.ts";
+import { FrontendOpenOrderSchema, OrderProcessingStatusSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Request order status.
@@ -25,10 +26,7 @@ export const OrderStatusRequest = /* @__PURE__ */ (() => {
       ),
       /** Order ID or Client Order ID. */
       oid: v.pipe(
-        v.union([
-          UnsignedInteger,
-          v.pipe(Hex, v.length(34)),
-        ]),
+        v.union([UnsignedInteger, Cloid]),
         v.description("Order ID or Client Order ID."),
       ),
     }),
@@ -57,126 +55,7 @@ export const OrderStatusResponse = /* @__PURE__ */ (() => {
           v.object({
             /** Open order with additional display information. */
             order: v.pipe(
-              v.object({
-                /** Asset symbol. */
-                coin: v.pipe(
-                  v.string(),
-                  v.description("Asset symbol."),
-                ),
-                /** Order side ("B" = Bid/Buy, "A" = Ask/Sell). */
-                side: v.pipe(
-                  v.picklist(["B", "A"]),
-                  v.description('Order side ("B" = Bid/Buy, "A" = Ask/Sell).'),
-                ),
-                /** Limit price. */
-                limitPx: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Limit price."),
-                ),
-                /** Size. */
-                sz: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Size."),
-                ),
-                /** Order ID. */
-                oid: v.pipe(
-                  UnsignedInteger,
-                  v.description("Order ID."),
-                ),
-                /** Timestamp when the order was placed (in ms since epoch). */
-                timestamp: v.pipe(
-                  UnsignedInteger,
-                  v.description("Timestamp when the order was placed (in ms since epoch)."),
-                ),
-                /** Original size at order placement. */
-                origSz: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Original size at order placement."),
-                ),
-                /** Condition for triggering the order. */
-                triggerCondition: v.pipe(
-                  v.string(),
-                  v.description("Condition for triggering the order."),
-                ),
-                /** Indicates if the order is a trigger order. */
-                isTrigger: v.pipe(
-                  v.boolean(),
-                  v.description("Indicates if the order is a trigger order."),
-                ),
-                /** Trigger price. */
-                triggerPx: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Trigger price."),
-                ),
-                /** Child orders associated with this order. */
-                children: v.pipe(
-                  v.array(v.unknown()),
-                  v.description("Child orders associated with this order."),
-                ),
-                /** Indicates if the order is a position TP/SL order. */
-                isPositionTpsl: v.pipe(
-                  v.boolean(),
-                  v.description("Indicates if the order is a position TP/SL order."),
-                ),
-                /** Indicates whether the order is reduce-only. */
-                reduceOnly: v.pipe(
-                  v.boolean(),
-                  v.description("Indicates whether the order is reduce-only."),
-                ),
-                /**
-                 * Order type for market execution.
-                 * - `"Market"`: Executes immediately at the market price.
-                 * - `"Limit"`: Executes at the specified limit price or better.
-                 * - `"Stop Market"`: Activates as a market order when a stop price is reached.
-                 * - `"Stop Limit"`: Activates as a limit order when a stop price is reached.
-                 * - `"Take Profit Market"`: Executes as a market order when a take profit price is reached.
-                 * - `"Take Profit Limit"`: Executes as a limit order when a take profit price is reached.
-                 * @see https://hyperliquid.gitbook.io/hyperliquid-docs/trading/order-types
-                 */
-                orderType: v.pipe(
-                  v.picklist([
-                    "Market",
-                    "Limit",
-                    "Stop Market",
-                    "Stop Limit",
-                    "Take Profit Market",
-                    "Take Profit Limit",
-                  ]),
-                  v.description(
-                    "Order type for market execution." +
-                      '\n- `"Market"`: Executes immediately at the market price.' +
-                      '\n- `"Limit"`: Executes at the specified limit price or better.' +
-                      '\n- `"Stop Market"`: Activates as a market order when a stop price is reached.' +
-                      '\n- `"Stop Limit"`: Activates as a limit order when a stop price is reached.' +
-                      '\n- `"Take Profit Market"`: Executes as a market order when a take profit price is reached.' +
-                      '\n- `"Take Profit Limit"`: Executes as a limit order when a take profit price is reached. ',
-                  ),
-                ),
-                /**
-                 * Time-in-force options.
-                 * - `"Gtc"`: Remains active until filled or canceled.
-                 * - `"Ioc"`: Fills immediately or cancels any unfilled portion.
-                 * - `"Alo"`: Adds liquidity only.
-                 * - `"FrontendMarket"`: Similar to Ioc, used in Hyperliquid UI.
-                 * - `"LiquidationMarket"`: Similar to Ioc, used in Hyperliquid UI.
-                 */
-                tif: v.pipe(
-                  v.nullable(v.picklist(["Gtc", "Ioc", "Alo", "FrontendMarket", "LiquidationMarket"])),
-                  v.description(
-                    "Time-in-force." +
-                      '\n- `"Gtc"`: Remains active until filled or canceled.' +
-                      '\n- `"Ioc"`: Fills immediately or cancels any unfilled portion.' +
-                      '\n- `"Alo"`: Adds liquidity only.' +
-                      '\n- `"FrontendMarket"`: Similar to Ioc, used in Hyperliquid UI.' +
-                      '\n- `"LiquidationMarket"`: Similar to Ioc, used in Hyperliquid UI.',
-                  ),
-                ),
-                /** Client Order ID. */
-                cloid: v.pipe(
-                  v.nullable(v.pipe(Hex, v.length(34))),
-                  v.description("Client Order ID."),
-                ),
-              }),
+              FrontendOpenOrderSchema,
               v.description("Open order with additional display information."),
             ),
             /**
@@ -212,37 +91,7 @@ export const OrderStatusResponse = /* @__PURE__ */ (() => {
              * - `"perpMaxPositionRejected"`: Rejected due to exceeding margin tier limit at current leverage.
              */
             status: v.pipe(
-              v.picklist([
-                "open",
-                "filled",
-                "canceled",
-                "triggered",
-                "rejected",
-                "marginCanceled",
-                "vaultWithdrawalCanceled",
-                "openInterestCapCanceled",
-                "selfTradeCanceled",
-                "reduceOnlyCanceled",
-                "siblingFilledCanceled",
-                "delistedCanceled",
-                "liquidatedCanceled",
-                "scheduledCancel",
-                "tickRejected",
-                "minTradeNtlRejected",
-                "perpMarginRejected",
-                "reduceOnlyRejected",
-                "badAloPxRejected",
-                "iocCancelRejected",
-                "badTriggerPxRejected",
-                "marketOrderNoLiquidityRejected",
-                "positionIncreaseAtOpenInterestCapRejected",
-                "positionFlipAtOpenInterestCapRejected",
-                "tooAggressiveAtOpenInterestCapRejected",
-                "openInterestIncreaseRejected",
-                "insufficientSpotBalanceRejected",
-                "oracleRejected",
-                "perpMaxPositionRejected",
-              ]),
+              OrderProcessingStatusSchema,
               v.description(
                 "Order processing status." +
                   '\n- `"open"`: Order active and waiting to be filled.' +
@@ -306,7 +155,7 @@ export type OrderStatusResponse = v.InferOutput<typeof OrderStatusResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode orderStatus} function. */
 export type OrderStatusParameters = Omit<v.InferInput<typeof OrderStatusRequest>, "type">;

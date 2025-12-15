@@ -68,7 +68,7 @@ export type PerpDexLimitsResponse = v.InferOutput<typeof PerpDexLimitsResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode perpDexLimits} function. */
 export type PerpDexLimitsParameters = Omit<v.InferInput<typeof PerpDexLimitsRequest>, "type">;

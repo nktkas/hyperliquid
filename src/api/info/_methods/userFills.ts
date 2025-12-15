@@ -4,7 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Decimal, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address, Cloid, UnsignedDecimal } from "../../_schemas.ts";
+import { UserFillSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Request array of user fills.
@@ -41,76 +42,12 @@ export type UserFillsRequest = v.InferOutput<typeof UserFillsRequest>;
 export const UserFillsResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.array(
-      v.pipe(
+      v.intersect([
+        UserFillSchema,
         v.object({
-          /** Asset symbol. */
-          coin: v.pipe(
-            v.string(),
-            v.description("Asset symbol."),
-          ),
-          /** Price. */
-          px: v.pipe(
-            UnsignedDecimal,
-            v.description("Price."),
-          ),
-          /** Size. */
-          sz: v.pipe(
-            UnsignedDecimal,
-            v.description("Size."),
-          ),
-          /** Order side ("B" = Bid/Buy, "A" = Ask/Sell). */
-          side: v.pipe(
-            v.picklist(["B", "A"]),
-            v.description('Order side ("B" = Bid/Buy, "A" = Ask/Sell).'),
-          ),
-          /** Timestamp when the trade occurred (in ms since epoch). */
-          time: v.pipe(
-            UnsignedInteger,
-            v.description("Timestamp when the trade occurred (in ms since epoch)."),
-          ),
-          /** Start position size. */
-          startPosition: v.pipe(
-            Decimal,
-            v.description("Start position size."),
-          ),
-          /** Direction indicator for frontend display. */
-          dir: v.pipe(
-            v.string(),
-            v.description("Direction indicator for frontend display."),
-          ),
-          /** Realized PnL. */
-          closedPnl: v.pipe(
-            Decimal,
-            v.description("Realized PnL."),
-          ),
-          /** L1 transaction hash. */
-          hash: v.pipe(
-            v.pipe(Hex, v.length(66)),
-            v.description("L1 transaction hash."),
-          ),
-          /** Order ID. */
-          oid: v.pipe(
-            UnsignedInteger,
-            v.description("Order ID."),
-          ),
-          /** Indicates if the fill was a taker order. */
-          crossed: v.pipe(
-            v.boolean(),
-            v.description("Indicates if the fill was a taker order."),
-          ),
-          /** Fee charged or rebate received (negative indicates rebate). */
-          fee: v.pipe(
-            Decimal,
-            v.description("Fee charged or rebate received (negative indicates rebate)."),
-          ),
-          /** Unique transaction identifier for a partial fill of an order. */
-          tid: v.pipe(
-            UnsignedInteger,
-            v.description("Unique transaction identifier for a partial fill of an order."),
-          ),
           /** Client Order ID. */
           cloid: v.pipe(
-            v.optional(v.pipe(Hex, v.length(34))),
+            v.optional(Cloid),
             v.description("Client Order ID."),
           ),
           /** Liquidation details. */
@@ -136,19 +73,8 @@ export const UserFillsResponse = /* @__PURE__ */ (() => {
             ),
             v.description("Liquidation details."),
           ),
-          /** Token in which the fee is denominated (e.g., "USDC"). */
-          feeToken: v.pipe(
-            v.string(),
-            v.description('Token in which the fee is denominated (e.g., "USDC").'),
-          ),
-          /** ID of the TWAP. */
-          twapId: v.pipe(
-            v.nullable(UnsignedInteger),
-            v.description("ID of the TWAP."),
-          ),
         }),
-        v.description("Order fill record."),
-      ),
+      ]),
     ),
     v.description("Array of user trade fills."),
   );
@@ -159,7 +85,7 @@ export type UserFillsResponse = v.InferOutput<typeof UserFillsResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userFills} function. */
 export type UserFillsParameters = Omit<v.InferInput<typeof UserFillsRequest>, "type">;

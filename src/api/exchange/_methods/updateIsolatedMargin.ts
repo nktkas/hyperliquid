@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Integer, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, Nonce, Signature, SuccessResponse } from "./_base/schemas.ts";
+import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Add or remove margin from isolated position.
@@ -41,9 +41,15 @@ export const UpdateIsolatedMarginRequest = /* @__PURE__ */ (() => {
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
       /** Vault address (for vault trading). */
       vaultAddress: v.pipe(
         v.optional(Address),

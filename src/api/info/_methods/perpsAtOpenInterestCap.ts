@@ -43,7 +43,7 @@ export type PerpsAtOpenInterestCapResponse = v.InferOutput<typeof PerpsAtOpenInt
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode perpsAtOpenInterestCap} function. */
 export type PerpsAtOpenInterestCapParameters = Omit<v.InferInput<typeof PerpsAtOpenInterestCapRequest>, "type">;

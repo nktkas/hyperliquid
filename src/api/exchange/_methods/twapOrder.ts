@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { Nonce, Signature } from "./_base/schemas.ts";
+import { SignatureSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Place a TWAP order.
@@ -48,6 +48,8 @@ export const TwapOrderRequest = /* @__PURE__ */ (() => {
               /** TWAP duration in minutes. */
               m: v.pipe(
                 UnsignedInteger,
+                v.minValue(5),
+                v.maxValue(1440),
                 v.description("TWAP duration in minutes."),
               ),
               /** Enable random order timing. */
@@ -62,9 +64,15 @@ export const TwapOrderRequest = /* @__PURE__ */ (() => {
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
       /** Vault address (for vault trading). */
       vaultAddress: v.pipe(
         v.optional(Address),

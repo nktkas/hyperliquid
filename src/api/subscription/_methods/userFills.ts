@@ -42,7 +42,10 @@ export const UserFillsEvent = /* @__PURE__ */ (() => {
         v.description("User address."),
       ),
       /** Array of user trade fills. */
-      fills: UserFillsResponse,
+      fills: v.pipe(
+        UserFillsResponse,
+        v.description("Array of user trade fills."),
+      ),
       /** Whether this is an initial snapshot. */
       isSnapshot: v.pipe(
         v.optional(v.literal(true)),

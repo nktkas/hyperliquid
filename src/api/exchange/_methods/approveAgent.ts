@@ -4,15 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address } from "../../_schemas.ts";
-import {
-  ErrorResponse,
-  HyperliquidChain,
-  Nonce,
-  Signature,
-  SignatureChainId,
-  SuccessResponse,
-} from "./_base/schemas.ts";
+import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
+import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Approve an agent to sign on behalf of the master account.
@@ -30,28 +23,50 @@ export const ApproveAgentRequest = /* @__PURE__ */ (() => {
             v.description("Type of action."),
           ),
           /** Chain ID in hex format for EIP-712 signing. */
-          signatureChainId: SignatureChainId,
+          signatureChainId: v.pipe(
+            Hex,
+            v.description("Chain ID in hex format for EIP-712 signing."),
+          ),
           /** HyperLiquid network type. */
-          hyperliquidChain: HyperliquidChain,
+          hyperliquidChain: v.pipe(
+            HyperliquidChainSchema,
+            v.description("HyperLiquid network type."),
+          ),
           /** Agent address. */
           agentAddress: v.pipe(
             Address,
             v.description("Agent address."),
           ),
-          /** Agent name or null for unnamed agent (default: null). */
+          /** Agent name or null for unnamed agent. */
           agentName: v.pipe(
-            v.optional(v.nullable(v.string()), null),
+            v.nullish(
+              v.pipe(
+                v.string(),
+                v.minLength(1),
+                v.maxLength(17),
+              ),
+              null,
+            ),
             v.description("Agent name or null for unnamed agent."),
           ),
           /** Nonce (timestamp in ms) used to prevent replay attacks. */
-          nonce: Nonce,
+          nonce: v.pipe(
+            UnsignedInteger,
+            v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+          ),
         }),
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
     }),
     v.description("Approve an agent to sign on behalf of the master account."),
   );

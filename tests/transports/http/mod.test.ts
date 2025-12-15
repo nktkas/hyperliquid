@@ -7,7 +7,7 @@ import { HttpRequestError, HttpTransport } from "@nktkas/hyperliquid";
 // ============================================================
 
 /** One-time mock for global fetch. */
-function mockFetch(handler: (input: RequestInfo | URL, init?: RequestInit) => Response | Promise<Response>) {
+function mockFetch(handler: (input: RequestInfo | URL, init?: RequestInit) => Response | Promise<Response>): void {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (...args) => {
     try {

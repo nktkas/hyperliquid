@@ -7,13 +7,16 @@ import { WebSocketTransport } from "@nktkas/hyperliquid";
 // ============================================================
 
 class DisposeWebSocketTransport extends WebSocketTransport {
-  async [Symbol.asyncDispose]() {
+  async [Symbol.asyncDispose](): Promise<void> {
     await this.close();
   }
 }
 
 /** Creates a transport with the test server URL. */
-function createTransport(testCase: string, options?: Partial<ConstructorParameters<typeof WebSocketTransport>[0]>) {
+function createTransport(
+  testCase: string,
+  options?: Partial<ConstructorParameters<typeof WebSocketTransport>[0]>,
+): DisposeWebSocketTransport {
   return new DisposeWebSocketTransport({
     url: `ws://localhost:8080/?test=${testCase}`,
     ...options,
@@ -24,7 +27,7 @@ function createTransport(testCase: string, options?: Partial<ConstructorParamete
 // Test Server
 // ============================================================
 
-function createTestServer() {
+function createTestServer(): AsyncDisposable {
   const server = Deno.serve(
     { port: 8080, onListen: () => {} },
     (request) => {
@@ -82,7 +85,7 @@ function createTestServer() {
     },
   );
   return {
-    async [Symbol.asyncDispose]() {
+    async [Symbol.asyncDispose](): Promise<void> {
       await server.shutdown();
     },
   };

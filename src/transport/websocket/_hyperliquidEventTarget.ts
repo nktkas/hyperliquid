@@ -88,10 +88,10 @@ const PongEventSchema = /* @__PURE__ */ (() => {
   return v.object({ channel: v.literal("pong") });
 })();
 const ExplorerBlockEventSchema = /* @__PURE__ */ (() => {
-  return v.pipe(v.array(BlockDetailsSchema), v.minLength(1));
+  return v.pipe(v.array(BlockDetailsSchema), v.nonEmpty());
 })();
 const ExplorerTxsEventSchema = /* @__PURE__ */ (() => {
-  return v.pipe(v.array(TxDetailsSchema), v.minLength(1));
+  return v.pipe(v.array(TxDetailsSchema), v.nonEmpty());
 })();
 
 /** Listens for WebSocket messages and sends them as Hyperliquid typed events. */

@@ -4,15 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { UnsignedInteger } from "../../_schemas.ts";
-import {
-  ErrorResponse,
-  HyperliquidChain,
-  Nonce,
-  Signature,
-  SignatureChainId,
-  SuccessResponse,
-} from "./_base/schemas.ts";
+import { Hex, UnsignedInteger } from "../../_schemas.ts";
+import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Transfer native token from staking into the user's spot account.
@@ -30,23 +23,39 @@ export const CWithdrawRequest = /* @__PURE__ */ (() => {
             v.description("Type of action."),
           ),
           /** Chain ID in hex format for EIP-712 signing. */
-          signatureChainId: SignatureChainId,
+          signatureChainId: v.pipe(
+            Hex,
+            v.description("Chain ID in hex format for EIP-712 signing."),
+          ),
           /** HyperLiquid network type. */
-          hyperliquidChain: HyperliquidChain,
+          hyperliquidChain: v.pipe(
+            HyperliquidChainSchema,
+            v.description("HyperLiquid network type."),
+          ),
           /** Amount of wei to withdraw from staking balance (float * 1e8). */
           wei: v.pipe(
             UnsignedInteger,
+            v.minValue(1),
             v.description("Amount of wei to withdraw from staking balance (float * 1e8)."),
           ),
           /** Nonce (timestamp in ms) used to prevent replay attacks. */
-          nonce: Nonce,
+          nonce: v.pipe(
+            UnsignedInteger,
+            v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+          ),
         }),
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
     }),
     v.description("Transfer native token from staking into the user's spot account."),
   );

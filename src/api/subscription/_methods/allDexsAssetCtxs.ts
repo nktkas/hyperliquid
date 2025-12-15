@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Decimal, UnsignedDecimal } from "../../_schemas.ts";
+import { PerpAssetCtxSchema } from "../../info/_methods/_base/commonSchemas.ts";
 
 /** Subscription to asset context events for all DEXs. */
 export const AllDexsAssetCtxsRequest = /* @__PURE__ */ (() => {
@@ -30,60 +30,7 @@ export const AllDexsAssetCtxsEvent = /* @__PURE__ */ (() => {
         v.array(
           v.tuple([
             v.string(),
-            v.array(
-              v.object({
-                /** Previous day's closing price. */
-                prevDayPx: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Previous day's closing price."),
-                ),
-                /** Daily notional volume. */
-                dayNtlVlm: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Daily notional volume."),
-                ),
-                /** Mark price. */
-                markPx: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Mark price."),
-                ),
-                /** Mid price. */
-                midPx: v.pipe(
-                  v.nullable(UnsignedDecimal),
-                  v.description("Mid price."),
-                ),
-                /** Funding rate. */
-                funding: v.pipe(
-                  Decimal,
-                  v.description("Funding rate."),
-                ),
-                /** Total open interest. */
-                openInterest: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Total open interest."),
-                ),
-                /** Premium price. */
-                premium: v.pipe(
-                  v.nullable(Decimal),
-                  v.description("Premium price."),
-                ),
-                /** Oracle price. */
-                oraclePx: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Oracle price."),
-                ),
-                /** Array of impact prices. */
-                impactPxs: v.pipe(
-                  v.nullable(v.array(v.string())),
-                  v.description("Array of impact prices."),
-                ),
-                /** Daily volume in base currency. */
-                dayBaseVlm: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Daily volume in base currency."),
-                ),
-              }),
-            ),
+            v.array(PerpAssetCtxSchema),
           ]),
         ),
         v.description("Array of tuples of dex names and contexts for each perpetual asset."),

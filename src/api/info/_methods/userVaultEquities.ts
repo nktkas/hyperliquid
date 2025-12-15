@@ -36,27 +36,23 @@ export type UserVaultEquitiesRequest = v.InferOutput<typeof UserVaultEquitiesReq
 export const UserVaultEquitiesResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.array(
-      /** User's vault deposit. */
-      v.pipe(
-        v.object({
-          /** Vault address. */
-          vaultAddress: v.pipe(
-            Address,
-            v.description("Vault address."),
-          ),
-          /** User deposited equity. */
-          equity: v.pipe(
-            UnsignedDecimal,
-            v.description("User deposited equity."),
-          ),
-          /** Timestamp when the user can withdraw their equity. */
-          lockedUntilTimestamp: v.pipe(
-            UnsignedInteger,
-            v.description("Timestamp when the user can withdraw their equity."),
-          ),
-        }),
-        v.description("User's vault deposit."),
-      ),
+      v.object({
+        /** Vault address. */
+        vaultAddress: v.pipe(
+          Address,
+          v.description("Vault address."),
+        ),
+        /** User deposited equity. */
+        equity: v.pipe(
+          UnsignedDecimal,
+          v.description("User deposited equity."),
+        ),
+        /** Timestamp when the user can withdraw their equity. */
+        lockedUntilTimestamp: v.pipe(
+          UnsignedInteger,
+          v.description("Timestamp when the user can withdraw their equity."),
+        ),
+      }),
     ),
     v.description("Array of user's vault deposits."),
   );
@@ -67,7 +63,7 @@ export type UserVaultEquitiesResponse = v.InferOutput<typeof UserVaultEquitiesRe
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userVaultEquities} function. */
 export type UserVaultEquitiesParameters = Omit<v.InferInput<typeof UserVaultEquitiesRequest>, "type">;

@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { Nonce, Signature } from "./_base/schemas.ts";
+import { SignatureSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Cancel order(s).
@@ -22,7 +22,7 @@ export const CancelRequest = /* @__PURE__ */ (() => {
             v.literal("cancel"),
             v.description("Type of action."),
           ),
-          /** Orders to cancel. */
+          /** Orders to cancel by asset and order ID. */
           cancels: v.pipe(
             v.array(
               v.object({
@@ -38,15 +38,21 @@ export const CancelRequest = /* @__PURE__ */ (() => {
                 ),
               }),
             ),
-            v.description("Orders to cancel."),
+            v.description("Orders to cancel by asset and order ID."),
           ),
         }),
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
       /** Vault address (for vault trading). */
       vaultAddress: v.pipe(
         v.optional(Address),
@@ -86,21 +92,21 @@ export const CancelResponse = /* @__PURE__ */ (() => {
           /** Specific data. */
           data: v.pipe(
             v.object({
-              /** Array of statuses or error messages. */
+              /** Array of statuses for each canceled order. */
               statuses: v.pipe(
                 v.array(
                   v.union([
                     v.literal("success"),
                     v.object({
-                      /** Error message. */
+                      /** Error message returned by the exchange. */
                       error: v.pipe(
                         v.string(),
-                        v.description("Error message."),
+                        v.description("Error message returned by the exchange."),
                       ),
                     }),
                   ]),
                 ),
-                v.description("Array of statuses or error messages."),
+                v.description("Array of statuses for each canceled order."),
               ),
             }),
             v.description("Specific data."),

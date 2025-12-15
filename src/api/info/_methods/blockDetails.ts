@@ -5,6 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
+import { ExplorerTransactionSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Request block details by block height.
@@ -49,7 +50,8 @@ export const BlockDetailsResponse = /* @__PURE__ */ (() => {
           ),
           /** Block hash. */
           hash: v.pipe(
-            v.pipe(Hex, v.length(66)),
+            Hex,
+            v.length(66),
             v.description("Block hash."),
           ),
           /** Block height in chain. */
@@ -69,50 +71,7 @@ export const BlockDetailsResponse = /* @__PURE__ */ (() => {
           ),
           /** Array of transactions in the block. */
           txs: v.pipe(
-            v.array(
-              /** Transaction details. */
-              v.pipe(
-                v.object({
-                  /** Action performed in transaction. */
-                  action: v.pipe(
-                    v.looseObject({
-                      /** Action type. */
-                      type: v.pipe(
-                        v.string(),
-                        v.description("Action type."),
-                      ),
-                    }),
-                    v.description("Action performed in transaction."),
-                  ),
-                  /** Block number where transaction was included. */
-                  block: v.pipe(
-                    UnsignedInteger,
-                    v.description("Block number where transaction was included."),
-                  ),
-                  /** Error message if transaction failed. */
-                  error: v.pipe(
-                    v.nullable(v.string()),
-                    v.description("Error message if transaction failed."),
-                  ),
-                  /** Transaction hash. */
-                  hash: v.pipe(
-                    v.pipe(Hex, v.length(66)),
-                    v.description("Transaction hash."),
-                  ),
-                  /** Transaction creation timestamp. */
-                  time: v.pipe(
-                    UnsignedInteger,
-                    v.description("Transaction creation timestamp."),
-                  ),
-                  /** Creator's address. */
-                  user: v.pipe(
-                    Address,
-                    v.description("Creator's address."),
-                  ),
-                }),
-                v.description("Transaction details."),
-              ),
-            ),
+            v.array(ExplorerTransactionSchema),
             v.description("Array of transactions in the block."),
           ),
         }),
@@ -128,7 +87,7 @@ export type BlockDetailsResponse = v.InferOutput<typeof BlockDetailsResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 import type { HttpTransport } from "../../../transport/http/mod.ts";
 
 /** Request parameters for the {@linkcode blockDetails} function. */

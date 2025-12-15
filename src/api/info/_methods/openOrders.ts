@@ -4,7 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address } from "../../_schemas.ts";
+import { OpenOrderSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Request open orders.
@@ -40,58 +41,7 @@ export type OpenOrdersRequest = v.InferOutput<typeof OpenOrdersRequest>;
  */
 export const OpenOrdersResponse = /* @__PURE__ */ (() => {
   return v.pipe(
-    v.array(
-      v.pipe(
-        v.object({
-          /** Asset symbol. */
-          coin: v.pipe(
-            v.string(),
-            v.description("Asset symbol."),
-          ),
-          /** Order side ("B" = Bid/Buy, "A" = Ask/Sell). */
-          side: v.pipe(
-            v.picklist(["B", "A"]),
-            v.description('Order side ("B" = Bid/Buy, "A" = Ask/Sell).'),
-          ),
-          /** Limit price. */
-          limitPx: v.pipe(
-            UnsignedDecimal,
-            v.description("Limit price."),
-          ),
-          /** Size. */
-          sz: v.pipe(
-            UnsignedDecimal,
-            v.description("Size."),
-          ),
-          /** Order ID. */
-          oid: v.pipe(
-            UnsignedInteger,
-            v.description("Order ID."),
-          ),
-          /** Timestamp when the order was placed (in ms since epoch). */
-          timestamp: v.pipe(
-            UnsignedInteger,
-            v.description("Timestamp when the order was placed (in ms since epoch)."),
-          ),
-          /** Original size at order placement. */
-          origSz: v.pipe(
-            UnsignedDecimal,
-            v.description("Original size at order placement."),
-          ),
-          /** Client Order ID. */
-          cloid: v.pipe(
-            v.optional(v.pipe(Hex, v.length(34))),
-            v.description("Client Order ID."),
-          ),
-          /** Indicates if the order is reduce-only. */
-          reduceOnly: v.pipe(
-            v.optional(v.literal(true)),
-            v.description("Indicates if the order is reduce-only."),
-          ),
-        }),
-        v.description("Order details."),
-      ),
-    ),
+    v.array(OpenOrderSchema),
     v.description("Array of open orders."),
   );
 })();
@@ -101,7 +51,7 @@ export type OpenOrdersResponse = v.InferOutput<typeof OpenOrdersResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode openOrders} function. */
 export type OpenOrdersParameters = Omit<v.InferInput<typeof OpenOrdersRequest>, "type">;

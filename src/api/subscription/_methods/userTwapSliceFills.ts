@@ -37,7 +37,10 @@ export const UserTwapSliceFillsEvent = /* @__PURE__ */ (() => {
         v.description("User address."),
       ),
       /** Array of user's twap slice fills. */
-      twapSliceFills: UserTwapSliceFillsResponse,
+      twapSliceFills: v.pipe(
+        UserTwapSliceFillsResponse,
+        v.description("Array of user's twap slice fills."),
+      ),
       /** Whether this is an initial snapshot. */
       isSnapshot: v.pipe(
         v.optional(v.literal(true)),

@@ -36,27 +36,23 @@ export type DelegatorRewardsRequest = v.InferOutput<typeof DelegatorRewardsReque
 export const DelegatorRewardsResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.array(
-      /** Reward received from staking activities. */
-      v.pipe(
-        v.object({
-          /** Timestamp when the reward was received (in ms since epoch). */
-          time: v.pipe(
-            UnsignedInteger,
-            v.description("Timestamp when the reward was received (in ms since epoch)."),
-          ),
-          /** Source of the reward. */
-          source: v.pipe(
-            v.picklist(["delegation", "commission"]),
-            v.description("Source of the reward."),
-          ),
-          /** Total reward amount. */
-          totalAmount: v.pipe(
-            UnsignedDecimal,
-            v.description("Total reward amount."),
-          ),
-        }),
-        v.description("Reward received from staking activities."),
-      ),
+      v.object({
+        /** Timestamp when the reward was received (in ms since epoch). */
+        time: v.pipe(
+          UnsignedInteger,
+          v.description("Timestamp when the reward was received (in ms since epoch)."),
+        ),
+        /** Source of the reward. */
+        source: v.pipe(
+          v.picklist(["delegation", "commission"]),
+          v.description("Source of the reward."),
+        ),
+        /** Total reward amount. */
+        totalAmount: v.pipe(
+          UnsignedDecimal,
+          v.description("Total reward amount."),
+        ),
+      }),
     ),
     v.description("Array of rewards received from staking activities."),
   );
@@ -67,7 +63,7 @@ export type DelegatorRewardsResponse = v.InferOutput<typeof DelegatorRewardsResp
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode delegatorRewards} function. */
 export type DelegatorRewardsParameters = Omit<v.InferInput<typeof DelegatorRewardsRequest>, "type">;

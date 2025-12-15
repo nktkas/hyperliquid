@@ -5,6 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Decimal, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { VaultRelationshipSchema } from "./_base/commonSchemas.ts";
 import { PortfolioResponse } from "./portfolio.ts";
 
 /**
@@ -72,7 +73,7 @@ export const VaultDetailsResponse = /* @__PURE__ */ (() => {
         v.number(),
         v.description("Annual percentage rate."),
       ),
-      /** Current user follower state */
+      /** Current user follower state. */
       followerState: v.pipe(
         v.nullable(
           v.object({
@@ -113,7 +114,7 @@ export const VaultDetailsResponse = /* @__PURE__ */ (() => {
             ),
           }),
         ),
-        v.description("Current user follower state"),
+        v.description("Current user follower state."),
       ),
       /** Ownership percentage held by leader. */
       leaderFraction: v.pipe(
@@ -128,47 +129,43 @@ export const VaultDetailsResponse = /* @__PURE__ */ (() => {
       /** Array of vault followers. */
       followers: v.pipe(
         v.array(
-          /** Vault follower state. */
-          v.pipe(
-            v.object({
-              /** Follower address or Leader. */
-              user: v.pipe(
-                v.union([Address, v.literal("Leader")]),
-                v.description("Follower address or Leader."),
-              ),
-              /** Follower vault equity. */
-              vaultEquity: v.pipe(
-                UnsignedDecimal,
-                v.description("Follower vault equity."),
-              ),
-              /** Current profit and loss. */
-              pnl: v.pipe(
-                Decimal,
-                v.description("Current profit and loss."),
-              ),
-              /** All-time profit and loss. */
-              allTimePnl: v.pipe(
-                Decimal,
-                v.description("All-time profit and loss."),
-              ),
-              /** Subscription duration in days. */
-              daysFollowing: v.pipe(
-                UnsignedInteger,
-                v.description("Subscription duration in days."),
-              ),
-              /** Vault entry timestamp. */
-              vaultEntryTime: v.pipe(
-                UnsignedInteger,
-                v.description("Vault entry timestamp."),
-              ),
-              /** Timestamp when funds become unlocked. */
-              lockupUntil: v.pipe(
-                UnsignedInteger,
-                v.description("Timestamp when funds become unlocked."),
-              ),
-            }),
-            v.description("Vault follower state."),
-          ),
+          v.object({
+            /** Follower address or Leader. */
+            user: v.pipe(
+              v.union([Address, v.literal("Leader")]),
+              v.description("Follower address or Leader."),
+            ),
+            /** Follower vault equity. */
+            vaultEquity: v.pipe(
+              UnsignedDecimal,
+              v.description("Follower vault equity."),
+            ),
+            /** Current profit and loss. */
+            pnl: v.pipe(
+              Decimal,
+              v.description("Current profit and loss."),
+            ),
+            /** All-time profit and loss. */
+            allTimePnl: v.pipe(
+              Decimal,
+              v.description("All-time profit and loss."),
+            ),
+            /** Subscription duration in days. */
+            daysFollowing: v.pipe(
+              UnsignedInteger,
+              v.description("Subscription duration in days."),
+            ),
+            /** Vault entry timestamp. */
+            vaultEntryTime: v.pipe(
+              UnsignedInteger,
+              v.description("Vault entry timestamp."),
+            ),
+            /** Timestamp when funds become unlocked. */
+            lockupUntil: v.pipe(
+              UnsignedInteger,
+              v.description("Timestamp when funds become unlocked."),
+            ),
+          }),
         ),
         v.description("Array of vault followers."),
       ),
@@ -189,33 +186,7 @@ export const VaultDetailsResponse = /* @__PURE__ */ (() => {
       ),
       /** Vault relationship type. */
       relationship: v.pipe(
-        v.variant("type", [
-          v.object({
-            /** Relationship type. */
-            type: v.pipe(
-              v.picklist(["normal", "child"]),
-              v.description("Relationship type."),
-            ),
-          }),
-          v.object({
-            /** Relationship type. */
-            type: v.pipe(
-              v.literal("parent"),
-              v.description("Relationship type."),
-            ),
-            /** Child vault information. */
-            data: v.pipe(
-              v.object({
-                /** Child vault addresses. */
-                childAddresses: v.pipe(
-                  v.array(Address),
-                  v.description("Child vault addresses."),
-                ),
-              }),
-              v.description("Child vault information."),
-            ),
-          }),
-        ]),
+        VaultRelationshipSchema,
         v.description("Vault relationship type."),
       ),
       /** Deposit permission status. */
@@ -238,7 +209,7 @@ export type VaultDetailsResponse = v.InferOutput<typeof VaultDetailsResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode vaultDetails} function. */
 export type VaultDetailsParameters = Omit<v.InferInput<typeof VaultDetailsRequest>, "type">;

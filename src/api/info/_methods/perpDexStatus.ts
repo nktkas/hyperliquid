@@ -51,7 +51,7 @@ export type PerpDexStatusResponse = v.InferOutput<typeof PerpDexStatusResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode perpDexStatus} function. */
 export type PerpDexStatusParameters = Omit<v.InferInput<typeof PerpDexStatusRequest>, "type">;

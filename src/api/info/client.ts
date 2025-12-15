@@ -1,4 +1,4 @@
-import type { InfoConfig } from "./_methods/_types.ts";
+import type { InfoConfig } from "./_methods/_base/types.ts";
 import type { HttpTransport } from "../../transport/http/mod.ts";
 
 // =============================================================
@@ -758,7 +758,7 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
 // Type Re-exports
 // =============================================================
 
-export type { InfoConfig } from "./_methods/_types.ts";
+export type { InfoConfig } from "./_methods/_base/types.ts";
 
 export type { ActiveAssetDataParameters, ActiveAssetDataResponse } from "./_methods/activeAssetData.ts";
 export type {

@@ -106,127 +106,123 @@ export const ClearinghouseStateResponse = /* @__PURE__ */ (() => {
       /** Array of asset positions. */
       assetPositions: v.pipe(
         v.array(
-          /** Position for a specific asset. */
-          v.pipe(
-            v.object({
-              /** Position type. */
-              type: v.pipe(
-                v.literal("oneWay"),
-                v.description("Position type."),
-              ),
-              /** Position details. */
-              position: v.pipe(
-                v.object({
-                  /** Asset symbol. */
-                  coin: v.pipe(
-                    v.string(),
-                    v.description("Asset symbol."),
-                  ),
-                  /** Signed position size. */
-                  szi: v.pipe(
-                    Decimal,
-                    v.description("Signed position size."),
-                  ),
-                  /** Leverage details. */
-                  leverage: v.pipe(
-                    v.variant("type", [
-                      v.object({
-                        /** Leverage type. */
-                        type: v.pipe(
-                          v.literal("isolated"),
-                          v.description("Leverage type."),
-                        ),
-                        /** Leverage value used. */
-                        value: v.pipe(
-                          UnsignedInteger,
-                          v.minValue(1),
-                          v.description("Leverage value used."),
-                        ),
-                        /** Amount of USD used (1 = $1). */
-                        rawUsd: v.pipe(
-                          UnsignedDecimal,
-                          v.description("Amount of USD used (1 = $1)."),
-                        ),
-                      }),
-                      v.object({
-                        /** Leverage type. */
-                        type: v.pipe(
-                          v.literal("cross"),
-                          v.description("Leverage type."),
-                        ),
-                        /** Leverage value used. */
-                        value: v.pipe(
-                          UnsignedInteger,
-                          v.minValue(1),
-                          v.description("Leverage value used."),
-                        ),
-                      }),
-                    ]),
-                    v.description("Leverage details."),
-                  ),
-                  /** Average entry price. */
-                  entryPx: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Average entry price."),
-                  ),
-                  /** Position value. */
-                  positionValue: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Position value."),
-                  ),
-                  /** Unrealized profit and loss. */
-                  unrealizedPnl: v.pipe(
-                    Decimal,
-                    v.description("Unrealized profit and loss."),
-                  ),
-                  /** Return on equity. */
-                  returnOnEquity: v.pipe(
-                    Decimal,
-                    v.description("Return on equity."),
-                  ),
-                  /** Liquidation price. */
-                  liquidationPx: v.pipe(
-                    v.nullable(UnsignedDecimal),
-                    v.description("Liquidation price."),
-                  ),
-                  /** Margin used. */
-                  marginUsed: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Margin used."),
-                  ),
-                  /** Maximum allowed leverage. */
-                  maxLeverage: v.pipe(
-                    UnsignedInteger,
-                    v.minValue(1),
-                    v.description("Maximum allowed leverage."),
-                  ),
-                  /** Cumulative funding details. */
-                  cumFunding: v.pipe(
+          v.object({
+            /** Position type. */
+            type: v.pipe(
+              v.literal("oneWay"),
+              v.description("Position type."),
+            ),
+            /** Position details. */
+            position: v.pipe(
+              v.object({
+                /** Asset symbol. */
+                coin: v.pipe(
+                  v.string(),
+                  v.description("Asset symbol."),
+                ),
+                /** Signed position size. */
+                szi: v.pipe(
+                  Decimal,
+                  v.description("Signed position size."),
+                ),
+                /** Leverage details. */
+                leverage: v.pipe(
+                  v.variant("type", [
                     v.object({
-                      /** Total funding paid or received since account opening. */
-                      allTime: v.pipe(
-                        Decimal,
-                        v.description("Total funding paid or received since account opening."),
+                      /** Leverage type. */
+                      type: v.pipe(
+                        v.literal("isolated"),
+                        v.description("Leverage type."),
                       ),
-                      /** Funding accumulated since the position was opened. */
-                      sinceOpen: v.pipe(
-                        Decimal,
-                        v.description("Funding accumulated since the position was opened."),
+                      /** Leverage value used. */
+                      value: v.pipe(
+                        UnsignedInteger,
+                        v.minValue(1),
+                        v.description("Leverage value used."),
                       ),
-                      /** Funding accumulated since the last change in position size. */
-                      sinceChange: v.pipe(
-                        Decimal,
-                        v.description("Funding accumulated since the last change in position size."),
+                      /** Amount of USD used (1 = $1). */
+                      rawUsd: v.pipe(
+                        UnsignedDecimal,
+                        v.description("Amount of USD used (1 = $1)."),
                       ),
                     }),
-                    v.description("Cumulative funding details."),
-                  ),
-                }),
-                v.description("Position details."),
-              ),
-            }),
-            v.description("Position for a specific asset."),
-          ),
+                    v.object({
+                      /** Leverage type. */
+                      type: v.pipe(
+                        v.literal("cross"),
+                        v.description("Leverage type."),
+                      ),
+                      /** Leverage value used. */
+                      value: v.pipe(
+                        UnsignedInteger,
+                        v.minValue(1),
+                        v.description("Leverage value used."),
+                      ),
+                    }),
+                  ]),
+                  v.description("Leverage details."),
+                ),
+                /** Average entry price. */
+                entryPx: v.pipe(
+                  UnsignedDecimal,
+                  v.description("Average entry price."),
+                ),
+                /** Position value. */
+                positionValue: v.pipe(
+                  UnsignedDecimal,
+                  v.description("Position value."),
+                ),
+                /** Unrealized profit and loss. */
+                unrealizedPnl: v.pipe(
+                  Decimal,
+                  v.description("Unrealized profit and loss."),
+                ),
+                /** Return on equity. */
+                returnOnEquity: v.pipe(
+                  Decimal,
+                  v.description("Return on equity."),
+                ),
+                /** Liquidation price. */
+                liquidationPx: v.pipe(
+                  v.nullable(UnsignedDecimal),
+                  v.description("Liquidation price."),
+                ),
+                /** Margin used. */
+                marginUsed: v.pipe(
+                  UnsignedDecimal,
+                  v.description("Margin used."),
+                ),
+                /** Maximum allowed leverage. */
+                maxLeverage: v.pipe(
+                  UnsignedInteger,
+                  v.minValue(1),
+                  v.description("Maximum allowed leverage."),
+                ),
+                /** Cumulative funding details. */
+                cumFunding: v.pipe(
+                  v.object({
+                    /** Total funding paid or received since account opening. */
+                    allTime: v.pipe(
+                      Decimal,
+                      v.description("Total funding paid or received since account opening."),
+                    ),
+                    /** Funding accumulated since the position was opened. */
+                    sinceOpen: v.pipe(
+                      Decimal,
+                      v.description("Funding accumulated since the position was opened."),
+                    ),
+                    /** Funding accumulated since the last change in position size. */
+                    sinceChange: v.pipe(
+                      Decimal,
+                      v.description("Funding accumulated since the last change in position size."),
+                    ),
+                  }),
+                  v.description("Cumulative funding details."),
+                ),
+              }),
+              v.description("Position details."),
+            ),
+          }),
         ),
         v.description("Array of asset positions."),
       ),
@@ -245,7 +241,7 @@ export type ClearinghouseStateResponse = v.InferOutput<typeof ClearinghouseState
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode clearinghouseState} function. */
 export type ClearinghouseStateParameters = Omit<v.InferInput<typeof ClearinghouseStateRequest>, "type">;

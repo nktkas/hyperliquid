@@ -6,7 +6,7 @@ import * as v from "@valibot/valibot";
 
 import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
 
-/** Subscription to explorer block events (RPC endpoint). */
+/** Subscription to explorer block events. */
 export const ExplorerBlockRequest = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
@@ -25,37 +25,34 @@ export type ExplorerBlockRequest = v.InferOutput<typeof ExplorerBlockRequest>;
 export const ExplorerBlockEvent = /* @__PURE__ */ (() => {
   return v.pipe(
     v.array(
-      /** Block details. */
-      v.pipe(
-        v.object({
-          /** Block creation timestamp. */
-          blockTime: v.pipe(
-            UnsignedInteger,
-            v.description("Block creation timestamp."),
-          ),
-          /** Block hash. */
-          hash: v.pipe(
-            v.pipe(Hex, v.length(66)),
-            v.description("Block hash."),
-          ),
-          /** Block height in chain. */
-          height: v.pipe(
-            UnsignedInteger,
-            v.description("Block height in chain."),
-          ),
-          /** Total transactions in block. */
-          numTxs: v.pipe(
-            UnsignedInteger,
-            v.description("Total transactions in block."),
-          ),
-          /** Block proposer address. */
-          proposer: v.pipe(
-            Address,
-            v.description("Block proposer address."),
-          ),
-        }),
-        v.description("The details of a block."),
-      ),
+      v.object({
+        /** Block creation timestamp. */
+        blockTime: v.pipe(
+          UnsignedInteger,
+          v.description("Block creation timestamp."),
+        ),
+        /** Block hash. */
+        hash: v.pipe(
+          Hex,
+          v.length(66),
+          v.description("Block hash."),
+        ),
+        /** Block height in chain. */
+        height: v.pipe(
+          UnsignedInteger,
+          v.description("Block height in chain."),
+        ),
+        /** Total transactions in block. */
+        numTxs: v.pipe(
+          UnsignedInteger,
+          v.description("Total transactions in block."),
+        ),
+        /** Block proposer address. */
+        proposer: v.pipe(
+          Address,
+          v.description("Block proposer address."),
+        ),
+      }),
     ),
     v.description("Event of array of block details."),
   );

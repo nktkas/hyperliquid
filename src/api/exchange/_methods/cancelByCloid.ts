@@ -4,8 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
-import { Nonce, Signature } from "./_base/schemas.ts";
+import { Address, Cloid, UnsignedInteger } from "../../_schemas.ts";
+import { SignatureSchema } from "./_base/commonSchemas.ts";
 import { CancelResponse } from "./cancel.ts";
 
 /**
@@ -23,7 +23,7 @@ export const CancelByCloidRequest = /* @__PURE__ */ (() => {
             v.literal("cancelByCloid"),
             v.description("Type of action."),
           ),
-          /** Orders to cancel. */
+          /** Orders to cancel by asset and client order ID. */
           cancels: v.pipe(
             v.array(
               v.object({
@@ -34,20 +34,26 @@ export const CancelByCloidRequest = /* @__PURE__ */ (() => {
                 ),
                 /** Client Order ID. */
                 cloid: v.pipe(
-                  v.pipe(Hex, v.length(34)),
+                  Cloid,
                   v.description("Client Order ID."),
                 ),
               }),
             ),
-            v.description("Orders to cancel."),
+            v.description("Orders to cancel by asset and client order ID."),
           ),
         }),
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
       /** Vault address (for vault trading). */
       vaultAddress: v.pipe(
         v.optional(Address),

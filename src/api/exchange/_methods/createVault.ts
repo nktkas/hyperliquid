@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, Nonce, Signature } from "./_base/schemas.ts";
+import { ErrorResponse, SignatureSchema } from "./_base/commonSchemas.ts";
 
 /** Create a vault. */
 export const CreateVaultRequest = /* @__PURE__ */ (() => {
@@ -23,29 +23,40 @@ export const CreateVaultRequest = /* @__PURE__ */ (() => {
           name: v.pipe(
             v.string(),
             v.minLength(3),
+            v.maxLength(50),
             v.description("Vault name."),
           ),
           /** Vault description. */
           description: v.pipe(
             v.string(),
             v.minLength(10),
+            v.maxLength(250),
             v.description("Vault description."),
           ),
           /** Initial balance (float * 1e6). */
           initialUsd: v.pipe(
             UnsignedInteger,
-            v.minValue(100000000), // 100 USDC
+            v.minValue(100 * 1e6), // 100 USD
             v.description("Initial balance (float * 1e6)."),
           ),
           /** Nonce (timestamp in ms) used to prevent replay attacks. */
-          nonce: Nonce,
+          nonce: v.pipe(
+            UnsignedInteger,
+            v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+          ),
         }),
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
       /** Expiration time of the action. */
       expiresAfter: v.pipe(
         v.optional(UnsignedInteger),
@@ -61,32 +72,29 @@ export type CreateVaultRequest = v.InferOutput<typeof CreateVaultRequest>;
 export const CreateVaultResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([
-      v.pipe(
-        v.object({
-          /** Successful status. */
-          status: v.pipe(
-            v.literal("ok"),
-            v.description("Successful status."),
-          ),
-          /** Response details. */
-          response: v.pipe(
-            v.object({
-              /** Type of response. */
-              type: v.pipe(
-                v.literal("createVault"),
-                v.description("Type of response."),
-              ),
-              /** Vault address. */
-              data: v.pipe(
-                Address,
-                v.description("Vault address."),
-              ),
-            }),
-            v.description("Response details."),
-          ),
-        }),
-        v.description("Successful response for creating a vault"),
-      ),
+      v.object({
+        /** Successful status. */
+        status: v.pipe(
+          v.literal("ok"),
+          v.description("Successful status."),
+        ),
+        /** Response details. */
+        response: v.pipe(
+          v.object({
+            /** Type of response. */
+            type: v.pipe(
+              v.literal("createVault"),
+              v.description("Type of response."),
+            ),
+            /** Vault address. */
+            data: v.pipe(
+              Address,
+              v.description("Vault address."),
+            ),
+          }),
+          v.description("Response details."),
+        ),
+      }),
       ErrorResponse,
     ]),
     v.description("Response for creating a vault."),

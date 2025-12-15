@@ -215,8 +215,8 @@ Deno.test("WebSocketPostRequest", async (t) => {
 
       socket.close();
 
-      await assertRejects(() => p1, WebSocketRequestError, "WebSocket connection closed.");
-      await assertRejects(() => p2, WebSocketRequestError, "WebSocket connection closed.");
+      await assertRejects(() => p1, WebSocketRequestError, "WebSocket connection closed");
+      await assertRejects(() => p2, WebSocketRequestError, "WebSocket connection closed");
     });
 
     await t.step("connection error", async () => {
@@ -226,7 +226,7 @@ Deno.test("WebSocketPostRequest", async (t) => {
 
       socket.error();
 
-      await assertRejects(() => promise, WebSocketRequestError, "WebSocket connection closed.");
+      await assertRejects(() => promise, WebSocketRequestError, "WebSocket connection closed");
     });
 
     await t.step("rejects if permanently closed", async () => {
@@ -264,7 +264,7 @@ Deno.test("WebSocketPostRequest", async (t) => {
 
         const promise = requester.request("post", { foo: "bar" });
 
-        await assertRejects(() => promise, DOMException, "Signal timed out.");
+        await assertRejects(() => promise, WebSocketRequestError, "Signal timed out.");
       });
 
       await t.step("timeout: null disables timeout", async () => {

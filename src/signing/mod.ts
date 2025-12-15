@@ -154,7 +154,7 @@ function largeIntToBigInt(obj: ValueType): ValueType {
   if (Array.isArray(obj)) return obj.map(largeIntToBigInt);
   if (typeof obj === "object" && obj !== null) {
     const result: Record<string, ValueType> = {};
-    for (const k in obj) result[k] = largeIntToBigInt(obj[k]);
+    for (const key in obj) result[key] = largeIntToBigInt(obj[key]);
     return result;
   }
   return obj;
@@ -164,9 +164,9 @@ function removeUndefinedKeys(obj: ValueType): ValueType {
   if (Array.isArray(obj)) return obj.map(removeUndefinedKeys);
   if (typeof obj === "object" && obj !== null) {
     const result: Record<string, ValueType> = {};
-    for (const k in obj) {
-      if (obj[k] !== undefined) {
-        result[k] = removeUndefinedKeys(obj[k]);
+    for (const key in obj) {
+      if (obj[key] !== undefined) {
+        result[key] = removeUndefinedKeys(obj[key]);
       }
     }
     return result;

@@ -38,7 +38,7 @@ export type AllPerpMetasResponse = v.InferOutput<typeof AllPerpMetasResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /**
  * Request trading metadata for all DEXes.

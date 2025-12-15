@@ -34,52 +34,49 @@ export type RecentTradesRequest = v.InferOutput<typeof RecentTradesRequest>;
 export const RecentTradesResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.array(
-      /** Trade for a specific asset. */
-      v.pipe(
-        v.object({
-          /** Asset symbol (e.g., BTC). */
-          coin: v.pipe(
-            v.string(),
-            v.description("Asset symbol (e.g., BTC)."),
-          ),
-          /** Trade side ("B" = Bid/Buy, "A" = Ask/Sell). */
-          side: v.pipe(
-            v.picklist(["B", "A"]),
-            v.description('Trade side ("B" = Bid/Buy, "A" = Ask/Sell).'),
-          ),
-          /** Trade price. */
-          px: v.pipe(
-            UnsignedDecimal,
-            v.description("Trade price."),
-          ),
-          /** Trade size. */
-          sz: v.pipe(
-            UnsignedDecimal,
-            v.description("Trade size."),
-          ),
-          /** Trade timestamp (in ms since epoch). */
-          time: v.pipe(
-            UnsignedInteger,
-            v.description("Trade timestamp (in ms since epoch)."),
-          ),
-          /** Transaction hash. */
-          hash: v.pipe(
-            v.pipe(Hex, v.length(66)),
-            v.description("Transaction hash."),
-          ),
-          /** Trade ID. */
-          tid: v.pipe(
-            UnsignedInteger,
-            v.description("Trade ID."),
-          ),
-          /** Addresses of users involved in the trade [Maker, Taker]. */
-          users: v.pipe(
-            v.tuple([Address, Address]),
-            v.description("Addresses of users involved in the trade [Maker, Taker]."),
-          ),
-        }),
-        v.description("Trade for a specific asset."),
-      ),
+      v.object({
+        /** Asset symbol (e.g., BTC). */
+        coin: v.pipe(
+          v.string(),
+          v.description("Asset symbol (e.g., BTC)."),
+        ),
+        /** Trade side ("B" = Bid/Buy, "A" = Ask/Sell). */
+        side: v.pipe(
+          v.picklist(["B", "A"]),
+          v.description('Trade side ("B" = Bid/Buy, "A" = Ask/Sell).'),
+        ),
+        /** Trade price. */
+        px: v.pipe(
+          UnsignedDecimal,
+          v.description("Trade price."),
+        ),
+        /** Trade size. */
+        sz: v.pipe(
+          UnsignedDecimal,
+          v.description("Trade size."),
+        ),
+        /** Trade timestamp (in ms since epoch). */
+        time: v.pipe(
+          UnsignedInteger,
+          v.description("Trade timestamp (in ms since epoch)."),
+        ),
+        /** Transaction hash. */
+        hash: v.pipe(
+          Hex,
+          v.length(66),
+          v.description("Transaction hash."),
+        ),
+        /** Trade ID. */
+        tid: v.pipe(
+          UnsignedInteger,
+          v.description("Trade ID."),
+        ),
+        /** Addresses of users involved in the trade [Maker, Taker]. */
+        users: v.pipe(
+          v.tuple([Address, Address]),
+          v.description("Addresses of users involved in the trade [Maker, Taker]."),
+        ),
+      }),
     ),
     v.description("Array of recent trades."),
   );
@@ -90,7 +87,7 @@ export type RecentTradesResponse = v.InferOutput<typeof RecentTradesResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode recentTrades} function. */
 export type RecentTradesParameters = Omit<v.InferInput<typeof RecentTradesRequest>, "type">;

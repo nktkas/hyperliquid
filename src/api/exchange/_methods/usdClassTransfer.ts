@@ -4,15 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { UnsignedDecimal } from "../../_schemas.ts";
-import {
-  ErrorResponse,
-  HyperliquidChain,
-  Nonce,
-  Signature,
-  SignatureChainId,
-  SuccessResponse,
-} from "./_base/schemas.ts";
+import { Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Transfer funds between Spot account and Perp account.
@@ -30,9 +23,15 @@ export const UsdClassTransferRequest = /* @__PURE__ */ (() => {
             v.description("Type of action."),
           ),
           /** Chain ID in hex format for EIP-712 signing. */
-          signatureChainId: SignatureChainId,
+          signatureChainId: v.pipe(
+            Hex,
+            v.description("Chain ID in hex format for EIP-712 signing."),
+          ),
           /** HyperLiquid network type. */
-          hyperliquidChain: HyperliquidChain,
+          hyperliquidChain: v.pipe(
+            HyperliquidChainSchema,
+            v.description("HyperLiquid network type."),
+          ),
           /** Amount to transfer (1 = $1). */
           amount: v.pipe(
             UnsignedDecimal,
@@ -44,14 +43,23 @@ export const UsdClassTransferRequest = /* @__PURE__ */ (() => {
             v.description("`true` for Spot to Perp, `false` for Perp to Spot."),
           ),
           /** Nonce (timestamp in ms) used to prevent replay attacks. */
-          nonce: Nonce,
+          nonce: v.pipe(
+            UnsignedInteger,
+            v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+          ),
         }),
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
     }),
     v.description("Transfer funds between Spot account and Perp account."),
   );

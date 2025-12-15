@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, Nonce, Signature, SuccessResponse } from "./_base/schemas.ts";
+import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
 
 /** Distribute funds from a vault between followers. */
 export const VaultDistributeRequest = /* @__PURE__ */ (() => {
@@ -26,23 +26,28 @@ export const VaultDistributeRequest = /* @__PURE__ */ (() => {
           ),
           /**
            * Amount to distribute (float * 1e6).
-           *
            * Set to 0 to close the vault.
            */
           usd: v.pipe(
             UnsignedInteger,
             v.description(
               "Amount to distribute (float * 1e6)." +
-                "\n\nSet to 0 to close the vault.",
+                "\nSet to 0 to close the vault.",
             ),
           ),
         }),
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
       /** Expiration time of the action. */
       expiresAfter: v.pipe(
         v.optional(UnsignedInteger),

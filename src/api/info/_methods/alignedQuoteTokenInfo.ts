@@ -52,21 +52,10 @@ export const AlignedQuoteTokenInfoResponse = /* @__PURE__ */ (() => {
       /** Daily amount owed as an array of [date, amount] tuples. */
       dailyAmountOwed: v.pipe(
         v.array(
-          v.pipe(
-            v.tuple([
-              /** Date in YYYY-MM-DD format. */
-              v.pipe(
-                v.string(),
-                v.description("Date in YYYY-MM-DD format."),
-              ),
-              /** Amount owed. */
-              v.pipe(
-                UnsignedDecimal,
-                v.description("Amount owed."),
-              ),
-            ]),
-            v.description("[date, amount] tuple."),
-          ),
+          v.tuple([
+            v.pipe(v.string(), v.isoDate()),
+            UnsignedDecimal,
+          ]),
         ),
         v.description("Daily amount owed as an array of [date, amount] tuples."),
       ),
@@ -85,7 +74,7 @@ export type AlignedQuoteTokenInfoResponse = v.InferOutput<typeof AlignedQuoteTok
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode alignedQuoteTokenInfo} function. */
 export type AlignedQuoteTokenInfoParameters = Omit<v.InferInput<typeof AlignedQuoteTokenInfoRequest>, "type">;

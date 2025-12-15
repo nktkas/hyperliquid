@@ -1,4 +1,5 @@
 // deno-lint-ignore-file no-import-prefix
+
 /**
  * Builds the Deno library for working with NodeJS or publishing to npm
  * Command: deno run -A .github/scripts/build_npm.ts
@@ -11,7 +12,7 @@ import denoJson from "../../deno.json" with { type: "json" };
  * Convert part of jsr dependencies to npm in deno.json imports.
  * HACK: I don't know of any other way to instruct `@deno/dnt` to convert jsr dependencies into npm equivalents.
  */
-async function modifyImports() {
+async function modifyImports(): Promise<() => Promise<void>> {
   // Define mappings from jsr to npm
   const jsr2npm = {
     "jsr:@nktkas/rews": "npm:@nktkas/rews",

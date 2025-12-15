@@ -104,7 +104,7 @@ export type PerpDexsResponse = v.InferOutput<typeof PerpDexsResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /**
  * Request all perpetual dexs.

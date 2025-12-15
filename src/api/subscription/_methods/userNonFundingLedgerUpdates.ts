@@ -37,7 +37,10 @@ export const UserNonFundingLedgerUpdatesEvent = /* @__PURE__ */ (() => {
         v.description("User address."),
       ),
       /** Array of user's non-funding ledger update. */
-      nonFundingLedgerUpdates: UserNonFundingLedgerUpdatesResponse,
+      nonFundingLedgerUpdates: v.pipe(
+        UserNonFundingLedgerUpdatesResponse,
+        v.description("Array of user's non-funding ledger update."),
+      ),
       /** Whether this is an initial snapshot. */
       isSnapshot: v.pipe(
         v.optional(v.literal(true)),

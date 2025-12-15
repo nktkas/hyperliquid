@@ -24,18 +24,14 @@ export const MaxMarketOrderNtlsRequest = /* @__PURE__ */ (() => {
 export type MaxMarketOrderNtlsRequest = v.InferOutput<typeof MaxMarketOrderNtlsRequest>;
 
 /**
- * Maximum market order notionals.
+ * Array of tuples containing maximum market order notionals and their corresponding asset symbols.
  */
 export const MaxMarketOrderNtlsResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.array(
-      /** Tuple of maximum market order notional and corresponding asset symbol. */
-      v.pipe(
-        v.tuple([UnsignedDecimal, v.string()]),
-        v.description("Tuple of maximum market order notional and corresponding asset symbol."),
-      ),
+      v.tuple([UnsignedDecimal, v.string()]),
     ),
-    v.description("Maximum market order notionals."),
+    v.description("Array of tuples containing maximum market order notionals and their corresponding asset symbols."),
   );
 })();
 export type MaxMarketOrderNtlsResponse = v.InferOutput<typeof MaxMarketOrderNtlsResponse>;
@@ -44,7 +40,7 @@ export type MaxMarketOrderNtlsResponse = v.InferOutput<typeof MaxMarketOrderNtls
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /**
  * Request maximum market order notionals.

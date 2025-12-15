@@ -5,9 +5,9 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, Nonce, Signature, SuccessResponse } from "./_base/schemas.ts";
+import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
 
-/** Modify a sub-account's. */
+/** Modify a sub-account. */
 export const SubAccountModifyRequest = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
@@ -28,15 +28,22 @@ export const SubAccountModifyRequest = /* @__PURE__ */ (() => {
           name: v.pipe(
             v.string(),
             v.minLength(1),
+            v.maxLength(16),
             v.description("New sub-account name."),
           ),
         }),
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
       /** Expiration time of the action. */
       expiresAfter: v.pipe(
         v.optional(UnsignedInteger),
@@ -81,7 +88,7 @@ export type SubAccountModifyOptions = ExtractRequestOptions<v.InferInput<typeof 
 export type SubAccountModifySuccessResponse = ExcludeErrorResponse<SubAccountModifyResponse>;
 
 /**
- * Modify a sub-account's.
+ * Modify a sub-account.
  *
  * @param config - General configuration for Exchange API requests.
  * @param params - Parameters specific to the API request.

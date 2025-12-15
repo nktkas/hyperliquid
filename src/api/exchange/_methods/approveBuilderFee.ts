@@ -4,15 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Percent } from "../../_schemas.ts";
-import {
-  ErrorResponse,
-  HyperliquidChain,
-  Nonce,
-  Signature,
-  SignatureChainId,
-  SuccessResponse,
-} from "./_base/schemas.ts";
+import { Address, Hex, Percent, UnsignedInteger } from "../../_schemas.ts";
+import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Approve a maximum fee rate for a builder.
@@ -30,9 +23,15 @@ export const ApproveBuilderFeeRequest = /* @__PURE__ */ (() => {
             v.description("Type of action."),
           ),
           /** Chain ID in hex format for EIP-712 signing. */
-          signatureChainId: SignatureChainId,
+          signatureChainId: v.pipe(
+            Hex,
+            v.description("Chain ID in hex format for EIP-712 signing."),
+          ),
           /** HyperLiquid network type. */
-          hyperliquidChain: HyperliquidChain,
+          hyperliquidChain: v.pipe(
+            HyperliquidChainSchema,
+            v.description("HyperLiquid network type."),
+          ),
           /** Max fee rate (e.g., "0.01%"). */
           maxFeeRate: v.pipe(
             Percent,
@@ -44,14 +43,23 @@ export const ApproveBuilderFeeRequest = /* @__PURE__ */ (() => {
             v.description("Builder address."),
           ),
           /** Nonce (timestamp in ms) used to prevent replay attacks. */
-          nonce: Nonce,
+          nonce: v.pipe(
+            UnsignedInteger,
+            v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+          ),
         }),
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
     }),
     v.description("Approve a maximum fee rate for a builder."),
   );

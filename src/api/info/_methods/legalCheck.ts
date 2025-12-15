@@ -59,7 +59,7 @@ export type LegalCheckResponse = v.InferOutput<typeof LegalCheckResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode legalCheck} function. */
 export type LegalCheckParameters = Omit<v.InferInput<typeof LegalCheckRequest>, "type">;

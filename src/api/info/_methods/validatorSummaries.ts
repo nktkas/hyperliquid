@@ -24,7 +24,7 @@ export const ValidatorSummariesRequest = /* @__PURE__ */ (() => {
 export type ValidatorSummariesRequest = v.InferOutput<typeof ValidatorSummariesRequest>;
 
 /** Statistics for validator performance over a time period. */
-const ValidatorStats = /* @__PURE__ */ (() => {
+const ValidatorStatsSchema = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
       /** Fraction of time the validator was online. */
@@ -53,71 +53,68 @@ const ValidatorStats = /* @__PURE__ */ (() => {
 export const ValidatorSummariesResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.array(
-      /** Validator performance statistics. */
-      v.pipe(
-        v.object({
-          /** Address of the validator. */
-          validator: v.pipe(
-            Address,
-            v.description("Address of the validator."),
-          ),
-          /** Address of the validator signer. */
-          signer: v.pipe(
-            Address,
-            v.description("Address of the validator signer."),
-          ),
-          /** Name of the validator. */
-          name: v.pipe(
-            v.string(),
-            v.description("Name of the validator."),
-          ),
-          /** Description of the validator. */
-          description: v.pipe(
-            v.string(),
-            v.description("Description of the validator."),
-          ),
-          /** Number of blocks produced recently. */
-          nRecentBlocks: v.pipe(
-            UnsignedInteger,
-            v.description("Number of blocks produced recently."),
-          ),
-          /** Total amount of tokens staked **(unsafe integer)**. */
-          stake: v.pipe(
-            v.pipe(v.number(), v.integer()),
-            v.description("Total amount of tokens staked **(unsafe integer)**."),
-          ),
-          /** Whether the validator is currently jailed. */
-          isJailed: v.pipe(
-            v.boolean(),
-            v.description("Whether the validator is currently jailed."),
-          ),
-          /** Timestamp when the validator can be unjailed (in ms since epoch). */
-          unjailableAfter: v.pipe(
-            v.nullable(UnsignedInteger),
-            v.description("Timestamp when the validator can be unjailed (in ms since epoch)."),
-          ),
-          /** Whether the validator is currently active. */
-          isActive: v.pipe(
-            v.boolean(),
-            v.description("Whether the validator is currently active."),
-          ),
-          /** Commission rate charged by the validator. */
-          commission: v.pipe(
-            UnsignedDecimal,
-            v.description("Commission rate charged by the validator."),
-          ),
-          /** Performance statistics over different time periods. */
-          stats: v.pipe(
-            v.tuple([
-              v.tuple([v.literal("day"), ValidatorStats]),
-              v.tuple([v.literal("week"), ValidatorStats]),
-              v.tuple([v.literal("month"), ValidatorStats]),
-            ]),
-            v.description("Performance statistics over different time periods."),
-          ),
-        }),
-        v.description("Validator performance statistics."),
-      ),
+      v.object({
+        /** Address of the validator. */
+        validator: v.pipe(
+          Address,
+          v.description("Address of the validator."),
+        ),
+        /** Address of the validator signer. */
+        signer: v.pipe(
+          Address,
+          v.description("Address of the validator signer."),
+        ),
+        /** Name of the validator. */
+        name: v.pipe(
+          v.string(),
+          v.description("Name of the validator."),
+        ),
+        /** Description of the validator. */
+        description: v.pipe(
+          v.string(),
+          v.description("Description of the validator."),
+        ),
+        /** Number of blocks produced recently. */
+        nRecentBlocks: v.pipe(
+          UnsignedInteger,
+          v.description("Number of blocks produced recently."),
+        ),
+        /** Total amount of tokens staked **(unsafe integer)**. */
+        stake: v.pipe(
+          v.number(),
+          v.integer(),
+          v.description("Total amount of tokens staked **(unsafe integer)**."),
+        ),
+        /** Whether the validator is currently jailed. */
+        isJailed: v.pipe(
+          v.boolean(),
+          v.description("Whether the validator is currently jailed."),
+        ),
+        /** Timestamp when the validator can be unjailed (in ms since epoch). */
+        unjailableAfter: v.pipe(
+          v.nullable(UnsignedInteger),
+          v.description("Timestamp when the validator can be unjailed (in ms since epoch)."),
+        ),
+        /** Whether the validator is currently active. */
+        isActive: v.pipe(
+          v.boolean(),
+          v.description("Whether the validator is currently active."),
+        ),
+        /** Commission rate charged by the validator. */
+        commission: v.pipe(
+          UnsignedDecimal,
+          v.description("Commission rate charged by the validator."),
+        ),
+        /** Performance statistics over different time periods. */
+        stats: v.pipe(
+          v.tuple([
+            v.tuple([v.literal("day"), ValidatorStatsSchema]),
+            v.tuple([v.literal("week"), ValidatorStatsSchema]),
+            v.tuple([v.literal("month"), ValidatorStatsSchema]),
+          ]),
+          v.description("Performance statistics over different time periods."),
+        ),
+      }),
     ),
     v.description("Array of validator performance statistics."),
   );
@@ -128,7 +125,7 @@ export type ValidatorSummariesResponse = v.InferOutput<typeof ValidatorSummaries
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /**
  * Request validator summaries.

@@ -47,7 +47,10 @@ export const OpenOrdersEvent = /* @__PURE__ */ (() => {
         v.description("User address."),
       ),
       /** Array of open orders with additional display information. */
-      orders: FrontendOpenOrdersResponse,
+      orders: v.pipe(
+        FrontendOpenOrdersResponse,
+        v.description("Array of open orders with additional display information."),
+      ),
     }),
     v.description("Event of open orders for a specific user."),
   );

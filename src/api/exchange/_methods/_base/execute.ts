@@ -13,7 +13,7 @@ import {
 import { assertSuccessResponse } from "./errors.ts";
 import { defaultNonceManager } from "./_nonce.ts";
 import { withLock } from "./_semaphore.ts";
-import type { Signature } from "./schemas.ts";
+import type { SignatureSchema } from "./commonSchemas.ts";
 
 // =============================================================
 // Type Utilities
@@ -226,7 +226,7 @@ export async function executeUserSignedAction<T>(
 // =============================================================
 
 /** Remove leading zeros from signature components (required by Hyperliquid). */
-function trimSignature(sig: Signature): Signature {
+function trimSignature(sig: SignatureSchema): SignatureSchema {
   return {
     r: sig.r.replace(/^0x0+/, "0x") as `0x${string}`,
     s: sig.s.replace(/^0x0+/, "0x") as `0x${string}`,
@@ -242,7 +242,7 @@ async function signMultiSigL1(
   nonce: number,
   vaultAddress?: `0x${string}`,
   expiresAfter?: number,
-): Promise<[Record<string, unknown>, Signature]> {
+): Promise<[Record<string, unknown>, SignatureSchema]> {
   const { transport: { isTestnet }, signers, multiSigUser } = config;
   const multiSigUser_ = v.parse(Address, multiSigUser);
   const outerSigner_ = v.parse(Address, outerSigner);
@@ -292,7 +292,7 @@ async function signMultiSigUserSigned(
   types: Record<string, { name: string; type: string }[]>,
   outerSigner: `0x${string}`,
   nonce: number,
-): Promise<[Record<string, unknown>, Signature]> {
+): Promise<[Record<string, unknown>, SignatureSchema]> {
   const { signers, multiSigUser, transport: { isTestnet } } = config;
   const multiSigUser_ = v.parse(Address, multiSigUser);
   const outerSigner_ = v.parse(Address, outerSigner);

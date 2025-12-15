@@ -31,8 +31,11 @@ export const AllMidsEvent = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
       /** Mapping of coin symbols to mid prices. */
-      mids: AllMidsResponse,
-      /** DEX name (undefined for main dex). */
+      mids: v.pipe(
+        AllMidsResponse,
+        v.description("Mapping of coin symbols to mid prices."),
+      ),
+      /** DEX name (empty string for main dex). */
       dex: v.pipe(
         v.optional(v.string()),
         v.description("DEX name (empty string for main dex)."),

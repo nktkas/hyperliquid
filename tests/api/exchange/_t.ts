@@ -189,9 +189,9 @@ export async function cleanupTempExchangeClient(
 export async function openOrder(
   client: ExchangeClient<ExchangeSingleWalletConfig | ExchangeMultiSigConfig>,
   type: "market" | "limit",
-  symbol: string = "ETH",
+  symbol = "ETH",
   side: "buy" | "sell" = "buy",
-  slippage: number = 0.05, // 5%
+  slippage = 0.05, // 5%
 ): Promise<{
   a: number;
   b: boolean;
@@ -254,7 +254,7 @@ export async function openOrder(
 
 export async function createTWAP(
   client: ExchangeClient<ExchangeSingleWalletConfig | ExchangeMultiSigConfig>,
-  symbol: string = "ETH",
+  symbol = "ETH",
   side: "buy" | "sell" = "buy",
 ): Promise<{ a: number; b: boolean; s: string; twapId: number; midPx: string }> {
   // Top-up account

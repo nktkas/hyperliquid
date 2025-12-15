@@ -66,7 +66,7 @@ export type PerpDeployAuctionStatusResponse = v.InferOutput<typeof PerpDeployAuc
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /**
  * Request for the status of the perpetual deploy auction.

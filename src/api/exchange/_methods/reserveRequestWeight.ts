@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, Nonce, Signature, SuccessResponse } from "./_base/schemas.ts";
+import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Reserve additional rate-limited actions for a fee.
@@ -25,15 +25,22 @@ export const ReserveRequestWeightRequest = /* @__PURE__ */ (() => {
           /** Amount of request weight to reserve. */
           weight: v.pipe(
             UnsignedInteger,
+            v.maxValue(1844674407370955), // truncated max uint64 / 1000
             v.description("Amount of request weight to reserve."),
           ),
         }),
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
       /** Expiration time of the action. */
       expiresAfter: v.pipe(
         v.optional(UnsignedInteger),

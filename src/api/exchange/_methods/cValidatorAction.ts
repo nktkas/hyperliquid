@@ -5,13 +5,13 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, Nonce, Signature, SuccessResponse } from "./_base/schemas.ts";
+import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
 
 /** Action related to validator management. */
 export const CValidatorActionRequest = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
-      /** Action to perform. */
+      /** Validator management action. */
       action: v.pipe(
         v.union([
           v.object({
@@ -47,10 +47,10 @@ export const CValidatorActionRequest = /* @__PURE__ */ (() => {
                   v.nullable(v.string()),
                   v.description("Validator description."),
                 ),
-                /** Validator jail status. */
+                /** Whether the validator is unjailed. */
                 unjailed: v.pipe(
                   v.boolean(),
-                  v.description("Validator jail status."),
+                  v.description("Whether the validator is unjailed."),
                 ),
                 /** Enable or disable delegations. */
                 disable_delegations: v.pipe(
@@ -150,12 +150,18 @@ export const CValidatorActionRequest = /* @__PURE__ */ (() => {
             ),
           }),
         ]),
-        v.description("Action to perform."),
+        v.description("Validator management action."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
       /** Expiration time of the action. */
       expiresAfter: v.pipe(
         v.optional(UnsignedInteger),
@@ -211,7 +217,7 @@ export type CValidatorActionSuccessResponse = ExcludeErrorResponse<CValidatorAct
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
- * @example
+ * @example Change validator profile
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { cValidatorAction } from "@nktkas/hyperliquid/api/exchange";
@@ -220,7 +226,6 @@ export type CValidatorActionSuccessResponse = ExcludeErrorResponse<CValidatorAct
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * // Change validator profile
  * await cValidatorAction(
  *   { transport, wallet },
  *   {
@@ -234,31 +239,6 @@ export type CValidatorActionSuccessResponse = ExcludeErrorResponse<CValidatorAct
  *       signer: null,
  *     },
  *   },
- * );
- *
- * // Register a new validator
- * await cValidatorAction(
- *   { transport, wallet },
- *   {
- *     register: {
- *       profile: {
- *         node_ip: { Ip: "1.2.3.4" },
- *         name: "...",
- *         description: "...",
- *         delegations_disabled: true,
- *         commission_bps: 1,
- *         signer: "0x...",
- *       },
- *       unjailed: false,
- *       initial_wei: 1,
- *     },
- *   },
- * );
- *
- * // Unregister a validator
- * await cValidatorAction(
- *   { transport, wallet },
- *   { unregister: null },
  * );
  * ```
  */

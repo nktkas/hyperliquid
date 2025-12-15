@@ -4,7 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
+import { Hex } from "../../_schemas.ts";
+import { ExplorerTransactionSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Request transaction details by transaction hash.
@@ -19,7 +20,8 @@ export const TxDetailsRequest = /* @__PURE__ */ (() => {
       ),
       /** Transaction hash. */
       hash: v.pipe(
-        v.pipe(Hex, v.length(66)),
+        Hex,
+        v.length(66),
         v.description("Transaction hash."),
       ),
     }),
@@ -41,44 +43,7 @@ export const TxDetailsResponse = /* @__PURE__ */ (() => {
       ),
       /** Transaction details. */
       tx: v.pipe(
-        v.object({
-          /** Action performed in transaction. */
-          action: v.pipe(
-            v.looseObject({
-              /** Action type. */
-              type: v.pipe(
-                v.string(),
-                v.description("Action type."),
-              ),
-            }),
-            v.description("Action performed in transaction."),
-          ),
-          /** Block number where transaction was included. */
-          block: v.pipe(
-            UnsignedInteger,
-            v.description("Block number where transaction was included."),
-          ),
-          /** Error message if transaction failed. */
-          error: v.pipe(
-            v.nullable(v.string()),
-            v.description("Error message if transaction failed."),
-          ),
-          /** Transaction hash. */
-          hash: v.pipe(
-            v.pipe(Hex, v.length(66)),
-            v.description("Transaction hash."),
-          ),
-          /** Transaction creation timestamp. */
-          time: v.pipe(
-            UnsignedInteger,
-            v.description("Transaction creation timestamp."),
-          ),
-          /** Creator's address. */
-          user: v.pipe(
-            Address,
-            v.description("Creator's address."),
-          ),
-        }),
+        ExplorerTransactionSchema,
         v.description("Transaction details."),
       ),
     }),
@@ -91,7 +56,7 @@ export type TxDetailsResponse = v.InferOutput<typeof TxDetailsResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 import type { HttpTransport } from "../../../transport/http/mod.ts";
 
 /** Request parameters for the {@linkcode txDetails} function. */

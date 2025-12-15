@@ -42,7 +42,10 @@ export const SpotStateEvent = /* @__PURE__ */ (() => {
         v.description("User address."),
       ),
       /** Account summary for spot trading. */
-      spotState: SpotClearinghouseStateResponse,
+      spotState: v.pipe(
+        SpotClearinghouseStateResponse,
+        v.description("Account summary for spot trading."),
+      ),
     }),
     v.description("Event of user spot state."),
   );

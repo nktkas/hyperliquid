@@ -4,8 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, Nonce, Signature, SuccessResponse } from "./_base/schemas.ts";
+import { Address, Cloid, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Modify an order.
@@ -24,10 +24,7 @@ export const ModifyRequest = /* @__PURE__ */ (() => {
           ),
           /** Order ID or Client Order ID. */
           oid: v.pipe(
-            v.union([
-              UnsignedInteger,
-              v.pipe(Hex, v.length(34)),
-            ]),
+            v.union([UnsignedInteger, Cloid]),
             v.description("Order ID or Client Order ID."),
           ),
           /** New order parameters. */
@@ -46,6 +43,7 @@ export const ModifyRequest = /* @__PURE__ */ (() => {
               /** Price. */
               p: v.pipe(
                 UnsignedDecimal,
+                v.check((input) => Number(input) > 0, "Value must be greater than zero."),
                 v.description("Price."),
               ),
               /** Size (in base currency units). */
@@ -58,7 +56,7 @@ export const ModifyRequest = /* @__PURE__ */ (() => {
                 v.boolean(),
                 v.description("Is reduce-only?"),
               ),
-              /** Order type. */
+              /** Order type (`limit` for limit orders, `trigger` for stop-loss/take-profit orders). */
               t: v.pipe(
                 v.union([
                   v.object({
@@ -100,6 +98,7 @@ export const ModifyRequest = /* @__PURE__ */ (() => {
                         /** Trigger price. */
                         triggerPx: v.pipe(
                           UnsignedDecimal,
+                          v.check((input) => Number(input) > 0, "Value must be greater than zero."),
                           v.description("Trigger price."),
                         ),
                         /** Indicates whether it is take profit or stop loss. */
@@ -112,11 +111,11 @@ export const ModifyRequest = /* @__PURE__ */ (() => {
                     ),
                   }),
                 ]),
-                v.description("Order type."),
+                v.description("Order type (`limit` for limit orders, `trigger` for stop-loss/take-profit orders)."),
               ),
               /** Client Order ID. */
               c: v.pipe(
-                v.optional(v.pipe(Hex, v.length(34))),
+                v.optional(Cloid),
                 v.description("Client Order ID."),
               ),
             }),
@@ -126,9 +125,15 @@ export const ModifyRequest = /* @__PURE__ */ (() => {
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
       /** Vault address (for vault trading). */
       vaultAddress: v.pipe(
         v.optional(Address),

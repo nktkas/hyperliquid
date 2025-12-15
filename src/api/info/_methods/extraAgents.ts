@@ -34,28 +34,24 @@ export type ExtraAgentsRequest = v.InferOutput<typeof ExtraAgentsRequest>;
 export const ExtraAgentsResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.array(
-      /** Extra agent details for a user. */
-      v.pipe(
-        v.object({
-          /** Extra agent address. */
-          address: v.pipe(
-            Address,
-            v.description("Extra agent address."),
-          ),
-          /** Extra agent name. */
-          name: v.pipe(
-            v.string(),
-            v.minLength(1),
-            v.description("Extra agent name."),
-          ),
-          /** Validity period as a timestamp (in ms since epoch). */
-          validUntil: v.pipe(
-            UnsignedInteger,
-            v.description("Validity period as a timestamp (in ms since epoch)."),
-          ),
-        }),
-        v.description("Extra agent details for a user."),
-      ),
+      v.object({
+        /** Extra agent address. */
+        address: v.pipe(
+          Address,
+          v.description("Extra agent address."),
+        ),
+        /** Extra agent name. */
+        name: v.pipe(
+          v.string(),
+          v.nonEmpty(),
+          v.description("Extra agent name."),
+        ),
+        /** Validity period as a timestamp (in ms since epoch). */
+        validUntil: v.pipe(
+          UnsignedInteger,
+          v.description("Validity period as a timestamp (in ms since epoch)."),
+        ),
+      }),
     ),
     v.description("Array of extra agent details for a user."),
   );
@@ -66,7 +62,7 @@ export type ExtraAgentsResponse = v.InferOutput<typeof ExtraAgentsResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode extraAgents} function. */
 export type ExtraAgentsParameters = Omit<v.InferInput<typeof ExtraAgentsRequest>, "type">;

@@ -4,9 +4,9 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
+import { ExplorerTransactionSchema } from "../../info/_methods/_base/commonSchemas.ts";
 
-/** Subscription to explorer transaction events (RPC endpoint). */
+/** Subscription to explorer transaction events. */
 export const ExplorerTxsRequest = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
@@ -24,50 +24,7 @@ export type ExplorerTxsRequest = v.InferOutput<typeof ExplorerTxsRequest>;
 /** Event of array of transaction details. */
 export const ExplorerTxsEvent = /* @__PURE__ */ (() => {
   return v.pipe(
-    v.array(
-      /** Transaction details. */
-      v.pipe(
-        v.object({
-          /** Action performed in transaction. */
-          action: v.pipe(
-            v.looseObject({
-              /** Action type. */
-              type: v.pipe(
-                v.string(),
-                v.description("Action type."),
-              ),
-            }),
-            v.description("Action performed in transaction."),
-          ),
-          /** Block number where transaction was included. */
-          block: v.pipe(
-            UnsignedInteger,
-            v.description("Block number where transaction was included."),
-          ),
-          /** Error message if transaction failed. */
-          error: v.pipe(
-            v.nullable(v.string()),
-            v.description("Error message if transaction failed."),
-          ),
-          /** Transaction hash. */
-          hash: v.pipe(
-            v.pipe(Hex, v.length(66)),
-            v.description("Transaction hash."),
-          ),
-          /** Transaction creation timestamp. */
-          time: v.pipe(
-            UnsignedInteger,
-            v.description("Transaction creation timestamp."),
-          ),
-          /** Creator's address. */
-          user: v.pipe(
-            Address,
-            v.description("Creator's address."),
-          ),
-        }),
-        v.description("Transaction details."),
-      ),
-    ),
+    v.array(ExplorerTransactionSchema),
     v.description("Event of array of transaction details."),
   );
 })();

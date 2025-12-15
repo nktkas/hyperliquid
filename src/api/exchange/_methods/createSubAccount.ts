@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, Nonce, Signature } from "./_base/schemas.ts";
+import { ErrorResponse, SignatureSchema } from "./_base/commonSchemas.ts";
 
 /** Create a sub-account. */
 export const CreateSubAccountRequest = /* @__PURE__ */ (() => {
@@ -23,15 +23,22 @@ export const CreateSubAccountRequest = /* @__PURE__ */ (() => {
           name: v.pipe(
             v.string(),
             v.minLength(1),
+            v.maxLength(16),
             v.description("Sub-account name."),
           ),
         }),
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
       /** Expiration time of the action. */
       expiresAfter: v.pipe(
         v.optional(UnsignedInteger),
@@ -47,32 +54,29 @@ export type CreateSubAccountRequest = v.InferOutput<typeof CreateSubAccountReque
 export const CreateSubAccountResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([
-      v.pipe(
-        v.object({
-          /** Successful status. */
-          status: v.pipe(
-            v.literal("ok"),
-            v.description("Successful status."),
-          ),
-          /** Response details. */
-          response: v.pipe(
-            v.object({
-              /** Type of response. */
-              type: v.pipe(
-                v.literal("createSubAccount"),
-                v.description("Type of response."),
-              ),
-              /** Sub-account address. */
-              data: v.pipe(
-                Address,
-                v.description("Sub-account address."),
-              ),
-            }),
-            v.description("Response details."),
-          ),
-        }),
-        v.description("Successful response for creating a sub-account"),
-      ),
+      v.object({
+        /** Successful status. */
+        status: v.pipe(
+          v.literal("ok"),
+          v.description("Successful status."),
+        ),
+        /** Response details. */
+        response: v.pipe(
+          v.object({
+            /** Type of response. */
+            type: v.pipe(
+              v.literal("createSubAccount"),
+              v.description("Type of response."),
+            ),
+            /** Sub-account address. */
+            data: v.pipe(
+              Address,
+              v.description("Sub-account address."),
+            ),
+          }),
+          v.description("Response details."),
+        ),
+      }),
       ErrorResponse,
     ]),
     v.description("Response for creating a sub-account."),

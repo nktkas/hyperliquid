@@ -47,7 +47,10 @@ export const ClearinghouseStateEvent = /* @__PURE__ */ (() => {
         v.description("User address."),
       ),
       /** Account summary for perpetual trading. */
-      clearinghouseState: ClearinghouseStateResponse,
+      clearinghouseState: v.pipe(
+        ClearinghouseStateResponse,
+        v.description("Account summary for perpetual trading."),
+      ),
     }),
     v.description("Event of clearinghouse state for a specific user."),
   );

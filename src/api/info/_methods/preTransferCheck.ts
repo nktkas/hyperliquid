@@ -69,7 +69,7 @@ export type PreTransferCheckResponse = v.InferOutput<typeof PreTransferCheckResp
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode preTransferCheck} function. */
 export type PreTransferCheckParameters = Omit<v.InferInput<typeof PreTransferCheckRequest>, "type">;

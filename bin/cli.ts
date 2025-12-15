@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// deno-lint-ignore-file no-console
 
 /**
  * Command-line interface for interacting with Hyperliquid API.
@@ -19,7 +20,6 @@
  * ```
  */
 
-// @ts-ignore: Ignore missing TS types when building npm
 import process from "node:process";
 import { type Args, extractArgs, transformArgs } from "./_utils.ts";
 import { ExchangeClient, HttpTransport, InfoClient } from "../src/mod.ts";
@@ -29,7 +29,7 @@ import { PrivateKeySigner } from "../src/signing/mod.ts";
 // Execute
 // ============================================================
 
-function transformParams(method: string, params: Args<false>) {
+function transformParams(method: string, params: Args<false>): Record<string, unknown> {
   switch (method) {
     case "spotUser": {
       return { toggleSpotDusting: { ...params } };
@@ -95,7 +95,7 @@ async function executeEndpointMethod(endpoint: string, method: string, args: Arg
 // CLI
 // ============================================================
 
-function printHelp() {
+function printHelp(): void {
   console.log(`Hyperliquid CLI
 
 Usage:

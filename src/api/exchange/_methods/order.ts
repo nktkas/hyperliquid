@@ -4,8 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { Nonce, Signature } from "./_base/schemas.ts";
+import { Address, Cloid, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { SignatureSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Place an order(s).
@@ -25,103 +25,102 @@ export const OrderRequest = /* @__PURE__ */ (() => {
           /** Array of order parameters. */
           orders: v.pipe(
             v.array(
-              v.pipe(
-                v.object({
-                  /** Asset ID. */
-                  a: v.pipe(
-                    UnsignedInteger,
-                    v.description("Asset ID."),
-                  ),
-                  /** Position side (`true` for long, `false` for short). */
-                  b: v.pipe(
-                    v.boolean(),
-                    v.description("Position side (`true` for long, `false` for short)."),
-                  ),
-                  /** Price. */
-                  p: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Price."),
-                  ),
-                  /** Size (in base currency units). */
-                  s: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Size (in base currency units)."),
-                  ),
-                  /** Is reduce-only? */
-                  r: v.pipe(
-                    v.boolean(),
-                    v.description("Is reduce-only?"),
-                  ),
-                  /** Order type. */
-                  t: v.pipe(
-                    v.union([
-                      v.object({
-                        /** Limit order parameters. */
-                        limit: v.pipe(
-                          v.object({
-                            /**
-                             * Time-in-force.
-                             * - `"Gtc"`: Remains active until filled or canceled.
-                             * - `"Ioc"`: Fills immediately or cancels any unfilled portion.
-                             * - `"Alo"`: Adds liquidity only.
-                             * - `"FrontendMarket"`: Similar to Ioc, used in Hyperliquid UI.
-                             * - `"LiquidationMarket"`: Similar to Ioc, used in Hyperliquid UI.
-                             */
-                            tif: v.pipe(
-                              v.picklist(["Gtc", "Ioc", "Alo", "FrontendMarket", "LiquidationMarket"]),
-                              v.description(
-                                "Time-in-force." +
-                                  '\n- `"Gtc"`: Remains active until filled or canceled.' +
-                                  '\n- `"Ioc"`: Fills immediately or cancels any unfilled portion.' +
-                                  '\n- `"Alo"`: Adds liquidity only.' +
-                                  '\n- `"FrontendMarket"`: Similar to Ioc, used in Hyperliquid UI.' +
-                                  '\n- `"LiquidationMarket"`: Similar to Ioc, used in Hyperliquid UI.',
-                              ),
+              v.object({
+                /** Asset ID. */
+                a: v.pipe(
+                  UnsignedInteger,
+                  v.description("Asset ID."),
+                ),
+                /** Position side (`true` for long, `false` for short). */
+                b: v.pipe(
+                  v.boolean(),
+                  v.description("Position side (`true` for long, `false` for short)."),
+                ),
+                /** Price. */
+                p: v.pipe(
+                  UnsignedDecimal,
+                  v.check((input) => Number(input) > 0, "Value must be greater than zero."),
+                  v.description("Price."),
+                ),
+                /** Size (in base currency units). */
+                s: v.pipe(
+                  UnsignedDecimal,
+                  v.description("Size (in base currency units)."),
+                ),
+                /** Is reduce-only? */
+                r: v.pipe(
+                  v.boolean(),
+                  v.description("Is reduce-only?"),
+                ),
+                /** Order type (`limit` for limit orders, `trigger` for stop-loss/take-profit orders). */
+                t: v.pipe(
+                  v.union([
+                    v.object({
+                      /** Limit order parameters. */
+                      limit: v.pipe(
+                        v.object({
+                          /**
+                           * Time-in-force.
+                           * - `"Gtc"`: Remains active until filled or canceled.
+                           * - `"Ioc"`: Fills immediately or cancels any unfilled portion.
+                           * - `"Alo"`: Adds liquidity only.
+                           * - `"FrontendMarket"`: Similar to Ioc, used in Hyperliquid UI.
+                           * - `"LiquidationMarket"`: Similar to Ioc, used in Hyperliquid UI.
+                           */
+                          tif: v.pipe(
+                            v.picklist(["Gtc", "Ioc", "Alo", "FrontendMarket", "LiquidationMarket"]),
+                            v.description(
+                              "Time-in-force." +
+                                '\n- `"Gtc"`: Remains active until filled or canceled.' +
+                                '\n- `"Ioc"`: Fills immediately or cancels any unfilled portion.' +
+                                '\n- `"Alo"`: Adds liquidity only.' +
+                                '\n- `"FrontendMarket"`: Similar to Ioc, used in Hyperliquid UI.' +
+                                '\n- `"LiquidationMarket"`: Similar to Ioc, used in Hyperliquid UI.',
                             ),
-                          }),
-                          v.description("Limit order parameters."),
-                        ),
-                      }),
-                      v.object({
-                        /** Trigger order parameters. */
-                        trigger: v.pipe(
-                          v.object({
-                            /** Is market order? */
-                            isMarket: v.pipe(
-                              v.boolean(),
-                              v.description("Is market order?"),
-                            ),
-                            /** Trigger price. */
-                            triggerPx: v.pipe(
-                              UnsignedDecimal,
-                              v.description("Trigger price."),
-                            ),
-                            /** Indicates whether it is take profit or stop loss. */
-                            tpsl: v.pipe(
-                              v.picklist(["tp", "sl"]),
-                              v.description("Indicates whether it is take profit or stop loss."),
-                            ),
-                          }),
-                          v.description("Trigger order parameters."),
-                        ),
-                      }),
-                    ]),
-                    v.description("Order type."),
-                  ),
-                  /** Client Order ID. */
-                  c: v.pipe(
-                    v.optional(v.pipe(Hex, v.length(34))),
-                    v.description("Client Order ID."),
-                  ),
-                }),
-                v.description("Place order parameters."),
-              ),
+                          ),
+                        }),
+                        v.description("Limit order parameters."),
+                      ),
+                    }),
+                    v.object({
+                      /** Trigger order parameters. */
+                      trigger: v.pipe(
+                        v.object({
+                          /** Is market order? */
+                          isMarket: v.pipe(
+                            v.boolean(),
+                            v.description("Is market order?"),
+                          ),
+                          /** Trigger price. */
+                          triggerPx: v.pipe(
+                            UnsignedDecimal,
+                            v.check((input) => Number(input) > 0, "Value must be greater than zero."),
+                            v.description("Trigger price."),
+                          ),
+                          /** Indicates whether it is take profit or stop loss. */
+                          tpsl: v.pipe(
+                            v.picklist(["tp", "sl"]),
+                            v.description("Indicates whether it is take profit or stop loss."),
+                          ),
+                        }),
+                        v.description("Trigger order parameters."),
+                      ),
+                    }),
+                  ]),
+                  v.description("Order type (`limit` for limit orders, `trigger` for stop-loss/take-profit orders)."),
+                ),
+                /** Client Order ID. */
+                c: v.pipe(
+                  v.optional(Cloid),
+                  v.description("Client Order ID."),
+                ),
+              }),
             ),
             v.description("Array of order parameters."),
           ),
           /**
            * Order grouping strategy:
-           * - `na`: Standard order without grouping (default).
+           * - `na`: Standard order without grouping.
            * - `normalTpsl`: TP/SL order with fixed size that doesn't adjust with position changes.
            * - `positionTpsl`: TP/SL order that adjusts proportionally with the position size.
            */
@@ -145,6 +144,7 @@ export const OrderRequest = /* @__PURE__ */ (() => {
               /** Builder fee in 0.1bps (1 = 0.0001%). */
               f: v.pipe(
                 UnsignedInteger,
+                v.maxValue(100),
                 v.description("Builder fee in 0.1bps (1 = 0.0001%)."),
               ),
             })),
@@ -154,9 +154,15 @@ export const OrderRequest = /* @__PURE__ */ (() => {
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
       /** Vault address (for vault trading). */
       vaultAddress: v.pipe(
         v.optional(Address),
@@ -196,7 +202,7 @@ export const OrderResponse = /* @__PURE__ */ (() => {
           /** Specific data. */
           data: v.pipe(
             v.object({
-              /** Array of statuses or error messages. */
+              /**Array of statuses for each placed order. */
               statuses: v.pipe(
                 v.array(
                   v.union([
@@ -211,7 +217,7 @@ export const OrderResponse = /* @__PURE__ */ (() => {
                           ),
                           /** Client Order ID. */
                           cloid: v.pipe(
-                            v.optional(v.pipe(Hex, v.length(34))),
+                            v.optional(Cloid),
                             v.description("Client Order ID."),
                           ),
                         }),
@@ -239,7 +245,7 @@ export const OrderResponse = /* @__PURE__ */ (() => {
                           ),
                           /** Client Order ID. */
                           cloid: v.pipe(
-                            v.optional(v.pipe(Hex, v.length(34))),
+                            v.optional(Cloid),
                             v.description("Client Order ID."),
                           ),
                         }),
@@ -255,7 +261,7 @@ export const OrderResponse = /* @__PURE__ */ (() => {
                     }),
                   ]),
                 ),
-                v.description("Array of statuses or error messages."),
+                v.description("Array of statuses for each placed order."),
               ),
             }),
             v.description("Specific data."),

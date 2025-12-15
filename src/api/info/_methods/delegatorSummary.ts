@@ -66,7 +66,7 @@ export type DelegatorSummaryResponse = v.InferOutput<typeof DelegatorSummaryResp
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode delegatorSummary} function. */
 export type DelegatorSummaryParameters = Omit<v.InferInput<typeof DelegatorSummaryRequest>, "type">;

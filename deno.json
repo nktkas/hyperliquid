@@ -18,12 +18,27 @@
       "tags": ["recommended", "jsr"],
       "include": [
         "camelcase",
-        "no-sync-fn-in-async-fn",
-        "single-var-declarator"
+        "default-param-last",
+        "eqeqeq",
+        "explicit-function-return-type",
+        "explicit-module-boundary-types",
+        "no-console",
+        "no-const-assign",
+        "no-eval",
+        "no-inferrable-types",
+        "no-non-null-asserted-optional-chain",
+        "no-self-compare",
+        "no-sparse-arrays",
+        "no-throw-literal",
+        "no-useless-rename"
       ],
       "exclude": ["no-slow-types"]
     },
-    "plugins": ["./.dev/lint_plugin.ts"]
+    "plugins": [
+      "./.dev/deno_style_lint_plugin.ts",
+      "./.dev/valibot_lint_plugin.ts",
+      "./.dev/project_valibot_lint_plugin.ts"
+    ]
   },
   "publish": {
     "exclude": [".github", "docs", "tests"]

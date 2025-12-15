@@ -29,34 +29,32 @@ export type ValidatorL1VotesRequest = v.InferOutput<typeof ValidatorL1VotesReque
 export const ValidatorL1VotesResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.array(
-      /** L1 governance vote cast by validators. */
-      v.pipe(
-        v.object({
-          /** Timestamp when the vote expires (in ms since epoch). */
-          expireTime: v.pipe(
-            Integer,
-            v.description("Timestamp when the vote expires (in ms since epoch)."),
-          ),
-          /** Type of the vote. */
-          action: v.pipe(
-            v.union([
-              v.object({
-                D: v.string(),
-              }),
-              v.object({
-                C: v.array(v.string()),
-              }),
-            ]),
-            v.description("Type of the vote."),
-          ),
-          /** List of validator addresses that cast this vote. */
-          votes: v.pipe(
-            v.array(Address),
-            v.description("List of validator addresses that cast this vote."),
-          ),
-        }),
-        v.description("L1 governance vote cast by validators."),
-      ),
+      v.object({
+        /** Timestamp when the vote expires (in ms since epoch). */
+        expireTime: v.pipe(
+          Integer,
+          v.description("Timestamp when the vote expires (in ms since epoch)."),
+        ),
+        /** Type of the vote. */
+        action: v.pipe(
+          v.union([
+            v.object({
+              // deno-lint-ignore valibot-project/require-description valibot-project/require-jsdoc
+              D: v.string(),
+            }),
+            v.object({
+              // deno-lint-ignore valibot-project/require-description valibot-project/require-jsdoc
+              C: v.array(v.string()),
+            }),
+          ]),
+          v.description("Type of the vote."),
+        ),
+        /** List of validator addresses that cast this vote. */
+        votes: v.pipe(
+          v.array(Address),
+          v.description("List of validator addresses that cast this vote."),
+        ),
+      }),
     ),
     v.description("Array of L1 governance votes cast by validators."),
   );
@@ -67,7 +65,7 @@ export type ValidatorL1VotesResponse = v.InferOutput<typeof ValidatorL1VotesResp
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /**
  * Request validator L1 votes.

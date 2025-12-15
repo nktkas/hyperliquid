@@ -40,7 +40,7 @@ export type SpotPairDeployAuctionStatusResponse = v.InferOutput<typeof SpotPairD
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /**
  * Request for the status of the spot deploy auction.

@@ -34,8 +34,10 @@ export const ExchangeStatusResponse = /* @__PURE__ */ (() => {
         UnsignedInteger,
         v.description("Server time (in ms since epoch)."),
       ),
+      /** Special statuses of the exchange system. */
       specialStatuses: v.pipe(
         v.nullable(v.unknown()),
+        v.description("Special statuses of the exchange system."),
       ),
     }),
     v.description("Exchange system status information."),
@@ -47,7 +49,7 @@ export type ExchangeStatusResponse = v.InferOutput<typeof ExchangeStatusResponse
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /**
  * Request exchange system status information.

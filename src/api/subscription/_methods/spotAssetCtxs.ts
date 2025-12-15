@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { UnsignedDecimal } from "../../_schemas.ts";
+import { SpotAssetCtxSchema } from "../../info/_methods/_base/commonSchemas.ts";
 
 /** Subscription to context events for all spot assets. */
 export const SpotAssetCtxsRequest = /* @__PURE__ */ (() => {
@@ -24,50 +24,7 @@ export type SpotAssetCtxsRequest = v.InferOutput<typeof SpotAssetCtxsRequest>;
 /** Event of spot asset contexts. */
 export const SpotAssetCtxsEvent = /* @__PURE__ */ (() => {
   return v.pipe(
-    v.array(
-      v.object({
-        /** Previous day's closing price. */
-        prevDayPx: v.pipe(
-          UnsignedDecimal,
-          v.description("Previous day's closing price."),
-        ),
-        /** Daily notional volume. */
-        dayNtlVlm: v.pipe(
-          UnsignedDecimal,
-          v.description("Daily notional volume."),
-        ),
-        /** Mark price. */
-        markPx: v.pipe(
-          UnsignedDecimal,
-          v.description("Mark price."),
-        ),
-        /** Mid price. */
-        midPx: v.pipe(
-          v.nullable(UnsignedDecimal),
-          v.description("Mid price."),
-        ),
-        /** Circulating supply. */
-        circulatingSupply: v.pipe(
-          UnsignedDecimal,
-          v.description("Circulating supply."),
-        ),
-        /** Asset symbol. */
-        coin: v.pipe(
-          v.string(),
-          v.description("Asset symbol."),
-        ),
-        /** Total supply. */
-        totalSupply: v.pipe(
-          UnsignedDecimal,
-          v.description("Total supply."),
-        ),
-        /** Daily volume in base currency. */
-        dayBaseVlm: v.pipe(
-          UnsignedDecimal,
-          v.description("Daily volume in base currency."),
-        ),
-      }),
-    ),
+    v.array(SpotAssetCtxSchema),
     v.description("Event of spot asset contexts."),
   );
 })();

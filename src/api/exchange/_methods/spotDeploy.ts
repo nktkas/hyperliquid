@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Percent, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, Nonce, Signature, SuccessResponse } from "./_base/schemas.ts";
+import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Deploying HIP-1 and HIP-2 assets.
@@ -77,7 +77,12 @@ export const SpotDeployRequest = /* @__PURE__ */ (() => {
                 ),
                 /** Array of tuples: [user address, genesis amount in wei]. */
                 userAndWei: v.pipe(
-                  v.array(v.tuple([Address, UnsignedDecimal])),
+                  v.array(
+                    v.tuple([
+                      Address,
+                      UnsignedDecimal,
+                    ]),
+                  ),
                   v.description("Array of tuples: [user address, genesis amount in wei]."),
                 ),
                 /** Array of tuples: [existing token identifier, genesis amount in wei]. */
@@ -94,7 +99,14 @@ export const SpotDeployRequest = /* @__PURE__ */ (() => {
                 ),
                 /** Array of tuples: [user address, blacklist status] (`true` for blacklist, `false` to remove existing blacklisted user). */
                 blacklistUsers: v.pipe(
-                  v.optional(v.array(v.tuple([Address, v.boolean()]))),
+                  v.optional(
+                    v.array(
+                      v.tuple([
+                        Address,
+                        v.boolean(),
+                      ]),
+                    ),
+                  ),
                   v.description(
                     "Array of tuples: [user address, blacklist status] (`true` for blacklist, `false` to remove existing blacklisted user).",
                   ),
@@ -253,24 +265,22 @@ export const SpotDeployRequest = /* @__PURE__ */ (() => {
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
       /** Expiration time of the action. */
       expiresAfter: v.pipe(
         v.optional(UnsignedInteger),
         v.description("Expiration time of the action."),
       ),
     }),
-    v.description(
-      "Deploying HIP-1 and HIP-2 assets:" +
-        "\n- Genesis" +
-        "\n- Register Hyperliquidity" +
-        "\n- Register Spot" +
-        "\n- Register Token2" +
-        "\n- Set Deployer Trading Fee Share" +
-        "\n- User Genesis",
-    ),
+    v.description("Deploying HIP-1 and HIP-2 assets."),
   );
 })();
 export type SpotDeployRequest = v.InferOutput<typeof SpotDeployRequest>;

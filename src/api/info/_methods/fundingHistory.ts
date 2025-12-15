@@ -46,32 +46,28 @@ export type FundingHistoryRequest = v.InferOutput<typeof FundingHistoryRequest>;
 export const FundingHistoryResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.array(
-      /** Historical funding rate record for an asset. */
-      v.pipe(
-        v.object({
-          /** Asset symbol. */
-          coin: v.pipe(
-            v.string(),
-            v.description("Asset symbol."),
-          ),
-          /** Funding rate. */
-          fundingRate: v.pipe(
-            Decimal,
-            v.description("Funding rate."),
-          ),
-          /** Premium price. */
-          premium: v.pipe(
-            Decimal,
-            v.description("Premium price."),
-          ),
-          /** Funding record timestamp (ms since epoch). */
-          time: v.pipe(
-            UnsignedInteger,
-            v.description("Funding record timestamp (ms since epoch)."),
-          ),
-        }),
-        v.description("Historical funding rate record for an asset."),
-      ),
+      v.object({
+        /** Asset symbol. */
+        coin: v.pipe(
+          v.string(),
+          v.description("Asset symbol."),
+        ),
+        /** Funding rate. */
+        fundingRate: v.pipe(
+          Decimal,
+          v.description("Funding rate."),
+        ),
+        /** Premium price. */
+        premium: v.pipe(
+          Decimal,
+          v.description("Premium price."),
+        ),
+        /** Funding record timestamp (ms since epoch). */
+        time: v.pipe(
+          UnsignedInteger,
+          v.description("Funding record timestamp (ms since epoch)."),
+        ),
+      }),
     ),
     v.description("Array of historical funding rate records for an asset."),
   );
@@ -82,7 +78,7 @@ export type FundingHistoryResponse = v.InferOutput<typeof FundingHistoryResponse
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode fundingHistory} function. */
 export type FundingHistoryParameters = Omit<v.InferInput<typeof FundingHistoryRequest>, "type">;

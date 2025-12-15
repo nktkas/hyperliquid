@@ -52,7 +52,7 @@ export type MaxBuilderFeeResponse = v.InferOutput<typeof MaxBuilderFeeResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode maxBuilderFee} function. */
 export type MaxBuilderFeeParameters = Omit<v.InferInput<typeof MaxBuilderFeeRequest>, "type">;

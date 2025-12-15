@@ -30,7 +30,7 @@ export const PortfolioRequest = /* @__PURE__ */ (() => {
 export type PortfolioRequest = v.InferOutput<typeof PortfolioRequest>;
 
 /** Portfolio metrics snapshot. */
-const Portfolio = /* @__PURE__ */ (() => {
+const PortfolioSchema = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
       /** History entries for account value as [timestamp, value]. */
@@ -52,7 +52,7 @@ const Portfolio = /* @__PURE__ */ (() => {
     v.description("Portfolio metrics snapshot."),
   );
 })();
-type Portfolio = v.InferOutput<typeof Portfolio>;
+type PortfolioSchema = v.InferOutput<typeof PortfolioSchema>;
 
 /**
  * Portfolio metrics grouped by time periods.
@@ -61,14 +61,14 @@ type Portfolio = v.InferOutput<typeof Portfolio>;
 export const PortfolioResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.tuple([
-      v.tuple([v.literal("day"), Portfolio]),
-      v.tuple([v.literal("week"), Portfolio]),
-      v.tuple([v.literal("month"), Portfolio]),
-      v.tuple([v.literal("allTime"), Portfolio]),
-      v.tuple([v.literal("perpDay"), Portfolio]),
-      v.tuple([v.literal("perpWeek"), Portfolio]),
-      v.tuple([v.literal("perpMonth"), Portfolio]),
-      v.tuple([v.literal("perpAllTime"), Portfolio]),
+      v.tuple([v.literal("day"), PortfolioSchema]),
+      v.tuple([v.literal("week"), PortfolioSchema]),
+      v.tuple([v.literal("month"), PortfolioSchema]),
+      v.tuple([v.literal("allTime"), PortfolioSchema]),
+      v.tuple([v.literal("perpDay"), PortfolioSchema]),
+      v.tuple([v.literal("perpWeek"), PortfolioSchema]),
+      v.tuple([v.literal("perpMonth"), PortfolioSchema]),
+      v.tuple([v.literal("perpAllTime"), PortfolioSchema]),
     ]),
     v.description("Portfolio metrics grouped by time periods."),
   );
@@ -79,7 +79,7 @@ export type PortfolioResponse = v.InferOutput<typeof PortfolioResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode portfolio} function. */
 export type PortfolioParameters = Omit<v.InferInput<typeof PortfolioRequest>, "type">;

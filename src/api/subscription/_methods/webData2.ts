@@ -31,7 +31,7 @@ export type WebData2Request = v.InferOutput<typeof WebData2Request>;
 export const WebData2Event = /* @__PURE__ */ (() => {
   return v.pipe(
     WebData2Response,
-    v.description("Comprehensive user and market data."),
+    v.description("Event of comprehensive user and market data."),
   );
 })();
 export type WebData2Event = v.InferOutput<typeof WebData2Event>;

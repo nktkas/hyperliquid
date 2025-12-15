@@ -1,4 +1,4 @@
-// deno-lint-ignore-file no-explicit-any no-import-prefix
+// deno-lint-ignore-file no-explicit-any no-import-prefix no-console
 
 /**
  * Generates OpenAPI specs from SDK valibot schemas and syncs them to GitBook.

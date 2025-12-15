@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, Nonce, Signature, SuccessResponse } from "./_base/schemas.ts";
+import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Deploying HIP-3 assets.
@@ -26,11 +26,11 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
             /** Parameters for registering a new perpetual asset (v2). */
             registerAsset2: v.pipe(
               v.object({
-                /**  Max gas in native token wei. If not provided, then uses current deploy auction price. */
+                /** Max gas in native token wei. If not provided, then uses current deploy auction price. */
                 maxGas: v.pipe(
                   v.nullable(UnsignedInteger),
                   v.description(
-                    " Max gas in native token wei. If not provided, then uses current deploy auction price.",
+                    "Max gas in native token wei. If not provided, then uses current deploy auction price.",
                   ),
                 ),
                 /** Contains new asset listing parameters. */
@@ -189,24 +189,40 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
                 /** Name of the dex. */
                 dex: v.pipe(
                   v.string(),
-                  v.minLength(1),
                   v.description("Name of the dex."),
                 ),
                 /** A list (sorted by key) of asset and oracle prices. */
                 oraclePxs: v.pipe(
-                  v.array(v.tuple([v.string(), UnsignedDecimal])),
+                  v.array(
+                    v.tuple([
+                      v.string(),
+                      UnsignedDecimal,
+                    ]),
+                  ),
                   v.description("A list (sorted by key) of asset and oracle prices."),
                 ),
                 /** An outer list of inner lists (inner list sorted by key) of asset and mark prices. */
                 markPxs: v.pipe(
-                  v.array(v.array(v.tuple([v.string(), UnsignedDecimal]))),
+                  v.array(
+                    v.array(
+                      v.tuple([
+                        v.string(),
+                        UnsignedDecimal,
+                      ]),
+                    ),
+                  ),
                   v.description(
                     "An outer list of inner lists (inner list sorted by key) of asset and mark prices.",
                   ),
                 ),
                 /** A list (sorted by key) of asset and external prices which prevent sudden mark price deviations. */
                 externalPerpPxs: v.pipe(
-                  v.array(v.tuple([v.string(), UnsignedDecimal])),
+                  v.array(
+                    v.tuple([
+                      v.string(),
+                      UnsignedDecimal,
+                    ]),
+                  ),
                   v.description(
                     "A list (sorted by key) of asset and external prices which prevent sudden mark price deviations.",
                   ),
@@ -223,7 +239,12 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
             ),
             /** A list (sorted by key) of asset and funding multiplier. */
             setFundingMultipliers: v.pipe(
-              v.array(v.tuple([v.string(), UnsignedDecimal])),
+              v.array(
+                v.tuple([
+                  v.string(),
+                  UnsignedDecimal,
+                ]),
+              ),
               v.description("A list (sorted by key) of asset and funding multiplier."),
             ),
           }),
@@ -236,10 +257,12 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
             /** Parameters for halting or resuming trading for an asset. */
             haltTrading: v.pipe(
               v.object({
+                /** Coin symbol for the asset to halt or resume. */
                 coin: v.pipe(
                   v.string(),
                   v.description("Coin symbol for the asset to halt or resume."),
                 ),
+                /** Whether trading should be halted (true) or resumed (false). */
                 isHalted: v.pipe(
                   v.boolean(),
                   v.description("Whether trading should be halted (true) or resumed (false)."),
@@ -256,7 +279,12 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
             ),
             /** A list (sorted by key) of asset and margin table ids. */
             setMarginTableIds: v.pipe(
-              v.array(v.tuple([v.string(), UnsignedInteger])),
+              v.array(
+                v.tuple([
+                  v.string(),
+                  UnsignedInteger,
+                ]),
+              ),
               v.description("A list (sorted by key) of asset and margin table ids."),
             ),
           }),
@@ -291,7 +319,12 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
             ),
             /** A list (sorted by key) of asset and open interest cap notionals. */
             setOpenInterestCaps: v.pipe(
-              v.array(v.tuple([v.string(), UnsignedInteger])),
+              v.array(
+                v.tuple([
+                  v.string(),
+                  UnsignedInteger,
+                ]),
+              ),
               v.description("A list (sorted by key) of asset and open interest cap notionals."),
             ),
           }),
@@ -347,7 +380,10 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
             /** A list (sorted by key) of asset and margin modes. */
             setMarginModes: v.pipe(
               v.array(
-                v.tuple([v.string(), v.picklist(["strictIsolated", "noCross"])]),
+                v.tuple([
+                  v.string(),
+                  v.picklist(["strictIsolated", "noCross"]),
+                ]),
               ),
               v.description("A list (sorted by key) of asset and margin modes."),
             ),
@@ -384,7 +420,10 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
             /** A list (sorted by key) of asset and growth modes. */
             setGrowthModes: v.pipe(
               v.array(
-                v.tuple([v.string(), v.boolean()]),
+                v.tuple([
+                  v.string(),
+                  v.boolean(),
+                ]),
               ),
               v.description("A list (sorted by key) of asset and growth modes."),
             ),
@@ -393,9 +432,15 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
       /** Expiration time of the action. */
       expiresAfter: v.pipe(
         v.optional(UnsignedInteger),

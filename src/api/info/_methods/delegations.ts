@@ -36,27 +36,23 @@ export type DelegationsRequest = v.InferOutput<typeof DelegationsRequest>;
 export const DelegationsResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.array(
-      /** User delegation to a validator. */
-      v.pipe(
-        v.object({
-          /** Validator address. */
-          validator: v.pipe(
-            Address,
-            v.description("Validator address."),
-          ),
-          /** Amount of tokens delegated to the validator. */
-          amount: v.pipe(
-            UnsignedDecimal,
-            v.description("Amount of tokens delegated to the validator."),
-          ),
-          /** Locked until timestamp (in ms since epoch). */
-          lockedUntilTimestamp: v.pipe(
-            UnsignedInteger,
-            v.description("Locked until timestamp (in ms since epoch)."),
-          ),
-        }),
-        v.description("User delegation to a validator."),
-      ),
+      v.object({
+        /** Validator address. */
+        validator: v.pipe(
+          Address,
+          v.description("Validator address."),
+        ),
+        /** Amount of tokens delegated to the validator. */
+        amount: v.pipe(
+          UnsignedDecimal,
+          v.description("Amount of tokens delegated to the validator."),
+        ),
+        /** Locked until timestamp (in ms since epoch). */
+        lockedUntilTimestamp: v.pipe(
+          UnsignedInteger,
+          v.description("Locked until timestamp (in ms since epoch)."),
+        ),
+      }),
     ),
     v.description("Array of user's delegations to validators."),
   );
@@ -67,7 +63,7 @@ export type DelegationsResponse = v.InferOutput<typeof DelegationsResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode delegations} function. */
 export type DelegationsParameters = Omit<v.InferInput<typeof DelegationsRequest>, "type">;

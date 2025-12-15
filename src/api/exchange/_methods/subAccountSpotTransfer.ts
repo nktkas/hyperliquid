@@ -4,8 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, TokenId, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, Nonce, Signature, SuccessResponse } from "./_base/schemas.ts";
+import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
 
 /** Transfer between sub-accounts (spot). */
 export const SubAccountSpotTransferRequest = /* @__PURE__ */ (() => {
@@ -31,7 +31,7 @@ export const SubAccountSpotTransferRequest = /* @__PURE__ */ (() => {
           ),
           /** Token identifier. */
           token: v.pipe(
-            TokenId,
+            v.string(),
             v.description("Token identifier."),
           ),
           /** Amount to send (not in wei). */
@@ -43,9 +43,15 @@ export const SubAccountSpotTransferRequest = /* @__PURE__ */ (() => {
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
       /** Expiration time of the action. */
       expiresAfter: v.pipe(
         v.optional(UnsignedInteger),

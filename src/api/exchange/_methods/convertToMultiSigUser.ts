@@ -4,20 +4,14 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedInteger } from "../../_schemas.ts";
-import {
-  ErrorResponse,
-  HyperliquidChain,
-  Nonce,
-  Signature,
-  SignatureChainId,
-  SuccessResponse,
-} from "./_base/schemas.ts";
+import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
+import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
 
-/** Signers configuration for {@linkcode ConvertToMultiSigUserRequest}. */
-const ConvertToMultiSigUserRequestSigners = /* @__PURE__ */ (() => {
+/** Multi-sig config or `null` to revert to single-sig. */
+const ConvertToMultiSigUserRequestSignersSchema = /* @__PURE__ */ (() => {
   return v.pipe(
-    v.union([
+    v.nullable(
+      /** Multi-signature configuration. */
       v.object({
         /** List of authorized user addresses. */
         authorizedUsers: v.pipe(
@@ -27,16 +21,13 @@ const ConvertToMultiSigUserRequestSigners = /* @__PURE__ */ (() => {
         /** Minimum number of signatures required. */
         threshold: v.pipe(
           UnsignedInteger,
+          v.minValue(1),
+          v.maxValue(10),
           v.description("Minimum number of signatures required."),
         ),
       }),
-      /** Convert a multi-signature account to a single-signature account. */
-      v.pipe(
-        v.null(),
-        v.description("Convert a multi-signature account to a single-signature account."),
-      ),
-    ]),
-    v.description("Signers configuration for `ConvertToMultiSigUserRequest`"),
+    ),
+    v.description("Multi-sig config or `null` to revert to single-sig."),
   );
 })();
 
@@ -56,41 +47,56 @@ export const ConvertToMultiSigUserRequest = /* @__PURE__ */ (() => {
             v.description("Type of action."),
           ),
           /** Chain ID in hex format for EIP-712 signing. */
-          signatureChainId: SignatureChainId,
+          signatureChainId: v.pipe(
+            Hex,
+            v.description("Chain ID in hex format for EIP-712 signing."),
+          ),
           /** HyperLiquid network type. */
-          hyperliquidChain: HyperliquidChain,
+          hyperliquidChain: v.pipe(
+            HyperliquidChainSchema,
+            v.description("HyperLiquid network type."),
+          ),
           /**
            * Signers configuration.
            *
-           * Must be {@linkcode ConvertToMultiSigUserRequestSigners} converted to a string via `JSON.stringify(...)`.
+           * Must be `ConvertToMultiSigUserRequestSignersSchema` converted to a string via `JSON.stringify(...)`.
            */
           signers: v.pipe(
             v.union([
               v.pipe(
                 v.string(),
                 v.parseJson(),
-                ConvertToMultiSigUserRequestSigners,
+                ConvertToMultiSigUserRequestSignersSchema,
                 v.stringifyJson(),
               ),
               v.pipe(
-                ConvertToMultiSigUserRequestSigners,
+                ConvertToMultiSigUserRequestSignersSchema,
                 v.stringifyJson(),
               ),
             ]),
             v.description(
               "Signers configuration." +
-                "\n\nMust be `ConvertToMultiSigUserRequestSigners` converted to a string via `JSON.stringify(...)`.",
+                "\n\nMust be `ConvertToMultiSigUserRequestSignersSchema` converted to a string via `JSON.stringify(...)`.",
             ),
           ),
           /** Nonce (timestamp in ms) used to prevent replay attacks. */
-          nonce: Nonce,
+          nonce: v.pipe(
+            UnsignedInteger,
+            v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+          ),
         }),
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
     }),
     v.description("Convert a single-signature account to a multi-signature account or vice versa."),
   );
@@ -154,7 +160,7 @@ export const ConvertToMultiSigUserTypes = {
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
- * @example
+ * @example Convert to multi-sig user
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { convertToMultiSigUser } from "@nktkas/hyperliquid/api/exchange";
@@ -163,7 +169,6 @@ export const ConvertToMultiSigUserTypes = {
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * // Convert to multi-sig user
  * await convertToMultiSigUser(
  *   { transport, wallet },
  *   {
@@ -173,8 +178,17 @@ export const ConvertToMultiSigUserTypes = {
  *     },
  *   },
  * );
+ * ```
  *
- * // Convert to single-sig user
+ * @example Convert to single-sig user
+ * ```ts
+ * import { HttpTransport } from "@nktkas/hyperliquid";
+ * import { convertToMultiSigUser } from "@nktkas/hyperliquid/api/exchange";
+ * import { privateKeyToAccount } from "npm:viem/accounts";
+ *
+ * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+ * const transport = new HttpTransport(); // or `WebSocketTransport`
+ *
  * await convertToMultiSigUser(
  *   { transport, wallet },
  *   { signers: null },

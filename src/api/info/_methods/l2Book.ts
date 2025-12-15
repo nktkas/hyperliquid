@@ -39,7 +39,7 @@ export const L2BookRequest = /* @__PURE__ */ (() => {
 })();
 export type L2BookRequest = v.InferOutput<typeof L2BookRequest>;
 
-const L2BookLevel = /* @__PURE__ */ (() => {
+const L2BookLevelSchema = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
       /** Price. */
@@ -63,7 +63,7 @@ const L2BookLevel = /* @__PURE__ */ (() => {
 })();
 
 /**
- * L2 order book snapshot.
+ * L2 order book snapshot or `null` if the market does not exist.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#l2-book-snapshot
  */
 export const L2BookResponse = /* @__PURE__ */ (() => {
@@ -82,7 +82,7 @@ export const L2BookResponse = /* @__PURE__ */ (() => {
         ),
         /** Bid and ask levels (index 0 = bids, index 1 = asks). */
         levels: v.pipe(
-          v.tuple([v.array(L2BookLevel), v.array(L2BookLevel)]),
+          v.tuple([v.array(L2BookLevelSchema), v.array(L2BookLevelSchema)]),
           v.description("Bid and ask levels (index 0 = bids, index 1 = asks)."),
         ),
       }),
@@ -96,7 +96,7 @@ export type L2BookResponse = v.InferOutput<typeof L2BookResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode l2Book} function. */
 export type L2BookParameters = Omit<v.InferInput<typeof L2BookRequest>, "type">;

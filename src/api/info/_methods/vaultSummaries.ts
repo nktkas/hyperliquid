@@ -5,6 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { VaultRelationshipSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Request a list of vaults less than 2 hours old.
@@ -29,73 +30,43 @@ export type VaultSummariesRequest = v.InferOutput<typeof VaultSummariesRequest>;
 export const VaultSummariesResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.array(
-      /** Summary of a vault. */
-      v.pipe(
-        v.object({
-          /** Vault name. */
-          name: v.pipe(
-            v.string(),
-            v.description("Vault name."),
-          ),
-          /** Vault address. */
-          vaultAddress: v.pipe(
-            Address,
-            v.description("Vault address."),
-          ),
-          /** Leader address. */
-          leader: v.pipe(
-            Address,
-            v.description("Leader address."),
-          ),
-          /** Total value locked. */
-          tvl: v.pipe(
-            UnsignedDecimal,
-            v.description("Total value locked."),
-          ),
-          /** Vault closure status. */
-          isClosed: v.pipe(
-            v.boolean(),
-            v.description("Vault closure status."),
-          ),
-          /** Vault relationship type. */
-          relationship: v.pipe(
-            v.variant("type", [
-              v.object({
-                /** Relationship type. */
-                type: v.pipe(
-                  v.picklist(["normal", "child"]),
-                  v.description("Relationship type."),
-                ),
-              }),
-              v.object({
-                /** Relationship type. */
-                type: v.pipe(
-                  v.literal("parent"),
-                  v.description("Relationship type."),
-                ),
-                /** Child vault information. */
-                data: v.pipe(
-                  v.object({
-                    /** Child vault addresses. */
-                    childAddresses: v.pipe(
-                      v.array(Address),
-                      v.description("Child vault addresses."),
-                    ),
-                  }),
-                  v.description("Child vault information."),
-                ),
-              }),
-            ]),
-            v.description("Vault relationship type."),
-          ),
-          /** Creation timestamp. */
-          createTimeMillis: v.pipe(
-            UnsignedInteger,
-            v.description("Creation timestamp."),
-          ),
-        }),
-        v.description("Summary of a vault."),
-      ),
+      v.object({
+        /** Vault name. */
+        name: v.pipe(
+          v.string(),
+          v.description("Vault name."),
+        ),
+        /** Vault address. */
+        vaultAddress: v.pipe(
+          Address,
+          v.description("Vault address."),
+        ),
+        /** Leader address. */
+        leader: v.pipe(
+          Address,
+          v.description("Leader address."),
+        ),
+        /** Total value locked. */
+        tvl: v.pipe(
+          UnsignedDecimal,
+          v.description("Total value locked."),
+        ),
+        /** Vault closure status. */
+        isClosed: v.pipe(
+          v.boolean(),
+          v.description("Vault closure status."),
+        ),
+        /** Vault relationship type. */
+        relationship: v.pipe(
+          VaultRelationshipSchema,
+          v.description("Vault relationship type."),
+        ),
+        /** Creation timestamp. */
+        createTimeMillis: v.pipe(
+          UnsignedInteger,
+          v.description("Creation timestamp."),
+        ),
+      }),
     ),
     v.description("Array of vaults less than 2 hours old."),
   );
@@ -106,7 +77,7 @@ export type VaultSummariesResponse = v.InferOutput<typeof VaultSummariesResponse
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /**
  * Request a list of vaults less than 2 hours old.

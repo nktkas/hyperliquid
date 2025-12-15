@@ -46,383 +46,344 @@ export type UserNonFundingLedgerUpdatesRequest = v.InferOutput<typeof UserNonFun
 export const UserNonFundingLedgerUpdatesResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.array(
-      /** User's non-funding ledger update. */
-      v.pipe(
-        v.object({
-          /** Timestamp of the update (in ms since epoch). */
-          time: v.pipe(
-            UnsignedInteger,
-            v.description("Timestamp of the update (in ms since epoch)."),
-          ),
-          /** L1 transaction hash. */
-          hash: v.pipe(
-            v.pipe(Hex, v.length(66)),
-            v.description("L1 transaction hash."),
-          ),
-          /** Update details. */
-          delta: v.pipe(
-            v.variant("type", [
-              /** Transfer between spot and perpetual accounts. */
-              v.pipe(
-                v.object({
-                  /** Update type. */
-                  type: v.pipe(
-                    v.literal("accountClassTransfer"),
-                    v.description("Update type."),
-                  ),
-                  /** Amount transferred in USDC. */
-                  usdc: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Amount transferred in USDC."),
-                  ),
-                  /** Indicates if the transfer is to the perpetual account. */
-                  toPerp: v.pipe(
-                    v.boolean(),
-                    v.description("Indicates if the transfer is to the perpetual account."),
-                  ),
-                }),
-                v.description("Transfer between spot and perpetual accounts."),
+      v.object({
+        /** Timestamp of the update (in ms since epoch). */
+        time: v.pipe(
+          UnsignedInteger,
+          v.description("Timestamp of the update (in ms since epoch)."),
+        ),
+        /** L1 transaction hash. */
+        hash: v.pipe(
+          Hex,
+          v.length(66),
+          v.description("L1 transaction hash."),
+        ),
+        /** Update details. */
+        delta: v.pipe(
+          v.variant("type", [
+            /** Transfer between spot and perpetual accounts. */
+            v.object({
+              /** Update type. */
+              type: v.pipe(
+                v.literal("accountClassTransfer"),
+                v.description("Update type."),
               ),
-              /** Deposit to an account. */
-              v.pipe(
-                v.object({
-                  /** Update type. */
-                  type: v.pipe(
-                    v.literal("deposit"),
-                    v.description("Update type."),
-                  ),
-                  /** Amount deposited in USDC. */
-                  usdc: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Amount deposited in USDC."),
-                  ),
-                }),
-                v.description("Deposit to an account."),
+              /** Amount transferred in USDC. */
+              usdc: v.pipe(
+                UnsignedDecimal,
+                v.description("Amount transferred in USDC."),
               ),
-              /** Internal transfer between accounts. */
-              v.pipe(
-                v.object({
-                  /** Update type. */
-                  type: v.pipe(
-                    v.literal("internalTransfer"),
-                    v.description("Update type."),
-                  ),
-                  /** Amount transferred in USDC. */
-                  usdc: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Amount transferred in USDC."),
-                  ),
-                  /** Initiator address. */
-                  user: v.pipe(
-                    Address,
-                    v.description("Initiator address."),
-                  ),
-                  /** Destination address. */
-                  destination: v.pipe(
-                    Address,
-                    v.description("Destination address."),
-                  ),
-                  /** Transfer fee. */
-                  fee: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Transfer fee."),
-                  ),
-                }),
-                v.description("Internal transfer between accounts."),
+              /** Indicates if the transfer is to the perpetual account. */
+              toPerp: v.pipe(
+                v.boolean(),
+                v.description("Indicates if the transfer is to the perpetual account."),
               ),
-              /** Liquidation event. */
-              v.pipe(
-                v.object({
-                  /** Update type. */
-                  type: v.pipe(
-                    v.literal("liquidation"),
-                    v.description("Update type."),
-                  ),
-                  /** Total notional value of liquidated positions. */
-                  liquidatedNtlPos: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Total notional value of liquidated positions."),
-                  ),
-                  /** Account value at liquidation time. */
-                  accountValue: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Account value at liquidation time."),
-                  ),
-                  /** Leverage type for liquidated positions. */
-                  leverageType: v.pipe(
-                    v.picklist(["Cross", "Isolated"]),
-                    v.description("Leverage type for liquidated positions."),
-                  ),
-                  /** Details of each liquidated position. */
-                  liquidatedPositions: v.pipe(
-                    v.array(
-                      /** Liquidated position. */
-                      v.pipe(
-                        v.object({
-                          /** Asset symbol of the liquidated position. */
-                          coin: v.pipe(
-                            v.string(),
-                            v.description("Asset symbol of the liquidated position."),
-                          ),
-                          /** Signed position size liquidated. */
-                          szi: v.pipe(
-                            Decimal,
-                            v.description("Signed position size liquidated."),
-                          ),
-                        }),
-                        v.description("Liquidated position."),
-                      ),
+            }),
+            /** Deposit to an account. */
+            v.object({
+              /** Update type. */
+              type: v.pipe(
+                v.literal("deposit"),
+                v.description("Update type."),
+              ),
+              /** Amount deposited in USDC. */
+              usdc: v.pipe(
+                UnsignedDecimal,
+                v.description("Amount deposited in USDC."),
+              ),
+            }),
+            /** Internal transfer between accounts. */
+            v.object({
+              /** Update type. */
+              type: v.pipe(
+                v.literal("internalTransfer"),
+                v.description("Update type."),
+              ),
+              /** Amount transferred in USDC. */
+              usdc: v.pipe(
+                UnsignedDecimal,
+                v.description("Amount transferred in USDC."),
+              ),
+              /** Initiator address. */
+              user: v.pipe(
+                Address,
+                v.description("Initiator address."),
+              ),
+              /** Destination address. */
+              destination: v.pipe(
+                Address,
+                v.description("Destination address."),
+              ),
+              /** Transfer fee. */
+              fee: v.pipe(
+                UnsignedDecimal,
+                v.description("Transfer fee."),
+              ),
+            }),
+            /** Liquidation event. */
+            v.object({
+              /** Update type. */
+              type: v.pipe(
+                v.literal("liquidation"),
+                v.description("Update type."),
+              ),
+              /** Total notional value of liquidated positions. */
+              liquidatedNtlPos: v.pipe(
+                UnsignedDecimal,
+                v.description("Total notional value of liquidated positions."),
+              ),
+              /** Account value at liquidation time. */
+              accountValue: v.pipe(
+                UnsignedDecimal,
+                v.description("Account value at liquidation time."),
+              ),
+              /** Leverage type for liquidated positions. */
+              leverageType: v.pipe(
+                v.picklist(["Cross", "Isolated"]),
+                v.description("Leverage type for liquidated positions."),
+              ),
+              /** Details of each liquidated position. */
+              liquidatedPositions: v.pipe(
+                v.array(
+                  v.object({
+                    /** Asset symbol of the liquidated position. */
+                    coin: v.pipe(
+                      v.string(),
+                      v.description("Asset symbol of the liquidated position."),
                     ),
-                    v.description("Details of each liquidated position."),
-                  ),
-                }),
-                v.description("Liquidation event."),
+                    /** Signed position size liquidated. */
+                    szi: v.pipe(
+                      Decimal,
+                      v.description("Signed position size liquidated."),
+                    ),
+                  }),
+                ),
+                v.description("Details of each liquidated position."),
               ),
-              /** Rewards claim event. */
-              v.pipe(
-                v.object({
-                  /** Update type. */
-                  type: v.pipe(
-                    v.literal("rewardsClaim"),
-                    v.description("Update type."),
-                  ),
-                  /** Amount of rewards claimed. */
-                  amount: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Amount of rewards claimed."),
-                  ),
-                  /** Token symbol. */
-                  token: v.pipe(
-                    v.string(),
-                    v.description("Token symbol."),
-                  ),
-                }),
-                v.description("Rewards claim event."),
+            }),
+            /** Rewards claim event. */
+            v.object({
+              /** Update type. */
+              type: v.pipe(
+                v.literal("rewardsClaim"),
+                v.description("Update type."),
               ),
-              /** Spot transfer between accounts. */
-              v.pipe(
-                v.object({
-                  /** Update type. */
-                  type: v.pipe(
-                    v.literal("spotTransfer"),
-                    v.description("Update type."),
-                  ),
-                  /** Token symbol. */
-                  token: v.pipe(
-                    v.string(),
-                    v.description("Token symbol."),
-                  ),
-                  /** Amount transferred. */
-                  amount: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Amount transferred."),
-                  ),
-                  /** Equivalent USDC value. */
-                  usdcValue: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Equivalent USDC value."),
-                  ),
-                  /** Initiator address. */
-                  user: v.pipe(
-                    Address,
-                    v.description("Initiator address."),
-                  ),
-                  /** Destination address. */
-                  destination: v.pipe(
-                    Address,
-                    v.description("Destination address."),
-                  ),
-                  /** Transfer fee. */
-                  fee: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Transfer fee."),
-                  ),
-                  /** Fee in native token. */
-                  nativeTokenFee: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Fee in native token."),
-                  ),
-                  nonce: v.null(),
-                  /** Token in which the fee is denominated (e.g., "USDC"). */
-                  feeToken: v.pipe(
-                    v.string(),
-                    v.description('Token in which the fee is denominated (e.g., "USDC").'),
-                  ),
-                }),
-                v.description("Spot transfer between accounts."),
+              /** Amount of rewards claimed. */
+              amount: v.pipe(
+                UnsignedDecimal,
+                v.description("Amount of rewards claimed."),
               ),
-              /** Transfer between sub-accounts. */
-              v.pipe(
-                v.object({
-                  /** Update type. */
-                  type: v.pipe(
-                    v.literal("subAccountTransfer"),
-                    v.description("Update type."),
-                  ),
-                  /** Amount transferred in USDC. */
-                  usdc: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Amount transferred in USDC."),
-                  ),
-                  /** Initiator address. */
-                  user: v.pipe(
-                    Address,
-                    v.description("Initiator address."),
-                  ),
-                  /** Destination address. */
-                  destination: v.pipe(
-                    Address,
-                    v.description("Destination address."),
-                  ),
-                }),
-                v.description("Transfer between sub-accounts."),
+              /** Token symbol. */
+              token: v.pipe(
+                v.string(),
+                v.description("Token symbol."),
               ),
-              /** Vault creation event. */
-              v.pipe(
-                v.object({
-                  /** Update type. */
-                  type: v.pipe(
-                    v.literal("vaultCreate"),
-                    v.description("Update type."),
-                  ),
-                  /** Address of the created vault. */
-                  vault: v.pipe(
-                    Address,
-                    v.description("Address of the created vault."),
-                  ),
-                  /** Initial allocated amount in USDC. */
-                  usdc: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Initial allocated amount in USDC."),
-                  ),
-                  /** Vault creation fee. */
-                  fee: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Vault creation fee."),
-                  ),
-                }),
-                v.description("Vault creation event."),
+            }),
+            /** Spot transfer between accounts. */
+            v.object({
+              /** Update type. */
+              type: v.pipe(
+                v.literal("spotTransfer"),
+                v.description("Update type."),
               ),
-              /** Vault deposit event. */
-              v.pipe(
-                v.object({
-                  /** Update type. */
-                  type: v.pipe(
-                    v.literal("vaultDeposit"),
-                    v.description("Update type."),
-                  ),
-                  /** Address of the target vault. */
-                  vault: v.pipe(
-                    Address,
-                    v.description("Address of the target vault."),
-                  ),
-                  /** Amount deposited in USDC. */
-                  usdc: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Amount deposited in USDC."),
-                  ),
-                }),
-                v.description("Vault deposit event."),
+              /** Token symbol. */
+              token: v.pipe(
+                v.string(),
+                v.description("Token symbol."),
               ),
-              /** Vault distribution event. */
-              v.pipe(
-                v.object({
-                  /** Update type. */
-                  type: v.pipe(
-                    v.literal("vaultDistribution"),
-                    v.description("Update type."),
-                  ),
-                  /** Address of the vault distributing funds. */
-                  vault: v.pipe(
-                    Address,
-                    v.description("Address of the vault distributing funds."),
-                  ),
-                  /** Amount distributed in USDC. */
-                  usdc: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Amount distributed in USDC."),
-                  ),
-                }),
-                v.description("Vault distribution event."),
+              /** Amount transferred. */
+              amount: v.pipe(
+                UnsignedDecimal,
+                v.description("Amount transferred."),
               ),
-              /** Vault withdrawal event. */
-              v.pipe(
-                v.object({
-                  /** Update type. */
-                  type: v.pipe(
-                    v.literal("vaultWithdraw"),
-                    v.description("Update type."),
-                  ),
-                  /** Vault address. */
-                  vault: v.pipe(
-                    Address,
-                    v.description("Vault address."),
-                  ),
-                  /** Address of the user withdrawing funds. */
-                  user: v.pipe(
-                    Address,
-                    v.description("Address of the user withdrawing funds."),
-                  ),
-                  /** Withdrawal request amount in USD. */
-                  requestedUsd: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Withdrawal request amount in USD."),
-                  ),
-                  /** Withdrawal commission fee. */
-                  commission: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Withdrawal commission fee."),
-                  ),
-                  /** Closing cost associated with positions. */
-                  closingCost: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Closing cost associated with positions."),
-                  ),
-                  /** Basis value for withdrawal calculation. */
-                  basis: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Basis value for withdrawal calculation."),
-                  ),
-                  /** Net withdrawn amount in USD after fees and costs. */
-                  netWithdrawnUsd: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Net withdrawn amount in USD after fees and costs."),
-                  ),
-                }),
-                v.description("Vault withdrawal event."),
+              /** Equivalent USDC value. */
+              usdcValue: v.pipe(
+                UnsignedDecimal,
+                v.description("Equivalent USDC value."),
               ),
-              /** Withdrawal from an account. */
-              v.pipe(
-                v.object({
-                  /** Update type. */
-                  type: v.pipe(
-                    v.literal("withdraw"),
-                    v.description("Update type."),
-                  ),
-                  /** Amount withdrawn in USDC. */
-                  usdc: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Amount withdrawn in USDC."),
-                  ),
-                  /** Nonce (timestamp in ms) used to prevent replay attacks. */
-                  nonce: v.pipe(
-                    UnsignedInteger,
-                    v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-                  ),
-                  /** Withdrawal fee. */
-                  fee: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Withdrawal fee."),
-                  ),
-                }),
-                v.description("Withdrawal from an account."),
+              /** Initiator address. */
+              user: v.pipe(
+                Address,
+                v.description("Initiator address."),
               ),
-            ]),
-            v.description("Update details."),
-          ),
-        }),
-        v.description("User's non-funding ledger update."),
-      ),
+              /** Destination address. */
+              destination: v.pipe(
+                Address,
+                v.description("Destination address."),
+              ),
+              /** Transfer fee. */
+              fee: v.pipe(
+                UnsignedDecimal,
+                v.description("Transfer fee."),
+              ),
+              /** Fee in native token. */
+              nativeTokenFee: v.pipe(
+                UnsignedDecimal,
+                v.description("Fee in native token."),
+              ),
+              /** Nonce of the transfer? */
+              nonce: v.pipe(
+                v.null(),
+                v.description("Nonce of the transfer?"),
+              ),
+              /** Token in which the fee is denominated (e.g., "USDC"). */
+              feeToken: v.pipe(
+                v.string(),
+                v.description('Token in which the fee is denominated (e.g., "USDC").'),
+              ),
+            }),
+            /** Transfer between sub-accounts. */
+            v.object({
+              /** Update type. */
+              type: v.pipe(
+                v.literal("subAccountTransfer"),
+                v.description("Update type."),
+              ),
+              /** Amount transferred in USDC. */
+              usdc: v.pipe(
+                UnsignedDecimal,
+                v.description("Amount transferred in USDC."),
+              ),
+              /** Initiator address. */
+              user: v.pipe(
+                Address,
+                v.description("Initiator address."),
+              ),
+              /** Destination address. */
+              destination: v.pipe(
+                Address,
+                v.description("Destination address."),
+              ),
+            }),
+            /** Vault creation event. */
+            v.object({
+              /** Update type. */
+              type: v.pipe(
+                v.literal("vaultCreate"),
+                v.description("Update type."),
+              ),
+              /** Address of the created vault. */
+              vault: v.pipe(
+                Address,
+                v.description("Address of the created vault."),
+              ),
+              /** Initial allocated amount in USDC. */
+              usdc: v.pipe(
+                UnsignedDecimal,
+                v.description("Initial allocated amount in USDC."),
+              ),
+              /** Vault creation fee. */
+              fee: v.pipe(
+                UnsignedDecimal,
+                v.description("Vault creation fee."),
+              ),
+            }),
+            /** Vault deposit event. */
+            v.object({
+              /** Update type. */
+              type: v.pipe(
+                v.literal("vaultDeposit"),
+                v.description("Update type."),
+              ),
+              /** Address of the target vault. */
+              vault: v.pipe(
+                Address,
+                v.description("Address of the target vault."),
+              ),
+              /** Amount deposited in USDC. */
+              usdc: v.pipe(
+                UnsignedDecimal,
+                v.description("Amount deposited in USDC."),
+              ),
+            }),
+            /** Vault distribution event. */
+            v.object({
+              /** Update type. */
+              type: v.pipe(
+                v.literal("vaultDistribution"),
+                v.description("Update type."),
+              ),
+              /** Address of the vault distributing funds. */
+              vault: v.pipe(
+                Address,
+                v.description("Address of the vault distributing funds."),
+              ),
+              /** Amount distributed in USDC. */
+              usdc: v.pipe(
+                UnsignedDecimal,
+                v.description("Amount distributed in USDC."),
+              ),
+            }),
+            /** Vault withdrawal event. */
+            v.object({
+              /** Update type. */
+              type: v.pipe(
+                v.literal("vaultWithdraw"),
+                v.description("Update type."),
+              ),
+              /** Vault address. */
+              vault: v.pipe(
+                Address,
+                v.description("Vault address."),
+              ),
+              /** Address of the user withdrawing funds. */
+              user: v.pipe(
+                Address,
+                v.description("Address of the user withdrawing funds."),
+              ),
+              /** Withdrawal request amount in USD. */
+              requestedUsd: v.pipe(
+                UnsignedDecimal,
+                v.description("Withdrawal request amount in USD."),
+              ),
+              /** Withdrawal commission fee. */
+              commission: v.pipe(
+                UnsignedDecimal,
+                v.description("Withdrawal commission fee."),
+              ),
+              /** Closing cost associated with positions. */
+              closingCost: v.pipe(
+                UnsignedDecimal,
+                v.description("Closing cost associated with positions."),
+              ),
+              /** Basis value for withdrawal calculation. */
+              basis: v.pipe(
+                UnsignedDecimal,
+                v.description("Basis value for withdrawal calculation."),
+              ),
+              /** Net withdrawn amount in USD after fees and costs. */
+              netWithdrawnUsd: v.pipe(
+                UnsignedDecimal,
+                v.description("Net withdrawn amount in USD after fees and costs."),
+              ),
+            }),
+            /** Withdrawal from an account. */
+            v.object({
+              /** Update type. */
+              type: v.pipe(
+                v.literal("withdraw"),
+                v.description("Update type."),
+              ),
+              /** Amount withdrawn in USDC. */
+              usdc: v.pipe(
+                UnsignedDecimal,
+                v.description("Amount withdrawn in USDC."),
+              ),
+              /** Nonce (timestamp in ms) used to prevent replay attacks. */
+              nonce: v.pipe(
+                UnsignedInteger,
+                v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+              ),
+              /** Withdrawal fee. */
+              fee: v.pipe(
+                UnsignedDecimal,
+                v.description("Withdrawal fee."),
+              ),
+            }),
+          ]),
+          v.description("Update details."),
+        ),
+      }),
     ),
     v.description("Array of user's non-funding ledger update."),
   );
@@ -433,7 +394,7 @@ export type UserNonFundingLedgerUpdatesResponse = v.InferOutput<typeof UserNonFu
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userNonFundingLedgerUpdates} function. */
 export type UserNonFundingLedgerUpdatesParameters = Omit<

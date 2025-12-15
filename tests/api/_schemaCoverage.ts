@@ -64,7 +64,7 @@ export function schemaCoverage<
   const assertResult = v.safeParse(
     v.pipe(
       v.array(strict(schema)),
-      v.minLength(1),
+      v.nonEmpty(),
     ),
     samples,
   );
@@ -181,7 +181,7 @@ function checkCoverage(
   schema: v.GenericSchema,
   samples: unknown[],
   options: CoverageOptions,
-  path: string = "#",
+  path = "#",
 ): CoverageIssue[] {
   const issues: CoverageIssue[] = [];
 

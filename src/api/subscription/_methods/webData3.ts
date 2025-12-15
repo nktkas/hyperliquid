@@ -107,7 +107,7 @@ export const WebData3Event = /* @__PURE__ */ (() => {
         v.description("Array of perpetual DEX states."),
       ),
     }),
-    v.description("Comprehensive user and market data."),
+    v.description("Event of comprehensive user and market data."),
   );
 })();
 export type WebData3Event = v.InferOutput<typeof WebData3Event>;

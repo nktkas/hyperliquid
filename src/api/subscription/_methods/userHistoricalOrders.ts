@@ -37,7 +37,10 @@ export const UserHistoricalOrdersEvent = /* @__PURE__ */ (() => {
         v.description("User address."),
       ),
       /** Array of frontend orders with current processing status. */
-      orderHistory: HistoricalOrdersResponse,
+      orderHistory: v.pipe(
+        HistoricalOrdersResponse,
+        v.description("Array of frontend orders with current processing status."),
+      ),
       /** Whether this is an initial snapshot. */
       isSnapshot: v.pipe(
         v.optional(v.literal(true)),

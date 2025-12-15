@@ -14,7 +14,7 @@ runTest({
     ]);
     schemaCoverage(UserFillsByTimeResponse, data, {
       ignoreDefinedTypes: [
-        "#/items/properties/twapId",
+        "#/items/intersect/0/properties/twapId",
       ],
     });
   },

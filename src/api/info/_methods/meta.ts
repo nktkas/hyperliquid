@@ -40,72 +40,64 @@ export const MetaResponse = /* @__PURE__ */ (() => {
       /** Trading universes available for perpetual trading. */
       universe: v.pipe(
         v.array(
-          /** Trading universe parameters for perpetual asset. */
-          v.pipe(
-            v.object({
-              /** Minimum decimal places for order sizes. */
-              szDecimals: v.pipe(
-                UnsignedInteger,
-                v.description("Minimum decimal places for order sizes."),
-              ),
-              /** Name of the universe. */
-              name: v.pipe(
-                v.string(),
-                v.description("Name of the universe."),
-              ),
-              /** Maximum allowed leverage. */
-              maxLeverage: v.pipe(
-                UnsignedInteger,
-                v.minValue(1),
-                v.description("Maximum allowed leverage."),
-              ),
-              /** Unique identifier for the margin requirements table. */
-              marginTableId: v.pipe(
-                UnsignedInteger,
-                v.description("Unique identifier for the margin requirements table."),
-              ),
-              /** Indicates if only isolated margin trading is allowed. */
-              onlyIsolated: v.pipe(
-                v.optional(v.literal(true)),
-                v.description("Indicates if only isolated margin trading is allowed."),
-              ),
-              /** Indicates if the universe is delisted. */
-              isDelisted: v.pipe(
-                v.optional(v.literal(true)),
-                v.description("Indicates if the universe is delisted."),
-              ),
-              /** Trading margin mode constraint. */
-              marginMode: v.pipe(
-                v.optional(v.picklist(["strictIsolated", "noCross"])),
-                v.description("Trading margin mode constraint."),
-              ),
-              /** Indicates if growth mode is enabled. */
-              growthMode: v.pipe(
-                v.optional(v.literal("enabled")),
-                v.description("Indicates if growth mode is enabled."),
-              ),
-              /** Timestamp of the last growth mode change. */
-              lastGrowthModeChangeTime: v.pipe(
-                v.optional(ISO8601WithoutTimezone),
-                v.description("Timestamp of the last growth mode change."),
-              ),
-            }),
-            v.description("Trading universe parameters for perpetual asset."),
-          ),
+          v.object({
+            /** Minimum decimal places for order sizes. */
+            szDecimals: v.pipe(
+              UnsignedInteger,
+              v.description("Minimum decimal places for order sizes."),
+            ),
+            /** Name of the universe. */
+            name: v.pipe(
+              v.string(),
+              v.description("Name of the universe."),
+            ),
+            /** Maximum allowed leverage. */
+            maxLeverage: v.pipe(
+              UnsignedInteger,
+              v.minValue(1),
+              v.description("Maximum allowed leverage."),
+            ),
+            /** Unique identifier for the margin requirements table. */
+            marginTableId: v.pipe(
+              UnsignedInteger,
+              v.description("Unique identifier for the margin requirements table."),
+            ),
+            /** Indicates if only isolated margin trading is allowed. */
+            onlyIsolated: v.pipe(
+              v.optional(v.literal(true)),
+              v.description("Indicates if only isolated margin trading is allowed."),
+            ),
+            /** Indicates if the universe is delisted. */
+            isDelisted: v.pipe(
+              v.optional(v.literal(true)),
+              v.description("Indicates if the universe is delisted."),
+            ),
+            /** Trading margin mode constraint. */
+            marginMode: v.pipe(
+              v.optional(v.picklist(["strictIsolated", "noCross"])),
+              v.description("Trading margin mode constraint."),
+            ),
+            /** Indicates if growth mode is enabled. */
+            growthMode: v.pipe(
+              v.optional(v.literal("enabled")),
+              v.description("Indicates if growth mode is enabled."),
+            ),
+            /** Timestamp of the last growth mode change. */
+            lastGrowthModeChangeTime: v.pipe(
+              v.optional(ISO8601WithoutTimezone),
+              v.description("Timestamp of the last growth mode change."),
+            ),
+          }),
         ),
         v.description("Trading universes available for perpetual trading."),
       ),
       /** Margin requirement tables for different leverage tiers. */
       marginTables: v.pipe(
         v.array(
-          /** Tuple of margin table ID and its details. */
-          v.pipe(
-            v.tuple([
-              UnsignedInteger,
-              MarginTableResponse,
-            ]),
-            v.description("Tuple of margin table ID and its details."),
-          ),
+          v.tuple([
+            UnsignedInteger,
+            MarginTableResponse,
+          ]),
         ),
         v.description("Margin requirement tables for different leverage tiers."),
       ),
@@ -124,7 +116,7 @@ export type MetaResponse = v.InferOutput<typeof MetaResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode meta} function. */
 export type MetaParameters = Omit<v.InferInput<typeof MetaRequest>, "type">;

@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Decimal, UnsignedDecimal } from "../../_schemas.ts";
+import { PerpAssetCtxSchema } from "../../info/_methods/_base/commonSchemas.ts";
 
 /** Subscription to context events for a specific perpetual asset. */
 export const ActiveAssetCtxRequest = /* @__PURE__ */ (() => {
@@ -37,58 +37,7 @@ export const ActiveAssetCtxEvent = /* @__PURE__ */ (() => {
       ),
       /** Context for a specific perpetual asset. */
       ctx: v.pipe(
-        v.object({
-          /** Previous day's closing price. */
-          prevDayPx: v.pipe(
-            UnsignedDecimal,
-            v.description("Previous day's closing price."),
-          ),
-          /** Daily notional volume. */
-          dayNtlVlm: v.pipe(
-            UnsignedDecimal,
-            v.description("Daily notional volume."),
-          ),
-          /** Mark price. */
-          markPx: v.pipe(
-            UnsignedDecimal,
-            v.description("Mark price."),
-          ),
-          /** Mid price. */
-          midPx: v.pipe(
-            v.nullable(UnsignedDecimal),
-            v.description("Mid price."),
-          ),
-          /** Funding rate. */
-          funding: v.pipe(
-            Decimal,
-            v.description("Funding rate."),
-          ),
-          /** Total open interest. */
-          openInterest: v.pipe(
-            UnsignedDecimal,
-            v.description("Total open interest."),
-          ),
-          /** Premium price. */
-          premium: v.pipe(
-            v.nullable(Decimal),
-            v.description("Premium price."),
-          ),
-          /** Oracle price. */
-          oraclePx: v.pipe(
-            UnsignedDecimal,
-            v.description("Oracle price."),
-          ),
-          /** Array of impact prices. */
-          impactPxs: v.pipe(
-            v.nullable(v.array(v.string())),
-            v.description("Array of impact prices."),
-          ),
-          /** Daily volume in base currency. */
-          dayBaseVlm: v.pipe(
-            UnsignedDecimal,
-            v.description("Daily volume in base currency."),
-          ),
-        }),
+        PerpAssetCtxSchema,
         v.description("Context for a specific perpetual asset."),
       ),
     }),

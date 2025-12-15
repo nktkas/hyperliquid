@@ -26,7 +26,7 @@ export const BboRequest = /* @__PURE__ */ (() => {
 })();
 export type BboRequest = v.InferOutput<typeof BboRequest>;
 
-const L2BookLevel = /* @__PURE__ */ (() => {
+const L2BookLevelSchema = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
       /** Price. */
@@ -65,7 +65,7 @@ export const BboEvent = /* @__PURE__ */ (() => {
       ),
       /** Best bid and offer tuple [bid, offer], either can be undefined if unavailable. */
       bbo: v.pipe(
-        v.tuple([L2BookLevel, L2BookLevel]),
+        v.tuple([L2BookLevelSchema, L2BookLevelSchema]),
         v.description("Best bid and offer tuple [bid, offer], either can be undefined if unavailable."),
       ),
     }),

@@ -41,10 +41,43 @@ export type SpotClearinghouseStateRequest = v.InferOutput<typeof SpotClearinghou
 export const SpotClearinghouseStateResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
-      /** Balance for each token. */
+      /** Array of available token balances. */
       balances: v.pipe(
         v.array(
-          v.pipe(
+          v.object({
+            /** Asset symbol. */
+            coin: v.pipe(
+              v.string(),
+              v.description("Asset symbol."),
+            ),
+            /** Unique identifier for the token. */
+            token: v.pipe(
+              UnsignedInteger,
+              v.description("Unique identifier for the token."),
+            ),
+            /** Total balance. */
+            total: v.pipe(
+              UnsignedDecimal,
+              v.description("Total balance."),
+            ),
+            /** Amount on hold. */
+            hold: v.pipe(
+              UnsignedDecimal,
+              v.description("Amount on hold."),
+            ),
+            /** Entry notional value. */
+            entryNtl: v.pipe(
+              UnsignedDecimal,
+              v.description("Entry notional value."),
+            ),
+          }),
+        ),
+        v.description("Array of available token balances."),
+      ),
+      /** Array of escrowed balances. */
+      evmEscrows: v.pipe(
+        v.optional(
+          v.array(
             v.object({
               /** Asset symbol. */
               coin: v.pipe(
@@ -61,50 +94,10 @@ export const SpotClearinghouseStateResponse = /* @__PURE__ */ (() => {
                 UnsignedDecimal,
                 v.description("Total balance."),
               ),
-              /** Amount on hold. */
-              hold: v.pipe(
-                UnsignedDecimal,
-                v.description("Amount on hold."),
-              ),
-              /** Entry notional value. */
-              entryNtl: v.pipe(
-                UnsignedDecimal,
-                v.description("Entry notional value."),
-              ),
             }),
-            v.description("Balance for a specific spot token."),
           ),
         ),
-        v.description("Balance for each token."),
-      ),
-      /** Escrowed balances. */
-      evmEscrows: v.pipe(
-        v.optional(
-          v.array(
-            /** Escrowed balance for a specific asset. */
-            v.pipe(
-              v.object({
-                /** Asset symbol. */
-                coin: v.pipe(
-                  v.string(),
-                  v.description("Asset symbol."),
-                ),
-                /** Unique identifier for the token. */
-                token: v.pipe(
-                  UnsignedInteger,
-                  v.description("Unique identifier for the token."),
-                ),
-                /** Total balance. */
-                total: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Total balance."),
-                ),
-              }),
-              v.description("Escrowed balance for a specific asset."),
-            ),
-          ),
-        ),
-        v.description("Escrowed balances."),
+        v.description("Array of escrowed balances."),
       ),
     }),
     v.description("Account summary for spot trading."),
@@ -116,7 +109,7 @@ export type SpotClearinghouseStateResponse = v.InferOutput<typeof SpotClearingho
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode spotClearinghouseState} function. */
 export type SpotClearinghouseStateParameters = Omit<v.InferInput<typeof SpotClearinghouseStateRequest>, "type">;

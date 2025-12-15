@@ -4,7 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Decimal, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address, UnsignedInteger } from "../../_schemas.ts";
+import { UserFillSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Request user TWAP slice fills.
@@ -36,98 +37,18 @@ export type UserTwapSliceFillsRequest = v.InferOutput<typeof UserTwapSliceFillsR
 export const UserTwapSliceFillsResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.array(
-      /** User twap slice fill. */
-      v.pipe(
-        v.object({
-          /** TWAP fill record. */
-          fill: v.pipe(
-            v.object({
-              /** Asset symbol. */
-              coin: v.pipe(
-                v.string(),
-                v.description("Asset symbol."),
-              ),
-              /** Price. */
-              px: v.pipe(
-                UnsignedDecimal,
-                v.description("Price."),
-              ),
-              /** Size. */
-              sz: v.pipe(
-                UnsignedDecimal,
-                v.description("Size."),
-              ),
-              /** Order side ("B" = Bid/Buy, "A" = Ask/Sell). */
-              side: v.pipe(
-                v.picklist(["B", "A"]),
-                v.description('Order side ("B" = Bid/Buy, "A" = Ask/Sell).'),
-              ),
-              /** Timestamp when the trade occurred (in ms since epoch). */
-              time: v.pipe(
-                UnsignedInteger,
-                v.description("Timestamp when the trade occurred (in ms since epoch)."),
-              ),
-              /** Start position size. */
-              startPosition: v.pipe(
-                Decimal,
-                v.description("Start position size."),
-              ),
-              /** Direction indicator for frontend display. */
-              dir: v.pipe(
-                v.string(),
-                v.description("Direction indicator for frontend display."),
-              ),
-              /** Realized PnL. */
-              closedPnl: v.pipe(
-                Decimal,
-                v.description("Realized PnL."),
-              ),
-              /** L1 transaction hash. */
-              hash: v.pipe(
-                v.pipe(Hex, v.length(66)),
-                v.description("L1 transaction hash."),
-              ),
-              /** Order ID. */
-              oid: v.pipe(
-                UnsignedInteger,
-                v.description("Order ID."),
-              ),
-              /** Indicates if the fill was a taker order. */
-              crossed: v.pipe(
-                v.boolean(),
-                v.description("Indicates if the fill was a taker order."),
-              ),
-              /** Fee charged or rebate received (negative indicates rebate). */
-              fee: v.pipe(
-                Decimal,
-                v.description("Fee charged or rebate received (negative indicates rebate)."),
-              ),
-              /** Unique transaction identifier for a partial fill of an order. */
-              tid: v.pipe(
-                UnsignedInteger,
-                v.description("Unique transaction identifier for a partial fill of an order."),
-              ),
-              /** Token in which the fee is denominated (e.g., "USDC"). */
-              feeToken: v.pipe(
-                v.string(),
-                v.description('Token in which the fee is denominated (e.g., "USDC").'),
-              ),
-              /** ID of the TWAP. */
-              twapId: v.pipe(
-                v.nullable(UnsignedInteger),
-                v.description("ID of the TWAP."),
-              ),
-            }),
-            v.description("TWAP fill record."),
-          ),
-          /** ID of the TWAP. */
-          twapId: v.pipe(
-            UnsignedInteger,
-            v.description("ID of the TWAP."),
-          ),
-        }),
-        v.description("User twap slice fill."),
-      ),
+      v.object({
+        /** TWAP fill record. */
+        fill: v.pipe(
+          UserFillSchema,
+          v.description("TWAP fill record."),
+        ),
+        /** ID of the TWAP. */
+        twapId: v.pipe(
+          UnsignedInteger,
+          v.description("ID of the TWAP."),
+        ),
+      }),
     ),
     v.description("Array of user's twap slice fills."),
   );
@@ -138,7 +59,7 @@ export type UserTwapSliceFillsResponse = v.InferOutput<typeof UserTwapSliceFills
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userTwapSliceFills} function. */
 export type UserTwapSliceFillsParameters = Omit<v.InferInput<typeof UserTwapSliceFillsRequest>, "type">;

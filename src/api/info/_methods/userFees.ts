@@ -39,33 +39,29 @@ export const UserFeesResponse = /* @__PURE__ */ (() => {
       /** Daily user volume metrics. */
       dailyUserVlm: v.pipe(
         v.array(
-          /** Daily user volume metrics record. */
-          v.pipe(
-            v.object({
-              /** Date in YYYY-M-D format. */
-              date: v.pipe(
-                v.string(),
-                v.isoDate(),
-                v.description("Date in YYYY-M-D format."),
-              ),
-              /** User cross-trade volume. */
-              userCross: v.pipe(
-                UnsignedDecimal,
-                v.description("User cross-trade volume."),
-              ),
-              /** User add-liquidity volume. */
-              userAdd: v.pipe(
-                UnsignedDecimal,
-                v.description("User add-liquidity volume."),
-              ),
-              /** Exchange total volume. */
-              exchange: v.pipe(
-                UnsignedDecimal,
-                v.description("Exchange total volume."),
-              ),
-            }),
-            v.description("Daily user volume metrics record."),
-          ),
+          v.object({
+            /** Date in YYYY-M-D format. */
+            date: v.pipe(
+              v.string(),
+              v.isoDate(),
+              v.description("Date in YYYY-M-D format."),
+            ),
+            /** User cross-trade volume. */
+            userCross: v.pipe(
+              UnsignedDecimal,
+              v.description("User cross-trade volume."),
+            ),
+            /** User add-liquidity volume. */
+            userAdd: v.pipe(
+              UnsignedDecimal,
+              v.description("User add-liquidity volume."),
+            ),
+            /** Exchange total volume. */
+            exchange: v.pipe(
+              UnsignedDecimal,
+              v.description("Exchange total volume."),
+            ),
+          }),
         ),
         v.description("Daily user volume metrics."),
       ),
@@ -98,59 +94,51 @@ export const UserFeesResponse = /* @__PURE__ */ (() => {
               /** Array of VIP fee tiers. */
               vip: v.pipe(
                 v.array(
-                  /** VIP fee tier. */
-                  v.pipe(
-                    v.object({
-                      /** Notional volume cutoff. */
-                      ntlCutoff: v.pipe(
-                        UnsignedDecimal,
-                        v.description("Notional volume cutoff."),
-                      ),
-                      /** Cross-trade fee rate. */
-                      cross: v.pipe(
-                        UnsignedDecimal,
-                        v.description("Cross-trade fee rate."),
-                      ),
-                      /** Add-liquidity fee rate. */
-                      add: v.pipe(
-                        UnsignedDecimal,
-                        v.description("Add-liquidity fee rate."),
-                      ),
-                      /** Spot cross-trade fee rate. */
-                      spotCross: v.pipe(
-                        UnsignedDecimal,
-                        v.description("Spot cross-trade fee rate."),
-                      ),
-                      /** Spot add-liquidity fee rate. */
-                      spotAdd: v.pipe(
-                        UnsignedDecimal,
-                        v.description("Spot add-liquidity fee rate."),
-                      ),
-                    }),
-                    v.description("VIP fee tier."),
-                  ),
+                  v.object({
+                    /** Notional volume cutoff. */
+                    ntlCutoff: v.pipe(
+                      UnsignedDecimal,
+                      v.description("Notional volume cutoff."),
+                    ),
+                    /** Cross-trade fee rate. */
+                    cross: v.pipe(
+                      UnsignedDecimal,
+                      v.description("Cross-trade fee rate."),
+                    ),
+                    /** Add-liquidity fee rate. */
+                    add: v.pipe(
+                      UnsignedDecimal,
+                      v.description("Add-liquidity fee rate."),
+                    ),
+                    /** Spot cross-trade fee rate. */
+                    spotCross: v.pipe(
+                      UnsignedDecimal,
+                      v.description("Spot cross-trade fee rate."),
+                    ),
+                    /** Spot add-liquidity fee rate. */
+                    spotAdd: v.pipe(
+                      UnsignedDecimal,
+                      v.description("Spot add-liquidity fee rate."),
+                    ),
+                  }),
                 ),
                 v.description("Array of VIP fee tiers."),
               ),
               /** Array of market maker fee tiers. */
               mm: v.pipe(
                 v.array(
-                  /** Market maker fee tier. */
-                  v.pipe(
-                    v.object({
-                      /** Maker fraction cutoff. */
-                      makerFractionCutoff: v.pipe(
-                        UnsignedDecimal,
-                        v.description("Maker fraction cutoff."),
-                      ),
-                      /** Add-liquidity fee rate. */
-                      add: v.pipe(
-                        Decimal,
-                        v.description("Add-liquidity fee rate."),
-                      ),
-                    }),
-                    v.description("Market maker fee tier."),
-                  ),
+                  v.object({
+                    /** Maker fraction cutoff. */
+                    makerFractionCutoff: v.pipe(
+                      UnsignedDecimal,
+                      v.description("Maker fraction cutoff."),
+                    ),
+                    /** Add-liquidity fee rate. */
+                    add: v.pipe(
+                      Decimal,
+                      v.description("Add-liquidity fee rate."),
+                    ),
+                  }),
                 ),
                 v.description("Array of market maker fee tiers."),
               ),
@@ -165,27 +153,23 @@ export const UserFeesResponse = /* @__PURE__ */ (() => {
           /** Array of staking discount tiers. */
           stakingDiscountTiers: v.pipe(
             v.array(
-              /** Staking discount tier. */
-              v.pipe(
-                v.object({
-                  /** Basis points of maximum supply. */
-                  bpsOfMaxSupply: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Basis points of maximum supply."),
-                  ),
-                  /** Discount rate applied. */
-                  discount: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Discount rate applied."),
-                  ),
-                }),
-                v.description("Staking discount tier."),
-              ),
+              v.object({
+                /** Basis points of maximum supply. */
+                bpsOfMaxSupply: v.pipe(
+                  UnsignedDecimal,
+                  v.description("Basis points of maximum supply."),
+                ),
+                /** Discount rate applied. */
+                discount: v.pipe(
+                  UnsignedDecimal,
+                  v.description("Discount rate applied."),
+                ),
+              }),
             ),
-            v.description("Staking discount tiers details."),
+            v.description("Array of staking discount tiers."),
           ),
         }),
-        v.description("Array of staking discount tiers."),
+        v.description("Fee schedule information."),
       ),
       /** User cross-trade rate. */
       userCrossRate: v.pipe(
@@ -258,15 +242,17 @@ export const UserFeesResponse = /* @__PURE__ */ (() => {
               v.picklist(["requested", "stakingUser", "tradingUser"]),
               v.description(
                 "Link status:" +
-                  "\n- `requested` = link initiated by trading user, awaiting staking user confirmation" +
-                  "\n- `stakingUser` = response queried by staking account" +
-                  "\n- `tradingUser` = response queried by trading account",
+                  "\n- `requested` = link initiated by trading user, awaiting staking user confirmation." +
+                  "\n- `stakingUser` = response queried by staking account." +
+                  "\n- `tradingUser` = response queried by trading account.",
               ),
             ),
           }),
         ),
         v.description(
-          "Permanent link between staking and trading accounts. Staking user gains full control of trading account funds. Staking user forfeits own fee discounts.",
+          "Permanent link between staking and trading accounts." +
+            "\nStaking user gains full control of trading account funds." +
+            "\nStaking user forfeits own fee discounts.",
         ),
       ),
       /** Active staking discount details. */
@@ -295,7 +281,7 @@ export type UserFeesResponse = v.InferOutput<typeof UserFeesResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userFees} function. */
 export type UserFeesParameters = Omit<v.InferInput<typeof UserFeesRequest>, "type">;

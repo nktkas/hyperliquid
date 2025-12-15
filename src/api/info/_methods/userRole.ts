@@ -89,7 +89,7 @@ export type UserRoleResponse = v.InferOutput<typeof UserRoleResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userRole} function. */
 export type UserRoleParameters = Omit<v.InferInput<typeof UserRoleRequest>, "type">;

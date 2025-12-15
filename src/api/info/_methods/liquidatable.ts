@@ -21,10 +21,13 @@ export const LiquidatableRequest = /* @__PURE__ */ (() => {
 })();
 export type LiquidatableRequest = v.InferOutput<typeof LiquidatableRequest>;
 
-/** */
+/**
+ * Response for liquidatable request.
+ */
 export const LiquidatableResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.array(v.unknown()),
+    v.description("Response for liquidatable request."),
   );
 })();
 export type LiquidatableResponse = v.InferOutput<typeof LiquidatableResponse>;
@@ -33,7 +36,7 @@ export type LiquidatableResponse = v.InferOutput<typeof LiquidatableResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /**
  * Request liquidatable.

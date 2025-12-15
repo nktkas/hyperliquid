@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, Nonce, Signature, SuccessResponse } from "./_base/schemas.ts";
+import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
 
 /** Set the display name in the leaderboard. */
 export const SetDisplayNameRequest = /* @__PURE__ */ (() => {
@@ -21,23 +21,29 @@ export const SetDisplayNameRequest = /* @__PURE__ */ (() => {
           ),
           /**
            * Display name.
-           *
            * Set to an empty string to remove the display name.
            */
           displayName: v.pipe(
             v.string(),
+            v.maxLength(20),
             v.description(
               "Display name." +
-                "\n\nSet to an empty string to remove the display name.",
+                "\nSet to an empty string to remove the display name.",
             ),
           ),
         }),
         v.description("Action to perform."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
       /** Expiration time of the action. */
       expiresAfter: v.pipe(
         v.optional(UnsignedInteger),

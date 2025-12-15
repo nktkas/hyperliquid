@@ -43,23 +43,19 @@ export const MarginTableResponse = /* @__PURE__ */ (() => {
       /** Array of margin tiers defining leverage limits. */
       marginTiers: v.pipe(
         v.array(
-          /** Individual tier in a margin requirements table. */
-          v.pipe(
-            v.object({
-              /** Lower position size boundary for this tier. */
-              lowerBound: v.pipe(
-                UnsignedDecimal,
-                v.description("Lower position size boundary for this tier."),
-              ),
-              /** Maximum allowed leverage for this tier. */
-              maxLeverage: v.pipe(
-                UnsignedInteger,
-                v.minValue(1),
-                v.description("Maximum allowed leverage for this tier."),
-              ),
-            }),
-            v.description("Individual tier in a margin requirements table."),
-          ),
+          v.object({
+            /** Lower position size boundary for this tier. */
+            lowerBound: v.pipe(
+              UnsignedDecimal,
+              v.description("Lower position size boundary for this tier."),
+            ),
+            /** Maximum allowed leverage for this tier. */
+            maxLeverage: v.pipe(
+              UnsignedInteger,
+              v.minValue(1),
+              v.description("Maximum allowed leverage for this tier."),
+            ),
+          }),
         ),
         v.description("Array of margin tiers defining leverage limits."),
       ),
@@ -74,7 +70,7 @@ export type MarginTableResponse = v.InferOutput<typeof MarginTableResponse>;
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode marginTable} function. */
 export type MarginTableParameters = Omit<v.InferInput<typeof MarginTableRequest>, "type">;

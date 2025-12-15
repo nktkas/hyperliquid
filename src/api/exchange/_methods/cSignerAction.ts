@@ -5,13 +5,13 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, Nonce, Signature, SuccessResponse } from "./_base/schemas.ts";
+import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
 
 /** Jail or unjail self as a validator signer. */
 export const CSignerActionRequest = /* @__PURE__ */ (() => {
   return v.pipe(
     v.object({
-      /** Action to perform. */
+      /** Action to jail or unjail the signer. */
       action: v.pipe(
         v.union([
           v.object({
@@ -39,12 +39,18 @@ export const CSignerActionRequest = /* @__PURE__ */ (() => {
             ),
           }),
         ]),
-        v.description("Action to perform."),
+        v.description("Action to jail or unjail the signer."),
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: Nonce,
+      nonce: v.pipe(
+        UnsignedInteger,
+        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      ),
       /** ECDSA signature components. */
-      signature: Signature,
+      signature: v.pipe(
+        SignatureSchema,
+        v.description("ECDSA signature components."),
+      ),
       /** Expiration time of the action. */
       expiresAfter: v.pipe(
         v.optional(UnsignedInteger),
@@ -100,7 +106,7 @@ export type CSignerActionSuccessResponse = ExcludeErrorResponse<CSignerActionRes
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
- * @example
+ * @example Jail self
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { cSignerAction } from "@nktkas/hyperliquid/api/exchange";
@@ -109,13 +115,20 @@ export type CSignerActionSuccessResponse = ExcludeErrorResponse<CSignerActionRes
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * // Jail self
  * await cSignerAction(
  *   { transport, wallet },
  *   { jailSelf: null },
  * );
+ * ```
+ * @example Unjail self
+ * ```ts
+ * import { HttpTransport } from "@nktkas/hyperliquid";
+ * import { cSignerAction } from "@nktkas/hyperliquid/api/exchange";
+ * import { privateKeyToAccount } from "npm:viem/accounts";
  *
- * // Unjail self
+ * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+ * const transport = new HttpTransport(); // or `WebSocketTransport`
+ *
  * await cSignerAction(
  *   { transport, wallet },
  *   { unjailSelf: null },

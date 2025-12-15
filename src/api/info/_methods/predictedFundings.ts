@@ -25,65 +25,45 @@ export const PredictedFundingsRequest = /* @__PURE__ */ (() => {
 export type PredictedFundingsRequest = v.InferOutput<typeof PredictedFundingsRequest>;
 
 /**
- * Array of predicted funding rates.
+ * Array of tuples of asset symbols and their predicted funding data.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-predicted-funding-rates-for-different-venues
  */
 export const PredictedFundingsResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.array(
-      /** Tuple of asset symbol and its predicted funding data. */
-      v.pipe(
-        v.tuple([
-          /** Asset symbol. */
-          v.pipe(
+      v.tuple([
+        // Asset symbol
+        v.string(),
+        // Array of predicted funding data for each exchange
+        v.array(
+          v.tuple([
+            // Exchange symbol
             v.string(),
-            v.description("Asset symbol."),
-          ),
-          /** Array of predicted funding data for each exchange. */
-          v.pipe(
-            v.array(
-              /** Tuple of exchange symbol and predicted funding data. */
-              v.pipe(
-                v.tuple([
-                  /** Exchange symbol. */
-                  v.pipe(
-                    v.string(),
-                    v.description("Exchange symbol."),
-                  ),
-                  /** Predicted funding data. */
-                  v.pipe(
-                    v.nullable(
-                      v.object({
-                        /** Predicted funding rate. */
-                        fundingRate: v.pipe(
-                          Decimal,
-                          v.description("Predicted funding rate."),
-                        ),
-                        /** Next funding time (ms since epoch). */
-                        nextFundingTime: v.pipe(
-                          UnsignedInteger,
-                          v.description("Next funding time (ms since epoch)."),
-                        ),
-                        /** Funding interval in hours. */
-                        fundingIntervalHours: v.pipe(
-                          v.optional(UnsignedInteger),
-                          v.description("Funding interval in hours."),
-                        ),
-                      }),
-                    ),
-                    v.description("Predicted funding data."),
-                  ),
-                ]),
-                v.description("Tuple of exchange symbol and predicted funding data."),
-              ),
+            // Predicted funding data (if available)
+            v.nullable(
+              v.object({
+                /** Predicted funding rate. */
+                fundingRate: v.pipe(
+                  Decimal,
+                  v.description("Predicted funding rate."),
+                ),
+                /** Next funding time (ms since epoch). */
+                nextFundingTime: v.pipe(
+                  UnsignedInteger,
+                  v.description("Next funding time (ms since epoch)."),
+                ),
+                /** Funding interval in hours. */
+                fundingIntervalHours: v.pipe(
+                  v.optional(UnsignedInteger),
+                  v.description("Funding interval in hours."),
+                ),
+              }),
             ),
-            v.description("Array of predicted funding data for each exchange."),
-          ),
-        ]),
-        v.description("Tuple of asset symbol and its predicted funding data."),
-      ),
+          ]),
+        ),
+      ]),
     ),
-    v.description("Array of predicted funding rates."),
+    v.description("Array of tuples of asset symbols and their predicted funding data."),
   );
 })();
 export type PredictedFundingsResponse = v.InferOutput<typeof PredictedFundingsResponse>;
@@ -92,7 +72,7 @@ export type PredictedFundingsResponse = v.InferOutput<typeof PredictedFundingsRe
 // Execution Logic
 // ============================================================
 
-import type { InfoConfig } from "./_types.ts";
+import type { InfoConfig } from "./_base/types.ts";
 
 /**
  * Request predicted funding rates.

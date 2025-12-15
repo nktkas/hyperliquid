@@ -255,8 +255,8 @@ function recursiveHexToLowercase(value: unknown): unknown {
   }
   if (typeof value === "object" && value !== null) {
     const result: Record<string, unknown> = {};
-    for (const k in value) {
-      result[k] = recursiveHexToLowercase((value as Record<string, unknown>)[k]);
+    for (const key in value) {
+      result[key] = recursiveHexToLowercase((value as Record<string, unknown>)[key]);
     }
     return result;
   }

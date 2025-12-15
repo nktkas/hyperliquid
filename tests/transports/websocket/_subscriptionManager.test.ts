@@ -343,7 +343,7 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
       await assertRejects(
         () => manager.subscribe("userEvents", payload11, () => {}),
         WebSocketRequestError,
-        "Cannot track more than 10 unique users.",
+        "Cannot track more than 10 unique users",
       );
     });
 
@@ -446,7 +446,7 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
       await assertRejects(
         () => manager.subscribe("allMids", payload1001, () => {}),
         WebSocketRequestError,
-        "Cannot subscribe to more than 1000 channels.",
+        "Cannot subscribe to more than 1000 channels",
       );
     });
 

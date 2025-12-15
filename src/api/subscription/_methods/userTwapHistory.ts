@@ -37,7 +37,10 @@ export const UserTwapHistoryEvent = /* @__PURE__ */ (() => {
         v.description("User address."),
       ),
       /** Array of user's TWAP history. */
-      history: TwapHistoryResponse,
+      history: v.pipe(
+        TwapHistoryResponse,
+        v.description("Array of user's TWAP history."),
+      ),
       /** Whether this is an initial snapshot. */
       isSnapshot: v.pipe(
         v.optional(v.literal(true)),
