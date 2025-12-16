@@ -46,7 +46,7 @@ export type AllDexsAssetCtxsEvent = v.InferOutput<typeof AllDexsAssetCtxsEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { ISubscription } from "../../../transport/_base.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
 
 /**
  * Subscribe to asset contexts for all DEXs.

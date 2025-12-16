@@ -57,7 +57,7 @@ export type SpotStateEvent = v.InferOutput<typeof SpotStateEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { ISubscription } from "../../../transport/_base.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
 
 /** Request parameters for the {@linkcode spotState} function. */
 export type SpotStateParameters = Omit<v.InferInput<typeof SpotStateRequest>, "type">;

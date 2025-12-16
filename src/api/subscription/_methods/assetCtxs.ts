@@ -51,7 +51,7 @@ export type AssetCtxsEvent = v.InferOutput<typeof AssetCtxsEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { ISubscription } from "../../../transport/_base.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
 
 /** Request parameters for the {@linkcode assetCtxs} function. */
 export type AssetCtxsParameters = Omit<v.InferInput<typeof AssetCtxsRequest>, "type">;

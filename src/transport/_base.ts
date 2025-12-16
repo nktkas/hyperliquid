@@ -1,12 +1,11 @@
 import { HyperliquidError } from "../_base.ts";
 
 /**
- * Interface representing a REST transport.
- * Handles communication with Hyperliquid API endpoints.
+ * Transport interface for executing requests to Hyperliquid servers.
  *
  * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint | Info endpoint}
  * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint | Exchange endpoint}
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/post-requests | Websocket post requests}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/post-requests | WebSocket POST requests}
  */
 export interface IRequestTransport {
   /** Indicates this transport uses testnet endpoint(s). */
@@ -24,10 +23,9 @@ export interface IRequestTransport {
 }
 
 /**
- * Interface representing an event subscription transport.
- * Handles WebSocket subscriptions for real-time updates.
+ * Transport interface for WebSocket subscriptions (real-time updates).
  *
- * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | Websocket subscriptions}
+ * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | WebSocket subscriptions}
  */
 export interface ISubscriptionTransport {
   /**

@@ -254,7 +254,9 @@ import {
 // =============================================================
 
 /**
- * A client for interacting with the Hyperliquid Exchange API.
+ * Execute actions: place orders, cancel orders, transfer funds, etc.
+ *
+ * Corresponds to the {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint | Exchange endpoint}.
  */
 export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfig> {
   config_: C;

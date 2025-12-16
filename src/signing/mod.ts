@@ -1,5 +1,5 @@
 /**
- * This module contains functions for generating Hyperliquid transaction signatures.
+ * Low-level utilities for signing Hyperliquid transactions.
  *
  * @example Signing an L1 action
  * ```ts

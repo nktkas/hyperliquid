@@ -78,10 +78,6 @@ deno add jsr:@nktkas/hyperliquid
       <td><strong>Wallet Support</strong></td>
       <td>Works with <a href="https://viem.sh">viem</a> and <a href="https://ethers.org">ethers</a>.</td>
     </tr>
-    <tr>
-      <td><strong>Open Source</strong></td>
-      <td>MIT licensed on <a href="https://github.com/nktkas/hyperliquid">GitHub</a>.</td>
-    </tr>
   </tbody>
 </table>
 

@@ -89,7 +89,7 @@ export type UserFundingsEvent = v.InferOutput<typeof UserFundingsEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { ISubscription } from "../../../transport/_base.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
 
 /** Request parameters for the {@linkcode userFundings} function. */
 export type UserFundingsParameters = Omit<v.InferInput<typeof UserFundingsRequest>, "type">;

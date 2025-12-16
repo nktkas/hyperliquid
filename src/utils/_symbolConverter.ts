@@ -1,4 +1,4 @@
-import type { IRequestTransport } from "../transport/_base.ts";
+import type { IRequestTransport } from "../transport/mod.ts";
 import {
   meta,
   type MetaResponse,

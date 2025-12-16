@@ -51,7 +51,7 @@ export type AllMidsEvent = v.InferOutput<typeof AllMidsEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { ISubscription } from "../../../transport/_base.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
 
 /** Request parameters for the {@linkcode allMids} function. */
 export type AllMidsParameters = Omit<v.InferInput<typeof AllMidsRequest>, "type">;

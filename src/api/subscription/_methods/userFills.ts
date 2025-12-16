@@ -62,7 +62,7 @@ export type UserFillsEvent = v.InferOutput<typeof UserFillsEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { ISubscription } from "../../../transport/_base.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
 
 /** Request parameters for the {@linkcode userFills} function. */
 export type UserFillsParameters = Omit<v.InferInput<typeof UserFillsRequest>, "type">;

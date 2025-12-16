@@ -57,7 +57,7 @@ export type TwapStatesEvent = v.InferOutput<typeof TwapStatesEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { ISubscription } from "../../../transport/_base.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
 
 /** Request parameters for the {@linkcode twapStates} function. */
 export type TwapStatesParameters = Omit<v.InferInput<typeof TwapStatesRequest>, "type">;

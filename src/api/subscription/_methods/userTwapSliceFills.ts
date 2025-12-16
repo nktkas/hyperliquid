@@ -57,7 +57,7 @@ export type UserTwapSliceFillsEvent = v.InferOutput<typeof UserTwapSliceFillsEve
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { ISubscription } from "../../../transport/_base.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
 
 /** Request parameters for the {@linkcode userTwapSliceFills} function. */
 export type UserTwapSliceFillsParameters = Omit<v.InferInput<typeof UserTwapSliceFillsRequest>, "type">;

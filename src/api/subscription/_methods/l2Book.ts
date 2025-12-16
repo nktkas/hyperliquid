@@ -89,7 +89,7 @@ export type L2BookEvent = v.InferOutput<typeof L2BookEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { ISubscription } from "../../../transport/_base.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
 
 /** Request parameters for the {@linkcode l2Book} function. */
 export type L2BookParameters = Omit<v.InferInput<typeof L2BookRequest>, "type">;

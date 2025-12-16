@@ -1,4 +1,4 @@
-import type { ISubscriptionTransport } from "../../../transport/_base.ts";
+import type { ISubscriptionTransport } from "../../../transport/mod.ts";
 
 /** Configuration for subscription API requests. */
 export interface SubscriptionConfig<T extends ISubscriptionTransport = ISubscriptionTransport> {

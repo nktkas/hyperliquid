@@ -64,7 +64,7 @@ export type ExplorerBlockEvent = v.InferOutput<typeof ExplorerBlockEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { ISubscription } from "../../../transport/_base.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
 
 /**
  * Subscribe to explorer block updates.

@@ -20,6 +20,7 @@
  * ```
  */
 
+// @ts-ignore: Ignore missing TS types when building npm
 import process from "node:process";
 import { type Args, extractArgs, transformArgs } from "./_utils.ts";
 import { ExchangeClient, HttpTransport, InfoClient } from "../src/mod.ts";

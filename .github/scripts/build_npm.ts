@@ -2,7 +2,11 @@
 
 /**
  * Builds the Deno library for working with NodeJS or publishing to npm
- * Command: deno run -A .github/scripts/build_npm.ts
+ *
+ * @example
+ * ```sh
+ * deno run -A .github/scripts/build_npm.ts
+ * ```
  */
 
 import { build, emptyDir } from "jsr:@deno/dnt@^0.42.3";

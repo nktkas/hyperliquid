@@ -1,3 +1,21 @@
+/**
+ * HTTP transport for executing requests to the Hyperliquid API.
+ *
+ * Use {@link HttpTransport} for simple requests via HTTP POST.
+ *
+ * @example
+ * ```ts
+ * import { HttpTransport, InfoClient } from "@nktkas/hyperliquid";
+ *
+ * const transport = new HttpTransport();
+ * const client = new InfoClient({ transport });
+ *
+ * const mids = await client.allMids();
+ * ```
+ *
+ * @module
+ */
+
 import { type IRequestTransport, TransportError } from "../_base.ts";
 import { AbortSignal_ } from "../_polyfills.ts";
 

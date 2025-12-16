@@ -1,5 +1,5 @@
 import * as v from "@valibot/valibot";
-import type { IRequestTransport } from "../../../../transport/_base.ts";
+import type { IRequestTransport } from "../../../../transport/mod.ts";
 import { Address, Hex, UnsignedInteger } from "../../../_schemas.ts";
 import {
   type AbstractWallet,

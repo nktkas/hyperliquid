@@ -1,3 +1,25 @@
+/**
+ * WebSocket transport for {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | subscriptions} and {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/post-requests | POST requests}.
+ *
+ * Use {@link WebSocketTransport} for real-time subscriptions and for lower-latency API requests.
+ *
+ * @example Subscriptions
+ * ```ts
+ * import { SubscriptionClient, WebSocketTransport } from "@nktkas/hyperliquid";
+ *
+ * const transport = new WebSocketTransport();
+ * const client = new SubscriptionClient({ transport });
+ *
+ * const subscription = await client.allMids((data) => {
+ *   console.log(data.mids);
+ * });
+ *
+ * await subscription.unsubscribe();
+ * ```
+ *
+ * @module
+ */
+
 import type { IRequestTransport, ISubscription, ISubscriptionTransport } from "../_base.ts";
 import { AbortSignal_ } from "../_polyfills.ts";
 import { ReconnectingWebSocket, type ReconnectingWebSocketOptions } from "@nktkas/rews";

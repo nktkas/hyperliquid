@@ -1,5 +1,5 @@
 import type { SubscriptionConfig } from "./_methods/_types.ts";
-import type { ISubscription } from "../../transport/_base.ts";
+import type { ISubscription } from "../../transport/mod.ts";
 
 // =============================================================
 // Methods Imports
@@ -72,7 +72,9 @@ import { webData3, type WebData3Event, type WebData3Parameters } from "./_method
 // =============================================================
 
 /**
- * A client for interacting with the Hyperliquid Subscription API.
+ * Real-time data via WebSocket subscriptions.
+ *
+ * Corresponds to {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | WebSocket subscriptions}.
  */
 export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfig> {
   config_: C;
@@ -80,7 +82,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Creates an instance of the SubscriptionClient.
    *
-   * @param args - Configuration for Exchange API requests. See {@link SubscriptionConfig}.
+   * @param config - Configuration for Subscription API requests. See {@link SubscriptionConfig}.
    *
    * @example
    * ```ts

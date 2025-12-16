@@ -1,4 +1,4 @@
-import type { IRequestTransport } from "../../../../transport/_base.ts";
+import type { IRequestTransport } from "../../../../transport/mod.ts";
 
 /** Configuration for Info API requests. */
 export interface InfoConfig<T extends IRequestTransport = IRequestTransport> {

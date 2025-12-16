@@ -168,7 +168,9 @@ import { webData2, type WebData2Parameters, type WebData2Response } from "./_met
 // =============================================================
 
 /**
- * A client for interacting with the Hyperliquid Info API.
+ * Read-only access to market data, user state, and other public information.
+ *
+ * Corresponds to the {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint | Info endpoint}.
  */
 export class InfoClient<C extends InfoConfig = InfoConfig> {
   config_: C;
@@ -176,7 +178,7 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Creates an instance of the InfoClient.
    *
-   * @param args - Configuration for Info API requests. See {@link InfoConfig}.
+   * @param config - Configuration for Info API requests. See {@link InfoConfig}.
    *
    * @example
    * ```ts

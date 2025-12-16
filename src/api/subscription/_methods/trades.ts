@@ -40,7 +40,7 @@ export type TradesEvent = v.InferOutput<typeof TradesEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { ISubscription } from "../../../transport/_base.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
 
 /** Request parameters for the {@linkcode trades} function. */
 export type TradesParameters = Omit<v.InferInput<typeof TradesRequest>, "type">;

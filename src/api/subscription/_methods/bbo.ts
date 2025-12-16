@@ -79,7 +79,7 @@ export type BboEvent = v.InferOutput<typeof BboEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { ISubscription } from "../../../transport/_base.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
 
 /** Request parameters for the {@linkcode bbo} function. */
 export type BboParameters = Omit<v.InferInput<typeof BboRequest>, "type">;

@@ -62,7 +62,7 @@ export type ClearinghouseStateEvent = v.InferOutput<typeof ClearinghouseStateEve
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { ISubscription } from "../../../transport/_base.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
 
 /** Request parameters for the {@linkcode clearinghouseState} function. */
 export type ClearinghouseStateParameters = Omit<v.InferInput<typeof ClearinghouseStateRequest>, "type">;

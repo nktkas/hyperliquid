@@ -96,7 +96,7 @@ export type CandleEvent = v.InferOutput<typeof CandleEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { ISubscription } from "../../../transport/_base.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
 
 /** Request parameters for the {@linkcode candle} function. */
 export type CandleParameters = Omit<v.InferInput<typeof CandleRequest>, "type">;
