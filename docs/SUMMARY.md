@@ -1470,6 +1470,17 @@
       spec:
         ref:
           kind: openapi
+          spec: hl-subscription-twapStates
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
           spec: hl-subscription-userEvents
     ```
   - ```yaml
