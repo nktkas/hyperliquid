@@ -23,7 +23,6 @@
         "explicit-function-return-type",
         "explicit-module-boundary-types",
         "no-console",
-        "no-const-assign",
         "no-eval",
         "no-inferrable-types",
         "no-non-null-asserted-optional-chain",
@@ -44,7 +43,7 @@
     "exclude": [".github", "docs", "tests"]
   },
   "imports": {
-    "@nktkas/rews": "jsr:@nktkas/rews@^1.2.1",
+    "@nktkas/rews": "jsr:@nktkas/rews@^1.2.2",
     "@noble/hashes": "jsr:@noble/hashes@^2.0.1",
     "@paulmillr/micro-eth-signer": "jsr:@paulmillr/micro-eth-signer@^0.18.1",
     "@std/msgpack": "jsr:@std/msgpack@^1.0.3",
