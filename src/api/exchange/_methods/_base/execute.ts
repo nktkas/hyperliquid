@@ -26,7 +26,7 @@ type Prettify<T> = { [K in keyof T]: T[K] } & {};
 
 /** Options for any execute functions. */
 interface BaseOptions {
-  /** [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to cancel a request. */
+  /** {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel a request. */
   signal?: AbortSignal;
 }
 

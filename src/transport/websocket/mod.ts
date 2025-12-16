@@ -118,7 +118,7 @@ export class WebSocketTransport {
    *
    * @param endpoint - The API endpoint to send the request to.
    * @param payload - The payload to send with the request.
-   * @param signal - [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to cancel the request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
    *
    * @returns A promise that resolves with parsed JSON response body.
    *
@@ -152,7 +152,7 @@ export class WebSocketTransport {
   /**
    * Waits until the WebSocket connection is ready.
    *
-   * @param signal - [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to cancel the promise.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the promise.
    *
    * @returns A promise that resolves when the connection is ready.
    *
@@ -195,7 +195,7 @@ export class WebSocketTransport {
   /**
    * Closes the WebSocket connection and waits until it is fully closed.
    *
-   * @param signal - [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to cancel the promise.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the promise.
    *
    * @returns A promise that resolves when the connection is fully closed.
    *

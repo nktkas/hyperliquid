@@ -13,7 +13,7 @@ export interface WebSocketSubscription {
   /** Removes the event listener and unsubscribes from the event channel. */
   unsubscribe(): Promise<void>;
 
-  /** [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) that is aborted if the subscription fails to restore after reconnection. */
+  /** {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} that is aborted if the subscription fails to restore after reconnection. */
   failureSignal: AbortSignal;
 }
 

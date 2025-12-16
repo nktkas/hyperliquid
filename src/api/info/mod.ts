@@ -2,7 +2,7 @@
  * This module re-exports all info-related API request functions and types.
  *
  * You can use raw functions to maximize tree-shaking in your app,
- * or to access [valibot](https://github.com/fabian-hiller/valibot) schemas Request/Response.
+ * or to access {@link https://github.com/fabian-hiller/valibot | valibot} schemas Request/Response.
  *
  * @example
  * ```ts

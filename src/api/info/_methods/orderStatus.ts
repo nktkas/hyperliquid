@@ -165,7 +165,7 @@ export type OrderStatusParameters = Omit<v.InferInput<typeof OrderStatusRequest>
  *
  * @param config - General configuration for Info API requests.
  * @param params - Parameters specific to the API request.
- * @param signal - [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to cancel the request.
+ * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  *
  * @returns Order status response.
  *

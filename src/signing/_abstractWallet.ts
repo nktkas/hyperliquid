@@ -5,7 +5,7 @@ import { HyperliquidError } from "../_errors.ts";
 // Ethers V6
 // =============================================================
 
-/** Abstract interface for an [ethers.js v6](https://docs.ethers.org/v6/api/providers/#Signer) */
+/** Abstract interface for an {@link https://docs.ethers.org/v6/api/providers/#Signer | ethers.js v6} */
 export interface AbstractEthersV6Signer {
   signTypedData(
     domain: {
@@ -47,7 +47,7 @@ const AbstractEthersV6SignerSchema = /* @__PURE__ */ (() => {
 // Ethers V5
 // =============================================================
 
-/** Abstract interface for an [ethers.js v5](https://docs.ethers.org/v5/api/signer/) */
+/** Abstract interface for an {@link https://docs.ethers.org/v5/api/signer/ | ethers.js v5} */
 export interface AbstractEthersV5Signer {
   _signTypedData(
     domain: {
@@ -89,7 +89,7 @@ const AbstractEthersV5SignerSchema = /* @__PURE__ */ (() => {
 // Viem
 // =============================================================
 
-/** Abstract interface for a [viem JSON-RPC Account](https://viem.sh/docs/accounts/jsonRpc#json-rpc-account). */
+/** Abstract interface for a {@link https://viem.sh/docs/accounts/jsonRpc#json-rpc-account | viem JSON-RPC Account}. */
 export interface AbstractViemJsonRpcAccount {
   signTypedData(
     params: {
@@ -125,7 +125,7 @@ const AbstractViemJsonRpcAccountSchema = /* @__PURE__ */ (() => {
   });
 })();
 
-/** Abstract interface for a [viem Local Account](https://viem.sh/docs/accounts/local). */
+/** Abstract interface for a {@link https://viem.sh/docs/accounts/local | viem Local Account}. */
 export interface AbstractViemLocalAccount {
   signTypedData(
     params: {

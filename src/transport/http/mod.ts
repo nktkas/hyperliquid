@@ -56,7 +56,7 @@ export interface HttpTransportOptions {
    * @default `https://rpc.hyperliquid.xyz` for mainnet, `https://rpc.hyperliquid-testnet.xyz` for testnet.
    */
   rpcUrl?: string | URL;
-  /** A custom [`RequestInit`](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit) that is merged with a fetch request. */
+  /** A custom {@link https://developer.mozilla.org/en-US/docs/Web/API/RequestInit | RequestInit} that is merged with a fetch request. */
   fetchOptions?: Omit<RequestInit, "body" | "method">;
 }
 
@@ -84,7 +84,7 @@ export class HttpTransport {
   apiUrl: string | URL;
   /** Custom RPC URL for explorer requests. */
   rpcUrl: string | URL;
-  /** A custom [`RequestInit`](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit) that is merged with a fetch request. */
+  /** A custom {@link https://developer.mozilla.org/en-US/docs/Web/API/RequestInit | RequestInit} that is merged with a fetch request. */
   fetchOptions: Omit<RequestInit, "body" | "method">;
 
   /**
@@ -101,11 +101,11 @@ export class HttpTransport {
   }
 
   /**
-   * Sends a request to the Hyperliquid API via [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
+   * Sends a request to the Hyperliquid API via {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API | fetch}.
    *
    * @param endpoint - The API endpoint to send the request to.
    * @param payload - The payload to send with the request.
-   * @param signal - [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to cancel the request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
    *
    * @returns A promise that resolves with parsed JSON response body.
    *
@@ -156,7 +156,7 @@ export class HttpTransport {
     }
   }
 
-  /** Merges multiple `HeadersInit` into one [`Headers`](https://developer.mozilla.org/en-US/docs/Web/API/Headers/Headers). */
+  /** Merges multiple `HeadersInit` into one {@link https://developer.mozilla.org/en-US/docs/Web/API/Headers/Headers | Headers}. */
   protected _mergeHeadersInit(...inits: HeadersInit[]): Headers {
     const merged = new Headers();
     for (const headers of inits) {
@@ -168,7 +168,7 @@ export class HttpTransport {
     return merged;
   }
 
-  /** Merges multiple [`RequestInit`](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit) into one [`RequestInit`](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit). */
+  /** Merges multiple {@link https://developer.mozilla.org/en-US/docs/Web/API/RequestInit | RequestInit} into one {@link https://developer.mozilla.org/en-US/docs/Web/API/RequestInit | RequestInit}. */
   protected _mergeRequestInit(...inits: RequestInit[]): RequestInit {
     const merged: RequestInit = {};
     const headersList: HeadersInit[] = [];

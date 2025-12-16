@@ -88,7 +88,7 @@ export type SubAccountsParameters = Omit<v.InferInput<typeof SubAccountsRequest>
  *
  * @param config - General configuration for Info API requests.
  * @param params - Parameters specific to the API request.
- * @param signal - [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to cancel the request.
+ * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  *
  * @returns Array of user sub-account or null if the user does not have any sub-accounts.
  *

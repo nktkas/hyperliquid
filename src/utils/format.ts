@@ -1,5 +1,5 @@
 /**
- * Format price according to Hyperliquid [rules](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/tick-and-lot-size):
+ * Format price according to Hyperliquid {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/tick-and-lot-size | rules}:
  * - Maximum 5 significant figures
  * - Maximum 6 (for perp) or 8 (for spot) - `szDecimals` decimal places
  * - Integer prices are always allowed regardless of significant figures
@@ -38,7 +38,7 @@ export function formatPrice(price: string | number, szDecimals: number, type: "p
 }
 
 /**
- * Format size according to Hyperliquid [rules](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/tick-and-lot-size):
+ * Format size according to Hyperliquid {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/tick-and-lot-size | rules}:
  * - Truncate decimal places to `szDecimals`
  *
  * @param size - The size to format (as string or number).

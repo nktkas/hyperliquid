@@ -44,7 +44,7 @@ import type { InfoConfig } from "./_base/types.ts";
  * Request trading metadata for all DEXes.
  *
  * @param config - General configuration for Info API requests.
- * @param signal - [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to cancel the request.
+ * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  *
  * @returns Metadata for perpetual assets across all DEXes.
  *
