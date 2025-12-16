@@ -110,9 +110,9 @@ Transport instance for API requests.
 
 Builder DEX support:
 
-- `false` or omitted — don't load builder dexs
-- `true` — load all available dexs
-- `["dex1", "dex2"]` — load only specified dexs
+- `false` or omitted - don't load builder dexs
+- `true` - load all available dexs
+- `["dex1", "dex2"]` - load only specified dexs
 
 ```ts
 // Don't load dexs (default)

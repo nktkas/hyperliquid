@@ -1,13 +1,13 @@
 # Signing
 
-Low-level utilities for signing Hyperliquid transactions. Most users don't need this —
+Low-level utilities for signing Hyperliquid transactions. Most users don't need this -
 [`ExchangeClient`](../core-concepts/clients.md#exchangeclient) handles signing automatically.
 
 Use these utilities when:
 
-- **Custom wallet integration** — implement `AbstractViemLocalAccount` to use hardware wallets, MPC, or other signing
+- **Custom wallet integration** - implement `AbstractViemLocalAccount` to use hardware wallets, MPC, or other signing
   systems
-- **Signing unsupported actions** — sign new action types that are not yet implemented in the SDK
+- **Signing unsupported actions** - sign new action types that are not yet implemented in the SDK
 
 ## Import
 
@@ -46,7 +46,7 @@ const client = new ExchangeClient({
 
 ## signL1Action
 
-Signs an L1 action — trading operations like orders, cancels, leverage updates, TWAP, vault operations, etc.
+Signs an L1 action - trading operations like orders, cancels, leverage updates, TWAP, vault operations, etc.
 
 ```ts
 import { signL1Action } from "@nktkas/hyperliquid/signing";
@@ -130,7 +130,7 @@ const action = v.parse(CancelByCloidRequest.entries.action, {
 
 ## signUserSignedAction
 
-Signs a user-signed action — transfers and administrative operations like withdraw, usdSend, spotSend, approveAgent,
+Signs a user-signed action - transfers and administrative operations like withdraw, usdSend, spotSend, approveAgent,
 etc. Uses EIP-712 typed data with `signatureChainId`.
 
 ```ts

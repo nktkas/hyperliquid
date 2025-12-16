@@ -76,7 +76,7 @@ const client = new ExchangeClient({
 ## How to sign with MetaMask or other browser wallets?
 
 L1 actions use chain ID `1337` (dev network, not in wallets by default) and sign an action hash instead of readable
-order details. Users will see `Agent { source: "a", connectionId: "0x..." }` — not useful.
+order details. Users will see `Agent { source: "a", connectionId: "0x..." }` - not useful.
 
 **Solution:** Use
 [Agent Wallet](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/nonces-and-api-wallets#api-wallets)

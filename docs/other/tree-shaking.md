@@ -1,6 +1,6 @@
 # Tree-shaking
 
-The SDK supports tree-shaking through granular imports — reduce bundle size by ~50% by importing only the functions you
+The SDK supports tree-shaking through granular imports - reduce bundle size by ~50% by importing only the functions you
 need.
 
 ## Import
@@ -115,8 +115,8 @@ import { OrderRequest, OrderResponse } from "@nktkas/hyperliquid/api/exchange";
 
 Each method exports:
 
-- `*Request` — full request schema (with `type`, `nonce`, `signature` for exchange)
-- `*Response` — response schema from API
+- `*Request` - full request schema (with `type`, `nonce`, `signature` for exchange)
+- `*Response` - response schema from API
 
 ### Use Cases
 

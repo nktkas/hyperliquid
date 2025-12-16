@@ -14,8 +14,8 @@ npx @nktkas/hyperliquid <endpoint> <method> [options]
 
 API endpoint to use:
 
-- `info` — query market data and account state
-- `exchange` — execute trading operations (requires `--private-key`)
+- `info` - query market data and account state
+- `exchange` - execute trading operations (requires `--private-key`)
 
 ### method
 

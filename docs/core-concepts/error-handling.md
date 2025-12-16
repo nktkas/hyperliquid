@@ -85,9 +85,9 @@ try {
 
 Common API errors:
 
-- `"User or API Wallet 0x... does not exist"` — invalid signer or signature
-- `"Insufficient margin to place order"` — not enough balance
-- `"Price too far from oracle"` — price outside allowed range
+- `"User or API Wallet 0x... does not exist"` - invalid signer or signature
+- `"Insufficient margin to place order"` - not enough balance
+- `"Price too far from oracle"` - price outside allowed range
 
 ## AbstractWalletError
 

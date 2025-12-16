@@ -247,8 +247,8 @@ await subscription.unsubscribe();
 
 Each subscription returns an object with:
 
-- `unsubscribe()` — Stop receiving updates
-- `failureSignal` — [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) that aborts if
+- `unsubscribe()` - Stop receiving updates
+- `failureSignal` - [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) that aborts if
   resubscription fails after reconnect
 
 ```ts

@@ -8,7 +8,7 @@ Get started with the SDK in just a few lines of code.
 
 ### Set up Transport
 
-First, create a [Transport](/core-concepts/transports) — the layer that handles communication with Hyperliquid servers.
+First, create a [Transport](/core-concepts/transports) - the layer that handles communication with Hyperliquid servers.
 
 {% tabs %}
 
