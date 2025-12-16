@@ -1,16 +1,16 @@
 # Error Handling
 
-All SDK errors extend `HyperliquidError`, making it easy to catch SDK-specific errors.
-
 ## Error Hierarchy
 
 ```
-HyperliquidError
-├── TransportError
-│   ├── HttpRequestError
-│   └── WebSocketRequestError
-├── ApiRequestError
-└── AbstractWalletError
+Error
+├─ HyperliquidError (SDK)
+│  ├─ TransportError
+│  │  ├─ HttpRequestError
+│  │  └─ WebSocketRequestError
+│  ├─ ApiRequestError
+│  └─ AbstractWalletError
+└─ ValiError (valibot)
 ```
 
 ## HyperliquidError
