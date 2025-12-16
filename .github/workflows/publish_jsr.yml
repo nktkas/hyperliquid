@@ -1,4 +1,4 @@
-name: publish to jsr
+name: Publish to jsr
 on:
   release:
     types: [published]

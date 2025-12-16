@@ -1,4 +1,4 @@
-name: update documentation
+name: Update GitBook OpenAPI specs
 on:
   release:
     types: [published]
