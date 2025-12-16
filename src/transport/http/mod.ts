@@ -1,4 +1,4 @@
-import { TransportError } from "../../_errors.ts";
+import { type IRequestTransport, TransportError } from "../_base.ts";
 import { AbortSignal_ } from "../_polyfills.ts";
 
 /** Error thrown when an HTTP request fails. */
@@ -75,7 +75,7 @@ export const TESTNET_RPC_URL = "https://rpc.hyperliquid-testnet.xyz";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint
  */
-export class HttpTransport {
+export class HttpTransport implements IRequestTransport {
   /** Indicates this transport uses testnet endpoint. */
   isTestnet: boolean;
   /** Request timeout in ms. Set to `null` to disable. */

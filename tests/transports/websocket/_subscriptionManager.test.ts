@@ -47,13 +47,13 @@ type ManagerWithInternals = WebSocketSubscriptionManager & {
 /** Creates a new WebSocketSubscriptionManager with mock socket. */
 function createManager(resubscribe = true): {
   socket: MockWebSocket;
-  requester: WebSocketPostRequest & { queue: unknown[] };
+  requester: WebSocketPostRequest & { _queue: unknown[] };
   hlEvents: HyperliquidEventTarget;
   manager: ManagerWithInternals;
 } {
   const socket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
   const hlEvents = new HyperliquidEventTarget(socket);
-  const requester = new WebSocketPostRequest(socket, hlEvents, 10_000) as WebSocketPostRequest & { queue: unknown[] };
+  const requester = new WebSocketPostRequest(socket, hlEvents, 10_000) as WebSocketPostRequest & { _queue: unknown[] };
   const manager = new WebSocketSubscriptionManager(socket, requester, hlEvents, resubscribe) as ManagerWithInternals;
   return { socket, requester, hlEvents, manager };
 }
@@ -160,7 +160,7 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
       manager.subscribe("test", payload, () => {}).catch(() => {});
       manager.subscribe("test", payload, () => {}).catch(() => {});
 
-      assertEquals(requester.queue.length, 1);
+      assertEquals(requester._queue.length, 1);
     });
 
     await t.step("new listeners wait for pending subscription", async () => {

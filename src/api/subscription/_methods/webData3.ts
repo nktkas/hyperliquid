@@ -117,7 +117,7 @@ export type WebData3Event = v.InferOutput<typeof WebData3Event>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { WebSocketSubscription } from "../../../transport/websocket/mod.ts";
+import type { ISubscription } from "../../../transport/_base.ts";
 
 /** Request parameters for the {@linkcode webData3} function. */
 export type WebData3Parameters = Omit<v.InferInput<typeof WebData3Request>, "type">;
@@ -129,7 +129,7 @@ export type WebData3Parameters = Omit<v.InferInput<typeof WebData3Request>, "typ
  * @param params - Parameters specific to the API subscription.
  * @param listener - A callback function to be called when the event is received.
  *
- * @returns A request-promise that resolves with a {@link WebSocketSubscription} object to manage the subscription lifecycle.
+ * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -154,7 +154,7 @@ export function webData3(
   config: SubscriptionConfig,
   params: WebData3Parameters,
   listener: (data: WebData3Event) => void,
-): Promise<WebSocketSubscription> {
+): Promise<ISubscription> {
   const payload = v.parse(WebData3Request, { type: "webData3", ...params });
   return config.transport.subscribe<WebData3Event>(payload.type, payload, (e) => {
     if (e.detail.userState.user === payload.user) {

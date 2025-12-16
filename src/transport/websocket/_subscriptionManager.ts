@@ -1,4 +1,5 @@
 import type { ReconnectingWebSocket } from "@nktkas/rews";
+import type { ISubscription } from "../_base.ts";
 import type { HyperliquidEventTarget } from "./_hyperliquidEventTarget.ts";
 import { WebSocketPostRequest, WebSocketRequestError } from "./_postRequest.ts";
 
@@ -7,15 +8,6 @@ const MAX_SUBSCRIPTIONS = 1000;
 
 /** Maximum number of unique user subscriptions allowed by Hyperliquid. */
 const MAX_UNIQUE_USER_SUBSCRIPTIONS = 10;
-
-/** WebSocket subscription with failure signal. */
-export interface WebSocketSubscription {
-  /** Removes the event listener and unsubscribes from the event channel. */
-  unsubscribe(): Promise<void>;
-
-  /** {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} that is aborted if the subscription fails to restore after reconnection. */
-  failureSignal: AbortSignal;
-}
 
 /** Internal state for managing a subscription. */
 interface SubscriptionState {
@@ -71,7 +63,7 @@ export class WebSocketSubscriptionManager {
    * @param payload - A payload to send with the subscription request.
    * @param listener - A function to call when the event is dispatched.
    *
-   * @returns A promise that resolves with a {@link WebSocketSubscription} object to manage the subscription lifecycle.
+   * @returns A promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {WebSocketRequestError} - An error that occurs when a WebSocket request fails.
    */
@@ -79,7 +71,7 @@ export class WebSocketSubscriptionManager {
     channel: string,
     payload: unknown,
     listener: (data: CustomEvent<T>) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     // Create a unique identifier for the subscription
     const id = WebSocketPostRequest.requestToId(payload);
 

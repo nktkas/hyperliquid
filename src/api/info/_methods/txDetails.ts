@@ -57,7 +57,6 @@ export type TxDetailsResponse = v.InferOutput<typeof TxDetailsResponse>;
 // ============================================================
 
 import type { InfoConfig } from "./_base/types.ts";
-import type { HttpTransport } from "../../../transport/http/mod.ts";
 
 /** Request parameters for the {@linkcode txDetails} function. */
 export type TxDetailsParameters = Omit<v.InferInput<typeof TxDetailsRequest>, "type">;
@@ -87,7 +86,7 @@ export type TxDetailsParameters = Omit<v.InferInput<typeof TxDetailsRequest>, "t
  * ```
  */
 export function txDetails(
-  config: InfoConfig<HttpTransport>,
+  config: InfoConfig,
   params: TxDetailsParameters,
   signal?: AbortSignal,
 ): Promise<TxDetailsResponse> {

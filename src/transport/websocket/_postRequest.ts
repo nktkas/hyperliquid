@@ -1,4 +1,4 @@
-import { TransportError } from "../../_errors.ts";
+import { TransportError } from "../_base.ts";
 import { AbortSignal_, Promise_ } from "../_polyfills.ts";
 import type { ReconnectingWebSocket } from "@nktkas/rews";
 import type { HyperliquidEventTarget } from "./_hyperliquidEventTarget.ts";
@@ -40,9 +40,9 @@ export class WebSocketPostRequest {
   /** Timeout for requests in ms. Set to `null` to disable. */
   timeout: number | null;
 
-  protected socket: ReconnectingWebSocket;
-  protected lastId = 0;
-  protected queue: PendingRequest[] = [];
+  protected _socket: ReconnectingWebSocket;
+  protected _lastId = 0;
+  protected _queue: PendingRequest[] = [];
 
   /**
    * Creates a new WebSocket async request handler.
@@ -53,18 +53,18 @@ export class WebSocketPostRequest {
    */
   constructor(socket: ReconnectingWebSocket, hlEvents: HyperliquidEventTarget, timeout: number | null) {
     this.timeout = timeout;
-    this.socket = socket;
+    this._socket = socket;
 
     // Monitor responses and match the pending request
     hlEvents.addEventListener("subscriptionResponse", (event) => {
-      this.queue
+      this._queue
         // NOTE: API may add new fields over time, so perform a loose check of the payload.
         .find((x) => typeof x.id === "string" && isSubset(JSON.parse(x.id), event.detail))
         ?.resolve(event.detail);
     });
     hlEvents.addEventListener("post", (event) => {
       if (event.detail.response.type === "error") {
-        this.queue
+        this._queue
           .find((x) => x.id === event.detail.id)
           ?.reject(new WebSocketRequestError(event.detail.response.payload));
         return;
@@ -72,10 +72,10 @@ export class WebSocketPostRequest {
       const data = event.detail.response.type === "info"
         ? event.detail.response.payload.data
         : event.detail.response.payload;
-      this.queue.find((x) => x.id === event.detail.id)?.resolve(data);
+      this._queue.find((x) => x.id === event.detail.id)?.resolve(data);
     });
     hlEvents.addEventListener("pong", () => {
-      this.queue.find((x) => x.id === "ping")?.resolve();
+      this._queue.find((x) => x.id === "ping")?.resolve();
     });
     hlEvents.addEventListener("error", (event) => {
       try {
@@ -83,7 +83,7 @@ export class WebSocketPostRequest {
         const idMatch = event.detail.match(/id=(\d+)$/);
         if (idMatch) {
           const id = parseInt(idMatch[1], 10);
-          this.queue.find((x) => x.id === id)
+          this._queue.find((x) => x.id === id)
             ?.reject(new WebSocketRequestError(event.detail));
           return;
         }
@@ -96,7 +96,7 @@ export class WebSocketPostRequest {
 
         // For `post` requests
         if ("id" in parsedRequest && typeof parsedRequest.id === "number") {
-          this.queue.find((x) => x.id === parsedRequest.id)
+          this._queue.find((x) => x.id === parsedRequest.id)
             ?.reject(new WebSocketRequestError(event.detail));
           return;
         }
@@ -107,7 +107,7 @@ export class WebSocketPostRequest {
           typeof parsedRequest.subscription === "object" && parsedRequest.subscription !== null
         ) {
           const id = WebSocketPostRequest.requestToId(parsedRequest);
-          this.queue.find((x) => x.id === id)
+          this._queue.find((x) => x.id === id)
             ?.reject(new WebSocketRequestError(event.detail));
           return;
         }
@@ -121,7 +121,7 @@ export class WebSocketPostRequest {
             method: "subscribe",
             subscription: parsedRequest,
           });
-          this.queue.find((x) => x.id === id)
+          this._queue.find((x) => x.id === id)
             ?.reject(new WebSocketRequestError(event.detail));
           return;
         }
@@ -132,14 +132,14 @@ export class WebSocketPostRequest {
             method: "unsubscribe",
             subscription: parsedRequest,
           });
-          this.queue.find((x) => x.id === id)
+          this._queue.find((x) => x.id === id)
             ?.reject(new WebSocketRequestError(event.detail));
           return;
         }
 
         // For unknown requests
         const id = WebSocketPostRequest.requestToId(parsedRequest);
-        this.queue.find((x) => x.id === id)
+        this._queue.find((x) => x.id === id)
           ?.reject(new WebSocketRequestError(event.detail));
       } catch {
         // Ignore JSON parsing errors
@@ -148,10 +148,10 @@ export class WebSocketPostRequest {
 
     // Throws all pending requests if the connection is dropped
     const handleClose = () => {
-      this.queue.forEach(({ reject }) => {
+      this._queue.forEach(({ reject }) => {
         reject(new WebSocketRequestError("WebSocket connection closed"));
       });
-      this.queue = [];
+      this._queue = [];
     };
     socket.addEventListener("close", handleClose);
     socket.addEventListener("error", handleClose);
@@ -181,15 +181,15 @@ export class WebSocketPostRequest {
       // Reject the request if the signal is aborted
       if (signal?.aborted) return Promise.reject(signal.reason);
       // or if the WebSocket connection is permanently closed
-      if (this.socket.terminationSignal.aborted) {
-        return Promise.reject(this.socket.terminationSignal.reason);
+      if (this._socket.terminationSignal.aborted) {
+        return Promise.reject(this._socket.terminationSignal.reason);
       }
 
       // Create a request
       let id: string | number;
       let request: SubscribeUnsubscribeRequest | PostRequest | PingRequest;
       if (method === "post") {
-        id = ++this.lastId;
+        id = ++this._lastId;
         request = { method, id, request: payload };
       } else if (method === "ping") {
         id = "ping";
@@ -200,18 +200,18 @@ export class WebSocketPostRequest {
       }
 
       // Send the request
-      this.socket.send(JSON.stringify(request));
+      this._socket.send(JSON.stringify(request));
 
       // Wait for a response
       const { promise, resolve, reject } = Promise_.withResolvers<T>();
-      this.queue.push({ id, resolve, reject });
+      this._queue.push({ id, resolve, reject });
 
       const onAbort = () => reject(signal?.reason);
       signal?.addEventListener("abort", onAbort, { once: true });
 
       return await promise.finally(() => {
-        const index = this.queue.findIndex((item) => item.id === id);
-        if (index !== -1) this.queue.splice(index, 1);
+        const index = this._queue.findIndex((item) => item.id === id);
+        if (index !== -1) this._queue.splice(index, 1);
 
         signal?.removeEventListener("abort", onAbort);
       });

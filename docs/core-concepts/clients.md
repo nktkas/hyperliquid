@@ -248,7 +248,8 @@ await subscription.unsubscribe();
 Each subscription returns an object with:
 
 - `unsubscribe()` — Stop receiving updates
-- `failureSignal` — AbortSignal that aborts if resubscription fails after reconnect
+- `failureSignal` — [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) that aborts if
+  resubscription fails after reconnect
 
 ```ts
 const subscription = await client.trades({ coin: "BTC" }, (data) => {

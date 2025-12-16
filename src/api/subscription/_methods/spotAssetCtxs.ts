@@ -35,7 +35,7 @@ export type SpotAssetCtxsEvent = v.InferOutput<typeof SpotAssetCtxsEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { WebSocketSubscription } from "../../../transport/websocket/mod.ts";
+import type { ISubscription } from "../../../transport/_base.ts";
 
 /**
  * Subscribe to context updates for all spot assets.
@@ -44,7 +44,7 @@ import type { WebSocketSubscription } from "../../../transport/websocket/mod.ts"
  * @param params - Parameters specific to the API subscription.
  * @param listener - A callback function to be called when the event is received.
  *
- * @returns A request-promise that resolves with a {@link WebSocketSubscription} object to manage the subscription lifecycle.
+ * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -67,7 +67,7 @@ import type { WebSocketSubscription } from "../../../transport/websocket/mod.ts"
 export function spotAssetCtxs(
   config: SubscriptionConfig,
   listener: (data: SpotAssetCtxsEvent) => void,
-): Promise<WebSocketSubscription> {
+): Promise<ISubscription> {
   const payload = v.parse(SpotAssetCtxsRequest, { type: "spotAssetCtxs" });
   return config.transport.subscribe<SpotAssetCtxsEvent>(payload.type, payload, (e) => {
     listener(e.detail);

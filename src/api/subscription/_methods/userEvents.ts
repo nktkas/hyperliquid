@@ -158,7 +158,7 @@ export type UserEventsEvent = v.InferOutput<typeof UserEventsEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { WebSocketSubscription } from "../../../transport/websocket/mod.ts";
+import type { ISubscription } from "../../../transport/_base.ts";
 
 /** Request parameters for the {@linkcode userEvents} function. */
 export type UserEventsParameters = Omit<v.InferInput<typeof UserEventsRequest>, "type">;
@@ -170,7 +170,7 @@ export type UserEventsParameters = Omit<v.InferInput<typeof UserEventsRequest>, 
  * @param params - Parameters specific to the API subscription.
  * @param listener - A callback function to be called when the event is received.
  *
- * @returns A request-promise that resolves with a {@link WebSocketSubscription} object to manage the subscription lifecycle.
+ * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -195,7 +195,7 @@ export function userEvents(
   config: SubscriptionConfig,
   params: UserEventsParameters,
   listener: (data: UserEventsEvent) => void,
-): Promise<WebSocketSubscription> {
+): Promise<ISubscription> {
   const payload = v.parse(UserEventsRequest, { type: "userEvents", ...params });
   return config.transport.subscribe<UserEventsEvent>("user", payload, (e) => {
     listener(e.detail);

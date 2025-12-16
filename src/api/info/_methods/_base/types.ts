@@ -1,8 +1,7 @@
-import type { HttpTransport } from "../../../../transport/http/mod.ts";
-import type { WebSocketTransport } from "../../../../transport/websocket/mod.ts";
+import type { IRequestTransport } from "../../../../transport/_base.ts";
 
 /** Configuration for Info API requests. */
-export interface InfoConfig<T extends HttpTransport | WebSocketTransport = HttpTransport | WebSocketTransport> {
+export interface InfoConfig<T extends IRequestTransport = IRequestTransport> {
   /** The transport used to connect to the Hyperliquid API. */
   transport: T;
 }

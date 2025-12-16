@@ -57,7 +57,7 @@ export type SpotStateEvent = v.InferOutput<typeof SpotStateEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { WebSocketSubscription } from "../../../transport/websocket/mod.ts";
+import type { ISubscription } from "../../../transport/_base.ts";
 
 /** Request parameters for the {@linkcode spotState} function. */
 export type SpotStateParameters = Omit<v.InferInput<typeof SpotStateRequest>, "type">;
@@ -69,7 +69,7 @@ export type SpotStateParameters = Omit<v.InferInput<typeof SpotStateRequest>, "t
  * @param params - Parameters specific to the API subscription.
  * @param listener - A callback function to be called when the event is received.
  *
- * @returns A request-promise that resolves with a {@link WebSocketSubscription} object to manage the subscription lifecycle.
+ * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -94,7 +94,7 @@ export function spotState(
   config: SubscriptionConfig,
   params: SpotStateParameters,
   listener: (data: SpotStateEvent) => void,
-): Promise<WebSocketSubscription> {
+): Promise<ISubscription> {
   const payload = v.parse(SpotStateRequest, { type: "spotState", user: params.user });
   return config.transport.subscribe<SpotStateEvent>(payload.type, payload, (e) => {
     if (e.detail.user === payload.user) {

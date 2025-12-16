@@ -46,7 +46,7 @@ export type NotificationEvent = v.InferOutput<typeof NotificationEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { WebSocketSubscription } from "../../../transport/websocket/mod.ts";
+import type { ISubscription } from "../../../transport/_base.ts";
 
 /** Request parameters for the {@linkcode notification} function. */
 export type NotificationParameters = Omit<v.InferInput<typeof NotificationRequest>, "type">;
@@ -58,7 +58,7 @@ export type NotificationParameters = Omit<v.InferInput<typeof NotificationReques
  * @param params - Parameters specific to the API subscription.
  * @param listener - A callback function to be called when the event is received.
  *
- * @returns A request-promise that resolves with a {@link WebSocketSubscription} object to manage the subscription lifecycle.
+ * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -83,7 +83,7 @@ export function notification(
   config: SubscriptionConfig,
   params: NotificationParameters,
   listener: (data: NotificationEvent) => void,
-): Promise<WebSocketSubscription> {
+): Promise<ISubscription> {
   const payload = v.parse(NotificationRequest, { type: "notification", ...params });
   return config.transport.subscribe<NotificationEvent>(payload.type, payload, (e) => {
     listener(e.detail);

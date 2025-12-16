@@ -41,7 +41,7 @@ export type WebData2Event = v.InferOutput<typeof WebData2Event>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { WebSocketSubscription } from "../../../transport/websocket/mod.ts";
+import type { ISubscription } from "../../../transport/_base.ts";
 
 /** Request parameters for the {@linkcode webData2} function. */
 export type WebData2Parameters = Omit<v.InferInput<typeof WebData2Request>, "type">;
@@ -53,7 +53,7 @@ export type WebData2Parameters = Omit<v.InferInput<typeof WebData2Request>, "typ
  * @param params - Parameters specific to the API subscription.
  * @param listener - A callback function to be called when the event is received.
  *
- * @returns A request-promise that resolves with a {@link WebSocketSubscription} object to manage the subscription lifecycle.
+ * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -78,7 +78,7 @@ export function webData2(
   config: SubscriptionConfig,
   params: WebData2Parameters,
   listener: (data: WebData2Event) => void,
-): Promise<WebSocketSubscription> {
+): Promise<ISubscription> {
   const payload = v.parse(WebData2Request, { type: "webData2", ...params });
   return config.transport.subscribe<WebData2Event>(payload.type, payload, (e) => {
     if (e.detail.user === payload.user) {

@@ -1,4 +1,4 @@
-import { HyperliquidError } from "../../../../_errors.ts";
+import { HyperliquidError } from "../../../../_base.ts";
 
 // =============================================================
 // Error Detection (Duck Typing)

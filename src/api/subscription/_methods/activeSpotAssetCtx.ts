@@ -51,7 +51,7 @@ export type ActiveSpotAssetCtxEvent = v.InferOutput<typeof ActiveSpotAssetCtxEve
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { WebSocketSubscription } from "../../../transport/websocket/mod.ts";
+import type { ISubscription } from "../../../transport/_base.ts";
 
 /** Request parameters for the {@linkcode activeSpotAssetCtx} function. */
 export type ActiveSpotAssetCtxParameters = Omit<v.InferInput<typeof ActiveSpotAssetCtxRequest>, "type">;
@@ -62,7 +62,7 @@ export type ActiveSpotAssetCtxParameters = Omit<v.InferInput<typeof ActiveSpotAs
  * @param config - General configuration for Subscription API subscriptions.
  * @param params - Parameters specific to the API subscription.
  * @param listener - A callback function to be called when the event is received.
- * @returns A request-promise that resolves with a {@link WebSocketSubscription} object to manage the subscription lifecycle.
+ * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -87,7 +87,7 @@ export function activeSpotAssetCtx(
   config: SubscriptionConfig,
   params: ActiveSpotAssetCtxParameters,
   listener: (data: ActiveSpotAssetCtxEvent) => void,
-): Promise<WebSocketSubscription> {
+): Promise<ISubscription> {
   const payload = v.parse(ActiveSpotAssetCtxRequest, { type: "activeAssetCtx", ...params });
   return config.transport.subscribe<ActiveSpotAssetCtxEvent>("activeSpotAssetCtx", payload, (e) => {
     if (e.detail.coin === payload.coin) {

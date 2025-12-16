@@ -51,7 +51,7 @@ export type AssetCtxsEvent = v.InferOutput<typeof AssetCtxsEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { WebSocketSubscription } from "../../../transport/websocket/mod.ts";
+import type { ISubscription } from "../../../transport/_base.ts";
 
 /** Request parameters for the {@linkcode assetCtxs} function. */
 export type AssetCtxsParameters = Omit<v.InferInput<typeof AssetCtxsRequest>, "type">;
@@ -63,7 +63,7 @@ export type AssetCtxsParameters = Omit<v.InferInput<typeof AssetCtxsRequest>, "t
  * @param params - Parameters specific to the API subscription.
  * @param listener - A callback function to be called when the event is received.
  *
- * @returns A request-promise that resolves with a {@link WebSocketSubscription} object to manage the subscription lifecycle.
+ * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -84,17 +84,17 @@ export type AssetCtxsParameters = Omit<v.InferInput<typeof AssetCtxsRequest>, "t
 export function assetCtxs(
   config: SubscriptionConfig,
   listener: (data: AssetCtxsEvent) => void,
-): Promise<WebSocketSubscription>;
+): Promise<ISubscription>;
 export function assetCtxs(
   config: SubscriptionConfig,
   params: AssetCtxsParameters,
   listener: (data: AssetCtxsEvent) => void,
-): Promise<WebSocketSubscription>;
+): Promise<ISubscription>;
 export function assetCtxs(
   config: SubscriptionConfig,
   paramsOrListener: AssetCtxsParameters | ((data: AssetCtxsEvent) => void),
   maybeListener?: (data: AssetCtxsEvent) => void,
-): Promise<WebSocketSubscription> {
+): Promise<ISubscription> {
   const params = typeof paramsOrListener === "function" ? {} : paramsOrListener;
   const listener = typeof paramsOrListener === "function" ? paramsOrListener : maybeListener!;
 

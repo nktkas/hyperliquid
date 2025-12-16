@@ -88,7 +88,6 @@ export type BlockDetailsResponse = v.InferOutput<typeof BlockDetailsResponse>;
 // ============================================================
 
 import type { InfoConfig } from "./_base/types.ts";
-import type { HttpTransport } from "../../../transport/http/mod.ts";
 
 /** Request parameters for the {@linkcode blockDetails} function. */
 export type BlockDetailsParameters = Omit<v.InferInput<typeof BlockDetailsRequest>, "type">;
@@ -118,7 +117,7 @@ export type BlockDetailsParameters = Omit<v.InferInput<typeof BlockDetailsReques
  * ```
  */
 export function blockDetails(
-  config: InfoConfig<HttpTransport>,
+  config: InfoConfig,
   params: BlockDetailsParameters,
   signal?: AbortSignal,
 ): Promise<BlockDetailsResponse> {

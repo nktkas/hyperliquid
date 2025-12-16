@@ -1,5 +1,5 @@
 import type { SubscriptionConfig } from "./_methods/_types.ts";
-import type { WebSocketSubscription } from "../../transport/websocket/mod.ts";
+import type { ISubscription } from "../../transport/_base.ts";
 
 // =============================================================
 // Methods Imports
@@ -99,7 +99,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   activeAssetCtx(
     params: ActiveAssetCtxParameters,
     listener: (data: ActiveAssetCtxEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return activeAssetCtx(this.config_, params, listener);
   }
 
@@ -107,7 +107,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   activeAssetData(
     params: ActiveAssetDataParameters,
     listener: (data: ActiveAssetDataEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return activeAssetData(this.config_, params, listener);
   }
 
@@ -115,14 +115,14 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   activeSpotAssetCtx(
     params: ActiveSpotAssetCtxParameters,
     listener: (data: ActiveSpotAssetCtxEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return activeSpotAssetCtx(this.config_, params, listener);
   }
 
   /** @see {@link allDexsAssetCtxs} */
   allDexsAssetCtxs(
     listener: (data: AllDexsAssetCtxsEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return allDexsAssetCtxs(this.config_, listener);
   }
 
@@ -130,22 +130,22 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   allDexsClearinghouseState(
     params: AllDexsClearinghouseStateParameters,
     listener: (data: AllDexsClearinghouseStateEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return allDexsClearinghouseState(this.config_, params, listener);
   }
 
   /** @see {@link allMids} */
   allMids(
     listener: (data: AllMidsEvent) => void,
-  ): Promise<WebSocketSubscription>;
+  ): Promise<ISubscription>;
   allMids(
     params: AllMidsParameters,
     listener: (data: AllMidsEvent) => void,
-  ): Promise<WebSocketSubscription>;
+  ): Promise<ISubscription>;
   allMids(
     paramsOrListener: AllMidsParameters | ((data: AllMidsEvent) => void),
     maybeListener?: (data: AllMidsEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     const params = typeof paramsOrListener === "function" ? {} : paramsOrListener;
     const listener = typeof paramsOrListener === "function" ? paramsOrListener : maybeListener!;
     return allMids(this.config_, params, listener);
@@ -154,15 +154,15 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /** @see {@link assetCtxs} */
   assetCtxs(
     listener: (data: AssetCtxsEvent) => void,
-  ): Promise<WebSocketSubscription>;
+  ): Promise<ISubscription>;
   assetCtxs(
     params: AssetCtxsParameters,
     listener: (data: AssetCtxsEvent) => void,
-  ): Promise<WebSocketSubscription>;
+  ): Promise<ISubscription>;
   assetCtxs(
     paramsOrListener: AssetCtxsParameters | ((data: AssetCtxsEvent) => void),
     maybeListener?: (data: AssetCtxsEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     const params = typeof paramsOrListener === "function" ? {} : paramsOrListener;
     const listener = typeof paramsOrListener === "function" ? paramsOrListener : maybeListener!;
     return assetCtxs(this.config_, params, listener);
@@ -172,7 +172,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   bbo(
     params: BboParameters,
     listener: (data: BboEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return bbo(this.config_, params, listener);
   }
 
@@ -180,7 +180,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   candle(
     params: CandleParameters,
     listener: (data: CandleEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return candle(this.config_, params, listener);
   }
 
@@ -188,21 +188,21 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   clearinghouseState(
     params: ClearinghouseStateParameters,
     listener: (data: ClearinghouseStateEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return clearinghouseState(this.config_, params, listener);
   }
 
   /** @see {@link explorerBlock} */
   explorerBlock(
     listener: (data: ExplorerBlockEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return explorerBlock(this.config_, listener);
   }
 
   /** @see {@link explorerTxs} */
   explorerTxs(
     listener: (data: ExplorerTxsEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return explorerTxs(this.config_, listener);
   }
 
@@ -210,7 +210,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   l2Book(
     params: L2BookParameters,
     listener: (data: L2BookEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return l2Book(this.config_, params, listener);
   }
 
@@ -218,7 +218,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   notification(
     params: NotificationParameters,
     listener: (data: NotificationEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return notification(this.config_, params, listener);
   }
 
@@ -226,7 +226,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   openOrders(
     params: OpenOrdersParameters,
     listener: (data: OpenOrdersEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return openOrders(this.config_, params, listener);
   }
 
@@ -234,14 +234,14 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   orderUpdates(
     params: OrderUpdatesParameters,
     listener: (data: OrderUpdatesEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return orderUpdates(this.config_, params, listener);
   }
 
   /** @see {@link spotAssetCtxs} */
   spotAssetCtxs(
     listener: (data: SpotAssetCtxsEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return spotAssetCtxs(this.config_, listener);
   }
 
@@ -249,7 +249,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   spotState(
     params: SpotStateParameters,
     listener: (data: SpotStateEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return spotState(this.config_, params, listener);
   }
 
@@ -257,7 +257,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   trades(
     params: TradesParameters,
     listener: (data: TradesEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return trades(this.config_, params, listener);
   }
 
@@ -265,7 +265,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   twapStates(
     params: TwapStatesParameters,
     listener: (data: TwapStatesEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return twapStates(this.config_, params, listener);
   }
 
@@ -273,7 +273,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   userEvents(
     params: UserEventsParameters,
     listener: (data: UserEventsEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return userEvents(this.config_, params, listener);
   }
 
@@ -281,7 +281,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   userFills(
     params: UserFillsParameters,
     listener: (data: UserFillsEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return userFills(this.config_, params, listener);
   }
 
@@ -289,7 +289,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   userFundings(
     params: UserFundingsParameters,
     listener: (data: UserFundingsEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return userFundings(this.config_, params, listener);
   }
 
@@ -297,7 +297,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   userHistoricalOrders(
     params: UserHistoricalOrdersParameters,
     listener: (data: UserHistoricalOrdersEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return userHistoricalOrders(this.config_, params, listener);
   }
 
@@ -305,7 +305,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   userNonFundingLedgerUpdates(
     params: UserNonFundingLedgerUpdatesParameters,
     listener: (data: UserNonFundingLedgerUpdatesEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return userNonFundingLedgerUpdates(this.config_, params, listener);
   }
 
@@ -313,7 +313,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   userTwapHistory(
     params: UserTwapHistoryParameters,
     listener: (data: UserTwapHistoryEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return userTwapHistory(this.config_, params, listener);
   }
 
@@ -321,7 +321,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   userTwapSliceFills(
     params: UserTwapSliceFillsParameters,
     listener: (data: UserTwapSliceFillsEvent) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return userTwapSliceFills(this.config_, params, listener);
   }
 
@@ -329,7 +329,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   webData2(
     params: WebData2Parameters,
     listener: (data: WebData2Event) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return webData2(this.config_, params, listener);
   }
 
@@ -337,7 +337,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   webData3(
     params: WebData3Parameters,
     listener: (data: WebData3Event) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return webData3(this.config_, params, listener);
   }
 }

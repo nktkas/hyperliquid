@@ -1,11 +1,11 @@
+import type { IRequestTransport, ISubscription, ISubscriptionTransport } from "../_base.ts";
 import { AbortSignal_ } from "../_polyfills.ts";
 import { ReconnectingWebSocket, type ReconnectingWebSocketOptions } from "@nktkas/rews";
 import { HyperliquidEventTarget } from "./_hyperliquidEventTarget.ts";
 import { WebSocketPostRequest, WebSocketRequestError } from "./_postRequest.ts";
-import { type WebSocketSubscription, WebSocketSubscriptionManager } from "./_subscriptionManager.ts";
+import { WebSocketSubscriptionManager } from "./_subscriptionManager.ts";
 
 export { WebSocketRequestError };
-export type { WebSocketSubscription };
 
 /** Configuration options for the WebSocket transport layer. */
 export interface WebSocketTransportOptions {
@@ -55,7 +55,7 @@ export const TESTNET_RPC_WS_URL = "wss://rpc.hyperliquid-testnet.xyz/ws";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/post-requests
  */
-export class WebSocketTransport {
+export class WebSocketTransport implements IRequestTransport, ISubscriptionTransport {
   /** Indicates this transport uses testnet endpoint. */
   readonly isTestnet: boolean;
   /** The WebSocket that is used for communication. */
@@ -137,7 +137,7 @@ export class WebSocketTransport {
    * @param payload - A payload to send with the subscription request.
    * @param listener - A function to call when the event is dispatched.
    *
-   * @returns A promise that resolves with a {@link WebSocketSubscription} object to manage the subscription lifecycle.
+   * @returns A promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {WebSocketRequestError} - An error that occurs when a WebSocket request fails.
    */
@@ -145,7 +145,7 @@ export class WebSocketTransport {
     channel: string,
     payload: unknown,
     listener: (data: CustomEvent<T>) => void,
-  ): Promise<WebSocketSubscription> {
+  ): Promise<ISubscription> {
     return this._subscriptionManager.subscribe(channel, payload, listener);
   }
 

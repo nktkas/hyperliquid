@@ -51,7 +51,7 @@ export type AllMidsEvent = v.InferOutput<typeof AllMidsEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { WebSocketSubscription } from "../../../transport/websocket/mod.ts";
+import type { ISubscription } from "../../../transport/_base.ts";
 
 /** Request parameters for the {@linkcode allMids} function. */
 export type AllMidsParameters = Omit<v.InferInput<typeof AllMidsRequest>, "type">;
@@ -63,7 +63,7 @@ export type AllMidsParameters = Omit<v.InferInput<typeof AllMidsRequest>, "type"
  * @param params - Parameters specific to the API subscription.
  * @param listener - A callback function to be called when the event is received.
  *
- * @returns A request-promise that resolves with a {@link WebSocketSubscription} object to manage the subscription lifecycle.
+ * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -86,17 +86,17 @@ export type AllMidsParameters = Omit<v.InferInput<typeof AllMidsRequest>, "type"
 export function allMids(
   config: SubscriptionConfig,
   listener: (data: AllMidsEvent) => void,
-): Promise<WebSocketSubscription>;
+): Promise<ISubscription>;
 export function allMids(
   config: SubscriptionConfig,
   params: AllMidsParameters,
   listener: (data: AllMidsEvent) => void,
-): Promise<WebSocketSubscription>;
+): Promise<ISubscription>;
 export function allMids(
   config: SubscriptionConfig,
   paramsOrListener: AllMidsParameters | ((data: AllMidsEvent) => void),
   maybeListener?: (data: AllMidsEvent) => void,
-): Promise<WebSocketSubscription> {
+): Promise<ISubscription> {
   const params = typeof paramsOrListener === "function" ? {} : paramsOrListener;
   const listener = typeof paramsOrListener === "function" ? paramsOrListener : maybeListener!;
 

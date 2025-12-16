@@ -1,5 +1,5 @@
 import * as v from "@valibot/valibot";
-import { HyperliquidError } from "../_errors.ts";
+import { HyperliquidError } from "../_base.ts";
 
 // =============================================================
 // Ethers V6

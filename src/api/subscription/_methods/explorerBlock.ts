@@ -64,7 +64,7 @@ export type ExplorerBlockEvent = v.InferOutput<typeof ExplorerBlockEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { WebSocketSubscription } from "../../../transport/websocket/mod.ts";
+import type { ISubscription } from "../../../transport/_base.ts";
 
 /**
  * Subscribe to explorer block updates.
@@ -72,7 +72,7 @@ import type { WebSocketSubscription } from "../../../transport/websocket/mod.ts"
  * @param config - General configuration for Subscription API subscriptions.
  * @param listener - A callback function to be called when the event is received.
  *
- * @returns A request-promise that resolves with a {@link WebSocketSubscription} object to manage the subscription lifecycle.
+ * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -93,7 +93,7 @@ import type { WebSocketSubscription } from "../../../transport/websocket/mod.ts"
 export function explorerBlock(
   config: SubscriptionConfig,
   listener: (data: ExplorerBlockEvent) => void,
-): Promise<WebSocketSubscription> {
+): Promise<ISubscription> {
   const payload = v.parse(ExplorerBlockRequest, { type: "explorerBlock" });
   return config.transport.subscribe<ExplorerBlockEvent>("_explorerBlock", payload, (e) => { // Internal channel as it does not have its own channel
     listener(e.detail);

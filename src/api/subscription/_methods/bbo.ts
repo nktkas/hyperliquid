@@ -79,7 +79,7 @@ export type BboEvent = v.InferOutput<typeof BboEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { WebSocketSubscription } from "../../../transport/websocket/mod.ts";
+import type { ISubscription } from "../../../transport/_base.ts";
 
 /** Request parameters for the {@linkcode bbo} function. */
 export type BboParameters = Omit<v.InferInput<typeof BboRequest>, "type">;
@@ -91,7 +91,7 @@ export type BboParameters = Omit<v.InferInput<typeof BboRequest>, "type">;
  * @param params - Parameters specific to the API subscription.
  * @param listener - A callback function to be called when the event is received.
  *
- * @returns A request-promise that resolves with a {@link WebSocketSubscription} object to manage the subscription lifecycle.
+ * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -116,7 +116,7 @@ export function bbo(
   config: SubscriptionConfig,
   params: BboParameters,
   listener: (data: BboEvent) => void,
-): Promise<WebSocketSubscription> {
+): Promise<ISubscription> {
   const payload = v.parse(BboRequest, { type: "bbo", ...params });
   return config.transport.subscribe<BboEvent>(payload.type, payload, (e) => {
     if (e.detail.coin === payload.coin) {

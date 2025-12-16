@@ -56,7 +56,6 @@ export type UserDetailsResponse = v.InferOutput<typeof UserDetailsResponse>;
 // ============================================================
 
 import type { InfoConfig } from "./_base/types.ts";
-import type { HttpTransport } from "../../../transport/http/mod.ts";
 
 /** Request parameters for the {@linkcode userDetails} function. */
 export type UserDetailsParameters = Omit<v.InferInput<typeof UserDetailsRequest>, "type">;
@@ -86,7 +85,7 @@ export type UserDetailsParameters = Omit<v.InferInput<typeof UserDetailsRequest>
  * ```
  */
 export function userDetails(
-  config: InfoConfig<HttpTransport>,
+  config: InfoConfig,
   params: UserDetailsParameters,
   signal?: AbortSignal,
 ): Promise<UserDetailsResponse> {

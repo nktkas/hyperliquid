@@ -1,5 +1,4 @@
-import type { HttpTransport } from "../transport/http/mod.ts";
-import type { WebSocketTransport } from "../transport/websocket/mod.ts";
+import type { IRequestTransport } from "../transport/_base.ts";
 import {
   meta,
   type MetaResponse,
@@ -12,8 +11,7 @@ import {
 /** Options for creating a {@link SymbolConverter} instance. */
 export interface SymbolConverterOptions {
   /** Transport instance to use for API requests. */
-  transport: HttpTransport | WebSocketTransport;
-
+  transport: IRequestTransport;
   /** Optional dex support: array of dex names, true for all dexs, or false/undefined to skip. */
   dexs?: string[] | boolean;
 }
@@ -47,7 +45,7 @@ export interface SymbolConverterOptions {
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/asset-ids
  */
 export class SymbolConverter {
-  #transport: HttpTransport | WebSocketTransport;
+  #transport: IRequestTransport;
   #dexOption: string[] | boolean;
   #nameToAssetId = new Map<string, number>();
   #nameToSzDecimals = new Map<string, number>();

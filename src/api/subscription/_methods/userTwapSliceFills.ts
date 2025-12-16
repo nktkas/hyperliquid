@@ -57,7 +57,7 @@ export type UserTwapSliceFillsEvent = v.InferOutput<typeof UserTwapSliceFillsEve
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { WebSocketSubscription } from "../../../transport/websocket/mod.ts";
+import type { ISubscription } from "../../../transport/_base.ts";
 
 /** Request parameters for the {@linkcode userTwapSliceFills} function. */
 export type UserTwapSliceFillsParameters = Omit<v.InferInput<typeof UserTwapSliceFillsRequest>, "type">;
@@ -69,7 +69,7 @@ export type UserTwapSliceFillsParameters = Omit<v.InferInput<typeof UserTwapSlic
  * @param params - Parameters specific to the API subscription.
  * @param listener - A callback function to be called when the event is received.
  *
- * @returns A request-promise that resolves with a {@link WebSocketSubscription} object to manage the subscription lifecycle.
+ * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -94,7 +94,7 @@ export function userTwapSliceFills(
   config: SubscriptionConfig,
   params: UserTwapSliceFillsParameters,
   listener: (data: UserTwapSliceFillsEvent) => void,
-): Promise<WebSocketSubscription> {
+): Promise<ISubscription> {
   const payload = v.parse(UserTwapSliceFillsRequest, { type: "userTwapSliceFills", ...params });
   return config.transport.subscribe<UserTwapSliceFillsEvent>(payload.type, payload, (e) => {
     if (e.detail.user === payload.user) {

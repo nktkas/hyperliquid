@@ -1,5 +1,6 @@
-export * from "./_errors.ts";
+export * from "./_base.ts";
 
+export * from "./transport/_base.ts";
 export * from "./transport/http/mod.ts";
 export * from "./transport/websocket/mod.ts";
 

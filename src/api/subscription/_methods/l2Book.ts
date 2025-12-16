@@ -89,7 +89,7 @@ export type L2BookEvent = v.InferOutput<typeof L2BookEvent>;
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { WebSocketSubscription } from "../../../transport/websocket/mod.ts";
+import type { ISubscription } from "../../../transport/_base.ts";
 
 /** Request parameters for the {@linkcode l2Book} function. */
 export type L2BookParameters = Omit<v.InferInput<typeof L2BookRequest>, "type">;
@@ -101,7 +101,7 @@ export type L2BookParameters = Omit<v.InferInput<typeof L2BookRequest>, "type">;
  * @param params - Parameters specific to the API subscription.
  * @param listener - A callback function to be called when the event is received.
  *
- * @returns A request-promise that resolves with a {@link WebSocketSubscription} object to manage the subscription lifecycle.
+ * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -126,7 +126,7 @@ export function l2Book(
   config: SubscriptionConfig,
   params: L2BookParameters,
   listener: (data: L2BookEvent) => void,
-): Promise<WebSocketSubscription> {
+): Promise<ISubscription> {
   const payload = v.parse(L2BookRequest, {
     type: "l2Book",
     ...params,

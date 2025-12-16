@@ -1,5 +1,4 @@
 import type { InfoConfig } from "./_methods/_base/types.ts";
-import type { HttpTransport } from "../../transport/http/mod.ts";
 
 // =============================================================
 // Methods Imports
@@ -234,7 +233,6 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
 
   /** @see {@link blockDetails} */
   blockDetails(
-    this: { config_: { transport: HttpTransport } },
     params: BlockDetailsParameters,
     signal?: AbortSignal,
   ): Promise<BlockDetailsResponse> {
@@ -604,7 +602,6 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
 
   /** @see {@link txDetails} */
   txDetails(
-    this: { config_: { transport: HttpTransport } },
     params: TxDetailsParameters,
     signal?: AbortSignal,
   ): Promise<TxDetailsResponse> {
@@ -613,7 +610,6 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
 
   /** @see {@link userDetails} */
   userDetails(
-    this: { config_: { transport: HttpTransport } },
     params: UserDetailsParameters,
     signal?: AbortSignal,
   ): Promise<UserDetailsResponse> {

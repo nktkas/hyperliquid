@@ -1,6 +1,5 @@
 import * as v from "@valibot/valibot";
-import type { HttpTransport } from "../../../../transport/http/mod.ts";
-import type { WebSocketTransport } from "../../../../transport/websocket/mod.ts";
+import type { IRequestTransport } from "../../../../transport/_base.ts";
 import { Address, Hex, UnsignedInteger } from "../../../_schemas.ts";
 import {
   type AbstractWallet,
@@ -41,7 +40,7 @@ export type ExtractRequestOptions<T extends { action: Record<string, unknown> }>
 // =============================================================
 
 /** Base configuration shared by single-wallet and multi-sig configs. */
-interface BaseConfig<T extends HttpTransport | WebSocketTransport = HttpTransport | WebSocketTransport> {
+interface BaseConfig<T extends IRequestTransport = IRequestTransport> {
   /** The transport used to connect to the Hyperliquid Exchange API. */
   transport: T;
 
@@ -69,17 +68,13 @@ interface BaseConfig<T extends HttpTransport | WebSocketTransport = HttpTranspor
 }
 
 /** Configuration for single-wallet Exchange API requests. */
-export interface ExchangeSingleWalletConfig<
-  T extends HttpTransport | WebSocketTransport = HttpTransport | WebSocketTransport,
-> extends BaseConfig<T> {
+export interface ExchangeSingleWalletConfig<T extends IRequestTransport = IRequestTransport> extends BaseConfig<T> {
   /** The wallet used to sign requests. */
   wallet: AbstractWallet;
 }
 
 /** Configuration for multi-signature Exchange API requests. */
-export interface ExchangeMultiSigConfig<
-  T extends HttpTransport | WebSocketTransport = HttpTransport | WebSocketTransport,
-> extends BaseConfig<T> {
+export interface ExchangeMultiSigConfig<T extends IRequestTransport = IRequestTransport> extends BaseConfig<T> {
   /** Array of wallets for multi-sig. First wallet is the leader. */
   signers: readonly [AbstractWallet, ...AbstractWallet[]];
   /** The multi-signature account address. */

@@ -57,7 +57,7 @@ export type AllDexsClearinghouseStateEvent = v.InferOutput<typeof AllDexsClearin
 // ============================================================
 
 import type { SubscriptionConfig } from "./_types.ts";
-import type { WebSocketSubscription } from "../../../transport/websocket/mod.ts";
+import type { ISubscription } from "../../../transport/_base.ts";
 
 /** Request parameters for the {@linkcode allDexsClearinghouseState} function. */
 export type AllDexsClearinghouseStateParameters = Omit<v.InferInput<typeof AllDexsClearinghouseStateRequest>, "type">;
@@ -69,7 +69,7 @@ export type AllDexsClearinghouseStateParameters = Omit<v.InferInput<typeof AllDe
  * @param params - Parameters specific to the API subscription.
  * @param listener - A callback function to be called when the event is received.
  *
- * @returns A request-promise that resolves with a {@link WebSocketSubscription} object to manage the subscription lifecycle.
+ * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -94,7 +94,7 @@ export function allDexsClearinghouseState(
   config: SubscriptionConfig,
   params: AllDexsClearinghouseStateParameters,
   listener: (data: AllDexsClearinghouseStateEvent) => void,
-): Promise<WebSocketSubscription> {
+): Promise<ISubscription> {
   const payload = v.parse(AllDexsClearinghouseStateRequest, {
     type: "allDexsClearinghouseState",
     ...params,
