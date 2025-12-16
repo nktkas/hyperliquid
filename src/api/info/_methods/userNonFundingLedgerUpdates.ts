@@ -25,7 +25,7 @@ export const UserNonFundingLedgerUpdatesRequest = /* @__PURE__ */ (() => {
       ),
       /** Start time (in ms since epoch). */
       startTime: v.pipe(
-        UnsignedInteger,
+        v.optional(UnsignedInteger),
         v.description("Start time (in ms since epoch)."),
       ),
       /** End time (in ms since epoch). */
@@ -221,10 +221,10 @@ export const UserNonFundingLedgerUpdatesResponse = /* @__PURE__ */ (() => {
                 UnsignedDecimal,
                 v.description("Fee in native token."),
               ),
-              /** Nonce of the transfer? */
+              /** Nonce of the transfer. */
               nonce: v.pipe(
-                v.null(),
-                v.description("Nonce of the transfer?"),
+                v.nullable(UnsignedInteger),
+                v.description("Nonce of the transfer."),
               ),
               /** Token in which the fee is denominated (e.g., "USDC"). */
               feeToken: v.pipe(
@@ -380,6 +380,110 @@ export const UserNonFundingLedgerUpdatesResponse = /* @__PURE__ */ (() => {
                 v.description("Withdrawal fee."),
               ),
             }),
+            /** Transfer tokens between different perp DEXs, spot balance, users, and/or sub-accounts. */
+            v.object({
+              /** Update type. */
+              type: v.pipe(
+                v.literal("send"),
+                v.description("Update type."),
+              ),
+              /** Address of the sender. */
+              user: v.pipe(
+                Address,
+                v.description("Address of the sender."),
+              ),
+              /** Destination address. */
+              destination: v.pipe(
+                Address,
+                v.description("Destination address."),
+              ),
+              /** Source DEX ("" for default USDC perp DEX, "spot" for spot). */
+              sourceDex: v.pipe(
+                v.string(),
+                v.description('Source DEX ("" for default USDC perp DEX, "spot" for spot).'),
+              ),
+              /** Destination DEX ("" for default USDC perp DEX, "spot" for spot). */
+              destinationDex: v.pipe(
+                v.string(),
+                v.description('Destination DEX ("" for default USDC perp DEX, "spot" for spot).'),
+              ),
+              /** Token identifier. */
+              token: v.pipe(
+                v.string(),
+                v.description("Token identifier."),
+              ),
+              /** Amount to send (not in wei). */
+              amount: v.pipe(
+                UnsignedDecimal,
+                v.description("Amount to send (not in wei)."),
+              ),
+              /** Equivalent USDC value. */
+              usdcValue: v.pipe(
+                UnsignedDecimal,
+                v.description("Equivalent USDC value."),
+              ),
+              /** Transfer fee. */
+              fee: v.pipe(
+                UnsignedDecimal,
+                v.description("Transfer fee."),
+              ),
+              /** Fee in native token. */
+              nativeTokenFee: v.pipe(
+                UnsignedDecimal,
+                v.description("Fee in native token."),
+              ),
+              /** Nonce of the transfer. */
+              nonce: v.pipe(
+                UnsignedInteger,
+                v.description("Nonce of the transfer."),
+              ),
+              /** Token in which the fee is denominated (e.g., "USDC"). */
+              feeToken: v.pipe(
+                v.string(),
+                v.description('Token in which the fee is denominated (e.g., "USDC").'),
+              ),
+            }),
+            /** Deploy gas auction update. */
+            v.object({
+              /** Update type. */
+              type: v.pipe(
+                v.literal("deployGasAuction"),
+                v.description("Update type."),
+              ),
+              /** Token symbol. */
+              token: v.pipe(
+                v.string(),
+                v.description("Token symbol."),
+              ),
+              /** Amount in the specified token. */
+              amount: v.pipe(
+                UnsignedDecimal,
+                v.description("Amount in the specified token."),
+              ),
+            }),
+            /** C-staking transfer update. */
+            v.object({
+              /** Update type. */
+              type: v.pipe(
+                v.literal("cStakingTransfer"),
+                v.description("Update type."),
+              ),
+              /** Token symbol. */
+              token: v.pipe(
+                v.string(),
+                v.description("Token symbol."),
+              ),
+              /** Amount in the specified token. */
+              amount: v.pipe(
+                UnsignedDecimal,
+                v.description("Amount in the specified token."),
+              ),
+              /** `true` for deposit, `false` for withdrawal. */
+              isDeposit: v.pipe(
+                v.boolean(),
+                v.description("`true` for deposit, `false` for withdrawal."),
+              ),
+            }),
           ]),
           v.description("Update details."),
         ),
@@ -423,7 +527,7 @@ export type UserNonFundingLedgerUpdatesParameters = Omit<
  *
  * const data = await userNonFundingLedgerUpdates(
  *   { transport },
- *   { user: "0x...", startTime: Date.now() - 1000 * 60 * 60 * 24 },
+ *   { user: "0x..." },
  * );
  * ```
  *

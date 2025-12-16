@@ -7,10 +7,8 @@ runTest({
   name: "userNonFundingLedgerUpdates",
   codeTestFn: async (_t, client) => {
     const data = await Promise.all([
-      client.userNonFundingLedgerUpdates({
-        user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9",
-        startTime: Date.now() - 1000 * 60 * 60 * 24 * 365 * 5,
-      }),
+      client.userNonFundingLedgerUpdates({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" }),
+      client.userNonFundingLedgerUpdates({ user: "0xc65008a70F511ae0407D26022ff1516422AceA94" }),
     ]);
     schemaCoverage(UserNonFundingLedgerUpdatesResponse, data, {
       ignorePicklistValues: {
