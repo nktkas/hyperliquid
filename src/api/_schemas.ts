@@ -10,6 +10,7 @@ export const UnsignedDecimal = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([v.string(), v.number()]),
     v.toString(),
+    v.string(), // HACK: for correct JSONSchema generation
     v.transform((value) => formatDecimalString(value)),
     v.regex(/^[0-9]+(\.[0-9]+)?$/),
   );
@@ -20,6 +21,7 @@ export const Decimal = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([v.string(), v.number()]),
     v.toString(),
+    v.string(), // HACK: for correct JSONSchema generation
     v.transform((value) => formatDecimalString(value)),
     v.regex(/^-?[0-9]+(\.[0-9]+)?$/),
   );
@@ -30,6 +32,7 @@ export const Integer = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([v.string(), v.number()]),
     v.toNumber(),
+    v.number(), // HACK: for correct JSONSchema generation
     v.safeInteger(),
   );
 })();
@@ -39,6 +42,7 @@ export const UnsignedInteger = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([v.string(), v.number()]),
     v.toNumber(),
+    v.number(), // HACK: for correct JSONSchema generation
     v.safeInteger(),
     v.minValue(0),
   );

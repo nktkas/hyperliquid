@@ -22,11 +22,11 @@ import * as hlInfo from "@nktkas/hyperliquid/api/info";
 import * as hlExchange from "@nktkas/hyperliquid/api/exchange";
 import * as hlSubscription from "@nktkas/hyperliquid/api/subscription";
 import type { AbstractWallet } from "@nktkas/hyperliquid/signing";
-import { type ConversionConfig, type JSONSchema7, toJsonSchema } from "jsr:@valibot/to-json-schema@1";
+import { type ConversionConfig, type JsonSchema, toJsonSchema } from "jsr:@valibot/to-json-schema@1";
 
 type Endpoint = "info" | "exchange" | "subscription";
 
-type AllSchemas = Record<Endpoint, Record<string, { request: JSONSchema7; response: JSONSchema7 }>>;
+type AllSchemas = Record<Endpoint, Record<string, { request: JsonSchema; response: JsonSchema }>>;
 
 export function getAllSchemas(): AllSchemas {
   console.log("[Schemas] Starting to extract schemas...");
