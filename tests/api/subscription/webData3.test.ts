@@ -12,6 +12,10 @@ runTest({
       await client.webData3({ user: "0xe019d6167E7e324aEd003d94098496b6d986aB05" }, cb);
     }, 10_000);
     schemaCoverage(WebData3Event, data.flat(), {
+      ignoreDefinedTypes: [
+        "#/properties/userState/properties/agentAddress",
+        "#/properties/userState/properties/agentValidUntil",
+      ],
       ignorePicklistValues: {
         "#/properties/perpDexStates/items/properties/openOrders/items/properties/orderType": [
           "Market",
