@@ -1,67 +1,32 @@
-// ============================================================
-// Semaphore
-// ============================================================
+import { Semaphore } from "@std/async/unstable-semaphore";
 
-// TODO: Replace with @std/async/semaphore if the PR (https://github.com/denoland/std/pull/6894) will be merged
-
-interface Node {
-  res: () => void;
-  next: Node | undefined;
-}
-
-export class Semaphore {
-  #max: number;
-  #count: number;
-  #head: Node | undefined;
-  #tail: Node | undefined;
-
-  constructor(max: number = 1) {
-    if (max < 1) {
-      throw new TypeError(
-        `Cannot create semaphore as 'max' must be at least 1: current value is ${max}`,
-      );
-    }
-    this.#count = this.#max = max;
-  }
-
-  acquire(): Promise<void> {
-    if (this.#count > 0) {
-      this.#count--;
-      return Promise.resolve();
-    }
-    return new Promise((res) => {
-      const node: Node = { res, next: undefined };
-      if (this.#tail) {
-        this.#tail = this.#tail.next = node;
-      } else {
-        this.#head = this.#tail = node;
-      }
-    });
-  }
-
-  release(): void {
-    if (this.#head) {
-      this.#head.res();
-      this.#head = this.#head.next;
-      if (!this.#head) this.#tail = undefined;
-    } else if (this.#count < this.#max) {
-      this.#count++;
-    }
-  }
-}
-
-// ============================================================
-// RefCounted Registry
-// ============================================================
-
+/**
+ * A reference-counted registry for lazily creating and reusing per-key values.
+ *
+ * @template K - Map key type.
+ * @template V - Stored value type.
+ */
 class RefCountedRegistry<K, V> {
   #map = new Map<K, { value: V; refs: number }>();
   #factory: () => V;
 
+  /**
+   * Creates a new registry instance.
+   *
+   * @param factory - Factory function used to create a new value when a key is first referenced.
+   */
   constructor(factory: () => V) {
     this.#factory = factory;
   }
 
+  /**
+   * Increments the reference count for a key and returns its value.
+   *
+   * If the key is not present, a new value is created via the factory.
+   *
+   * @param key - Registry key.
+   * @returns The value associated with the key.
+   */
   ref(key: K): V {
     let entry = this.#map.get(key);
     if (!entry) {
@@ -72,6 +37,13 @@ class RefCountedRegistry<K, V> {
     return entry.value;
   }
 
+  /**
+   * Decrements the reference count for a key.
+   *
+   * When the count reaches zero, the entry is removed.
+   *
+   * @param key - Registry key.
+   */
   unref(key: K): void {
     const entry = this.#map.get(key);
     if (!entry) return;
@@ -81,12 +53,15 @@ class RefCountedRegistry<K, V> {
   }
 }
 
-// ============================================================
-// Helper
-// ============================================================
-
 const semaphores = new RefCountedRegistry(() => new Semaphore(1));
 
+/**
+ * Acquires a lock for the given key, executes the provided async function, and releases the lock.
+ *
+ * @param key The key to lock on.
+ * @param fn The async function to execute while holding the lock.
+ * @returns The result of the async function.
+ */
 export async function withLock<K, T>(key: K, fn: () => Promise<T>): Promise<T> {
   const semaphore = semaphores.ref(key);
   await semaphore.acquire();

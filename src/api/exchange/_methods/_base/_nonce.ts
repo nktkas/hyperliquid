@@ -1,5 +1,6 @@
 /**
  * Nonce manager for generating unique nonces per wallet address and network.
+ *
  * Uses lazy cleanup: removes entries when Date.now() > lastNonce.
  */
 class NonceManager {
@@ -24,5 +25,5 @@ class NonceManager {
   }
 }
 
-/** Default nonce manager, used when custom nonceManager is not provided in config. */
-export const defaultNonceManager = /* @__PURE__ */ new NonceManager();
+/** Global nonce manager instance. */
+export const globalNonceManager = /* @__PURE__ */ new NonceManager();

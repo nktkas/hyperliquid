@@ -10,7 +10,7 @@ import {
   signUserSignedAction,
 } from "../../../../signing/mod.ts";
 import { assertSuccessResponse } from "./errors.ts";
-import { defaultNonceManager } from "./_nonce.ts";
+import { globalNonceManager } from "./_nonce.ts";
 import { withLock } from "./_semaphore.ts";
 import type { SignatureSchema } from "./commonSchemas.ts";
 
@@ -108,7 +108,7 @@ export async function executeL1Action<T>(
   // Semaphore ensures requests arrive at server in nonce order (prevents out-of-order delivery)
   const key = `${walletAddress}:${transport.isTestnet}`;
   return await withLock(key, async () => {
-    const nonce = await (config.nonceManager?.(walletAddress) ?? defaultNonceManager.getNonce(key));
+    const nonce = await (config.nonceManager?.(walletAddress) ?? globalNonceManager.getNonce(key));
 
     // Validate and resolve options
     const vaultAddress = v.parse(
@@ -186,7 +186,7 @@ export async function executeUserSignedAction<T>(
   // Semaphore ensures requests arrive at server in nonce order (prevents out-of-order delivery)
   const key = `${walletAddress}:${transport.isTestnet}`;
   return withLock(key, async () => {
-    const nonce = await (config.nonceManager?.(walletAddress) ?? defaultNonceManager.getNonce(key));
+    const nonce = await (config.nonceManager?.(walletAddress) ?? globalNonceManager.getNonce(key));
     const signal = options?.signal;
 
     // Add system fields for user-signed actions
