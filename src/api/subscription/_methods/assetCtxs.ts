@@ -80,6 +80,8 @@ export type AssetCtxsParameters = Omit<v.InferInput<typeof AssetCtxsRequest>, "t
  *   (data) => console.log(data),
  * );
  * ```
+ *
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export function assetCtxs(
   config: SubscriptionConfig,

@@ -92,6 +92,8 @@ export type TwapStatesParameters = Omit<v.InferInput<typeof TwapStatesRequest>, 
  *   (data) => console.log(data),
  * );
  * ```
+ *
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export function twapStates(
   config: SubscriptionConfig,

@@ -92,6 +92,8 @@ export type ClearinghouseStateParameters = Omit<v.InferInput<typeof Clearinghous
  *   (data) => console.log(data),
  * );
  * ```
+ *
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export function clearinghouseState(
   config: SubscriptionConfig,

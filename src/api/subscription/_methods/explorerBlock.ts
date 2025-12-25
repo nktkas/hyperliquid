@@ -89,6 +89,8 @@ import type { ISubscription } from "../../../transport/mod.ts";
  *   (data) => console.log(data),
  * );
  * ```
+ *
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export function explorerBlock(
   config: SubscriptionConfig,
