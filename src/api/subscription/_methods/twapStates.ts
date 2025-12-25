@@ -21,6 +21,11 @@ export const TwapStatesRequest = /* @__PURE__ */ (() => {
         Address,
         v.description("User address."),
       ),
+      /** DEX name (empty string for main dex). */
+      dex: v.pipe(
+        v.optional(v.string()),
+        v.description("DEX name (empty string for main dex)."),
+      ),
     }),
     v.description("Subscribe to TWAP states updates for a specific user."),
   );
@@ -96,9 +101,10 @@ export function twapStates(
   const payload = v.parse(TwapStatesRequest, {
     type: "twapStates",
     ...params,
+    dex: params.dex ?? "", // same value as in response
   });
   return config.transport.subscribe<TwapStatesEvent>(payload.type, payload, (e) => {
-    if (e.detail.user === payload.user) {
+    if (e.detail.user === payload.user && e.detail.dex === payload.dex) {
       listener(e.detail);
     }
   });
