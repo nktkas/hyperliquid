@@ -141,11 +141,11 @@ export const OrderRequest = /* @__PURE__ */ (() => {
                 Address,
                 v.description("Builder address."),
               ),
-              /** Builder fee in 0.1bps (1 = 0.0001%). */
+              /** Builder fee in 0.1bps (1 = 0.0001%). Max 100 for perps (0.1%), 1000 for spot (1%). */
               f: v.pipe(
                 UnsignedInteger,
-                v.maxValue(100),
-                v.description("Builder fee in 0.1bps (1 = 0.0001%)."),
+                v.maxValue(1000),
+                v.description("Builder fee in 0.1bps (1 = 0.0001%). Max 100 for perps (0.1%), 1000 for spot (1%)."),
               ),
             })),
             v.description("Builder fee."),
