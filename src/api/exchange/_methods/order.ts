@@ -259,7 +259,8 @@ export const OrderResponse = /* @__PURE__ */ (() => {
                         v.description("Error message."),
                       ),
                     }),
-                    v.string()
+                    v.literal("waitingForFill"),
+                    v.literal("waitingForTrigger"),
                   ]),
                 ),
                 v.description("Array of statuses for each placed order."),
