@@ -63,7 +63,7 @@
 
 import { keccak_256 } from "@noble/hashes/sha3.js";
 import { bytesToHex, concatBytes, hexToBytes } from "@noble/hashes/utils.js";
-import { encode as encodeMsgpack, type ValueType } from "@std/msgpack";
+import { encode as encodeMsgpack, type ValueType } from "@std/msgpack/encode";
 import { type AbstractWallet, type Signature, signTypedData } from "./_abstractWallet.ts";
 
 export {

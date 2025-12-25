@@ -22,6 +22,7 @@ async function modifyImports(): Promise<() => Promise<void>> {
     "jsr:@nktkas/rews": "npm:@nktkas/rews",
     "jsr:@noble/hashes": "npm:@noble/hashes",
     "jsr:@paulmillr/micro-eth-signer": "npm:micro-eth-signer",
+    // "jsr:@std/async": "...", // No npm equivalent available
     // "jsr:@std/msgpack": "...", // No npm equivalent available
     "jsr:@valibot/valibot": "npm:valibot",
   };
