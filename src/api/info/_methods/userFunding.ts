@@ -25,7 +25,7 @@ export const UserFundingRequest = /* @__PURE__ */ (() => {
       ),
       /** Start time (in ms since epoch). */
       startTime: v.pipe(
-        UnsignedInteger,
+        v.nullish(UnsignedInteger),
         v.description("Start time (in ms since epoch)."),
       ),
       /** End time (in ms since epoch). */
@@ -131,7 +131,7 @@ export type UserFundingParameters = Omit<v.InferInput<typeof UserFundingRequest>
  *
  * const data = await userFunding(
  *   { transport },
- *   { user: "0x...", startTime: Date.now() - 1000 * 60 * 60 * 24 },
+ *   { user: "0x..." },
  * );
  * ```
  *
