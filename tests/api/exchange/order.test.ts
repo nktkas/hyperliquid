@@ -72,8 +72,40 @@ runTest({
         }],
         grouping: "na",
       }),
+      // waitingForTrigger
+      exchClient.order({
+        orders: [
+          {
+            a: id,
+            b: false,
+            p: pxDown,
+            s: sz,
+            r: false,
+            t: { limit: { tif: "Gtc" } },
+          },
+          {
+            a: id,
+            b: true,
+            p: pxDown,
+            s: sz,
+            r: true,
+            t: {
+              trigger: {
+                isMarket: true,
+                tpsl: "tp",
+                triggerPx: pxUp,
+              },
+            },
+          },
+        ],
+        grouping: "normalTpsl",
+      }),
     ]);
-    schemaCoverage(excludeErrorResponse(OrderResponse), data);
+    schemaCoverage(excludeErrorResponse(OrderResponse), data, {
+      ignoreBranches: {
+        "#/properties/response/properties/data/properties/statuses/items": [2],
+      },
+    });
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

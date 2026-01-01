@@ -238,7 +238,10 @@ export async function openOrder(
   });
 
   // Extract order info
-  const [order] = result.response.data.statuses;
+  const [order] = result.response.data.statuses as (
+    | { resting: { oid: number; cloid: `0x${string}` } }[]
+    | { filled: { oid: number; cloid: `0x${string}` } }[]
+  );
   return {
     a: id,
     b: side === "buy",

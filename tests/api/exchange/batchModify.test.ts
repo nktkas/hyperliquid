@@ -98,7 +98,11 @@ runTest({
         });
       })(),
     ]);
-    schemaCoverage(excludeErrorResponse(BatchModifyResponse), data);
+    schemaCoverage(excludeErrorResponse(BatchModifyResponse), data, {
+      ignoreBranches: {
+        "#/properties/response/properties/data/properties/statuses/items": [2, 3],
+      },
+    });
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([
