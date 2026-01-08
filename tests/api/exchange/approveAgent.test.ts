@@ -27,6 +27,19 @@ runTest({
       ]);
       schemaCoverage(excludeErrorResponse(ApproveAgentResponse), data);
     });
+
+    await new Promise((r) => setTimeout(r, 5000)); // waiting to avoid error `ApiRequestError: User has pending agent removal`
+
+    await t.step("with expiration timestamp in 'agentName'", async () => {
+      const expirationTimestamp = Date.now() + 24 * 60 * 60 * 1000; // 24 hours from now
+      const data = await Promise.all([
+        exchClient.approveAgent({
+          agentAddress: randomAddress(),
+          agentName: `test valid_until ${expirationTimestamp}`,
+        }),
+      ]);
+      schemaCoverage(excludeErrorResponse(ApproveAgentResponse), data);
+    });
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

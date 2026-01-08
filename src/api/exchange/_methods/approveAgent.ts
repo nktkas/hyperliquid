@@ -43,7 +43,6 @@ export const ApproveAgentRequest = /* @__PURE__ */ (() => {
               v.pipe(
                 v.string(),
                 v.minLength(1),
-                v.maxLength(17),
               ),
               null,
             ),
@@ -140,9 +139,20 @@ export const ApproveAgentTypes = {
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
+ * // Basic usage with agent name only
  * await approveAgent(
  *   { transport, wallet },
- *   { agentAddress: "0x...", agentName: "..." },
+ *   { agentAddress: "0x...", agentName: "myAgent" },
+ * );
+ *
+ * // With expiration timestamp
+ * const expirationTimestamp = Date.now() + 24 * 60 * 60 * 1000;
+ * await approveAgent(
+ *   { transport, wallet },
+ *   {
+ *     agentAddress: "0x...",
+ *     agentName: `myAgent valid_until ${expirationTimestamp}`,
+ *   },
  * );
  * ```
  *
