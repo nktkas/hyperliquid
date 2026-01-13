@@ -146,7 +146,7 @@ export const ApproveAgentTypes = {
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * // Basic usage with agent name only
+ * // Basic usage
  * await approveAgent(
  *   { transport, wallet },
  *   { agentAddress: "0x...", agentName: "myAgent" },
