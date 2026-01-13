@@ -37,7 +37,7 @@ export const ApproveAgentRequest = /* @__PURE__ */ (() => {
             Address,
             v.description("Agent address."),
           ),
-          /** Agent name or null for unnamed agent. */
+          /** Agent name (min 1 and max 16 characters) or null for unnamed agent. */
           agentName: v.pipe(
             v.nullish(
               v.pipe(
@@ -56,7 +56,7 @@ export const ApproveAgentRequest = /* @__PURE__ */ (() => {
               ),
               null,
             ),
-            v.description("Agent name or null for unnamed agent."),
+            v.description("Agent name (min 1 and max 16 characters) or null for unnamed agent."),
           ),
           /** Nonce (timestamp in ms) used to prevent replay attacks. */
           nonce: v.pipe(
