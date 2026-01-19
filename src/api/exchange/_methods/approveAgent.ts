@@ -37,17 +37,26 @@ export const ApproveAgentRequest = /* @__PURE__ */ (() => {
             Address,
             v.description("Agent address."),
           ),
-          /** Agent name or null for unnamed agent. */
+          /** Agent name (min 1 and max 16 characters) or null for unnamed agent. */
           agentName: v.pipe(
             v.nullish(
               v.pipe(
                 v.string(),
-                v.minLength(1),
-                v.maxLength(17),
+                v.check(
+                  (input) => {
+                    // Ignore trailing ` valid_until <timestamp>` when checking length
+                    const baseName = input.replace(/ valid_until \d+$/, "");
+                    return baseName.length >= 1 && baseName.length <= 16;
+                  },
+                  (issue) => {
+                    const baseName = issue.input.replace(/ valid_until \d+$/, "");
+                    return `Invalid length: Expected >= 1 and <= 16 but received ${baseName.length}`;
+                  },
+                ),
               ),
               null,
             ),
-            v.description("Agent name or null for unnamed agent."),
+            v.description("Agent name (min 1 and max 16 characters) or null for unnamed agent."),
           ),
           /** Nonce (timestamp in ms) used to prevent replay attacks. */
           nonce: v.pipe(
@@ -140,9 +149,20 @@ export const ApproveAgentTypes = {
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
+ * // Basic usage
  * await approveAgent(
  *   { transport, wallet },
- *   { agentAddress: "0x...", agentName: "..." },
+ *   { agentAddress: "0x...", agentName: "myAgent" },
+ * );
+ *
+ * // With expiration timestamp
+ * const expirationTimestamp = Date.now() + 24 * 60 * 60 * 1000;
+ * await approveAgent(
+ *   { transport, wallet },
+ *   {
+ *     agentAddress: "0x...",
+ *     agentName: `myAgent valid_until ${expirationTimestamp}`,
+ *   },
  * );
  * ```
  *
