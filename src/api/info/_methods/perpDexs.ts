@@ -96,7 +96,7 @@ export const PerpDexsResponse = /* @__PURE__ */ (() => {
               v.description("Array of tuples mapping asset names to their funding interest rates."),
             ),
           }),
-          v.description(" Perpetual dex metadata."),
+          v.description("Perpetual dex metadata."),
         ),
       ),
     ),
