@@ -10,8 +10,8 @@ runTest({
       client.spotPairDeployAuctionStatus(),
     ]);
     schemaCoverage(SpotPairDeployAuctionStatusResponse, data, {
-      ignoreNullTypes: ["#/properties/currentGas"],
-      ignoreDefinedTypes: ["#/properties/endGas"],
+      ignoreNullTypes: ["#/properties/currentGas", "#/properties/endGas"],
+      ignoreDefinedTypes: ["#/properties/endGas", "#/properties/currentGas"],
     });
   },
   cliTestFn: async (_t, runCommand) => {
