@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address, Decimal, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Request user active asset data.
@@ -68,7 +68,7 @@ export const ActiveAssetDataResponse = /* @__PURE__ */ (() => {
             ),
             /** Amount of USD used (1 = $1). */
             rawUsd: v.pipe(
-              UnsignedDecimal,
+              Decimal,
               v.description("Amount of USD used (1 = $1)."),
             ),
           }),

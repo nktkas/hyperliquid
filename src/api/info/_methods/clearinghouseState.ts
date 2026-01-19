@@ -56,7 +56,7 @@ export const ClearinghouseStateResponse = /* @__PURE__ */ (() => {
           ),
           /** Total raw USD value. */
           totalRawUsd: v.pipe(
-            UnsignedDecimal,
+            Decimal,
             v.description("Total raw USD value."),
           ),
           /** Total margin used. */
@@ -82,7 +82,7 @@ export const ClearinghouseStateResponse = /* @__PURE__ */ (() => {
           ),
           /** Total raw USD value. */
           totalRawUsd: v.pipe(
-            UnsignedDecimal,
+            Decimal,
             v.description("Total raw USD value."),
           ),
           /** Total margin used. */
@@ -142,7 +142,7 @@ export const ClearinghouseStateResponse = /* @__PURE__ */ (() => {
                       ),
                       /** Amount of USD used (1 = $1). */
                       rawUsd: v.pipe(
-                        UnsignedDecimal,
+                        Decimal,
                         v.description("Amount of USD used (1 = $1)."),
                       ),
                     }),
