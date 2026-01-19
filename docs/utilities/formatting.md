@@ -61,7 +61,7 @@ Market type. Affects maximum decimal places (6 for perp, 8 for spot).
 - `RangeError` - if the formatted price becomes `0` after truncation
 
 ```ts
-formatPrice("0.0000001", 0); // throws RangeError: Price is too small and was truncated to 0
+formatPrice("0.0000001", 0); // => RangeError: Price is too small and was truncated to 0
 ```
 
 ## formatSize
@@ -96,7 +96,7 @@ response.
 - `RangeError` - if the formatted size becomes `0` after truncation (prevents accidentally closing entire position)
 
 ```ts
-formatSize("0.001", 2); // throws RangeError: Size is too small and was truncated to 0
+formatSize("0.001", 2); // => RangeError: Size is too small and was truncated to 0
 ```
 
 ## Example: Placing an Order

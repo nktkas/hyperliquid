@@ -12,7 +12,7 @@ First, create a [Transport](/core-concepts/transports) - the layer that handles 
 
 {% tabs %}
 
-{% tab title="HttpTransport" %}
+{% tab title="HTTP" %}
 
 Use [`HttpTransport`](/core-concepts/transports#httptransport) for simple requests.
 
@@ -24,7 +24,7 @@ const transport = new HttpTransport();
 
 {% endtab %}
 
-{% tab title="WebSocketTransport" %}
+{% tab title="WebSocket" %}
 
 Use [`WebSocketTransport`](/core-concepts/transports#websockettransport) for subscriptions or lower latency.
 
@@ -49,26 +49,20 @@ purposes:
 
 {% tabs %}
 
-{% tab title="InfoClient" %}
+{% tab title="Info endpoint" %}
 
-Use [`InfoClient`](/core-concepts/clients#infoclient) to query market data, account state, and other read-only
-information.
+Use [`Info`](/core-concepts/clients#infoclient) to query market data, account state, and other read-only information.
 
 ```ts
 import { HttpTransport, InfoClient } from "@nktkas/hyperliquid";
 
 const transport = new HttpTransport();
-
-const client = new InfoClient({ transport });
-
-// Get mid prices for all assets
-const mids = await client.allMids();
-// => { "BTC": "97000.5", "ETH": "3500.25", ... }
+const info = new InfoClient({ transport });
 ```
 
 {% endtab %}
 
-{% tab title="ExchangeClient" %}
+{% tab title="Exchange endpoint" %}
 
 Use [`ExchangeClient`](/core-concepts/clients#exchangeclient) to place orders, transfer funds, and perform other actions
 that require signing.
@@ -77,31 +71,15 @@ that require signing.
 import { ExchangeClient, HttpTransport } from "@nktkas/hyperliquid";
 import { privateKeyToAccount } from "viem/accounts";
 
+const wallet = privateKeyToAccount("0x..."); // viem account or ethers signer
+
 const transport = new HttpTransport();
-
-const client = new ExchangeClient({
-  transport,
-  wallet: privateKeyToAccount("0x..."), // viem account or ethers signer
-});
-
-// Place a limit order
-const result = await client.order({
-  orders: [{
-    a: 0, // Asset index (0 = BTC)
-    b: true, // Buy side
-    p: "95000", // Price
-    s: "0.01", // Size
-    r: false, // Not reduce-only
-    t: { limit: { tif: "Gtc" } },
-  }],
-  grouping: "na",
-});
-// => { status: "ok", response: { type: "order", data: { statuses: [...] } } }
+const exchange = new ExchangeClient({ transport, wallet });
 ```
 
 {% endtab %}
 
-{% tab title="SubscriptionClient" %}
+{% tab title="Subscription" %}
 
 Use [`SubscriptionClient`](/core-concepts/clients#subscriptionclient) to subscribe to live market data via WebSocket.
 
@@ -109,16 +87,80 @@ Use [`SubscriptionClient`](/core-concepts/clients#subscriptionclient) to subscri
 import { SubscriptionClient, WebSocketTransport } from "@nktkas/hyperliquid";
 
 const transport = new WebSocketTransport();
+const subs = new SubscriptionClient({ transport });
+```
 
-const client = new SubscriptionClient({ transport });
+{% endtab %}
 
-// Subscribe to all mid prices
-const subscription = await client.allMids((data) => {
-  console.log("Price update:", data.mids);
+{% endtabs %}
+
+{% endstep %}
+
+{% step %}
+
+### Use the Client
+
+Call client methods to query data, place orders, or subscribe to streams.
+
+{% tabs %}
+
+{% tab title="Info endpoint" %}
+
+```ts
+// Retrieve mids for all coins
+const mids = await info.allMids();
+
+// Retrieve a user's open orders
+const openOrders = await info.openOrders({ user: "0x..." });
+
+// L2 book snapshot
+const book = await info.l2Book({ coin: "BTC" });
+```
+
+{% endtab %}
+
+{% tab title="Exchange endpoint" %}
+
+```ts
+// Place an order
+const result = await exchange.order({
+  orders: [{
+    a: 0,
+    b: true,
+    p: "95000",
+    s: "0.01",
+    r: false,
+    t: { limit: { tif: "Gtc" } },
+  }],
+  grouping: "na",
 });
 
-// Later: unsubscribe
-await subscription.unsubscribe();
+// Update leverage
+await exchange.updateLeverage({ asset: 0, isCross: true, leverage: 5 });
+
+// Initiate a withdrawal request
+await exchange.withdraw3({ destination: "0x...", amount: "1" });
+```
+
+{% endtab %}
+
+{% tab title="Subscription" %}
+
+```ts
+// Subscribe to mids for all coins
+await subs.allMids((data) => {
+  console.log(data);
+});
+
+// Subscribe to user's open orders
+await subs.openOrders({ user: "0x..." }, (data) => {
+  console.log(data);
+});
+
+// Subscribe to L2 book snapshot
+await subs.l2Book({ coin: "ETH" }, (data) => {
+  console.log(data);
+});
 ```
 
 {% endtab %}

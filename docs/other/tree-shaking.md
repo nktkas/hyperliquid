@@ -47,10 +47,10 @@ Compare with client approach:
 import { ExchangeClient, HttpTransport } from "@nktkas/hyperliquid";
 import { privateKeyToAccount } from "viem/accounts";
 
-const client = new ExchangeClient({
-  transport: new HttpTransport(),
-  wallet: privateKeyToAccount("0x..."),
-});
+const wallet = privateKeyToAccount("0x...");
+
+const transport = new HttpTransport();
+const client = new ExchangeClient({ transport, wallet });
 
 // Method on client instance
 const result = await client.order({
@@ -77,6 +77,27 @@ import { allMids } from "@nktkas/hyperliquid/api/info";
 const transport = new HttpTransport();
 
 const mids = await allMids({ transport });
+```
+
+## Exchange Functions
+
+Exchange functions require `transport` and `wallet`:
+
+```ts
+import { HttpTransport } from "@nktkas/hyperliquid";
+import { order } from "@nktkas/hyperliquid/api/exchange";
+import { privateKeyToAccount } from "viem/accounts";
+
+const transport = new HttpTransport();
+const wallet = privateKeyToAccount("0x...");
+
+const result = await order(
+  { transport, wallet },
+  {
+    orders: [{ a: 0, b: true, p: "30000", s: "0.1", r: false, t: { limit: { tif: "Gtc" } } }],
+    grouping: "na",
+  },
+);
 ```
 
 ## Subscription Functions

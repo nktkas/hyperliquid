@@ -242,7 +242,6 @@ const hash = createL1ActionHash({
   action,
   nonce: Date.now(),
 });
-// => "0x..."
 ```
 
 ## AbstractWallet

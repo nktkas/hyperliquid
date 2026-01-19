@@ -61,10 +61,11 @@ Simply add a `<script type="module">` tag to the bottom of your HTML file with t
 
 ## Platform Requirements
 
-{% hint style="info" %} Node.js Requires **Node.js 20** or higher.
+{% hint style="info" %} Node.js: requires v20 or higher.
 
-Node.js 22+ includes native WebSocket support. For earlier versions, install the `ws` package if you plan to use
-`WebSocketTransport`:
+Node.js 22+ includes native WebSocket support. For earlier versions, install the
+[`ws`](https://www.npmjs.com/package/ws) package if you plan to use
+[`WebSocketTransport`](https://nktkas.gitbook.io/hyperliquid/core-concepts/transports#websockettransport):
 
 ```sh
 npm install ws
@@ -83,8 +84,9 @@ const transport = new hl.WebSocketTransport({
 
 {% endhint %}
 
-{% hint style="info" %} React Native React Native requires polyfills for `TextEncoder` and `EventTarget`. Install and
-import them before the SDK:
+{% hint style="info" %} React Native: requires polyfills for
+[`TextEncoder`](https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder) and
+[`EventTarget`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget). Install and import them before the SDK:
 
 ```sh
 npm install fast-text-encoding event-target-polyfill
