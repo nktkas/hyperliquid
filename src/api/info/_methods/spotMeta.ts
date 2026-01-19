@@ -125,6 +125,47 @@ export const SpotMetaResponse = /* @__PURE__ */ (() => {
         ),
         v.description("Tokens available for spot trading."),
       ),
+      /** Outcome markets available for spot trading. */
+      outcomes: v.pipe(
+        v.array(
+          v.object({
+            /** Unique identifier of the outcome market. */
+            outcome: v.pipe(
+              UnsignedInteger,
+              v.description("Unique identifier of the outcome market."),
+            ),
+            /** Short name of the outcome market. */
+            name: v.pipe(
+              v.string(),
+              v.description("Short name of the outcome market."),
+            ),
+            /** Description of the outcome market. */
+            description: v.pipe(
+              v.string(),
+              v.description("Description of the outcome market."),
+            ),
+            /** Token specifications for each side of the outcome market. */
+            sideSpecs: v.pipe(
+              v.array(
+                v.object({
+                  /** Side name (e.g., "YES", "NO"). */
+                  name: v.pipe(
+                    v.string(),
+                    v.description('Side name (e.g., "YES", "NO").'),
+                  ),
+                  /** Spot token index corresponding to this side. */
+                  token: v.pipe(
+                    UnsignedInteger,
+                    v.description("Spot token index corresponding to this side."),
+                  ),
+                }),
+              ),
+              v.description("Token specifications for each side of the outcome market."),
+            ),
+          }),
+        ),
+        v.description("Outcome markets available for spot trading."),
+      ),
     }),
     v.description("Metadata for spot assets."),
   );
