@@ -88,7 +88,7 @@ export type BorrowLendReserveStateResponse = v.InferOutput<typeof BorrowLendRese
 
 import type { InfoConfig } from "./_base/types.ts";
 
-/** Request parameters for the {@linkcode blockDetails} function. */
+/** Request parameters for the {@linkcode borrowLendReserveState} function. */
 export type BorrowLendReserveStateParameters = Omit<v.InferInput<typeof BorrowLendReserveStateRequest>, "type">;
 
 /**
