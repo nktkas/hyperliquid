@@ -282,6 +282,9 @@ Validator Actions:
   cValidatorAction        --<action> <json>
   validatorL1Stream       --riskFreeRate <number>
 
+Earn:
+  borrowLend              --operation <supply|withdraw> --token <number> --amount <number|null>
+
 Other:
   convertToMultiSigUser   --authorizedUsers <json> --threshold <number>
 

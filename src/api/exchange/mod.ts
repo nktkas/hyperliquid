@@ -44,6 +44,7 @@ export * from "./_methods/agentEnableDexAbstraction.ts";
 export * from "./_methods/approveAgent.ts";
 export * from "./_methods/approveBuilderFee.ts";
 export * from "./_methods/batchModify.ts";
+export * from "./_methods/borrowLend.ts";
 export * from "./_methods/cancel.ts";
 export * from "./_methods/cancelByCloid.ts";
 export * from "./_methods/cDeposit.ts";
