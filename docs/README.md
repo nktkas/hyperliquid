@@ -1,6 +1,7 @@
 # @nktkas/hyperliquid
 
-A TypeScript SDK for the [Hyperliquid API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api).
+A community-supported [Hyperliquid API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api) SDK for all
+major JS runtimes, written in TypeScript.
 
 {% tabs %}
 
@@ -56,7 +57,7 @@ deno add jsr:@nktkas/hyperliquid
   <tbody>
     <tr>
       <td><strong>Type Safe</strong></td>
-      <td>100% TypeScript. Full inference for 80+ methods.</td>
+      <td>100% TypeScript. Full inference for 140+ API methods.</td>
     </tr>
     <tr>
       <td><strong>Tested</strong></td>
@@ -100,10 +101,6 @@ const book = await client.l2Book({ coin: "ETH" });
 const state = await client.clearinghouseState({ user: "0x..." });
 //    ^? { marginSummary: {...}, assetPositions: [...], withdrawable: string }
 ```
-
-<!-- deno-fmt-ignore-start -->
-{% hint style="info" %} Every method has fully typed parameters and responses. No more guessing what the API returns. {% endhint %}
-<!-- deno-fmt-ignore-end -->
 
 ### Place Orders
 
