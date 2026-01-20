@@ -526,7 +526,7 @@ export const UserNonFundingLedgerUpdatesResponse = /* @__PURE__ */ (() => {
               ),
               /** Amount in the specified token. */
               amount: v.pipe(
-                UnsignedDecimal,
+                Decimal,
                 v.description("Amount in the specified token."),
               ),
             }),
