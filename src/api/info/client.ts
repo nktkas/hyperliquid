@@ -27,6 +27,11 @@ import {
   type BorrowLendReserveStateResponse,
 } from "./_methods/borrowLendReserveState.ts";
 import {
+  borrowLendUserState,
+  type BorrowLendUserStateParameters,
+  type BorrowLendUserStateResponse,
+} from "./_methods/borrowLendUserState.ts";
+import {
   candleSnapshot,
   type CandleSnapshotParameters,
   type CandleSnapshotResponse,
@@ -263,6 +268,14 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     signal?: AbortSignal,
   ): Promise<BorrowLendReserveStateResponse> {
     return borrowLendReserveState(this.config_, params, signal);
+  }
+
+  /** @see {@link borrowLendUserState} */
+  borrowLendUserState(
+    params: BorrowLendUserStateParameters,
+    signal?: AbortSignal,
+  ): Promise<BorrowLendUserStateResponse> {
+    return borrowLendUserState(this.config_, params, signal);
   }
 
   /** @see {@link candleSnapshot} */
@@ -795,6 +808,7 @@ export type {
   BorrowLendReserveStateParameters,
   BorrowLendReserveStateResponse,
 } from "./_methods/borrowLendReserveState.ts";
+export type { BorrowLendUserStateParameters, BorrowLendUserStateResponse } from "./_methods/borrowLendUserState.ts";
 export type { CandleSnapshotParameters, CandleSnapshotResponse } from "./_methods/candleSnapshot.ts";
 export type { ClearinghouseStateParameters, ClearinghouseStateResponse } from "./_methods/clearinghouseState.ts";
 export type { DelegationsParameters, DelegationsResponse } from "./_methods/delegations.ts";

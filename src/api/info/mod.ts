@@ -31,6 +31,7 @@ export * from "./_methods/allMids.ts";
 export * from "./_methods/allPerpMetas.ts";
 export * from "./_methods/blockDetails.ts";
 export * from "./_methods/borrowLendReserveState.ts";
+export * from "./_methods/borrowLendUserState.ts";
 export * from "./_methods/candleSnapshot.ts";
 export * from "./_methods/clearinghouseState.ts";
 export * from "./_methods/delegations.ts";

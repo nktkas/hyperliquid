@@ -202,6 +202,7 @@ Deploy Market:
 Earn:
   allBorrowLendReserveStates   (no params)
   borrowLendReserveState       --token <number>
+  borrowLendUserState          --user <address>
 
 Other:
   exchangeStatus          (no params)
