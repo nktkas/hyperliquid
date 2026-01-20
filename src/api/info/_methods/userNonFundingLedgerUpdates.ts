@@ -484,6 +484,75 @@ export const UserNonFundingLedgerUpdatesResponse = /* @__PURE__ */ (() => {
                 v.description("`true` for deposit, `false` for withdrawal."),
               ),
             }),
+            /** Borrow/lend operation update. */
+            v.object({
+              /** Update type. */
+              type: v.pipe(
+                v.literal("borrowLend"),
+                v.description("Update type."),
+              ),
+              /** Token symbol. */
+              token: v.pipe(
+                v.string(),
+                v.description("Token symbol."),
+              ),
+              /** Operation type. */
+              operation: v.pipe(
+                v.picklist(["supply", "withdraw", "repay", "borrow"]),
+                v.description("Operation type."),
+              ),
+              /** Amount in the specified token. */
+              amount: v.pipe(
+                UnsignedDecimal,
+                v.description("Amount in the specified token."),
+              ),
+              /** Interest amount in the specified token. */
+              interestAmount: v.pipe(
+                UnsignedDecimal,
+                v.description("Interest amount in the specified token."),
+              ),
+            }),
+            /** Spot genesis operation update. */
+            v.object({
+              /** Update type. */
+              type: v.pipe(
+                v.literal("spotGenesis"),
+                v.description("Update type."),
+              ),
+              /** Token symbol. */
+              token: v.pipe(
+                v.string(),
+                v.description("Token symbol."),
+              ),
+              /** Amount in the specified token. */
+              amount: v.pipe(
+                UnsignedDecimal,
+                v.description("Amount in the specified token."),
+              ),
+            }),
+            /** Activate DEX abstraction update. */
+            v.object({
+              /** Update type. */
+              type: v.pipe(
+                v.literal("activateDexAbstraction"),
+                v.description("Update type."),
+              ),
+              /** Name of the dex. */
+              dex: v.pipe(
+                v.string(),
+                v.description("Name of the dex."),
+              ),
+              /** Token symbol. */
+              token: v.pipe(
+                v.string(),
+                v.description("Token symbol."),
+              ),
+              /** Amount in the specified token. */
+              amount: v.pipe(
+                UnsignedDecimal,
+                v.description("Amount in the specified token."),
+              ),
+            }),
           ]),
           v.description("Update details."),
         ),
