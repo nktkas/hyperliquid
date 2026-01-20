@@ -27,6 +27,12 @@ import {
   type BatchModifyParameters,
   type BatchModifySuccessResponse,
 } from "./_methods/batchModify.ts";
+import {
+  borrowLend,
+  type BorrowLendOptions,
+  type BorrowLendParameters,
+  type BorrowLendSuccessResponse,
+} from "./_methods/borrowLend.ts";
 import { cancel, type CancelOptions, type CancelParameters, type CancelSuccessResponse } from "./_methods/cancel.ts";
 import {
   cancelByCloid,
@@ -219,6 +225,12 @@ import {
   type UserDexAbstractionSuccessResponse,
 } from "./_methods/userDexAbstraction.ts";
 import {
+  userPortfolioMargin,
+  type UserPortfolioMarginOptions,
+  type UserPortfolioMarginParameters,
+  type UserPortfolioMarginSuccessResponse,
+} from "./_methods/userPortfolioMargin.ts";
+import {
   validatorL1Stream,
   type ValidatorL1StreamOptions,
   type ValidatorL1StreamParameters,
@@ -338,6 +350,14 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     opts?: BatchModifyOptions,
   ): Promise<BatchModifySuccessResponse> {
     return batchModify(this.config_, params, opts);
+  }
+
+  /** @see {@link borrowLend} */
+  borrowLend(
+    params: BorrowLendParameters,
+    opts?: BorrowLendOptions,
+  ): Promise<BorrowLendSuccessResponse> {
+    return borrowLend(this.config_, params, opts);
   }
 
   /** @see {@link cancel} */
@@ -636,6 +656,14 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return userDexAbstraction(this.config_, params, opts);
   }
 
+  /** @see {@link userPortfolioMargin} */
+  userPortfolioMargin(
+    params: UserPortfolioMarginParameters,
+    opts?: UserPortfolioMarginOptions,
+  ): Promise<UserPortfolioMarginSuccessResponse> {
+    return userPortfolioMargin(this.config_, params, opts);
+  }
+
   /** @see {@link validatorL1Stream} */
   validatorL1Stream(
     params: ValidatorL1StreamParameters,
@@ -699,6 +727,7 @@ export type {
   ApproveBuilderFeeSuccessResponse,
 } from "./_methods/approveBuilderFee.ts";
 export type { BatchModifyOptions, BatchModifyParameters, BatchModifySuccessResponse } from "./_methods/batchModify.ts";
+export type { BorrowLendOptions, BorrowLendParameters, BorrowLendSuccessResponse } from "./_methods/borrowLend.ts";
 export type { CancelOptions, CancelParameters, CancelSuccessResponse } from "./_methods/cancel.ts";
 export type {
   CancelByCloidOptions,
@@ -811,6 +840,11 @@ export type {
   UserDexAbstractionParameters,
   UserDexAbstractionSuccessResponse,
 } from "./_methods/userDexAbstraction.ts";
+export type {
+  UserPortfolioMarginOptions,
+  UserPortfolioMarginParameters,
+  UserPortfolioMarginSuccessResponse,
+} from "./_methods/userPortfolioMargin.ts";
 export type {
   ValidatorL1StreamOptions,
   ValidatorL1StreamParameters,

@@ -14,9 +14,23 @@ import {
   type AlignedQuoteTokenInfoParameters,
   type AlignedQuoteTokenInfoResponse,
 } from "./_methods/alignedQuoteTokenInfo.ts";
+import {
+  allBorrowLendReserveStates,
+  type AllBorrowLendReserveStatesResponse,
+} from "./_methods/allBorrowLendReserveStates.ts";
 import { allMids, type AllMidsParameters, type AllMidsResponse } from "./_methods/allMids.ts";
 import { allPerpMetas, type AllPerpMetasResponse } from "./_methods/allPerpMetas.ts";
 import { blockDetails, type BlockDetailsParameters, type BlockDetailsResponse } from "./_methods/blockDetails.ts";
+import {
+  borrowLendReserveState,
+  type BorrowLendReserveStateParameters,
+  type BorrowLendReserveStateResponse,
+} from "./_methods/borrowLendReserveState.ts";
+import {
+  borrowLendUserState,
+  type BorrowLendUserStateParameters,
+  type BorrowLendUserStateResponse,
+} from "./_methods/borrowLendUserState.ts";
 import {
   candleSnapshot,
   type CandleSnapshotParameters,
@@ -116,6 +130,11 @@ import { subAccounts2, type SubAccounts2Parameters, type SubAccounts2Response } 
 import { tokenDetails, type TokenDetailsParameters, type TokenDetailsResponse } from "./_methods/tokenDetails.ts";
 import { twapHistory, type TwapHistoryParameters, type TwapHistoryResponse } from "./_methods/twapHistory.ts";
 import { txDetails, type TxDetailsParameters, type TxDetailsResponse } from "./_methods/txDetails.ts";
+import {
+  userBorrowLendInterest,
+  type UserBorrowLendInterestParameters,
+  type UserBorrowLendInterestResponse,
+} from "./_methods/userBorrowLendInterest.ts";
 import { userDetails, type UserDetailsParameters, type UserDetailsResponse } from "./_methods/userDetails.ts";
 import {
   userDexAbstraction,
@@ -209,6 +228,13 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return alignedQuoteTokenInfo(this.config_, params, signal);
   }
 
+  /** @see {@link allBorrowLendReserveStates} */
+  allBorrowLendReserveStates(
+    signal?: AbortSignal,
+  ): Promise<AllBorrowLendReserveStatesResponse> {
+    return allBorrowLendReserveStates(this.config_, signal);
+  }
+
   /** @see {@link allMids} */
   allMids(
     params?: AllMidsParameters,
@@ -239,6 +265,22 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     signal?: AbortSignal,
   ): Promise<BlockDetailsResponse> {
     return blockDetails(this.config_, params, signal);
+  }
+
+  /** @see {@link borrowLendReserveState} */
+  borrowLendReserveState(
+    params: BorrowLendReserveStateParameters,
+    signal?: AbortSignal,
+  ): Promise<BorrowLendReserveStateResponse> {
+    return borrowLendReserveState(this.config_, params, signal);
+  }
+
+  /** @see {@link borrowLendUserState} */
+  borrowLendUserState(
+    params: BorrowLendUserStateParameters,
+    signal?: AbortSignal,
+  ): Promise<BorrowLendUserStateResponse> {
+    return borrowLendUserState(this.config_, params, signal);
   }
 
   /** @see {@link candleSnapshot} */
@@ -610,6 +652,14 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return txDetails(this.config_, params, signal);
   }
 
+  /** @see {@link userBorrowLendInterest} */
+  userBorrowLendInterest(
+    params: UserBorrowLendInterestParameters,
+    signal?: AbortSignal,
+  ): Promise<UserBorrowLendInterestResponse> {
+    return userBorrowLendInterest(this.config_, params, signal);
+  }
+
   /** @see {@link userDetails} */
   userDetails(
     params: UserDetailsParameters,
@@ -763,9 +813,15 @@ export type {
   AlignedQuoteTokenInfoParameters,
   AlignedQuoteTokenInfoResponse,
 } from "./_methods/alignedQuoteTokenInfo.ts";
+export type { AllBorrowLendReserveStatesResponse } from "./_methods/allBorrowLendReserveStates.ts";
 export type { AllMidsParameters, AllMidsResponse } from "./_methods/allMids.ts";
 export type { AllPerpMetasResponse } from "./_methods/allPerpMetas.ts";
 export type { BlockDetailsParameters, BlockDetailsResponse } from "./_methods/blockDetails.ts";
+export type {
+  BorrowLendReserveStateParameters,
+  BorrowLendReserveStateResponse,
+} from "./_methods/borrowLendReserveState.ts";
+export type { BorrowLendUserStateParameters, BorrowLendUserStateResponse } from "./_methods/borrowLendUserState.ts";
 export type { CandleSnapshotParameters, CandleSnapshotResponse } from "./_methods/candleSnapshot.ts";
 export type { ClearinghouseStateParameters, ClearinghouseStateResponse } from "./_methods/clearinghouseState.ts";
 export type { DelegationsParameters, DelegationsResponse } from "./_methods/delegations.ts";
@@ -816,6 +872,10 @@ export type { SubAccounts2Parameters, SubAccounts2Response } from "./_methods/su
 export type { TokenDetailsParameters, TokenDetailsResponse } from "./_methods/tokenDetails.ts";
 export type { TwapHistoryParameters, TwapHistoryResponse } from "./_methods/twapHistory.ts";
 export type { TxDetailsParameters, TxDetailsResponse } from "./_methods/txDetails.ts";
+export type {
+  UserBorrowLendInterestParameters,
+  UserBorrowLendInterestResponse,
+} from "./_methods/userBorrowLendInterest.ts";
 export type { UserDetailsParameters, UserDetailsResponse } from "./_methods/userDetails.ts";
 export type {
   UserDexAbstractionParameters as UserDexAbstractionInfoParameters,

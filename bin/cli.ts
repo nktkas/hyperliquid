@@ -199,6 +199,12 @@ Deploy Market:
   spotDeployState              --user <address>
   spotPairDeployAuctionStatus  (no params)
 
+Earn:
+  allBorrowLendReserveStates   (no params)
+  borrowLendReserveState       --token <number>
+  borrowLendUserState          --user <address>
+  userBorrowLendInterest       --user <address> --startTime <number> [--endTime <number>]
+
 Other:
   exchangeStatus          (no params)
 
@@ -234,6 +240,7 @@ Account:
   setDisplayName          --displayName <string>
   spotUser                --optOut <bool>
   userDexAbstraction      --user <address> --enabled <bool>
+  userPortfolioMargin     --user <address> --enabled <bool>
 
 Fund Transfers:
   sendAsset               --destination <address> --token <name:address> --amount <number>
@@ -276,6 +283,9 @@ Validator Actions:
   cSignerAction           --jailSelf null | --unjailSelf null
   cValidatorAction        --<action> <json>
   validatorL1Stream       --riskFreeRate <number>
+
+Earn:
+  borrowLend              --operation <supply|withdraw> --token <number> --amount <number|null>
 
 Other:
   convertToMultiSigUser   --authorizedUsers <json> --threshold <number>
