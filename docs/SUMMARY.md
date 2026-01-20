@@ -47,6 +47,17 @@
       spec:
         ref:
           kind: openapi
+          spec: hl-info-allBorrowLendReserveStates
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
           spec: hl-info-allMids
     ```
   - ```yaml
@@ -70,6 +81,28 @@
         ref:
           kind: openapi
           spec: hl-info-blockDetails
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-info-borrowLendReserveState
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-info-borrowLendUserState
     ```
   - ```yaml
     type: builtin:openapi
@@ -564,6 +597,17 @@
       spec:
         ref:
           kind: openapi
+          spec: hl-info-userBorrowLendInterest
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
           spec: hl-info-userDetails
     ```
   - ```yaml
@@ -798,6 +842,17 @@
         ref:
           kind: openapi
           spec: hl-exchange-batchModify
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-exchange-borrowLend
     ```
   - ```yaml
     type: builtin:openapi
@@ -1194,6 +1249,17 @@
         ref:
           kind: openapi
           spec: hl-exchange-userDexAbstraction
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-exchange-userPortfolioMargin
     ```
   - ```yaml
     type: builtin:openapi
