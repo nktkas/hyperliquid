@@ -130,6 +130,11 @@ import { subAccounts2, type SubAccounts2Parameters, type SubAccounts2Response } 
 import { tokenDetails, type TokenDetailsParameters, type TokenDetailsResponse } from "./_methods/tokenDetails.ts";
 import { twapHistory, type TwapHistoryParameters, type TwapHistoryResponse } from "./_methods/twapHistory.ts";
 import { txDetails, type TxDetailsParameters, type TxDetailsResponse } from "./_methods/txDetails.ts";
+import {
+  userBorrowLendInterest,
+  type UserBorrowLendInterestParameters,
+  type UserBorrowLendInterestResponse,
+} from "./_methods/userBorrowLendInterest.ts";
 import { userDetails, type UserDetailsParameters, type UserDetailsResponse } from "./_methods/userDetails.ts";
 import {
   userDexAbstraction,
@@ -647,6 +652,14 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return txDetails(this.config_, params, signal);
   }
 
+  /** @see {@link userBorrowLendInterest} */
+  userBorrowLendInterest(
+    params: UserBorrowLendInterestParameters,
+    signal?: AbortSignal,
+  ): Promise<UserBorrowLendInterestResponse> {
+    return userBorrowLendInterest(this.config_, params, signal);
+  }
+
   /** @see {@link userDetails} */
   userDetails(
     params: UserDetailsParameters,
@@ -859,6 +872,10 @@ export type { SubAccounts2Parameters, SubAccounts2Response } from "./_methods/su
 export type { TokenDetailsParameters, TokenDetailsResponse } from "./_methods/tokenDetails.ts";
 export type { TwapHistoryParameters, TwapHistoryResponse } from "./_methods/twapHistory.ts";
 export type { TxDetailsParameters, TxDetailsResponse } from "./_methods/txDetails.ts";
+export type {
+  UserBorrowLendInterestParameters,
+  UserBorrowLendInterestResponse,
+} from "./_methods/userBorrowLendInterest.ts";
 export type { UserDetailsParameters, UserDetailsResponse } from "./_methods/userDetails.ts";
 export type {
   UserDexAbstractionParameters as UserDexAbstractionInfoParameters,

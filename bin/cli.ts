@@ -203,6 +203,7 @@ Earn:
   allBorrowLendReserveStates   (no params)
   borrowLendReserveState       --token <number>
   borrowLendUserState          --user <address>
+  userBorrowLendInterest       --user <address> --startTime <number> [--endTime <number>]
 
 Other:
   exchangeStatus          (no params)
