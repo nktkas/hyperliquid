@@ -106,7 +106,7 @@ export type BorrowLendReserveStateParameters = Omit<v.InferInput<typeof BorrowLe
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
- * import { activeAssetData } from "@nktkas/hyperliquid/api/info";
+ * import { borrowLendReserveState } from "@nktkas/hyperliquid/api/info";
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
