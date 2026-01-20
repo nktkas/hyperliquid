@@ -21,10 +21,7 @@ export const BorrowLendRequest = /* @__PURE__ */ (() => {
           ),
           /** Operation type. */
           operation: v.pipe(
-            v.picklist([
-              "supply",
-              "withdraw",
-            ]),
+            v.picklist(["supply", "withdraw", "repay", "borrow"]),
             v.description("Operation type."),
           ),
           /** Token ID. */
