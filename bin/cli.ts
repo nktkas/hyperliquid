@@ -239,6 +239,7 @@ Account:
   setDisplayName          --displayName <string>
   spotUser                --optOut <bool>
   userDexAbstraction      --user <address> --enabled <bool>
+  userPortfolioMargin     --user <address> --enabled <bool>
 
 Fund Transfers:
   sendAsset               --destination <address> --token <name:address> --amount <number>

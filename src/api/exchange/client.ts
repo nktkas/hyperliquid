@@ -225,6 +225,12 @@ import {
   type UserDexAbstractionSuccessResponse,
 } from "./_methods/userDexAbstraction.ts";
 import {
+  userPortfolioMargin,
+  type UserPortfolioMarginOptions,
+  type UserPortfolioMarginParameters,
+  type UserPortfolioMarginSuccessResponse,
+} from "./_methods/userPortfolioMargin.ts";
+import {
   validatorL1Stream,
   type ValidatorL1StreamOptions,
   type ValidatorL1StreamParameters,
@@ -650,6 +656,14 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return userDexAbstraction(this.config_, params, opts);
   }
 
+  /** @see {@link userPortfolioMargin} */
+  userPortfolioMargin(
+    params: UserPortfolioMarginParameters,
+    opts?: UserPortfolioMarginOptions,
+  ): Promise<UserPortfolioMarginSuccessResponse> {
+    return userPortfolioMargin(this.config_, params, opts);
+  }
+
   /** @see {@link validatorL1Stream} */
   validatorL1Stream(
     params: ValidatorL1StreamParameters,
@@ -826,6 +840,11 @@ export type {
   UserDexAbstractionParameters,
   UserDexAbstractionSuccessResponse,
 } from "./_methods/userDexAbstraction.ts";
+export type {
+  UserPortfolioMarginOptions,
+  UserPortfolioMarginParameters,
+  UserPortfolioMarginSuccessResponse,
+} from "./_methods/userPortfolioMargin.ts";
 export type {
   ValidatorL1StreamOptions,
   ValidatorL1StreamParameters,
