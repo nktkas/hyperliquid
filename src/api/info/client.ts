@@ -22,6 +22,11 @@ import { allMids, type AllMidsParameters, type AllMidsResponse } from "./_method
 import { allPerpMetas, type AllPerpMetasResponse } from "./_methods/allPerpMetas.ts";
 import { blockDetails, type BlockDetailsParameters, type BlockDetailsResponse } from "./_methods/blockDetails.ts";
 import {
+  borrowLendReserveState,
+  type BorrowLendReserveStateParameters,
+  type BorrowLendReserveStateResponse,
+} from "./_methods/borrowLendReserveState.ts";
+import {
   candleSnapshot,
   type CandleSnapshotParameters,
   type CandleSnapshotResponse,
@@ -250,6 +255,14 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     signal?: AbortSignal,
   ): Promise<BlockDetailsResponse> {
     return blockDetails(this.config_, params, signal);
+  }
+
+  /** @see {@link borrowLendReserveState} */
+  borrowLendReserveState(
+    params: BorrowLendReserveStateParameters,
+    signal?: AbortSignal,
+  ): Promise<BorrowLendReserveStateResponse> {
+    return borrowLendReserveState(this.config_, params, signal);
   }
 
   /** @see {@link candleSnapshot} */
@@ -778,6 +791,10 @@ export type { AllBorrowLendReserveStatesResponse } from "./_methods/allBorrowLen
 export type { AllMidsParameters, AllMidsResponse } from "./_methods/allMids.ts";
 export type { AllPerpMetasResponse } from "./_methods/allPerpMetas.ts";
 export type { BlockDetailsParameters, BlockDetailsResponse } from "./_methods/blockDetails.ts";
+export type {
+  BorrowLendReserveStateParameters,
+  BorrowLendReserveStateResponse,
+} from "./_methods/borrowLendReserveState.ts";
 export type { CandleSnapshotParameters, CandleSnapshotResponse } from "./_methods/candleSnapshot.ts";
 export type { ClearinghouseStateParameters, ClearinghouseStateResponse } from "./_methods/clearinghouseState.ts";
 export type { DelegationsParameters, DelegationsResponse } from "./_methods/delegations.ts";

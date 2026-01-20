@@ -4,7 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { UnsignedInteger } from "../../_schemas.ts";
+import { BorrowLendReserveStateResponse } from "./borrowLendReserveState.ts";
 
 /**
  * Request all borrow/lend reserve states.
@@ -32,50 +33,8 @@ export const AllBorrowLendReserveStatesResponse = /* @__PURE__ */ (() => {
   return v.pipe(
     v.array(
       v.tuple([
-        // Reserve ID
         UnsignedInteger,
-        v.object({
-          /** Borrow interest rate (yearly). */
-          borrowYearlyRate: v.pipe(
-            UnsignedDecimal,
-            v.description("Borrow interest rate (yearly)."),
-          ),
-          /** Supply interest rate (yearly). */
-          supplyYearlyRate: v.pipe(
-            UnsignedDecimal,
-            v.description("Supply interest rate (yearly)."),
-          ),
-          /** Reserve balance. */
-          balance: v.pipe(
-            UnsignedDecimal,
-            v.description("Reserve balance."),
-          ),
-          /** Reserve utilization ratio. */
-          utilization: v.pipe(
-            UnsignedDecimal,
-            v.description("Reserve utilization ratio."),
-          ),
-          /** Oracle price. */
-          oraclePx: v.pipe(
-            UnsignedDecimal,
-            v.description("Oracle price."),
-          ),
-          /** Loan-to-value (LTV) ratio. */
-          ltv: v.pipe(
-            UnsignedDecimal,
-            v.description("Loan-to-value (LTV) ratio."),
-          ),
-          /** Total supplied amount. */
-          totalSupplied: v.pipe(
-            UnsignedDecimal,
-            v.description("Total supplied amount."),
-          ),
-          /** Total borrowed amount. */
-          totalBorrowed: v.pipe(
-            UnsignedDecimal,
-            v.description("Total borrowed amount."),
-          ),
-        }),
+        BorrowLendReserveStateResponse,
       ]),
     ),
     v.description("Array of tuples of reserve IDs and their borrow/lend reserve state."),
