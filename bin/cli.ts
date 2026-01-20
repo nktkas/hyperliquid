@@ -199,6 +199,9 @@ Deploy Market:
   spotDeployState              --user <address>
   spotPairDeployAuctionStatus  (no params)
 
+Earn:
+  allBorrowLendReserveStates   (no params)
+
 Other:
   exchangeStatus          (no params)
 

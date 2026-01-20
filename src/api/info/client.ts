@@ -14,6 +14,10 @@ import {
   type AlignedQuoteTokenInfoParameters,
   type AlignedQuoteTokenInfoResponse,
 } from "./_methods/alignedQuoteTokenInfo.ts";
+import {
+  allBorrowLendReserveStates,
+  type AllBorrowLendReserveStatesResponse,
+} from "./_methods/allBorrowLendReserveStates.ts";
 import { allMids, type AllMidsParameters, type AllMidsResponse } from "./_methods/allMids.ts";
 import { allPerpMetas, type AllPerpMetasResponse } from "./_methods/allPerpMetas.ts";
 import { blockDetails, type BlockDetailsParameters, type BlockDetailsResponse } from "./_methods/blockDetails.ts";
@@ -207,6 +211,13 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     signal?: AbortSignal,
   ): Promise<AlignedQuoteTokenInfoResponse> {
     return alignedQuoteTokenInfo(this.config_, params, signal);
+  }
+
+  /** @see {@link allBorrowLendReserveStates} */
+  allBorrowLendReserveStates(
+    signal?: AbortSignal,
+  ): Promise<AllBorrowLendReserveStatesResponse> {
+    return allBorrowLendReserveStates(this.config_, signal);
   }
 
   /** @see {@link allMids} */
@@ -763,6 +774,7 @@ export type {
   AlignedQuoteTokenInfoParameters,
   AlignedQuoteTokenInfoResponse,
 } from "./_methods/alignedQuoteTokenInfo.ts";
+export type { AllBorrowLendReserveStatesResponse } from "./_methods/allBorrowLendReserveStates.ts";
 export type { AllMidsParameters, AllMidsResponse } from "./_methods/allMids.ts";
 export type { AllPerpMetasResponse } from "./_methods/allPerpMetas.ts";
 export type { BlockDetailsParameters, BlockDetailsResponse } from "./_methods/blockDetails.ts";

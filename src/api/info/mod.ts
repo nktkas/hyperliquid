@@ -26,6 +26,7 @@ export type { InfoConfig } from "./_methods/_base/types.ts";
 
 export * from "./_methods/activeAssetData.ts";
 export * from "./_methods/alignedQuoteTokenInfo.ts";
+export * from "./_methods/allBorrowLendReserveStates.ts";
 export * from "./_methods/allMids.ts";
 export * from "./_methods/allPerpMetas.ts";
 export * from "./_methods/blockDetails.ts";
