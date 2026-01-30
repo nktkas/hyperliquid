@@ -13,6 +13,7 @@ runTest({
     schemaCoverage(UserFillsEvent, data, {
       ignoreDefinedTypes: [
         "#/properties/fills/items/intersect/0/properties/twapId",
+        "#/properties/fills/items/intersect/0/properties/builderFee",
       ],
       ignoreUndefinedTypes: [
         "#/properties/isSnapshot",

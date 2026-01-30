@@ -509,7 +509,7 @@ export const UserFillSchema = /* @__PURE__ */ (() => {
       ),
       /** Optional fee charged by the UI builder. */
       builderFee: v.pipe(
-        Decimal,
+        v.optional(Decimal),
         v.description("Optional fee charged by the UI builder."),
       ),
       /** Unique transaction identifier for a partial fill of an order. */

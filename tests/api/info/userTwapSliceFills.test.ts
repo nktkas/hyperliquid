@@ -12,6 +12,7 @@ runTest({
     schemaCoverage(UserTwapSliceFillsResponse, data, {
       ignoreDefinedTypes: [
         "#/items/properties/fill/properties/twapId",
+        "#/items/properties/fill/properties/builderFee",
       ],
     });
   },
