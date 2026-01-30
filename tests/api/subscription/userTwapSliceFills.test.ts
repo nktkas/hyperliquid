@@ -12,7 +12,10 @@ runTest({
     }, 10_000);
     schemaCoverage(UserTwapSliceFillsEvent, data, {
       ignoreUndefinedTypes: ["#/properties/isSnapshot"],
-      ignoreDefinedTypes: ["#/properties/twapSliceFills/items/properties/fill/properties/twapId"],
+      ignoreDefinedTypes: [
+        "#/properties/twapSliceFills/items/properties/fill/properties/twapId",
+        "#/properties/twapSliceFills/items/properties/fill/properties/builderFee",
+      ],
     });
   },
 });

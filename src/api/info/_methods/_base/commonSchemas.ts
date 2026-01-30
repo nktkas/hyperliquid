@@ -507,6 +507,11 @@ export const UserFillSchema = /* @__PURE__ */ (() => {
         Decimal,
         v.description("Fee charged or rebate received (negative indicates rebate)."),
       ),
+      /** Optional fee charged by the UI builder. */
+      builderFee: v.pipe(
+        v.optional(Decimal),
+        v.description("Optional fee charged by the UI builder."),
+      ),
       /** Unique transaction identifier for a partial fill of an order. */
       tid: v.pipe(
         UnsignedInteger,
