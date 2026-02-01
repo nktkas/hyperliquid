@@ -46,7 +46,7 @@
     "@nktkas/rews": "jsr:@nktkas/rews@^1.2.3",
     "@noble/hashes": "jsr:@noble/hashes@^2.0.1",
     "@paulmillr/micro-eth-signer": "jsr:@paulmillr/micro-eth-signer@^0.18.1",
-    "@std/async/unstable-semaphore": "jsr:@std/async@^1.0.16/unstable-semaphore",
+    "@std/async/unstable-semaphore": "jsr:@std/async@1.1.1/unstable-semaphore",
     "@std/msgpack/encode": "jsr:@std/msgpack@^1.0.3/encode",
     "@valibot/valibot": "jsr:@valibot/valibot@1.2.0"
   },
