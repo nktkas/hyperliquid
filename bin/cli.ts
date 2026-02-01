@@ -30,51 +30,38 @@ import { PrivateKeySigner } from "../src/signing/mod.ts";
 // Execute
 // ============================================================
 
-function transformParams(method: string, params: Args<false>): Record<string, unknown> {
-  switch (method) {
-    case "spotUser": {
-      return { toggleSpotDusting: { ...params } };
-    }
-    case "twapOrder": {
-      return { twap: { ...params } };
-    }
-    default: {
-      return params;
-    }
-  }
-}
-
+/**
+ * Transport that echoes the request payload instead of sending it to the server.
+ * Used for offline mode to generate transactions without broadcasting them.
+ */
 class EchoTransport extends HttpTransport {
-  constructor(isTestnet: boolean) {
-    super({ isTestnet });
-  }
   override request<T>(_: string, payload: unknown): Promise<T> {
-    return new Promise((resolve) => resolve({ status: "ok", response: payload } as T));
+    return Promise.resolve({ status: "ok", response: payload } as T);
   }
 }
 
-/** Execute CLI command on info/exchange endpoint */
+/** Execute CLI command on info/exchange endpoint. */
 async function executeEndpointMethod(endpoint: string, method: string, args: Args<false>): Promise<unknown> {
   // Parse CLI flags
   const isTestnet = "testnet" in args;
-  const timeout = Number(args.timeout) || undefined;
   const isOffline = "offline" in args;
+  const timeout = args.timeout ? Number(args.timeout) : undefined;
 
-  // Create transport (echo for offline, http for online)
-  const transport = isOffline ? new EchoTransport(isTestnet) : new HttpTransport({ isTestnet, timeout });
+  // Select transport: EchoTransport for offline mode, HttpTransport for real requests
+  const transport = isOffline ? new EchoTransport({ isTestnet }) : new HttpTransport({ isTestnet, timeout });
   let client: InfoClient | ExchangeClient;
 
-  // Create client based on endpoint
+  // Initialize the appropriate client based on endpoint type
   switch (endpoint) {
     case "info":
+      // InfoClient requires no authentication
       client = new InfoClient({ transport });
       break;
     case "exchange": {
+      // ExchangeClient requires a private key for signing transactions
       const wallet = new PrivateKeySigner(args["private-key"] as `0x${string}`);
-      delete args["private-key"]; // remove before uncontrolled transfer of arguments (just in case)
-
+      delete args["private-key"]; // Remove sensitive data before passing args to method
       const defaultVaultAddress = args.vault as `0x${string}` | undefined;
-
       client = new ExchangeClient({ transport, wallet, defaultVaultAddress });
       break;
     }
@@ -82,20 +69,24 @@ async function executeEndpointMethod(endpoint: string, method: string, args: Arg
       throw new Error(`Invalid endpoint "${endpoint}". Use "info" or "exchange"`);
   }
 
-  // Check if method exists on client
-  if (!(method in client)) throw new Error(`Unknown "${method}" method for "${endpoint}" endpoint`);
+  // Validate that the requested method exists on the client
+  if (!(method in client)) {
+    throw new Error(`Unknown "${method}" method for "${endpoint}" endpoint`);
+  }
 
-  // Execute method and return result
-  const params = transformParams(method, args);
+  // Execute the method with remaining args as parameters
   // @ts-expect-error: dynamic method access
-  const response = await client[method](params);
-  return isOffline ? response.response : response; // for offline mode, we want to see the request payload, not the wrapper
+  const response = await client[method](args);
+
+  // For offline mode, return the request payload instead of the wrapper
+  return isOffline ? response.response : response;
 }
 
 // ============================================================
 // CLI
 // ============================================================
 
+/** Prints CLI help message with usage instructions, available endpoints, methods, and examples. */
 function printHelp(): void {
   console.log(`Hyperliquid CLI
 
@@ -226,7 +217,7 @@ Order & TWAP & Position:
   order                   --orders <json> [--grouping <na|normalTpsl|positionTpsl>] [--builder <json>]
   scheduleCancel          [--time <number>]
   twapCancel              --a <number> --t <number>
-  twapOrder               --a <number> --b <bool> --s <number> --r <bool> --m <number> --t <bool>
+  twapOrder               --twap <json>
   updateIsolatedMargin    --asset <number> --isBuy <bool> --ntli <number>
   updateLeverage          --asset <number> --isCross <bool> --leverage <number>
 
@@ -238,7 +229,7 @@ Account:
   noop                    (no params)
   reserveRequestWeight    --weight <number>
   setDisplayName          --displayName <string>
-  spotUser                --optOut <bool>
+  spotUser                --toggleSpotDusting <json>
   userDexAbstraction      --user <address> --enabled <bool>
   userPortfolioMargin     --user <address> --enabled <bool>
 
@@ -331,12 +322,10 @@ Examples:
 // Entry
 // ============================================================
 
-const rawArgs = extractArgs(process.argv.slice(2), {
-  flags: ["testnet", "help", "h", "offline"],
-  collect: false,
-});
+const rawArgs = extractArgs(process.argv.slice(2), { flags: ["testnet", "help", "h", "offline"], collect: false });
 const args = transformArgs(rawArgs, { number: "string" });
 const [endpoint, method] = args._;
+
 if (args.help || args.h || !endpoint || !method) {
   printHelp();
 } else {
