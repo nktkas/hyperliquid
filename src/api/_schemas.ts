@@ -1,4 +1,4 @@
-// deno-lint-ignore-file valibot-project/require-name-suffix valibot-project/require-jsdoc
+// deno-lint-ignore-file valibot-project/require-name-suffix
 
 import * as v from "@valibot/valibot";
 
@@ -6,6 +6,7 @@ import * as v from "@valibot/valibot";
 // Number
 // ============================================================
 
+/** Unsigned decimal number as a string (e.g., "123.45"). */
 export const UnsignedDecimal = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([v.string(), v.number()]),
@@ -17,6 +18,7 @@ export const UnsignedDecimal = /* @__PURE__ */ (() => {
 })();
 export type UnsignedDecimal = v.InferOutput<typeof UnsignedDecimal>;
 
+/** Decimal number as a string, can be negative (e.g., "-123.45"). */
 export const Decimal = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([v.string(), v.number()]),
@@ -28,6 +30,7 @@ export const Decimal = /* @__PURE__ */ (() => {
 })();
 export type Decimal = v.InferOutput<typeof Decimal>;
 
+/** Safe integer number. */
 export const Integer = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([v.string(), v.number()]),
@@ -38,6 +41,7 @@ export const Integer = /* @__PURE__ */ (() => {
 })();
 export type Integer = v.InferOutput<typeof Integer>;
 
+/** Unsigned safe integer number (>= 0). */
 export const UnsignedInteger = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([v.string(), v.number()]),
@@ -69,6 +73,7 @@ function formatDecimalString(value: string): string {
 // Hex
 // ============================================================
 
+/** Hexadecimal string starting with "0x". */
 export const Hex = /* @__PURE__ */ (() => {
   return v.pipe(
     v.string(),
@@ -78,11 +83,13 @@ export const Hex = /* @__PURE__ */ (() => {
 })();
 export type Hex = v.InferOutput<typeof Hex>;
 
+/** Ethereum address (42 characters hex string). */
 export const Address = /* @__PURE__ */ (() => {
   return v.pipe(Hex, v.length(42));
 })();
 export type Address = v.InferOutput<typeof Address>;
 
+/** Client order ID (34 characters hex string). */
 export const Cloid = /* @__PURE__ */ (() => {
   return v.pipe(Hex, v.length(34));
 })();
@@ -92,6 +99,7 @@ export type Cloid = v.InferOutput<typeof Cloid>;
 // Other
 // ============================================================
 
+/** Percentage string (e.g., "50%"). */
 export const Percent = /* @__PURE__ */ (() => {
   return v.pipe(
     v.string(),
@@ -101,6 +109,7 @@ export const Percent = /* @__PURE__ */ (() => {
 })();
 export type Percent = v.InferOutput<typeof Percent>;
 
+/** ISO 8601 datetime string without timezone (e.g., "2024-01-15T10:30:00"). */
 export const ISO8601WithoutTimezone = /* @__PURE__ */ (() => {
   return v.pipe(
     v.string(),
