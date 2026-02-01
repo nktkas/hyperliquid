@@ -10,16 +10,10 @@ import { UnsignedDecimal } from "../../_schemas.ts";
  * Request maximum market order notionals.
  */
 export const MaxMarketOrderNtlsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("maxMarketOrderNtls"),
-        v.description("Type of request."),
-      ),
-    }),
-    v.description("Request maximum market order notionals."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("maxMarketOrderNtls"),
+  });
 })();
 export type MaxMarketOrderNtlsRequest = v.InferOutput<typeof MaxMarketOrderNtlsRequest>;
 
@@ -27,12 +21,7 @@ export type MaxMarketOrderNtlsRequest = v.InferOutput<typeof MaxMarketOrderNtlsR
  * Array of tuples containing maximum market order notionals and their corresponding asset symbols.
  */
 export const MaxMarketOrderNtlsResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(
-      v.tuple([UnsignedDecimal, v.string()]),
-    ),
-    v.description("Array of tuples containing maximum market order notionals and their corresponding asset symbols."),
-  );
+  return v.array(v.tuple([UnsignedDecimal, v.string()]));
 })();
 export type MaxMarketOrderNtlsResponse = v.InferOutput<typeof MaxMarketOrderNtlsResponse>;
 

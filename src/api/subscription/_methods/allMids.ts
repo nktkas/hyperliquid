@@ -8,41 +8,23 @@ import { AllMidsResponse } from "../../info/_methods/allMids.ts";
 
 /** Subscription to mid price events for all coins. */
 export const AllMidsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("allMids"),
-        v.description("Type of subscription."),
-      ),
-      /** DEX name (empty string for main dex). */
-      dex: v.pipe(
-        v.optional(v.string()),
-        v.description("DEX name (empty string for main dex)."),
-      ),
-    }),
-    v.description("Subscription to mid price events for all coins."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("allMids"),
+    /** DEX name (empty string for main dex). */
+    dex: v.optional(v.string()),
+  });
 })();
 export type AllMidsRequest = v.InferOutput<typeof AllMidsRequest>;
 
 /** Event of mid prices for all assets. */
 export const AllMidsEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Mapping of coin symbols to mid prices. */
-      mids: v.pipe(
-        AllMidsResponse,
-        v.description("Mapping of coin symbols to mid prices."),
-      ),
-      /** DEX name (empty string for main dex). */
-      dex: v.pipe(
-        v.optional(v.string()),
-        v.description("DEX name (empty string for main dex)."),
-      ),
-    }),
-    v.description("Event of mid prices for all assets."),
-  );
+  return v.object({
+    /** Mapping of coin symbols to mid prices. */
+    mids: AllMidsResponse,
+    /** DEX name (empty string for main dex). */
+    dex: v.optional(v.string()),
+  });
 })();
 export type AllMidsEvent = v.InferOutput<typeof AllMidsEvent>;
 

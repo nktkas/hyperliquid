@@ -8,41 +8,23 @@ import { PerpAssetCtxSchema } from "../../info/_methods/_base/commonSchemas.ts";
 
 /** Subscription to context events for all perpetual assets. */
 export const AssetCtxsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("assetCtxs"),
-        v.description("Type of subscription."),
-      ),
-      /** DEX name (empty string for main dex). */
-      dex: v.pipe(
-        v.optional(v.string()),
-        v.description("DEX name (empty string for main dex)."),
-      ),
-    }),
-    v.description("Subscription to context events for all perpetual assets."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("assetCtxs"),
+    /** DEX name (empty string for main dex). */
+    dex: v.optional(v.string()),
+  });
 })();
 export type AssetCtxsRequest = v.InferOutput<typeof AssetCtxsRequest>;
 
 /** Event of asset contexts for all perpetual assets on a specified DEX. */
 export const AssetCtxsEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** DEX name (empty string for main dex). */
-      dex: v.pipe(
-        v.string(),
-        v.description("DEX name (empty string for main dex)."),
-      ),
-      /** Array of context information for each perpetual asset. */
-      ctxs: v.pipe(
-        v.array(PerpAssetCtxSchema),
-        v.description("Array of context information for each perpetual asset."),
-      ),
-    }),
-    v.description("Event of asset contexts for all perpetual assets on a specified DEX."),
-  );
+  return v.object({
+    /** DEX name (empty string for main dex). */
+    dex: v.string(),
+    /** Array of context information for each perpetual asset. */
+    ctxs: v.array(PerpAssetCtxSchema),
+  });
 })();
 export type AssetCtxsEvent = v.InferOutput<typeof AssetCtxsEvent>;
 

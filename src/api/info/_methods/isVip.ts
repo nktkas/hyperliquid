@@ -10,21 +10,12 @@ import { Address } from "../../_schemas.ts";
  * Request to check if a user is a VIP.
  */
 export const IsVipRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("isVip"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request to check if a user is a VIP."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("isVip"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type IsVipRequest = v.InferOutput<typeof IsVipRequest>;
 
@@ -32,10 +23,7 @@ export type IsVipRequest = v.InferOutput<typeof IsVipRequest>;
  * Boolean indicating user's VIP status.
  */
 export const IsVipResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.nullable(v.boolean()),
-    v.description("Boolean indicating user's VIP status."),
-  );
+  return v.nullable(v.boolean());
 })();
 export type IsVipResponse = v.InferOutput<typeof IsVipResponse>;
 

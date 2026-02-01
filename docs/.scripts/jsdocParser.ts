@@ -1,4 +1,18 @@
-// deno-lint-ignore-file no-import-prefix
+/**
+ * Parses JSDoc comments from TypeScript files containing Valibot schema definitions.
+ *
+ * Extracts schema-level descriptions and field-level descriptions from JSDoc comments,
+ * following imports to resolve referenced schemas from other files.
+ *
+ * @example
+ * ```ts
+ * import { parseJSDocFromFile } from "./jsdocParser.ts";
+ *
+ * const jsdoc = parseJSDocFromFile("/path/to/schema.ts");
+ * // Returns: { SchemaName: { schemaDescription: "...", fields: { "field": "..." } } }
+ * ```
+ */
+
 import ts from "npm:typescript@5";
 import * as path from "jsr:@std/path@^1";
 

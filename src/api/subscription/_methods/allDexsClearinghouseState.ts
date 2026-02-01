@@ -9,46 +9,23 @@ import { ClearinghouseStateResponse } from "../../info/_methods/clearinghouseSta
 
 /** Subscription to clearinghouse state events for all DEXs for a specific user. */
 export const AllDexsClearinghouseStateRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("allDexsClearinghouseState"),
-        v.description("Type of subscription."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Subscription to clearinghouse state events for all DEXs for a specific user."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("allDexsClearinghouseState"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type AllDexsClearinghouseStateRequest = v.InferOutput<typeof AllDexsClearinghouseStateRequest>;
 
 /** Event of clearinghouse states for all DEXs for a specific user. */
 export const AllDexsClearinghouseStateEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** Array of tuples of dex names and clearinghouse states. */
-      clearinghouseStates: v.pipe(
-        v.array(
-          v.tuple([
-            v.string(),
-            ClearinghouseStateResponse,
-          ]),
-        ),
-        v.description("Array of tuples of dex names and clearinghouse states."),
-      ),
-    }),
-    v.description("Event of clearinghouse states for all DEXs for a specific user."),
-  );
+  return v.object({
+    /** User address. */
+    user: Address,
+    /** Array of tuples of dex names and clearinghouse states. */
+    clearinghouseStates: v.array(v.tuple([v.string(), ClearinghouseStateResponse])),
+  });
 })();
 export type AllDexsClearinghouseStateEvent = v.InferOutput<typeof AllDexsClearinghouseStateEvent>;
 

@@ -1,4 +1,4 @@
-// deno-lint-ignore-file valibot-project/require-name-suffix valibot-project/require-jsdoc valibot-project/require-description
+// deno-lint-ignore-file valibot-project/require-name-suffix valibot-project/require-jsdoc
 
 import * as v from "@valibot/valibot";
 

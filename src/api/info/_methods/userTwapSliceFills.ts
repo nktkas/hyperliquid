@@ -12,21 +12,12 @@ import { UserFillSchema } from "./_base/commonSchemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills
  */
 export const UserTwapSliceFillsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("userTwapSliceFills"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request user TWAP slice fills."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("userTwapSliceFills"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type UserTwapSliceFillsRequest = v.InferOutput<typeof UserTwapSliceFillsRequest>;
 
@@ -35,22 +26,13 @@ export type UserTwapSliceFillsRequest = v.InferOutput<typeof UserTwapSliceFillsR
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills
  */
 export const UserTwapSliceFillsResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(
-      v.object({
-        /** TWAP fill record. */
-        fill: v.pipe(
-          UserFillSchema,
-          v.description("TWAP fill record."),
-        ),
-        /** ID of the TWAP. */
-        twapId: v.pipe(
-          UnsignedInteger,
-          v.description("ID of the TWAP."),
-        ),
-      }),
-    ),
-    v.description("Array of user's twap slice fills."),
+  return v.array(
+    v.object({
+      /** TWAP fill record. */
+      fill: UserFillSchema,
+      /** ID of the TWAP. */
+      twapId: UnsignedInteger,
+    }),
   );
 })();
 export type UserTwapSliceFillsResponse = v.InferOutput<typeof UserTwapSliceFillsResponse>;

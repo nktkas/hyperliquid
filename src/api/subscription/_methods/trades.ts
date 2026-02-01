@@ -8,30 +8,18 @@ import { RecentTradesResponse } from "../../info/_methods/recentTrades.ts";
 
 /** Subscription to trade events for a specific asset. */
 export const TradesRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("trades"),
-        v.description("Type of subscription."),
-      ),
-      /** Asset symbol (e.g., BTC). */
-      coin: v.pipe(
-        v.string(),
-        v.description("Asset symbol (e.g., BTC)."),
-      ),
-    }),
-    v.description("Subscription to trade events for a specific asset."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("trades"),
+    /** Asset symbol (e.g., BTC). */
+    coin: v.string(),
+  });
 })();
 export type TradesRequest = v.InferOutput<typeof TradesRequest>;
 
 /** Event of array of trades for a specific asset. */
 export const TradesEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    RecentTradesResponse,
-    v.description("Event of array of trades for a specific asset."),
-  );
+  return RecentTradesResponse;
 })();
 export type TradesEvent = v.InferOutput<typeof TradesEvent>;
 

@@ -10,26 +10,14 @@ import { Address, UnsignedDecimal } from "../../_schemas.ts";
  * Request user existence check before transfer.
  */
 export const PreTransferCheckRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("preTransferCheck"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** Source address. */
-      source: v.pipe(
-        Address,
-        v.description("Source address."),
-      ),
-    }),
-    v.description("Request user existence check before transfer."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("preTransferCheck"),
+    /** User address. */
+    user: Address,
+    /** Source address. */
+    source: Address,
+  });
 })();
 export type PreTransferCheckRequest = v.InferOutput<typeof PreTransferCheckRequest>;
 
@@ -37,31 +25,16 @@ export type PreTransferCheckRequest = v.InferOutput<typeof PreTransferCheckReque
  * Pre-transfer user existence check result.
  */
 export const PreTransferCheckResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Activation fee. */
-      fee: v.pipe(
-        UnsignedDecimal,
-        v.description("Activation fee."),
-      ),
-      /** Whether the user is sanctioned. */
-      isSanctioned: v.pipe(
-        v.boolean(),
-        v.description("Whether the user is sanctioned."),
-      ),
-      /** Whether the user exists. */
-      userExists: v.pipe(
-        v.boolean(),
-        v.description("Whether the user exists."),
-      ),
-      /** Whether the user has sent a transaction. */
-      userHasSentTx: v.pipe(
-        v.boolean(),
-        v.description("Whether the user has sent a transaction."),
-      ),
-    }),
-    v.description("Pre-transfer user existence check result."),
-  );
+  return v.object({
+    /** Activation fee. */
+    fee: UnsignedDecimal,
+    /** Whether the user is sanctioned. */
+    isSanctioned: v.boolean(),
+    /** Whether the user exists. */
+    userExists: v.boolean(),
+    /** Whether the user has sent a transaction. */
+    userHasSentTx: v.boolean(),
+  });
 })();
 export type PreTransferCheckResponse = v.InferOutput<typeof PreTransferCheckResponse>;
 

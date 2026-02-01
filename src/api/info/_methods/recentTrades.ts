@@ -10,21 +10,12 @@ import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.t
  * Request recent trades.
  */
 export const RecentTradesRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("recentTrades"),
-        v.description("Type of request."),
-      ),
-      /** Asset symbol (e.g., BTC). */
-      coin: v.pipe(
-        v.string(),
-        v.description("Asset symbol (e.g., BTC)."),
-      ),
-    }),
-    v.description("Request recent trades."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("recentTrades"),
+    /** Asset symbol (e.g., BTC). */
+    coin: v.string(),
+  });
 })();
 export type RecentTradesRequest = v.InferOutput<typeof RecentTradesRequest>;
 
@@ -32,53 +23,25 @@ export type RecentTradesRequest = v.InferOutput<typeof RecentTradesRequest>;
  * Array of recent trades.
  */
 export const RecentTradesResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(
-      v.object({
-        /** Asset symbol (e.g., BTC). */
-        coin: v.pipe(
-          v.string(),
-          v.description("Asset symbol (e.g., BTC)."),
-        ),
-        /** Trade side ("B" = Bid/Buy, "A" = Ask/Sell). */
-        side: v.pipe(
-          v.picklist(["B", "A"]),
-          v.description('Trade side ("B" = Bid/Buy, "A" = Ask/Sell).'),
-        ),
-        /** Trade price. */
-        px: v.pipe(
-          UnsignedDecimal,
-          v.description("Trade price."),
-        ),
-        /** Trade size. */
-        sz: v.pipe(
-          UnsignedDecimal,
-          v.description("Trade size."),
-        ),
-        /** Trade timestamp (in ms since epoch). */
-        time: v.pipe(
-          UnsignedInteger,
-          v.description("Trade timestamp (in ms since epoch)."),
-        ),
-        /** Transaction hash. */
-        hash: v.pipe(
-          Hex,
-          v.length(66),
-          v.description("Transaction hash."),
-        ),
-        /** Trade ID. */
-        tid: v.pipe(
-          UnsignedInteger,
-          v.description("Trade ID."),
-        ),
-        /** Addresses of users involved in the trade [Maker, Taker]. */
-        users: v.pipe(
-          v.tuple([Address, Address]),
-          v.description("Addresses of users involved in the trade [Maker, Taker]."),
-        ),
-      }),
-    ),
-    v.description("Array of recent trades."),
+  return v.array(
+    v.object({
+      /** Asset symbol (e.g., BTC). */
+      coin: v.string(),
+      /** Trade side ("B" = Bid/Buy, "A" = Ask/Sell). */
+      side: v.picklist(["B", "A"]),
+      /** Trade price. */
+      px: UnsignedDecimal,
+      /** Trade size. */
+      sz: UnsignedDecimal,
+      /** Trade timestamp (in ms since epoch). */
+      time: UnsignedInteger,
+      /** Transaction hash. */
+      hash: v.pipe(Hex, v.length(66)),
+      /** Trade ID. */
+      tid: UnsignedInteger,
+      /** Addresses of users involved in the trade [Maker, Taker]. */
+      users: v.tuple([Address, Address]),
+    }),
   );
 })();
 export type RecentTradesResponse = v.InferOutput<typeof RecentTradesResponse>;

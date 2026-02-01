@@ -11,26 +11,14 @@ import { Address, Decimal, UnsignedDecimal, UnsignedInteger } from "../../_schem
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-active-asset-data
  */
 export const ActiveAssetDataRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("activeAssetData"),
-        v.description("Type of request."),
-      ),
-      /** Asset symbol (e.g., BTC). */
-      coin: v.pipe(
-        v.string(),
-        v.description("Asset symbol (e.g., BTC)."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request user active asset data."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("activeAssetData"),
+    /** Asset symbol (e.g., BTC). */
+    coin: v.string(),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type ActiveAssetDataRequest = v.InferOutput<typeof ActiveAssetDataRequest>;
 
@@ -39,73 +27,35 @@ export type ActiveAssetDataRequest = v.InferOutput<typeof ActiveAssetDataRequest
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-active-asset-data
  */
 export const ActiveAssetDataResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** Asset symbol (e.g., BTC). */
-      coin: v.pipe(
-        v.string(),
-        v.description("Asset symbol (e.g., BTC)."),
-      ),
-      /** Leverage configuration. */
-      leverage: v.pipe(
-        v.variant("type", [
-          v.object({
-            /** Leverage type. */
-            type: v.pipe(
-              v.literal("isolated"),
-              v.description("Leverage type."),
-            ),
-            /** Leverage value used. */
-            value: v.pipe(
-              UnsignedInteger,
-              v.minValue(1),
-              v.description("Leverage value used."),
-            ),
-            /** Amount of USD used (1 = $1). */
-            rawUsd: v.pipe(
-              Decimal,
-              v.description("Amount of USD used (1 = $1)."),
-            ),
-          }),
-          v.object({
-            /** Leverage type. */
-            type: v.pipe(
-              v.literal("cross"),
-              v.description("Leverage type."),
-            ),
-            /** Leverage value used. */
-            value: v.pipe(
-              UnsignedInteger,
-              v.minValue(1),
-              v.description("Leverage value used."),
-            ),
-          }),
-        ]),
-        v.description("Leverage configuration."),
-      ),
-      /** Maximum trade size range [min, max]. */
-      maxTradeSzs: v.pipe(
-        v.tuple([UnsignedDecimal, UnsignedDecimal]),
-        v.description("Maximum trade size range [min, max]."),
-      ),
-      /** Available to trade range [min, max]. */
-      availableToTrade: v.pipe(
-        v.tuple([UnsignedDecimal, UnsignedDecimal]),
-        v.description("Available to trade range [min, max]."),
-      ),
-      /** Mark price. */
-      markPx: v.pipe(
-        UnsignedDecimal,
-        v.description("Mark price."),
-      ),
-    }),
-    v.description("User active asset data."),
-  );
+  return v.object({
+    /** User address. */
+    user: Address,
+    /** Asset symbol (e.g., BTC). */
+    coin: v.string(),
+    /** Leverage configuration. */
+    leverage: v.variant("type", [
+      v.object({
+        /** Leverage type. */
+        type: v.literal("isolated"),
+        /** Leverage value used. */
+        value: v.pipe(UnsignedInteger, v.minValue(1)),
+        /** Amount of USD used (1 = $1). */
+        rawUsd: Decimal,
+      }),
+      v.object({
+        /** Leverage type. */
+        type: v.literal("cross"),
+        /** Leverage value used. */
+        value: v.pipe(UnsignedInteger, v.minValue(1)),
+      }),
+    ]),
+    /** Maximum trade size range [min, max]. */
+    maxTradeSzs: v.tuple([UnsignedDecimal, UnsignedDecimal]),
+    /** Available to trade range [min, max]. */
+    availableToTrade: v.tuple([UnsignedDecimal, UnsignedDecimal]),
+    /** Mark price. */
+    markPx: UnsignedDecimal,
+  });
 })();
 export type ActiveAssetDataResponse = v.InferOutput<typeof ActiveAssetDataResponse>;
 

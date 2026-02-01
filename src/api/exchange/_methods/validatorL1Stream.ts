@@ -12,42 +12,21 @@ import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonS
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#validator-vote-on-risk-free-rate-for-aligned-quote-asset
  */
 export const ValidatorL1StreamRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("validatorL1Stream"),
-            v.description("Type of action."),
-          ),
-          /** Risk-free rate as a decimal string (e.g., "0.05" for 5%). */
-          riskFreeRate: v.pipe(
-            UnsignedDecimal,
-            v.description('Risk-free rate as a decimal string (e.g., "0.05" for 5%).'),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("validatorL1Stream"),
+      /** Risk-free rate as a decimal string (e.g., "0.05" for 5%). */
+      riskFreeRate: UnsignedDecimal,
     }),
-    v.description("Validator vote on risk-free rate for aligned quote asset."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type ValidatorL1StreamRequest = v.InferOutput<typeof ValidatorL1StreamRequest>;
 
@@ -56,10 +35,7 @@ export type ValidatorL1StreamRequest = v.InferOutput<typeof ValidatorL1StreamReq
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#validator-vote-on-risk-free-rate-for-aligned-quote-asset
  */
 export const ValidatorL1StreamResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type ValidatorL1StreamResponse = v.InferOutput<typeof ValidatorL1StreamResponse>;
 

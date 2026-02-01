@@ -12,36 +12,18 @@ import { UserFillsResponse } from "./userFills.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills-by-time
  */
 export const UserFillsByTimeRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("userFillsByTime"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** Start time (in ms since epoch). */
-      startTime: v.pipe(
-        UnsignedInteger,
-        v.description("Start time (in ms since epoch)."),
-      ),
-      /** End time (in ms since epoch). */
-      endTime: v.pipe(
-        v.nullish(UnsignedInteger),
-        v.description("End time (in ms since epoch)."),
-      ),
-      /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
-      aggregateByTime: v.pipe(
-        v.optional(v.boolean()),
-        v.description("If true, partial fills are aggregated when a crossing order fills multiple resting orders."),
-      ),
-    }),
-    v.description("Request array of user fills by time."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("userFillsByTime"),
+    /** User address. */
+    user: Address,
+    /** Start time (in ms since epoch). */
+    startTime: UnsignedInteger,
+    /** End time (in ms since epoch). */
+    endTime: v.nullish(UnsignedInteger),
+    /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
+    aggregateByTime: v.optional(v.boolean()),
+  });
 })();
 export type UserFillsByTimeRequest = v.InferOutput<typeof UserFillsByTimeRequest>;
 
@@ -50,10 +32,7 @@ export type UserFillsByTimeRequest = v.InferOutput<typeof UserFillsByTimeRequest
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills-by-time
  */
 export const UserFillsByTimeResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    UserFillsResponse,
-    v.description("Array of user trade fills by time."),
-  );
+  return UserFillsResponse;
 })();
 export type UserFillsByTimeResponse = v.InferOutput<typeof UserFillsByTimeResponse>;
 

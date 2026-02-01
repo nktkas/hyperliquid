@@ -9,66 +9,33 @@ import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonS
 
 /** Transfer between sub-accounts (spot). */
 export const SubAccountSpotTransferRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("subAccountSpotTransfer"),
-            v.description("Type of action."),
-          ),
-          /** Sub-account address. */
-          subAccountUser: v.pipe(
-            Address,
-            v.description("Sub-account address."),
-          ),
-          /** `true` for deposit, `false` for withdrawal. */
-          isDeposit: v.pipe(
-            v.boolean(),
-            v.description("`true` for deposit, `false` for withdrawal."),
-          ),
-          /** Token identifier. */
-          token: v.pipe(
-            v.string(),
-            v.description("Token identifier."),
-          ),
-          /** Amount to send (not in wei). */
-          amount: v.pipe(
-            UnsignedDecimal,
-            v.description("Amount to send (not in wei)."),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("subAccountSpotTransfer"),
+      /** Sub-account address. */
+      subAccountUser: Address,
+      /** `true` for deposit, `false` for withdrawal. */
+      isDeposit: v.boolean(),
+      /** Token identifier. */
+      token: v.string(),
+      /** Amount to send (not in wei). */
+      amount: UnsignedDecimal,
     }),
-    v.description("Transfer between sub-accounts (spot)."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type SubAccountSpotTransferRequest = v.InferOutput<typeof SubAccountSpotTransferRequest>;
 
 /** Successful response without specific data or error response. */
 export const SubAccountSpotTransferResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type SubAccountSpotTransferResponse = v.InferOutput<typeof SubAccountSpotTransferResponse>;
 

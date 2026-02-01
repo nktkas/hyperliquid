@@ -11,31 +11,16 @@ import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-borrow-lend-user-state
  */
 export const UserBorrowLendInterestRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("userBorrowLendInterest"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** Start time (in ms since epoch). */
-      startTime: v.pipe(
-        UnsignedInteger,
-        v.description("Start time (in ms since epoch)."),
-      ),
-      /** End time (in ms since epoch). */
-      endTime: v.pipe(
-        v.nullish(UnsignedInteger),
-        v.description("End time (in ms since epoch)."),
-      ),
-    }),
-    v.description("Request user borrow/lend interest."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("userBorrowLendInterest"),
+    /** User address. */
+    user: Address,
+    /** Start time (in ms since epoch). */
+    startTime: UnsignedInteger,
+    /** End time (in ms since epoch). */
+    endTime: v.nullish(UnsignedInteger),
+  });
 })();
 export type UserBorrowLendInterestRequest = v.InferOutput<typeof UserBorrowLendInterestRequest>;
 
@@ -44,35 +29,21 @@ export type UserBorrowLendInterestRequest = v.InferOutput<typeof UserBorrowLendI
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-borrow-lend-user-state
  */
 export const UserBorrowLendInterestResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(
-      v.object({
-        /** Timestamp of the update (in ms since epoch). */
-        time: v.pipe(
-          UnsignedInteger,
-          v.description("Timestamp of the update (in ms since epoch)."),
-        ),
-        /** Token symbol. */
-        token: v.pipe(
-          v.string(),
-          v.description("Token symbol."),
-        ),
-        /** Borrow interest amount. */
-        borrow: v.pipe(
-          UnsignedDecimal,
-          v.description("Borrow interest amount."),
-        ),
-        /** Supply interest amount. */
-        supply: v.pipe(
-          UnsignedDecimal,
-          v.description("Supply interest amount."),
-        ),
-      }),
-    ),
-    v.description("User's borrow/lend interest."),
+  return v.array(
+    v.object({
+      /** Timestamp of the update (in ms since epoch). */
+      time: UnsignedInteger,
+      /** Token symbol. */
+      token: v.string(),
+      /** Borrow interest amount. */
+      borrow: UnsignedDecimal,
+      /** Supply interest amount. */
+      supply: UnsignedDecimal,
+    }),
   );
 })();
 export type UserBorrowLendInterestResponse = v.InferOutput<typeof UserBorrowLendInterestResponse>;
+
 // ============================================================
 // Execution Logic
 // ============================================================

@@ -9,62 +9,32 @@ import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonS
 
 /** Distribute funds from a vault between followers. */
 export const VaultDistributeRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("vaultDistribute"),
-            v.description("Type of action."),
-          ),
-          /** Vault address. */
-          vaultAddress: v.pipe(
-            Address,
-            v.description("Vault address."),
-          ),
-          /**
-           * Amount to distribute (float * 1e6).
-           * Set to 0 to close the vault.
-           */
-          usd: v.pipe(
-            UnsignedInteger,
-            v.description(
-              "Amount to distribute (float * 1e6)." +
-                "\nSet to 0 to close the vault.",
-            ),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("vaultDistribute"),
+      /** Vault address. */
+      vaultAddress: Address,
+      /**
+       * Amount to distribute (float * 1e6).
+       * Set to 0 to close the vault.
+       */
+      usd: UnsignedInteger,
     }),
-    v.description("Distribute funds from a vault between followers."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type VaultDistributeRequest = v.InferOutput<typeof VaultDistributeRequest>;
 
 /** Successful response without specific data or error response. */
 export const VaultDistributeResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type VaultDistributeResponse = v.InferOutput<typeof VaultDistributeResponse>;
 

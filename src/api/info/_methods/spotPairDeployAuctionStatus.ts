@@ -11,16 +11,10 @@ import { PerpDeployAuctionStatusResponse } from "./perpDeployAuctionStatus.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-pair-deploy-auction
  */
 export const SpotPairDeployAuctionStatusRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("spotPairDeployAuctionStatus"),
-        v.description("Type of request."),
-      ),
-    }),
-    v.description("Request for the status of the spot deploy auction."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("spotPairDeployAuctionStatus"),
+  });
 })();
 export type SpotPairDeployAuctionStatusRequest = v.InferOutput<typeof SpotPairDeployAuctionStatusRequest>;
 
@@ -29,10 +23,7 @@ export type SpotPairDeployAuctionStatusRequest = v.InferOutput<typeof SpotPairDe
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-pair-deploy-auction
  */
 export const SpotPairDeployAuctionStatusResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    PerpDeployAuctionStatusResponse,
-    v.description("Status of the spot deploy auction."),
-  );
+  return PerpDeployAuctionStatusResponse;
 })();
 export type SpotPairDeployAuctionStatusResponse = v.InferOutput<typeof SpotPairDeployAuctionStatusResponse>;
 

@@ -11,26 +11,14 @@ import { Address } from "../../_schemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#check-builder-fee-approval
  */
 export const MaxBuilderFeeRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("maxBuilderFee"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** Builder address. */
-      builder: v.pipe(
-        Address,
-        v.description("Builder address."),
-      ),
-    }),
-    v.description("Request builder fee approval."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("maxBuilderFee"),
+    /** User address. */
+    user: Address,
+    /** Builder address. */
+    builder: Address,
+  });
 })();
 
 export type MaxBuilderFeeRequest = v.InferOutput<typeof MaxBuilderFeeRequest>;
@@ -40,10 +28,7 @@ export type MaxBuilderFeeRequest = v.InferOutput<typeof MaxBuilderFeeRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#check-builder-fee-approval
  */
 export const MaxBuilderFeeResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.number(),
-    v.description("Maximum builder fee approval."),
-  );
+  return v.number();
 })();
 
 export type MaxBuilderFeeResponse = v.InferOutput<typeof MaxBuilderFeeResponse>;

@@ -11,21 +11,12 @@ import { Address } from "../../_schemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-hip-3-dex-abstraction-state
  */
 export const UserDexAbstractionRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("userDexAbstraction"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request user HIP-3 DEX abstraction state."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("userDexAbstraction"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type UserDexAbstractionRequest = v.InferOutput<typeof UserDexAbstractionRequest>;
 
@@ -34,10 +25,7 @@ export type UserDexAbstractionRequest = v.InferOutput<typeof UserDexAbstractionR
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-hip-3-dex-abstraction-state
  */
 export const UserDexAbstractionResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.nullable(v.boolean()),
-    v.description("User HIP-3 DEX abstraction state."),
-  );
+  return v.nullable(v.boolean());
 })();
 export type UserDexAbstractionResponse = v.InferOutput<typeof UserDexAbstractionResponse>;
 

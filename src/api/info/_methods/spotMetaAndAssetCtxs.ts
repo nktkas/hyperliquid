@@ -12,16 +12,10 @@ import { SpotMetaResponse } from "./spotMeta.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-asset-contexts
  */
 export const SpotMetaAndAssetCtxsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("spotMetaAndAssetCtxs"),
-        v.description("Type of request."),
-      ),
-    }),
-    v.description("Request spot metadata and asset contexts."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("spotMetaAndAssetCtxs"),
+  });
 })();
 export type SpotMetaAndAssetCtxsRequest = v.InferOutput<typeof SpotMetaAndAssetCtxsRequest>;
 
@@ -30,13 +24,7 @@ export type SpotMetaAndAssetCtxsRequest = v.InferOutput<typeof SpotMetaAndAssetC
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-asset-contexts
  */
 export const SpotMetaAndAssetCtxsResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.tuple([
-      SpotMetaResponse,
-      v.array(SpotAssetCtxSchema),
-    ]),
-    v.description("Tuple of spot metadata and asset contexts."),
-  );
+  return v.tuple([SpotMetaResponse, v.array(SpotAssetCtxSchema)]);
 })();
 export type SpotMetaAndAssetCtxsResponse = v.InferOutput<typeof SpotMetaAndAssetCtxsResponse>;
 

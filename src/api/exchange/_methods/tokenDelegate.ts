@@ -12,63 +12,29 @@ import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#delegate-or-undelegate-stake-from-validator
  */
 export const TokenDelegateRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("tokenDelegate"),
-            v.description("Type of action."),
-          ),
-          /** Chain ID in hex format for EIP-712 signing. */
-          signatureChainId: v.pipe(
-            Hex,
-            v.description("Chain ID in hex format for EIP-712 signing."),
-          ),
-          /** HyperLiquid network type. */
-          hyperliquidChain: v.pipe(
-            HyperliquidChainSchema,
-            v.description("HyperLiquid network type."),
-          ),
-          /** Validator address. */
-          validator: v.pipe(
-            Address,
-            v.description("Validator address."),
-          ),
-          /** Amount for delegate/undelegate (float * 1e8). */
-          wei: v.pipe(
-            UnsignedInteger,
-            v.minValue(1),
-            v.description("Amount for delegate/undelegate (float * 1e8)."),
-          ),
-          /** `true` for undelegate, `false` for delegate. */
-          isUndelegate: v.pipe(
-            v.boolean(),
-            v.description("`true` for undelegate, `false` for delegate."),
-          ),
-          /** Nonce (timestamp in ms) used to prevent replay attacks. */
-          nonce: v.pipe(
-            UnsignedInteger,
-            v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("tokenDelegate"),
+      /** Chain ID in hex format for EIP-712 signing. */
+      signatureChainId: Hex,
+      /** HyperLiquid network type. */
+      hyperliquidChain: HyperliquidChainSchema,
+      /** Validator address. */
+      validator: Address,
+      /** Amount for delegate/undelegate (float * 1e8). */
+      wei: v.pipe(UnsignedInteger, v.minValue(1)),
+      /** `true` for undelegate, `false` for delegate. */
+      isUndelegate: v.boolean(),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
+      nonce: UnsignedInteger,
     }),
-    v.description("Delegate or undelegate native tokens to or from a validator."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+  });
 })();
 export type TokenDelegateRequest = v.InferOutput<typeof TokenDelegateRequest>;
 
@@ -77,10 +43,7 @@ export type TokenDelegateRequest = v.InferOutput<typeof TokenDelegateRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#delegate-or-undelegate-stake-from-validator
  */
 export const TokenDelegateResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type TokenDelegateResponse = v.InferOutput<typeof TokenDelegateResponse>;
 

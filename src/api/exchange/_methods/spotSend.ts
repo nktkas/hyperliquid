@@ -12,62 +12,29 @@ import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-spot-transfer
  */
 export const SpotSendRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("spotSend"),
-            v.description("Type of action."),
-          ),
-          /** Chain ID in hex format for EIP-712 signing. */
-          signatureChainId: v.pipe(
-            Hex,
-            v.description("Chain ID in hex format for EIP-712 signing."),
-          ),
-          /** HyperLiquid network type. */
-          hyperliquidChain: v.pipe(
-            HyperliquidChainSchema,
-            v.description("HyperLiquid network type."),
-          ),
-          /** Destination address. */
-          destination: v.pipe(
-            Address,
-            v.description("Destination address."),
-          ),
-          /** Token identifier. */
-          token: v.pipe(
-            v.string(),
-            v.description("Token identifier."),
-          ),
-          /** Amount to send (not in wei). */
-          amount: v.pipe(
-            UnsignedDecimal,
-            v.description("Amount to send (not in wei)."),
-          ),
-          /** Nonce (timestamp in ms) used to prevent replay attacks. */
-          time: v.pipe(
-            UnsignedInteger,
-            v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("spotSend"),
+      /** Chain ID in hex format for EIP-712 signing. */
+      signatureChainId: Hex,
+      /** HyperLiquid network type. */
+      hyperliquidChain: HyperliquidChainSchema,
+      /** Destination address. */
+      destination: Address,
+      /** Token identifier. */
+      token: v.string(),
+      /** Amount to send (not in wei). */
+      amount: UnsignedDecimal,
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
+      time: UnsignedInteger,
     }),
-    v.description("Send spot assets to another address."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+  });
 })();
 export type SpotSendRequest = v.InferOutput<typeof SpotSendRequest>;
 
@@ -76,10 +43,7 @@ export type SpotSendRequest = v.InferOutput<typeof SpotSendRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-spot-transfer
  */
 export const SpotSendResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type SpotSendResponse = v.InferOutput<typeof SpotSendResponse>;
 

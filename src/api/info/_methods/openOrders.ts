@@ -12,26 +12,14 @@ import { OpenOrderSchema } from "./_base/commonSchemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders
  */
 export const OpenOrdersRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("openOrders"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** DEX name (empty string for main dex). */
-      dex: v.pipe(
-        v.optional(v.string()),
-        v.description("DEX name (empty string for main dex)."),
-      ),
-    }),
-    v.description("Request open orders."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("openOrders"),
+    /** User address. */
+    user: Address,
+    /** DEX name (empty string for main dex). */
+    dex: v.optional(v.string()),
+  });
 })();
 export type OpenOrdersRequest = v.InferOutput<typeof OpenOrdersRequest>;
 
@@ -40,10 +28,7 @@ export type OpenOrdersRequest = v.InferOutput<typeof OpenOrdersRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders
  */
 export const OpenOrdersResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(OpenOrderSchema),
-    v.description("Array of open orders."),
-  );
+  return v.array(OpenOrderSchema);
 })();
 export type OpenOrdersResponse = v.InferOutput<typeof OpenOrdersResponse>;
 

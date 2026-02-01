@@ -12,80 +12,36 @@ import { SignatureSchema } from "./_base/commonSchemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-a-twap-order
  */
 export const TwapOrderRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("twapOrder"),
-            v.description("Type of action."),
-          ),
-          /** Twap parameters. */
-          twap: v.pipe(
-            v.object({
-              /** Asset ID. */
-              a: v.pipe(
-                UnsignedInteger,
-                v.description("Asset ID."),
-              ),
-              /** Position side (`true` for long, `false` for short). */
-              b: v.pipe(
-                v.boolean(),
-                v.description("Position side (`true` for long, `false` for short)."),
-              ),
-              /** Size (in base currency units). */
-              s: v.pipe(
-                UnsignedDecimal,
-                v.description("Size (in base currency units)."),
-              ),
-              /** Is reduce-only? */
-              r: v.pipe(
-                v.boolean(),
-                v.description("Is reduce-only?"),
-              ),
-              /** TWAP duration in minutes. */
-              m: v.pipe(
-                UnsignedInteger,
-                v.minValue(5),
-                v.maxValue(1440),
-                v.description("TWAP duration in minutes."),
-              ),
-              /** Enable random order timing. */
-              t: v.pipe(
-                v.boolean(),
-                v.description("Enable random order timing."),
-              ),
-            }),
-            v.description("Twap parameters."),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Vault address (for vault trading). */
-      vaultAddress: v.pipe(
-        v.optional(Address),
-        v.description("Vault address (for vault trading)."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("twapOrder"),
+      /** Twap parameters. */
+      twap: v.object({
+        /** Asset ID. */
+        a: UnsignedInteger,
+        /** Position side (`true` for long, `false` for short). */
+        b: v.boolean(),
+        /** Size (in base currency units). */
+        s: UnsignedDecimal,
+        /** Is reduce-only? */
+        r: v.boolean(),
+        /** TWAP duration in minutes. */
+        m: v.pipe(UnsignedInteger, v.minValue(5), v.maxValue(1440)),
+        /** Enable random order timing. */
+        t: v.boolean(),
+      }),
     }),
-    v.description("Place a TWAP order."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Vault address (for vault trading). */
+    vaultAddress: v.optional(Address),
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type TwapOrderRequest = v.InferOutput<typeof TwapOrderRequest>;
 
@@ -94,59 +50,32 @@ export type TwapOrderRequest = v.InferOutput<typeof TwapOrderRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-a-twap-order
  */
 export const TwapOrderResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Successful status. */
-      status: v.pipe(
-        v.literal("ok"),
-        v.description("Successful status."),
-      ),
-      /** Response details. */
-      response: v.pipe(
-        v.object({
-          /** Type of response. */
-          type: v.pipe(
-            v.literal("twapOrder"),
-            v.description("Type of response."),
-          ),
-          /** Specific data. */
-          data: v.pipe(
-            v.object({
-              /** Status of the operation or error message. */
-              status: v.pipe(
-                v.union([
-                  v.object({
-                    /** Running order status. */
-                    running: v.pipe(
-                      v.object({
-                        /** TWAP ID. */
-                        twapId: v.pipe(
-                          UnsignedInteger,
-                          v.description("TWAP ID."),
-                        ),
-                      }),
-                      v.description("Running order status."),
-                    ),
-                  }),
-                  v.object({
-                    /** Error message. */
-                    error: v.pipe(
-                      v.string(),
-                      v.description("Error message."),
-                    ),
-                  }),
-                ]),
-                v.description("Status of the operation or error message."),
-              ),
+  return v.object({
+    /** Successful status. */
+    status: v.literal("ok"),
+    /** Response details. */
+    response: v.object({
+      /** Type of response. */
+      type: v.literal("twapOrder"),
+      /** Specific data. */
+      data: v.object({
+        /** Status of the operation or error message. */
+        status: v.union([
+          v.object({
+            /** Running order status. */
+            running: v.object({
+              /** TWAP ID. */
+              twapId: UnsignedInteger,
             }),
-            v.description("Specific data."),
-          ),
-        }),
-        v.description("Response details."),
-      ),
+          }),
+          v.object({
+            /** Error message. */
+            error: v.string(),
+          }),
+        ]),
+      }),
     }),
-    v.description("Response for creating a TWAP order."),
-  );
+  });
 })();
 export type TwapOrderResponse = v.InferOutput<typeof TwapOrderResponse>;
 

@@ -9,51 +9,27 @@ import { FrontendOpenOrdersResponse } from "../../info/_methods/frontendOpenOrde
 
 /** Subscription to open order events for a specific user. */
 export const OpenOrdersRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("openOrders"),
-        v.description("Type of subscription."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** DEX name (empty string for main dex). */
-      dex: v.pipe(
-        v.optional(v.string()),
-        v.description("DEX name (empty string for main dex)."),
-      ),
-    }),
-    v.description("Subscription to open order events for a specific user."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("openOrders"),
+    /** User address. */
+    user: Address,
+    /** DEX name (empty string for main dex). */
+    dex: v.optional(v.string()),
+  });
 })();
 export type OpenOrdersRequest = v.InferOutput<typeof OpenOrdersRequest>;
 
 /** Event of open orders for a specific user. */
 export const OpenOrdersEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** DEX name (empty string for main dex). */
-      dex: v.pipe(
-        v.string(),
-        v.description("DEX name (empty string for main dex)."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** Array of open orders with additional display information. */
-      orders: v.pipe(
-        FrontendOpenOrdersResponse,
-        v.description("Array of open orders with additional display information."),
-      ),
-    }),
-    v.description("Event of open orders for a specific user."),
-  );
+  return v.object({
+    /** DEX name (empty string for main dex). */
+    dex: v.string(),
+    /** User address. */
+    user: Address,
+    /** Array of open orders with additional display information. */
+    orders: FrontendOpenOrdersResponse,
+  });
 })();
 export type OpenOrdersEvent = v.InferOutput<typeof OpenOrdersEvent>;
 

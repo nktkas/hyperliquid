@@ -9,65 +9,35 @@ import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonS
 
 /** Jail or unjail self as a validator signer. */
 export const CSignerActionRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to jail or unjail the signer. */
-      action: v.pipe(
-        v.union([
-          v.object({
-            /** Type of action. */
-            type: v.pipe(
-              v.literal("CSignerAction"),
-              v.description("Type of action."),
-            ),
-            /** Jail the signer. */
-            jailSelf: v.pipe(
-              v.null(),
-              v.description("Jail the signer."),
-            ),
-          }),
-          v.object({
-            /** Type of action. */
-            type: v.pipe(
-              v.literal("CSignerAction"),
-              v.description("Type of action."),
-            ),
-            /** Unjail the signer. */
-            unjailSelf: v.pipe(
-              v.null(),
-              v.description("Unjail the signer."),
-            ),
-          }),
-        ]),
-        v.description("Action to jail or unjail the signer."),
-      ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
-      ),
-    }),
-    v.description("Jail or unjail self as a validator signer."),
-  );
+  return v.object({
+    /** Action to jail or unjail the signer. */
+    action: v.variant("type", [
+      v.object({
+        /** Type of action. */
+        type: v.literal("CSignerAction"),
+        /** Jail the signer. */
+        jailSelf: v.null(),
+      }),
+      v.object({
+        /** Type of action. */
+        type: v.literal("CSignerAction"),
+        /** Unjail the signer. */
+        unjailSelf: v.null(),
+      }),
+    ]),
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type CSignerActionRequest = v.InferOutput<typeof CSignerActionRequest>;
 
 /** Successful response without specific data or error response. */
 export const CSignerActionResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type CSignerActionResponse = v.InferOutput<typeof CSignerActionResponse>;
 

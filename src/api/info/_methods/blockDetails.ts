@@ -11,21 +11,12 @@ import { ExplorerTransactionSchema } from "./_base/commonSchemas.ts";
  * Request block details by block height.
  */
 export const BlockDetailsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("blockDetails"),
-        v.description("Type of request."),
-      ),
-      /** Block height. */
-      height: v.pipe(
-        UnsignedInteger,
-        v.description("Block height."),
-      ),
-    }),
-    v.description("Request block details by block height."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("blockDetails"),
+    /** Block height. */
+    height: UnsignedInteger,
+  });
 })();
 export type BlockDetailsRequest = v.InferOutput<typeof BlockDetailsRequest>;
 
@@ -33,53 +24,25 @@ export type BlockDetailsRequest = v.InferOutput<typeof BlockDetailsRequest>;
  * Response containing block information.
  */
 export const BlockDetailsResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of response. */
-      type: v.pipe(
-        v.literal("blockDetails"),
-        v.description("Type of response."),
-      ),
-      /** The details of a block. */
-      blockDetails: v.pipe(
-        v.object({
-          /** Block creation timestamp. */
-          blockTime: v.pipe(
-            UnsignedInteger,
-            v.description("Block creation timestamp."),
-          ),
-          /** Block hash. */
-          hash: v.pipe(
-            Hex,
-            v.length(66),
-            v.description("Block hash."),
-          ),
-          /** Block height in chain. */
-          height: v.pipe(
-            UnsignedInteger,
-            v.description("Block height in chain."),
-          ),
-          /** Total transactions in block. */
-          numTxs: v.pipe(
-            UnsignedInteger,
-            v.description("Total transactions in block."),
-          ),
-          /** Block proposer address. */
-          proposer: v.pipe(
-            Address,
-            v.description("Block proposer address."),
-          ),
-          /** Array of transactions in the block. */
-          txs: v.pipe(
-            v.array(ExplorerTransactionSchema),
-            v.description("Array of transactions in the block."),
-          ),
-        }),
-        v.description("The details of a block."),
-      ),
+  return v.object({
+    /** Type of response. */
+    type: v.literal("blockDetails"),
+    /** The details of a block. */
+    blockDetails: v.object({
+      /** Block creation timestamp. */
+      blockTime: UnsignedInteger,
+      /** Block hash. */
+      hash: v.pipe(Hex, v.length(66)),
+      /** Block height in chain. */
+      height: UnsignedInteger,
+      /** Total transactions in block. */
+      numTxs: UnsignedInteger,
+      /** Block proposer address. */
+      proposer: Address,
+      /** Array of transactions in the block. */
+      txs: v.array(ExplorerTransactionSchema),
     }),
-    v.description("Response containing block information."),
-  );
+  });
 })();
 export type BlockDetailsResponse = v.InferOutput<typeof BlockDetailsResponse>;
 

@@ -9,30 +9,18 @@ import { WebData2Response } from "../../info/_methods/webData2.ts";
 
 /** Subscription to comprehensive user and market data events. */
 export const WebData2Request = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("webData2"),
-        v.description("Type of subscription."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Subscription to comprehensive user and market data events."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("webData2"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type WebData2Request = v.InferOutput<typeof WebData2Request>;
 
 /** Event of comprehensive user and market data. */
 export const WebData2Event = /* @__PURE__ */ (() => {
-  return v.pipe(
-    WebData2Response,
-    v.description("Event of comprehensive user and market data."),
-  );
+  return WebData2Response;
 })();
 export type WebData2Event = v.InferOutput<typeof WebData2Event>;
 

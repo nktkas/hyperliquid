@@ -11,21 +11,12 @@ import { UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-borrow-lend-reserve-state
  */
 export const BorrowLendReserveStateRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("borrowLendReserveState"),
-        v.description("Type of request."),
-      ),
-      /** Token index. */
-      token: v.pipe(
-        UnsignedInteger,
-        v.description("Token index."),
-      ),
-    }),
-    v.description("Request borrow/lend reserve states."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("borrowLendReserveState"),
+    /** Token index. */
+    token: UnsignedInteger,
+  });
 })();
 export type BorrowLendReserveStateRequest = v.InferOutput<typeof BorrowLendReserveStateRequest>;
 
@@ -34,51 +25,24 @@ export type BorrowLendReserveStateRequest = v.InferOutput<typeof BorrowLendReser
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-borrow-lend-reserve-state
  */
 export const BorrowLendReserveStateResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Borrow interest rate (yearly). */
-      borrowYearlyRate: v.pipe(
-        UnsignedDecimal,
-        v.description("Borrow interest rate (yearly)."),
-      ),
-      /** Supply interest rate (yearly). */
-      supplyYearlyRate: v.pipe(
-        UnsignedDecimal,
-        v.description("Supply interest rate (yearly)."),
-      ),
-      /** Reserve balance. */
-      balance: v.pipe(
-        UnsignedDecimal,
-        v.description("Reserve balance."),
-      ),
-      /** Reserve utilization ratio. */
-      utilization: v.pipe(
-        UnsignedDecimal,
-        v.description("Reserve utilization ratio."),
-      ),
-      /** Oracle price. */
-      oraclePx: v.pipe(
-        UnsignedDecimal,
-        v.description("Oracle price."),
-      ),
-      /** Loan-to-value (LTV) ratio. */
-      ltv: v.pipe(
-        UnsignedDecimal,
-        v.description("Loan-to-value (LTV) ratio."),
-      ),
-      /** Total supplied amount. */
-      totalSupplied: v.pipe(
-        UnsignedDecimal,
-        v.description("Total supplied amount."),
-      ),
-      /** Total borrowed amount. */
-      totalBorrowed: v.pipe(
-        UnsignedDecimal,
-        v.description("Total borrowed amount."),
-      ),
-    }),
-    v.description("Borrow/lend reserve state."),
-  );
+  return v.object({
+    /** Borrow interest rate (yearly). */
+    borrowYearlyRate: UnsignedDecimal,
+    /** Supply interest rate (yearly). */
+    supplyYearlyRate: UnsignedDecimal,
+    /** Reserve balance. */
+    balance: UnsignedDecimal,
+    /** Reserve utilization ratio. */
+    utilization: UnsignedDecimal,
+    /** Oracle price. */
+    oraclePx: UnsignedDecimal,
+    /** Loan-to-value (LTV) ratio. */
+    ltv: UnsignedDecimal,
+    /** Total supplied amount. */
+    totalSupplied: UnsignedDecimal,
+    /** Total borrowed amount. */
+    totalBorrowed: UnsignedDecimal,
+  });
 })();
 export type BorrowLendReserveStateResponse = v.InferOutput<typeof BorrowLendReserveStateResponse>;
 

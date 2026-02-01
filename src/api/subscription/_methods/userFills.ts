@@ -9,51 +9,27 @@ import { UserFillsResponse } from "../../info/_methods/userFills.ts";
 
 /** Subscription to user fill events for a specific user. */
 export const UserFillsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("userFills"),
-        v.description("Type of subscription."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
-      aggregateByTime: v.pipe(
-        v.optional(v.boolean()),
-        v.description("If true, partial fills are aggregated when a crossing order fills multiple resting orders."),
-      ),
-    }),
-    v.description("Subscription to user fill events for a specific user."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("userFills"),
+    /** User address. */
+    user: Address,
+    /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
+    aggregateByTime: v.optional(v.boolean()),
+  });
 })();
 export type UserFillsRequest = v.InferOutput<typeof UserFillsRequest>;
 
 /** Event of user trade fill. */
 export const UserFillsEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** Array of user trade fills. */
-      fills: v.pipe(
-        UserFillsResponse,
-        v.description("Array of user trade fills."),
-      ),
-      /** Whether this is an initial snapshot. */
-      isSnapshot: v.pipe(
-        v.optional(v.literal(true)),
-        v.description("Whether this is an initial snapshot."),
-      ),
-    }),
-    v.description("Event of user trade fill."),
-  );
+  return v.object({
+    /** User address. */
+    user: Address,
+    /** Array of user trade fills. */
+    fills: UserFillsResponse,
+    /** Whether this is an initial snapshot. */
+    isSnapshot: v.optional(v.literal(true)),
+  });
 })();
 export type UserFillsEvent = v.InferOutput<typeof UserFillsEvent>;
 

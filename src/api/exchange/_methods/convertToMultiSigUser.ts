@@ -9,25 +9,14 @@ import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse
 
 /** Multi-sig config or `null` to revert to single-sig. */
 const ConvertToMultiSigUserRequestSignersSchema = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.nullable(
-      /** Multi-signature configuration. */
-      v.object({
-        /** List of authorized user addresses. */
-        authorizedUsers: v.pipe(
-          v.array(Address),
-          v.description("List of authorized user addresses."),
-        ),
-        /** Minimum number of signatures required. */
-        threshold: v.pipe(
-          UnsignedInteger,
-          v.minValue(1),
-          v.maxValue(10),
-          v.description("Minimum number of signatures required."),
-        ),
-      }),
-    ),
-    v.description("Multi-sig config or `null` to revert to single-sig."),
+  return v.nullable(
+    /** Multi-signature configuration. */
+    v.object({
+      /** List of authorized user addresses. */
+      authorizedUsers: v.array(Address),
+      /** Minimum number of signatures required. */
+      threshold: v.pipe(UnsignedInteger, v.minValue(1), v.maxValue(10)),
+    }),
   );
 })();
 
@@ -36,70 +25,40 @@ const ConvertToMultiSigUserRequestSignersSchema = /* @__PURE__ */ (() => {
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig
  */
 export const ConvertToMultiSigUserRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("convertToMultiSigUser"),
-            v.description("Type of action."),
-          ),
-          /** Chain ID in hex format for EIP-712 signing. */
-          signatureChainId: v.pipe(
-            Hex,
-            v.description("Chain ID in hex format for EIP-712 signing."),
-          ),
-          /** HyperLiquid network type. */
-          hyperliquidChain: v.pipe(
-            HyperliquidChainSchema,
-            v.description("HyperLiquid network type."),
-          ),
-          /**
-           * Signers configuration.
-           *
-           * Must be `ConvertToMultiSigUserRequestSignersSchema` converted to a string via `JSON.stringify(...)`.
-           */
-          signers: v.pipe(
-            v.union([
-              v.pipe(
-                v.string(),
-                v.parseJson(),
-                ConvertToMultiSigUserRequestSignersSchema,
-                v.stringifyJson(),
-              ),
-              v.pipe(
-                ConvertToMultiSigUserRequestSignersSchema,
-                v.stringifyJson(),
-              ),
-            ]),
-            v.description(
-              "Signers configuration." +
-                "\n\nMust be `ConvertToMultiSigUserRequestSignersSchema` converted to a string via `JSON.stringify(...)`.",
-            ),
-          ),
-          /** Nonce (timestamp in ms) used to prevent replay attacks. */
-          nonce: v.pipe(
-            UnsignedInteger,
-            v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("convertToMultiSigUser"),
+      /** Chain ID in hex format for EIP-712 signing. */
+      signatureChainId: Hex,
+      /** HyperLiquid network type. */
+      hyperliquidChain: HyperliquidChainSchema,
+      /**
+       * Signers configuration.
+       *
+       * Must be `ConvertToMultiSigUserRequestSignersSchema` converted to a string via `JSON.stringify(...)`.
+       */
+      signers: v.union([
+        v.pipe(
+          v.string(),
+          v.parseJson(),
+          ConvertToMultiSigUserRequestSignersSchema,
+          v.stringifyJson(),
+        ),
+        v.pipe(
+          ConvertToMultiSigUserRequestSignersSchema,
+          v.stringifyJson(),
+        ),
+      ]),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
+      nonce: UnsignedInteger,
     }),
-    v.description("Convert a single-signature account to a multi-signature account or vice versa."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+  });
 })();
 export type ConvertToMultiSigUserRequest = v.InferOutput<typeof ConvertToMultiSigUserRequest>;
 
@@ -108,10 +67,7 @@ export type ConvertToMultiSigUserRequest = v.InferOutput<typeof ConvertToMultiSi
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig
  */
 export const ConvertToMultiSigUserResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type ConvertToMultiSigUserResponse = v.InferOutput<typeof ConvertToMultiSigUserResponse>;
 

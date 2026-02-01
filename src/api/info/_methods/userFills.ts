@@ -12,26 +12,14 @@ import { UserFillSchema } from "./_base/commonSchemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills
  */
 export const UserFillsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("userFills"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
-      aggregateByTime: v.pipe(
-        v.optional(v.boolean()),
-        v.description("If true, partial fills are aggregated when a crossing order fills multiple resting orders."),
-      ),
-    }),
-    v.description("Request array of user fills."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("userFills"),
+    /** User address. */
+    user: Address,
+    /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
+    aggregateByTime: v.optional(v.boolean()),
+  });
 })();
 export type UserFillsRequest = v.InferOutput<typeof UserFillsRequest>;
 
@@ -40,43 +28,25 @@ export type UserFillsRequest = v.InferOutput<typeof UserFillsRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills
  */
 export const UserFillsResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(
-      v.intersect([
-        UserFillSchema,
-        v.object({
-          /** Client Order ID. */
-          cloid: v.pipe(
-            v.optional(Cloid),
-            v.description("Client Order ID."),
-          ),
-          /** Liquidation details. */
-          liquidation: v.pipe(
-            v.optional(
-              v.object({
-                /** Address of the liquidated user. */
-                liquidatedUser: v.pipe(
-                  Address,
-                  v.description("Address of the liquidated user."),
-                ),
-                /** Mark price at the time of liquidation. */
-                markPx: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Mark price at the time of liquidation."),
-                ),
-                /** Liquidation method. */
-                method: v.pipe(
-                  v.picklist(["market", "backstop"]),
-                  v.description("Liquidation method."),
-                ),
-              }),
-            ),
-            v.description("Liquidation details."),
-          ),
-        }),
-      ]),
-    ),
-    v.description("Array of user trade fills."),
+  return v.array(
+    v.intersect([
+      UserFillSchema,
+      v.object({
+        /** Client Order ID. */
+        cloid: v.optional(Cloid),
+        /** Liquidation details. */
+        liquidation: v.optional(
+          v.object({
+            /** Address of the liquidated user. */
+            liquidatedUser: Address,
+            /** Mark price at the time of liquidation. */
+            markPx: UnsignedDecimal,
+            /** Liquidation method. */
+            method: v.picklist(["market", "backstop"]),
+          }),
+        ),
+      }),
+    ]),
   );
 })();
 export type UserFillsResponse = v.InferOutput<typeof UserFillsResponse>;

@@ -12,58 +12,27 @@ import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonS
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-leverage
  */
 export const UpdateLeverageRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("updateLeverage"),
-            v.description("Type of action."),
-          ),
-          /** Asset ID. */
-          asset: v.pipe(
-            UnsignedInteger,
-            v.description("Asset ID."),
-          ),
-          /** `true` for cross leverage, `false` for isolated leverage. */
-          isCross: v.pipe(
-            v.boolean(),
-            v.description("`true` for cross leverage, `false` for isolated leverage."),
-          ),
-          /** New leverage value. */
-          leverage: v.pipe(
-            UnsignedInteger,
-            v.minValue(1),
-            v.description("New leverage value."),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Vault address (for vault trading). */
-      vaultAddress: v.pipe(
-        v.optional(Address),
-        v.description("Vault address (for vault trading)."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("updateLeverage"),
+      /** Asset ID. */
+      asset: UnsignedInteger,
+      /** `true` for cross leverage, `false` for isolated leverage. */
+      isCross: v.boolean(),
+      /** New leverage value. */
+      leverage: v.pipe(UnsignedInteger, v.minValue(1)),
     }),
-    v.description("Update cross or isolated leverage on a coin."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Vault address (for vault trading). */
+    vaultAddress: v.optional(Address),
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type UpdateLeverageRequest = v.InferOutput<typeof UpdateLeverageRequest>;
 
@@ -72,10 +41,7 @@ export type UpdateLeverageRequest = v.InferOutput<typeof UpdateLeverageRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-leverage
  */
 export const UpdateLeverageResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type UpdateLeverageResponse = v.InferOutput<typeof UpdateLeverageResponse>;
 

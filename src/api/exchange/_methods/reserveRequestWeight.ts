@@ -12,43 +12,21 @@ import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonS
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#reserve-additional-actions
  */
 export const ReserveRequestWeightRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("reserveRequestWeight"),
-            v.description("Type of action."),
-          ),
-          /** Amount of request weight to reserve. */
-          weight: v.pipe(
-            UnsignedInteger,
-            v.maxValue(1844674407370955), // truncated max uint64 / 1000
-            v.description("Amount of request weight to reserve."),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("reserveRequestWeight"),
+      /** Amount of request weight to reserve. */
+      weight: v.pipe(UnsignedInteger, v.maxValue(1844674407370955)), // truncated max uint64 / 1000
     }),
-    v.description("Reserve additional rate-limited actions for a fee."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type ReserveRequestWeightRequest = v.InferOutput<typeof ReserveRequestWeightRequest>;
 
@@ -57,10 +35,7 @@ export type ReserveRequestWeightRequest = v.InferOutput<typeof ReserveRequestWei
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#reserve-additional-actions
  */
 export const ReserveRequestWeightResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type ReserveRequestWeightResponse = v.InferOutput<typeof ReserveRequestWeightResponse>;
 

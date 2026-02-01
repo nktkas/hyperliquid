@@ -8,53 +8,28 @@ import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
 
 /** Subscription to explorer block events. */
 export const ExplorerBlockRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("explorerBlock"),
-        v.description("Type of subscription."),
-      ),
-    }),
-    v.description("Subscription to explorer block events."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("explorerBlock"),
+  });
 })();
 export type ExplorerBlockRequest = v.InferOutput<typeof ExplorerBlockRequest>;
 
 /** Event of array of block details. */
 export const ExplorerBlockEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(
-      v.object({
-        /** Block creation timestamp. */
-        blockTime: v.pipe(
-          UnsignedInteger,
-          v.description("Block creation timestamp."),
-        ),
-        /** Block hash. */
-        hash: v.pipe(
-          Hex,
-          v.length(66),
-          v.description("Block hash."),
-        ),
-        /** Block height in chain. */
-        height: v.pipe(
-          UnsignedInteger,
-          v.description("Block height in chain."),
-        ),
-        /** Total transactions in block. */
-        numTxs: v.pipe(
-          UnsignedInteger,
-          v.description("Total transactions in block."),
-        ),
-        /** Block proposer address. */
-        proposer: v.pipe(
-          Address,
-          v.description("Block proposer address."),
-        ),
-      }),
-    ),
-    v.description("Event of array of block details."),
+  return v.array(
+    v.object({
+      /** Block creation timestamp. */
+      blockTime: UnsignedInteger,
+      /** Block hash. */
+      hash: v.pipe(Hex, v.length(66)),
+      /** Block height in chain. */
+      height: UnsignedInteger,
+      /** Total transactions in block. */
+      numTxs: UnsignedInteger,
+      /** Block proposer address. */
+      proposer: Address,
+    }),
   );
 })();
 export type ExplorerBlockEvent = v.InferOutput<typeof ExplorerBlockEvent>;

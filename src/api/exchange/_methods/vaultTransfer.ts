@@ -12,53 +12,25 @@ import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonS
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-a-vault
  */
 export const VaultTransferRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("vaultTransfer"),
-            v.description("Type of action."),
-          ),
-          /** Vault address. */
-          vaultAddress: v.pipe(
-            Address,
-            v.description("Vault address."),
-          ),
-          /** `true` for deposit, `false` for withdrawal. */
-          isDeposit: v.pipe(
-            v.boolean(),
-            v.description("`true` for deposit, `false` for withdrawal."),
-          ),
-          /** Amount for deposit/withdrawal (float * 1e6). */
-          usd: v.pipe(
-            UnsignedInteger,
-            v.minValue(1),
-            v.description("Amount for deposit/withdrawal (float * 1e6)."),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("vaultTransfer"),
+      /** Vault address. */
+      vaultAddress: Address,
+      /** `true` for deposit, `false` for withdrawal. */
+      isDeposit: v.boolean(),
+      /** Amount for deposit/withdrawal (float * 1e6). */
+      usd: v.pipe(UnsignedInteger, v.minValue(1)),
     }),
-    v.description("Deposit or withdraw from a vault."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type VaultTransferRequest = v.InferOutput<typeof VaultTransferRequest>;
 
@@ -67,10 +39,7 @@ export type VaultTransferRequest = v.InferOutput<typeof VaultTransferRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-a-vault
  */
 export const VaultTransferResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type VaultTransferResponse = v.InferOutput<typeof VaultTransferResponse>;
 

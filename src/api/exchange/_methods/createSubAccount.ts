@@ -9,78 +9,40 @@ import { ErrorResponse, SignatureSchema } from "./_base/commonSchemas.ts";
 
 /** Create a sub-account. */
 export const CreateSubAccountRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("createSubAccount"),
-            v.description("Type of action."),
-          ),
-          /** Sub-account name. */
-          name: v.pipe(
-            v.string(),
-            v.minLength(1),
-            v.maxLength(16),
-            v.description("Sub-account name."),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("createSubAccount"),
+      /** Sub-account name. */
+      name: v.pipe(v.string(), v.minLength(1), v.maxLength(16)),
     }),
-    v.description("Create a sub-account."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type CreateSubAccountRequest = v.InferOutput<typeof CreateSubAccountRequest>;
 
 /** Response for creating a sub-account. */
 export const CreateSubAccountResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([
-      v.object({
-        /** Successful status. */
-        status: v.pipe(
-          v.literal("ok"),
-          v.description("Successful status."),
-        ),
-        /** Response details. */
-        response: v.pipe(
-          v.object({
-            /** Type of response. */
-            type: v.pipe(
-              v.literal("createSubAccount"),
-              v.description("Type of response."),
-            ),
-            /** Sub-account address. */
-            data: v.pipe(
-              Address,
-              v.description("Sub-account address."),
-            ),
-          }),
-          v.description("Response details."),
-        ),
+  return v.union([
+    v.object({
+      /** Successful status. */
+      status: v.literal("ok"),
+      /** Response details. */
+      response: v.object({
+        /** Type of response. */
+        type: v.literal("createSubAccount"),
+        /** Sub-account address. */
+        data: Address,
       }),
-      ErrorResponse,
-    ]),
-    v.description("Response for creating a sub-account."),
-  );
+    }),
+    ErrorResponse,
+  ]);
 })();
 export type CreateSubAccountResponse = v.InferOutput<typeof CreateSubAccountResponse>;
 

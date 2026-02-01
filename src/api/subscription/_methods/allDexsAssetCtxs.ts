@@ -8,36 +8,19 @@ import { PerpAssetCtxSchema } from "../../info/_methods/_base/commonSchemas.ts";
 
 /** Subscription to asset context events for all DEXs. */
 export const AllDexsAssetCtxsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("allDexsAssetCtxs"),
-        v.description("Type of subscription."),
-      ),
-    }),
-    v.description("Subscription to asset context events for all DEXs."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("allDexsAssetCtxs"),
+  });
 })();
 export type AllDexsAssetCtxsRequest = v.InferOutput<typeof AllDexsAssetCtxsRequest>;
 
 /** Event of asset contexts for all DEXs. */
 export const AllDexsAssetCtxsEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Array of tuples of dex names and contexts for each perpetual asset. */
-      ctxs: v.pipe(
-        v.array(
-          v.tuple([
-            v.string(),
-            v.array(PerpAssetCtxSchema),
-          ]),
-        ),
-        v.description("Array of tuples of dex names and contexts for each perpetual asset."),
-      ),
-    }),
-    v.description("Event of asset contexts for all DEXs."),
-  );
+  return v.object({
+    /** Array of tuples of dex names and contexts for each perpetual asset. */
+    ctxs: v.array(v.tuple([v.string(), v.array(PerpAssetCtxSchema)])),
+  });
 })();
 export type AllDexsAssetCtxsEvent = v.InferOutput<typeof AllDexsAssetCtxsEvent>;
 

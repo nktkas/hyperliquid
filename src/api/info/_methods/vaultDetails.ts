@@ -13,26 +13,14 @@ import { PortfolioResponse } from "./portfolio.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-details-for-a-vault
  */
 export const VaultDetailsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("vaultDetails"),
-        v.description("Type of request."),
-      ),
-      /** Vault address. */
-      vaultAddress: v.pipe(
-        Address,
-        v.description("Vault address."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        v.nullish(Address),
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request details of a vault."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("vaultDetails"),
+    /** Vault address. */
+    vaultAddress: Address,
+    /** User address. */
+    user: v.nullish(Address),
+  });
 })();
 export type VaultDetailsRequest = v.InferOutput<typeof VaultDetailsRequest>;
 
@@ -41,167 +29,74 @@ export type VaultDetailsRequest = v.InferOutput<typeof VaultDetailsRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-details-for-a-vault
  */
 export const VaultDetailsResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Vault name. */
-      name: v.pipe(
-        v.string(),
-        v.description("Vault name."),
-      ),
-      /** Vault address. */
-      vaultAddress: v.pipe(
-        Address,
-        v.description("Vault address."),
-      ),
-      /** Leader address. */
-      leader: v.pipe(
-        Address,
-        v.description("Leader address."),
-      ),
-      /** Vault description. */
-      description: v.pipe(
-        v.string(),
-        v.description("Vault description."),
-      ),
-      /** Vault portfolio metrics grouped by time periods. */
-      portfolio: v.pipe(
-        PortfolioResponse,
-        v.description("Vault portfolio metrics grouped by time periods."),
-      ),
-      /** Annual percentage rate. */
-      apr: v.pipe(
-        v.number(),
-        v.description("Annual percentage rate."),
-      ),
-      /** Current user follower state. */
-      followerState: v.pipe(
-        v.nullable(
-          v.object({
-            /** Follower address. */
-            user: v.pipe(
-              Address,
-              v.description("Follower address."),
-            ),
-            /** Follower vault equity. */
-            vaultEquity: v.pipe(
-              UnsignedDecimal,
-              v.description("Follower vault equity."),
-            ),
-            /** Current profit and loss. */
-            pnl: v.pipe(
-              Decimal,
-              v.description("Current profit and loss."),
-            ),
-            /** All-time profit and loss. */
-            allTimePnl: v.pipe(
-              Decimal,
-              v.description("All-time profit and loss."),
-            ),
-            /** Subscription duration in days. */
-            daysFollowing: v.pipe(
-              UnsignedInteger,
-              v.description("Subscription duration in days."),
-            ),
-            /** Vault entry timestamp. */
-            vaultEntryTime: v.pipe(
-              UnsignedInteger,
-              v.description("Vault entry timestamp."),
-            ),
-            /** Timestamp when funds become unlocked. */
-            lockupUntil: v.pipe(
-              UnsignedInteger,
-              v.description("Timestamp when funds become unlocked."),
-            ),
-          }),
-        ),
-        v.description("Current user follower state."),
-      ),
-      /** Ownership percentage held by leader. */
-      leaderFraction: v.pipe(
-        v.number(),
-        v.description("Ownership percentage held by leader."),
-      ),
-      /** Leader commission percentage. */
-      leaderCommission: v.pipe(
-        v.number(),
-        v.description("Leader commission percentage."),
-      ),
-      /** Array of vault followers. */
-      followers: v.pipe(
-        v.array(
-          v.object({
-            /** Follower address or Leader. */
-            user: v.pipe(
-              v.union([Address, v.literal("Leader")]),
-              v.description("Follower address or Leader."),
-            ),
-            /** Follower vault equity. */
-            vaultEquity: v.pipe(
-              UnsignedDecimal,
-              v.description("Follower vault equity."),
-            ),
-            /** Current profit and loss. */
-            pnl: v.pipe(
-              Decimal,
-              v.description("Current profit and loss."),
-            ),
-            /** All-time profit and loss. */
-            allTimePnl: v.pipe(
-              Decimal,
-              v.description("All-time profit and loss."),
-            ),
-            /** Subscription duration in days. */
-            daysFollowing: v.pipe(
-              UnsignedInteger,
-              v.description("Subscription duration in days."),
-            ),
-            /** Vault entry timestamp. */
-            vaultEntryTime: v.pipe(
-              UnsignedInteger,
-              v.description("Vault entry timestamp."),
-            ),
-            /** Timestamp when funds become unlocked. */
-            lockupUntil: v.pipe(
-              UnsignedInteger,
-              v.description("Timestamp when funds become unlocked."),
-            ),
-          }),
-        ),
-        v.description("Array of vault followers."),
-      ),
-      /** Maximum distributable amount. */
-      maxDistributable: v.pipe(
-        v.number(),
-        v.description("Maximum distributable amount."),
-      ),
-      /** Maximum withdrawable amount. */
-      maxWithdrawable: v.pipe(
-        v.number(),
-        v.description("Maximum withdrawable amount."),
-      ),
-      /** Vault closure status. */
-      isClosed: v.pipe(
-        v.boolean(),
-        v.description("Vault closure status."),
-      ),
-      /** Vault relationship type. */
-      relationship: v.pipe(
-        VaultRelationshipSchema,
-        v.description("Vault relationship type."),
-      ),
-      /** Deposit permission status. */
-      allowDeposits: v.pipe(
-        v.boolean(),
-        v.description("Deposit permission status."),
-      ),
-      /** Position closure policy on withdrawal. */
-      alwaysCloseOnWithdraw: v.pipe(
-        v.boolean(),
-        v.description("Position closure policy on withdrawal."),
-      ),
-    }),
-    v.description("Details of a vault or null if the vault does not exist."),
-  );
+  return v.object({
+    /** Vault name. */
+    name: v.string(),
+    /** Vault address. */
+    vaultAddress: Address,
+    /** Leader address. */
+    leader: Address,
+    /** Vault description. */
+    description: v.string(),
+    /** Vault portfolio metrics grouped by time periods. */
+    portfolio: PortfolioResponse,
+    /** Annual percentage rate. */
+    apr: v.number(),
+    /** Current user follower state. */
+    followerState: v.nullable(
+      v.object({
+        /** Follower address. */
+        user: Address,
+        /** Follower vault equity. */
+        vaultEquity: UnsignedDecimal,
+        /** Current profit and loss. */
+        pnl: Decimal,
+        /** All-time profit and loss. */
+        allTimePnl: Decimal,
+        /** Subscription duration in days. */
+        daysFollowing: UnsignedInteger,
+        /** Vault entry timestamp. */
+        vaultEntryTime: UnsignedInteger,
+        /** Timestamp when funds become unlocked. */
+        lockupUntil: UnsignedInteger,
+      }),
+    ),
+    /** Ownership percentage held by leader. */
+    leaderFraction: v.number(),
+    /** Leader commission percentage. */
+    leaderCommission: v.number(),
+    /** Array of vault followers. */
+    followers: v.array(
+      v.object({
+        /** Follower address or Leader. */
+        user: v.union([Address, v.literal("Leader")]),
+        /** Follower vault equity. */
+        vaultEquity: UnsignedDecimal,
+        /** Current profit and loss. */
+        pnl: Decimal,
+        /** All-time profit and loss. */
+        allTimePnl: Decimal,
+        /** Subscription duration in days. */
+        daysFollowing: UnsignedInteger,
+        /** Vault entry timestamp. */
+        vaultEntryTime: UnsignedInteger,
+        /** Timestamp when funds become unlocked. */
+        lockupUntil: UnsignedInteger,
+      }),
+    ),
+    /** Maximum distributable amount. */
+    maxDistributable: v.number(),
+    /** Maximum withdrawable amount. */
+    maxWithdrawable: v.number(),
+    /** Vault closure status. */
+    isClosed: v.boolean(),
+    /** Vault relationship type. */
+    relationship: VaultRelationshipSchema,
+    /** Deposit permission status. */
+    allowDeposits: v.boolean(),
+    /** Position closure policy on withdrawal. */
+    alwaysCloseOnWithdraw: v.boolean(),
+  });
 })();
 export type VaultDetailsResponse = v.InferOutput<typeof VaultDetailsResponse>;
 
