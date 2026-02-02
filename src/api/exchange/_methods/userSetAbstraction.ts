@@ -158,7 +158,6 @@ export const UserSetAbstractionTypes = {
  * );
  * ```
  *
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction
  */
 export function userSetAbstraction(
   config: ExchangeConfig,
