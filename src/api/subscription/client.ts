@@ -97,7 +97,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     this.config_ = config;
   }
 
-  /** @see {@link activeAssetCtx} */
+  /**
+   * Subscribe to context updates for a specific perpetual asset.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.activeAssetCtx({ coin: "ETH" }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   activeAssetCtx(
     params: ActiveAssetCtxParameters,
     listener: (data: ActiveAssetCtxEvent) => void,
@@ -105,7 +127,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return activeAssetCtx(this.config_, params, listener);
   }
 
-  /** @see {@link activeAssetData} */
+  /**
+   * Subscribe to trading data updates for a specific asset and user.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.activeAssetData({ coin: "ETH", user: "0x..." }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   activeAssetData(
     params: ActiveAssetDataParameters,
     listener: (data: ActiveAssetDataEvent) => void,
@@ -113,7 +157,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return activeAssetData(this.config_, params, listener);
   }
 
-  /** @see {@link activeSpotAssetCtx} */
+  /**
+   * Subscribe to context updates for a specific spot asset.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.activeSpotAssetCtx({ coin: "@1" }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   activeSpotAssetCtx(
     params: ActiveSpotAssetCtxParameters,
     listener: (data: ActiveSpotAssetCtxEvent) => void,
@@ -121,14 +187,57 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return activeSpotAssetCtx(this.config_, params, listener);
   }
 
-  /** @see {@link allDexsAssetCtxs} */
+  /**
+   * Subscribe to asset contexts for all DEXs.
+   *
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.allDexsAssetCtxs((data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   allDexsAssetCtxs(
     listener: (data: AllDexsAssetCtxsEvent) => void,
   ): Promise<ISubscription> {
     return allDexsAssetCtxs(this.config_, listener);
   }
 
-  /** @see {@link allDexsClearinghouseState} */
+  /**
+   * Subscribe to clearinghouse states for all DEXs for a specific user.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.allDexsClearinghouseState({ user: "0x..." }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   allDexsClearinghouseState(
     params: AllDexsClearinghouseStateParameters,
     listener: (data: AllDexsClearinghouseStateEvent) => void,
@@ -136,7 +245,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return allDexsClearinghouseState(this.config_, params, listener);
   }
 
-  /** @see {@link allMids} */
+  /**
+   * Subscribe to mid prices for all actively traded assets.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.allMids((data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   allMids(
     listener: (data: AllMidsEvent) => void,
   ): Promise<ISubscription>;
@@ -153,7 +284,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return allMids(this.config_, params, listener);
   }
 
-  /** @see {@link assetCtxs} */
+  /**
+   * Subscribe to asset contexts for all perpetual assets.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.assetCtxs((data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   assetCtxs(
     listener: (data: AssetCtxsEvent) => void,
   ): Promise<ISubscription>;
@@ -170,7 +323,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return assetCtxs(this.config_, params, listener);
   }
 
-  /** @see {@link bbo} */
+  /**
+   * Subscribe to best bid and offer updates for a specific asset.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.bbo({ coin: "ETH" }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   bbo(
     params: BboParameters,
     listener: (data: BboEvent) => void,
@@ -178,7 +353,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return bbo(this.config_, params, listener);
   }
 
-  /** @see {@link candle} */
+  /**
+   * Subscribe to candlestick data updates for a specific asset.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.candle({ coin: "ETH", interval: "1h" }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   candle(
     params: CandleParameters,
     listener: (data: CandleEvent) => void,
@@ -186,7 +383,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return candle(this.config_, params, listener);
   }
 
-  /** @see {@link clearinghouseState} */
+  /**
+   * Subscribe to clearinghouse state updates for a specific user.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.clearinghouseState({ user: "0x..." }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   clearinghouseState(
     params: ClearinghouseStateParameters,
     listener: (data: ClearinghouseStateEvent) => void,
@@ -194,21 +413,85 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return clearinghouseState(this.config_, params, listener);
   }
 
-  /** @see {@link explorerBlock} */
+  /**
+   * Subscribe to explorer block updates.
+   *
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport({ url: "wss://rpc.hyperliquid.xyz/ws" }); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.explorerBlock((data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   explorerBlock(
     listener: (data: ExplorerBlockEvent) => void,
   ): Promise<ISubscription> {
     return explorerBlock(this.config_, listener);
   }
 
-  /** @see {@link explorerTxs} */
+  /**
+   * Subscribe to explorer transaction updates.
+   *
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport({ url: "wss://rpc.hyperliquid.xyz/ws" }); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.explorerTxs((data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   explorerTxs(
     listener: (data: ExplorerTxsEvent) => void,
   ): Promise<ISubscription> {
     return explorerTxs(this.config_, listener);
   }
 
-  /** @see {@link l2Book} */
+  /**
+   * Subscribe to L2 order book updates for a specific asset.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.l2Book({ coin: "ETH" }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   l2Book(
     params: L2BookParameters,
     listener: (data: L2BookEvent) => void,
@@ -216,7 +499,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return l2Book(this.config_, params, listener);
   }
 
-  /** @see {@link notification} */
+  /**
+   * Subscribe to notification updates for a specific user.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.notification({ user: "0x..." }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   notification(
     params: NotificationParameters,
     listener: (data: NotificationEvent) => void,
@@ -224,7 +529,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return notification(this.config_, params, listener);
   }
 
-  /** @see {@link openOrders} */
+  /**
+   * Subscribe to open orders updates for a specific user.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.openOrders({ user: "0x..." }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   openOrders(
     params: OpenOrdersParameters,
     listener: (data: OpenOrdersEvent) => void,
@@ -232,7 +559,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return openOrders(this.config_, params, listener);
   }
 
-  /** @see {@link orderUpdates} */
+  /**
+   * Subscribe to order status updates for a specific user.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.orderUpdates({ user: "0x..." }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   orderUpdates(
     params: OrderUpdatesParameters,
     listener: (data: OrderUpdatesEvent) => void,
@@ -240,14 +589,58 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return orderUpdates(this.config_, params, listener);
   }
 
-  /** @see {@link spotAssetCtxs} */
+  /**
+   * Subscribe to context updates for all spot assets.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.spotAssetCtxs((data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   spotAssetCtxs(
     listener: (data: SpotAssetCtxsEvent) => void,
   ): Promise<ISubscription> {
     return spotAssetCtxs(this.config_, listener);
   }
 
-  /** @see {@link spotState} */
+  /**
+   * Subscribe to spot state updates for a specific user.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.spotState({ user: "0x..." }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   spotState(
     params: SpotStateParameters,
     listener: (data: SpotStateEvent) => void,
@@ -255,7 +648,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return spotState(this.config_, params, listener);
   }
 
-  /** @see {@link trades} */
+  /**
+   * Subscribe to real-time trade updates for a specific asset.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.trades({ coin: "ETH" }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   trades(
     params: TradesParameters,
     listener: (data: TradesEvent) => void,
@@ -263,7 +678,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return trades(this.config_, params, listener);
   }
 
-  /** @see {@link twapStates} */
+  /**
+   * Subscribe to TWAP states updates for a specific user.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.twapStates({ user: "0x..." }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   twapStates(
     params: TwapStatesParameters,
     listener: (data: TwapStatesEvent) => void,
@@ -271,7 +708,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return twapStates(this.config_, params, listener);
   }
 
-  /** @see {@link userEvents} */
+  /**
+   * Subscribe to non-order events for a specific user.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.userEvents({ user: "0x..." }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   userEvents(
     params: UserEventsParameters,
     listener: (data: UserEventsEvent) => void,
@@ -279,7 +738,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return userEvents(this.config_, params, listener);
   }
 
-  /** @see {@link userFills} */
+  /**
+   * Subscribe to trade fill updates for a specific user.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.userFills({ user: "0x..." }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   userFills(
     params: UserFillsParameters,
     listener: (data: UserFillsEvent) => void,
@@ -287,7 +768,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return userFills(this.config_, params, listener);
   }
 
-  /** @see {@link userFundings} */
+  /**
+   * Subscribe to funding payment updates for a specific user.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.userFundings({ user: "0x..." }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   userFundings(
     params: UserFundingsParameters,
     listener: (data: UserFundingsEvent) => void,
@@ -295,7 +798,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return userFundings(this.config_, params, listener);
   }
 
-  /** @see {@link userHistoricalOrders} */
+  /**
+   * Subscribe to historical order updates for a specific user.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.userHistoricalOrders({ user: "0x..." }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   userHistoricalOrders(
     params: UserHistoricalOrdersParameters,
     listener: (data: UserHistoricalOrdersEvent) => void,
@@ -303,7 +828,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return userHistoricalOrders(this.config_, params, listener);
   }
 
-  /** @see {@link userNonFundingLedgerUpdates} */
+  /**
+   * Subscribe to non-funding ledger updates for a specific user.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.userNonFundingLedgerUpdates({ user: "0x..." }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   userNonFundingLedgerUpdates(
     params: UserNonFundingLedgerUpdatesParameters,
     listener: (data: UserNonFundingLedgerUpdatesEvent) => void,
@@ -311,7 +858,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return userNonFundingLedgerUpdates(this.config_, params, listener);
   }
 
-  /** @see {@link userTwapHistory} */
+  /**
+   * Subscribe to TWAP order history updates for a specific user.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.userTwapHistory({ user: "0x..." }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   userTwapHistory(
     params: UserTwapHistoryParameters,
     listener: (data: UserTwapHistoryEvent) => void,
@@ -319,7 +888,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return userTwapHistory(this.config_, params, listener);
   }
 
-  /** @see {@link userTwapSliceFills} */
+  /**
+   * Subscribe to TWAP execution updates for a specific user.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.userTwapSliceFills({ user: "0x..." }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   userTwapSliceFills(
     params: UserTwapSliceFillsParameters,
     listener: (data: UserTwapSliceFillsEvent) => void,
@@ -327,7 +918,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return userTwapSliceFills(this.config_, params, listener);
   }
 
-  /** @see {@link webData2} */
+  /**
+   * Subscribe to comprehensive user and market data updates.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.webData2({ user: "0x..." }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   webData2(
     params: WebData2Parameters,
     listener: (data: WebData2Event) => void,
@@ -335,7 +948,29 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     return webData2(this.config_, params, listener);
   }
 
-  /** @see {@link webData3} */
+  /**
+   * Subscribe to comprehensive user and market data updates.
+   *
+   * @param params - Parameters specific to the API subscription.
+   * @param listener - A callback function to be called when the event is received.
+   *
+   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.webData3({ user: "0x..." }, (data) => console.log(data));
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
   webData3(
     params: WebData3Parameters,
     listener: (data: WebData3Event) => void,

@@ -212,7 +212,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     this.config_ = config;
   }
 
-  /** @see {@link activeAssetData} */
+  /**
+   * Request user active asset data.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns User active asset data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.activeAssetData({ user: "0x...", coin: "ETH" });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-active-asset-data
+   */
   activeAssetData(
     params: ActiveAssetDataParameters,
     signal?: AbortSignal,
@@ -220,7 +242,27 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return activeAssetData(this.config_, params, signal);
   }
 
-  /** @see {@link alignedQuoteTokenInfo} */
+  /**
+   * Request supply, rate, and pending payment information for an aligned quote token.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Supply, rate, and pending payment information for an aligned quote token.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.alignedQuoteTokenInfo({ token: 1328 });
+   * ```
+   */
   alignedQuoteTokenInfo(
     params: AlignedQuoteTokenInfoParameters,
     signal?: AbortSignal,
@@ -228,14 +270,57 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return alignedQuoteTokenInfo(this.config_, params, signal);
   }
 
-  /** @see {@link allBorrowLendReserveStates} */
+  /**
+   * Request all borrow/lend reserve states.
+   *
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of tuples of reserve IDs and their borrow/lend reserve state.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.allBorrowLendReserveStates();
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-all-borrow-lend-reserve-states
+   */
   allBorrowLendReserveStates(
     signal?: AbortSignal,
   ): Promise<AllBorrowLendReserveStatesResponse> {
     return allBorrowLendReserveStates(this.config_, signal);
   }
 
-  /** @see {@link allMids} */
+  /**
+   * Request mid coin prices.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Mapping of coin symbols to mid prices.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.allMids();
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-mids-for-all-coins
+   */
   allMids(
     params?: AllMidsParameters,
     signal?: AbortSignal,
@@ -252,14 +337,53 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return allMids(this.config_, params, signal);
   }
 
-  /** @see {@link allPerpMetas} */
+  /**
+   * Request trading metadata for all DEXes.
+   *
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Metadata for perpetual assets across all DEXes.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.allPerpMetas();
+   * ```
+   */
   allPerpMetas(
     signal?: AbortSignal,
   ): Promise<AllPerpMetasResponse> {
     return allPerpMetas(this.config_, signal);
   }
 
-  /** @see {@link blockDetails} */
+  /**
+   * Request block details by block height.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Response containing block information.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.blockDetails({ height: 123 });
+   * ```
+   */
   blockDetails(
     params: BlockDetailsParameters,
     signal?: AbortSignal,
@@ -267,7 +391,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return blockDetails(this.config_, params, signal);
   }
 
-  /** @see {@link borrowLendReserveState} */
+  /**
+   * Request borrow/lend reserve state.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Borrow/lend reserve state.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.borrowLendReserveState({ token: 0 });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-borrow-lend-reserve-state
+   */
   borrowLendReserveState(
     params: BorrowLendReserveStateParameters,
     signal?: AbortSignal,
@@ -275,7 +421,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return borrowLendReserveState(this.config_, params, signal);
   }
 
-  /** @see {@link borrowLendUserState} */
+  /**
+   * Request borrow/lend user state.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns User's borrow/lend state.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.borrowLendUserState({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-borrow-lend-user-state
+   */
   borrowLendUserState(
     params: BorrowLendUserStateParameters,
     signal?: AbortSignal,
@@ -283,7 +451,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return borrowLendUserState(this.config_, params, signal);
   }
 
-  /** @see {@link candleSnapshot} */
+  /**
+   * Request candlestick snapshots.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of candlestick data points.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.candleSnapshot({ coin: "ETH", interval: "1h", startTime: Date.now() - 1000 * 60 * 60 * 24 });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#candle-snapshot
+   */
   candleSnapshot(
     params: CandleSnapshotParameters,
     signal?: AbortSignal,
@@ -291,7 +481,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return candleSnapshot(this.config_, params, signal);
   }
 
-  /** @see {@link clearinghouseState} */
+  /**
+   * Request clearinghouse state.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Account summary for perpetual trading.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.clearinghouseState({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-perpetuals-account-summary
+   */
   clearinghouseState(
     params: ClearinghouseStateParameters,
     signal?: AbortSignal,
@@ -299,7 +511,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return clearinghouseState(this.config_, params, signal);
   }
 
-  /** @see {@link delegations} */
+  /**
+   * Request user staking delegations.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of user's delegations to validators.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.delegations({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-delegations
+   */
   delegations(
     params: DelegationsParameters,
     signal?: AbortSignal,
@@ -307,7 +541,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return delegations(this.config_, params, signal);
   }
 
-  /** @see {@link delegatorHistory} */
+  /**
+   * Request user staking history.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of records of staking events by a delegator.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.delegatorHistory({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-history
+   */
   delegatorHistory(
     params: DelegatorHistoryParameters,
     signal?: AbortSignal,
@@ -315,7 +571,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return delegatorHistory(this.config_, params, signal);
   }
 
-  /** @see {@link delegatorRewards} */
+  /**
+   * Request user staking rewards.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of rewards received from staking activities.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.delegatorRewards({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-rewards
+   */
   delegatorRewards(
     params: DelegatorRewardsParameters,
     signal?: AbortSignal,
@@ -323,7 +601,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return delegatorRewards(this.config_, params, signal);
   }
 
-  /** @see {@link delegatorSummary} */
+  /**
+   * Request user's staking summary.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns User's staking summary.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.delegatorSummary({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-summary
+   */
   delegatorSummary(
     params: DelegatorSummaryParameters,
     signal?: AbortSignal,
@@ -331,14 +631,53 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return delegatorSummary(this.config_, params, signal);
   }
 
-  /** @see {@link exchangeStatus} */
+  /**
+   * Request exchange system status information.
+   *
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Exchange system status information.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.exchangeStatus();
+   * ```
+   */
   exchangeStatus(
     signal?: AbortSignal,
   ): Promise<ExchangeStatusResponse> {
     return exchangeStatus(this.config_, signal);
   }
 
-  /** @see {@link extraAgents} */
+  /**
+   * Request user extra agents.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of extra agent details for a user.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.extraAgents({ user: "0x..." });
+   * ```
+   */
   extraAgents(
     params: ExtraAgentsParameters,
     signal?: AbortSignal,
@@ -346,7 +685,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return extraAgents(this.config_, params, signal);
   }
 
-  /** @see {@link frontendOpenOrders} */
+  /**
+   * Request frontend open orders.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of open orders with additional display information.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.frontendOpenOrders({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders-with-additional-frontend-info
+   */
   frontendOpenOrders(
     params: FrontendOpenOrdersParameters,
     signal?: AbortSignal,
@@ -354,7 +715,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return frontendOpenOrders(this.config_, params, signal);
   }
 
-  /** @see {@link fundingHistory} */
+  /**
+   * Request funding history.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of historical funding rate records for an asset.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.fundingHistory({ coin: "ETH", startTime: Date.now() - 1000 * 60 * 60 * 24 });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-historical-funding-rates
+   */
   fundingHistory(
     params: FundingHistoryParameters,
     signal?: AbortSignal,
@@ -362,14 +745,55 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return fundingHistory(this.config_, params, signal);
   }
 
-  /** @see {@link gossipRootIps} */
+  /**
+   * Request gossip root IPs.
+   *
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of gossip root IPs.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.gossipRootIps();
+   * ```
+   */
   gossipRootIps(
     signal?: AbortSignal,
   ): Promise<GossipRootIpsResponse> {
     return gossipRootIps(this.config_, signal);
   }
 
-  /** @see {@link historicalOrders} */
+  /**
+   * Request user historical orders.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of frontend orders with current processing status.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.historicalOrders({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-historical-orders
+   */
   historicalOrders(
     params: HistoricalOrdersParameters,
     signal?: AbortSignal,
@@ -377,7 +801,27 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return historicalOrders(this.config_, params, signal);
   }
 
-  /** @see {@link isVip} */
+  /**
+   * Request to check if a user is a VIP.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Boolean indicating user's VIP status.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.isVip({ user: "0x..." });
+   * ```
+   */
   isVip(
     params: IsVipParameters,
     signal?: AbortSignal,
@@ -385,7 +829,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return isVip(this.config_, params, signal);
   }
 
-  /** @see {@link l2Book} */
+  /**
+   * Request L2 order book.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns L2 order book snapshot.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.l2Book({ coin: "ETH", nSigFigs: 2 });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#l2-book-snapshot
+   */
   l2Book(
     params: L2BookParameters,
     signal?: AbortSignal,
@@ -393,7 +859,27 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return l2Book(this.config_, params, signal);
   }
 
-  /** @see {@link leadingVaults} */
+  /**
+   * Request leading vaults for a user.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of leading vaults for a user.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.leadingVaults({ user: "0x..." });
+   * ```
+   */
   leadingVaults(
     params: LeadingVaultsParameters,
     signal?: AbortSignal,
@@ -401,7 +887,27 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return leadingVaults(this.config_, params, signal);
   }
 
-  /** @see {@link legalCheck} */
+  /**
+   * Request legal verification status of a user.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Legal verification status for a user.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.legalCheck({ user: "0x..." });
+   * ```
+   */
   legalCheck(
     params: LegalCheckParameters,
     signal?: AbortSignal,
@@ -409,14 +915,53 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return legalCheck(this.config_, params, signal);
   }
 
-  /** @see {@link liquidatable} */
+  /**
+   * Request liquidatable.
+   *
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns unknown
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.liquidatable();
+   * ```
+   */
   liquidatable(
     signal?: AbortSignal,
   ): Promise<LiquidatableResponse> {
     return liquidatable(this.config_, signal);
   }
 
-  /** @see {@link marginTable} */
+  /**
+   * Request margin table data.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Margin requirements table with multiple tiers.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.marginTable({ id: 1 });
+   * ```
+   */
   marginTable(
     params: MarginTableParameters,
     signal?: AbortSignal,
@@ -424,7 +969,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return marginTable(this.config_, params, signal);
   }
 
-  /** @see {@link maxBuilderFee} */
+  /**
+   * Request builder fee approval.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Maximum builder fee approval.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.maxBuilderFee({ user: "0x...", builder: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#check-builder-fee-approval
+   */
   maxBuilderFee(
     params: MaxBuilderFeeParameters,
     signal?: AbortSignal,
@@ -432,14 +999,55 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return maxBuilderFee(this.config_, params, signal);
   }
 
-  /** @see {@link maxMarketOrderNtls} */
+  /**
+   * Request maximum market order notionals.
+   *
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Maximum market order notionals.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.maxMarketOrderNtls();
+   * ```
+   */
   maxMarketOrderNtls(
     signal?: AbortSignal,
   ): Promise<MaxMarketOrderNtlsResponse> {
     return maxMarketOrderNtls(this.config_, signal);
   }
 
-  /** @see {@link meta} */
+  /**
+   * Request trading metadata.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Metadata for perpetual assets.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.meta();
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-metadata-universe-and-margin-tables
+   */
   meta(
     params?: MetaParameters,
     signal?: AbortSignal,
@@ -456,7 +1064,28 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return meta(this.config_, params, signal);
   }
 
-  /** @see {@link metaAndAssetCtxs} */
+  /**
+   * Request metadata and asset contexts.
+   *
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Metadata and context for perpetual assets.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.metaAndAssetCtxs();
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-asset-contexts-includes-mark-price-current-funding-open-interest-etc
+   */
   metaAndAssetCtxs(
     params?: MetaAndAssetCtxsParameters,
     signal?: AbortSignal,
@@ -473,7 +1102,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return metaAndAssetCtxs(this.config_, params, signal);
   }
 
-  /** @see {@link openOrders} */
+  /**
+   * Request open orders.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of open orders.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.openOrders({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders
+   */
   openOrders(
     params: OpenOrdersParameters,
     signal?: AbortSignal,
@@ -481,7 +1132,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return openOrders(this.config_, params, signal);
   }
 
-  /** @see {@link orderStatus} */
+  /**
+   * Request order status.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Order status response.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.orderStatus({ user: "0x...", oid: 12345 });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-order-status-by-oid-or-cloid
+   */
   orderStatus(
     params: OrderStatusParameters,
     signal?: AbortSignal,
@@ -489,14 +1162,57 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return orderStatus(this.config_, params, signal);
   }
 
-  /** @see {@link perpDeployAuctionStatus} */
+  /**
+   * Request for the status of the perpetual deploy auction.
+   *
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Status of the perpetual deploy auction.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.perpDeployAuctionStatus();
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-information-about-the-perp-deploy-auction
+   */
   perpDeployAuctionStatus(
     signal?: AbortSignal,
   ): Promise<PerpDeployAuctionStatusResponse> {
     return perpDeployAuctionStatus(this.config_, signal);
   }
 
-  /** @see {@link perpDexLimits} */
+  /**
+   * Request builder deployed perpetual market limits.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Builder deployed perpetual market limits.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.perpDexLimits({ dex: "test" });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-builder-deployed-perp-market-limits
+   */
   perpDexLimits(
     params: PerpDexLimitsParameters,
     signal?: AbortSignal,
@@ -504,14 +1220,57 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return perpDexLimits(this.config_, params, signal);
   }
 
-  /** @see {@link perpDexs} */
+  /**
+   * Request all perpetual dexs.
+   *
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of perpetual dexes (null is main dex).
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.perpDexs();
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-all-perpetual-dexs
+   */
   perpDexs(
     signal?: AbortSignal,
   ): Promise<PerpDexsResponse> {
     return perpDexs(this.config_, signal);
   }
 
-  /** @see {@link perpDexStatus} */
+  /**
+   * Request perp DEX status.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - An {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} can be used to cancel the request.
+   *
+   * @returns Status of a perp DEX.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.perpDexStatus({ dex: "test" });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#get-perp-market-status
+   */
   perpDexStatus(
     params: PerpDexStatusParameters,
     signal?: AbortSignal,
@@ -519,7 +1278,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return perpDexStatus(this.config_, params, signal);
   }
 
-  /** @see {@link perpsAtOpenInterestCap} */
+  /**
+   * Request perpetuals at open interest cap.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of perpetuals at open interest caps.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.perpsAtOpenInterestCap();
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#query-perps-at-open-interest-caps
+   */
   perpsAtOpenInterestCap(
     params?: PerpsAtOpenInterestCapParameters,
     signal?: AbortSignal,
@@ -536,7 +1317,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return perpsAtOpenInterestCap(this.config_, params, signal);
   }
 
-  /** @see {@link portfolio} */
+  /**
+   * Request user portfolio.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Portfolio metrics grouped by time periods.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.portfolio({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-portfolio
+   */
   portfolio(
     params: PortfolioParameters,
     signal?: AbortSignal,
@@ -544,14 +1347,55 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return portfolio(this.config_, params, signal);
   }
 
-  /** @see {@link predictedFundings} */
+  /**
+   * Request predicted funding rates.
+   *
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of predicted funding rates.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.predictedFundings();
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-predicted-funding-rates-for-different-venues
+   */
   predictedFundings(
     signal?: AbortSignal,
   ): Promise<PredictedFundingsResponse> {
     return predictedFundings(this.config_, signal);
   }
 
-  /** @see {@link preTransferCheck} */
+  /**
+   * Request user existence check before transfer.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Pre-transfer user existence check result.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.preTransferCheck({ user: "0x...", source: "0x..." });
+   * ```
+   */
   preTransferCheck(
     params: PreTransferCheckParameters,
     signal?: AbortSignal,
@@ -559,7 +1403,27 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return preTransferCheck(this.config_, params, signal);
   }
 
-  /** @see {@link recentTrades} */
+  /**
+   * Request recent trades.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of recent trades.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.recentTrades({ coin: "ETH" });
+   * ```
+   */
   recentTrades(
     params: RecentTradesParameters,
     signal?: AbortSignal,
@@ -567,7 +1431,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return recentTrades(this.config_, params, signal);
   }
 
-  /** @see {@link referral} */
+  /**
+   * Request user referral.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Referral details for a user.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.referral({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-referral-information
+   */
   referral(
     params: ReferralParameters,
     signal?: AbortSignal,
@@ -575,7 +1461,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return referral(this.config_, params, signal);
   }
 
-  /** @see {@link spotClearinghouseState} */
+  /**
+   * Request spot clearinghouse state.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Account summary for spot trading.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.spotClearinghouseState({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-a-users-token-balances
+   */
   spotClearinghouseState(
     params: SpotClearinghouseStateParameters,
     signal?: AbortSignal,
@@ -583,7 +1491,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return spotClearinghouseState(this.config_, params, signal);
   }
 
-  /** @see {@link spotDeployState} */
+  /**
+   * Request spot deploy state.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Deploy state for spot tokens.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.spotDeployState({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-deploy-auction
+   */
   spotDeployState(
     params: SpotDeployStateParameters,
     signal?: AbortSignal,
@@ -591,28 +1521,113 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return spotDeployState(this.config_, params, signal);
   }
 
-  /** @see {@link spotMeta} */
+  /**
+   * Request spot trading metadata.
+   *
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Metadata for spot assets.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.spotMeta();
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-metadata
+   */
   spotMeta(
     signal?: AbortSignal,
   ): Promise<SpotMetaResponse> {
     return spotMeta(this.config_, signal);
   }
 
-  /** @see {@link spotMetaAndAssetCtxs} */
+  /**
+   * Request spot metadata and asset contexts.
+   *
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Metadata and context for spot assets.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.spotMetaAndAssetCtxs();
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-asset-contexts
+   */
   spotMetaAndAssetCtxs(
     signal?: AbortSignal,
   ): Promise<SpotMetaAndAssetCtxsResponse> {
     return spotMetaAndAssetCtxs(this.config_, signal);
   }
 
-  /** @see {@link spotPairDeployAuctionStatus} */
+  /**
+   * Request for the status of the spot deploy auction.
+   *
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Status of the spot deploy auction.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.spotPairDeployAuctionStatus();
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-pair-deploy-auction
+   */
   spotPairDeployAuctionStatus(
     signal?: AbortSignal,
   ): Promise<SpotPairDeployAuctionStatusResponse> {
     return spotPairDeployAuctionStatus(this.config_, signal);
   }
 
-  /** @see {@link subAccounts} */
+  /**
+   * Request user sub-accounts.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of user sub-account or null if the user does not have any sub-accounts.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.subAccounts({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-subaccounts
+   */
   subAccounts(
     params: SubAccountsParameters,
     signal?: AbortSignal,
@@ -620,7 +1635,27 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return subAccounts(this.config_, params, signal);
   }
 
-  /** @see {@link subAccounts2} */
+  /**
+   * Request user sub-accounts V2.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of user sub-account or null if the user does not have any sub-accounts.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.subAccounts2({ user: "0x..." });
+   * ```
+   */
   subAccounts2(
     params: SubAccounts2Parameters,
     signal?: AbortSignal,
@@ -628,7 +1663,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return subAccounts2(this.config_, params, signal);
   }
 
-  /** @see {@link tokenDetails} */
+  /**
+   * Request token details.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Details of a token.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.tokenDetails({ tokenId: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-a-token
+   */
   tokenDetails(
     params: TokenDetailsParameters,
     signal?: AbortSignal,
@@ -636,7 +1693,27 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return tokenDetails(this.config_, params, signal);
   }
 
-  /** @see {@link twapHistory} */
+  /**
+   * Request twap history of a user.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of user's TWAP history.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.twapHistory({ user: "0x..." });
+   * ```
+   */
   twapHistory(
     params: TwapHistoryParameters,
     signal?: AbortSignal,
@@ -644,7 +1721,27 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return twapHistory(this.config_, params, signal);
   }
 
-  /** @see {@link txDetails} */
+  /**
+   * Request transaction details by transaction hash.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Transaction details.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.txDetails({ hash: "0x..." });
+   * ```
+   */
   txDetails(
     params: TxDetailsParameters,
     signal?: AbortSignal,
@@ -652,7 +1749,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return txDetails(this.config_, params, signal);
   }
 
-  /** @see {@link userBorrowLendInterest} */
+  /**
+   * Request borrow/lend user interest.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns User's borrow/lend interest.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.userBorrowLendInterest({ user: "0x...", startTime: 1725991229384 });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-borrow-lend-user-state
+   */
   userBorrowLendInterest(
     params: UserBorrowLendInterestParameters,
     signal?: AbortSignal,
@@ -660,7 +1779,27 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return userBorrowLendInterest(this.config_, params, signal);
   }
 
-  /** @see {@link userDetails} */
+  /**
+   * Request array of user transaction details.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of user transaction details.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.userDetails({ user: "0x..." });
+   * ```
+   */
   userDetails(
     params: UserDetailsParameters,
     signal?: AbortSignal,
@@ -668,7 +1807,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return userDetails(this.config_, params, signal);
   }
 
-  /** @see {@link userDexAbstraction} */
+  /**
+   * Request user HIP-3 DEX abstraction state.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns User HIP-3 DEX abstraction state.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.userDexAbstraction({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-hip-3-dex-abstraction-state
+   */
   userDexAbstraction(
     params: UserDexAbstractionParameters,
     signal?: AbortSignal,
@@ -676,7 +1837,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return userDexAbstraction(this.config_, params, signal);
   }
 
-  /** @see {@link userFees} */
+  /**
+   * Request user fees.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns User fees.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.userFees({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-fees
+   */
   userFees(
     params: UserFeesParameters,
     signal?: AbortSignal,
@@ -684,7 +1867,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return userFees(this.config_, params, signal);
   }
 
-  /** @see {@link userFills} */
+  /**
+   * Request array of user fills.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of user trade fills.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.userFills({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills
+   */
   userFills(
     params: UserFillsParameters,
     signal?: AbortSignal,
@@ -692,7 +1897,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return userFills(this.config_, params, signal);
   }
 
-  /** @see {@link userFillsByTime} */
+  /**
+   * Request array of user fills by time.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of user trade fills by time.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.userFillsByTime({ user: "0x...", startTime: Date.now() - 1000 * 60 * 60 * 24 });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills-by-time
+   */
   userFillsByTime(
     params: UserFillsByTimeParameters,
     signal?: AbortSignal,
@@ -700,7 +1927,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return userFillsByTime(this.config_, params, signal);
   }
 
-  /** @see {@link userFunding} */
+  /**
+   * Request array of user funding ledger updates.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of user funding ledger updates.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.userFunding({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates
+   */
   userFunding(
     params: UserFundingParameters,
     signal?: AbortSignal,
@@ -708,7 +1957,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return userFunding(this.config_, params, signal);
   }
 
-  /** @see {@link userNonFundingLedgerUpdates} */
+  /**
+   * Request user non-funding ledger updates.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of user's non-funding ledger update.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.userNonFundingLedgerUpdates({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates
+   */
   userNonFundingLedgerUpdates(
     params: UserNonFundingLedgerUpdatesParameters,
     signal?: AbortSignal,
@@ -716,7 +1987,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return userNonFundingLedgerUpdates(this.config_, params, signal);
   }
 
-  /** @see {@link userRateLimit} */
+  /**
+   * Request user rate limits.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns User rate limits.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.userRateLimit({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-rate-limits
+   */
   userRateLimit(
     params: UserRateLimitParameters,
     signal?: AbortSignal,
@@ -724,7 +2017,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return userRateLimit(this.config_, params, signal);
   }
 
-  /** @see {@link userRole} */
+  /**
+   * Request user role.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns User role.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.userRole({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-role
+   */
   userRole(
     params: UserRoleParameters,
     signal?: AbortSignal,
@@ -732,7 +2047,27 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return userRole(this.config_, params, signal);
   }
 
-  /** @see {@link userToMultiSigSigners} */
+  /**
+   * Request multi-sig signers for a user.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Multi-sig signers for a user or null if the user does not have any multi-sig signers.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.userToMultiSigSigners({ user: "0x..." });
+   * ```
+   */
   userToMultiSigSigners(
     params: UserToMultiSigSignersParameters,
     signal?: AbortSignal,
@@ -740,7 +2075,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return userToMultiSigSigners(this.config_, params, signal);
   }
 
-  /** @see {@link userTwapSliceFills} */
+  /**
+   * Request user TWAP slice fills.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of user's twap slice fills.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.userTwapSliceFills({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills
+   */
   userTwapSliceFills(
     params: UserTwapSliceFillsParameters,
     signal?: AbortSignal,
@@ -748,7 +2105,27 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return userTwapSliceFills(this.config_, params, signal);
   }
 
-  /** @see {@link userTwapSliceFillsByTime} */
+  /**
+   * Request user TWAP slice fills by time.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of user's twap slice fill by time.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.userTwapSliceFillsByTime({ user: "0x...", startTime: Date.now() - 1000 * 60 * 60 * 24 });
+   * ```
+   */
   userTwapSliceFillsByTime(
     params: UserTwapSliceFillsByTimeParameters,
     signal?: AbortSignal,
@@ -756,7 +2133,29 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return userTwapSliceFillsByTime(this.config_, params, signal);
   }
 
-  /** @see {@link userVaultEquities} */
+  /**
+   * Request user vault deposits.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of user's vault deposits.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.userVaultEquities({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-vault-deposits
+   */
   userVaultEquities(
     params: UserVaultEquitiesParameters,
     signal?: AbortSignal,
@@ -764,21 +2163,81 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return userVaultEquities(this.config_, params, signal);
   }
 
-  /** @see {@link validatorL1Votes} */
+  /**
+   * Request validator L1 votes.
+   *
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of L1 governance votes cast by validators.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.validatorL1Votes();
+   * ```
+   */
   validatorL1Votes(
     signal?: AbortSignal,
   ): Promise<ValidatorL1VotesResponse> {
     return validatorL1Votes(this.config_, signal);
   }
 
-  /** @see {@link validatorSummaries} */
+  /**
+   * Request validator summaries.
+   *
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of validator performance statistics.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.validatorSummaries();
+   * ```
+   */
   validatorSummaries(
     signal?: AbortSignal,
   ): Promise<ValidatorSummariesResponse> {
     return validatorSummaries(this.config_, signal);
   }
 
-  /** @see {@link vaultDetails} */
+  /**
+   * Request details of a vault.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Details of a vault or null if the vault does not exist.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.vaultDetails({ vaultAddress: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-details-for-a-vault
+   */
   vaultDetails(
     params: VaultDetailsParameters,
     signal?: AbortSignal,
@@ -786,14 +2245,53 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     return vaultDetails(this.config_, params, signal);
   }
 
-  /** @see {@link vaultSummaries} */
+  /**
+   * Request a list of vaults less than 2 hours old.
+   *
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Array of vaults less than 2 hours old.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.vaultSummaries();
+   * ```
+   */
   vaultSummaries(
     signal?: AbortSignal,
   ): Promise<VaultSummariesResponse> {
     return vaultSummaries(this.config_, signal);
   }
 
-  /** @see {@link webData2} */
+  /**
+   * Request comprehensive user and market data.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   *
+   * @returns Comprehensive user and market data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.webData2({ user: "0x..." });
+   * ```
+   */
   webData2(
     params: WebData2Parameters,
     signal?: AbortSignal,
