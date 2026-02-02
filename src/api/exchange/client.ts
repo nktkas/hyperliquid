@@ -837,8 +837,11 @@ export type {
 export type { UsdSendOptions, UsdSendParameters, UsdSendSuccessResponse } from "./_methods/usdSend.ts";
 export type {
   UserDexAbstractionOptions,
+  UserDexAbstractionOptions as UserDexAbstractionExchangeOptions,
   UserDexAbstractionParameters,
+  UserDexAbstractionParameters as UserDexAbstractionExchangeParameters,
   UserDexAbstractionSuccessResponse,
+  UserDexAbstractionSuccessResponse as UserDexAbstractionExchangeSuccessResponse,
 } from "./_methods/userDexAbstraction.ts";
 export type {
   UserPortfolioMarginOptions,
