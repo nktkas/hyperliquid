@@ -82,6 +82,7 @@ export * from "./_methods/usdClassTransfer.ts";
 export * from "./_methods/usdSend.ts";
 export * from "./_methods/userDexAbstraction.ts";
 export * from "./_methods/userPortfolioMargin.ts";
+export * from "./_methods/userSetAbstraction.ts";
 export * from "./_methods/validatorL1Stream.ts";
 export * from "./_methods/vaultDistribute.ts";
 export * from "./_methods/vaultModify.ts";

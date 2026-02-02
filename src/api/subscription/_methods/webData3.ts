@@ -77,7 +77,7 @@ export const WebData3Event = /* @__PURE__ */ (() => {
           ),
           /** Abstraction mode for the user account. */
           abstraction: v.pipe(
-            v.optional(v.picklist(["dexAbstraction", "disabled"])),
+            v.optional(v.picklist(["dexAbstraction", "unifiedAccount", "disabled"])),
             v.description("Abstraction mode for the user account."),
           ),
         }),

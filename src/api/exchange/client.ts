@@ -225,6 +225,12 @@ import {
   type UserDexAbstractionSuccessResponse,
 } from "./_methods/userDexAbstraction.ts";
 import {
+  userSetAbstraction,
+  type UserSetAbstractionOptions,
+  type UserSetAbstractionParameters,
+  type UserSetAbstractionSuccessResponse,
+} from "./_methods/userSetAbstraction.ts";
+import {
   userPortfolioMargin,
   type UserPortfolioMarginOptions,
   type UserPortfolioMarginParameters,
@@ -656,6 +662,14 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return userDexAbstraction(this.config_, params, opts);
   }
 
+  /** @see {@link userSetAbstraction} */
+  userSetAbstraction(
+    params: UserSetAbstractionParameters,
+    opts?: UserSetAbstractionOptions,
+  ): Promise<UserSetAbstractionSuccessResponse> {
+    return userSetAbstraction(this.config_, params, opts);
+  }
+
   /** @see {@link userPortfolioMargin} */
   userPortfolioMargin(
     params: UserPortfolioMarginParameters,
@@ -840,6 +854,11 @@ export type {
   UserDexAbstractionParameters,
   UserDexAbstractionSuccessResponse,
 } from "./_methods/userDexAbstraction.ts";
+export type {
+  UserSetAbstractionOptions,
+  UserSetAbstractionParameters,
+  UserSetAbstractionSuccessResponse,
+} from "./_methods/userSetAbstraction.ts";
 export type {
   UserPortfolioMarginOptions,
   UserPortfolioMarginParameters,
