@@ -3,7 +3,8 @@
   "version": "0.30.3",
   "license": "MIT",
   "tasks": {
-    "check:jsdoc": "deno run -A .dev/jsdoc_sync_check.ts"
+    "check:jsdoc": "deno run -A .dev/jsdoc_sync_check.ts",
+    "check:cli-help": "deno run -A .dev/cli_help_sync_check.ts"
   },
   "exports": {
     ".": "./src/mod.ts",

@@ -23,3 +23,6 @@ jobs:
 
       - name: jsdoc sync
         run: deno task check:jsdoc
+
+      - name: cli help sync
+        run: deno task check:cli-help

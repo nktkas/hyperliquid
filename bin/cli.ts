@@ -145,8 +145,8 @@ User Account:
   subAccounts2            --user <address>
   userDexAbstraction      --user <address>
   userFees                --user <address>
-  userFunding             --user <address> --startTime <number> [--endTime <number>]
-  userNonFundingLedgerUpdates  --user <address> --startTime <number> [--endTime <number>]
+  userFunding             --user <address> [--startTime <number>] [--endTime <number>]
+  userNonFundingLedgerUpdates  --user <address> [--startTime <number>] [--endTime <number>]
   userRateLimit           --user <address>
   userRole                --user <address>
   userToMultiSigSigners   --user <address>
@@ -261,25 +261,36 @@ Staking & Delegation:
 
 Vault:
   createVault             --name <string> --description <string> --initialUsd <number>
+                          --nonce <number>
   vaultDistribute         --vaultAddress <address> --usd <number>
   vaultModify             --vaultAddress <address> [--allowDeposits <bool>]
                           [--alwaysCloseOnWithdraw <bool>]
   vaultTransfer           --vaultAddress <address> --isDeposit <bool> --usd <number>
 
 Deploy Market:
-  perpDeploy              --<action> <json>
-  spotDeploy              --<action> <json>
+  perpDeploy              [--registerAsset2 <json>] [--registerAsset <json>]
+                          [--setOracle <json>] [--setFundingMultipliers <json>]
+                          [--haltTrading <json>] [--setMarginTableIds <json>]
+                          [--setFeeRecipient <json>] [--setOpenInterestCaps <json>]
+                          [--setSubDeployers <json>] [--setMarginModes <json>]
+                          [--setFeeScale <json>] [--setGrowthModes <json>]
+  spotDeploy              [--registerToken2 <json>] [--userGenesis <json>]
+                          [--genesis <json>] [--registerSpot <json>]
+                          [--registerHyperliquidity <json>]
+                          [--setDeployerTradingFeeShare <json>]
+                          [--enableQuoteToken <json>] [--enableAlignedQuoteToken <json>]
 
 Validator Actions:
-  cSignerAction           --jailSelf null | --unjailSelf null
-  cValidatorAction        --<action> <json>
+  cSignerAction           [--jailSelf <null>] [--unjailSelf <null>]
+  cValidatorAction        [--changeProfile <json>] [--register <json>]
+                          [--unregister <null>]
   validatorL1Stream       --riskFreeRate <number>
 
 Earn:
   borrowLend              --operation <supply|withdraw> --token <number> --amount <number|null>
 
 Other:
-  convertToMultiSigUser   --authorizedUsers <json> --threshold <number>
+  convertToMultiSigUser   --signers <json>
 
 =============================================================================
 
