@@ -26,7 +26,7 @@ import * as hlSubscription from "@nktkas/hyperliquid/api/subscription";
 import type { AbstractWallet } from "@nktkas/hyperliquid/signing";
 import { convert } from "npm:@openapi-contrib/json-schema-to-openapi-schema@4";
 import { type ConversionConfig, type JsonSchema, toJsonSchema } from "jsr:@valibot/to-json-schema@1";
-import * as path from "jsr:@std/path@^1";
+import * as path from "jsr:@std/path@1";
 
 import { enrichJsonSchema } from "./schemaEnricher.ts";
 import { parseFunctionJSDocFromFile, parseJSDocFromFile } from "./jsdocParser.ts";
