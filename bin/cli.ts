@@ -22,6 +22,7 @@
 
 // @ts-ignore: Ignore missing TS types when building npm
 import process from "node:process";
+import { bold, dim } from "@std/fmt/colors";
 import { type Args, extractArgs, transformArgs } from "./_utils.ts";
 import { ExchangeClient, HttpTransport, InfoClient } from "../src/mod.ts";
 import { PrivateKeySigner } from "../src/signing/mod.ts";
@@ -87,246 +88,261 @@ async function executeEndpointMethod(endpoint: string, method: string, args: Arg
 // ============================================================
 
 /** Prints CLI help message with usage instructions, available endpoints, methods, and examples. */
+// deno-fmt-ignore
 function printHelp(): void {
-  console.log(`Hyperliquid CLI
+  // Color scheme: Minimal (git-style)
+  // Respect NO_COLOR standard (https://no-color.org/)
+  const noColor = "NO_COLOR" in process.env;
+  const title = noColor ? (s: string) => s : (s: string) => bold(s);
+  const separator = noColor ? (s: string) => s : (s: string) => dim(s);
+  const sectionHeader = noColor ? (s: string) => s : (s: string) => bold(s);
+  const category = noColor ? (s: string) => s : (s: string) => bold(s);
+  const method = (s: string) => s;
+  const params = noColor ? (s: string) => s : (s: string) => dim(s);
+  const flag = noColor ? (s: string) => s : (s: string) => bold(s);
+  const desc = noColor ? (s: string) => s : (s: string) => dim(s);
+  const comment = noColor ? (s: string) => s : (s: string) => dim(s);
+  const cmd = (s: string) => s;
+  const label = noColor ? (s: string) => s : (s: string) => dim(s);
 
-Usage:
-  npx @nktkas/hyperliquid <endpoint> <method> [options]
+  const sep = separator("=".repeat(77));
 
-Endpoints:
-  info      - Query blockchain and market information
-  exchange  - Execute trading operations (requires --private-key)
+  console.log(`${title("Hyperliquid CLI")}
 
-Common Options:
-  --testnet               Use testnet instead of mainnet
-  --timeout <number>      Request timeout in milliseconds (default: 10000)
-  --help, -h              Show this help message
-  --offline               Generate transactions offline without broadcasting
+${label("Usage:")}
+  ${cmd("npx @nktkas/hyperliquid")} ${params("<endpoint> <method> [options]")}
 
-Exchange Options:
-  --private-key <key>     Private key for exchange operations (required)
-  --vault <address>       Vault address for operations
+${label("Endpoints:")}
+  ${flag("info")}      ${desc("- Query blockchain and market information")}
+  ${flag("exchange")}  ${desc("- Execute trading operations (requires")} ${flag("--private-key")}${desc(")")}
 
-=============================================================================
-INFO ENDPOINT METHODS
-=============================================================================
+${label("Common Options:")}
+  ${flag("--testnet")}            ${desc("Use testnet instead of mainnet")}
+  ${flag("--timeout")} ${params("<number>")}   ${desc("Request timeout in milliseconds (default: 10000)")}
+  ${flag("--help")}, ${flag("-h")}           ${desc("Show this help message")}
+  ${flag("--offline")}            ${desc("Generate transactions offline without broadcasting")}
 
-Market Data:
-  alignedQuoteTokenInfo   --token <number>
-  allMids                 [--dex <string>]
-  allPerpMetas            (no params)
-  candleSnapshot          --coin <string> --interval <1m|3m|5m|15m|30m|1h|2h|4h|8h|12h|1d|3d|1w|1M>
-                          --startTime <number> [--endTime <number>]
-  fundingHistory          --coin <string> --startTime <number> [--endTime <number>]
-  l2Book                  --coin <string> [--nSigFigs <2|3|4|5>] [--mantissa <2|5>]
-  liquidatable            (no params)
-  marginTable             --id <number>
-  maxMarketOrderNtls      (no params)
-  meta                    [--dex <string>]
-  metaAndAssetCtxs        [--dex <string>]
-  perpsAtOpenInterestCap  [--dex <string>]
-  predictedFundings       (no params)
-  recentTrades            --coin <string>
-  spotMeta                (no params)
-  spotMetaAndAssetCtxs    (no params)
+${label("Exchange Options:")}
+  ${flag("--private-key")} ${params("<key>")}  ${desc("Private key for exchange operations (required)")}
+  ${flag("--vault")} ${params("<address>")}    ${desc("Vault address for operations")}
 
-User Account:
-  activeAssetData         --user <address> --coin <string>
-  clearinghouseState      --user <address> [--dex <string>]
-  extraAgents             --user <address>
-  isVip                   --user <address>
-  legalCheck              --user <address>
-  maxBuilderFee           --user <address> --builder <address>
-  portfolio               --user <address>
-  preTransferCheck        --user <address> --source <address>
-  referral                --user <address>
-  spotClearinghouseState  --user <address> [--dex <string>]
-  subAccounts             --user <address>
-  subAccounts2            --user <address>
-  userDexAbstraction      --user <address>
-  userFees                --user <address>
-  userFunding             --user <address> [--startTime <number>] [--endTime <number>]
-  userNonFundingLedgerUpdates  --user <address> [--startTime <number>] [--endTime <number>]
-  userRateLimit           --user <address>
-  userRole                --user <address>
-  userToMultiSigSigners   --user <address>
-  webData2                --user <address>
+${sep}
+${sectionHeader("INFO ENDPOINT METHODS")}
+${sep}
 
-Orders & TWAP & Position:
-  frontendOpenOrders      --user <address> [--dex <string>]
-  historicalOrders        --user <address>
-  openOrders              --user <address> [--dex <string>]
-  orderStatus             --user <address> --oid <number|hex>
-  twapHistory             --user <address>
-  userFills               --user <address> [--aggregateByTime <bool>]
-  userFillsByTime         --user <address> --startTime <number>
-                          [--endTime <number>] [--aggregateByTime <bool>]
-  userTwapSliceFills           --user <address>
-  userTwapSliceFillsByTime     --user <address> --startTime <number>
-                               [--endTime <number>] [--aggregateByTime <bool>]
+${category("Market Data:")}
+  ${method("alignedQuoteTokenInfo")}   ${params("--token <number>")}
+  ${method("allMids")}                 ${params("[--dex <string>]")}
+  ${method("allPerpMetas")}            ${params("(no params)")}
+  ${method("candleSnapshot")}          ${params("--coin <string> --interval <1m|3m|5m|15m|30m|1h|2h|4h|8h|12h|1d|3d|1w|1M>")}
+                          ${params("--startTime <number> [--endTime <number>]")}
+  ${method("fundingHistory")}          ${params("--coin <string> --startTime <number> [--endTime <number>]")}
+  ${method("l2Book")}                  ${params("--coin <string> [--nSigFigs <2|3|4|5>] [--mantissa <2|5>]")}
+  ${method("liquidatable")}            ${params("(no params)")}
+  ${method("marginTable")}             ${params("--id <number>")}
+  ${method("maxMarketOrderNtls")}      ${params("(no params)")}
+  ${method("meta")}                    ${params("[--dex <string>]")}
+  ${method("metaAndAssetCtxs")}        ${params("[--dex <string>]")}
+  ${method("perpsAtOpenInterestCap")}  ${params("[--dex <string>]")}
+  ${method("predictedFundings")}       ${params("(no params)")}
+  ${method("recentTrades")}            ${params("--coin <string>")}
+  ${method("spotMeta")}                ${params("(no params)")}
+  ${method("spotMetaAndAssetCtxs")}    ${params("(no params)")}
 
-Delegation & Validators:
-  delegations             --user <address>
-  delegatorHistory        --user <address>
-  delegatorRewards        --user <address>
-  delegatorSummary        --user <address>
-  gossipRootIps           (no params)
-  validatorL1Votes        (no params)
-  validatorSummaries      (no params)
+${category("User Account:")}
+  ${method("activeAssetData")}              ${params("--user <address> --coin <string>")}
+  ${method("clearinghouseState")}           ${params("--user <address> [--dex <string>]")}
+  ${method("extraAgents")}                  ${params("--user <address>")}
+  ${method("isVip")}                        ${params("--user <address>")}
+  ${method("legalCheck")}                   ${params("--user <address>")}
+  ${method("maxBuilderFee")}                ${params("--user <address> --builder <address>")}
+  ${method("portfolio")}                    ${params("--user <address>")}
+  ${method("preTransferCheck")}             ${params("--user <address> --source <address>")}
+  ${method("referral")}                     ${params("--user <address>")}
+  ${method("spotClearinghouseState")}       ${params("--user <address> [--dex <string>]")}
+  ${method("subAccounts")}                  ${params("--user <address>")}
+  ${method("subAccounts2")}                 ${params("--user <address>")}
+  ${method("userDexAbstraction")}           ${params("--user <address>")}
+  ${method("userFees")}                     ${params("--user <address>")}
+  ${method("userFunding")}                  ${params("--user <address> [--startTime <number>] [--endTime <number>]")}
+  ${method("userNonFundingLedgerUpdates")}  ${params("--user <address> [--startTime <number>] [--endTime <number>]")}
+  ${method("userRateLimit")}                ${params("--user <address>")}
+  ${method("userRole")}                     ${params("--user <address>")}
+  ${method("userToMultiSigSigners")}        ${params("--user <address>")}
+  ${method("webData2")}                     ${params("--user <address>")}
 
-Vault:
-  leadingVaults           --user <address>
-  userVaultEquities       --user <address>
-  vaultDetails            --vaultAddress <address> [--user <address>]
-  vaultSummaries          (no params)
+${category("Orders & TWAP & Position:")}
+  ${method("frontendOpenOrders")}        ${params("--user <address> [--dex <string>]")}
+  ${method("historicalOrders")}          ${params("--user <address>")}
+  ${method("openOrders")}                ${params("--user <address> [--dex <string>]")}
+  ${method("orderStatus")}               ${params("--user <address> --oid <number|hex>")}
+  ${method("twapHistory")}               ${params("--user <address>")}
+  ${method("userFills")}                 ${params("--user <address> [--aggregateByTime <bool>]")}
+  ${method("userFillsByTime")}           ${params("--user <address> --startTime <number>")}
+                            ${params("[--endTime <number>] [--aggregateByTime <bool>]")}
+  ${method("userTwapSliceFills")}        ${params("--user <address>")}
+  ${method("userTwapSliceFillsByTime")}  ${params("--user <address> --startTime <number>")}
+                            ${params("[--endTime <number>] [--aggregateByTime <bool>]")}
 
-DEX:
-  perpDexLimits           --dex <string>
-  perpDexs                (no params)
-  perpDexStatus           --dex <string>
+${category("Delegation & Validators:")}
+  ${method("delegations")}         ${params("--user <address>")}
+  ${method("delegatorHistory")}    ${params("--user <address>")}
+  ${method("delegatorRewards")}    ${params("--user <address>")}
+  ${method("delegatorSummary")}    ${params("--user <address>")}
+  ${method("gossipRootIps")}       ${params("(no params)")}
+  ${method("validatorL1Votes")}    ${params("(no params)")}
+  ${method("validatorSummaries")}  ${params("(no params)")}
 
-Deploy Market:
-  perpDeployAuctionStatus      (no params)
-  spotDeployState              --user <address>
-  spotPairDeployAuctionStatus  (no params)
+${category("Vault:")}
+  ${method("leadingVaults")}      ${params("--user <address>")}
+  ${method("userVaultEquities")}  ${params("--user <address>")}
+  ${method("vaultDetails")}       ${params("--vaultAddress <address> [--user <address>]")}
+  ${method("vaultSummaries")}     ${params("(no params)")}
 
-Earn:
-  allBorrowLendReserveStates   (no params)
-  borrowLendReserveState       --token <number>
-  borrowLendUserState          --user <address>
-  userBorrowLendInterest       --user <address> --startTime <number> [--endTime <number>]
+${category("DEX:")}
+  ${method("perpDexLimits")}  ${params("--dex <string>")}
+  ${method("perpDexs")}       ${params("(no params)")}
+  ${method("perpDexStatus")}  ${params("--dex <string>")}
 
-Other:
-  exchangeStatus          (no params)
+${category("Deploy Market:")}
+  ${method("perpDeployAuctionStatus")}       ${params("(no params)")}
+  ${method("spotDeployState")}               ${params("--user <address>")}
+  ${method("spotPairDeployAuctionStatus")}   ${params("(no params)")}
 
-Transaction & Block Details:
-  blockDetails            --height <number>
-  tokenDetails            --tokenId <hex>
-  txDetails               --hash <hex>
-  userDetails             --user <address>
+${category("Earn:")}
+  ${method("allBorrowLendReserveStates")}  ${params("(no params)")}
+  ${method("borrowLendReserveState")}      ${params("--token <number>")}
+  ${method("borrowLendUserState")}         ${params("--user <address>")}
+  ${method("userBorrowLendInterest")}      ${params("--user <address> --startTime <number> [--endTime <number>]")}
 
-=============================================================================
-EXCHANGE ENDPOINT METHODS
-=============================================================================
+${category("Other:")}
+  ${method("exchangeStatus")}  ${params("(no params)")}
 
-Order & TWAP & Position:
-  batchModify             --modifies <json>
-  cancel                  --cancels <json>
-  cancelByCloid           --cancels <json>
-  modify                  --oid <number|hex> --order <json>
-  order                   --orders <json> [--grouping <na|normalTpsl|positionTpsl>] [--builder <json>]
-  scheduleCancel          [--time <number>]
-  twapCancel              --a <number> --t <number>
-  twapOrder               --twap <json>
-  updateIsolatedMargin    --asset <number> --isBuy <bool> --ntli <number>
-  updateLeverage          --asset <number> --isCross <bool> --leverage <number>
+${category("Transaction & Block Details:")}
+  ${method("blockDetails")}  ${params("--height <number>")}
+  ${method("tokenDetails")}  ${params("--tokenId <hex>")}
+  ${method("txDetails")}     ${params("--hash <hex>")}
+  ${method("userDetails")}   ${params("--user <address>")}
 
-Account:
-  agentEnableDexAbstraction  (no params)
-  approveAgent            --agentAddress <address> [--agentName <string>]
-  approveBuilderFee       --maxFeeRate <number> --builder <address>
-  evmUserModify           --usingBigBlocks <bool>
-  noop                    (no params)
-  reserveRequestWeight    --weight <number>
-  setDisplayName          --displayName <string>
-  spotUser                --toggleSpotDusting <json>
-  userDexAbstraction      --user <address> --enabled <bool>
-  userPortfolioMargin     --user <address> --enabled <bool>
+${sep}
+${sectionHeader("EXCHANGE ENDPOINT METHODS")}
+${sep}
 
-Fund Transfers:
-  sendAsset               --destination <address> --token <name:address> --amount <number>
-                          --sourceDex <string> --destinationDex <string> [--fromSubAccount <address>]
-  spotSend                --destination <address> --token <name:address> --amount <number>
-  usdClassTransfer        --amount <number> --toPerp <bool>
-  usdSend                 --destination <address> --amount <number>
-  withdraw3               --destination <address> --amount <number>
+${category("Order & TWAP & Position:")}
+  ${method("batchModify")}           ${params("--modifies <json>")}
+  ${method("cancel")}                ${params("--cancels <json>")}
+  ${method("cancelByCloid")}         ${params("--cancels <json>")}
+  ${method("modify")}                ${params("--oid <number|hex> --order <json>")}
+  ${method("order")}                 ${params("--orders <json> [--grouping <na|normalTpsl|positionTpsl>] [--builder <json>]")}
+  ${method("scheduleCancel")}        ${params("[--time <number>]")}
+  ${method("twapCancel")}            ${params("--a <number> --t <number>")}
+  ${method("twapOrder")}             ${params("--twap <json>")}
+  ${method("updateIsolatedMargin")}  ${params("--asset <number> --isBuy <bool> --ntli <number>")}
+  ${method("updateLeverage")}        ${params("--asset <number> --isCross <bool> --leverage <number>")}
 
-Sub-Account:
-  createSubAccount        --name <string>
-  subAccountModify        --subAccountUser <address> --name <string>
-  subAccountSpotTransfer  --subAccountUser <address> --isDeposit <bool>
-                          --token <name:address> --amount <number>
-  subAccountTransfer      --subAccountUser <address> --isDeposit <bool> --usd <number>
+${category("Account:")}
+  ${method("agentEnableDexAbstraction")}  ${params("(no params)")}
+  ${method("approveAgent")}               ${params("--agentAddress <address> [--agentName <string>]")}
+  ${method("approveBuilderFee")}          ${params("--maxFeeRate <number> --builder <address>")}
+  ${method("evmUserModify")}              ${params("--usingBigBlocks <bool>")}
+  ${method("noop")}                       ${params("(no params)")}
+  ${method("reserveRequestWeight")}       ${params("--weight <number>")}
+  ${method("setDisplayName")}             ${params("--displayName <string>")}
+  ${method("spotUser")}                   ${params("--toggleSpotDusting <json>")}
+  ${method("userDexAbstraction")}         ${params("--user <address> --enabled <bool>")}
+  ${method("userPortfolioMargin")}        ${params("--user <address> --enabled <bool>")}
 
-Referrer:
-  claimRewards            (no params)
-  registerReferrer        --code <string>
-  setReferrer             --code <string>
+${category("Fund Transfers:")}
+  ${method("sendAsset")}         ${params("--destination <address> --token <name:address> --amount <number>")}
+                    ${params("--sourceDex <string> --destinationDex <string> [--fromSubAccount <address>]")}
+  ${method("spotSend")}          ${params("--destination <address> --token <name:address> --amount <number>")}
+  ${method("usdClassTransfer")}  ${params("--amount <number> --toPerp <bool>")}
+  ${method("usdSend")}           ${params("--destination <address> --amount <number>")}
+  ${method("withdraw3")}         ${params("--destination <address> --amount <number>")}
 
-Staking & Delegation:
-  cDeposit                --wei <number>
-  cWithdraw               --wei <number>
-  linkStakingUser         --user <address> --isFinalize <bool>
-  tokenDelegate           --validator <address> --wei <number> --isUndelegate <bool>
+${category("Sub-Account:")}
+  ${method("createSubAccount")}        ${params("--name <string>")}
+  ${method("subAccountModify")}        ${params("--subAccountUser <address> --name <string>")}
+  ${method("subAccountSpotTransfer")}  ${params("--subAccountUser <address> --isDeposit <bool>")}
+                          ${params("--token <name:address> --amount <number>")}
+  ${method("subAccountTransfer")}      ${params("--subAccountUser <address> --isDeposit <bool> --usd <number>")}
 
-Vault:
-  createVault             --name <string> --description <string> --initialUsd <number>
-                          --nonce <number>
-  vaultDistribute         --vaultAddress <address> --usd <number>
-  vaultModify             --vaultAddress <address> [--allowDeposits <bool>]
-                          [--alwaysCloseOnWithdraw <bool>]
-  vaultTransfer           --vaultAddress <address> --isDeposit <bool> --usd <number>
+${category("Referrer:")}
+  ${method("claimRewards")}      ${params("(no params)")}
+  ${method("registerReferrer")}  ${params("--code <string>")}
+  ${method("setReferrer")}       ${params("--code <string>")}
 
-Deploy Market:
-  perpDeploy              [--registerAsset2 <json>] [--registerAsset <json>]
-                          [--setOracle <json>] [--setFundingMultipliers <json>]
-                          [--haltTrading <json>] [--setMarginTableIds <json>]
-                          [--setFeeRecipient <json>] [--setOpenInterestCaps <json>]
-                          [--setSubDeployers <json>] [--setMarginModes <json>]
-                          [--setFeeScale <json>] [--setGrowthModes <json>]
-  spotDeploy              [--registerToken2 <json>] [--userGenesis <json>]
-                          [--genesis <json>] [--registerSpot <json>]
-                          [--registerHyperliquidity <json>]
-                          [--setDeployerTradingFeeShare <json>]
-                          [--enableQuoteToken <json>] [--enableAlignedQuoteToken <json>]
+${category("Staking & Delegation:")}
+  ${method("cDeposit")}         ${params("--wei <number>")}
+  ${method("cWithdraw")}        ${params("--wei <number>")}
+  ${method("linkStakingUser")}  ${params("--user <address> --isFinalize <bool>")}
+  ${method("tokenDelegate")}    ${params("--validator <address> --wei <number> --isUndelegate <bool>")}
 
-Validator Actions:
-  cSignerAction           [--jailSelf <null>] [--unjailSelf <null>]
-  cValidatorAction        [--changeProfile <json>] [--register <json>]
-                          [--unregister <null>]
-  validatorL1Stream       --riskFreeRate <number>
+${category("Vault:")}
+  ${method("createVault")}      ${params("--name <string> --description <string> --initialUsd <number>")}
+                   ${params("--nonce <number>")}
+  ${method("vaultDistribute")}  ${params("--vaultAddress <address> --usd <number>")}
+  ${method("vaultModify")}      ${params("--vaultAddress <address> [--allowDeposits <bool>]")}
+                   ${params("[--alwaysCloseOnWithdraw <bool>]")}
+  ${method("vaultTransfer")}    ${params("--vaultAddress <address> --isDeposit <bool> --usd <number>")}
 
-Earn:
-  borrowLend              --operation <supply|withdraw> --token <number> --amount <number|null>
+${category("Deploy Market:")}
+  ${method("perpDeploy")}  ${params("[--registerAsset2 <json>] [--registerAsset <json>]")}
+              ${params("[--setOracle <json>] [--setFundingMultipliers <json>]")}
+              ${params("[--haltTrading <json>] [--setMarginTableIds <json>]")}
+              ${params("[--setFeeRecipient <json>] [--setOpenInterestCaps <json>]")}
+              ${params("[--setSubDeployers <json>] [--setMarginModes <json>]")}
+              ${params("[--setFeeScale <json>] [--setGrowthModes <json>]")}
+  ${method("spotDeploy")}  ${params("[--registerToken2 <json>] [--userGenesis <json>]")}
+              ${params("[--genesis <json>] [--registerSpot <json>]")}
+              ${params("[--registerHyperliquidity <json>]")}
+              ${params("[--setDeployerTradingFeeShare <json>]")}
+              ${params("[--enableQuoteToken <json>] [--enableAlignedQuoteToken <json>]")}
 
-Other:
-  convertToMultiSigUser   --signers <json>
+${category("Validator Actions:")}
+  ${method("cSignerAction")}      ${params("[--jailSelf <null>] [--unjailSelf <null>]")}
+  ${method("cValidatorAction")}   ${params("[--changeProfile <json>] [--register <json>]")}
+                     ${params("[--unregister <null>]")}
+  ${method("validatorL1Stream")}  ${params("--riskFreeRate <number>")}
 
-=============================================================================
+${category("Earn:")}
+  ${method("borrowLend")}  ${params("--operation <supply|withdraw> --token <number> --amount <number|null>")}
 
-Examples:
-  # Get all mid prices
-  npx @nktkas/hyperliquid info allMids
+${category("Other:")}
+  ${method("convertToMultiSigUser")}  ${params("--signers <json>")}
 
-  # Get ETH order book with 3 significant figures
-  npx @nktkas/hyperliquid info l2Book --coin ETH --nSigFigs 3
+${sep}
 
-  # Get user's portfolio
-  npx @nktkas/hyperliquid info portfolio --user 0x...
+${label("Examples:")}
+  ${comment("# Get all mid prices")}
+  ${cmd("npx @nktkas/hyperliquid info allMids")}
 
-  # Get candle data for BTC
-  npx @nktkas/hyperliquid info candleSnapshot --coin BTC --interval 1h --startTime 1700000000000
+  ${comment("# Get ETH order book with 3 significant figures")}
+  ${cmd("npx @nktkas/hyperliquid info l2Book --coin ETH --nSigFigs 3")}
 
-  # Place a limit order
-  npx @nktkas/hyperliquid exchange order --private-key 0x... --orders '[{\"a\":0,\"b\":true,\"p\":30000,\"s\":0.1,\"r\":false,\"t\":{\"limit\":{\"tif\":\"Gtc\"}}}]'
+  ${comment("# Get user's portfolio")}
+  ${cmd("npx @nktkas/hyperliquid info portfolio --user 0x...")}
 
-  # Modify an existing order
-  npx @nktkas/hyperliquid exchange modify --private-key 0x... --oid 12345 --order '{\"a\":0,\"b\":true,\"p\":31000,\"s\":0.1,\"r\":false,\"t\":{\"limit\":{\"tif\":\"Gtc\"}}}'
+  ${comment("# Get candle data for BTC")}
+  ${cmd("npx @nktkas/hyperliquid info candleSnapshot --coin BTC --interval 1h --startTime 1700000000000")}
 
-  # Cancel orders
-  npx @nktkas/hyperliquid exchange cancel --private-key 0x... --cancels '[{\"a\":0,\"o\":12345}]'
+  ${comment("# Place a limit order")}
+  ${cmd('npx @nktkas/hyperliquid exchange order --private-key 0x... --orders \'[{"a":0,"b":true,"p":30000,"s":0.1,"r":false,"t":{"limit":{"tif":"Gtc"}}}]\'')}
 
-  # Update leverage
-  npx @nktkas/hyperliquid exchange updateLeverage --private-key 0x... --asset 0 --isCross true --leverage 5
+  ${comment("# Cancel orders")}
+  ${cmd('npx @nktkas/hyperliquid exchange cancel --private-key 0x... --cancels \'[{"a":0,"o":12345}]\'')}
 
-  # Withdraw funds
-  npx @nktkas/hyperliquid exchange withdraw3 --private-key 0x... --destination 0x... --amount 100.5
+  ${comment("# Update leverage")}
+  ${cmd("npx @nktkas/hyperliquid exchange updateLeverage --private-key 0x... --asset 0 --isCross true --leverage 5")}
 
-  # Send USD to another user
-  npx @nktkas/hyperliquid exchange usdSend --private-key 0x... --destination 0x... --amount 50
+  ${comment("# Withdraw funds")}
+  ${cmd("npx @nktkas/hyperliquid exchange withdraw3 --private-key 0x... --destination 0x... --amount 100.5")}
 
-  # Create a vault
-  npx @nktkas/hyperliquid exchange createVault --private-key 0x... --name "My Vault" --description "Test vault" --initialUsd 1000`);
+  ${comment("# Send USD to another user")}
+  ${cmd("npx @nktkas/hyperliquid exchange usdSend --private-key 0x... --destination 0x... --amount 50")}
+
+  ${comment("# Create a vault")}
+  ${cmd('npx @nktkas/hyperliquid exchange createVault --private-key 0x... --name "My Vault" --description "Test vault" --initialUsd 1000')}`);
 }
 
 // ============================================================
@@ -342,5 +358,8 @@ if (args.help || args.h || !endpoint || !method) {
 } else {
   executeEndpointMethod(endpoint, method, args)
     .then((result) => console.log(JSON.stringify(result)))
-    .catch((error) => console.error(error));
+    .catch((error) => {
+      console.error(error);
+      process.exit(1);
+    });
 }

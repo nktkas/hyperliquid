@@ -370,19 +370,25 @@ function parseMethodParams(methodName: string, paramsText: string): Method {
   return { name: methodName, params };
 }
 
-/** Extract printHelp function content from CLI file */
+/** Extract help text by running CLI with --help flag */
 async function extractHelpText(cliPath: string): Promise<string> {
   const projectRoot = Deno.cwd();
   const fullPath = path.join(projectRoot, cliPath);
-  const content = await Deno.readTextFile(fullPath);
 
-  // Find printHelp function and extract the template literal
-  const helpMatch = content.match(/function printHelp\(\)[\s\S]*?console\.log\(`([\s\S]*?)`\)/);
-  if (!helpMatch) {
-    throw new Error("Could not find printHelp function in CLI file");
+  // Run CLI with --help and NO_COLOR to get clean text output
+  const command = new Deno.Command("deno", {
+    args: ["run", "--allow-env", fullPath, "--help"],
+    env: { NO_COLOR: "1" },
+  });
+
+  const { code, stdout, stderr } = await command.output();
+
+  if (code !== 0) {
+    const errorText = new TextDecoder().decode(stderr);
+    throw new Error(`CLI --help failed with code ${code}: ${errorText}`);
   }
 
-  return helpMatch[1];
+  return new TextDecoder().decode(stdout);
 }
 
 // =============================================================================
