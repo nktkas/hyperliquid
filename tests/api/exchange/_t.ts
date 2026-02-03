@@ -336,85 +336,119 @@ type InferOutputWithoutErrors<T> = T extends v.GenericSchema<unknown, infer O> ?
 export function excludeErrorResponse<T extends v.GenericSchema>(
   schema: T,
 ): v.GenericSchema<v.InferInput<T>, InferOutputWithoutErrors<T>> {
-  const getPipeEntries = (s: v.GenericSchema): Record<string, v.GenericSchema> | null => {
-    if ("pipe" in s && Array.isArray(s.pipe) && "entries" in s.pipe[0] && typeof s.pipe[0].entries === "object") {
-      return s.pipe[0].entries;
-    }
-    return null;
-  };
+  // Deep clone schema preserving functions and getters
+  function cloneSchema(s: v.GenericSchema): v.GenericSchema {
+    const clone = Object.defineProperties({}, Object.getOwnPropertyDescriptors(s)) as v.GenericSchema;
 
-  const getPipeBase = (s: v.GenericSchema): v.GenericSchema | null => {
-    if ("pipe" in s && Array.isArray(s.pipe)) {
-      return s.pipe[0];
-    }
-    return null;
-  };
-
-  const removeErrorFromUnion = (unionSchema: v.GenericSchema): void => {
-    if (
-      "type" in unionSchema && unionSchema.type === "union" && "options" in unionSchema &&
-      Array.isArray(unionSchema.options)
-    ) {
-      const filtered = unionSchema.options.filter((opt) =>
-        !("entries" in opt && typeof opt.entries === "object" && "error" in opt.entries)
+    if ("pipe" in clone && Array.isArray(clone.pipe)) {
+      (clone as Record<string, unknown>).pipe = clone.pipe.map((p) =>
+        typeof p === "object" && p !== null ? cloneSchema(p as v.GenericSchema) : p
       );
-      if (filtered.length > 0) {
-        unionSchema.options = filtered;
-      }
     }
-  };
+    if ("options" in clone && Array.isArray(clone.options)) {
+      (clone as Record<string, unknown>).options = clone.options.map(cloneSchema);
+    }
+    if ("entries" in clone && typeof clone.entries === "object" && clone.entries !== null) {
+      (clone as Record<string, unknown>).entries = Object.fromEntries(
+        Object.entries(clone.entries).map(([k, v]) => [k, cloneSchema(v as v.GenericSchema)]),
+      );
+    }
+    if ("item" in clone && typeof clone.item === "object" && clone.item !== null) {
+      (clone as Record<string, unknown>).item = cloneSchema(clone.item as v.GenericSchema);
+    }
+    if ("wrapped" in clone && typeof clone.wrapped === "object" && clone.wrapped !== null) {
+      (clone as Record<string, unknown>).wrapped = cloneSchema(clone.wrapped as v.GenericSchema);
+    }
+    return clone;
+  }
 
-  const s = schema;
+  // Work on a cloned copy to avoid mutating the original
+  const cloned = cloneSchema(schema);
 
-  // Case 1: Remove ErrorResponse from top-level union[SuccessResponse, ErrorResponse]
-  const topBase = getPipeBase(s);
-  if (
-    topBase && "type" in topBase && topBase.type === "union" && "options" in topBase && Array.isArray(topBase.options)
-  ) {
-    const filtered = topBase.options.filter((opt) => {
-      const optEntries = getPipeEntries(opt);
-      if (optEntries && "status" in optEntries) {
-        const statusSchema = optEntries.status;
-        const statusBase = getPipeBase(statusSchema);
-        if (statusBase && statusBase.type === "literal" && "literal" in statusBase && statusBase.literal === "err") {
-          return false; // Remove ErrorResponse
-        }
-      }
-      return true;
-    });
-    if (filtered.length > 0 && filtered.length < topBase.options.length) {
-      topBase.options = filtered;
-      return schema as v.GenericSchema<v.InferInput<T>, InferOutputWithoutErrors<T>>;
+  // Unwrap pipe wrapper to get the underlying schema
+  function getBase(s: v.GenericSchema): v.GenericSchema {
+    return "pipe" in s && Array.isArray(s.pipe) ? s.pipe[0] : s;
+  }
+
+  function getEntries(s: v.GenericSchema): Record<string, v.GenericSchema> | null {
+    const base = getBase(s);
+    return "entries" in base && typeof base.entries === "object"
+      ? base.entries as Record<string, v.GenericSchema>
+      : null;
+  }
+
+  function getArrayItem(s: v.GenericSchema): v.GenericSchema | null {
+    const base = getBase(s);
+    return "item" in base && typeof base.item === "object" ? base.item as v.GenericSchema : null;
+  }
+
+  function getUnionOptions(s: v.GenericSchema): v.GenericSchema[] | null {
+    const base = getBase(s);
+    return "type" in base && base.type === "union" && "options" in base && Array.isArray(base.options)
+      ? base.options
+      : null;
+  }
+
+  function setUnionOptions(s: v.GenericSchema, options: v.GenericSchema[]): void {
+    const base = getBase(s);
+    if ("options" in s) (s as { options: v.GenericSchema[] }).options = options;
+    if (base !== s && "options" in base) (base as { options: v.GenericSchema[] }).options = options;
+  }
+
+  function hasErrStatus(s: v.GenericSchema): boolean {
+    const entries = getEntries(s);
+    if (!entries || !("status" in entries)) return false;
+    const statusBase = getBase(entries.status);
+    return "type" in statusBase && statusBase.type === "literal" && "literal" in statusBase &&
+      statusBase.literal === "err";
+  }
+
+  function hasErrorField(s: v.GenericSchema): boolean {
+    const entries = getEntries(s);
+    return entries !== null && "error" in entries;
+  }
+
+  function filterUnion(s: v.GenericSchema, predicate: (opt: v.GenericSchema) => boolean): void {
+    const options = getUnionOptions(s);
+    if (!options) return;
+    const filtered = options.filter(predicate);
+    if (filtered.length > 0 && filtered.length < options.length) {
+      setUnionOptions(s, filtered);
     }
   }
 
-  // Case 2 & 3: Remove error from response.data.statuses or response.data.status
-  const topEntries = getPipeEntries(s);
-  if (topEntries && "response" in topEntries) {
-    const responseEntries = getPipeEntries(topEntries.response);
-    if (responseEntries && "data" in responseEntries) {
-      const dataEntries = getPipeEntries(responseEntries.data);
-      if (dataEntries) {
-        // Case 2: Remove error from statuses array union
-        if ("statuses" in dataEntries) {
-          const statusesSchema = dataEntries.statuses;
-          const statusesBase = getPipeBase(statusesSchema);
-          if (statusesBase && "item" in statusesBase && typeof statusesBase.item === "object") {
-            removeErrorFromUnion(statusesBase.item as v.GenericSchema);
-          }
-        }
+  // Remove top-level ErrorResponse (status: "err") from union
+  if (getUnionOptions(cloned)) {
+    filterUnion(cloned, (opt) => !hasErrStatus(opt));
+  }
 
-        // Case 3: Remove error from single status union
-        if ("status" in dataEntries) {
-          const statusSchema = dataEntries.status;
-          const statusBase = getPipeBase(statusSchema);
-          if (statusBase) {
-            removeErrorFromUnion(statusBase);
-          }
-        }
-      }
+  // Remove nested error responses from response.data.statuses[] or response.data.status
+  function processNestedErrors(target: v.GenericSchema): void {
+    const topEntries = getEntries(target);
+    if (!topEntries?.response) return;
+
+    const responseEntries = getEntries(topEntries.response);
+    if (!responseEntries?.data) return;
+
+    const dataEntries = getEntries(responseEntries.data);
+    if (!dataEntries) return;
+
+    if ("statuses" in dataEntries) {
+      const item = getArrayItem(dataEntries.statuses);
+      if (item) filterUnion(item, (opt) => !hasErrorField(opt));
+    }
+
+    if ("status" in dataEntries) {
+      filterUnion(dataEntries.status, (opt) => !hasErrorField(opt));
     }
   }
 
-  return schema as v.GenericSchema<v.InferInput<T>, InferOutputWithoutErrors<T>>;
+  const options = getUnionOptions(cloned);
+  if (options) {
+    options.forEach(processNestedErrors);
+  } else {
+    processNestedErrors(cloned);
+  }
+
+  return cloned as v.GenericSchema<v.InferInput<T>, InferOutputWithoutErrors<T>>;
 }
