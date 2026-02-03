@@ -2,6 +2,9 @@
   "name": "@nktkas/hyperliquid",
   "version": "0.30.3",
   "license": "MIT",
+  "tasks": {
+    "check:jsdoc": "deno run -A .dev/jsdoc_sync_check.ts"
+  },
   "exports": {
     ".": "./src/mod.ts",
     "./signing": "./src/signing/mod.ts",
