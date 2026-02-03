@@ -26,9 +26,7 @@ hype-spot.
 
 ## Coding Guidelines
 
-- **Style**: After making all changes, run: [`deno fmt`](https://docs.deno.com/runtime/reference/cli/fmt/) >
-  [`deno lint`](https://docs.deno.com/runtime/reference/cli/lint/) >
-  [`deno check`](https://docs.deno.com/runtime/reference/cli/check/)
+- **Style**: After making all changes, run: `deno task check`
 - **Dependencies**: Use small and easily auditable dependencies (e.g.
   [@noble/hashes](https://www.npmjs.com/package/@noble/hashes) or [@std](https://jsr.io/@std)).
 - **Testing**: Write tests for any new functionality.

@@ -12,17 +12,5 @@ jobs:
       - uses: actions/checkout@v6
       - uses: denoland/setup-deno@v2
 
-      - name: deno fmt
-        run: deno fmt --check
-
-      - name: deno lint
-        run: deno lint
-
-      - name: deno check
-        run: deno check --doc
-
-      - name: jsdoc sync
-        run: deno task check:jsdoc
-
-      - name: cli help sync
-        run: deno task check:cli-help
+      - name: deno task check
+        run: deno task check
