@@ -15,7 +15,7 @@ runTest({
     const data = await runCommand([
       "exchange",
       "spotUser",
-      "--optOut=true",
+      `--toggleSpotDusting=${JSON.stringify({ optOut: true })}`,
     ]);
     v.parse(SpotUserRequest, data);
   },
