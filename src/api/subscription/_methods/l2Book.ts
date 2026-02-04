@@ -30,11 +30,6 @@ export const L2BookRequest = /* @__PURE__ */ (() => {
         v.nullish(v.pipe(Integer, v.picklist([2, 5]))),
         v.description("Mantissa for aggregation (if `nSigFigs` is 5)."),
       ),
-      /** Spread for aggregation (if `nSigFigs` is non-null). */
-      spread: v.pipe(
-        v.nullish(UnsignedDecimal),
-        v.description("Spread for aggregation (if `nSigFigs` is non-null)."),
-      ),
     }),
     v.description("Subscription to L2 order book events for a specific asset."),
   );
@@ -142,7 +137,6 @@ export function l2Book(
     ...params,
     nSigFigs: params.nSigFigs ?? null,
     mantissa: params.mantissa ?? null,
-    spread: params.spread ?? null,
   });
   return config.transport.subscribe<L2BookEvent>(payload.type, payload, (e) => {
     if (e.detail.coin === payload.coin) {

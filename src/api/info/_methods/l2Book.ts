@@ -33,11 +33,6 @@ export const L2BookRequest = /* @__PURE__ */ (() => {
         v.nullish(v.picklist([2, 5])),
         v.description("Mantissa for aggregation (if `nSigFigs` is 5)."),
       ),
-      /** Spread for aggregation (if `nSigFigs` is non-null). */
-      spread: v.pipe(
-        v.nullish(UnsignedDecimal),
-        v.description("Spread for aggregation (if `nSigFigs` is non-null)."),
-      ),
     }),
     v.description("Request L2 order book."),
   );
