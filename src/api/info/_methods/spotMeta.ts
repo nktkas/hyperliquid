@@ -87,6 +87,21 @@ export const SpotMetaResponse = /* @__PURE__ */ (() => {
         ),
       }),
     ),
+    /** Questions for prediction markets. */
+    questions: v.array(
+      v.object({
+        /** Unique identifier of the question. */
+        question: UnsignedInteger,
+        /** Short name of the question. */
+        name: v.string(),
+        /** Description of the question. */
+        description: v.string(),
+        /** Default outcome index if the question is not resolved. */
+        fallbackOutcome: UnsignedInteger,
+        /** Outcome indices associated with this question. */
+        namedOutcomes: v.array(UnsignedInteger),
+      }),
+    ),
   });
 })();
 export type SpotMetaResponse = v.InferOutput<typeof SpotMetaResponse>;
