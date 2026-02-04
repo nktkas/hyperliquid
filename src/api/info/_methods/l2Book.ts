@@ -33,6 +33,11 @@ export const L2BookRequest = /* @__PURE__ */ (() => {
         v.nullish(v.picklist([2, 5])),
         v.description("Mantissa for aggregation (if `nSigFigs` is 5)."),
       ),
+      /** Spread for aggregation (if `nSigFigs` is non-null). */
+      spread: v.pipe(
+        v.nullish(UnsignedDecimal),
+        v.description("Spread for aggregation (if `nSigFigs` is non-null)."),
+      ),
     }),
     v.description("Request L2 order book."),
   );
@@ -84,6 +89,11 @@ export const L2BookResponse = /* @__PURE__ */ (() => {
         levels: v.pipe(
           v.tuple([v.array(L2BookLevelSchema), v.array(L2BookLevelSchema)]),
           v.description("Bid and ask levels (index 0 = bids, index 1 = asks)."),
+        ),
+        /** Spread (only present when `nSigFigs` is non-null). */
+        spread: v.pipe(
+          v.optional(UnsignedDecimal),
+          v.description("Spread (only present when `nSigFigs` is non-null)."),
         ),
       }),
     ),

@@ -9,6 +9,7 @@ runTest({
     const data = await Promise.all([
       client.l2Book({ coin: "ETH" }),
       client.l2Book({ coin: "NONE/EXISTENT" }),
+      client.l2Book({ coin: "ETH", nSigFigs: 2 }),
     ]);
     schemaCoverage(L2BookResponse, data);
   },

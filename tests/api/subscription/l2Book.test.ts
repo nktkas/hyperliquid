@@ -8,6 +8,7 @@ runTest({
   fn: async (_t, client) => {
     const data = await collectEventsOverTime<L2BookEvent>(async (cb) => {
       await client.l2Book({ coin: "BTC" }, cb);
+      await client.l2Book({ coin: "BTC", nSigFigs: 2 }, cb);
     }, 10_000);
     schemaCoverage(L2BookEvent, data);
   },
