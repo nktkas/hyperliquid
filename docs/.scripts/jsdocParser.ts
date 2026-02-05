@@ -285,8 +285,8 @@ function extractJSDocTags(rawText: string): JSDocTags | undefined {
 
 /** Extract `@example` blocks from raw JSDoc text */
 function extractExamples(rawText: string): string[] | undefined {
-  // Clean lines: remove JSDoc asterisk prefix
-  const lines = rawText.split("\n").map((line) => line.replace(/^\s*\*\s*/, ""));
+  // Clean lines: remove JSDoc asterisk prefix (preserve indentation after "* ")
+  const lines = rawText.split("\n").map((line) => line.replace(/^\s*\* ?/, ""));
 
   const examples: string[] = [];
   let inExample = false;
