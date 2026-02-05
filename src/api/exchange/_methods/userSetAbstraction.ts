@@ -8,23 +8,23 @@ import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
 import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
- * Enable/disable HIP-3 DEX abstraction.
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction
+ * Set User abstraction mode.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction
  */
-export const UserDexAbstractionRequest = /* @__PURE__ */ (() => {
+export const UserSetAbstractionRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Action to perform. */
     action: v.object({
       /** Type of action. */
-      type: v.literal("userDexAbstraction"),
+      type: v.literal("userSetAbstraction"),
       /** Chain ID in hex format for EIP-712 signing. */
       signatureChainId: Hex,
       /** HyperLiquid network type. */
       hyperliquidChain: HyperliquidChainSchema,
       /** User address. */
       user: Address,
-      /** Whether to enable or disable HIP-3 DEX abstraction. */
-      enabled: v.boolean(),
+      /** Abstraction mode to set. */
+      abstraction: v.picklist(["dexAbstraction", "unifiedAccount", "portfolioMargin", "disabled"]),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
       nonce: UnsignedInteger,
     }),
@@ -34,16 +34,16 @@ export const UserDexAbstractionRequest = /* @__PURE__ */ (() => {
     signature: SignatureSchema,
   });
 })();
-export type UserDexAbstractionRequest = v.InferOutput<typeof UserDexAbstractionRequest>;
+export type UserSetAbstractionRequest = v.InferOutput<typeof UserSetAbstractionRequest>;
 
 /**
  * Successful response without specific data or error response.
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction
  */
-export const UserDexAbstractionResponse = /* @__PURE__ */ (() => {
+export const UserSetAbstractionResponse = /* @__PURE__ */ (() => {
   return v.union([SuccessResponse, ErrorResponse]);
 })();
-export type UserDexAbstractionResponse = v.InferOutput<typeof UserDexAbstractionResponse>;
+export type UserSetAbstractionResponse = v.InferOutput<typeof UserSetAbstractionResponse>;
 
 // ============================================================
 // Execution Logic
@@ -53,37 +53,33 @@ import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOption
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
-const UserDexAbstractionParameters = /* @__PURE__ */ (() => {
+const UserSetAbstractionParameters = /* @__PURE__ */ (() => {
   return v.omit(
-    v.object(UserDexAbstractionRequest.entries.action.entries),
+    v.object(UserSetAbstractionRequest.entries.action.entries),
     ["type", "signatureChainId", "hyperliquidChain", "nonce"],
   );
 })();
-/** Action parameters for the {@linkcode userDexAbstraction} function. */
-export type UserDexAbstractionParameters = v.InferInput<typeof UserDexAbstractionParameters>;
+/** Action parameters for the {@linkcode userSetAbstraction} function. */
+export type UserSetAbstractionParameters = v.InferInput<typeof UserSetAbstractionParameters>;
 
-/** Request options for the {@linkcode userDexAbstraction} function. */
-export type UserDexAbstractionOptions = ExtractRequestOptions<
-  v.InferInput<typeof UserDexAbstractionRequest>
->;
+/** Request options for the {@linkcode userSetAbstraction} function. */
+export type UserSetAbstractionOptions = ExtractRequestOptions<v.InferInput<typeof UserSetAbstractionRequest>>;
 
-/** Successful variant of {@linkcode UserDexAbstractionResponse} without errors. */
-export type UserDexAbstractionSuccessResponse = ExcludeErrorResponse<UserDexAbstractionResponse>;
+/** Successful variant of {@linkcode UserSetAbstractionResponse} without errors. */
+export type UserSetAbstractionSuccessResponse = ExcludeErrorResponse<UserSetAbstractionResponse>;
 
-/** EIP-712 types for the {@linkcode userDexAbstraction} function. */
-export const UserDexAbstractionTypes = {
-  "HyperliquidTransaction:UserDexAbstraction": [
+/** EIP-712 types for the {@linkcode userSetAbstraction} function. */
+export const UserSetAbstractionTypes = {
+  "HyperliquidTransaction:UserSetAbstraction": [
     { name: "hyperliquidChain", type: "string" },
     { name: "user", type: "address" },
-    { name: "enabled", type: "bool" },
+    { name: "abstraction", type: "string" },
     { name: "nonce", type: "uint64" },
   ],
 };
 
 /**
- * Enable/disable HIP-3 DEX abstraction.
- *
- * @deprecated Use {@link userSetAbstraction} instead.
+ * Set User abstraction mode.
  *
  * @param config - General configuration for Exchange API requests.
  * @param params - Parameters specific to the API request.
@@ -98,30 +94,30 @@ export const UserDexAbstractionTypes = {
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
- * import { userDexAbstraction } from "@nktkas/hyperliquid/api/exchange";
+ * import { userSetAbstraction } from "@nktkas/hyperliquid/api/exchange";
  * import { privateKeyToAccount } from "npm:viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await userDexAbstraction(
+ * await userSetAbstraction(
  *   { transport, wallet },
- *   { user: "0x...", enabled: true },
+ *   { user: "0x...", abstraction: "dexAbstraction" },
  * );
  * ```
  *
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction
  */
-export function userDexAbstraction(
+export function userSetAbstraction(
   config: ExchangeConfig,
-  params: UserDexAbstractionParameters,
-  opts?: UserDexAbstractionOptions,
-): Promise<UserDexAbstractionSuccessResponse> {
-  const action = v.parse(UserDexAbstractionParameters, params);
+  params: UserSetAbstractionParameters,
+  opts?: UserSetAbstractionOptions,
+): Promise<UserSetAbstractionSuccessResponse> {
+  const action = v.parse(UserSetAbstractionParameters, params);
   return executeUserSignedAction(
     config,
-    { type: "userDexAbstraction", ...action },
-    UserDexAbstractionTypes,
+    { type: "userSetAbstraction", ...action },
+    UserSetAbstractionTypes,
     opts,
   );
 }

@@ -225,6 +225,12 @@ import {
   type UserDexAbstractionSuccessResponse,
 } from "./_methods/userDexAbstraction.ts";
 import {
+  userSetAbstraction,
+  type UserSetAbstractionOptions,
+  type UserSetAbstractionParameters,
+  type UserSetAbstractionSuccessResponse,
+} from "./_methods/userSetAbstraction.ts";
+import {
   userPortfolioMargin,
   type UserPortfolioMarginOptions,
   type UserPortfolioMarginParameters,
@@ -1648,6 +1654,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Enable/disable HIP-3 DEX abstraction.
    *
+   * @deprecated Use {@link userSetAbstraction} instead.
+   *
    * @param params - Parameters specific to the API request.
    * @param opts - Request execution options.
    *
@@ -1676,6 +1684,39 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     opts?: UserDexAbstractionOptions,
   ): Promise<UserDexAbstractionSuccessResponse> {
     return userDexAbstraction(this.config_, params, opts);
+  }
+
+  /**
+   * Set User abstraction mode.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.userSetAbstraction({ user: "0x...", abstraction: "dexAbstraction" });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction
+   */
+  userSetAbstraction(
+    params: UserSetAbstractionParameters,
+    opts?: UserSetAbstractionOptions,
+  ): Promise<UserSetAbstractionSuccessResponse> {
+    return userSetAbstraction(this.config_, params, opts);
   }
 
   /**
@@ -2011,6 +2052,11 @@ export type {
   UserDexAbstractionSuccessResponse,
   UserDexAbstractionSuccessResponse as UserDexAbstractionExchangeSuccessResponse,
 } from "./_methods/userDexAbstraction.ts";
+export type {
+  UserSetAbstractionOptions,
+  UserSetAbstractionParameters,
+  UserSetAbstractionSuccessResponse,
+} from "./_methods/userSetAbstraction.ts";
 export type {
   UserPortfolioMarginOptions,
   UserPortfolioMarginParameters,
