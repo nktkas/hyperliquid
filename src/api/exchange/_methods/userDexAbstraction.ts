@@ -83,6 +83,8 @@ export const UserDexAbstractionTypes = {
 /**
  * Enable/disable HIP-3 DEX abstraction.
  *
+ * @deprecated Use {@link userSetAbstraction} instead.
+ *
  * @param config - General configuration for Exchange API requests.
  * @param params - Parameters specific to the API request.
  * @param opts - Request execution options.
