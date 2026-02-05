@@ -819,6 +819,17 @@
       spec:
         ref:
           kind: openapi
+          spec: hl-exchange-agentSetAbstraction
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
           spec: hl-exchange-approveAgent
     ```
   - ```yaml
@@ -1260,6 +1271,17 @@
         ref:
           kind: openapi
           spec: hl-exchange-userPortfolioMargin
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-exchange-userSetAbstraction
     ```
   - ```yaml
     type: builtin:openapi
