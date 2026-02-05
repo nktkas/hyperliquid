@@ -48,6 +48,8 @@ export const L2BookResponse = /* @__PURE__ */ (() => {
       time: UnsignedInteger,
       /** Bid and ask levels (index 0 = bids, index 1 = asks). */
       levels: v.tuple([v.array(L2BookLevelSchema), v.array(L2BookLevelSchema)]),
+      /** Spread (only present when `nSigFigs` is non-null). */
+      spread: v.optional(UnsignedDecimal),
     }),
   );
 })();
