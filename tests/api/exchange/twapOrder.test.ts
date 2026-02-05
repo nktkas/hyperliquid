@@ -35,12 +35,16 @@ runTest({
     const data = await runCommand([
       "exchange",
       "twapOrder",
-      "--a=0",
-      "--b=true",
-      "--s=0",
-      "--r=false",
-      "--m=5",
-      "--t=false",
+      `--twap=${
+        JSON.stringify({
+          a: 0,
+          b: true,
+          s: 0,
+          r: false,
+          m: 5,
+          t: false,
+        })
+      }`,
     ]);
     v.parse(TwapOrderRequest, data);
   },
