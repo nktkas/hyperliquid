@@ -1707,6 +1707,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    *
    * await client.userSetAbstraction({ user: "0x...", abstraction: "dexAbstraction" });
    * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction
    */
   userSetAbstraction(
     params: UserSetAbstractionParameters,

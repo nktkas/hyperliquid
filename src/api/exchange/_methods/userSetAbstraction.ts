@@ -9,6 +9,7 @@ import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse
 
 /**
  * Set User abstraction mode.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction
  */
 export const UserSetAbstractionRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -37,6 +38,7 @@ export type UserSetAbstractionRequest = v.InferOutput<typeof UserSetAbstractionR
 
 /**
  * Successful response without specific data or error response.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction
  */
 export const UserSetAbstractionResponse = /* @__PURE__ */ (() => {
   return v.union([SuccessResponse, ErrorResponse]);
@@ -103,6 +105,8 @@ export const UserSetAbstractionTypes = {
  *   { user: "0x...", abstraction: "dexAbstraction" },
  * );
  * ```
+ *
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction
  */
 export function userSetAbstraction(
   config: ExchangeConfig,
