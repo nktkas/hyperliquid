@@ -5,120 +5,66 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
-import {
-  ErrorResponse,
-  HyperliquidChainSchema,
-  SignatureSchema,
-  SuccessResponse,
-} from "./_base/commonSchemas.ts";
+import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Set User abstraction mode.
  */
 export const UserSetAbstractionRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("userSetAbstraction"),
-            v.description("Type of action.")
-          ),
-          /** Chain ID in hex format for EIP-712 signing. */
-          signatureChainId: v.pipe(
-            Hex,
-            v.description("Chain ID in hex format for EIP-712 signing.")
-          ),
-          /** HyperLiquid network type. */
-          hyperliquidChain: v.pipe(
-            HyperliquidChainSchema,
-            v.description("HyperLiquid network type.")
-          ),
-          /** User address. */
-          user: v.pipe(Address, v.description("User address.")),
-          /** Abstraction mode to set. */
-          abstraction: v.pipe(
-            v.picklist(["dexAbstraction", "unifiedAccount", "disabled"]),
-            v.description("Abstraction mode to set.")
-          ),
-          /** Nonce (timestamp in ms) used to prevent replay attacks. */
-          nonce: v.pipe(
-            UnsignedInteger,
-            v.description(
-              "Nonce (timestamp in ms) used to prevent replay attacks."
-            )
-          ),
-        }),
-        v.description("Action to perform.")
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("userSetAbstraction"),
+      /** Chain ID in hex format for EIP-712 signing. */
+      signatureChainId: Hex,
+      /** HyperLiquid network type. */
+      hyperliquidChain: HyperliquidChainSchema,
+      /** User address. */
+      user: Address,
+      /** Abstraction mode to set. */
+      abstraction: v.picklist(["dexAbstraction", "unifiedAccount", "disabled"]),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks.")
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components.")
-      ),
+      nonce: UnsignedInteger,
     }),
-    v.description("Set User abstraction mode.")
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+  });
 })();
-export type UserSetAbstractionRequest = v.InferOutput<
-  typeof UserSetAbstractionRequest
->;
+export type UserSetAbstractionRequest = v.InferOutput<typeof UserSetAbstractionRequest>;
 
 /**
  * Successful response without specific data or error response.
  */
 export const UserSetAbstractionResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description(
-      "Successful response without specific data or error response."
-    )
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
-export type UserSetAbstractionResponse = v.InferOutput<
-  typeof UserSetAbstractionResponse
->;
+export type UserSetAbstractionResponse = v.InferOutput<typeof UserSetAbstractionResponse>;
 
 // ============================================================
 // Execution Logic
 // ============================================================
 
-import {
-  type ExchangeConfig,
-  executeUserSignedAction,
-  type ExtractRequestOptions,
-} from "./_base/execute.ts";
+import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const UserSetAbstractionParameters = /* @__PURE__ */ (() => {
-  return v.omit(v.object(UserSetAbstractionRequest.entries.action.entries), [
-    "type",
-    "signatureChainId",
-    "hyperliquidChain",
-    "nonce",
-  ]);
+  return v.omit(
+    v.object(UserSetAbstractionRequest.entries.action.entries),
+    ["type", "signatureChainId", "hyperliquidChain", "nonce"],
+  );
 })();
 /** Action parameters for the {@linkcode userSetAbstraction} function. */
-export type UserSetAbstractionParameters = v.InferInput<
-  typeof UserSetAbstractionParameters
->;
+export type UserSetAbstractionParameters = v.InferInput<typeof UserSetAbstractionParameters>;
 
 /** Request options for the {@linkcode userSetAbstraction} function. */
-export type UserSetAbstractionOptions = ExtractRequestOptions<
-  v.InferInput<typeof UserSetAbstractionRequest>
->;
+export type UserSetAbstractionOptions = ExtractRequestOptions<v.InferInput<typeof UserSetAbstractionRequest>>;
 
 /** Successful variant of {@linkcode UserSetAbstractionResponse} without errors. */
-export type UserSetAbstractionSuccessResponse =
-  ExcludeErrorResponse<UserSetAbstractionResponse>;
+export type UserSetAbstractionSuccessResponse = ExcludeErrorResponse<UserSetAbstractionResponse>;
 
 /** EIP-712 types for the {@linkcode userSetAbstraction} function. */
 export const UserSetAbstractionTypes = {
@@ -157,18 +103,17 @@ export const UserSetAbstractionTypes = {
  *   { user: "0x...", abstraction: "dexAbstraction" },
  * );
  * ```
- *
  */
 export function userSetAbstraction(
   config: ExchangeConfig,
   params: UserSetAbstractionParameters,
-  opts?: UserSetAbstractionOptions
+  opts?: UserSetAbstractionOptions,
 ): Promise<UserSetAbstractionSuccessResponse> {
   const action = v.parse(UserSetAbstractionParameters, params);
   return executeUserSignedAction(
     config,
     { type: "userSetAbstraction", ...action },
     UserSetAbstractionTypes,
-    opts
+    opts,
   );
 }

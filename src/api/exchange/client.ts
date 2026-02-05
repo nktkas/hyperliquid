@@ -1684,7 +1684,30 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return userDexAbstraction(this.config_, params, opts);
   }
 
-  /** @see {@link userSetAbstraction} */
+  /**
+   * Set User abstraction mode.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.userSetAbstraction({ user: "0x...", abstraction: "dexAbstraction" });
+   * ```
+   */
   userSetAbstraction(
     params: UserSetAbstractionParameters,
     opts?: UserSetAbstractionOptions,
