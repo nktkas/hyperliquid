@@ -19,11 +19,7 @@ import * as path from "jsr:@std/path@1";
 /** Parsed JSDoc data structure */
 interface ParsedJSDoc {
   description: string | undefined;
-  params: Map<string, string>;
-  returns: string | undefined;
-  throws: string[];
-  examples: string[];
-  see: string[];
+  tags: Map<string, string[]>;
 }
 
 /** API endpoint configuration */
@@ -88,7 +84,7 @@ function getRawJSDocText(node: ts.Node, sourceFile: ts.SourceFile): string | und
 function cleanJSDocLines(rawText: string): string[] {
   return rawText
     .split("\n")
-    .map((line) => line.replace(/^\s*\*\s*/, ""));
+    .map((line) => line.replace(/^\s*\*\s?/, ""));
 }
 
 /** Parse JSDoc text into structured data */
@@ -96,55 +92,28 @@ function parseJSDoc(rawText: string): ParsedJSDoc {
   const lines = cleanJSDocLines(rawText);
   const result: ParsedJSDoc = {
     description: undefined,
-    params: new Map(),
-    returns: undefined,
-    throws: [],
-    examples: [],
-    see: [],
+    tags: new Map(),
   };
 
   let currentTag: string | null = null;
   let currentTagContent: string[] = [];
-  let currentParamName: string | null = null;
   const descriptionLines: string[] = [];
 
   /** Save accumulated tag content to result and reset state */
   function saveCurrentTag(): void {
     if (!currentTag) return;
 
-    // Join content: examples preserve newlines, other tags use space
-    const content = currentTagContent.join(currentTag === "example" ? "\n" : " ").trim();
-
-    switch (currentTag) {
-      case "param":
-        if (currentParamName) {
-          result.params.set(currentParamName, content);
-        }
-        break;
-      case "returns":
-        result.returns = content;
-        break;
-      case "throws":
-        if (content) {
-          result.throws.push(content);
-        }
-        break;
-      case "example":
-        if (content) {
-          result.examples.push(content);
-        }
-        break;
-      case "see":
-        if (content.startsWith("http://") || content.startsWith("https://")) {
-          result.see.push(content);
-        }
-        break;
+    const content = currentTagContent.join("\n").trim();
+    // Always save tag, even with empty content (e.g., @deprecated without text)
+    const existing = result.tags.get(currentTag);
+    if (existing) {
+      existing.push(content);
+    } else {
+      result.tags.set(currentTag, [content]);
     }
 
-    // Reset state for next tag
     currentTag = null;
     currentTagContent = [];
-    currentParamName = null;
   }
 
   for (const line of lines) {
@@ -154,54 +123,18 @@ function parseJSDoc(rawText: string): ParsedJSDoc {
     if (trimmed.startsWith("@")) {
       saveCurrentTag();
 
-      // @param name - description
-      const paramMatch = trimmed.match(/^@param\s+(\w+)\s*[-–]?\s*(.*)/);
-      if (paramMatch) {
-        currentTag = "param";
-        currentParamName = paramMatch[1];
-        currentTagContent = paramMatch[2] ? [paramMatch[2]] : [];
-        continue;
+      // Extract tag name and initial content
+      const tagMatch = trimmed.match(/^@(\w+)(?:\s+(.*))?$/);
+      if (tagMatch) {
+        currentTag = tagMatch[1];
+        currentTagContent = tagMatch[2] ? [tagMatch[2]] : [];
       }
-
-      // @returns description
-      const returnsMatch = trimmed.match(/^@returns\s+(.*)/);
-      if (returnsMatch) {
-        currentTag = "returns";
-        currentTagContent = returnsMatch[1] ? [returnsMatch[1]] : [];
-        continue;
-      }
-
-      // @throws {Type} description
-      const throwsMatch = trimmed.match(/^@throws\s+(.*)/);
-      if (throwsMatch) {
-        currentTag = "throws";
-        currentTagContent = throwsMatch[1] ? [throwsMatch[1]] : [];
-        continue;
-      }
-
-      // @example (content on following lines)
-      if (trimmed.startsWith("@example")) {
-        currentTag = "example";
-        currentTagContent = [];
-        continue;
-      }
-
-      // @see URL
-      const seeMatch = trimmed.match(/^@see\s+(.*)/);
-      if (seeMatch) {
-        currentTag = "see";
-        currentTagContent = seeMatch[1] ? [seeMatch[1]] : [];
-        continue;
-      }
-
-      // Unknown @tag - skip
       continue;
     }
 
     // Continuation line - add to current tag or description
     if (currentTag) {
-      // Preserve original indentation for examples
-      currentTagContent.push(currentTag === "example" ? line : trimmed);
+      currentTagContent.push(line);
     } else {
       descriptionLines.push(trimmed);
     }
@@ -222,10 +155,11 @@ function parseJSDoc(rawText: string): ParsedJSDoc {
  * Essential: description, @param, @returns, or @throws.
  */
 function isIncompleteJSDoc(jsdoc: ParsedJSDoc): boolean {
-  return !jsdoc.description &&
-    jsdoc.params.size === 0 &&
-    !jsdoc.returns &&
-    jsdoc.throws.length === 0;
+  if (jsdoc.description) return false;
+  if ((jsdoc.tags.get("param")?.length ?? 0) > 0) return false;
+  if ((jsdoc.tags.get("returns")?.length ?? 0) > 0) return false;
+  if ((jsdoc.tags.get("throws")?.length ?? 0) > 0) return false;
+  return true;
 }
 
 // =============================================================================
@@ -383,8 +317,8 @@ function formatArray(arr: string[]): string {
   return arr.map((item) => `"${item}"`).join(", ");
 }
 
-/** Compare arrays (for @throws and @see) and return errors if mismatched */
-function compareArrays(
+/** Compare two arrays of tag values */
+function compareTagArrays(
   funcArray: string[],
   methodArray: string[],
   tagName: string,
@@ -399,7 +333,7 @@ function compareArrays(
     errors.push({
       methodName,
       className,
-      errorType: `${tagName} count mismatch`,
+      errorType: `@${tagName} count mismatch`,
       details: `Function: ${formatArray(funcArray)}\nMethod:   ${formatArray(methodArray)}`,
       filePath,
     });
@@ -412,7 +346,7 @@ function compareArrays(
       errors.push({
         methodName,
         className,
-        errorType: `${tagName} mismatch`,
+        errorType: `@${tagName} mismatch`,
         details: `Position ${i}:\nFunction: "${funcArray[i]}"\nMethod:   "${methodArray[i]}"`,
         filePath,
       });
@@ -456,82 +390,56 @@ function compareJSDoc(
     });
   }
 
-  // Compare @param
-  // Function has 'config' as first param which method doesn't have - exclude it
-  const funcParams = new Map(funcJSDoc.params);
-  funcParams.delete("config");
+  // Collect all tag names from both JSDoc
+  const allTagNames = new Set([
+    ...funcJSDoc.tags.keys(),
+    ...methodJSDoc.tags.keys(),
+  ]);
 
-  if (funcParams.size !== methodJSDoc.params.size) {
-    errors.push({
-      methodName,
-      className,
-      errorType: "@param count mismatch",
-      details: `Function has ${funcParams.size} params (excluding config), method has ${methodJSDoc.params.size}`,
-      filePath: funcFilePath,
-    });
-  } else {
-    for (const [paramName, funcDesc] of funcParams) {
-      const methodDesc = methodJSDoc.params.get(paramName);
-      if (methodDesc === undefined) {
+  // Compare each tag
+  for (const tagName of allTagNames) {
+    let funcValues = funcJSDoc.tags.get(tagName) ?? [];
+    const methodValues = methodJSDoc.tags.get(tagName) ?? [];
+
+    // Special case: @param - filter out "config" entries from function
+    if (tagName === "param") {
+      funcValues = funcValues.filter((v) => !v.startsWith("config "));
+    }
+
+    // Special case: @example - normalize before comparison
+    if (tagName === "example") {
+      const funcHasExample = funcValues.length > 0;
+      const methodHasExample = methodValues.length > 0;
+
+      if (funcHasExample !== methodHasExample) {
         errors.push({
           methodName,
           className,
-          errorType: "@param missing",
-          details: `Method missing @param ${paramName}`,
+          errorType: funcHasExample ? "@example missing" : "@example unexpected",
+          details: funcHasExample ? "Function has @example, method does not" : "Method has @example, function does not",
           filePath: funcFilePath,
         });
-      } else if (funcDesc !== methodDesc) {
-        errors.push({
-          methodName,
-          className,
-          errorType: "@param mismatch",
-          details: `@param ${paramName}\nFunction: "${funcDesc}"\nMethod:   "${methodDesc}"`,
-          filePath: funcFilePath,
-        });
+      } else if (funcHasExample && methodHasExample) {
+        const funcNormalized = normalizeExample(funcValues[0], true, methodName);
+        const methodNormalized = normalizeExample(methodValues[0], false, methodName);
+
+        if (funcNormalized !== methodNormalized) {
+          errors.push({
+            methodName,
+            className,
+            errorType: "@example mismatch",
+            details: `Normalized params differ:\nFunction: "${funcNormalized}"\nMethod:   "${methodNormalized}"`,
+            filePath: funcFilePath,
+          });
+        }
       }
+      continue;
     }
-  }
 
-  // Compare @returns
-  if (funcJSDoc.returns !== methodJSDoc.returns) {
-    errors.push({
-      methodName,
-      className,
-      errorType: "@returns mismatch",
-      details: `Function: "${funcJSDoc.returns}"\nMethod:   "${methodJSDoc.returns}"`,
-      filePath: funcFilePath,
-    });
-  }
-
-  // Compare @throws and @see arrays
-  errors.push(...compareArrays(funcJSDoc.throws, methodJSDoc.throws, "@throws", methodName, className, funcFilePath));
-  errors.push(...compareArrays(funcJSDoc.see, methodJSDoc.see, "@see", methodName, className, funcFilePath));
-
-  // Compare @example (only compare params, not setup code)
-  const funcHasExample = funcJSDoc.examples.length > 0;
-  const methodHasExample = methodJSDoc.examples.length > 0;
-
-  if (funcHasExample !== methodHasExample) {
-    errors.push({
-      methodName,
-      className,
-      errorType: funcHasExample ? "@example missing" : "@example unexpected",
-      details: funcHasExample ? "Function has @example, method does not" : "Method has @example, function does not",
-      filePath: funcFilePath,
-    });
-  } else if (funcHasExample && methodHasExample) {
-    const funcNormalized = normalizeExample(funcJSDoc.examples[0], true, methodName);
-    const methodNormalized = normalizeExample(methodJSDoc.examples[0], false, methodName);
-
-    if (funcNormalized !== methodNormalized) {
-      errors.push({
-        methodName,
-        className,
-        errorType: "@example mismatch",
-        details: `Normalized params differ:\nFunction: "${funcNormalized}"\nMethod:   "${methodNormalized}"`,
-        filePath: funcFilePath,
-      });
-    }
+    // Universal comparison for all other tags
+    errors.push(
+      ...compareTagArrays(funcValues, methodValues, tagName, methodName, className, funcFilePath),
+    );
   }
 
   return errors;
