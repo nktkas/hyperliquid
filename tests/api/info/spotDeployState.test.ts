@@ -1,7 +1,7 @@
 import * as v from "@valibot/valibot";
 import { SpotDeployStateRequest, SpotDeployStateResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
 
 runTest({
   name: "spotDeployState",
@@ -12,17 +12,11 @@ runTest({
       client.spotDeployState({ user: "0x051dbfc562d44e4a01ebb986da35a47ab4f346db" }), // states.maxSupply = string
       client.spotDeployState({ user: "0xd8cb8d9747f50be8e423c698f9104ee090540961" }), // states.maxSupply = null
     ]);
-    schemaCoverage(SpotDeployStateResponse, data, {
-      ignoreEmptyArray: ["#/properties/states/items/properties/blacklistUsers"],
-      ignoreDefinedTypes: [
-        "#/properties/gasAuction/properties/currentGas",
-        "#/properties/gasAuction/properties/endGas",
-      ],
-      ignoreNullTypes: [
-        "#/properties/gasAuction/properties/endGas",
-        "#/properties/gasAuction/properties/currentGas",
-      ],
-    });
+    schemaCoverage(SpotDeployStateResponse, data, [
+      "#/properties/states/items/properties/blacklistUsers/array",
+      "#/properties/gasAuction/properties/currentGas/defined",
+      "#/properties/gasAuction/properties/endGas/null",
+    ]);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

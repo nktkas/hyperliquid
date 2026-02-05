@@ -1,7 +1,7 @@
 import { TwapStatesEvent } from "@nktkas/hyperliquid/api/subscription";
 import { getWalletAddress } from "@nktkas/hyperliquid/signing";
 import { collectEventsOverTime, createTWAP, runTestWithExchange } from "./_t.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
 
 runTestWithExchange({
   name: "twapStates",
@@ -13,10 +13,8 @@ runTestWithExchange({
       await client.subs.twapStates({ user }, cb);
       await createTWAP(client.exch);
     }, 10_000);
-    schemaCoverage(TwapStatesEvent, data, {
-      ignorePicklistValues: {
-        "#/properties/states/items/items/1/properties/side": ["A"],
-      },
-    });
+    schemaCoverage(TwapStatesEvent, data, [
+      "#/properties/states/items/items/1/properties/side/picklist/1",
+    ]);
   },
 });

@@ -1,7 +1,7 @@
 import * as v from "@valibot/valibot";
 import { TokenDetailsRequest, TokenDetailsResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
 
 runTest({
   name: "tokenDetails",
@@ -19,9 +19,9 @@ runTest({
       client.tokenDetails({ tokenId: "0x3d8a82efa63e86d54a1922c2afdac61e" }), // deployTime = string
       client.tokenDetails({ tokenId: "0xc4bf3f870c0e9465323c0b6ed28096c2" }), // deployTime = null
     ]);
-    schemaCoverage(TokenDetailsResponse, data, {
-      ignoreEmptyArray: ["#/properties/genesis/wrapped/properties/blacklistUsers"],
-    });
+    schemaCoverage(TokenDetailsResponse, data, [
+      "#/properties/genesis/wrapped/properties/blacklistUsers/array",
+    ]);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

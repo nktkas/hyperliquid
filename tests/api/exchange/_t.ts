@@ -1,6 +1,5 @@
 // deno-lint-ignore-file no-import-prefix
 import "jsr:@std/dotenv@^0.225.5/load";
-import type * as v from "@valibot/valibot";
 import { generatePrivateKey, privateKeyToAccount } from "npm:viem@2/accounts";
 import {
   ExchangeClient,
@@ -11,7 +10,6 @@ import {
 } from "@nktkas/hyperliquid";
 import { getWalletAddress } from "@nktkas/hyperliquid/signing";
 import { formatPrice, formatSize, SymbolConverter } from "@nktkas/hyperliquid/utils";
-import type { ExcludeErrorResponse } from "../../../src/api/exchange/_methods/_base/errors.ts";
 
 // =============================================================
 // Arguments
@@ -189,7 +187,7 @@ export async function cleanupTempExchangeClient(
 export async function openOrder(
   client: ExchangeClient<ExchangeSingleWalletConfig | ExchangeMultiSigConfig>,
   type: "market" | "limit",
-  symbol = "ETH",
+  symbol = "SOL",
   side: "buy" | "sell" = "buy",
   slippage = 0.05, // 5%
 ): Promise<{
@@ -257,7 +255,7 @@ export async function openOrder(
 
 export async function createTWAP(
   client: ExchangeClient<ExchangeSingleWalletConfig | ExchangeMultiSigConfig>,
-  symbol = "ETH",
+  symbol = "SOL",
   side: "buy" | "sell" = "buy",
 ): Promise<{ a: number; b: boolean; s: string; twapId: number; midPx: string }> {
   // Top-up account
@@ -325,130 +323,4 @@ export async function topUpSpot(
     token: `${token}:${tokenAddresses[token]}`,
     amount,
   });
-}
-
-// =============================================================
-// Schema Modifier
-// =============================================================
-
-type InferOutputWithoutErrors<T> = T extends v.GenericSchema<unknown, infer O> ? ExcludeErrorResponse<O> : never;
-
-export function excludeErrorResponse<T extends v.GenericSchema>(
-  schema: T,
-): v.GenericSchema<v.InferInput<T>, InferOutputWithoutErrors<T>> {
-  // Deep clone schema preserving functions and getters
-  function cloneSchema(s: v.GenericSchema): v.GenericSchema {
-    const clone = Object.defineProperties({}, Object.getOwnPropertyDescriptors(s)) as v.GenericSchema;
-
-    if ("pipe" in clone && Array.isArray(clone.pipe)) {
-      (clone as Record<string, unknown>).pipe = clone.pipe.map((p) =>
-        typeof p === "object" && p !== null ? cloneSchema(p as v.GenericSchema) : p
-      );
-    }
-    if ("options" in clone && Array.isArray(clone.options)) {
-      (clone as Record<string, unknown>).options = clone.options.map(cloneSchema);
-    }
-    if ("entries" in clone && typeof clone.entries === "object" && clone.entries !== null) {
-      (clone as Record<string, unknown>).entries = Object.fromEntries(
-        Object.entries(clone.entries).map(([k, v]) => [k, cloneSchema(v as v.GenericSchema)]),
-      );
-    }
-    if ("item" in clone && typeof clone.item === "object" && clone.item !== null) {
-      (clone as Record<string, unknown>).item = cloneSchema(clone.item as v.GenericSchema);
-    }
-    if ("wrapped" in clone && typeof clone.wrapped === "object" && clone.wrapped !== null) {
-      (clone as Record<string, unknown>).wrapped = cloneSchema(clone.wrapped as v.GenericSchema);
-    }
-    return clone;
-  }
-
-  // Work on a cloned copy to avoid mutating the original
-  const cloned = cloneSchema(schema);
-
-  // Unwrap pipe wrapper to get the underlying schema
-  function getBase(s: v.GenericSchema): v.GenericSchema {
-    return "pipe" in s && Array.isArray(s.pipe) ? s.pipe[0] : s;
-  }
-
-  function getEntries(s: v.GenericSchema): Record<string, v.GenericSchema> | null {
-    const base = getBase(s);
-    return "entries" in base && typeof base.entries === "object"
-      ? base.entries as Record<string, v.GenericSchema>
-      : null;
-  }
-
-  function getArrayItem(s: v.GenericSchema): v.GenericSchema | null {
-    const base = getBase(s);
-    return "item" in base && typeof base.item === "object" ? base.item as v.GenericSchema : null;
-  }
-
-  function getUnionOptions(s: v.GenericSchema): v.GenericSchema[] | null {
-    const base = getBase(s);
-    return "type" in base && base.type === "union" && "options" in base && Array.isArray(base.options)
-      ? base.options
-      : null;
-  }
-
-  function setUnionOptions(s: v.GenericSchema, options: v.GenericSchema[]): void {
-    const base = getBase(s);
-    if ("options" in s) (s as { options: v.GenericSchema[] }).options = options;
-    if (base !== s && "options" in base) (base as { options: v.GenericSchema[] }).options = options;
-  }
-
-  function hasErrStatus(s: v.GenericSchema): boolean {
-    const entries = getEntries(s);
-    if (!entries || !("status" in entries)) return false;
-    const statusBase = getBase(entries.status);
-    return "type" in statusBase && statusBase.type === "literal" && "literal" in statusBase &&
-      statusBase.literal === "err";
-  }
-
-  function hasErrorField(s: v.GenericSchema): boolean {
-    const entries = getEntries(s);
-    return entries !== null && "error" in entries;
-  }
-
-  function filterUnion(s: v.GenericSchema, predicate: (opt: v.GenericSchema) => boolean): void {
-    const options = getUnionOptions(s);
-    if (!options) return;
-    const filtered = options.filter(predicate);
-    if (filtered.length > 0 && filtered.length < options.length) {
-      setUnionOptions(s, filtered);
-    }
-  }
-
-  // Remove top-level ErrorResponse (status: "err") from union
-  if (getUnionOptions(cloned)) {
-    filterUnion(cloned, (opt) => !hasErrStatus(opt));
-  }
-
-  // Remove nested error responses from response.data.statuses[] or response.data.status
-  function processNestedErrors(target: v.GenericSchema): void {
-    const topEntries = getEntries(target);
-    if (!topEntries?.response) return;
-
-    const responseEntries = getEntries(topEntries.response);
-    if (!responseEntries?.data) return;
-
-    const dataEntries = getEntries(responseEntries.data);
-    if (!dataEntries) return;
-
-    if ("statuses" in dataEntries) {
-      const item = getArrayItem(dataEntries.statuses);
-      if (item) filterUnion(item, (opt) => !hasErrorField(opt));
-    }
-
-    if ("status" in dataEntries) {
-      filterUnion(dataEntries.status, (opt) => !hasErrorField(opt));
-    }
-  }
-
-  const options = getUnionOptions(cloned);
-  if (options) {
-    options.forEach(processNestedErrors);
-  } else {
-    processNestedErrors(cloned);
-  }
-
-  return cloned as v.GenericSchema<v.InferInput<T>, InferOutputWithoutErrors<T>>;
 }
