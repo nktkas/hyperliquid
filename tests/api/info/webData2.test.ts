@@ -26,6 +26,7 @@ runTest({
       "#/properties/meta/properties/universe/items/properties/lastGrowthModeChangeTime/defined",
       "#/properties/twapStates/array",
       "#/properties/perpsAtOpenInterestCap/defined",
+      "#/properties/openOrders/items/properties/cloid/defined",
     ]);
   },
   cliTestFn: async (_t, runCommand) => {

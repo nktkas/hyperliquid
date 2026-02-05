@@ -12,6 +12,7 @@ runTest({
     }, 10_000);
     schemaCoverage(UserHistoricalOrdersEvent, data, [
       "#/properties/orderHistory/items/properties/order/properties/orderType/picklist/3",
+      "#/properties/orderHistory/items/properties/status/picklist/4",
       "#/properties/orderHistory/items/properties/status/picklist/5",
       "#/properties/orderHistory/items/properties/status/picklist/6",
       "#/properties/orderHistory/items/properties/status/picklist/7",

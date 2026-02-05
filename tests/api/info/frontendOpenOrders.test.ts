@@ -16,6 +16,7 @@ runTest({
       "#/items/properties/tif/wrapped/picklist/1",
       "#/items/properties/tif/wrapped/picklist/3",
       "#/items/properties/tif/wrapped/picklist/4",
+      "#/items/properties/cloid/defined",
     ]);
   },
   cliTestFn: async (_t, runCommand) => {

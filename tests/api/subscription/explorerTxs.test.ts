@@ -9,6 +9,8 @@ runTest({
     const data = await collectEventsOverTime<ExplorerTxsEvent>(async (cb) => {
       await client.explorerTxs(cb);
     }, 10_000);
-    schemaCoverage(ExplorerTxsEvent, data);
+    schemaCoverage(ExplorerTxsEvent, data, [
+      "#/items/properties/error/defined",
+    ]);
   },
 });

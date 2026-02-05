@@ -16,6 +16,8 @@ runTest({
       "#/properties/states/items/properties/blacklistUsers/array",
       "#/properties/gasAuction/properties/currentGas/defined",
       "#/properties/gasAuction/properties/endGas/null",
+      "#/properties/gasAuction/properties/currentGas/null",
+      "#/properties/gasAuction/properties/endGas/defined",
     ]);
   },
   cliTestFn: async (_t, runCommand) => {

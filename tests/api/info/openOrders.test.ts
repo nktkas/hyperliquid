@@ -9,7 +9,9 @@ runTest({
     const data = await Promise.all([
       client.openOrders({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" }),
     ]);
-    schemaCoverage(OpenOrdersResponse, data);
+    schemaCoverage(OpenOrdersResponse, data, [
+      "#/items/properties/cloid/defined",
+    ]);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

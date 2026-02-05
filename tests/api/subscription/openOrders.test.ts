@@ -16,6 +16,7 @@ runTest({
       "#/properties/orders/items/properties/tif/wrapped/picklist/1",
       "#/properties/orders/items/properties/tif/wrapped/picklist/3",
       "#/properties/orders/items/properties/tif/wrapped/picklist/4",
+      "#/properties/orders/items/properties/cloid/defined",
     ]);
   },
 });

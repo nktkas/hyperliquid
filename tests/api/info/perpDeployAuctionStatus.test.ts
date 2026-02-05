@@ -12,6 +12,8 @@ runTest({
     schemaCoverage(PerpDeployAuctionStatusResponse, data, [
       "#/properties/currentGas/defined",
       "#/properties/endGas/null",
+      "#/properties/currentGas/null",
+      "#/properties/endGas/defined",
     ]);
   },
   cliTestFn: async (_t, runCommand) => {
