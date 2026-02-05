@@ -22,7 +22,6 @@
 
 // @ts-ignore: Ignore missing TS types when building npm
 import process from "node:process";
-import { bold, dim } from "@std/fmt/colors";
 import { type Args, extractArgs, transformArgs } from "./_utils.ts";
 import { ExchangeClient, HttpTransport, InfoClient } from "../src/mod.ts";
 import { PrivateKeySigner } from "../src/signing/mod.ts";
@@ -86,6 +85,16 @@ async function executeEndpointMethod(endpoint: string, method: string, args: Arg
 // ============================================================
 // CLI
 // ============================================================
+
+/** Format string as bold using ANSI escape codes. */
+function bold(s: string): string {
+  return `\x1b[1m${s}\x1b[22m`;
+}
+
+/** Format string as dim using ANSI escape codes. */
+function dim(s: string): string {
+  return `\x1b[2m${s}\x1b[22m`;
+}
 
 /** Prints CLI help message with usage instructions, available endpoints, methods, and examples. */
 // deno-fmt-ignore
