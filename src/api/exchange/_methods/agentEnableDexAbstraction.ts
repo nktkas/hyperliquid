@@ -55,6 +55,8 @@ export type AgentEnableDexAbstractionSuccessResponse = ExcludeErrorResponse<Agen
 /**
  * Enable HIP-3 DEX abstraction.
  *
+ * @deprecated Use {@link agentSetAbstraction} instead.
+ *
  * @param config - General configuration for Exchange API requests.
  * @param params - Parameters specific to the API request.
  * @param opts - Request execution options.

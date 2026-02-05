@@ -242,6 +242,7 @@ ${category("Order & TWAP & Position:")}
 
 ${category("Account:")}
   ${method("agentEnableDexAbstraction")}  ${params("(no params)")}
+  ${method("agentSetAbstraction")}        ${params("--abstraction <i|u|p>")}
   ${method("approveAgent")}               ${params("--agentAddress <address> [--agentName <string>]")}
   ${method("approveBuilderFee")}          ${params("--maxFeeRate <number> --builder <address>")}
   ${method("evmUserModify")}              ${params("--usingBigBlocks <bool>")}

@@ -10,6 +10,12 @@ import {
   type AgentEnableDexAbstractionSuccessResponse,
 } from "./_methods/agentEnableDexAbstraction.ts";
 import {
+  agentSetAbstraction,
+  type AgentSetAbstractionOptions,
+  type AgentSetAbstractionParameters,
+  type AgentSetAbstractionSuccessResponse,
+} from "./_methods/agentSetAbstraction.ts";
+import {
   approveAgent,
   type ApproveAgentOptions,
   type ApproveAgentParameters,
@@ -330,6 +336,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Enable HIP-3 DEX abstraction.
    *
+   * @deprecated Use {@link agentSetAbstraction} instead.
+   *
    * @param params - Parameters specific to the API request.
    * @param opts - Request execution options.
    *
@@ -357,6 +365,39 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     opts?: AgentEnableDexAbstractionOptions,
   ): Promise<AgentEnableDexAbstractionSuccessResponse> {
     return agentEnableDexAbstraction(this.config_, opts);
+  }
+
+  /**
+   * Set User abstraction mode (method for agent wallet).
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.agentSetAbstraction({ abstraction: "u" });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction-agent
+   */
+  agentSetAbstraction(
+    params: AgentSetAbstractionParameters,
+    opts?: AgentSetAbstractionOptions,
+  ): Promise<AgentSetAbstractionSuccessResponse> {
+    return agentSetAbstraction(this.config_, params, opts);
   }
 
   /**
@@ -1925,6 +1966,11 @@ export type {
   AgentEnableDexAbstractionOptions,
   AgentEnableDexAbstractionSuccessResponse,
 } from "./_methods/agentEnableDexAbstraction.ts";
+export type {
+  AgentSetAbstractionOptions,
+  AgentSetAbstractionParameters,
+  AgentSetAbstractionSuccessResponse,
+} from "./_methods/agentSetAbstraction.ts";
 export type {
   ApproveAgentOptions,
   ApproveAgentParameters,

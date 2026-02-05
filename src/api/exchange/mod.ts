@@ -41,6 +41,7 @@ export type { ExchangeMultiSigConfig, ExchangeSingleWalletConfig } from "./_meth
 export { ApiRequestError } from "./_methods/_base/errors.ts";
 
 export * from "./_methods/agentEnableDexAbstraction.ts";
+export * from "./_methods/agentSetAbstraction.ts";
 export * from "./_methods/approveAgent.ts";
 export * from "./_methods/approveBuilderFee.ts";
 export * from "./_methods/batchModify.ts";
