@@ -68,7 +68,6 @@ export type SubAccounts2Parameters = Omit<v.InferInput<typeof SubAccounts2Respon
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
- * @seenull
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
