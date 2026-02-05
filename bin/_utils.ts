@@ -21,6 +21,11 @@
 // Extract Args
 // ============================================================
 
+/**
+ * Raw parsed arguments with all values as strings.
+ * @template Collect - If `true`, repeated keys accumulate into arrays.
+ * @template DoubleDash - If `true`, includes `"--"` array for arguments after `--`.
+ */
 export type RawArgs<
   Collect extends boolean = true,
   DoubleDash extends boolean = false,
@@ -29,6 +34,11 @@ export type RawArgs<
   & (DoubleDash extends true ? { "--": string[] } : { "--"?: never })
   & Record<string, Collect extends false ? string : string | string[]>;
 
+/**
+ * Options for {@link extractArgs} function.
+ * @template Collect - If `true`, repeated keys accumulate into arrays.
+ * @template DoubleDash - If `true`, includes `"--"` array for arguments after `--`.
+ */
 export type ExtractOptions<
   Collect extends boolean = true,
   DoubleDash extends boolean = false,
@@ -90,7 +100,16 @@ function setValue(
   }
 }
 
-/** Extract command-line arguments into a key-value object (does not transform values). */
+/**
+ * Extract command-line arguments into a key-value object (does not transform values).
+ *
+ * @example
+ * ```ts
+ * const args = ["info", "--user", "0x1234", "--verbose", "-n", "5"];
+ * const result = extractArgs(args, { flags: ["verbose"] });
+ * // { _: ["info"], user: "0x1234", verbose: "true", n: "5" }
+ * ```
+ */
 export function extractArgs<
   Collect extends boolean = true,
   DoubleDash extends boolean = false,
@@ -191,6 +210,7 @@ export function extractArgs<
 // Transform Args
 // ============================================================
 
+/** Options for {@link transformArgs} function. */
 export interface TransformOptions {
   /**
    * Transform rule for null values.
@@ -232,6 +252,11 @@ export interface TransformOptions {
 
 type TransformedValue = string | number | boolean | null | Record<string, unknown> | unknown[];
 
+/**
+ * Transformed arguments with typed values.
+ * @template Collect - If `true`, repeated keys accumulate into arrays.
+ * @template DoubleDash - If `true`, includes `"--"` array for arguments after `--`.
+ */
 export type Args<
   Collect extends boolean = true,
   DoubleDash extends boolean = false,
@@ -307,6 +332,13 @@ function transformValue(
  * 5. number (numeric strings)
  * 6. json (object/array strings)
  * 7. string (default)
+ *
+ * @example
+ * ```ts
+ * const rawArgs = { _: ["info"], limit: "10", verbose: "true" };
+ * const result = transformArgs(rawArgs);
+ * // { _: ["info"], limit: 10, verbose: true }
+ * ```
  */
 export function transformArgs<
   Collect extends boolean = true,

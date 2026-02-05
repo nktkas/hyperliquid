@@ -10,16 +10,10 @@ import { UnsignedInteger } from "../../_schemas.ts";
  * Request exchange system status information.
  */
 export const ExchangeStatusRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("exchangeStatus"),
-        v.description("Type of request."),
-      ),
-    }),
-    v.description("Request exchange system status information."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("exchangeStatus"),
+  });
 })();
 export type ExchangeStatusRequest = v.InferOutput<typeof ExchangeStatusRequest>;
 
@@ -27,21 +21,12 @@ export type ExchangeStatusRequest = v.InferOutput<typeof ExchangeStatusRequest>;
  * Exchange system status information.
  */
 export const ExchangeStatusResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Server time (in ms since epoch). */
-      time: v.pipe(
-        UnsignedInteger,
-        v.description("Server time (in ms since epoch)."),
-      ),
-      /** Special statuses of the exchange system. */
-      specialStatuses: v.pipe(
-        v.nullable(v.unknown()),
-        v.description("Special statuses of the exchange system."),
-      ),
-    }),
-    v.description("Exchange system status information."),
-  );
+  return v.object({
+    /** Server time (in ms since epoch). */
+    time: UnsignedInteger,
+    /** Special statuses of the exchange system. */
+    specialStatuses: v.nullable(v.unknown()),
+  });
 })();
 export type ExchangeStatusResponse = v.InferOutput<typeof ExchangeStatusResponse>;
 

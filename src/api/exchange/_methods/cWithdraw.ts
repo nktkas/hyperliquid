@@ -12,53 +12,25 @@ import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#withdraw-from-staking
  */
 export const CWithdrawRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("cWithdraw"),
-            v.description("Type of action."),
-          ),
-          /** Chain ID in hex format for EIP-712 signing. */
-          signatureChainId: v.pipe(
-            Hex,
-            v.description("Chain ID in hex format for EIP-712 signing."),
-          ),
-          /** HyperLiquid network type. */
-          hyperliquidChain: v.pipe(
-            HyperliquidChainSchema,
-            v.description("HyperLiquid network type."),
-          ),
-          /** Amount of wei to withdraw from staking balance (float * 1e8). */
-          wei: v.pipe(
-            UnsignedInteger,
-            v.minValue(1),
-            v.description("Amount of wei to withdraw from staking balance (float * 1e8)."),
-          ),
-          /** Nonce (timestamp in ms) used to prevent replay attacks. */
-          nonce: v.pipe(
-            UnsignedInteger,
-            v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("cWithdraw"),
+      /** Chain ID in hex format for EIP-712 signing. */
+      signatureChainId: Hex,
+      /** HyperLiquid network type. */
+      hyperliquidChain: HyperliquidChainSchema,
+      /** Amount of wei to withdraw from staking balance (float * 1e8). */
+      wei: v.pipe(UnsignedInteger, v.minValue(1)),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
+      nonce: UnsignedInteger,
     }),
-    v.description("Transfer native token from staking into the user's spot account."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+  });
 })();
 export type CWithdrawRequest = v.InferOutput<typeof CWithdrawRequest>;
 
@@ -67,10 +39,7 @@ export type CWithdrawRequest = v.InferOutput<typeof CWithdrawRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#withdraw-from-staking
  */
 export const CWithdrawResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type CWithdrawResponse = v.InferOutput<typeof CWithdrawResponse>;
 

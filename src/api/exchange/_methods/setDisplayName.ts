@@ -9,58 +9,30 @@ import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonS
 
 /** Set the display name in the leaderboard. */
 export const SetDisplayNameRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("setDisplayName"),
-            v.description("Type of action."),
-          ),
-          /**
-           * Display name.
-           * Set to an empty string to remove the display name.
-           */
-          displayName: v.pipe(
-            v.string(),
-            v.maxLength(20),
-            v.description(
-              "Display name." +
-                "\nSet to an empty string to remove the display name.",
-            ),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("setDisplayName"),
+      /**
+       * Display name.
+       * Set to an empty string to remove the display name.
+       */
+      displayName: v.pipe(v.string(), v.maxLength(20)),
     }),
-    v.description("Set the display name in the leaderboard."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type SetDisplayNameRequest = v.InferOutput<typeof SetDisplayNameRequest>;
 
 /** Successful response without specific data or error response. */
 export const SetDisplayNameResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type SetDisplayNameResponse = v.InferOutput<typeof SetDisplayNameResponse>;
 

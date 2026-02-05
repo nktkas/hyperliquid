@@ -8,25 +8,16 @@ import { ExplorerTransactionSchema } from "../../info/_methods/_base/commonSchem
 
 /** Subscription to explorer transaction events. */
 export const ExplorerTxsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("explorerTxs"),
-        v.description("Type of subscription."),
-      ),
-    }),
-    v.description("Subscription to explorer transaction events."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("explorerTxs"),
+  });
 })();
 export type ExplorerTxsRequest = v.InferOutput<typeof ExplorerTxsRequest>;
 
 /** Event of array of transaction details. */
 export const ExplorerTxsEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(ExplorerTransactionSchema),
-    v.description("Event of array of transaction details."),
-  );
+  return v.array(ExplorerTransactionSchema);
 })();
 export type ExplorerTxsEvent = v.InferOutput<typeof ExplorerTxsEvent>;
 

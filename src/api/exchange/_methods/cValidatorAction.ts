@@ -9,176 +9,84 @@ import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonS
 
 /** Action related to validator management. */
 export const CValidatorActionRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Validator management action. */
-      action: v.pipe(
-        v.union([
-          v.object({
-            /** Type of action. */
-            type: v.pipe(
-              v.literal("CValidatorAction"),
-              v.description("Type of action."),
-            ),
-            /** Profile changes to apply. */
-            changeProfile: v.pipe(
-              v.object({
-                /** Validator node IP address. */
-                node_ip: v.pipe(
-                  v.nullable(
-                    v.object({
-                      /** IP address. */
-                      Ip: v.pipe(
-                        v.string(),
-                        v.ip(),
-                        v.description("IP address."),
-                      ),
-                    }),
-                  ),
-                  v.description("Validator node IP address."),
-                ),
-                /** Validator name. */
-                name: v.pipe(
-                  v.nullable(v.string()),
-                  v.description("Validator name."),
-                ),
-                /** Validator description. */
-                description: v.pipe(
-                  v.nullable(v.string()),
-                  v.description("Validator description."),
-                ),
-                /** Whether the validator is unjailed. */
-                unjailed: v.pipe(
-                  v.boolean(),
-                  v.description("Whether the validator is unjailed."),
-                ),
-                /** Enable or disable delegations. */
-                disable_delegations: v.pipe(
-                  v.nullable(v.boolean()),
-                  v.description("Enable or disable delegations."),
-                ),
-                /** Commission rate in basis points (1 = 0.0001%). */
-                commission_bps: v.pipe(
-                  v.nullable(UnsignedInteger),
-                  v.description("Commission rate in basis points (1 = 0.0001%)."),
-                ),
-                /** Signer address. */
-                signer: v.pipe(
-                  v.nullable(Address),
-                  v.description("Signer address."),
-                ),
-              }),
-              v.description("Profile changes to apply."),
-            ),
+  return v.object({
+    /** Validator management action. */
+    action: v.variant("type", [
+      v.object({
+        /** Type of action. */
+        type: v.literal("CValidatorAction"),
+        /** Profile changes to apply. */
+        changeProfile: v.object({
+          /** Validator node IP address. */
+          node_ip: v.nullable(
+            v.object({
+              /** IP address. */
+              Ip: v.pipe(v.string(), v.ip()),
+            }),
+          ),
+          /** Validator name. */
+          name: v.nullable(v.string()),
+          /** Validator description. */
+          description: v.nullable(v.string()),
+          /** Whether the validator is unjailed. */
+          unjailed: v.boolean(),
+          /** Enable or disable delegations. */
+          disable_delegations: v.nullable(v.boolean()),
+          /** Commission rate in basis points (1 = 0.0001%). */
+          commission_bps: v.nullable(UnsignedInteger),
+          /** Signer address. */
+          signer: v.nullable(Address),
+        }),
+      }),
+      v.object({
+        /** Type of action. */
+        type: v.literal("CValidatorAction"),
+        /** Registration parameters. */
+        register: v.object({
+          /** Validator profile information. */
+          profile: v.object({
+            /** Validator node IP address. */
+            node_ip: v.object({
+              /** IP address. */
+              Ip: v.pipe(v.string(), v.ip()),
+            }),
+            /** Validator name. */
+            name: v.string(),
+            /** Validator description. */
+            description: v.string(),
+            /** Whether delegations are disabled. */
+            delegations_disabled: v.boolean(),
+            /** Commission rate in basis points (1 = 0.0001%). */
+            commission_bps: UnsignedInteger,
+            /** Signer address. */
+            signer: Address,
           }),
-          v.object({
-            /** Type of action. */
-            type: v.pipe(
-              v.literal("CValidatorAction"),
-              v.description("Type of action."),
-            ),
-            /** Registration parameters. */
-            register: v.pipe(
-              v.object({
-                /** Validator profile information. */
-                profile: v.pipe(
-                  v.object({
-                    /** Validator node IP address. */
-                    node_ip: v.pipe(
-                      v.object({
-                        /** IP address. */
-                        Ip: v.pipe(
-                          v.string(),
-                          v.ip(),
-                          v.description("IP address."),
-                        ),
-                      }),
-                      v.description("Validator node IP address."),
-                    ),
-                    /** Validator name. */
-                    name: v.pipe(
-                      v.string(),
-                      v.description("Validator name."),
-                    ),
-                    /** Validator description. */
-                    description: v.pipe(
-                      v.string(),
-                      v.description("Validator description."),
-                    ),
-                    /** Whether delegations are disabled. */
-                    delegations_disabled: v.pipe(
-                      v.boolean(),
-                      v.description("Whether delegations are disabled."),
-                    ),
-                    /** Commission rate in basis points (1 = 0.0001%). */
-                    commission_bps: v.pipe(
-                      UnsignedInteger,
-                      v.description("Commission rate in basis points (1 = 0.0001%)."),
-                    ),
-                    /** Signer address. */
-                    signer: v.pipe(
-                      Address,
-                      v.description("Signer address."),
-                    ),
-                  }),
-                  v.description("Validator profile information."),
-                ),
-                /** Initial jail status. */
-                unjailed: v.pipe(
-                  v.boolean(),
-                  v.description("Initial jail status."),
-                ),
-                /** Initial stake amount in wei. */
-                initial_wei: v.pipe(
-                  UnsignedInteger,
-                  v.description("Initial stake amount in wei."),
-                ),
-              }),
-              v.description("Registration parameters."),
-            ),
-          }),
-          v.object({
-            /** Type of action. */
-            type: v.pipe(
-              v.literal("CValidatorAction"),
-              v.description("Type of action."),
-            ),
-            /** Unregister the validator. */
-            unregister: v.pipe(
-              v.null(),
-              v.description("Unregister the validator."),
-            ),
-          }),
-        ]),
-        v.description("Validator management action."),
-      ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
-      ),
-    }),
-    v.description("Action related to validator management."),
-  );
+          /** Initial jail status. */
+          unjailed: v.boolean(),
+          /** Initial stake amount in wei. */
+          initial_wei: UnsignedInteger,
+        }),
+      }),
+      v.object({
+        /** Type of action. */
+        type: v.literal("CValidatorAction"),
+        /** Unregister the validator. */
+        unregister: v.null(),
+      }),
+    ]),
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type CValidatorActionRequest = v.InferOutput<typeof CValidatorActionRequest>;
 
 /** Successful response without specific data or error response. */
 export const CValidatorActionResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type CValidatorActionResponse = v.InferOutput<typeof CValidatorActionResponse>;
 

@@ -10,21 +10,12 @@ import { UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
  * Request supply, rate, and pending payment information for an aligned quote token.
  */
 export const AlignedQuoteTokenInfoRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("alignedQuoteTokenInfo"),
-        v.description("Type of request."),
-      ),
-      /** Token index. */
-      token: v.pipe(
-        UnsignedInteger,
-        v.description("Token index."),
-      ),
-    }),
-    v.description("Request supply, rate, and pending payment information for an aligned quote token."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("alignedQuoteTokenInfo"),
+    /** Token index. */
+    token: UnsignedInteger,
+  });
 })();
 export type AlignedQuoteTokenInfoRequest = v.InferOutput<typeof AlignedQuoteTokenInfoRequest>;
 
@@ -32,41 +23,23 @@ export type AlignedQuoteTokenInfoRequest = v.InferOutput<typeof AlignedQuoteToke
  * Supply, rate, and pending payment information for an aligned quote token.
  */
 export const AlignedQuoteTokenInfoResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Whether the token is aligned. */
-      isAligned: v.pipe(
-        v.boolean(),
-        v.description("Whether the token is aligned."),
-      ),
-      /** Timestamp (in ms since epoch) when the token was first aligned. */
-      firstAlignedTime: v.pipe(
-        UnsignedInteger,
-        v.description("Timestamp (in ms since epoch) when the token was first aligned."),
-      ),
-      /** Total EVM minted supply. */
-      evmMintedSupply: v.pipe(
+  return v.object({
+    /** Whether the token is aligned. */
+    isAligned: v.boolean(),
+    /** Timestamp (in ms since epoch) when the token was first aligned. */
+    firstAlignedTime: UnsignedInteger,
+    /** Total EVM minted supply. */
+    evmMintedSupply: UnsignedDecimal,
+    /** Daily amount owed as an array of [date, amount] tuples. */
+    dailyAmountOwed: v.array(
+      v.tuple([
+        v.pipe(v.string(), v.isoDate()),
         UnsignedDecimal,
-        v.description("Total EVM minted supply."),
-      ),
-      /** Daily amount owed as an array of [date, amount] tuples. */
-      dailyAmountOwed: v.pipe(
-        v.array(
-          v.tuple([
-            v.pipe(v.string(), v.isoDate()),
-            UnsignedDecimal,
-          ]),
-        ),
-        v.description("Daily amount owed as an array of [date, amount] tuples."),
-      ),
-      /** Predicted rate. */
-      predictedRate: v.pipe(
-        UnsignedDecimal,
-        v.description("Predicted rate."),
-      ),
-    }),
-    v.description("Supply, rate, and pending payment information for an aligned quote token."),
-  );
+      ]),
+    ),
+    /** Predicted rate. */
+    predictedRate: UnsignedDecimal,
+  });
 })();
 export type AlignedQuoteTokenInfoResponse = v.InferOutput<typeof AlignedQuoteTokenInfoResponse>;
 

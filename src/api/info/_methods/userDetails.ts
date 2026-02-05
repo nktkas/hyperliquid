@@ -11,21 +11,12 @@ import { ExplorerTransactionSchema } from "./_base/commonSchemas.ts";
  * Request array of user transaction details.
  */
 export const UserDetailsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("userDetails"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request array of user transaction details."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("userDetails"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type UserDetailsRequest = v.InferOutput<typeof UserDetailsRequest>;
 
@@ -33,21 +24,12 @@ export type UserDetailsRequest = v.InferOutput<typeof UserDetailsRequest>;
  * Response array of user transaction details.
  */
 export const UserDetailsResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of response. */
-      type: v.pipe(
-        v.literal("userDetails"),
-        v.description("Type of response."),
-      ),
-      /** Array of user transaction details. */
-      txs: v.pipe(
-        v.array(ExplorerTransactionSchema),
-        v.description("Array of user transaction details."),
-      ),
-    }),
-    v.description("Response array of user transaction details."),
-  );
+  return v.object({
+    /** Type of response. */
+    type: v.literal("userDetails"),
+    /** Array of user transaction details. */
+    txs: v.array(ExplorerTransactionSchema),
+  });
 })();
 export type UserDetailsResponse = v.InferOutput<typeof UserDetailsResponse>;
 

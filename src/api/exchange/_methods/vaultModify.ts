@@ -9,61 +9,31 @@ import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonS
 
 /** Modify a vault's configuration. */
 export const VaultModifyRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("vaultModify"),
-            v.description("Type of action."),
-          ),
-          /** Vault address. */
-          vaultAddress: v.pipe(
-            Address,
-            v.description("Vault address."),
-          ),
-          /** Allow deposits from followers. */
-          allowDeposits: v.pipe(
-            v.nullish(v.boolean(), null),
-            v.description("Allow deposits from followers."),
-          ),
-          /** Always close positions on withdrawal. */
-          alwaysCloseOnWithdraw: v.pipe(
-            v.nullish(v.boolean(), null),
-            v.description("Always close positions on withdrawal."),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("vaultModify"),
+      /** Vault address. */
+      vaultAddress: Address,
+      /** Allow deposits from followers. */
+      allowDeposits: v.nullish(v.boolean(), null),
+      /** Always close positions on withdrawal. */
+      alwaysCloseOnWithdraw: v.nullish(v.boolean(), null),
     }),
-    v.description("Modify a vault's configuration."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type VaultModifyRequest = v.InferOutput<typeof VaultModifyRequest>;
 
 /** Successful response without specific data or error response. */
 export const VaultModifyResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type VaultModifyResponse = v.InferOutput<typeof VaultModifyResponse>;
 

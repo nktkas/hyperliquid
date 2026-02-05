@@ -10,21 +10,12 @@ import { UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
  * Request margin table data.
  */
 export const MarginTableRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("marginTable"),
-        v.description("Type of request."),
-      ),
-      /** Margin requirements table. */
-      id: v.pipe(
-        UnsignedInteger,
-        v.description("Margin requirements table."),
-      ),
-    }),
-    v.description("Request margin table data."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("marginTable"),
+    /** Margin requirements table. */
+    id: UnsignedInteger,
+  });
 })();
 
 export type MarginTableRequest = v.InferOutput<typeof MarginTableRequest>;
@@ -33,35 +24,19 @@ export type MarginTableRequest = v.InferOutput<typeof MarginTableRequest>;
  * Margin requirements table with multiple tiers.
  */
 export const MarginTableResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Description of the margin table. */
-      description: v.pipe(
-        v.string(),
-        v.description("Description of the margin table."),
-      ),
-      /** Array of margin tiers defining leverage limits. */
-      marginTiers: v.pipe(
-        v.array(
-          v.object({
-            /** Lower position size boundary for this tier. */
-            lowerBound: v.pipe(
-              UnsignedDecimal,
-              v.description("Lower position size boundary for this tier."),
-            ),
-            /** Maximum allowed leverage for this tier. */
-            maxLeverage: v.pipe(
-              UnsignedInteger,
-              v.minValue(1),
-              v.description("Maximum allowed leverage for this tier."),
-            ),
-          }),
-        ),
-        v.description("Array of margin tiers defining leverage limits."),
-      ),
-    }),
-    v.description("Margin requirements table with multiple tiers."),
-  );
+  return v.object({
+    /** Description of the margin table. */
+    description: v.string(),
+    /** Array of margin tiers defining leverage limits. */
+    marginTiers: v.array(
+      v.object({
+        /** Lower position size boundary for this tier. */
+        lowerBound: UnsignedDecimal,
+        /** Maximum allowed leverage for this tier. */
+        maxLeverage: v.pipe(UnsignedInteger, v.minValue(1)),
+      }),
+    ),
+  });
 })();
 
 export type MarginTableResponse = v.InferOutput<typeof MarginTableResponse>;

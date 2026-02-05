@@ -1,7 +1,7 @@
 import * as v from "@valibot/valibot";
 import { UserFillsRequest, UserFillsResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
 
 runTest({
   name: "userFills",
@@ -10,9 +10,9 @@ runTest({
       client.userFills({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" }),
       client.userFills({ user: "0x8172cc20bc3a55dcd07c75dd37ac0c2534de3b84" }),
     ]);
-    schemaCoverage(UserFillsResponse, data, {
-      ignoreDefinedTypes: ["#/items/intersect/0/properties/twapId"],
-    });
+    schemaCoverage(UserFillsResponse, data, [
+      "#/items/intersect/0/properties/twapId/defined",
+    ]);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

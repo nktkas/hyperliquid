@@ -8,41 +8,23 @@ import { PerpAssetCtxSchema } from "../../info/_methods/_base/commonSchemas.ts";
 
 /** Subscription to context events for a specific perpetual asset. */
 export const ActiveAssetCtxRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("activeAssetCtx"),
-        v.description("Type of subscription."),
-      ),
-      /** Asset symbol (e.g., BTC). */
-      coin: v.pipe(
-        v.string(),
-        v.description("Asset symbol (e.g., BTC)."),
-      ),
-    }),
-    v.description("Subscription to context events for a specific perpetual asset."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("activeAssetCtx"),
+    /** Asset symbol (e.g., BTC). */
+    coin: v.string(),
+  });
 })();
 export type ActiveAssetCtxRequest = v.InferOutput<typeof ActiveAssetCtxRequest>;
 
 /** Event of active perpetual asset context. */
 export const ActiveAssetCtxEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Asset symbol (e.g., BTC). */
-      coin: v.pipe(
-        v.string(),
-        v.description("Asset symbol (e.g., BTC)."),
-      ),
-      /** Context for a specific perpetual asset. */
-      ctx: v.pipe(
-        PerpAssetCtxSchema,
-        v.description("Context for a specific perpetual asset."),
-      ),
-    }),
-    v.description("Event of active perpetual asset context."),
-  );
+  return v.object({
+    /** Asset symbol (e.g., BTC). */
+    coin: v.string(),
+    /** Context for a specific perpetual asset. */
+    ctx: PerpAssetCtxSchema,
+  });
 })();
 export type ActiveAssetCtxEvent = v.InferOutput<typeof ActiveAssetCtxEvent>;
 

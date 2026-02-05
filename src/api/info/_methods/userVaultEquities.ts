@@ -11,21 +11,12 @@ import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-vault-deposits
  */
 export const UserVaultEquitiesRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("userVaultEquities"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request user vault deposits."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("userVaultEquities"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type UserVaultEquitiesRequest = v.InferOutput<typeof UserVaultEquitiesRequest>;
 
@@ -34,27 +25,15 @@ export type UserVaultEquitiesRequest = v.InferOutput<typeof UserVaultEquitiesReq
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-vault-deposits
  */
 export const UserVaultEquitiesResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(
-      v.object({
-        /** Vault address. */
-        vaultAddress: v.pipe(
-          Address,
-          v.description("Vault address."),
-        ),
-        /** User deposited equity. */
-        equity: v.pipe(
-          UnsignedDecimal,
-          v.description("User deposited equity."),
-        ),
-        /** Timestamp when the user can withdraw their equity. */
-        lockedUntilTimestamp: v.pipe(
-          UnsignedInteger,
-          v.description("Timestamp when the user can withdraw their equity."),
-        ),
-      }),
-    ),
-    v.description("Array of user's vault deposits."),
+  return v.array(
+    v.object({
+      /** Vault address. */
+      vaultAddress: Address,
+      /** User deposited equity. */
+      equity: UnsignedDecimal,
+      /** Timestamp when the user can withdraw their equity. */
+      lockedUntilTimestamp: UnsignedInteger,
+    }),
   );
 })();
 export type UserVaultEquitiesResponse = v.InferOutput<typeof UserVaultEquitiesResponse>;

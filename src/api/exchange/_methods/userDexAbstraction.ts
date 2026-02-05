@@ -12,57 +12,27 @@ import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction
  */
 export const UserDexAbstractionRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("userDexAbstraction"),
-            v.description("Type of action."),
-          ),
-          /** Chain ID in hex format for EIP-712 signing. */
-          signatureChainId: v.pipe(
-            Hex,
-            v.description("Chain ID in hex format for EIP-712 signing."),
-          ),
-          /** HyperLiquid network type. */
-          hyperliquidChain: v.pipe(
-            HyperliquidChainSchema,
-            v.description("HyperLiquid network type."),
-          ),
-          /** User address. */
-          user: v.pipe(
-            Address,
-            v.description("User address."),
-          ),
-          /** Whether to enable or disable HIP-3 DEX abstraction. */
-          enabled: v.pipe(
-            v.boolean(),
-            v.description("Whether to enable or disable HIP-3 DEX abstraction."),
-          ),
-          /** Nonce (timestamp in ms) used to prevent replay attacks. */
-          nonce: v.pipe(
-            UnsignedInteger,
-            v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("userDexAbstraction"),
+      /** Chain ID in hex format for EIP-712 signing. */
+      signatureChainId: Hex,
+      /** HyperLiquid network type. */
+      hyperliquidChain: HyperliquidChainSchema,
+      /** User address. */
+      user: Address,
+      /** Whether to enable or disable HIP-3 DEX abstraction. */
+      enabled: v.boolean(),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
+      nonce: UnsignedInteger,
     }),
-    v.description("Enable/disable HIP-3 DEX abstraction."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+  });
 })();
 export type UserDexAbstractionRequest = v.InferOutput<typeof UserDexAbstractionRequest>;
 
@@ -71,10 +41,7 @@ export type UserDexAbstractionRequest = v.InferOutput<typeof UserDexAbstractionR
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction
  */
 export const UserDexAbstractionResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type UserDexAbstractionResponse = v.InferOutput<typeof UserDexAbstractionResponse>;
 
@@ -115,6 +82,8 @@ export const UserDexAbstractionTypes = {
 
 /**
  * Enable/disable HIP-3 DEX abstraction.
+ *
+ * @deprecated Use {@link userSetAbstraction} instead.
  *
  * @param config - General configuration for Exchange API requests.
  * @param params - Parameters specific to the API request.

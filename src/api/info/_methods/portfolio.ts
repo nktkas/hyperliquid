@@ -11,67 +11,42 @@ import { Address, Decimal, UnsignedDecimal, UnsignedInteger } from "../../_schem
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-portfolio
  */
 export const PortfolioRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("portfolio"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request user portfolio."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("portfolio"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type PortfolioRequest = v.InferOutput<typeof PortfolioRequest>;
 
 /** Portfolio metrics snapshot. */
 const PortfolioSchema = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** History entries for account value as [timestamp, value]. */
-      accountValueHistory: v.pipe(
-        v.array(v.tuple([UnsignedInteger, UnsignedDecimal])),
-        v.description("History entries for account value as [timestamp, value]."),
-      ),
-      /** History entries for profit and loss as [timestamp, value]. */
-      pnlHistory: v.pipe(
-        v.array(v.tuple([UnsignedInteger, Decimal])),
-        v.description("History entries for profit and loss as [timestamp, value]."),
-      ),
-      /** Volume metric for the portfolio. */
-      vlm: v.pipe(
-        UnsignedDecimal,
-        v.description("Volume metric for the portfolio."),
-      ),
-    }),
-    v.description("Portfolio metrics snapshot."),
-  );
+  return v.object({
+    /** History entries for account value as [timestamp, value]. */
+    accountValueHistory: v.array(v.tuple([UnsignedInteger, UnsignedDecimal])),
+    /** History entries for profit and loss as [timestamp, value]. */
+    pnlHistory: v.array(v.tuple([UnsignedInteger, Decimal])),
+    /** Volume metric for the portfolio. */
+    vlm: UnsignedDecimal,
+  });
 })();
-type PortfolioSchema = v.InferOutput<typeof PortfolioSchema>;
 
 /**
  * Portfolio metrics grouped by time periods.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-portfolio
  */
 export const PortfolioResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.tuple([
-      v.tuple([v.literal("day"), PortfolioSchema]),
-      v.tuple([v.literal("week"), PortfolioSchema]),
-      v.tuple([v.literal("month"), PortfolioSchema]),
-      v.tuple([v.literal("allTime"), PortfolioSchema]),
-      v.tuple([v.literal("perpDay"), PortfolioSchema]),
-      v.tuple([v.literal("perpWeek"), PortfolioSchema]),
-      v.tuple([v.literal("perpMonth"), PortfolioSchema]),
-      v.tuple([v.literal("perpAllTime"), PortfolioSchema]),
-    ]),
-    v.description("Portfolio metrics grouped by time periods."),
-  );
+  return v.tuple([
+    v.tuple([v.literal("day"), PortfolioSchema]),
+    v.tuple([v.literal("week"), PortfolioSchema]),
+    v.tuple([v.literal("month"), PortfolioSchema]),
+    v.tuple([v.literal("allTime"), PortfolioSchema]),
+    v.tuple([v.literal("perpDay"), PortfolioSchema]),
+    v.tuple([v.literal("perpWeek"), PortfolioSchema]),
+    v.tuple([v.literal("perpMonth"), PortfolioSchema]),
+    v.tuple([v.literal("perpAllTime"), PortfolioSchema]),
+  ]);
 })();
 export type PortfolioResponse = v.InferOutput<typeof PortfolioResponse>;
 

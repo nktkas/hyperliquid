@@ -9,96 +9,46 @@ import { ErrorResponse, SignatureSchema } from "./_base/commonSchemas.ts";
 
 /** Create a vault. */
 export const CreateVaultRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("createVault"),
-            v.description("Type of action."),
-          ),
-          /** Vault name. */
-          name: v.pipe(
-            v.string(),
-            v.minLength(3),
-            v.maxLength(50),
-            v.description("Vault name."),
-          ),
-          /** Vault description. */
-          description: v.pipe(
-            v.string(),
-            v.minLength(10),
-            v.maxLength(250),
-            v.description("Vault description."),
-          ),
-          /** Initial balance (float * 1e6). */
-          initialUsd: v.pipe(
-            UnsignedInteger,
-            v.minValue(100 * 1e6), // 100 USD
-            v.description("Initial balance (float * 1e6)."),
-          ),
-          /** Nonce (timestamp in ms) used to prevent replay attacks. */
-          nonce: v.pipe(
-            UnsignedInteger,
-            v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("createVault"),
+      /** Vault name. */
+      name: v.pipe(v.string(), v.minLength(3), v.maxLength(50)),
+      /** Vault description. */
+      description: v.pipe(v.string(), v.minLength(10), v.maxLength(250)),
+      /** Initial balance (float * 1e6). */
+      initialUsd: v.pipe(UnsignedInteger, v.minValue(100 * 1e6)), // 100 USD
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
-      ),
+      nonce: UnsignedInteger,
     }),
-    v.description("Create a vault."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type CreateVaultRequest = v.InferOutput<typeof CreateVaultRequest>;
 
 /** Response for creating a vault. */
 export const CreateVaultResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([
-      v.object({
-        /** Successful status. */
-        status: v.pipe(
-          v.literal("ok"),
-          v.description("Successful status."),
-        ),
-        /** Response details. */
-        response: v.pipe(
-          v.object({
-            /** Type of response. */
-            type: v.pipe(
-              v.literal("createVault"),
-              v.description("Type of response."),
-            ),
-            /** Vault address. */
-            data: v.pipe(
-              Address,
-              v.description("Vault address."),
-            ),
-          }),
-          v.description("Response details."),
-        ),
+  return v.union([
+    v.object({
+      /** Successful status. */
+      status: v.literal("ok"),
+      /** Response details. */
+      response: v.object({
+        /** Type of response. */
+        type: v.literal("createVault"),
+        /** Vault address. */
+        data: Address,
       }),
-      ErrorResponse,
-    ]),
-    v.description("Response for creating a vault."),
-  );
+    }),
+    ErrorResponse,
+  ]);
 })();
 export type CreateVaultResponse = v.InferOutput<typeof CreateVaultResponse>;
 

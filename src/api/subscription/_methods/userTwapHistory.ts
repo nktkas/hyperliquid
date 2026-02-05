@@ -9,46 +9,25 @@ import { TwapHistoryResponse } from "../../info/_methods/twapHistory.ts";
 
 /** Subscription to user TWAP history events for a specific user. */
 export const UserTwapHistoryRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("userTwapHistory"),
-        v.description("Type of subscription."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Subscription to user TWAP history events for a specific user."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("userTwapHistory"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type UserTwapHistoryRequest = v.InferOutput<typeof UserTwapHistoryRequest>;
 
 /** Event of user TWAP history. */
 export const UserTwapHistoryEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** Array of user's TWAP history. */
-      history: v.pipe(
-        TwapHistoryResponse,
-        v.description("Array of user's TWAP history."),
-      ),
-      /** Whether this is an initial snapshot. */
-      isSnapshot: v.pipe(
-        v.optional(v.literal(true)),
-        v.description("Whether this is an initial snapshot."),
-      ),
-    }),
-    v.description("Event of user TWAP history."),
-  );
+  return v.object({
+    /** User address. */
+    user: Address,
+    /** Array of user's TWAP history. */
+    history: TwapHistoryResponse,
+    /** Whether this is an initial snapshot. */
+    isSnapshot: v.optional(v.literal(true)),
+  });
 })();
 export type UserTwapHistoryEvent = v.InferOutput<typeof UserTwapHistoryEvent>;
 

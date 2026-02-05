@@ -9,46 +9,25 @@ import { UserNonFundingLedgerUpdatesResponse } from "../../info/_methods/userNon
 
 /** Subscription to user non-funding ledger updates for a specific user. */
 export const UserNonFundingLedgerUpdatesRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("userNonFundingLedgerUpdates"),
-        v.description("Type of subscription."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Subscription to user non-funding ledger updates for a specific user."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("userNonFundingLedgerUpdates"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type UserNonFundingLedgerUpdatesRequest = v.InferOutput<typeof UserNonFundingLedgerUpdatesRequest>;
 
 /** Event of user non-funding ledger updates. */
 export const UserNonFundingLedgerUpdatesEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** Array of user's non-funding ledger update. */
-      nonFundingLedgerUpdates: v.pipe(
-        UserNonFundingLedgerUpdatesResponse,
-        v.description("Array of user's non-funding ledger update."),
-      ),
-      /** Whether this is an initial snapshot. */
-      isSnapshot: v.pipe(
-        v.optional(v.literal(true)),
-        v.description("Whether this is an initial snapshot."),
-      ),
-    }),
-    v.description("Event of user non-funding ledger updates."),
-  );
+  return v.object({
+    /** User address. */
+    user: Address,
+    /** Array of user's non-funding ledger update. */
+    nonFundingLedgerUpdates: UserNonFundingLedgerUpdatesResponse,
+    /** Whether this is an initial snapshot. */
+    isSnapshot: v.optional(v.literal(true)),
+  });
 })();
 export type UserNonFundingLedgerUpdatesEvent = v.InferOutput<typeof UserNonFundingLedgerUpdatesEvent>;
 

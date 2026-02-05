@@ -11,16 +11,10 @@ import { Address, Hex, Integer, UnsignedDecimal, UnsignedInteger } from "../../_
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-metadata
  */
 export const SpotMetaRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("spotMeta"),
-        v.description("Type of request."),
-      ),
-    }),
-    v.description("Request spot trading metadata."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("spotMeta"),
+  });
 })();
 export type SpotMetaRequest = v.InferOutput<typeof SpotMetaRequest>;
 
@@ -29,146 +23,86 @@ export type SpotMetaRequest = v.InferOutput<typeof SpotMetaRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-metadata
  */
 export const SpotMetaResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Trading universes available for spot trading. */
-      universe: v.pipe(
-        v.array(
+  return v.object({
+    /** Trading universes available for spot trading. */
+    universe: v.array(
+      v.object({
+        /** Token indices included in this universe. */
+        tokens: v.array(UnsignedInteger),
+        /** Name of the universe. */
+        name: v.string(),
+        /** Unique identifier of the universe. */
+        index: UnsignedInteger,
+        /** Indicates if the token is the primary representation in the system. */
+        isCanonical: v.boolean(),
+      }),
+    ),
+    /** Tokens available for spot trading. */
+    tokens: v.array(
+      v.object({
+        /** Name of the token. */
+        name: v.string(),
+        /** Minimum decimal places for order sizes. */
+        szDecimals: UnsignedInteger,
+        /** Number of decimals for the token's smallest unit. */
+        weiDecimals: UnsignedInteger,
+        /** Unique identifier for the token. */
+        index: UnsignedInteger,
+        /** Token ID. */
+        tokenId: Hex,
+        /** Indicates if the token is the primary representation in the system. */
+        isCanonical: v.boolean(),
+        /** EVM contract details. */
+        evmContract: v.nullable(
           v.object({
-            /** Token indices included in this universe. */
-            tokens: v.pipe(
-              v.array(UnsignedInteger),
-              v.description("Token indices included in this universe."),
-            ),
-            /** Name of the universe. */
-            name: v.pipe(
-              v.string(),
-              v.description("Name of the universe."),
-            ),
-            /** Unique identifier of the universe. */
-            index: v.pipe(
-              UnsignedInteger,
-              v.description("Unique identifier of the universe."),
-            ),
-            /** Indicates if the token is the primary representation in the system. */
-            isCanonical: v.pipe(
-              v.boolean(),
-              v.description("Indicates if the token is the primary representation in the system."),
-            ),
+            /** Contract address. */
+            address: Address,
+            /** Extra decimals in the token's smallest unit. */
+            evm_extra_wei_decimals: Integer,
           }),
         ),
-        v.description("Trading universes available for spot trading."),
-      ),
-      /** Tokens available for spot trading. */
-      tokens: v.pipe(
-        v.array(
+        /** Full display name of the token. */
+        fullName: v.nullable(v.string()),
+        /** Deployer trading fee share for the token. */
+        deployerTradingFeeShare: UnsignedDecimal,
+      }),
+    ),
+    /** Outcome markets available for spot trading. */
+    outcomes: v.array(
+      v.object({
+        /** Unique identifier of the outcome market. */
+        outcome: UnsignedInteger,
+        /** Short name of the outcome market. */
+        name: v.string(),
+        /** Description of the outcome market. */
+        description: v.string(),
+        /** Token specifications for each side of the outcome market. */
+        sideSpecs: v.array(
           v.object({
-            /** Name of the token. */
-            name: v.pipe(
-              v.string(),
-              v.description("Name of the token."),
-            ),
-            /** Minimum decimal places for order sizes. */
-            szDecimals: v.pipe(
-              UnsignedInteger,
-              v.description("Minimum decimal places for order sizes."),
-            ),
-            /** Number of decimals for the token's smallest unit. */
-            weiDecimals: v.pipe(
-              UnsignedInteger,
-              v.description("Number of decimals for the token's smallest unit."),
-            ),
-            /** Unique identifier for the token. */
-            index: v.pipe(
-              UnsignedInteger,
-              v.description("Unique identifier for the token."),
-            ),
-            /** Token ID. */
-            tokenId: v.pipe(
-              Hex,
-              v.description("Token ID."),
-            ),
-            /** Indicates if the token is the primary representation in the system. */
-            isCanonical: v.pipe(
-              v.boolean(),
-              v.description("Indicates if the token is the primary representation in the system."),
-            ),
-            /** EVM contract details. */
-            evmContract: v.pipe(
-              v.nullable(
-                v.object({
-                  /** Contract address. */
-                  address: v.pipe(
-                    Address,
-                    v.description("Contract address."),
-                  ),
-                  /** Extra decimals in the token's smallest unit. */
-                  evm_extra_wei_decimals: v.pipe(
-                    Integer,
-                    v.description("Extra decimals in the token's smallest unit."),
-                  ),
-                }),
-              ),
-              v.description("EVM contract details."),
-            ),
-            /** Full display name of the token. */
-            fullName: v.pipe(
-              v.nullable(v.string()),
-              v.description("Full display name of the token."),
-            ),
-            /** Deployer trading fee share for the token. */
-            deployerTradingFeeShare: v.pipe(
-              UnsignedDecimal,
-              v.description("Deployer trading fee share for the token."),
-            ),
+            /** Side name (e.g., "YES", "NO"). */
+            name: v.string(),
+            /** Spot token index corresponding to this side. */
+            token: UnsignedInteger,
           }),
         ),
-        v.description("Tokens available for spot trading."),
-      ),
-      /** Outcome markets available for spot trading. */
-      outcomes: v.pipe(
-        v.array(
-          v.object({
-            /** Unique identifier of the outcome market. */
-            outcome: v.pipe(
-              UnsignedInteger,
-              v.description("Unique identifier of the outcome market."),
-            ),
-            /** Short name of the outcome market. */
-            name: v.pipe(
-              v.string(),
-              v.description("Short name of the outcome market."),
-            ),
-            /** Description of the outcome market. */
-            description: v.pipe(
-              v.string(),
-              v.description("Description of the outcome market."),
-            ),
-            /** Token specifications for each side of the outcome market. */
-            sideSpecs: v.pipe(
-              v.array(
-                v.object({
-                  /** Side name (e.g., "YES", "NO"). */
-                  name: v.pipe(
-                    v.string(),
-                    v.description('Side name (e.g., "YES", "NO").'),
-                  ),
-                  /** Spot token index corresponding to this side. */
-                  token: v.pipe(
-                    UnsignedInteger,
-                    v.description("Spot token index corresponding to this side."),
-                  ),
-                }),
-              ),
-              v.description("Token specifications for each side of the outcome market."),
-            ),
-          }),
-        ),
-        v.description("Outcome markets available for spot trading."),
-      ),
-    }),
-    v.description("Metadata for spot assets."),
-  );
+      }),
+    ),
+    /** Questions for prediction markets. */
+    questions: v.array(
+      v.object({
+        /** Unique identifier of the question. */
+        question: UnsignedInteger,
+        /** Short name of the question. */
+        name: v.string(),
+        /** Description of the question. */
+        description: v.string(),
+        /** Default outcome index if the question is not resolved. */
+        fallbackOutcome: UnsignedInteger,
+        /** Outcome indices associated with this question. */
+        namedOutcomes: v.array(UnsignedInteger),
+      }),
+    ),
+  });
 })();
 export type SpotMetaResponse = v.InferOutput<typeof SpotMetaResponse>;
 

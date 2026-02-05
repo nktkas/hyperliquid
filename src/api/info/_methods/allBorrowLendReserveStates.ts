@@ -12,16 +12,10 @@ import { BorrowLendReserveStateResponse } from "./borrowLendReserveState.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-all-borrow-lend-reserve-states
  */
 export const AllBorrowLendReserveStatesRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("allBorrowLendReserveStates"),
-        v.description("Type of request."),
-      ),
-    }),
-    v.description("Request all borrow/lend reserve states."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("allBorrowLendReserveStates"),
+  });
 })();
 export type AllBorrowLendReserveStatesRequest = v.InferOutput<typeof AllBorrowLendReserveStatesRequest>;
 
@@ -30,15 +24,7 @@ export type AllBorrowLendReserveStatesRequest = v.InferOutput<typeof AllBorrowLe
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-all-borrow-lend-reserve-states
  */
 export const AllBorrowLendReserveStatesResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(
-      v.tuple([
-        UnsignedInteger,
-        BorrowLendReserveStateResponse,
-      ]),
-    ),
-    v.description("Array of tuples of reserve IDs and their borrow/lend reserve state."),
-  );
+  return v.array(v.tuple([UnsignedInteger, BorrowLendReserveStateResponse]));
 })();
 export type AllBorrowLendReserveStatesResponse = v.InferOutput<typeof AllBorrowLendReserveStatesResponse>;
 

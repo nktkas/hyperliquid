@@ -4,12 +4,12 @@ on:
     types: [published]
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   update-docs:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v6

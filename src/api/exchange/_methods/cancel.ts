@@ -12,60 +12,30 @@ import { SignatureSchema } from "./_base/commonSchemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s
  */
 export const CancelRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("cancel"),
+      /** Orders to cancel by asset and order ID. */
+      cancels: v.array(
         v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("cancel"),
-            v.description("Type of action."),
-          ),
-          /** Orders to cancel by asset and order ID. */
-          cancels: v.pipe(
-            v.array(
-              v.object({
-                /** Asset ID. */
-                a: v.pipe(
-                  UnsignedInteger,
-                  v.description("Asset ID."),
-                ),
-                /** Order ID. */
-                o: v.pipe(
-                  UnsignedInteger,
-                  v.description("Order ID."),
-                ),
-              }),
-            ),
-            v.description("Orders to cancel by asset and order ID."),
-          ),
+          /** Asset ID. */
+          a: UnsignedInteger,
+          /** Order ID. */
+          o: UnsignedInteger,
         }),
-        v.description("Action to perform."),
-      ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Vault address (for vault trading). */
-      vaultAddress: v.pipe(
-        v.optional(Address),
-        v.description("Vault address (for vault trading)."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
       ),
     }),
-    v.description("Cancel order(s)."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Vault address (for vault trading). */
+    vaultAddress: v.optional(Address),
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type CancelRequest = v.InferOutput<typeof CancelRequest>;
 
@@ -74,49 +44,28 @@ export type CancelRequest = v.InferOutput<typeof CancelRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s
  */
 export const CancelResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Successful status. */
-      status: v.pipe(
-        v.literal("ok"),
-        v.description("Successful status."),
-      ),
-      /** Response details. */
-      response: v.pipe(
-        v.object({
-          /** Type of response. */
-          type: v.pipe(
-            v.literal("cancel"),
-            v.description("Type of response."),
-          ),
-          /** Specific data. */
-          data: v.pipe(
+  return v.object({
+    /** Successful status. */
+    status: v.literal("ok"),
+    /** Response details. */
+    response: v.object({
+      /** Type of response. */
+      type: v.literal("cancel"),
+      /** Specific data. */
+      data: v.object({
+        /** Array of statuses for each canceled order. */
+        statuses: v.array(
+          v.union([
+            v.literal("success"),
             v.object({
-              /** Array of statuses for each canceled order. */
-              statuses: v.pipe(
-                v.array(
-                  v.union([
-                    v.literal("success"),
-                    v.object({
-                      /** Error message returned by the exchange. */
-                      error: v.pipe(
-                        v.string(),
-                        v.description("Error message returned by the exchange."),
-                      ),
-                    }),
-                  ]),
-                ),
-                v.description("Array of statuses for each canceled order."),
-              ),
+              /** Error message returned by the exchange. */
+              error: v.string(),
             }),
-            v.description("Specific data."),
-          ),
-        }),
-        v.description("Response details."),
-      ),
+          ]),
+        ),
+      }),
     }),
-    v.description("Response for order cancellation."),
-  );
+  });
 })();
 export type CancelResponse = v.InferOutput<typeof CancelResponse>;
 

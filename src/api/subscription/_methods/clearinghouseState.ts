@@ -9,51 +9,27 @@ import { ClearinghouseStateResponse } from "../../info/_methods/clearinghouseSta
 
 /** Subscription to clearinghouse state events for a specific user. */
 export const ClearinghouseStateRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("clearinghouseState"),
-        v.description("Type of subscription."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** DEX name (empty string for main dex). */
-      dex: v.pipe(
-        v.optional(v.string()),
-        v.description("DEX name (empty string for main dex)."),
-      ),
-    }),
-    v.description("Subscription to clearinghouse state events for a specific user."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("clearinghouseState"),
+    /** User address. */
+    user: Address,
+    /** DEX name (empty string for main dex). */
+    dex: v.optional(v.string()),
+  });
 })();
 export type ClearinghouseStateRequest = v.InferOutput<typeof ClearinghouseStateRequest>;
 
 /** Event of clearinghouse state for a specific user. */
 export const ClearinghouseStateEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** DEX name (empty string for main dex). */
-      dex: v.pipe(
-        v.string(),
-        v.description("DEX name (empty string for main dex)."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** Account summary for perpetual trading. */
-      clearinghouseState: v.pipe(
-        ClearinghouseStateResponse,
-        v.description("Account summary for perpetual trading."),
-      ),
-    }),
-    v.description("Event of clearinghouse state for a specific user."),
-  );
+  return v.object({
+    /** DEX name (empty string for main dex). */
+    dex: v.string(),
+    /** User address. */
+    user: Address,
+    /** Account summary for perpetual trading. */
+    clearinghouseState: ClearinghouseStateResponse,
+  });
 })();
 export type ClearinghouseStateEvent = v.InferOutput<typeof ClearinghouseStateEvent>;
 

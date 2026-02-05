@@ -58,7 +58,7 @@ Deno.test("valibot-project/require-type-export", () => {
     `import * as v from "valibot";
 /** User schema. */
 export const UserSchema = /* @__PURE__ */ (() => {
-  return v.pipe(v.string(), v.description("User schema."));
+  return v.string();
 })();
 export type UserSchema = v.InferOutput<typeof UserSchema>;
 `,
@@ -70,7 +70,7 @@ export type UserSchema = v.InferOutput<typeof UserSchema>;
     `import * as v from "valibot";
 /** User schema. */
 export const UserSchema = /* @__PURE__ */ (() => {
-  return v.pipe(v.string(), v.description("User schema."));
+  return v.string();
 })();
 `,
     [
@@ -115,7 +115,7 @@ Deno.test("valibot-project/require-jsdoc", () => {
     `import * as v from "valibot";
 /** User schema. */
 export const UserSchema = /* @__PURE__ */ (() => {
-  return v.pipe(v.string(), v.description("User schema."));
+  return v.string();
 })();
 export type UserSchema = v.InferOutput<typeof UserSchema>;
 `,
@@ -126,7 +126,7 @@ export type UserSchema = v.InferOutput<typeof UserSchema>;
   assertLintPluginDiagnostics(
     `import * as v from "valibot";
 export const UserSchema = /* @__PURE__ */ (() => {
-  return v.pipe(v.string(), v.description("User schema."));
+  return v.string();
 })();
 export type UserSchema = v.InferOutput<typeof UserSchema>;
 `,
@@ -143,12 +143,7 @@ export type UserSchema = v.InferOutput<typeof UserSchema>;
     `import * as v from "valibot";
 /** User schema. */
 export const UserSchema = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      name: v.pipe(v.string(), v.description("User name.")),
-    }),
-    v.description("User schema."),
-  );
+  return v.object({ name: v.string() });
 })();
 export type UserSchema = v.InferOutput<typeof UserSchema>;
 `,
@@ -156,201 +151,6 @@ export type UserSchema = v.InferOutput<typeof UserSchema>;
       {
         message: "Field 'name' must have a JSDoc comment",
         hint: "Add: `/** Description */`",
-      },
-    ],
-  );
-});
-
-Deno.test("valibot-project/require-description", () => {
-  // Good
-  assertLintPluginDiagnostics(
-    `import * as v from "valibot";
-/** User schema. */
-export const UserSchema = /* @__PURE__ */ (() => {
-  return v.pipe(v.string(), v.description("User schema."));
-})();
-export type UserSchema = v.InferOutput<typeof UserSchema>;
-`,
-    [],
-  );
-
-  // Bad: exported schema without v.description()
-  assertLintPluginDiagnostics(
-    `import * as v from "valibot";
-/** User schema. */
-export const UserSchema = /* @__PURE__ */ (() => {
-  return v.pipe(v.string(), v.minLength(1));
-})();
-export type UserSchema = v.InferOutput<typeof UserSchema>;
-`,
-    [
-      {
-        message: "Exported Valibot schema 'UserSchema' must end with `v.description()`",
-        hint: 'Wrap the schema in `v.pipe(..., v.description("..."))`',
-      },
-    ],
-  );
-
-  // Bad: schema reference field
-  assertLintPluginDiagnostics(
-    `import * as v from "valibot";
-/** Address schema. */
-const AddressSchema = /* @__PURE__ */ (() => {
-  return v.pipe(v.string(), v.description("Address schema."));
-})();
-
-/** User schema. */
-export const UserSchema = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Address. */
-      address: AddressSchema,
-    }),
-    v.description("User schema."),
-  );
-})();
-export type UserSchema = v.InferOutput<typeof UserSchema>;
-`,
-    [
-      {
-        message: "Schema reference 'AddressSchema' must have `v.description()`",
-        hint: 'Wrap in `v.pipe(AddressSchema, v.description("..."))`',
-      },
-    ],
-  );
-
-  // Bad: field schema without v.description()
-  assertLintPluginDiagnostics(
-    `import * as v from "valibot";
-/** User schema. */
-export const UserSchema = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** User name. */
-      name: v.string(),
-    }),
-    v.description("User schema."),
-  );
-})();
-export type UserSchema = v.InferOutput<typeof UserSchema>;
-`,
-    [
-      {
-        message: "Valibot field schema must end with `v.description()`",
-        hint: 'Wrap in `v.pipe(v.string(), v.description("..."))`',
-      },
-    ],
-  );
-});
-
-Deno.test("valibot-project/require-description-match-jsdoc", () => {
-  // Good
-  assertLintPluginDiagnostics(
-    `import * as v from "valibot";
-/** User schema. */
-export const UserSchema = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** User name. */
-      name: v.pipe(v.string(), v.description("User name.")),
-    }),
-    v.description("User schema."),
-  );
-})();
-export type UserSchema = v.InferOutput<typeof UserSchema>;
-`,
-    [],
-  );
-
-  // Bad: schema mismatch
-  assertLintPluginDiagnostics(
-    `import * as v from "valibot";
-/** User schema. */
-export const UserSchema = /* @__PURE__ */ (() => {
-  return v.pipe(v.string(), v.description("Different text."));
-})();
-export type UserSchema = v.InferOutput<typeof UserSchema>;
-`,
-    [
-      {
-        message: "JSDoc 'User schema.' does not match `v.description('Different text.')`",
-        hint: "Make JSDoc and `v.description()` text identical",
-      },
-    ],
-  );
-
-  // Bad: field mismatch
-  assertLintPluginDiagnostics(
-    `import * as v from "valibot";
-/** User schema. */
-export const UserSchema = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** User name. */
-      name: v.pipe(v.string(), v.description("Different text.")),
-    }),
-    v.description("User schema."),
-  );
-})();
-export type UserSchema = v.InferOutput<typeof UserSchema>;
-`,
-    [
-      {
-        message: "JSDoc 'User name.' does not match `v.description('Different text.')`",
-        hint: "Make JSDoc and `v.description()` text identical",
-      },
-    ],
-  );
-
-  // Bad: whitespace mismatch
-  assertLintPluginDiagnostics(
-    `import * as v from "valibot";
-/** User schema. */
-export const UserSchema = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** User  name. */
-      name: v.pipe(v.string(), v.description("User name.")),
-    }),
-    v.description("User schema."),
-  );
-})();
-export type UserSchema = v.InferOutput<typeof UserSchema>;
-`,
-    [
-      {
-        message: "JSDoc 'User  name.' does not match `v.description('User name.')`",
-        hint: "Make JSDoc and `v.description()` text identical",
-      },
-    ],
-  );
-
-  // Bad: newline mismatch should be an error
-  assertLintPluginDiagnostics(
-    `import * as v from "valibot";
-/** User schema. */
-export const UserSchema = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Order type.
-       * - Market.
-       * - Limit.
-       */
-      orderType: v.pipe(
-        v.string(),
-        v.description("Order type. - Market. - Limit."),
-      ),
-    }),
-    v.description("User schema."),
-  );
-})();
-export type UserSchema = v.InferOutput<typeof UserSchema>;
-`,
-    [
-      {
-        message:
-          "JSDoc 'Order type.\n- Market.\n- Limit.' does not match `v.description('Order type. - Market. - Limit.')`",
-        hint: "Make JSDoc and `v.description()` text identical",
       },
     ],
   );

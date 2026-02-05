@@ -9,21 +9,12 @@ import * as v from "@valibot/valibot";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#query-perps-at-open-interest-caps
  */
 export const PerpsAtOpenInterestCapRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("perpsAtOpenInterestCap"),
-        v.description("Type of request."),
-      ),
-      /** DEX name (empty string for main dex). */
-      dex: v.pipe(
-        v.optional(v.string()),
-        v.description("DEX name (empty string for main dex)."),
-      ),
-    }),
-    v.description("Request perpetuals at open interest cap."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("perpsAtOpenInterestCap"),
+    /** DEX name (empty string for main dex). */
+    dex: v.optional(v.string()),
+  });
 })();
 export type PerpsAtOpenInterestCapRequest = v.InferOutput<typeof PerpsAtOpenInterestCapRequest>;
 
@@ -32,10 +23,7 @@ export type PerpsAtOpenInterestCapRequest = v.InferOutput<typeof PerpsAtOpenInte
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#query-perps-at-open-interest-caps
  */
 export const PerpsAtOpenInterestCapResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(v.string()),
-    v.description("Array of perpetuals at open interest caps."),
-  );
+  return v.array(v.string());
 })();
 export type PerpsAtOpenInterestCapResponse = v.InferOutput<typeof PerpsAtOpenInterestCapResponse>;
 

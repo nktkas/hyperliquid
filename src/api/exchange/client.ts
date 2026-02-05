@@ -225,6 +225,12 @@ import {
   type UserDexAbstractionSuccessResponse,
 } from "./_methods/userDexAbstraction.ts";
 import {
+  userSetAbstraction,
+  type UserSetAbstractionOptions,
+  type UserSetAbstractionParameters,
+  type UserSetAbstractionSuccessResponse,
+} from "./_methods/userSetAbstraction.ts";
+import {
   userPortfolioMargin,
   type UserPortfolioMarginOptions,
   type UserPortfolioMarginParameters,
@@ -321,14 +327,64 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     this.config_ = config;
   }
 
-  /** @see {@link agentEnableDexAbstraction} */
+  /**
+   * Enable HIP-3 DEX abstraction.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.agentEnableDexAbstraction();
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction-agent
+   */
   agentEnableDexAbstraction(
     opts?: AgentEnableDexAbstractionOptions,
   ): Promise<AgentEnableDexAbstractionSuccessResponse> {
     return agentEnableDexAbstraction(this.config_, opts);
   }
 
-  /** @see {@link approveAgent} */
+  /**
+   * Approve an agent to sign on behalf of the master account.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.approveAgent({ agentAddress: "0x...", agentName: "myAgent" });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet
+   */
   approveAgent(
     params: ApproveAgentParameters,
     opts?: ApproveAgentOptions,
@@ -336,7 +392,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return approveAgent(this.config_, params, opts);
   }
 
-  /** @see {@link approveBuilderFee} */
+  /**
+   * Approve a maximum fee rate for a builder.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.approveBuilderFee({ maxFeeRate: "0.01%", builder: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-a-builder-fee
+   */
   approveBuilderFee(
     params: ApproveBuilderFeeParameters,
     opts?: ApproveBuilderFeeOptions,
@@ -344,7 +425,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return approveBuilderFee(this.config_, params, opts);
   }
 
-  /** @see {@link batchModify} */
+  /**
+   * Modify multiple orders.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful variant of {@link OrderResponse} without error statuses.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * const data = await client.batchModify({ modifies: [ { oid: 123, order: { a: 0, b: true, p: "31000", s: "0.2", r: false, t: { limit: { tif: "Gtc" } } } }, ] });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-multiple-orders
+   */
   batchModify(
     params: BatchModifyParameters,
     opts?: BatchModifyOptions,
@@ -352,7 +458,30 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return batchModify(this.config_, params, opts);
   }
 
-  /** @see {@link borrowLend} */
+  /**
+   * Borrow or lend assets.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * const data = await client.borrowLend({ operation: "supply", token: 0, amount: "20" });
+   * ```
+   */
   borrowLend(
     params: BorrowLendParameters,
     opts?: BorrowLendOptions,
@@ -360,7 +489,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return borrowLend(this.config_, params, opts);
   }
 
-  /** @see {@link cancel} */
+  /**
+   * Cancel order(s).
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful variant of {@link CancelResponse} without error statuses.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * const data = await client.cancel({ cancels: [ { a: 0, o: 123 }, ] });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s
+   */
   cancel(
     params: CancelParameters,
     opts?: CancelOptions,
@@ -368,7 +522,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return cancel(this.config_, params, opts);
   }
 
-  /** @see {@link cancelByCloid} */
+  /**
+   * Cancel order(s) by cloid.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful variant of {@link CancelResponse} without error statuses.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * const data = await client.cancelByCloid({ cancels: [ { asset: 0, cloid: "0x..." }, ] });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid
+   */
   cancelByCloid(
     params: CancelByCloidParameters,
     opts?: CancelByCloidOptions,
@@ -376,7 +555,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return cancelByCloid(this.config_, params, opts);
   }
 
-  /** @see {@link cDeposit} */
+  /**
+   * Transfer native token from the user spot account into staking for delegating to validators.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.cDeposit({ wei: 1 * 1e8 });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-into-staking
+   */
   cDeposit(
     params: CDepositParameters,
     opts?: CDepositOptions,
@@ -384,14 +588,73 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return cDeposit(this.config_, params, opts);
   }
 
-  /** @see {@link claimRewards} */
+  /**
+   * Claim rewards from referral program.
+   *
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.claimRewards();
+   * ```
+   */
   claimRewards(
     opts?: ClaimRewardsOptions,
   ): Promise<ClaimRewardsSuccessResponse> {
     return claimRewards(this.config_, opts);
   }
 
-  /** @see {@link convertToMultiSigUser} */
+  /**
+   * Convert a single-signature account to a multi-signature account or vice versa.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.convertToMultiSigUser({ signers: { authorizedUsers: ["0x...", "0x...", "0x..."], threshold: 2 } });
+   * ```
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.convertToMultiSigUser({ signers: null });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig
+   */
   convertToMultiSigUser(
     params: ConvertToMultiSigUserParameters,
     opts?: ConvertToMultiSigUserOptions,
@@ -399,7 +662,30 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return convertToMultiSigUser(this.config_, params, opts);
   }
 
-  /** @see {@link createSubAccount} */
+  /**
+   * Create a sub-account.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Response for creating a sub-account.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * const data = await client.createSubAccount({ name: "..." });
+   * ```
+   */
   createSubAccount(
     params: CreateSubAccountParameters,
     opts?: CreateSubAccountOptions,
@@ -407,7 +693,30 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return createSubAccount(this.config_, params, opts);
   }
 
-  /** @see {@link createVault} */
+  /**
+   * Create a vault.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Response for creating a vault.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * const data = await client.createVault({ name: "...", description: "...", initialUsd: 100 * 1e6, nonce: Date.now() });
+   * ```
+   */
   createVault(
     params: CreateVaultParameters,
     opts?: CreateVaultOptions,
@@ -415,7 +724,42 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return createVault(this.config_, params, opts);
   }
 
-  /** @see {@link cSignerAction} */
+  /**
+   * Jail or unjail self as a validator signer.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.cSignerAction({ jailSelf: null });
+   * ```
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.cSignerAction({ unjailSelf: null });
+   * ```
+   */
   cSignerAction(
     params: CSignerActionParameters,
     opts?: CSignerActionOptions,
@@ -423,7 +767,30 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return cSignerAction(this.config_, params, opts);
   }
 
-  /** @see {@link cValidatorAction} */
+  /**
+   * Action related to validator management.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.cValidatorAction({ changeProfile: { node_ip: { Ip: "1.2.3.4" }, name: "...", description: "...", unjailed: true, disable_delegations: false, commission_bps: null, signer: null } });
+   * ```
+   */
   cValidatorAction(
     params: CValidatorActionParameters,
     opts?: CValidatorActionOptions,
@@ -431,7 +798,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return cValidatorAction(this.config_, params, opts);
   }
 
-  /** @see {@link cWithdraw} */
+  /**
+   * Transfer native token from staking into the user's spot account.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.cWithdraw({ wei: 1 * 1e8 });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#withdraw-from-staking
+   */
   cWithdraw(
     params: CWithdrawParameters,
     opts?: CWithdrawOptions,
@@ -439,7 +831,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return cWithdraw(this.config_, params, opts);
   }
 
-  /** @see {@link evmUserModify} */
+  /**
+   * Configure block type for EVM transactions.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.evmUserModify({ usingBigBlocks: true });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/hyperevm/dual-block-architecture
+   */
   evmUserModify(
     params: EvmUserModifyParameters,
     opts?: EvmUserModifyOptions,
@@ -447,7 +864,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return evmUserModify(this.config_, params, opts);
   }
 
-  /** @see {@link linkStakingUser} */
+  /**
+   * Link staking and trading accounts for fee discount attribution.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.linkStakingUser({ user: "0x...", isFinalize: false });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/trading/fees#staking-linking
+   */
   linkStakingUser(
     params: LinkStakingUserParameters,
     opts?: LinkStakingUserOptions,
@@ -455,7 +897,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return linkStakingUser(this.config_, params, opts);
   }
 
-  /** @see {@link modify} */
+  /**
+   * Modify an order.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.modify({ oid: 123, order: { a: 0, b: true, p: "31000", s: "0.2", r: false, t: { limit: { tif: "Gtc" } }, c: "0x..." } });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order
+   */
   modify(
     params: ModifyParameters,
     opts?: ModifyOptions,
@@ -463,7 +930,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return modify(this.config_, params, opts);
   }
 
-  /** @see {@link order} */
+  /**
+   * Place an order(s).
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful variant of {@link OrderResponse} without error statuses.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * const data = await client.order({ orders: [ { a: 0, b: true, p: "30000", s: "0.1", r: false, t: { limit: { tif: "Gtc" } }, c: "0x..." }, ], grouping: "na" });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-an-order
+   */
   order(
     params: OrderParameters,
     opts?: OrderOptions,
@@ -471,14 +963,64 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return order(this.config_, params, opts);
   }
 
-  /** @see {@link noop} */
+  /**
+   * This action does not do anything (no operation), but causes the nonce to be marked as used.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.noop();
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#invalidate-pending-nonce-noop
+   */
   noop(
     opts?: NoopOptions,
   ): Promise<NoopSuccessResponse> {
     return noop(this.config_, opts);
   }
 
-  /** @see {@link perpDeploy} */
+  /**
+   * Deploying HIP-3 assets.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.perpDeploy({ registerAsset: { maxGas: 1000000, assetRequest: { coin: "USDC", szDecimals: 8, oraclePx: "1", marginTableId: 1, onlyIsolated: false }, dex: "test", schema: null } });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions
+   */
   perpDeploy(
     params: PerpDeployParameters,
     opts?: PerpDeployOptions,
@@ -486,7 +1028,30 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return perpDeploy(this.config_, params, opts);
   }
 
-  /** @see {@link registerReferrer} */
+  /**
+   * Create a referral code.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.registerReferrer({ code: "..." });
+   * ```
+   */
   registerReferrer(
     params: RegisterReferrerParameters,
     opts?: RegisterReferrerOptions,
@@ -494,7 +1059,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return registerReferrer(this.config_, params, opts);
   }
 
-  /** @see {@link reserveRequestWeight} */
+  /**
+   * Reserve additional rate-limited actions for a fee.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.reserveRequestWeight({ weight: 10 });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#reserve-additional-actions
+   */
   reserveRequestWeight(
     params: ReserveRequestWeightParameters,
     opts?: ReserveRequestWeightOptions,
@@ -502,7 +1092,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return reserveRequestWeight(this.config_, params, opts);
   }
 
-  /** @see {@link scheduleCancel} */
+  /**
+   * Schedule a cancel-all operation at a future time.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.scheduleCancel({ time: Date.now() + 10_000 });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#schedule-cancel-dead-mans-switch
+   */
   scheduleCancel(
     params?: ScheduleCancelParameters,
     opts?: ScheduleCancelOptions,
@@ -520,7 +1135,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return scheduleCancel(this.config_, params, opts);
   }
 
-  /** @see {@link sendAsset} */
+  /**
+   * Transfer tokens between different perp DEXs, spot balance, users, and/or sub-accounts.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.sendAsset({ destination: "0x0000000000000000000000000000000000000001", sourceDex: "", destinationDex: "test", token: "USDC:0xeb62eee3685fc4c43992febcd9e75443", amount: "1" });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset
+   */
   sendAsset(
     params: SendAssetParameters,
     opts?: SendAssetOptions,
@@ -528,7 +1168,30 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return sendAsset(this.config_, params, opts);
   }
 
-  /** @see {@link setDisplayName} */
+  /**
+   * Set the display name in the leaderboard.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.setDisplayName({ displayName: "..." });
+   * ```
+   */
   setDisplayName(
     params: SetDisplayNameParameters,
     opts?: SetDisplayNameOptions,
@@ -536,7 +1199,30 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return setDisplayName(this.config_, params, opts);
   }
 
-  /** @see {@link setReferrer} */
+  /**
+   * Set a referral code.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.setReferrer({ code: "..." });
+   * ```
+   */
   setReferrer(
     params: SetReferrerParameters,
     opts?: SetReferrerOptions,
@@ -544,7 +1230,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return setReferrer(this.config_, params, opts);
   }
 
-  /** @see {@link spotDeploy} */
+  /**
+   * Deploying HIP-1 and HIP-2 assets.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.spotDeploy({ registerToken2: { spec: { name: "USDC", szDecimals: 8, weiDecimals: 8 }, maxGas: 1000000, fullName: "USD Coin" } });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
+   */
   spotDeploy(
     params: SpotDeployParameters,
     opts?: SpotDeployOptions,
@@ -552,7 +1263,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return spotDeploy(this.config_, params, opts);
   }
 
-  /** @see {@link spotSend} */
+  /**
+   * Send spot assets to another address.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.spotSend({ destination: "0x...", token: "USDC:0xeb62eee3685fc4c43992febcd9e75443", amount: "1" });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-spot-transfer
+   */
   spotSend(
     params: SpotSendParameters,
     opts?: SpotSendOptions,
@@ -560,7 +1296,30 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return spotSend(this.config_, params, opts);
   }
 
-  /** @see {@link spotUser} */
+  /**
+   * Opt Out of Spot Dusting.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.spotUser({ toggleSpotDusting: { optOut: false } });
+   * ```
+   */
   spotUser(
     params: SpotUserParameters,
     opts?: SpotUserOptions,
@@ -568,7 +1327,30 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return spotUser(this.config_, params, opts);
   }
 
-  /** @see {@link subAccountModify} */
+  /**
+   * Modify a sub-account.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.subAccountModify({ subAccountUser: "0x...", name: "..." });
+   * ```
+   */
   subAccountModify(
     params: SubAccountModifyParameters,
     opts?: SubAccountModifyOptions,
@@ -576,7 +1358,30 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return subAccountModify(this.config_, params, opts);
   }
 
-  /** @see {@link subAccountSpotTransfer} */
+  /**
+   * Transfer between sub-accounts (spot).
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.subAccountSpotTransfer({ subAccountUser: "0x...", isDeposit: true, token: "USDC:0xeb62eee3685fc4c43992febcd9e75443", amount: "1" });
+   * ```
+   */
   subAccountSpotTransfer(
     params: SubAccountSpotTransferParameters,
     opts?: SubAccountSpotTransferOptions,
@@ -584,7 +1389,30 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return subAccountSpotTransfer(this.config_, params, opts);
   }
 
-  /** @see {@link subAccountTransfer} */
+  /**
+   * Transfer between sub-accounts (perpetual).
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.subAccountTransfer({ subAccountUser: "0x...", isDeposit: true, usd: 1 * 1e6 });
+   * ```
+   */
   subAccountTransfer(
     params: SubAccountTransferParameters,
     opts?: SubAccountTransferOptions,
@@ -592,7 +1420,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return subAccountTransfer(this.config_, params, opts);
   }
 
-  /** @see {@link tokenDelegate} */
+  /**
+   * Delegate or undelegate native tokens to or from a validator.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.tokenDelegate({ validator: "0x...", isUndelegate: true, wei: 1 * 1e8 });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#delegate-or-undelegate-stake-from-validator
+   */
   tokenDelegate(
     params: TokenDelegateParameters,
     opts?: TokenDelegateOptions,
@@ -600,7 +1453,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return tokenDelegate(this.config_, params, opts);
   }
 
-  /** @see {@link twapCancel} */
+  /**
+   * Cancel a TWAP order.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful variant of {@link TwapCancelResponse} without error status.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * const data = await client.twapCancel({ a: 0, t: 1 });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order
+   */
   twapCancel(
     params: TwapCancelParameters,
     opts?: TwapCancelOptions,
@@ -608,7 +1486,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return twapCancel(this.config_, params, opts);
   }
 
-  /** @see {@link twapOrder} */
+  /**
+   * Place a TWAP order.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful variant of {@link TwapOrderResponse} without error status.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * const data = await client.twapOrder({ twap: { a: 0, b: true, s: "1", r: false, m: 10, t: true } });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-a-twap-order
+   */
   twapOrder(
     params: TwapOrderParameters,
     opts?: TwapOrderOptions,
@@ -616,7 +1519,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return twapOrder(this.config_, params, opts);
   }
 
-  /** @see {@link updateIsolatedMargin} */
+  /**
+   * Add or remove margin from isolated position.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.updateIsolatedMargin({ asset: 0, isBuy: true, ntli: 1 * 1e6 });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin
+   */
   updateIsolatedMargin(
     params: UpdateIsolatedMarginParameters,
     opts?: UpdateIsolatedMarginOptions,
@@ -624,7 +1552,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return updateIsolatedMargin(this.config_, params, opts);
   }
 
-  /** @see {@link updateLeverage} */
+  /**
+   * Update cross or isolated leverage on a coin.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.updateLeverage({ asset: 0, isCross: true, leverage: 5 });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-leverage
+   */
   updateLeverage(
     params: UpdateLeverageParameters,
     opts?: UpdateLeverageOptions,
@@ -632,7 +1585,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return updateLeverage(this.config_, params, opts);
   }
 
-  /** @see {@link usdClassTransfer} */
+  /**
+   * Transfer funds between Spot account and Perp account.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.usdClassTransfer({ amount: "1", toPerp: true });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa
+   */
   usdClassTransfer(
     params: UsdClassTransferParameters,
     opts?: UsdClassTransferOptions,
@@ -640,7 +1618,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return usdClassTransfer(this.config_, params, opts);
   }
 
-  /** @see {@link usdSend} */
+  /**
+   * Send usd to another address.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.usdSend({ destination: "0x...", amount: "1" });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-usdc-transfer
+   */
   usdSend(
     params: UsdSendParameters,
     opts?: UsdSendOptions,
@@ -648,7 +1651,34 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return usdSend(this.config_, params, opts);
   }
 
-  /** @see {@link userDexAbstraction} */
+  /**
+   * Enable/disable HIP-3 DEX abstraction.
+   *
+   * @deprecated Use {@link userSetAbstraction} instead.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.userDexAbstraction({ user: "0x...", enabled: true });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction
+   */
   userDexAbstraction(
     params: UserDexAbstractionParameters,
     opts?: UserDexAbstractionOptions,
@@ -656,7 +1686,65 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return userDexAbstraction(this.config_, params, opts);
   }
 
-  /** @see {@link userPortfolioMargin} */
+  /**
+   * Set User abstraction mode.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.userSetAbstraction({ user: "0x...", abstraction: "dexAbstraction" });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction
+   */
+  userSetAbstraction(
+    params: UserSetAbstractionParameters,
+    opts?: UserSetAbstractionOptions,
+  ): Promise<UserSetAbstractionSuccessResponse> {
+    return userSetAbstraction(this.config_, params, opts);
+  }
+
+  /**
+   * Enable/disable user portfolio margin.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.userPortfolioMargin({ user: "0x...", enabled: true });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/trading/portfolio-margin
+   */
   userPortfolioMargin(
     params: UserPortfolioMarginParameters,
     opts?: UserPortfolioMarginOptions,
@@ -664,7 +1752,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return userPortfolioMargin(this.config_, params, opts);
   }
 
-  /** @see {@link validatorL1Stream} */
+  /**
+   * Validator vote on risk-free rate for aligned quote asset.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.validatorL1Stream({ riskFreeRate: "0.05" });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#validator-vote-on-risk-free-rate-for-aligned-quote-asset
+   */
   validatorL1Stream(
     params: ValidatorL1StreamParameters,
     opts?: ValidatorL1StreamOptions,
@@ -672,7 +1785,30 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return validatorL1Stream(this.config_, params, opts);
   }
 
-  /** @see {@link vaultDistribute} */
+  /**
+   * Distribute funds from a vault between followers.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.vaultDistribute({ vaultAddress: "0x...", usd: 10 * 1e6 });
+   * ```
+   */
   vaultDistribute(
     params: VaultDistributeParameters,
     opts?: VaultDistributeOptions,
@@ -680,7 +1816,30 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return vaultDistribute(this.config_, params, opts);
   }
 
-  /** @see {@link vaultModify} */
+  /**
+   * Modify a vault's configuration.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.vaultModify({ vaultAddress: "0x...", allowDeposits: true, alwaysCloseOnWithdraw: false });
+   * ```
+   */
   vaultModify(
     params: VaultModifyParameters,
     opts?: VaultModifyOptions,
@@ -688,7 +1847,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return vaultModify(this.config_, params, opts);
   }
 
-  /** @see {@link vaultTransfer} */
+  /**
+   * Deposit or withdraw from a vault.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.vaultTransfer({ vaultAddress: "0x...", isDeposit: true, usd: 10 * 1e6 });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-a-vault
+   */
   vaultTransfer(
     params: VaultTransferParameters,
     opts?: VaultTransferOptions,
@@ -696,7 +1880,32 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     return vaultTransfer(this.config_, params, opts);
   }
 
-  /** @see {@link withdraw3} */
+  /**
+   * Initiate a withdrawal request.
+   *
+   * @param params - Parameters specific to the API request.
+   * @param opts - Request execution options.
+   *
+   * @returns Successful response without specific data.
+   *
+   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.withdraw3({ destination: "0x...", amount: "1" });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#initiate-a-withdrawal-request
+   */
   withdraw3(
     params: Withdraw3Parameters,
     opts?: Withdraw3Options,
@@ -837,9 +2046,17 @@ export type {
 export type { UsdSendOptions, UsdSendParameters, UsdSendSuccessResponse } from "./_methods/usdSend.ts";
 export type {
   UserDexAbstractionOptions,
+  UserDexAbstractionOptions as UserDexAbstractionExchangeOptions,
   UserDexAbstractionParameters,
+  UserDexAbstractionParameters as UserDexAbstractionExchangeParameters,
   UserDexAbstractionSuccessResponse,
+  UserDexAbstractionSuccessResponse as UserDexAbstractionExchangeSuccessResponse,
 } from "./_methods/userDexAbstraction.ts";
+export type {
+  UserSetAbstractionOptions,
+  UserSetAbstractionParameters,
+  UserSetAbstractionSuccessResponse,
+} from "./_methods/userSetAbstraction.ts";
 export type {
   UserPortfolioMarginOptions,
   UserPortfolioMarginParameters,

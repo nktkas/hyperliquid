@@ -12,21 +12,12 @@ import { MarginTableResponse } from "./marginTable.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-metadata-universe-and-margin-tables
  */
 export const MetaRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("meta"),
-        v.description("Type of request."),
-      ),
-      /** DEX name (empty string for main dex). */
-      dex: v.pipe(
-        v.optional(v.string()),
-        v.description("DEX name (empty string for main dex)."),
-      ),
-    }),
-    v.description("Request trading metadata."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("meta"),
+    /** DEX name (empty string for main dex). */
+    dex: v.optional(v.string()),
+  });
 })();
 export type MetaRequest = v.InferOutput<typeof MetaRequest>;
 
@@ -35,80 +26,35 @@ export type MetaRequest = v.InferOutput<typeof MetaRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-metadata-universe-and-margin-tables
  */
 export const MetaResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Trading universes available for perpetual trading. */
-      universe: v.pipe(
-        v.array(
-          v.object({
-            /** Minimum decimal places for order sizes. */
-            szDecimals: v.pipe(
-              UnsignedInteger,
-              v.description("Minimum decimal places for order sizes."),
-            ),
-            /** Name of the universe. */
-            name: v.pipe(
-              v.string(),
-              v.description("Name of the universe."),
-            ),
-            /** Maximum allowed leverage. */
-            maxLeverage: v.pipe(
-              UnsignedInteger,
-              v.minValue(1),
-              v.description("Maximum allowed leverage."),
-            ),
-            /** Unique identifier for the margin requirements table. */
-            marginTableId: v.pipe(
-              UnsignedInteger,
-              v.description("Unique identifier for the margin requirements table."),
-            ),
-            /** Indicates if only isolated margin trading is allowed. */
-            onlyIsolated: v.pipe(
-              v.optional(v.literal(true)),
-              v.description("Indicates if only isolated margin trading is allowed."),
-            ),
-            /** Indicates if the universe is delisted. */
-            isDelisted: v.pipe(
-              v.optional(v.literal(true)),
-              v.description("Indicates if the universe is delisted."),
-            ),
-            /** Trading margin mode constraint. */
-            marginMode: v.pipe(
-              v.optional(v.picklist(["strictIsolated", "noCross"])),
-              v.description("Trading margin mode constraint."),
-            ),
-            /** Indicates if growth mode is enabled. */
-            growthMode: v.pipe(
-              v.optional(v.literal("enabled")),
-              v.description("Indicates if growth mode is enabled."),
-            ),
-            /** Timestamp of the last growth mode change. */
-            lastGrowthModeChangeTime: v.pipe(
-              v.optional(ISO8601WithoutTimezone),
-              v.description("Timestamp of the last growth mode change."),
-            ),
-          }),
-        ),
-        v.description("Trading universes available for perpetual trading."),
-      ),
-      /** Margin requirement tables for different leverage tiers. */
-      marginTables: v.pipe(
-        v.array(
-          v.tuple([
-            UnsignedInteger,
-            MarginTableResponse,
-          ]),
-        ),
-        v.description("Margin requirement tables for different leverage tiers."),
-      ),
-      /** Collateral token index. */
-      collateralToken: v.pipe(
-        UnsignedInteger,
-        v.description("Collateral token index."),
-      ),
-    }),
-    v.description("Metadata for perpetual assets."),
-  );
+  return v.object({
+    /** Trading universes available for perpetual trading. */
+    universe: v.array(
+      v.object({
+        /** Minimum decimal places for order sizes. */
+        szDecimals: UnsignedInteger,
+        /** Name of the universe. */
+        name: v.string(),
+        /** Maximum allowed leverage. */
+        maxLeverage: v.pipe(UnsignedInteger, v.minValue(1)),
+        /** Unique identifier for the margin requirements table. */
+        marginTableId: UnsignedInteger,
+        /** Indicates if only isolated margin trading is allowed. */
+        onlyIsolated: v.optional(v.literal(true)),
+        /** Indicates if the universe is delisted. */
+        isDelisted: v.optional(v.literal(true)),
+        /** Trading margin mode constraint. */
+        marginMode: v.optional(v.picklist(["strictIsolated", "noCross"])),
+        /** Indicates if growth mode is enabled. */
+        growthMode: v.optional(v.literal("enabled")),
+        /** Timestamp of the last growth mode change. */
+        lastGrowthModeChangeTime: v.optional(ISO8601WithoutTimezone),
+      }),
+    ),
+    /** Margin requirement tables for different leverage tiers. */
+    marginTables: v.array(v.tuple([UnsignedInteger, MarginTableResponse])),
+    /** Collateral token index. */
+    collateralToken: UnsignedInteger,
+  });
 })();
 export type MetaResponse = v.InferOutput<typeof MetaResponse>;
 

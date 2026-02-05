@@ -12,73 +12,35 @@ import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/trading/fees#staking-linking
  */
 export const LinkStakingUserRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("linkStakingUser"),
-            v.description("Type of action."),
-          ),
-          /** Chain ID in hex format for EIP-712 signing. */
-          signatureChainId: v.pipe(
-            Hex,
-            v.description("Chain ID in hex format for EIP-712 signing."),
-          ),
-          /** HyperLiquid network type. */
-          hyperliquidChain: v.pipe(
-            HyperliquidChainSchema,
-            v.description("HyperLiquid network type."),
-          ),
-          /**
-           * Target account address.
-           * - Trading user initiating: enter staking account address.
-           * - Staking user finalizing: enter trading account address.
-           */
-          user: v.pipe(
-            Address,
-            v.description(
-              "Target account address." +
-                "\n- Trading user initiating: enter staking account address." +
-                "\n- Staking user finalizing: enter trading account address.",
-            ),
-          ),
-          /**
-           * Link phase.
-           * - `false` = trading user initiates link request.
-           * - `true` = staking user finalizes permanent link.
-           */
-          isFinalize: v.pipe(
-            v.boolean(),
-            v.description(
-              "Link phase." +
-                "\n- `false` = trading user initiates link request." +
-                "\n- `true` = staking user finalizes permanent link.",
-            ),
-          ),
-          /** Nonce (timestamp in ms) used to prevent replay attacks. */
-          nonce: v.pipe(
-            UnsignedInteger,
-            v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("linkStakingUser"),
+      /** Chain ID in hex format for EIP-712 signing. */
+      signatureChainId: Hex,
+      /** HyperLiquid network type. */
+      hyperliquidChain: HyperliquidChainSchema,
+      /**
+       * Target account address.
+       * - Trading user initiating: enter staking account address.
+       * - Staking user finalizing: enter trading account address.
+       */
+      user: Address,
+      /**
+       * Link phase.
+       * - `false` = trading user initiates link request.
+       * - `true` = staking user finalizes permanent link.
+       */
+      isFinalize: v.boolean(),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
+      nonce: UnsignedInteger,
     }),
-    v.description("Link staking and trading accounts for fee discount attribution."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+  });
 })();
 export type LinkStakingUserRequest = v.InferOutput<typeof LinkStakingUserRequest>;
 
@@ -87,10 +49,7 @@ export type LinkStakingUserRequest = v.InferOutput<typeof LinkStakingUserRequest
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/trading/fees#staking-linking
  */
 export const LinkStakingUserResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type LinkStakingUserResponse = v.InferOutput<typeof LinkStakingUserResponse>;
 

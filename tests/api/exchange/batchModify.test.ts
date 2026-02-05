@@ -1,7 +1,7 @@
 import * as v from "@valibot/valibot";
 import { BatchModifyRequest, BatchModifyResponse } from "@nktkas/hyperliquid/api/exchange";
-import { excludeErrorResponse, openOrder, runTest } from "./_t.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { openOrder, runTest } from "./_t.ts";
+import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
 
 runTest({
   name: "batchModify",
@@ -98,11 +98,10 @@ runTest({
         });
       })(),
     ]);
-    schemaCoverage(excludeErrorResponse(BatchModifyResponse), data, {
-      ignoreBranches: {
-        "#/properties/response/properties/data/properties/statuses/items": [2, 3],
-      },
-    });
+    schemaCoverage(excludeErrorResponse(BatchModifyResponse), data, [
+      "#/properties/response/properties/data/properties/statuses/items/union/2",
+      "#/properties/response/properties/data/properties/statuses/items/union/3",
+    ]);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

@@ -10,21 +10,12 @@ import { Address } from "../../_schemas.ts";
  * Request legal verification status of a user.
  */
 export const LegalCheckRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("legalCheck"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request legal verification status of a user."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("legalCheck"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type LegalCheckRequest = v.InferOutput<typeof LegalCheckRequest>;
 
@@ -32,26 +23,14 @@ export type LegalCheckRequest = v.InferOutput<typeof LegalCheckRequest>;
  * Legal verification status for a user.
  */
 export const LegalCheckResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Whether the user IP address is allowed. */
-      ipAllowed: v.pipe(
-        v.boolean(),
-        v.description("Whether the user IP address is allowed."),
-      ),
-      /** Whether the user has accepted the terms of service. */
-      acceptedTerms: v.pipe(
-        v.boolean(),
-        v.description("Whether the user has accepted the terms of service."),
-      ),
-      /** Whether the user is allowed to use the platform. */
-      userAllowed: v.pipe(
-        v.boolean(),
-        v.description("Whether the user is allowed to use the platform."),
-      ),
-    }),
-    v.description("Legal verification status for a user."),
-  );
+  return v.object({
+    /** Whether the user IP address is allowed. */
+    ipAllowed: v.boolean(),
+    /** Whether the user has accepted the terms of service. */
+    acceptedTerms: v.boolean(),
+    /** Whether the user is allowed to use the platform. */
+    userAllowed: v.boolean(),
+  });
 })();
 export type LegalCheckResponse = v.InferOutput<typeof LegalCheckResponse>;
 

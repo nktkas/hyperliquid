@@ -12,56 +12,28 @@ import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonS
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#schedule-cancel-dead-mans-switch
  */
 export const ScheduleCancelRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("scheduleCancel"),
-            v.description("Type of action."),
-          ),
-          /**
-           * Scheduled time (in ms since epoch).
-           * Must be at least 5 seconds in the future.
-           *
-           * If not specified, will cause all scheduled cancel operations to be deleted.
-           */
-          time: v.pipe(
-            v.optional(UnsignedInteger),
-            v.description(
-              "Scheduled time (in ms since epoch)." +
-                "\nMust be at least 5 seconds in the future." +
-                "\n\nIf not specified, will cause all scheduled cancel operations to be deleted.",
-            ),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Vault address (for vault trading). */
-      vaultAddress: v.pipe(
-        v.optional(Address),
-        v.description("Vault address (for vault trading)."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("scheduleCancel"),
+      /**
+       * Scheduled time (in ms since epoch).
+       * Must be at least 5 seconds in the future.
+       *
+       * If not specified, will cause all scheduled cancel operations to be deleted.
+       */
+      time: v.optional(UnsignedInteger),
     }),
-    v.description("Schedule a cancel-all operation at a future time."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Vault address (for vault trading). */
+    vaultAddress: v.optional(Address),
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type ScheduleCancelRequest = v.InferOutput<typeof ScheduleCancelRequest>;
 
@@ -70,10 +42,7 @@ export type ScheduleCancelRequest = v.InferOutput<typeof ScheduleCancelRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#schedule-cancel-dead-mans-switch
  */
 export const ScheduleCancelResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type ScheduleCancelResponse = v.InferOutput<typeof ScheduleCancelResponse>;
 

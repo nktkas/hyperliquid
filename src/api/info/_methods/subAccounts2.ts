@@ -12,21 +12,12 @@ import { SpotClearinghouseStateResponse } from "./spotClearinghouseState.ts";
  * Request user sub-accounts (V2).
  */
 export const SubAccounts2Request = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("subAccounts2"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request user sub-accounts (V2)."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("subAccounts2"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type SubAccounts2Request = v.InferOutput<typeof SubAccounts2Request>;
 
@@ -34,41 +25,24 @@ export type SubAccounts2Request = v.InferOutput<typeof SubAccounts2Request>;
  * Array of user sub-account or null if the user does not have any sub-accounts.
  */
 export const SubAccounts2Response = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.nullable(
-      v.array(
-        v.object({
-          /** Sub-account name. */
-          name: v.pipe(
-            v.string(),
-            v.nonEmpty(),
-            v.description("Sub-account name."),
-          ),
-          /** Sub-account address. */
-          subAccountUser: v.pipe(
-            Address,
-            v.description("Sub-account address."),
-          ),
-          /** Master account address. */
-          master: v.pipe(
-            Address,
-            v.description("Master account address."),
-          ),
-          /** DEX to clearinghouse state mapping. Always includes the main DEX (empty dex name). */
-          dexToClearinghouseState: v.pipe(
-            v.array(v.tuple([v.string(), ClearinghouseStateResponse])),
-            v.nonEmpty(),
-            v.description("DEX to clearinghouse state mapping. Always includes the main DEX (empty dex name)."),
-          ),
-          /** Spot tokens clearinghouse state. */
-          spotState: v.pipe(
-            SpotClearinghouseStateResponse,
-            v.description("Spot tokens clearinghouse state."),
-          ),
-        }),
-      ),
+  return v.nullable(
+    v.array(
+      v.object({
+        /** Sub-account name. */
+        name: v.pipe(v.string(), v.nonEmpty()),
+        /** Sub-account address. */
+        subAccountUser: Address,
+        /** Master account address. */
+        master: Address,
+        /** DEX to clearinghouse state mapping. Always includes the main DEX (empty dex name). */
+        dexToClearinghouseState: v.pipe(
+          v.array(v.tuple([v.string(), ClearinghouseStateResponse])),
+          v.nonEmpty(),
+        ),
+        /** Spot tokens clearinghouse state. */
+        spotState: SpotClearinghouseStateResponse,
+      }),
     ),
-    v.description("Array of user sub-account or null if the user does not have any sub-accounts."),
   );
 })();
 export type SubAccounts2Response = v.InferOutput<typeof SubAccounts2Response>;
@@ -94,7 +68,6 @@ export type SubAccounts2Parameters = Omit<v.InferInput<typeof SubAccounts2Respon
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
- * @seenull
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";

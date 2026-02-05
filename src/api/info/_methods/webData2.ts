@@ -17,21 +17,12 @@ import { PerpsAtOpenInterestCapResponse } from "./perpsAtOpenInterestCap.ts";
  * Request comprehensive user and market data.
  */
 export const WebData2Request = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("webData2"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request comprehensive user and market data."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("webData2"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type WebData2Request = v.InferOutput<typeof WebData2Request>;
 
@@ -39,96 +30,42 @@ export type WebData2Request = v.InferOutput<typeof WebData2Request>;
  * Comprehensive user and market data.
  */
 export const WebData2Response = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Account summary for perpetual trading. */
-      clearinghouseState: v.pipe(
-        ClearinghouseStateResponse,
-        v.description("Account summary for perpetual trading."),
-      ),
-      /** Array of leading vaults for a user. */
-      leadingVaults: v.pipe(
-        LeadingVaultsResponse,
-        v.description("Array of leading vaults for a user."),
-      ),
-      /** Total equity in vaults. */
-      totalVaultEquity: v.pipe(
-        UnsignedDecimal,
-        v.description("Total equity in vaults."),
-      ),
-      /** Array of open orders with additional display information. */
-      openOrders: v.pipe(
-        FrontendOpenOrdersResponse,
-        v.description("Array of open orders with additional display information."),
-      ),
-      /** Agent address if one exists. */
-      agentAddress: v.pipe(
-        v.nullable(Address),
-        v.description("Agent address if one exists."),
-      ),
-      /** Timestamp until which the agent is valid. */
-      agentValidUntil: v.pipe(
-        v.nullable(UnsignedInteger),
-        v.description("Timestamp until which the agent is valid."),
-      ),
-      /** Cumulative ledger value. */
-      cumLedger: v.pipe(
-        UnsignedDecimal,
-        v.description("Cumulative ledger value."),
-      ),
-      /** Metadata for perpetual assets. */
-      meta: v.pipe(
-        MetaResponse,
-        v.description("Metadata for perpetual assets."),
-      ),
-      /** Array of contexts for each perpetual asset. */
-      assetCtxs: v.pipe(
-        v.array(PerpAssetCtxSchema),
-        v.description("Array of contexts for each perpetual asset."),
-      ),
-      /** Server timestamp (in ms since epoch). */
-      serverTime: v.pipe(
-        UnsignedInteger,
-        v.description("Server timestamp (in ms since epoch)."),
-      ),
-      /** Whether this account is a vault. */
-      isVault: v.pipe(
-        v.boolean(),
-        v.description("Whether this account is a vault."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** Array of tuples containing TWAP order ID and its state. */
-      twapStates: v.pipe(
-        v.array(v.tuple([UnsignedInteger, TwapStateSchema])),
-        v.description("Array of tuples containing TWAP order ID and its state."),
-      ),
-      /** Account summary for spot trading. */
-      spotState: v.pipe(
-        v.optional(SpotClearinghouseStateResponse),
-        v.description("Account summary for spot trading."),
-      ),
-      /** Asset context for each spot asset. */
-      spotAssetCtxs: v.pipe(
-        v.array(SpotAssetCtxSchema),
-        v.description("Asset context for each spot asset."),
-      ),
-      /** Whether the user has opted out of spot dusting. */
-      optOutOfSpotDusting: v.pipe(
-        v.optional(v.literal(true)),
-        v.description("Whether the user has opted out of spot dusting."),
-      ),
-      /** Assets currently at their open interest cap. */
-      perpsAtOpenInterestCap: v.pipe(
-        v.optional(PerpsAtOpenInterestCapResponse),
-        v.description("Assets currently at their open interest cap."),
-      ),
-    }),
-    v.description("Comprehensive user and market data."),
-  );
+  return v.object({
+    /** Account summary for perpetual trading. */
+    clearinghouseState: ClearinghouseStateResponse,
+    /** Array of leading vaults for a user. */
+    leadingVaults: LeadingVaultsResponse,
+    /** Total equity in vaults. */
+    totalVaultEquity: UnsignedDecimal,
+    /** Array of open orders with additional display information. */
+    openOrders: FrontendOpenOrdersResponse,
+    /** Agent address if one exists. */
+    agentAddress: v.nullable(Address),
+    /** Timestamp until which the agent is valid. */
+    agentValidUntil: v.nullable(UnsignedInteger),
+    /** Cumulative ledger value. */
+    cumLedger: UnsignedDecimal,
+    /** Metadata for perpetual assets. */
+    meta: MetaResponse,
+    /** Array of contexts for each perpetual asset. */
+    assetCtxs: v.array(PerpAssetCtxSchema),
+    /** Server timestamp (in ms since epoch). */
+    serverTime: UnsignedInteger,
+    /** Whether this account is a vault. */
+    isVault: v.boolean(),
+    /** User address. */
+    user: Address,
+    /** Array of tuples containing TWAP order ID and its state. */
+    twapStates: v.array(v.tuple([UnsignedInteger, TwapStateSchema])),
+    /** Account summary for spot trading. */
+    spotState: v.optional(SpotClearinghouseStateResponse),
+    /** Asset context for each spot asset. */
+    spotAssetCtxs: v.array(SpotAssetCtxSchema),
+    /** Whether the user has opted out of spot dusting. */
+    optOutOfSpotDusting: v.optional(v.literal(true)),
+    /** Assets currently at their open interest cap. */
+    perpsAtOpenInterestCap: v.optional(PerpsAtOpenInterestCapResponse),
+  });
 })();
 export type WebData2Response = v.InferOutput<typeof WebData2Response>;
 

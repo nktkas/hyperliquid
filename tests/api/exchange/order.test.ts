@@ -1,8 +1,8 @@
 import * as v from "@valibot/valibot";
 import { OrderRequest, OrderResponse } from "@nktkas/hyperliquid/api/exchange";
 import { formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
-import { allMids, excludeErrorResponse, runTest, symbolConverter, topUpPerp } from "./_t.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { allMids, runTest, symbolConverter, topUpPerp } from "./_t.ts";
+import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
 
 runTest({
   name: "order",
@@ -11,9 +11,9 @@ runTest({
 
     await topUpPerp(exchClient, "20");
 
-    const id = symbolConverter.getAssetId("ETH")!;
-    const szDecimals = symbolConverter.getSzDecimals("ETH")!;
-    const midPx = allMids["ETH"];
+    const id = symbolConverter.getAssetId("SOL")!;
+    const szDecimals = symbolConverter.getSzDecimals("SOL")!;
+    const midPx = allMids["SOL"];
 
     const pxUp = formatPrice(parseFloat(midPx) * 1.05, szDecimals);
     const pxDown = formatPrice(parseFloat(midPx) * 0.95, szDecimals);
@@ -101,11 +101,9 @@ runTest({
         grouping: "normalTpsl",
       }),
     ]);
-    schemaCoverage(excludeErrorResponse(OrderResponse), data, {
-      ignoreBranches: {
-        "#/properties/response/properties/data/properties/statuses/items": [2],
-      },
-    });
+    schemaCoverage(excludeErrorResponse(OrderResponse), data, [
+      "#/properties/response/properties/data/properties/statuses/items/union/2",
+    ]);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

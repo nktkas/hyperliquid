@@ -13,60 +13,30 @@ import { CancelResponse } from "./cancel.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid
  */
 export const CancelByCloidRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("cancelByCloid"),
+      /** Orders to cancel by asset and client order ID. */
+      cancels: v.array(
         v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("cancelByCloid"),
-            v.description("Type of action."),
-          ),
-          /** Orders to cancel by asset and client order ID. */
-          cancels: v.pipe(
-            v.array(
-              v.object({
-                /** Asset ID. */
-                asset: v.pipe(
-                  UnsignedInteger,
-                  v.description("Asset ID."),
-                ),
-                /** Client Order ID. */
-                cloid: v.pipe(
-                  Cloid,
-                  v.description("Client Order ID."),
-                ),
-              }),
-            ),
-            v.description("Orders to cancel by asset and client order ID."),
-          ),
+          /** Asset ID. */
+          asset: UnsignedInteger,
+          /** Client Order ID. */
+          cloid: Cloid,
         }),
-        v.description("Action to perform."),
-      ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Vault address (for vault trading). */
-      vaultAddress: v.pipe(
-        v.optional(Address),
-        v.description("Vault address (for vault trading)."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
       ),
     }),
-    v.description("Cancel order(s) by cloid."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Vault address (for vault trading). */
+    vaultAddress: v.optional(Address),
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type CancelByCloidRequest = v.InferOutput<typeof CancelByCloidRequest>;
 
@@ -75,10 +45,7 @@ export type CancelByCloidRequest = v.InferOutput<typeof CancelByCloidRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid
  */
 export const CancelByCloidResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    CancelResponse,
-    v.description("Response for order cancellation by cloid."),
-  );
+  return CancelResponse;
 })();
 export type CancelByCloidResponse = v.InferOutput<typeof CancelByCloidResponse>;
 

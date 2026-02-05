@@ -11,21 +11,12 @@ import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-rewards
  */
 export const DelegatorRewardsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("delegatorRewards"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request user staking rewards."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("delegatorRewards"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type DelegatorRewardsRequest = v.InferOutput<typeof DelegatorRewardsRequest>;
 
@@ -34,27 +25,15 @@ export type DelegatorRewardsRequest = v.InferOutput<typeof DelegatorRewardsReque
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-rewards
  */
 export const DelegatorRewardsResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(
-      v.object({
-        /** Timestamp when the reward was received (in ms since epoch). */
-        time: v.pipe(
-          UnsignedInteger,
-          v.description("Timestamp when the reward was received (in ms since epoch)."),
-        ),
-        /** Source of the reward. */
-        source: v.pipe(
-          v.picklist(["delegation", "commission"]),
-          v.description("Source of the reward."),
-        ),
-        /** Total reward amount. */
-        totalAmount: v.pipe(
-          UnsignedDecimal,
-          v.description("Total reward amount."),
-        ),
-      }),
-    ),
-    v.description("Array of rewards received from staking activities."),
+  return v.array(
+    v.object({
+      /** Timestamp when the reward was received (in ms since epoch). */
+      time: UnsignedInteger,
+      /** Source of the reward. */
+      source: v.picklist(["delegation", "commission"]),
+      /** Total reward amount. */
+      totalAmount: UnsignedDecimal,
+    }),
   );
 })();
 export type DelegatorRewardsResponse = v.InferOutput<typeof DelegatorRewardsResponse>;

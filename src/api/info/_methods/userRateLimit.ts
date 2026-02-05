@@ -11,21 +11,12 @@ import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-rate-limits
  */
 export const UserRateLimitRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("userRateLimit"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request user rate limits."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("userRateLimit"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type UserRateLimitRequest = v.InferOutput<typeof UserRateLimitRequest>;
 
@@ -34,31 +25,16 @@ export type UserRateLimitRequest = v.InferOutput<typeof UserRateLimitRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-rate-limits
  */
 export const UserRateLimitResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Cumulative trading volume. */
-      cumVlm: v.pipe(
-        UnsignedDecimal,
-        v.description("Cumulative trading volume."),
-      ),
-      /** Number of API requests used. */
-      nRequestsUsed: v.pipe(
-        UnsignedInteger,
-        v.description("Number of API requests used."),
-      ),
-      /** Maximum allowed API requests. */
-      nRequestsCap: v.pipe(
-        UnsignedInteger,
-        v.description("Maximum allowed API requests."),
-      ),
-      /** Number of surplus API requests. */
-      nRequestsSurplus: v.pipe(
-        UnsignedInteger,
-        v.description("Number of surplus API requests."),
-      ),
-    }),
-    v.description("User rate limits."),
-  );
+  return v.object({
+    /** Cumulative trading volume. */
+    cumVlm: UnsignedDecimal,
+    /** Number of API requests used. */
+    nRequestsUsed: UnsignedInteger,
+    /** Maximum allowed API requests. */
+    nRequestsCap: UnsignedInteger,
+    /** Number of surplus API requests. */
+    nRequestsSurplus: UnsignedInteger,
+  });
 })();
 export type UserRateLimitResponse = v.InferOutput<typeof UserRateLimitResponse>;
 

@@ -1,7 +1,7 @@
 import * as v from "@valibot/valibot";
 import { ReferralRequest, ReferralResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
 
 runTest({
   name: "referral",
@@ -13,9 +13,9 @@ runTest({
       client.referral({ user: "0x97c36726668f490fa17eb2957a92D39116f171fE" }), // referrerState.stage = needToCreateCode
       client.referral({ user: "0x0000000000000000000000000000000000000001" }), // referrerState.stage = needToTrade
     ]);
-    schemaCoverage(ReferralResponse, data, {
-      ignoreEmptyArray: ["#/properties/rewardHistory"],
-    });
+    schemaCoverage(ReferralResponse, data, [
+      "#/properties/rewardHistory/array",
+    ]);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

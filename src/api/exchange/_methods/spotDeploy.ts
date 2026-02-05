@@ -12,276 +12,120 @@ import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonS
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
  */
 export const SpotDeployRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.union([
-          v.object({
-            /** Type of action. */
-            type: v.pipe(
-              v.literal("spotDeploy"),
-              v.description("Type of action."),
-            ),
-            /** Register token parameters. */
-            registerToken2: v.pipe(
-              v.object({
-                /** Token specifications. */
-                spec: v.pipe(
-                  v.object({
-                    /** Token name. */
-                    name: v.pipe(
-                      v.string(),
-                      v.description("Token name."),
-                    ),
-                    /** Number of decimals for token size. */
-                    szDecimals: v.pipe(
-                      UnsignedInteger,
-                      v.description("Number of decimals for token size."),
-                    ),
-                    /** Number of decimals for token amounts in wei. */
-                    weiDecimals: v.pipe(
-                      UnsignedInteger,
-                      v.description("Number of decimals for token amounts in wei."),
-                    ),
-                  }),
-                  v.description("Token specifications."),
-                ),
-                /** Maximum gas allowed for registration. */
-                maxGas: v.pipe(
-                  UnsignedInteger,
-                  v.description("Maximum gas allowed for registration."),
-                ),
-                /** Optional full token name. */
-                fullName: v.pipe(
-                  v.optional(v.string()),
-                  v.description("Optional full token name."),
-                ),
-              }),
-              v.description("Register token parameters."),
-            ),
+  return v.object({
+    /** Action to perform. */
+    action: v.variant("type", [
+      v.object({
+        /** Type of action. */
+        type: v.literal("spotDeploy"),
+        /** Register token parameters. */
+        registerToken2: v.object({
+          /** Token specifications. */
+          spec: v.object({
+            /** Token name. */
+            name: v.string(),
+            /** Number of decimals for token size. */
+            szDecimals: UnsignedInteger,
+            /** Number of decimals for token amounts in wei. */
+            weiDecimals: UnsignedInteger,
           }),
-          v.object({
-            /** Type of action. */
-            type: v.pipe(
-              v.literal("spotDeploy"),
-              v.description("Type of action."),
-            ),
-            /** User genesis parameters. */
-            userGenesis: v.pipe(
-              v.object({
-                /** Token identifier. */
-                token: v.pipe(
-                  UnsignedInteger,
-                  v.description("Token identifier."),
-                ),
-                /** Array of tuples: [user address, genesis amount in wei]. */
-                userAndWei: v.pipe(
-                  v.array(
-                    v.tuple([
-                      Address,
-                      UnsignedDecimal,
-                    ]),
-                  ),
-                  v.description("Array of tuples: [user address, genesis amount in wei]."),
-                ),
-                /** Array of tuples: [existing token identifier, genesis amount in wei]. */
-                existingTokenAndWei: v.pipe(
-                  v.array(
-                    v.tuple([
-                      UnsignedInteger,
-                      UnsignedDecimal,
-                    ]),
-                  ),
-                  v.description(
-                    "Array of tuples: [existing token identifier, genesis amount in wei].",
-                  ),
-                ),
-                /** Array of tuples: [user address, blacklist status] (`true` for blacklist, `false` to remove existing blacklisted user). */
-                blacklistUsers: v.pipe(
-                  v.optional(
-                    v.array(
-                      v.tuple([
-                        Address,
-                        v.boolean(),
-                      ]),
-                    ),
-                  ),
-                  v.description(
-                    "Array of tuples: [user address, blacklist status] (`true` for blacklist, `false` to remove existing blacklisted user).",
-                  ),
-                ),
-              }),
-              v.description("User genesis parameters."),
-            ),
-          }),
-          v.object({
-            /** Type of action. */
-            type: v.pipe(
-              v.literal("spotDeploy"),
-              v.description("Type of action."),
-            ),
-            /** Genesis parameters. */
-            genesis: v.pipe(
-              v.object({
-                /** Token identifier. */
-                token: v.pipe(
-                  UnsignedInteger,
-                  v.description("Token identifier."),
-                ),
-                /** Maximum token supply. */
-                maxSupply: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Maximum token supply."),
-                ),
-                /** Set hyperliquidity balance to 0. */
-                noHyperliquidity: v.pipe(
-                  v.optional(v.literal(true)),
-                  v.description("Set hyperliquidity balance to 0."),
-                ),
-              }),
-              v.description("Genesis parameters."),
-            ),
-          }),
-          v.object({
-            /** Type of action. */
-            type: v.pipe(
-              v.literal("spotDeploy"),
-              v.description("Type of action."),
-            ),
-            /** Register spot parameters. */
-            registerSpot: v.pipe(
-              v.object({
-                /** Tuple containing base and quote token indices. */
-                tokens: v.pipe(
-                  v.tuple([
-                    UnsignedInteger,
-                    UnsignedInteger,
-                  ]),
-                  v.description("Tuple containing base and quote token indices."),
-                ),
-              }),
-              v.description("Register spot parameters."),
-            ),
-          }),
-          v.object({
-            /** Type of action. */
-            type: v.pipe(
-              v.literal("spotDeploy"),
-              v.description("Type of action."),
-            ),
-            /** Register hyperliquidity parameters. */
-            registerHyperliquidity: v.pipe(
-              v.object({
-                /** Spot index (distinct from base token index). */
-                spot: v.pipe(
-                  UnsignedInteger,
-                  v.description("Spot index (distinct from base token index)."),
-                ),
-                /** Starting price for liquidity seeding. */
-                startPx: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Starting price for liquidity seeding."),
-                ),
-                /** Order size as a float (not in wei). */
-                orderSz: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Order size as a float (not in wei)."),
-                ),
-                /** Total number of orders to place. */
-                nOrders: v.pipe(
-                  UnsignedInteger,
-                  v.description("Total number of orders to place."),
-                ),
-                /** Number of levels to seed with USDC. */
-                nSeededLevels: v.pipe(
-                  v.optional(UnsignedInteger),
-                  v.description("Number of levels to seed with USDC."),
-                ),
-              }),
-              v.description("Register hyperliquidity parameters."),
-            ),
-          }),
-          v.object({
-            /** Type of action. */
-            type: v.pipe(
-              v.literal("spotDeploy"),
-              v.description("Type of action."),
-            ),
-            /** Set deployer trading fee share parameters. */
-            setDeployerTradingFeeShare: v.pipe(
-              v.object({
-                /** Token identifier. */
-                token: v.pipe(
-                  UnsignedInteger,
-                  v.description("Token identifier."),
-                ),
-                /** The deployer trading fee share. Range is 0% to 100%. */
-                share: v.pipe(
-                  Percent,
-                  v.description("The deployer trading fee share. Range is 0% to 100%."),
-                ),
-              }),
-              v.description("Set deployer trading fee share parameters."),
-            ),
-          }),
-          v.object({
-            /** Type of action. */
-            type: v.pipe(
-              v.literal("spotDeploy"),
-              v.description("Type of action."),
-            ),
-            /** Enable quote token parameters. */
-            enableQuoteToken: v.pipe(
-              v.object({
-                /** The token ID to convert to a quote token. */
-                token: v.pipe(
-                  UnsignedInteger,
-                  v.description("The token ID to convert to a quote token."),
-                ),
-              }),
-              v.description("Enable quote token parameters."),
-            ),
-          }),
-          v.object({
-            /** Type of action. */
-            type: v.pipe(
-              v.literal("spotDeploy"),
-              v.description("Type of action."),
-            ),
-            /** Enable aligned quote token parameters. */
-            enableAlignedQuoteToken: v.pipe(
-              v.object({
-                /** Token identifier to enable as aligned quote token. */
-                token: v.pipe(
-                  UnsignedInteger,
-                  v.description("Token identifier to enable as aligned quote token."),
-                ),
-              }),
-              v.description("Enable aligned quote token parameters."),
-            ),
-          }),
-        ]),
-        v.description("Action to perform."),
-      ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
-      ),
-    }),
-    v.description("Deploying HIP-1 and HIP-2 assets."),
-  );
+          /** Maximum gas allowed for registration. */
+          maxGas: UnsignedInteger,
+          /** Optional full token name. */
+          fullName: v.optional(v.string()),
+        }),
+      }),
+      v.object({
+        /** Type of action. */
+        type: v.literal("spotDeploy"),
+        /** User genesis parameters. */
+        userGenesis: v.object({
+          /** Token identifier. */
+          token: UnsignedInteger,
+          /** Array of tuples: [user address, genesis amount in wei]. */
+          userAndWei: v.array(v.tuple([Address, UnsignedDecimal])),
+          /** Array of tuples: [existing token identifier, genesis amount in wei]. */
+          existingTokenAndWei: v.array(v.tuple([UnsignedInteger, UnsignedDecimal])),
+          /** Array of tuples: [user address, blacklist status] (`true` for blacklist, `false` to remove existing blacklisted user). */
+          blacklistUsers: v.optional(v.array(v.tuple([Address, v.boolean()]))),
+        }),
+      }),
+      v.object({
+        /** Type of action. */
+        type: v.literal("spotDeploy"),
+        /** Genesis parameters. */
+        genesis: v.object({
+          /** Token identifier. */
+          token: UnsignedInteger,
+          /** Maximum token supply. */
+          maxSupply: UnsignedDecimal,
+          /** Set hyperliquidity balance to 0. */
+          noHyperliquidity: v.optional(v.literal(true)),
+        }),
+      }),
+      v.object({
+        /** Type of action. */
+        type: v.literal("spotDeploy"),
+        /** Register spot parameters. */
+        registerSpot: v.object({
+          /** Tuple containing base and quote token indices. */
+          tokens: v.tuple([UnsignedInteger, UnsignedInteger]),
+        }),
+      }),
+      v.object({
+        /** Type of action. */
+        type: v.literal("spotDeploy"),
+        /** Register hyperliquidity parameters. */
+        registerHyperliquidity: v.object({
+          /** Spot index (distinct from base token index). */
+          spot: UnsignedInteger,
+          /** Starting price for liquidity seeding. */
+          startPx: UnsignedDecimal,
+          /** Order size as a float (not in wei). */
+          orderSz: UnsignedDecimal,
+          /** Total number of orders to place. */
+          nOrders: UnsignedInteger,
+          /** Number of levels to seed with USDC. */
+          nSeededLevels: v.optional(UnsignedInteger),
+        }),
+      }),
+      v.object({
+        /** Type of action. */
+        type: v.literal("spotDeploy"),
+        /** Set deployer trading fee share parameters. */
+        setDeployerTradingFeeShare: v.object({
+          /** Token identifier. */
+          token: UnsignedInteger,
+          /** The deployer trading fee share. Range is 0% to 100%. */
+          share: Percent,
+        }),
+      }),
+      v.object({
+        /** Type of action. */
+        type: v.literal("spotDeploy"),
+        /** Enable quote token parameters. */
+        enableQuoteToken: v.object({
+          /** The token ID to convert to a quote token. */
+          token: UnsignedInteger,
+        }),
+      }),
+      v.object({
+        /** Type of action. */
+        type: v.literal("spotDeploy"),
+        /** Enable aligned quote token parameters. */
+        enableAlignedQuoteToken: v.object({
+          /** Token identifier to enable as aligned quote token. */
+          token: UnsignedInteger,
+        }),
+      }),
+    ]),
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type SpotDeployRequest = v.InferOutput<typeof SpotDeployRequest>;
 
@@ -290,10 +134,7 @@ export type SpotDeployRequest = v.InferOutput<typeof SpotDeployRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
  */
 export const SpotDeployResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type SpotDeployResponse = v.InferOutput<typeof SpotDeployResponse>;
 

@@ -12,170 +12,91 @@ import { SignatureSchema } from "./_base/commonSchemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-an-order
  */
 export const OrderRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("order"),
+      /** Array of order parameters. */
+      orders: v.array(
         v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("order"),
-            v.description("Type of action."),
+          /** Asset ID. */
+          a: UnsignedInteger,
+          /** Position side (`true` for long, `false` for short). */
+          b: v.boolean(),
+          /** Price. */
+          p: v.pipe(
+            UnsignedDecimal,
+            v.check((input) => Number(input) > 0, "Value must be greater than zero."),
           ),
-          /** Array of order parameters. */
-          orders: v.pipe(
-            v.array(
-              v.object({
-                /** Asset ID. */
-                a: v.pipe(
-                  UnsignedInteger,
-                  v.description("Asset ID."),
-                ),
-                /** Position side (`true` for long, `false` for short). */
-                b: v.pipe(
-                  v.boolean(),
-                  v.description("Position side (`true` for long, `false` for short)."),
-                ),
-                /** Price. */
-                p: v.pipe(
+          /** Size (in base currency units). */
+          s: UnsignedDecimal,
+          /** Is reduce-only? */
+          r: v.boolean(),
+          /** Order type (`limit` for limit orders, `trigger` for stop-loss/take-profit orders). */
+          t: v.union([
+            v.object({
+              /** Limit order parameters. */
+              limit: v.object({
+                /**
+                 * Time-in-force.
+                 * - `"Gtc"`: Remains active until filled or canceled.
+                 * - `"Ioc"`: Fills immediately or cancels any unfilled portion.
+                 * - `"Alo"`: Adds liquidity only.
+                 * - `"FrontendMarket"`: Similar to Ioc, used in Hyperliquid UI.
+                 * - `"LiquidationMarket"`: Similar to Ioc, used in Hyperliquid UI.
+                 */
+                tif: v.picklist(["Gtc", "Ioc", "Alo", "FrontendMarket", "LiquidationMarket"]),
+              }),
+            }),
+            v.object({
+              /** Trigger order parameters. */
+              trigger: v.object({
+                /** Is market order? */
+                isMarket: v.boolean(),
+                /** Trigger price. */
+                triggerPx: v.pipe(
                   UnsignedDecimal,
                   v.check((input) => Number(input) > 0, "Value must be greater than zero."),
-                  v.description("Price."),
                 ),
-                /** Size (in base currency units). */
-                s: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Size (in base currency units)."),
-                ),
-                /** Is reduce-only? */
-                r: v.pipe(
-                  v.boolean(),
-                  v.description("Is reduce-only?"),
-                ),
-                /** Order type (`limit` for limit orders, `trigger` for stop-loss/take-profit orders). */
-                t: v.pipe(
-                  v.union([
-                    v.object({
-                      /** Limit order parameters. */
-                      limit: v.pipe(
-                        v.object({
-                          /**
-                           * Time-in-force.
-                           * - `"Gtc"`: Remains active until filled or canceled.
-                           * - `"Ioc"`: Fills immediately or cancels any unfilled portion.
-                           * - `"Alo"`: Adds liquidity only.
-                           * - `"FrontendMarket"`: Similar to Ioc, used in Hyperliquid UI.
-                           * - `"LiquidationMarket"`: Similar to Ioc, used in Hyperliquid UI.
-                           */
-                          tif: v.pipe(
-                            v.picklist(["Gtc", "Ioc", "Alo", "FrontendMarket", "LiquidationMarket"]),
-                            v.description(
-                              "Time-in-force." +
-                                '\n- `"Gtc"`: Remains active until filled or canceled.' +
-                                '\n- `"Ioc"`: Fills immediately or cancels any unfilled portion.' +
-                                '\n- `"Alo"`: Adds liquidity only.' +
-                                '\n- `"FrontendMarket"`: Similar to Ioc, used in Hyperliquid UI.' +
-                                '\n- `"LiquidationMarket"`: Similar to Ioc, used in Hyperliquid UI.',
-                            ),
-                          ),
-                        }),
-                        v.description("Limit order parameters."),
-                      ),
-                    }),
-                    v.object({
-                      /** Trigger order parameters. */
-                      trigger: v.pipe(
-                        v.object({
-                          /** Is market order? */
-                          isMarket: v.pipe(
-                            v.boolean(),
-                            v.description("Is market order?"),
-                          ),
-                          /** Trigger price. */
-                          triggerPx: v.pipe(
-                            UnsignedDecimal,
-                            v.check((input) => Number(input) > 0, "Value must be greater than zero."),
-                            v.description("Trigger price."),
-                          ),
-                          /** Indicates whether it is take profit or stop loss. */
-                          tpsl: v.pipe(
-                            v.picklist(["tp", "sl"]),
-                            v.description("Indicates whether it is take profit or stop loss."),
-                          ),
-                        }),
-                        v.description("Trigger order parameters."),
-                      ),
-                    }),
-                  ]),
-                  v.description("Order type (`limit` for limit orders, `trigger` for stop-loss/take-profit orders)."),
-                ),
-                /** Client Order ID. */
-                c: v.pipe(
-                  v.optional(Cloid),
-                  v.description("Client Order ID."),
-                ),
+                /** Indicates whether it is take profit or stop loss. */
+                tpsl: v.picklist(["tp", "sl"]),
               }),
-            ),
-            v.description("Array of order parameters."),
-          ),
-          /**
-           * Order grouping strategy:
-           * - `na`: Standard order without grouping.
-           * - `normalTpsl`: TP/SL order with fixed size that doesn't adjust with position changes.
-           * - `positionTpsl`: TP/SL order that adjusts proportionally with the position size.
-           */
-          grouping: v.pipe(
-            v.optional(v.picklist(["na", "normalTpsl", "positionTpsl"]), "na"),
-            v.description(
-              "Order grouping strategy:" +
-                "\n- `na`: Standard order without grouping." +
-                "\n- `normalTpsl`: TP/SL order with fixed size that doesn't adjust with position changes." +
-                "\n- `positionTpsl`: TP/SL order that adjusts proportionally with the position size.",
-            ),
-          ),
-          /** Builder fee. */
-          builder: v.pipe(
-            v.optional(v.object({
-              /** Builder address. */
-              b: v.pipe(
-                Address,
-                v.description("Builder address."),
-              ),
-              /** Builder fee in 0.1bps (1 = 0.0001%). Max 100 for perps (0.1%), 1000 for spot (1%). */
-              f: v.pipe(
-                UnsignedInteger,
-                v.maxValue(1000),
-                v.description("Builder fee in 0.1bps (1 = 0.0001%). Max 100 for perps (0.1%), 1000 for spot (1%)."),
-              ),
-            })),
-            v.description("Builder fee."),
-          ),
+            }),
+          ]),
+          /** Client Order ID. */
+          c: v.optional(Cloid),
         }),
-        v.description("Action to perform."),
       ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
+      /**
+       * Order grouping strategy:
+       * - `na`: Standard order without grouping.
+       * - `normalTpsl`: TP/SL order with fixed size that doesn't adjust with position changes.
+       * - `positionTpsl`: TP/SL order that adjusts proportionally with the position size.
+       */
+      grouping: v.optional(
+        v.picklist(["na", "normalTpsl", "positionTpsl"]),
+        "na",
       ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Vault address (for vault trading). */
-      vaultAddress: v.pipe(
-        v.optional(Address),
-        v.description("Vault address (for vault trading)."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
+      /** Builder fee. */
+      builder: v.optional(
+        v.object({
+          /** Builder address. */
+          b: Address,
+          /** Builder fee in 0.1bps (1 = 0.0001%). Max 100 for perps (0.1%), 1000 for spot (1%). */
+          f: v.pipe(UnsignedInteger, v.maxValue(1000)),
+        }),
       ),
     }),
-    v.description("Place an order(s)."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Vault address (for vault trading). */
+    vaultAddress: v.optional(Address),
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type OrderRequest = v.InferOutput<typeof OrderRequest>;
 
@@ -184,96 +105,51 @@ export type OrderRequest = v.InferOutput<typeof OrderRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-an-order
  */
 export const OrderResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Successful status. */
-      status: v.pipe(
-        v.literal("ok"),
-        v.description("Successful status."),
-      ),
-      /** Response details. */
-      response: v.pipe(
-        v.object({
-          /** Type of response. */
-          type: v.pipe(
-            v.literal("order"),
-            v.description("Type of response."),
-          ),
-          /** Specific data. */
-          data: v.pipe(
+  return v.object({
+    /** Successful status. */
+    status: v.literal("ok"),
+    /** Response details. */
+    response: v.object({
+      /** Type of response. */
+      type: v.literal("order"),
+      /** Specific data. */
+      data: v.object({
+        /**Array of statuses for each placed order. */
+        statuses: v.array(
+          v.union([
             v.object({
-              /**Array of statuses for each placed order. */
-              statuses: v.pipe(
-                v.array(
-                  v.union([
-                    v.object({
-                      /** Resting order status. */
-                      resting: v.pipe(
-                        v.object({
-                          /** Order ID. */
-                          oid: v.pipe(
-                            UnsignedInteger,
-                            v.description("Order ID."),
-                          ),
-                          /** Client Order ID. */
-                          cloid: v.pipe(
-                            v.optional(Cloid),
-                            v.description("Client Order ID."),
-                          ),
-                        }),
-                        v.description("Resting order status."),
-                      ),
-                    }),
-                    v.object({
-                      /** Filled order status. */
-                      filled: v.pipe(
-                        v.object({
-                          /** Total size filled. */
-                          totalSz: v.pipe(
-                            UnsignedDecimal,
-                            v.description("Total size filled."),
-                          ),
-                          /** Average price of fill. */
-                          avgPx: v.pipe(
-                            UnsignedDecimal,
-                            v.description("Average price of fill."),
-                          ),
-                          /** Order ID. */
-                          oid: v.pipe(
-                            UnsignedInteger,
-                            v.description("Order ID."),
-                          ),
-                          /** Client Order ID. */
-                          cloid: v.pipe(
-                            v.optional(Cloid),
-                            v.description("Client Order ID."),
-                          ),
-                        }),
-                        v.description("Filled order status."),
-                      ),
-                    }),
-                    v.object({
-                      /** Error message. */
-                      error: v.pipe(
-                        v.string(),
-                        v.description("Error message."),
-                      ),
-                    }),
-                    v.literal("waitingForFill"),
-                    v.literal("waitingForTrigger"),
-                  ]),
-                ),
-                v.description("Array of statuses for each placed order."),
-              ),
+              /** Resting order status. */
+              resting: v.object({
+                /** Order ID. */
+                oid: UnsignedInteger,
+                /** Client Order ID. */
+                cloid: v.optional(Cloid),
+              }),
             }),
-            v.description("Specific data."),
-          ),
-        }),
-        v.description("Response details."),
-      ),
+            v.object({
+              /** Filled order status. */
+              filled: v.object({
+                /** Total size filled. */
+                totalSz: UnsignedDecimal,
+                /** Average price of fill. */
+                avgPx: UnsignedDecimal,
+                /** Order ID. */
+                oid: UnsignedInteger,
+                /** Client Order ID. */
+                cloid: v.optional(Cloid),
+              }),
+            }),
+            v.object({
+              /** Error message. */
+              error: v.string(),
+            }),
+            v.literal("waitingForFill"),
+            v.literal("waitingForTrigger"),
+          ]),
+        ),
+      }),
     }),
-    v.description("Response for order placement."),
-  );
+  });
 })();
 export type OrderResponse = v.InferOutput<typeof OrderResponse>;
 

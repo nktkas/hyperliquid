@@ -79,6 +79,9 @@ export {
 } from "./_abstractWallet.ts";
 export { PrivateKeySigner } from "./_privateKeySigner.ts";
 
+/** Zero address used as verifyingContract in EIP-712 domains. */
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000" as const;
+
 /**
  * Create a hash of the L1 action.
  * @example
@@ -228,7 +231,7 @@ export async function signL1Action(args: {
       name: "Exchange",
       version: "1",
       chainId: 1337, // hyperliquid requires chainId to be 1337
-      verifyingContract: "0x0000000000000000000000000000000000000000",
+      verifyingContract: ZERO_ADDRESS,
     },
     types: {
       Agent: [
@@ -332,7 +335,7 @@ export async function signUserSignedAction(args: {
       name: "HyperliquidSignTransaction",
       version: "1",
       chainId: parseInt(action.signatureChainId),
-      verifyingContract: "0x0000000000000000000000000000000000000000",
+      verifyingContract: ZERO_ADDRESS,
     },
     types,
     primaryType,
@@ -422,20 +425,19 @@ export async function signMultiSigAction(args: {
   /** Optional expiration time of the action in ms since the epoch. */
   expiresAfter?: number;
 }): Promise<Signature> {
-  let { wallet, action, nonce, isTestnet = false, vaultAddress, expiresAfter } = args;
+  const { wallet, nonce, isTestnet = false, vaultAddress, expiresAfter } = args;
 
-  if ("type" in action) {
-    const { type: _, ...actionWithoutType } = action;
-    action = actionWithoutType;
-  }
+  // Remove 'type' field from action if present (destructure to exclude it)
+  const { type: _, signatureChainId, ...actionRest } = args.action;
+  const actionForHash = { signatureChainId, ...actionRest };
 
   return await signTypedData({
     wallet,
     domain: {
       name: "HyperliquidSignTransaction",
       version: "1",
-      chainId: parseInt(action.signatureChainId),
-      verifyingContract: "0x0000000000000000000000000000000000000000",
+      chainId: parseInt(signatureChainId),
+      verifyingContract: ZERO_ADDRESS,
     },
     types: {
       "HyperliquidTransaction:SendMultiSig": [
@@ -447,7 +449,7 @@ export async function signMultiSigAction(args: {
     primaryType: "HyperliquidTransaction:SendMultiSig",
     message: {
       hyperliquidChain: isTestnet ? "Testnet" : "Mainnet",
-      multiSigActionHash: createL1ActionHash({ action, nonce, vaultAddress, expiresAfter }),
+      multiSigActionHash: createL1ActionHash({ action: actionForHash, nonce, vaultAddress, expiresAfter }),
       nonce,
     },
   });
