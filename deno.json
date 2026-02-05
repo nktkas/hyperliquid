@@ -1,6 +1,6 @@
 {
   "name": "@nktkas/hyperliquid",
-  "version": "0.30.3",
+  "version": "0.31.0",
   "license": "MIT",
   "tasks": {
     "check": "deno fmt --check && deno lint && deno check --doc && deno task check:jsdoc && deno task check:cli-help && deno task check:export",
