@@ -23,7 +23,7 @@ export const UserSetAbstractionRequest = /* @__PURE__ */ (() => {
       /** User address. */
       user: Address,
       /** Abstraction mode to set. */
-      abstraction: v.picklist(["dexAbstraction", "unifiedAccount", "disabled"]),
+      abstraction: v.picklist(["dexAbstraction", "unifiedAccount", "portfolioMargin", "disabled"]),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
       nonce: UnsignedInteger,
     }),

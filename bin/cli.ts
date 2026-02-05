@@ -250,7 +250,7 @@ ${category("Account:")}
   ${method("setDisplayName")}             ${params("--displayName <string>")}
   ${method("spotUser")}                   ${params("--toggleSpotDusting <json>")}
   ${method("userDexAbstraction")}         ${params("--user <address> --enabled <bool>")}
-  ${method("userSetAbstraction")}         ${params("--user <address> --abstraction <dexAbstraction|unifiedAccount|disabled>")}
+  ${method("userSetAbstraction")}         ${params("--user <address> --abstraction <dexAbstraction|unifiedAccount|portfolioMargin|disabled>")}
   ${method("userPortfolioMargin")}        ${params("--user <address> --enabled <bool>")}
 
 ${category("Fund Transfers:")}

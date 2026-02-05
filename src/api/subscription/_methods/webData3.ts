@@ -41,7 +41,7 @@ export const WebData3Event = /* @__PURE__ */ (() => {
       /** Whether DEX abstraction is enabled. */
       dexAbstractionEnabled: v.optional(v.boolean()),
       /** Abstraction mode for the user account. */
-      abstraction: v.optional(v.picklist(["dexAbstraction", "unifiedAccount", "disabled"])),
+      abstraction: v.optional(v.picklist(["dexAbstraction", "unifiedAccount", "portfolioMargin", "disabled"])),
     }),
     /** Array of perpetual DEX states. */
     perpDexStates: v.array(
