@@ -326,7 +326,14 @@ function extractExamples(rawText: string): string[] | undefined {
     examples.push(currentExample.trim());
   }
 
-  return examples.length > 0 ? examples : undefined;
+  if (examples.length === 0) return undefined;
+
+  // Strip markdown code fences (```ts, ```typescript, ```) from each example
+  return examples.map((example) =>
+    example
+      .replace(/^```\w*\n/, "")
+      .replace(/\n```$/, "")
+  );
 }
 
 // =============================================================================
