@@ -11,21 +11,12 @@ import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-borrow-lend-user-state
  */
 export const BorrowLendUserStateRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("borrowLendUserState"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request borrow/lend user state."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("borrowLendUserState"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type BorrowLendUserStateRequest = v.InferOutput<typeof BorrowLendUserStateRequest>;
 
@@ -34,64 +25,34 @@ export type BorrowLendUserStateRequest = v.InferOutput<typeof BorrowLendUserStat
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-borrow-lend-user-state
  */
 export const BorrowLendUserStateResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Array of tuples of token IDs and their borrow/lend state. */
-      tokenToState: v.pipe(
-        v.array(
-          v.tuple([
-            UnsignedInteger,
-            v.object({
-              /** Borrow state for the token. */
-              borrow: v.pipe(
-                v.object({
-                  /** Borrow basis amount. */
-                  basis: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Borrow basis amount."),
-                  ),
-                  /** Borrow value. */
-                  value: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Borrow value."),
-                  ),
-                }),
-                v.description("Borrow state for the token."),
-              ),
-              /** Supply state for the token. */
-              supply: v.pipe(
-                v.object({
-                  /** Supply basis amount. */
-                  basis: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Supply basis amount."),
-                  ),
-                  /** Supply value. */
-                  value: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Supply value."),
-                  ),
-                }),
-                v.description("Supply state for the token."),
-              ),
-            }),
-          ]),
-        ),
-        v.description("Array of tuples of token IDs and their borrow/lend state."),
-      ),
-      /** Account health status. */
-      health: v.pipe(
-        v.literal("healthy"), // FIXME: presumably there are other literals
-        v.description("Account health status."),
-      ),
-      /** Health factor. */
-      healthFactor: v.pipe(
-        v.null(),
-        v.description("Health factor."),
-      ),
-    }),
-    v.description("User's borrow/lend state."),
-  );
+  return v.object({
+    /** Array of tuples of token IDs and their borrow/lend state. */
+    tokenToState: v.array(
+      v.tuple([
+        UnsignedInteger,
+        v.object({
+          /** Borrow state for the token. */
+          borrow: v.object({
+            /** Borrow basis amount. */
+            basis: UnsignedDecimal,
+            /** Borrow value. */
+            value: UnsignedDecimal,
+          }),
+          /** Supply state for the token. */
+          supply: v.object({
+            /** Supply basis amount. */
+            basis: UnsignedDecimal,
+            /** Supply value. */
+            value: UnsignedDecimal,
+          }),
+        }),
+      ]),
+    ),
+    /** Account health status. */
+    health: v.literal("healthy"), // FIXME: presumably there are other literals
+    /** Health factor. */
+    healthFactor: v.null(),
+  });
 })();
 export type BorrowLendUserStateResponse = v.InferOutput<typeof BorrowLendUserStateResponse>;
 

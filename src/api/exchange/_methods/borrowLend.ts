@@ -9,66 +9,33 @@ import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonS
 
 /** Borrow or lend assets. */
 export const BorrowLendRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("borrowLend"),
-            v.description("Type of action."),
-          ),
-          /** Operation type. */
-          operation: v.pipe(
-            v.picklist(["supply", "withdraw", "repay", "borrow"]),
-            v.description("Operation type."),
-          ),
-          /** Token ID. */
-          token: v.pipe(
-            UnsignedInteger,
-            v.description("Token ID."),
-          ),
-          /** Amount to supply/withdraw (null = full). */
-          amount: v.pipe(
-            v.nullable(UnsignedDecimal),
-            v.description("Amount to supply/withdraw (null = full)."),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Vault address (for vault trading). */
-      vaultAddress: v.pipe(
-        v.optional(Address),
-        v.description("Vault address (for vault trading)."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("borrowLend"),
+      /** Operation type. */
+      operation: v.picklist(["supply", "withdraw", "repay", "borrow"]),
+      /** Token ID. */
+      token: UnsignedInteger,
+      /** Amount to supply/withdraw (null = full). */
+      amount: v.nullable(UnsignedDecimal),
     }),
-    v.description("Borrow or lend assets."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Vault address (for vault trading). */
+    vaultAddress: v.optional(Address),
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type BorrowLendRequest = v.InferOutput<typeof BorrowLendRequest>;
 
 /** Successful response without specific data or error response. */
 export const BorrowLendResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type BorrowLendResponse = v.InferOutput<typeof BorrowLendResponse>;
 

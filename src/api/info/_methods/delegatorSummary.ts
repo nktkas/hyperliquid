@@ -11,21 +11,12 @@ import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-summary
  */
 export const DelegatorSummaryRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("delegatorSummary"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request user's staking summary."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("delegatorSummary"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type DelegatorSummaryRequest = v.InferOutput<typeof DelegatorSummaryRequest>;
 
@@ -34,31 +25,16 @@ export type DelegatorSummaryRequest = v.InferOutput<typeof DelegatorSummaryReque
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-summary
  */
 export const DelegatorSummaryResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Total amount of delegated tokens. */
-      delegated: v.pipe(
-        UnsignedDecimal,
-        v.description("Total amount of delegated tokens."),
-      ),
-      /** Total amount of undelegated tokens. */
-      undelegated: v.pipe(
-        UnsignedDecimal,
-        v.description("Total amount of undelegated tokens."),
-      ),
-      /** Total amount of tokens pending withdrawal. */
-      totalPendingWithdrawal: v.pipe(
-        UnsignedDecimal,
-        v.description("Total amount of tokens pending withdrawal."),
-      ),
-      /** Number of pending withdrawals. */
-      nPendingWithdrawals: v.pipe(
-        UnsignedInteger,
-        v.description("Number of pending withdrawals."),
-      ),
-    }),
-    v.description("User's staking summary."),
-  );
+  return v.object({
+    /** Total amount of delegated tokens. */
+    delegated: UnsignedDecimal,
+    /** Total amount of undelegated tokens. */
+    undelegated: UnsignedDecimal,
+    /** Total amount of tokens pending withdrawal. */
+    totalPendingWithdrawal: UnsignedDecimal,
+    /** Number of pending withdrawals. */
+    nPendingWithdrawals: UnsignedInteger,
+  });
 })();
 export type DelegatorSummaryResponse = v.InferOutput<typeof DelegatorSummaryResponse>;
 

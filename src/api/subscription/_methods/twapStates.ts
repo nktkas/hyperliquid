@@ -9,51 +9,27 @@ import { TwapStateSchema } from "../../info/_methods/_base/commonSchemas.ts";
 
 /** Subscribe to TWAP states updates for a specific user. */
 export const TwapStatesRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("twapStates"),
-        v.description("Type of subscription."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** DEX name (empty string for main dex). */
-      dex: v.pipe(
-        v.optional(v.string()),
-        v.description("DEX name (empty string for main dex)."),
-      ),
-    }),
-    v.description("Subscribe to TWAP states updates for a specific user."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("twapStates"),
+    /** User address. */
+    user: Address,
+    /** DEX name (empty string for main dex). */
+    dex: v.optional(v.string()),
+  });
 })();
 export type TwapStatesRequest = v.InferOutput<typeof TwapStatesRequest>;
 
 /** Event of user TWAP states. */
 export const TwapStatesEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** DEX name (empty string for main dex). */
-      dex: v.pipe(
-        v.string(),
-        v.description("DEX name (empty string for main dex)."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** Array of tuples of TWAP ID and TWAP state. */
-      states: v.pipe(
-        v.array(v.tuple([UnsignedInteger, TwapStateSchema])),
-        v.description("Array of tuples of TWAP ID and TWAP state."),
-      ),
-    }),
-    v.description("Event of user TWAP states."),
-  );
+  return v.object({
+    /** DEX name (empty string for main dex). */
+    dex: v.string(),
+    /** User address. */
+    user: Address,
+    /** Array of tuples of TWAP ID and TWAP state. */
+    states: v.array(v.tuple([UnsignedInteger, TwapStateSchema])),
+  });
 })();
 export type TwapStatesEvent = v.InferOutput<typeof TwapStatesEvent>;
 

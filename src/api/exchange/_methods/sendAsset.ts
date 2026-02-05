@@ -12,80 +12,38 @@ import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset
  */
 export const SendAssetRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("sendAsset"),
-            v.description("Type of action."),
-          ),
-          /** Chain ID in hex format for EIP-712 signing. */
-          signatureChainId: v.pipe(
-            Hex,
-            v.description("Chain ID in hex format for EIP-712 signing."),
-          ),
-          /** HyperLiquid network type. */
-          hyperliquidChain: v.pipe(
-            HyperliquidChainSchema,
-            v.description("HyperLiquid network type."),
-          ),
-          /** Destination address. */
-          destination: v.pipe(
-            Address,
-            v.description("Destination address."),
-          ),
-          /** Source DEX ("" for default USDC perp DEX, "spot" for spot). */
-          sourceDex: v.pipe(
-            v.string(),
-            v.description('Source DEX ("" for default USDC perp DEX, "spot" for spot).'),
-          ),
-          /** Destination DEX ("" for default USDC perp DEX, "spot" for spot). */
-          destinationDex: v.pipe(
-            v.string(),
-            v.description('Destination DEX ("" for default USDC perp DEX, "spot" for spot).'),
-          ),
-          /** Token identifier. */
-          token: v.pipe(
-            v.string(),
-            v.description("Token identifier."),
-          ),
-          /** Amount to send (not in wei). */
-          amount: v.pipe(
-            UnsignedDecimal,
-            v.description("Amount to send (not in wei)."),
-          ),
-          /** Source sub-account address ("" for main account). */
-          fromSubAccount: v.pipe(
-            v.optional(
-              v.union([v.literal(""), Address]),
-              "",
-            ),
-            v.description('Source sub-account address ("" for main account).'),
-          ),
-          /** Nonce (timestamp in ms) used to prevent replay attacks. */
-          nonce: v.pipe(
-            UnsignedInteger,
-            v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-          ),
-        }),
-        v.description("Action to perform."),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("sendAsset"),
+      /** Chain ID in hex format for EIP-712 signing. */
+      signatureChainId: Hex,
+      /** HyperLiquid network type. */
+      hyperliquidChain: HyperliquidChainSchema,
+      /** Destination address. */
+      destination: Address,
+      /** Source DEX ("" for default USDC perp DEX, "spot" for spot). */
+      sourceDex: v.string(),
+      /** Destination DEX ("" for default USDC perp DEX, "spot" for spot). */
+      destinationDex: v.string(),
+      /** Token identifier. */
+      token: v.string(),
+      /** Amount to send (not in wei). */
+      amount: UnsignedDecimal,
+      /** Source sub-account address ("" for main account). */
+      fromSubAccount: v.optional(
+        v.union([v.literal(""), Address]),
+        "",
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
+      nonce: UnsignedInteger,
     }),
-    v.description("Transfer tokens between different perp DEXs, spot balance, users, and/or sub-accounts."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+  });
 })();
 export type SendAssetRequest = v.InferOutput<typeof SendAssetRequest>;
 
@@ -94,10 +52,7 @@ export type SendAssetRequest = v.InferOutput<typeof SendAssetRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset
  */
 export const SendAssetResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type SendAssetResponse = v.InferOutput<typeof SendAssetResponse>;
 

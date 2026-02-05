@@ -12,73 +12,43 @@ import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet
  */
 export const ApproveAgentRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("approveAgent"),
-            v.description("Type of action."),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("approveAgent"),
+      /** Chain ID in hex format for EIP-712 signing. */
+      signatureChainId: Hex,
+      /** HyperLiquid network type. */
+      hyperliquidChain: HyperliquidChainSchema,
+      /** Agent address. */
+      agentAddress: Address,
+      /** Agent name (min 1 and max 16 characters) or null for unnamed agent. */
+      agentName: v.nullish(
+        v.pipe(
+          v.string(),
+          v.check(
+            (input) => {
+              // Ignore trailing ` valid_until <timestamp>` when checking length
+              const baseName = input.replace(/ valid_until \d+$/, "");
+              return baseName.length >= 1 && baseName.length <= 16;
+            },
+            (issue) => {
+              const baseName = issue.input.replace(/ valid_until \d+$/, "");
+              return `Invalid length: Expected >= 1 and <= 16 but received ${baseName.length}`;
+            },
           ),
-          /** Chain ID in hex format for EIP-712 signing. */
-          signatureChainId: v.pipe(
-            Hex,
-            v.description("Chain ID in hex format for EIP-712 signing."),
-          ),
-          /** HyperLiquid network type. */
-          hyperliquidChain: v.pipe(
-            HyperliquidChainSchema,
-            v.description("HyperLiquid network type."),
-          ),
-          /** Agent address. */
-          agentAddress: v.pipe(
-            Address,
-            v.description("Agent address."),
-          ),
-          /** Agent name (min 1 and max 16 characters) or null for unnamed agent. */
-          agentName: v.pipe(
-            v.nullish(
-              v.pipe(
-                v.string(),
-                v.check(
-                  (input) => {
-                    // Ignore trailing ` valid_until <timestamp>` when checking length
-                    const baseName = input.replace(/ valid_until \d+$/, "");
-                    return baseName.length >= 1 && baseName.length <= 16;
-                  },
-                  (issue) => {
-                    const baseName = issue.input.replace(/ valid_until \d+$/, "");
-                    return `Invalid length: Expected >= 1 and <= 16 but received ${baseName.length}`;
-                  },
-                ),
-              ),
-              null,
-            ),
-            v.description("Agent name (min 1 and max 16 characters) or null for unnamed agent."),
-          ),
-          /** Nonce (timestamp in ms) used to prevent replay attacks. */
-          nonce: v.pipe(
-            UnsignedInteger,
-            v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-          ),
-        }),
-        v.description("Action to perform."),
+        ),
+        null,
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
+      nonce: UnsignedInteger,
     }),
-    v.description("Approve an agent to sign on behalf of the master account."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+  });
 })();
 export type ApproveAgentRequest = v.InferOutput<typeof ApproveAgentRequest>;
 
@@ -87,10 +57,7 @@ export type ApproveAgentRequest = v.InferOutput<typeof ApproveAgentRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet
  */
 export const ApproveAgentResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type ApproveAgentResponse = v.InferOutput<typeof ApproveAgentResponse>;
 

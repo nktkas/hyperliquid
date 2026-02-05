@@ -9,46 +9,25 @@ import { UserTwapSliceFillsResponse } from "../../info/_methods/userTwapSliceFil
 
 /** Subscription to user TWAP slice fill events for a specific user. */
 export const UserTwapSliceFillsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("userTwapSliceFills"),
-        v.description("Type of subscription."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Subscription to user TWAP slice fill events for a specific user."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("userTwapSliceFills"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type UserTwapSliceFillsRequest = v.InferOutput<typeof UserTwapSliceFillsRequest>;
 
 /** Event of user TWAP slice fill. */
 export const UserTwapSliceFillsEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** Array of user's twap slice fills. */
-      twapSliceFills: v.pipe(
-        UserTwapSliceFillsResponse,
-        v.description("Array of user's twap slice fills."),
-      ),
-      /** Whether this is an initial snapshot. */
-      isSnapshot: v.pipe(
-        v.optional(v.literal(true)),
-        v.description("Whether this is an initial snapshot."),
-      ),
-    }),
-    v.description("Event of user TWAP slice fill."),
-  );
+  return v.object({
+    /** User address. */
+    user: Address,
+    /** Array of user's twap slice fills. */
+    twapSliceFills: UserTwapSliceFillsResponse,
+    /** Whether this is an initial snapshot. */
+    isSnapshot: v.optional(v.literal(true)),
+  });
 })();
 export type UserTwapSliceFillsEvent = v.InferOutput<typeof UserTwapSliceFillsEvent>;
 

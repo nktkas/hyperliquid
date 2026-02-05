@@ -1,18 +1,16 @@
-name: deno fmt & lint
+name: Code Quality
 
 on:
   pull_request:
+  workflow_call:
 
 jobs:
-  fmt_lint:
+  quality:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v6
       - uses: denoland/setup-deno@v2
 
-      - name: deno fmt
-        run: deno fmt --check
-
-      - name: deno lint
-        run: deno lint
+      - name: deno task check
+        run: deno task check

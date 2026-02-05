@@ -9,46 +9,25 @@ import { HistoricalOrdersResponse } from "../../info/_methods/historicalOrders.t
 
 /** Subscription to user historical orders for a specific user. */
 export const UserHistoricalOrdersRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("userHistoricalOrders"),
-        v.description("Type of subscription."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Subscription to user historical orders for a specific user."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("userHistoricalOrders"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type UserHistoricalOrdersRequest = v.InferOutput<typeof UserHistoricalOrdersRequest>;
 
 /** Event of user historical orders. */
 export const UserHistoricalOrdersEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** Array of frontend orders with current processing status. */
-      orderHistory: v.pipe(
-        HistoricalOrdersResponse,
-        v.description("Array of frontend orders with current processing status."),
-      ),
-      /** Whether this is an initial snapshot. */
-      isSnapshot: v.pipe(
-        v.optional(v.literal(true)),
-        v.description("Whether this is an initial snapshot."),
-      ),
-    }),
-    v.description("Event of user historical orders."),
-  );
+  return v.object({
+    /** User address. */
+    user: Address,
+    /** Array of frontend orders with current processing status. */
+    orderHistory: HistoricalOrdersResponse,
+    /** Whether this is an initial snapshot. */
+    isSnapshot: v.optional(v.literal(true)),
+  });
 })();
 export type UserHistoricalOrdersEvent = v.InferOutput<typeof UserHistoricalOrdersEvent>;
 

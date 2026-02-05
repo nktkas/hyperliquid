@@ -11,21 +11,12 @@ import { Address } from "../../_schemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-role
  */
 export const UserRoleRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("userRole"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request user role."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("userRole"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type UserRoleRequest = v.InferOutput<typeof UserRoleRequest>;
 
@@ -34,54 +25,30 @@ export type UserRoleRequest = v.InferOutput<typeof UserRoleRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-role
  */
 export const UserRoleResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.variant("role", [
-      v.object({
-        /** Role identifier. */
-        role: v.pipe(
-          v.picklist(["missing", "user", "vault"]),
-          v.description("Role identifier."),
-        ),
+  return v.variant("role", [
+    v.object({
+      /** Role identifier. */
+      role: v.picklist(["missing", "user", "vault"]),
+    }),
+    v.object({
+      /** Role identifier. */
+      role: v.literal("agent"),
+      /** Details for agent role. */
+      data: v.object({
+        /** Master account address associated with the agent. */
+        user: Address,
       }),
-      v.object({
-        /** Role identifier. */
-        role: v.pipe(
-          v.literal("agent"),
-          v.description("Role identifier."),
-        ),
-        /** Details for agent role. */
-        data: v.pipe(
-          v.object({
-            /** Master account address associated with the agent. */
-            user: v.pipe(
-              Address,
-              v.description("Master account address associated with the agent."),
-            ),
-          }),
-          v.description("Details for agent role."),
-        ),
+    }),
+    v.object({
+      /** Role identifier. */
+      role: v.literal("subAccount"),
+      /** Details for sub-account role. */
+      data: v.object({
+        /** Master account address associated with the sub-account. */
+        master: Address,
       }),
-      v.object({
-        /** Role identifier. */
-        role: v.pipe(
-          v.literal("subAccount"),
-          v.description("Role identifier."),
-        ),
-        /** Details for sub-account role. */
-        data: v.pipe(
-          v.object({
-            /** Master account address associated with the sub-account. */
-            master: v.pipe(
-              Address,
-              v.description("Master account address associated with the sub-account."),
-            ),
-          }),
-          v.description("Details for sub-account role."),
-        ),
-      }),
-    ]),
-    v.description("User role."),
-  );
+    }),
+  ]);
 })();
 export type UserRoleResponse = v.InferOutput<typeof UserRoleResponse>;
 

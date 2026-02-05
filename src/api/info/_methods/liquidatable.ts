@@ -8,16 +8,10 @@ import * as v from "@valibot/valibot";
  * Request liquidatable.
  */
 export const LiquidatableRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("liquidatable"),
-        v.description("Type of request."),
-      ),
-    }),
-    v.description("Request liquidatable."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("liquidatable"),
+  });
 })();
 export type LiquidatableRequest = v.InferOutput<typeof LiquidatableRequest>;
 
@@ -25,10 +19,7 @@ export type LiquidatableRequest = v.InferOutput<typeof LiquidatableRequest>;
  * Response for liquidatable request.
  */
 export const LiquidatableResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(v.unknown()),
-    v.description("Response for liquidatable request."),
-  );
+  return v.array(v.unknown());
 })();
 export type LiquidatableResponse = v.InferOutput<typeof LiquidatableResponse>;
 

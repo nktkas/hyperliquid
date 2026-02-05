@@ -2,24 +2,31 @@ import * as v from "@valibot/valibot";
 import { HyperliquidError } from "../_base.ts";
 
 // =============================================================
+// Common Types
+// =============================================================
+
+/** Common domain type for EIP-712 typed data signing. */
+interface TypedDataDomain {
+  name: string;
+  version: string;
+  chainId: number;
+  verifyingContract: `0x${string}`;
+}
+
+/** Common types structure for EIP-712 typed data. */
+interface TypedDataTypes {
+  [key: string]: { name: string; type: string }[];
+}
+
+// =============================================================
 // Ethers V6
 // =============================================================
 
 /** Abstract interface for an {@link https://docs.ethers.org/v6/api/providers/#Signer | ethers.js v6} */
 export interface AbstractEthersV6Signer {
   signTypedData(
-    domain: {
-      name: string;
-      version: string;
-      chainId: number;
-      verifyingContract: string;
-    },
-    types: {
-      [key: string]: {
-        name: string;
-        type: string;
-      }[];
-    },
+    domain: TypedDataDomain,
+    types: TypedDataTypes,
     value: Record<string, unknown>,
   ): Promise<string>;
   getAddress(): Promise<string>;
@@ -35,11 +42,7 @@ const AbstractEthersV6SignerSchema = /* @__PURE__ */ (() => {
       v.check((fn) => fn.length === 3, "Number of arguments must be 3"),
     ),
     getAddress: v.function(),
-    provider: v.nullish(
-      v.object({
-        getNetwork: v.function(),
-      }),
-    ),
+    provider: v.nullish(v.object({ getNetwork: v.function() })),
   });
 })();
 
@@ -50,18 +53,8 @@ const AbstractEthersV6SignerSchema = /* @__PURE__ */ (() => {
 /** Abstract interface for an {@link https://docs.ethers.org/v5/api/signer/ | ethers.js v5} */
 export interface AbstractEthersV5Signer {
   _signTypedData(
-    domain: {
-      name: string;
-      version: string;
-      chainId: number;
-      verifyingContract: string;
-    },
-    types: {
-      [key: string]: {
-        name: string;
-        type: string;
-      }[];
-    },
+    domain: TypedDataDomain,
+    types: TypedDataTypes,
     value: Record<string, unknown>,
   ): Promise<string>;
   getAddress(): Promise<string>;
@@ -77,11 +70,7 @@ const AbstractEthersV5SignerSchema = /* @__PURE__ */ (() => {
       v.check((fn) => fn.length === 3, "Number of arguments must be 3"),
     ),
     getAddress: v.function(),
-    provider: v.nullish(
-      v.object({
-        getNetwork: v.function(),
-      }),
-    ),
+    provider: v.nullish(v.object({ getNetwork: v.function() })),
   });
 })();
 
@@ -89,27 +78,22 @@ const AbstractEthersV5SignerSchema = /* @__PURE__ */ (() => {
 // Viem
 // =============================================================
 
+/** Viem-style typed data parameters. */
+interface ViemTypedDataParams {
+  domain: {
+    name: string;
+    version: string;
+    chainId: number;
+    verifyingContract: `0x${string}`;
+  };
+  types: TypedDataTypes;
+  primaryType: string;
+  message: Record<string, unknown>;
+}
+
 /** Abstract interface for a {@link https://viem.sh/docs/accounts/jsonRpc#json-rpc-account | viem JSON-RPC Account}. */
 export interface AbstractViemJsonRpcAccount {
-  signTypedData(
-    params: {
-      domain: {
-        name: string;
-        version: string;
-        chainId: number;
-        verifyingContract: `0x${string}`;
-      };
-      types: {
-        [key: string]: {
-          name: string;
-          type: string;
-        }[];
-      };
-      primaryType: string;
-      message: Record<string, unknown>;
-    },
-    options?: unknown,
-  ): Promise<`0x${string}`>;
+  signTypedData(params: ViemTypedDataParams, options?: unknown): Promise<`0x${string}`>;
   getAddresses(): Promise<`0x${string}`[]>;
   getChainId(): Promise<number>;
 }
@@ -127,25 +111,7 @@ const AbstractViemJsonRpcAccountSchema = /* @__PURE__ */ (() => {
 
 /** Abstract interface for a {@link https://viem.sh/docs/accounts/local | viem Local Account}. */
 export interface AbstractViemLocalAccount {
-  signTypedData(
-    params: {
-      domain: {
-        name: string;
-        version: string;
-        chainId: number;
-        verifyingContract: `0x${string}`;
-      };
-      types: {
-        [key: string]: {
-          name: string;
-          type: string;
-        }[];
-      };
-      primaryType: string;
-      message: Record<string, unknown>;
-    },
-    options?: unknown,
-  ): Promise<`0x${string}`>;
+  signTypedData(params: ViemTypedDataParams, options?: unknown): Promise<`0x${string}`>;
   address: `0x${string}`;
 }
 
@@ -190,26 +156,20 @@ export class AbstractWalletError extends HyperliquidError {
 
 export async function signTypedData(args: {
   wallet: AbstractWallet;
-  domain: {
-    name: string;
-    version: string;
-    chainId: number;
-    verifyingContract: `0x${string}`;
-  };
-  types: {
-    [key: string]: {
-      name: string;
-      type: string;
-    }[];
-  };
+  domain: TypedDataDomain;
+  types: TypedDataTypes;
   primaryType: string;
   message: Record<string, unknown>;
 }): Promise<Signature> {
   const { wallet, domain, types, primaryType, message } = args;
 
+  const isViemWallet = v.is(AbstractViemJsonRpcAccountSchema, wallet) || v.is(AbstractViemLocalAccountSchema, wallet);
+  const isEthersV6 = v.is(AbstractEthersV6SignerSchema, wallet);
+  const isEthersV5 = v.is(AbstractEthersV5SignerSchema, wallet);
+
   let signature: `0x${string}`;
-  if (v.is(AbstractViemJsonRpcAccountSchema, wallet) || v.is(AbstractViemLocalAccountSchema, wallet)) {
-    try {
+  try {
+    if (isViemWallet) {
       signature = await wallet.signTypedData({
         domain,
         types: {
@@ -224,23 +184,17 @@ export async function signTypedData(args: {
         primaryType,
         message,
       }) as `0x${string}`;
-    } catch (error) {
-      throw new AbstractWalletError("Failed to sign typed data with viem wallet", { cause: error });
-    }
-  } else if (v.is(AbstractEthersV6SignerSchema, wallet)) {
-    try {
+    } else if (isEthersV6) {
       signature = await wallet.signTypedData(domain, types, message) as `0x${string}`;
-    } catch (error) {
-      throw new AbstractWalletError("Failed to sign typed data with ethers v6 wallet", { cause: error });
-    }
-  } else if (v.is(AbstractEthersV5SignerSchema, wallet)) {
-    try {
+    } else if (isEthersV5) {
       signature = await wallet._signTypedData(domain, types, message) as `0x${string}`;
-    } catch (error) {
-      throw new AbstractWalletError("Failed to sign typed data with ethers v5 wallet", { cause: error });
+    } else {
+      throw new AbstractWalletError("Failed to sign typed data: unknown wallet type");
     }
-  } else {
-    throw new AbstractWalletError("Failed to sign typed data: unknown wallet");
+  } catch (error) {
+    if (error instanceof AbstractWalletError) throw error;
+    const walletType = isViemWallet ? "viem" : isEthersV6 ? "ethers v6" : "ethers v5";
+    throw new AbstractWalletError(`Failed to sign typed data with ${walletType} wallet`, { cause: error });
   }
 
   return splitSignature(signature);
@@ -259,57 +213,49 @@ function splitSignature(signature: `0x${string}`): Signature {
 
 /** Get the chain ID of the wallet. */
 export async function getWalletChainId(wallet: AbstractWallet): Promise<`0x${string}`> {
-  if (v.is(AbstractViemJsonRpcAccountSchema, wallet)) {
-    try {
+  try {
+    // Viem JSON-RPC account has getChainId method
+    if (v.is(AbstractViemJsonRpcAccountSchema, wallet)) {
       const chainId = await wallet.getChainId() as number;
       return `0x${chainId.toString(16)}`;
-    } catch (error) {
-      throw new AbstractWalletError("Failed to get chain ID from viem wallet", { cause: error });
     }
-  }
-  if (v.is(AbstractEthersV6SignerSchema, wallet)) {
-    if ("provider" in wallet && wallet.provider) {
-      try {
-        const network = await wallet.provider.getNetwork() as { chainId: number | bigint };
-        return `0x${network.chainId.toString(16)}`;
-      } catch (error) {
-        throw new AbstractWalletError("Failed to get chain ID from ethers v6 wallet", { cause: error });
-      }
+
+    // Ethers signers use provider.getNetwork()
+    const isEthersSigner = v.is(AbstractEthersV6SignerSchema, wallet) || v.is(AbstractEthersV5SignerSchema, wallet);
+    if (isEthersSigner && wallet.provider) {
+      const network = await wallet.provider.getNetwork() as { chainId: number | bigint };
+      return `0x${network.chainId.toString(16)}`;
     }
+  } catch (error) {
+    throw new AbstractWalletError("Failed to get chain ID from wallet", { cause: error });
   }
-  if (v.is(AbstractEthersV5SignerSchema, wallet)) {
-    if ("provider" in wallet && wallet.provider) {
-      try {
-        const network = await wallet.provider.getNetwork() as { chainId: number | bigint };
-        return `0x${network.chainId.toString(16)}`;
-      } catch (error) {
-        throw new AbstractWalletError("Failed to get chain ID from ethers v5 wallet", { cause: error });
-      }
-    }
-  }
+
+  // Default chain ID for local accounts or signers without provider
   return "0x1";
 }
 
 /** Get the lowercase wallet address from various wallet types. */
 export async function getWalletAddress(wallet: AbstractWallet): Promise<`0x${string}`> {
-  if (v.is(AbstractViemJsonRpcAccountSchema, wallet)) {
-    try {
+  try {
+    // Viem JSON-RPC account uses getAddresses()
+    if (v.is(AbstractViemJsonRpcAccountSchema, wallet)) {
       const addresses = await wallet.getAddresses() as `0x${string}`[];
       return addresses[0].toLowerCase() as `0x${string}`;
-    } catch (error) {
-      throw new AbstractWalletError("Failed to get address from viem wallet", { cause: error });
     }
-  }
-  if (v.is(AbstractViemLocalAccountSchema, wallet)) {
-    return wallet.address.toLowerCase() as `0x${string}`;
-  }
-  if (v.is(AbstractEthersV6SignerSchema, wallet) || v.is(AbstractEthersV5SignerSchema, wallet)) {
-    try {
+
+    // Viem local account has address property
+    if (v.is(AbstractViemLocalAccountSchema, wallet)) {
+      return wallet.address.toLowerCase() as `0x${string}`;
+    }
+
+    // Ethers signers use getAddress()
+    if (v.is(AbstractEthersV6SignerSchema, wallet) || v.is(AbstractEthersV5SignerSchema, wallet)) {
       const address = await wallet.getAddress() as string;
       return address.toLowerCase() as `0x${string}`;
-    } catch (error) {
-      throw new AbstractWalletError("Failed to get address from ethers wallet", { cause: error });
     }
+  } catch (error) {
+    throw new AbstractWalletError("Failed to get address from wallet", { cause: error });
   }
-  throw new AbstractWalletError("Failed to get wallet address: unknown wallet");
+
+  throw new AbstractWalletError("Failed to get wallet address: unknown wallet type");
 }

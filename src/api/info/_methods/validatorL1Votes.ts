@@ -10,16 +10,10 @@ import { Address, Integer } from "../../_schemas.ts";
  * Request validator L1 votes.
  */
 export const ValidatorL1VotesRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("validatorL1Votes"),
-        v.description("Type of request."),
-      ),
-    }),
-    v.description("Request validator L1 votes."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("validatorL1Votes"),
+  });
 })();
 export type ValidatorL1VotesRequest = v.InferOutput<typeof ValidatorL1VotesRequest>;
 
@@ -27,36 +21,24 @@ export type ValidatorL1VotesRequest = v.InferOutput<typeof ValidatorL1VotesReque
  * Array of L1 governance votes cast by validators.
  */
 export const ValidatorL1VotesResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(
-      v.object({
-        /** Timestamp when the vote expires (in ms since epoch). */
-        expireTime: v.pipe(
-          Integer,
-          v.description("Timestamp when the vote expires (in ms since epoch)."),
-        ),
-        /** Type of the vote. */
-        action: v.pipe(
-          v.union([
-            v.object({
-              // deno-lint-ignore valibot-project/require-description valibot-project/require-jsdoc
-              D: v.string(),
-            }),
-            v.object({
-              // deno-lint-ignore valibot-project/require-description valibot-project/require-jsdoc
-              C: v.array(v.string()),
-            }),
-          ]),
-          v.description("Type of the vote."),
-        ),
-        /** List of validator addresses that cast this vote. */
-        votes: v.pipe(
-          v.array(Address),
-          v.description("List of validator addresses that cast this vote."),
-        ),
-      }),
-    ),
-    v.description("Array of L1 governance votes cast by validators."),
+  return v.array(
+    v.object({
+      /** Timestamp when the vote expires (in ms since epoch). */
+      expireTime: Integer,
+      /** Type of the vote. */
+      action: v.union([
+        v.object({
+          // deno-lint-ignore valibot-project/require-jsdoc
+          D: v.string(),
+        }),
+        v.object({
+          // deno-lint-ignore valibot-project/require-jsdoc
+          C: v.array(v.string()),
+        }),
+      ]),
+      /** List of validator addresses that cast this vote. */
+      votes: v.array(Address),
+    }),
   );
 })();
 export type ValidatorL1VotesResponse = v.InferOutput<typeof ValidatorL1VotesResponse>;

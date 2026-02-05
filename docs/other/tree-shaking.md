@@ -167,8 +167,3 @@ const validated = v.parse(OrderRequest, {
   signature: { r: "0x...", s: "0x...", v: 27 },
 });
 ```
-
-**Field descriptions:**
-
-Schemas include descriptions for all fields via `v.description()`, useful for generating documentation or exploring the
-API structure.

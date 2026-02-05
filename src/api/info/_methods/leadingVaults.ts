@@ -10,21 +10,12 @@ import { Address } from "../../_schemas.ts";
  * Request leading vaults for a user.
  */
 export const LeadingVaultsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("leadingVaults"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request leading vaults for a user."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("leadingVaults"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type LeadingVaultsRequest = v.InferOutput<typeof LeadingVaultsRequest>;
 
@@ -32,22 +23,13 @@ export type LeadingVaultsRequest = v.InferOutput<typeof LeadingVaultsRequest>;
  * Array of leading vaults for a user.
  */
 export const LeadingVaultsResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(
-      v.object({
-        /** Vault address. */
-        address: v.pipe(
-          Address,
-          v.description("Vault address."),
-        ),
-        /** Vault name. */
-        name: v.pipe(
-          v.string(),
-          v.description("Vault name."),
-        ),
-      }),
-    ),
-    v.description("Array of leading vaults for a user."),
+  return v.array(
+    v.object({
+      /** Vault address. */
+      address: Address,
+      /** Vault name. */
+      name: v.string(),
+    }),
   );
 })();
 export type LeadingVaultsResponse = v.InferOutput<typeof LeadingVaultsResponse>;

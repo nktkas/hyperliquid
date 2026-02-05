@@ -11,22 +11,12 @@ import { ExplorerTransactionSchema } from "./_base/commonSchemas.ts";
  * Request transaction details by transaction hash.
  */
 export const TxDetailsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("txDetails"),
-        v.description("Type of request."),
-      ),
-      /** Transaction hash. */
-      hash: v.pipe(
-        Hex,
-        v.length(66),
-        v.description("Transaction hash."),
-      ),
-    }),
-    v.description("Request transaction details by transaction hash."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("txDetails"),
+    /** Transaction hash. */
+    hash: v.pipe(Hex, v.length(66)),
+  });
 })();
 export type TxDetailsRequest = v.InferOutput<typeof TxDetailsRequest>;
 
@@ -34,21 +24,12 @@ export type TxDetailsRequest = v.InferOutput<typeof TxDetailsRequest>;
  * Response with transaction details.
  */
 export const TxDetailsResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Response type. */
-      type: v.pipe(
-        v.literal("txDetails"),
-        v.description("Response type."),
-      ),
-      /** Transaction details. */
-      tx: v.pipe(
-        ExplorerTransactionSchema,
-        v.description("Transaction details."),
-      ),
-    }),
-    v.description("Response with transaction details."),
-  );
+  return v.object({
+    /** Response type. */
+    type: v.literal("txDetails"),
+    /** Transaction details. */
+    tx: ExplorerTransactionSchema,
+  });
 })();
 export type TxDetailsResponse = v.InferOutput<typeof TxDetailsResponse>;
 

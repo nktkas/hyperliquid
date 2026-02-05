@@ -40,17 +40,8 @@ export class PrivateKeySigner implements AbstractViemLocalAccount {
     primaryType: string;
     message: Record<string, unknown>;
   }): Promise<`0x${string}`> {
-    const signature = signTyped(
-      {
-        domain: params.domain,
-        // deno-lint-ignore no-explicit-any
-        types: params.types as any, // function is too strict on types
-        primaryType: params.primaryType,
-        message: params.message,
-      },
-      this.#privateKey,
-      false,
-    ) as `0x${string}`;
+    // deno-lint-ignore no-explicit-any -- function is too strict
+    const signature = signTyped(params as any, this.#privateKey, false) as `0x${string}`;
     return Promise.resolve(signature);
   }
 }

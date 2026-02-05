@@ -1,7 +1,7 @@
 import * as v from "@valibot/valibot";
 import { OrderStatusRequest, OrderStatusResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
 
 runTest({
   name: "orderStatus",
@@ -37,37 +37,33 @@ runTest({
         oid: "0xd4bb069b673a48161bca56cfc88deb6b",
       }),
     ]);
-    schemaCoverage(OrderStatusResponse, data, {
-      ignoreEmptyArray: ["#/variant/0/properties/order/properties/order/properties/children"],
-      ignorePicklistValues: {
-        "#/variant/0/properties/order/properties/status": [
-          "triggered",
-          "marginCanceled",
-          "vaultWithdrawalCanceled",
-          "openInterestCapCanceled",
-          "selfTradeCanceled",
-          "siblingFilledCanceled",
-          "delistedCanceled",
-          "liquidatedCanceled",
-          "scheduledCancel",
-          "tickRejected",
-          "minTradeNtlRejected",
-          "perpMarginRejected",
-          "reduceOnlyRejected",
-          "badAloPxRejected",
-          "iocCancelRejected",
-          "badTriggerPxRejected",
-          "marketOrderNoLiquidityRejected",
-          "positionIncreaseAtOpenInterestCapRejected",
-          "positionFlipAtOpenInterestCapRejected",
-          "tooAggressiveAtOpenInterestCapRejected",
-          "openInterestIncreaseRejected",
-          "insufficientSpotBalanceRejected",
-          "oracleRejected",
-          "perpMaxPositionRejected",
-        ],
-      },
-    });
+    schemaCoverage(OrderStatusResponse, data, [
+      "#/variant/0/properties/order/properties/order/properties/children/array",
+      "#/variant/0/properties/order/properties/status/picklist/3",
+      "#/variant/0/properties/order/properties/status/picklist/5",
+      "#/variant/0/properties/order/properties/status/picklist/6",
+      "#/variant/0/properties/order/properties/status/picklist/7",
+      "#/variant/0/properties/order/properties/status/picklist/8",
+      "#/variant/0/properties/order/properties/status/picklist/10",
+      "#/variant/0/properties/order/properties/status/picklist/11",
+      "#/variant/0/properties/order/properties/status/picklist/12",
+      "#/variant/0/properties/order/properties/status/picklist/13",
+      "#/variant/0/properties/order/properties/status/picklist/14",
+      "#/variant/0/properties/order/properties/status/picklist/15",
+      "#/variant/0/properties/order/properties/status/picklist/16",
+      "#/variant/0/properties/order/properties/status/picklist/17",
+      "#/variant/0/properties/order/properties/status/picklist/18",
+      "#/variant/0/properties/order/properties/status/picklist/19",
+      "#/variant/0/properties/order/properties/status/picklist/20",
+      "#/variant/0/properties/order/properties/status/picklist/21",
+      "#/variant/0/properties/order/properties/status/picklist/22",
+      "#/variant/0/properties/order/properties/status/picklist/23",
+      "#/variant/0/properties/order/properties/status/picklist/24",
+      "#/variant/0/properties/order/properties/status/picklist/25",
+      "#/variant/0/properties/order/properties/status/picklist/26",
+      "#/variant/0/properties/order/properties/status/picklist/27",
+      "#/variant/0/properties/order/properties/status/picklist/28",
+    ]);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

@@ -11,21 +11,12 @@ import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-delegations
  */
 export const DelegationsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("delegations"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request user staking delegations."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("delegations"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type DelegationsRequest = v.InferOutput<typeof DelegationsRequest>;
 
@@ -34,27 +25,15 @@ export type DelegationsRequest = v.InferOutput<typeof DelegationsRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-delegations
  */
 export const DelegationsResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(
-      v.object({
-        /** Validator address. */
-        validator: v.pipe(
-          Address,
-          v.description("Validator address."),
-        ),
-        /** Amount of tokens delegated to the validator. */
-        amount: v.pipe(
-          UnsignedDecimal,
-          v.description("Amount of tokens delegated to the validator."),
-        ),
-        /** Locked until timestamp (in ms since epoch). */
-        lockedUntilTimestamp: v.pipe(
-          UnsignedInteger,
-          v.description("Locked until timestamp (in ms since epoch)."),
-        ),
-      }),
-    ),
-    v.description("Array of user's delegations to validators."),
+  return v.array(
+    v.object({
+      /** Validator address. */
+      validator: Address,
+      /** Amount of tokens delegated to the validator. */
+      amount: UnsignedDecimal,
+      /** Locked until timestamp (in ms since epoch). */
+      lockedUntilTimestamp: UnsignedInteger,
+    }),
   );
 })();
 export type DelegationsResponse = v.InferOutput<typeof DelegationsResponse>;

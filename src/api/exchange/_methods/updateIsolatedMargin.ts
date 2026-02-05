@@ -12,57 +12,27 @@ import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonS
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin
  */
 export const UpdateIsolatedMarginRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("updateIsolatedMargin"),
-            v.description("Type of action."),
-          ),
-          /** Asset ID. */
-          asset: v.pipe(
-            UnsignedInteger,
-            v.description("Asset ID."),
-          ),
-          /** Position side (`true` for long, `false` for short). */
-          isBuy: v.pipe(
-            v.boolean(),
-            v.description("Position side (`true` for long, `false` for short)."),
-          ),
-          /** Amount to adjust (float * 1e6). */
-          ntli: v.pipe(
-            Integer,
-            v.description("Amount to adjust (float * 1e6)."),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Vault address (for vault trading). */
-      vaultAddress: v.pipe(
-        v.optional(Address),
-        v.description("Vault address (for vault trading)."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("updateIsolatedMargin"),
+      /** Asset ID. */
+      asset: UnsignedInteger,
+      /** Position side (`true` for long, `false` for short). */
+      isBuy: v.boolean(),
+      /** Amount to adjust (float * 1e6). */
+      ntli: Integer,
     }),
-    v.description("Add or remove margin from isolated position."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Vault address (for vault trading). */
+    vaultAddress: v.optional(Address),
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type UpdateIsolatedMarginRequest = v.InferOutput<typeof UpdateIsolatedMarginRequest>;
 
@@ -71,10 +41,7 @@ export type UpdateIsolatedMarginRequest = v.InferOutput<typeof UpdateIsolatedMar
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin
  */
 export const UpdateIsolatedMarginResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type UpdateIsolatedMarginResponse = v.InferOutput<typeof UpdateIsolatedMarginResponse>;
 

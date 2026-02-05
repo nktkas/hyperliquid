@@ -12,21 +12,12 @@ import { MetaResponse } from "./meta.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-asset-contexts-includes-mark-price-current-funding-open-interest-etc
  */
 export const MetaAndAssetCtxsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("metaAndAssetCtxs"),
-        v.description("Type of request."),
-      ),
-      /** DEX name (empty string for main dex). */
-      dex: v.pipe(
-        v.optional(v.string()),
-        v.description("DEX name (empty string for main dex)."),
-      ),
-    }),
-    v.description("Request metadata and asset contexts."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("metaAndAssetCtxs"),
+    /** DEX name (empty string for main dex). */
+    dex: v.optional(v.string()),
+  });
 })();
 export type MetaAndAssetCtxsRequest = v.InferOutput<typeof MetaAndAssetCtxsRequest>;
 
@@ -35,13 +26,7 @@ export type MetaAndAssetCtxsRequest = v.InferOutput<typeof MetaAndAssetCtxsReque
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-asset-contexts-includes-mark-price-current-funding-open-interest-etc
  */
 export const MetaAndAssetCtxsResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.tuple([
-      MetaResponse,
-      v.array(PerpAssetCtxSchema),
-    ]),
-    v.description("Tuple containing metadata and array of asset contexts."),
-  );
+  return v.tuple([MetaResponse, v.array(PerpAssetCtxSchema)]);
 })();
 export type MetaAndAssetCtxsResponse = v.InferOutput<typeof MetaAndAssetCtxsResponse>;
 

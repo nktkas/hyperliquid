@@ -8,69 +8,36 @@ import { UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
 
 /** Subscription to best bid and offer events for a specific asset. */
 export const BboRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("bbo"),
-        v.description("Type of subscription."),
-      ),
-      /** Asset symbol (e.g., BTC). */
-      coin: v.pipe(
-        v.string(),
-        v.description("Asset symbol (e.g., BTC)."),
-      ),
-    }),
-    v.description("Subscription to best bid and offer events for a specific asset."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("bbo"),
+    /** Asset symbol (e.g., BTC). */
+    coin: v.string(),
+  });
 })();
 export type BboRequest = v.InferOutput<typeof BboRequest>;
 
 const L2BookLevelSchema = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Price. */
-      px: v.pipe(
-        UnsignedDecimal,
-        v.description("Price."),
-      ),
-      /** Total size. */
-      sz: v.pipe(
-        UnsignedDecimal,
-        v.description("Total size."),
-      ),
-      /** Number of individual orders. */
-      n: v.pipe(
-        UnsignedInteger,
-        v.description("Number of individual orders."),
-      ),
-    }),
-    v.description("L2 order book level."),
-  );
+  return v.object({
+    /** Price. */
+    px: UnsignedDecimal,
+    /** Total size. */
+    sz: UnsignedDecimal,
+    /** Number of individual orders. */
+    n: UnsignedInteger,
+  });
 })();
 
 /** Event of best bid and offer. */
 export const BboEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Asset symbol (e.g., BTC). */
-      coin: v.pipe(
-        v.string(),
-        v.description("Asset symbol (e.g., BTC)."),
-      ),
-      /** Time of the BBO update (in ms since epoch). */
-      time: v.pipe(
-        UnsignedInteger,
-        v.description("Time of the BBO update (in ms since epoch)."),
-      ),
-      /** Best bid and offer tuple [bid, offer], either can be undefined if unavailable. */
-      bbo: v.pipe(
-        v.tuple([L2BookLevelSchema, L2BookLevelSchema]),
-        v.description("Best bid and offer tuple [bid, offer], either can be undefined if unavailable."),
-      ),
-    }),
-    v.description("Event of best bid and offer."),
-  );
+  return v.object({
+    /** Asset symbol (e.g., BTC). */
+    coin: v.string(),
+    /** Time of the BBO update (in ms since epoch). */
+    time: UnsignedInteger,
+    /** Best bid and offer tuple [bid, offer], either can be undefined if unavailable. */
+    bbo: v.tuple([L2BookLevelSchema, L2BookLevelSchema]),
+  });
 })();
 export type BboEvent = v.InferOutput<typeof BboEvent>;
 

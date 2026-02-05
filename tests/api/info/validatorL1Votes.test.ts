@@ -1,7 +1,7 @@
 import * as v from "@valibot/valibot";
 import { ValidatorL1VotesRequest, ValidatorL1VotesResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
 
 runTest({
   name: "validatorL1Votes",
@@ -9,12 +9,9 @@ runTest({
     const data = await Promise.all([
       client.validatorL1Votes(),
     ]);
-    schemaCoverage(ValidatorL1VotesResponse, data, {
-      ignoreEmptyArray: ["#"],
-      ignoreBranches: {
-        "#/items/properties/action": [0, 1],
-      },
-    });
+    schemaCoverage(ValidatorL1VotesResponse, data, [
+      "#/array",
+    ]);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

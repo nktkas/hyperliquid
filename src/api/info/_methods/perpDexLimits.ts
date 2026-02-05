@@ -11,21 +11,12 @@ import { UnsignedDecimal } from "../../_schemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-builder-deployed-perp-market-limits
  */
 export const PerpDexLimitsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("perpDexLimits"),
-        v.description("Type of request."),
-      ),
-      /** DEX name (empty string for main dex). */
-      dex: v.pipe(
-        v.string(),
-        v.description("DEX name (empty string for main dex)."),
-      ),
-    }),
-    v.description("Request builder deployed perpetual market limits."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("perpDexLimits"),
+    /** DEX name (empty string for main dex). */
+    dex: v.string(),
+  });
 })();
 export type PerpDexLimitsRequest = v.InferOutput<typeof PerpDexLimitsRequest>;
 
@@ -34,32 +25,17 @@ export type PerpDexLimitsRequest = v.InferOutput<typeof PerpDexLimitsRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-builder-deployed-perp-market-limits
  */
 export const PerpDexLimitsResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.nullable(
-      v.object({
-        /** Total open interest cap. */
-        totalOiCap: v.pipe(
-          UnsignedDecimal,
-          v.description("Total open interest cap."),
-        ),
-        /** Open interest size cap per perpetual. */
-        oiSzCapPerPerp: v.pipe(
-          UnsignedDecimal,
-          v.description("Open interest size cap per perpetual."),
-        ),
-        /** Maximum transfer notional amount. */
-        maxTransferNtl: v.pipe(
-          UnsignedDecimal,
-          v.description("Maximum transfer notional amount."),
-        ),
-        /** Coin to open interest cap mapping. */
-        coinToOiCap: v.pipe(
-          v.array(v.tuple([v.string(), UnsignedDecimal])),
-          v.description("Coin to open interest cap mapping."),
-        ),
-      }),
-    ),
-    v.description("Builder deployed perpetual market limits."),
+  return v.nullable(
+    v.object({
+      /** Total open interest cap. */
+      totalOiCap: UnsignedDecimal,
+      /** Open interest size cap per perpetual. */
+      oiSzCapPerPerp: UnsignedDecimal,
+      /** Maximum transfer notional amount. */
+      maxTransferNtl: UnsignedDecimal,
+      /** Coin to open interest cap mapping. */
+      coinToOiCap: v.array(v.tuple([v.string(), UnsignedDecimal])),
+    }),
   );
 })();
 export type PerpDexLimitsResponse = v.InferOutput<typeof PerpDexLimitsResponse>;

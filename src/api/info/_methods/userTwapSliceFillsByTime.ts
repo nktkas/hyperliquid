@@ -11,36 +11,18 @@ import { UserTwapSliceFillsResponse } from "./userTwapSliceFills.ts";
  * Request user TWAP slice fills by time.
  */
 export const UserTwapSliceFillsByTimeRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("userTwapSliceFillsByTime"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** Start time (in ms since epoch). */
-      startTime: v.pipe(
-        UnsignedInteger,
-        v.description("Start time (in ms since epoch)."),
-      ),
-      /** End time (in ms since epoch). */
-      endTime: v.pipe(
-        v.nullish(UnsignedInteger),
-        v.description("End time (in ms since epoch)."),
-      ),
-      /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
-      aggregateByTime: v.pipe(
-        v.optional(v.boolean()),
-        v.description("If true, partial fills are aggregated when a crossing order fills multiple resting orders."),
-      ),
-    }),
-    v.description("Request user TWAP slice fills by time."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("userTwapSliceFillsByTime"),
+    /** User address. */
+    user: Address,
+    /** Start time (in ms since epoch). */
+    startTime: UnsignedInteger,
+    /** End time (in ms since epoch). */
+    endTime: v.nullish(UnsignedInteger),
+    /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
+    aggregateByTime: v.optional(v.boolean()),
+  });
 })();
 export type UserTwapSliceFillsByTimeRequest = v.InferOutput<typeof UserTwapSliceFillsByTimeRequest>;
 
@@ -49,10 +31,7 @@ export type UserTwapSliceFillsByTimeRequest = v.InferOutput<typeof UserTwapSlice
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills
  */
 export const UserTwapSliceFillsByTimeResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    UserTwapSliceFillsResponse,
-    v.description("Array of user's twap slice fill by time."),
-  );
+  return UserTwapSliceFillsResponse;
 })();
 export type UserTwapSliceFillsByTimeResponse = v.InferOutput<typeof UserTwapSliceFillsByTimeResponse>;
 

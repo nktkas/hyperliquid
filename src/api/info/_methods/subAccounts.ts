@@ -13,21 +13,12 @@ import { SpotClearinghouseStateResponse } from "./spotClearinghouseState.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-subaccounts
  */
 export const SubAccountsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("subAccounts"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request user sub-accounts."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("subAccounts"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type SubAccountsRequest = v.InferOutput<typeof SubAccountsRequest>;
 
@@ -36,40 +27,21 @@ export type SubAccountsRequest = v.InferOutput<typeof SubAccountsRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-subaccounts
  */
 export const SubAccountsResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.nullable(
-      v.array(
-        v.object({
-          /** Sub-account name. */
-          name: v.pipe(
-            v.string(),
-            v.nonEmpty(),
-            v.description("Sub-account name."),
-          ),
-          /** Sub-account address. */
-          subAccountUser: v.pipe(
-            Address,
-            v.description("Sub-account address."),
-          ),
-          /** Master account address. */
-          master: v.pipe(
-            Address,
-            v.description("Master account address."),
-          ),
-          /** Perpetual trading clearinghouse state summary. */
-          clearinghouseState: v.pipe(
-            ClearinghouseStateResponse,
-            v.description("Perpetual trading clearinghouse state summary."),
-          ),
-          /** Spot tokens clearinghouse state. */
-          spotState: v.pipe(
-            SpotClearinghouseStateResponse,
-            v.description("Spot tokens clearinghouse state."),
-          ),
-        }),
-      ),
+  return v.nullable(
+    v.array(
+      v.object({
+        /** Sub-account name. */
+        name: v.pipe(v.string(), v.nonEmpty()),
+        /** Sub-account address. */
+        subAccountUser: Address,
+        /** Master account address. */
+        master: Address,
+        /** Perpetual trading clearinghouse state summary. */
+        clearinghouseState: ClearinghouseStateResponse,
+        /** Spot tokens clearinghouse state. */
+        spotState: SpotClearinghouseStateResponse,
+      }),
     ),
-    v.description("Array of user sub-account or null if the user does not have any sub-accounts."),
   );
 })();
 export type SubAccountsResponse = v.InferOutput<typeof SubAccountsResponse>;

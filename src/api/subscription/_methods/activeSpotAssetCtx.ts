@@ -8,41 +8,23 @@ import { SpotAssetCtxSchema } from "../../info/_methods/_base/commonSchemas.ts";
 
 /** Subscription to context events for a specific spot asset. */
 export const ActiveSpotAssetCtxRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("activeAssetCtx"),
-        v.description("Type of subscription."),
-      ),
-      /** Asset ID (e.g., @1). */
-      coin: v.pipe(
-        v.string(),
-        v.description("Asset ID (e.g., @1)."),
-      ),
-    }),
-    v.description("Subscription to context events for a specific spot asset."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("activeAssetCtx"),
+    /** Asset ID (e.g., @1). */
+    coin: v.string(),
+  });
 })();
 export type ActiveSpotAssetCtxRequest = v.InferOutput<typeof ActiveSpotAssetCtxRequest>;
 
 /** Event of active spot asset context. */
 export const ActiveSpotAssetCtxEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Asset ID (e.g., @1). */
-      coin: v.pipe(
-        v.string(),
-        v.description("Asset ID (e.g., @1)."),
-      ),
-      /** Context for a specific spot asset. */
-      ctx: v.pipe(
-        SpotAssetCtxSchema,
-        v.description("Context for a specific spot asset."),
-      ),
-    }),
-    v.description("Event of active spot asset context."),
-  );
+  return v.object({
+    /** Asset ID (e.g., @1). */
+    coin: v.string(),
+    /** Context for a specific spot asset. */
+    ctx: SpotAssetCtxSchema,
+  });
 })();
 export type ActiveSpotAssetCtxEvent = v.InferOutput<typeof ActiveSpotAssetCtxEvent>;
 

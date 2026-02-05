@@ -11,21 +11,12 @@ import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-referral-information
  */
 export const ReferralRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("referral"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request user referral."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("referral"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type ReferralRequest = v.InferOutput<typeof ReferralRequest>;
 
@@ -34,229 +25,110 @@ export type ReferralRequest = v.InferOutput<typeof ReferralRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-referral-information
  */
 export const ReferralResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Referrer details. */
-      referredBy: v.pipe(
-        v.nullable(
-          v.object({
-            /** Referrer address. */
-            referrer: v.pipe(
-              Address,
-              v.description("Referrer address."),
-            ),
-            /** Referral code used. */
-            code: v.pipe(
-              v.string(),
-              v.nonEmpty(),
-              v.description("Referral code used."),
-            ),
-          }),
-        ),
-        v.description("Referrer details."),
-      ),
-      /** Cumulative traded volume. */
-      cumVlm: v.pipe(
-        UnsignedDecimal,
-        v.description("Cumulative traded volume."),
-      ),
-      /** Rewards earned but not yet claimed. */
-      unclaimedRewards: v.pipe(
-        UnsignedDecimal,
-        v.description("Rewards earned but not yet claimed."),
-      ),
-      /** Rewards that have been claimed. */
-      claimedRewards: v.pipe(
-        UnsignedDecimal,
-        v.description("Rewards that have been claimed."),
-      ),
-      /** Builder reward amount. */
-      builderRewards: v.pipe(
-        UnsignedDecimal,
-        v.description("Builder reward amount."),
-      ),
-      /** Current state of the referrer. */
-      referrerState: v.pipe(
-        v.variant("stage", [
-          v.object({
-            /** Referrer is ready to receive rewards. */
-            stage: v.pipe(
-              v.literal("ready"),
-              v.description("Referrer is ready to receive rewards."),
-            ),
-            /** Referral program details. */
-            data: v.pipe(
-              v.object({
-                /** Assigned referral code. */
-                code: v.pipe(
-                  v.string(),
-                  v.nonEmpty(),
-                  v.description("Assigned referral code."),
-                ),
-                /** Total number of referrals. */
-                nReferrals: v.pipe(
-                  UnsignedInteger,
-                  v.description("Total number of referrals."),
-                ),
-                /** Summary of each referral state. */
-                referralStates: v.pipe(
-                  v.array(
-                    v.object({
-                      /** Cumulative traded volume. */
-                      cumVlm: v.pipe(
-                        UnsignedDecimal,
-                        v.description("Cumulative traded volume."),
-                      ),
-                      /** Total fees rewarded to the referred user since referral. */
-                      cumRewardedFeesSinceReferred: v.pipe(
-                        UnsignedDecimal,
-                        v.description("Total fees rewarded to the referred user since referral."),
-                      ),
-                      /** Total fees rewarded to the referrer from referred trades. */
-                      cumFeesRewardedToReferrer: v.pipe(
-                        UnsignedDecimal,
-                        v.description("Total fees rewarded to the referrer from referred trades."),
-                      ),
-                      /** Timestamp when the referred user joined (in ms since epoch). */
-                      timeJoined: v.pipe(
-                        UnsignedInteger,
-                        v.description(
-                          "Timestamp when the referred user joined (in ms since epoch).",
-                        ),
-                      ),
-                      /** Address of the referred user. */
-                      user: v.pipe(
-                        Address,
-                        v.description("Address of the referred user."),
-                      ),
-                      /** Mapping of token IDs to referral reward states. */
-                      tokenToState: v.pipe(
-                        v.array(
-                          v.tuple([
-                            UnsignedInteger,
-                            v.object({
-                              /** Cumulative traded volume. */
-                              cumVlm: v.pipe(
-                                UnsignedDecimal,
-                                v.description("Cumulative traded volume."),
-                              ),
-                              /** Total fees rewarded to the referred user since referral. */
-                              cumRewardedFeesSinceReferred: v.pipe(
-                                UnsignedDecimal,
-                                v.description(
-                                  "Total fees rewarded to the referred user since referral.",
-                                ),
-                              ),
-                              /** Total fees rewarded to the referrer from referred trades. */
-                              cumFeesRewardedToReferrer: v.pipe(
-                                UnsignedDecimal,
-                                v.description(
-                                  "Total fees rewarded to the referrer from referred trades.",
-                                ),
-                              ),
-                            }),
-                          ]),
-                        ),
-                        v.description("Mapping of token IDs to referral reward states."),
-                      ),
-                    }),
-                  ),
-                  v.description("Summary of each referral state."),
-                ),
-              }),
-              v.description("Referral program details."),
-            ),
-          }),
-          v.object({
-            /** Referrer needs to create a referral code. */
-            stage: v.pipe(
-              v.literal("needToCreateCode"),
-              v.description("Referrer needs to create a referral code."),
-            ),
-          }),
-          v.object({
-            /** Referrer must complete a trade before earning rewards. */
-            stage: v.pipe(
-              v.literal("needToTrade"),
-              v.description("Referrer must complete a trade before earning rewards."),
-            ),
-            /** Required trading volume details for activation. */
-            data: v.pipe(
-              v.object({
-                /** Required trading volume. */
-                required: v.pipe(
-                  UnsignedDecimal,
-                  v.description("Required trading volume."),
-                ),
-              }),
-              v.description("Required trading volume details for activation."),
-            ),
-          }),
-        ]),
-        v.description("Current state of the referrer."),
-      ),
-      /** History of referral rewards. */
-      rewardHistory: v.pipe(
-        v.array(
-          v.object({
-            /** Amount of earned rewards. */
-            earned: v.pipe(
-              UnsignedDecimal,
-              v.description("Amount of earned rewards."),
-            ),
-            /** Traded volume at the time of reward. */
-            vlm: v.pipe(
-              UnsignedDecimal,
-              v.description("Traded volume at the time of reward."),
-            ),
-            /** Traded volume via referrals. */
-            referralVlm: v.pipe(
-              UnsignedDecimal,
-              v.description("Traded volume via referrals."),
-            ),
-            /** Timestamp when the reward was earned (in ms since epoch). */
-            time: v.pipe(
-              UnsignedInteger,
-              v.description("Timestamp when the reward was earned (in ms since epoch)."),
-            ),
-          }),
-        ),
-        v.description("History of referral rewards."),
-      ),
-      /** Mapping of token IDs to referral reward states. */
-      tokenToState: v.pipe(
-        v.array(
-          v.tuple([
-            UnsignedInteger,
+  return v.object({
+    /** Referrer details. */
+    referredBy: v.nullable(
+      v.object({
+        /** Referrer address. */
+        referrer: Address,
+        /** Referral code used. */
+        code: v.pipe(v.string(), v.nonEmpty()),
+      }),
+    ),
+    /** Cumulative traded volume. */
+    cumVlm: UnsignedDecimal,
+    /** Rewards earned but not yet claimed. */
+    unclaimedRewards: UnsignedDecimal,
+    /** Rewards that have been claimed. */
+    claimedRewards: UnsignedDecimal,
+    /** Builder reward amount. */
+    builderRewards: UnsignedDecimal,
+    /** Current state of the referrer. */
+    referrerState: v.variant("stage", [
+      v.object({
+        /** Referrer is ready to receive rewards. */
+        stage: v.literal("ready"),
+        /** Referral program details. */
+        data: v.object({
+          /** Assigned referral code. */
+          code: v.pipe(v.string(), v.nonEmpty()),
+          /** Total number of referrals. */
+          nReferrals: UnsignedInteger,
+          /** Summary of each referral state. */
+          referralStates: v.array(
             v.object({
               /** Cumulative traded volume. */
-              cumVlm: v.pipe(
-                UnsignedDecimal,
-                v.description("Cumulative traded volume."),
-              ),
-              /** Rewards earned but not yet claimed. */
-              unclaimedRewards: v.pipe(
-                UnsignedDecimal,
-                v.description("Rewards earned but not yet claimed."),
-              ),
-              /** Rewards that have been claimed. */
-              claimedRewards: v.pipe(
-                UnsignedDecimal,
-                v.description("Rewards that have been claimed."),
-              ),
-              /** Builder reward amount. */
-              builderRewards: v.pipe(
-                UnsignedDecimal,
-                v.description("Builder reward amount."),
+              cumVlm: UnsignedDecimal,
+              /** Total fees rewarded to the referred user since referral. */
+              cumRewardedFeesSinceReferred: UnsignedDecimal,
+              /** Total fees rewarded to the referrer from referred trades. */
+              cumFeesRewardedToReferrer: UnsignedDecimal,
+              /** Timestamp when the referred user joined (in ms since epoch). */
+              timeJoined: UnsignedInteger,
+              /** Address of the referred user. */
+              user: Address,
+              /** Mapping of token IDs to referral reward states. */
+              tokenToState: v.array(
+                v.tuple([
+                  UnsignedInteger,
+                  v.object({
+                    /** Cumulative traded volume. */
+                    cumVlm: UnsignedDecimal,
+                    /** Total fees rewarded to the referred user since referral. */
+                    cumRewardedFeesSinceReferred: UnsignedDecimal,
+                    /** Total fees rewarded to the referrer from referred trades. */
+                    cumFeesRewardedToReferrer: UnsignedDecimal,
+                  }),
+                ]),
               ),
             }),
-          ]),
-        ),
-        v.description("Mapping of token IDs to referral reward states."),
-      ),
-    }),
-    v.description("Referral details for a user."),
-  );
+          ),
+        }),
+      }),
+      v.object({
+        /** Referrer needs to create a referral code. */
+        stage: v.literal("needToCreateCode"),
+      }),
+      v.object({
+        /** Referrer must complete a trade before earning rewards. */
+        stage: v.literal("needToTrade"),
+        /** Required trading volume details for activation. */
+        data: v.object({
+          /** Required trading volume. */
+          required: UnsignedDecimal,
+        }),
+      }),
+    ]),
+    /** History of referral rewards. */
+    rewardHistory: v.array(
+      v.object({
+        /** Amount of earned rewards. */
+        earned: UnsignedDecimal,
+        /** Traded volume at the time of reward. */
+        vlm: UnsignedDecimal,
+        /** Traded volume via referrals. */
+        referralVlm: UnsignedDecimal,
+        /** Timestamp when the reward was earned (in ms since epoch). */
+        time: UnsignedInteger,
+      }),
+    ),
+    /** Mapping of token IDs to referral reward states. */
+    tokenToState: v.array(
+      v.tuple([
+        UnsignedInteger,
+        v.object({
+          /** Cumulative traded volume. */
+          cumVlm: UnsignedDecimal,
+          /** Rewards earned but not yet claimed. */
+          unclaimedRewards: UnsignedDecimal,
+          /** Rewards that have been claimed. */
+          claimedRewards: UnsignedDecimal,
+          /** Builder reward amount. */
+          builderRewards: UnsignedDecimal,
+        }),
+      ]),
+    ),
+  });
 })();
 export type ReferralResponse = v.InferOutput<typeof ReferralResponse>;
 

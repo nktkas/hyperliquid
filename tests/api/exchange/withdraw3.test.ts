@@ -1,7 +1,7 @@
 import * as v from "@valibot/valibot";
 import { Withdraw3Request, Withdraw3Response } from "@nktkas/hyperliquid/api/exchange";
-import { excludeErrorResponse, runTest, topUpPerp } from "./_t.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { runTest, topUpPerp } from "./_t.ts";
+import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
 
 runTest({
   name: "withdraw3",

@@ -1,7 +1,7 @@
 import * as v from "@valibot/valibot";
 import { CancelRequest, CancelResponse } from "@nktkas/hyperliquid/api/exchange";
-import { excludeErrorResponse, openOrder, runTest } from "./_t.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { openOrder, runTest } from "./_t.ts";
+import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
 
 runTest({
   name: "cancel",

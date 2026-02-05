@@ -1,7 +1,7 @@
 import * as v from "@valibot/valibot";
 import { SpotUserRequest, SpotUserResponse } from "@nktkas/hyperliquid/api/exchange";
-import { excludeErrorResponse, runTest } from "./_t.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { runTest } from "./_t.ts";
+import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
 
 runTest({
   name: "spotUser",
@@ -15,7 +15,7 @@ runTest({
     const data = await runCommand([
       "exchange",
       "spotUser",
-      "--optOut=true",
+      `--toggleSpotDusting=${JSON.stringify({ optOut: true })}`,
     ]);
     v.parse(SpotUserRequest, data);
   },

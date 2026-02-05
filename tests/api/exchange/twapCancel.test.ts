@@ -1,7 +1,7 @@
 import * as v from "@valibot/valibot";
 import { TwapCancelRequest, TwapCancelResponse } from "@nktkas/hyperliquid/api/exchange";
-import { createTWAP, excludeErrorResponse, runTest } from "./_t.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { createTWAP, runTest } from "./_t.ts";
+import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
 
 runTest({
   name: "twapCancel",

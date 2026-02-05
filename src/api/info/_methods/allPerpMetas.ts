@@ -10,16 +10,10 @@ import { MetaResponse } from "./meta.ts";
  * Request trading metadata for all DEXes.
  */
 export const AllPerpMetasRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("allPerpMetas"),
-        v.description("Type of request."),
-      ),
-    }),
-    v.description("Request trading metadata for all DEXes."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("allPerpMetas"),
+  });
 })();
 export type AllPerpMetasRequest = v.InferOutput<typeof AllPerpMetasRequest>;
 
@@ -27,10 +21,7 @@ export type AllPerpMetasRequest = v.InferOutput<typeof AllPerpMetasRequest>;
  * Metadata for perpetual assets across all DEXes.
  */
 export const AllPerpMetasResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(MetaResponse),
-    v.description("Metadata for perpetual assets across all DEXes."),
-  );
+  return v.array(MetaResponse);
 })();
 export type AllPerpMetasResponse = v.InferOutput<typeof AllPerpMetasResponse>;
 

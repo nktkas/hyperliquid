@@ -1,7 +1,7 @@
 import * as v from "@valibot/valibot";
 import { RecentTradesRequest, RecentTradesResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
 
 runTest({
   name: "recentTrades",
@@ -9,11 +9,9 @@ runTest({
     const data = await Promise.all([
       client.recentTrades({ coin: "ETH" }),
     ]);
-    schemaCoverage(RecentTradesResponse, data, {
-      ignorePicklistValues: {
-        "#/items/properties/side": ["A", "B"],
-      },
-    });
+    schemaCoverage(RecentTradesResponse, data, [
+      "#/items/properties/side/picklist/1",
+    ]);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

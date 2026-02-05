@@ -12,141 +12,72 @@ import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonS
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order
  */
 export const ModifyRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("modify"),
-            v.description("Type of action."),
-          ),
-          /** Order ID or Client Order ID. */
-          oid: v.pipe(
-            v.union([UnsignedInteger, Cloid]),
-            v.description("Order ID or Client Order ID."),
-          ),
-          /** New order parameters. */
-          order: v.pipe(
-            v.object({
-              /** Asset ID. */
-              a: v.pipe(
-                UnsignedInteger,
-                v.description("Asset ID."),
-              ),
-              /** Position side (`true` for long, `false` for short). */
-              b: v.pipe(
-                v.boolean(),
-                v.description("Position side (`true` for long, `false` for short)."),
-              ),
-              /** Price. */
-              p: v.pipe(
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("modify"),
+      /** Order ID or Client Order ID. */
+      oid: v.union([UnsignedInteger, Cloid]),
+      /** New order parameters. */
+      order: v.object({
+        /** Asset ID. */
+        a: UnsignedInteger,
+        /** Position side (`true` for long, `false` for short). */
+        b: v.boolean(),
+        /** Price. */
+        p: v.pipe(
+          UnsignedDecimal,
+          v.check((input) => Number(input) > 0, "Value must be greater than zero."),
+        ),
+        /** Size (in base currency units). */
+        s: UnsignedDecimal,
+        /** Is reduce-only? */
+        r: v.boolean(),
+        /** Order type (`limit` for limit orders, `trigger` for stop-loss/take-profit orders). */
+        t: v.union([
+          v.object({
+            /** Limit order parameters. */
+            limit: v.object({
+              /**
+               * Time-in-force.
+               * - `"Gtc"`: Remains active until filled or canceled.
+               * - `"Ioc"`: Fills immediately or cancels any unfilled portion.
+               * - `"Alo"`: Adds liquidity only.
+               * - `"FrontendMarket"`: Similar to Ioc, used in Hyperliquid UI.
+               * - `"LiquidationMarket"`: Similar to Ioc, used in Hyperliquid UI.
+               */
+              tif: v.picklist(["Gtc", "Ioc", "Alo", "FrontendMarket", "LiquidationMarket"]),
+            }),
+          }),
+          v.object({
+            /** Trigger order parameters. */
+            trigger: v.object({
+              /** Is market order? */
+              isMarket: v.boolean(),
+              /** Trigger price. */
+              triggerPx: v.pipe(
                 UnsignedDecimal,
                 v.check((input) => Number(input) > 0, "Value must be greater than zero."),
-                v.description("Price."),
               ),
-              /** Size (in base currency units). */
-              s: v.pipe(
-                UnsignedDecimal,
-                v.description("Size (in base currency units)."),
-              ),
-              /** Is reduce-only? */
-              r: v.pipe(
-                v.boolean(),
-                v.description("Is reduce-only?"),
-              ),
-              /** Order type (`limit` for limit orders, `trigger` for stop-loss/take-profit orders). */
-              t: v.pipe(
-                v.union([
-                  v.object({
-                    /** Limit order parameters. */
-                    limit: v.pipe(
-                      v.object({
-                        /**
-                         * Time-in-force.
-                         * - `"Gtc"`: Remains active until filled or canceled.
-                         * - `"Ioc"`: Fills immediately or cancels any unfilled portion.
-                         * - `"Alo"`: Adds liquidity only.
-                         * - `"FrontendMarket"`: Similar to Ioc, used in Hyperliquid UI.
-                         * - `"LiquidationMarket"`: Similar to Ioc, used in Hyperliquid UI.
-                         */
-                        tif: v.pipe(
-                          v.picklist(["Gtc", "Ioc", "Alo", "FrontendMarket", "LiquidationMarket"]),
-                          v.description(
-                            "Time-in-force." +
-                              '\n- `"Gtc"`: Remains active until filled or canceled.' +
-                              '\n- `"Ioc"`: Fills immediately or cancels any unfilled portion.' +
-                              '\n- `"Alo"`: Adds liquidity only.' +
-                              '\n- `"FrontendMarket"`: Similar to Ioc, used in Hyperliquid UI.' +
-                              '\n- `"LiquidationMarket"`: Similar to Ioc, used in Hyperliquid UI.',
-                          ),
-                        ),
-                      }),
-                      v.description("Limit order parameters."),
-                    ),
-                  }),
-                  v.object({
-                    /** Trigger order parameters. */
-                    trigger: v.pipe(
-                      v.object({
-                        /** Is market order? */
-                        isMarket: v.pipe(
-                          v.boolean(),
-                          v.description("Is market order?"),
-                        ),
-                        /** Trigger price. */
-                        triggerPx: v.pipe(
-                          UnsignedDecimal,
-                          v.check((input) => Number(input) > 0, "Value must be greater than zero."),
-                          v.description("Trigger price."),
-                        ),
-                        /** Indicates whether it is take profit or stop loss. */
-                        tpsl: v.pipe(
-                          v.picklist(["tp", "sl"]),
-                          v.description("Indicates whether it is take profit or stop loss."),
-                        ),
-                      }),
-                      v.description("Trigger order parameters."),
-                    ),
-                  }),
-                ]),
-                v.description("Order type (`limit` for limit orders, `trigger` for stop-loss/take-profit orders)."),
-              ),
-              /** Client Order ID. */
-              c: v.pipe(
-                v.optional(Cloid),
-                v.description("Client Order ID."),
-              ),
+              /** Indicates whether it is take profit or stop loss. */
+              tpsl: v.picklist(["tp", "sl"]),
             }),
-            v.description("New order parameters."),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Vault address (for vault trading). */
-      vaultAddress: v.pipe(
-        v.optional(Address),
-        v.description("Vault address (for vault trading)."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
-      ),
+          }),
+        ]),
+        /** Client Order ID. */
+        c: v.optional(Cloid),
+      }),
     }),
-    v.description("Modify an order."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Vault address (for vault trading). */
+    vaultAddress: v.optional(Address),
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type ModifyRequest = v.InferOutput<typeof ModifyRequest>;
 
@@ -155,10 +86,7 @@ export type ModifyRequest = v.InferOutput<typeof ModifyRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order
  */
 export const ModifyResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.union([SuccessResponse, ErrorResponse]),
-    v.description("Successful response without specific data or error response."),
-  );
+  return v.union([SuccessResponse, ErrorResponse]);
 })();
 export type ModifyResponse = v.InferOutput<typeof ModifyResponse>;
 

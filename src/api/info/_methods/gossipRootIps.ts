@@ -8,16 +8,10 @@ import * as v from "@valibot/valibot";
  * Request gossip root IPs.
  */
 export const GossipRootIpsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("gossipRootIps"),
-        v.description("Type of request."),
-      ),
-    }),
-    v.description("Request gossip root IPs."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("gossipRootIps"),
+  });
 })();
 export type GossipRootIpsRequest = v.InferOutput<typeof GossipRootIpsRequest>;
 
@@ -25,10 +19,7 @@ export type GossipRootIpsRequest = v.InferOutput<typeof GossipRootIpsRequest>;
  * Array of gossip root IPs.
  */
 export const GossipRootIpsResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(v.pipe(v.string(), v.ipv4())),
-    v.description("Array of gossip root IPs."),
-  );
+  return v.array(v.pipe(v.string(), v.ipv4()));
 })();
 export type GossipRootIpsResponse = v.InferOutput<typeof GossipRootIpsResponse>;
 

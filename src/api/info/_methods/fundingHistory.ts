@@ -11,31 +11,16 @@ import { Decimal, UnsignedInteger } from "../../_schemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-historical-funding-rates
  */
 export const FundingHistoryRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("fundingHistory"),
-        v.description("Type of request."),
-      ),
-      /** Asset symbol (e.g., BTC). */
-      coin: v.pipe(
-        v.string(),
-        v.description("Asset symbol (e.g., BTC)."),
-      ),
-      /** Start time (in ms since epoch). */
-      startTime: v.pipe(
-        UnsignedInteger,
-        v.description("Start time (in ms since epoch)."),
-      ),
-      /** End time (in ms since epoch). */
-      endTime: v.pipe(
-        v.nullish(UnsignedInteger),
-        v.description("End time (in ms since epoch)."),
-      ),
-    }),
-    v.description("Request funding history."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("fundingHistory"),
+    /** Asset symbol (e.g., BTC). */
+    coin: v.string(),
+    /** Start time (in ms since epoch). */
+    startTime: UnsignedInteger,
+    /** End time (in ms since epoch). */
+    endTime: v.nullish(UnsignedInteger),
+  });
 })();
 export type FundingHistoryRequest = v.InferOutput<typeof FundingHistoryRequest>;
 
@@ -44,32 +29,17 @@ export type FundingHistoryRequest = v.InferOutput<typeof FundingHistoryRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-historical-funding-rates
  */
 export const FundingHistoryResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(
-      v.object({
-        /** Asset symbol. */
-        coin: v.pipe(
-          v.string(),
-          v.description("Asset symbol."),
-        ),
-        /** Funding rate. */
-        fundingRate: v.pipe(
-          Decimal,
-          v.description("Funding rate."),
-        ),
-        /** Premium price. */
-        premium: v.pipe(
-          Decimal,
-          v.description("Premium price."),
-        ),
-        /** Funding record timestamp (ms since epoch). */
-        time: v.pipe(
-          UnsignedInteger,
-          v.description("Funding record timestamp (ms since epoch)."),
-        ),
-      }),
-    ),
-    v.description("Array of historical funding rate records for an asset."),
+  return v.array(
+    v.object({
+      /** Asset symbol. */
+      coin: v.string(),
+      /** Funding rate. */
+      fundingRate: Decimal,
+      /** Premium price. */
+      premium: Decimal,
+      /** Funding record timestamp (ms since epoch). */
+      time: UnsignedInteger,
+    }),
   );
 })();
 export type FundingHistoryResponse = v.InferOutput<typeof FundingHistoryResponse>;

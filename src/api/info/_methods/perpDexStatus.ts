@@ -11,21 +11,12 @@ import { UnsignedDecimal } from "../../_schemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#get-perp-market-status
  */
 export const PerpDexStatusRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("perpDexStatus"),
-        v.description("Type of request."),
-      ),
-      /** Perp dex name of builder-deployed dex market. The empty string represents the first perp dex. */
-      dex: v.pipe(
-        v.string(),
-        v.description("Perp dex name of builder-deployed dex market. The empty string represents the first perp dex."),
-      ),
-    }),
-    v.description("Request perp DEX status."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("perpDexStatus"),
+    /** Perp dex name of builder-deployed dex market. The empty string represents the first perp dex. */
+    dex: v.string(),
+  });
 })();
 export type PerpDexStatusRequest = v.InferOutput<typeof PerpDexStatusRequest>;
 
@@ -34,16 +25,10 @@ export type PerpDexStatusRequest = v.InferOutput<typeof PerpDexStatusRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#get-perp-market-status
  */
 export const PerpDexStatusResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Total net deposit. */
-      totalNetDeposit: v.pipe(
-        UnsignedDecimal,
-        v.description("Total net deposit."),
-      ),
-    }),
-    v.description("Status of a perp DEX."),
-  );
+  return v.object({
+    /** Total net deposit. */
+    totalNetDeposit: UnsignedDecimal,
+  });
 })();
 export type PerpDexStatusResponse = v.InferOutput<typeof PerpDexStatusResponse>;
 

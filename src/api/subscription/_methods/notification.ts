@@ -8,36 +8,21 @@ import { Address } from "../../_schemas.ts";
 
 /** Subscription to notification events for a specific user. */
 export const NotificationRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("notification"),
-        v.description("Type of subscription."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Subscription to notification events for a specific user."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("notification"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type NotificationRequest = v.InferOutput<typeof NotificationRequest>;
 
 /** Event of user notification. */
 export const NotificationEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Notification content. */
-      notification: v.pipe(
-        v.string(),
-        v.description("Notification content."),
-      ),
-    }),
-    v.description("Event of user notification."),
-  );
+  return v.object({
+    /** Notification content. */
+    notification: v.string(),
+  });
 })();
 export type NotificationEvent = v.InferOutput<typeof NotificationEvent>;
 

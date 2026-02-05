@@ -1,7 +1,7 @@
 import * as v from "@valibot/valibot";
 import { PerpsAtOpenInterestCapRequest, PerpsAtOpenInterestCapResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
 
 runTest({
   name: "perpsAtOpenInterestCap",
@@ -9,9 +9,9 @@ runTest({
     const data = await Promise.all([
       client.perpsAtOpenInterestCap(),
     ]);
-    schemaCoverage(PerpsAtOpenInterestCapResponse, data, {
-      ignoreEmptyArray: ["#"],
-    });
+    schemaCoverage(PerpsAtOpenInterestCapResponse, data, [
+      "#/array",
+    ]);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

@@ -9,46 +9,25 @@ import { SpotClearinghouseStateResponse } from "../../info/_methods/spotClearing
 
 /** Subscription to spot state events for a specific user. */
 export const SpotStateRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("spotState"),
-        v.description("Type of subscription."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** Whether to ignore portfolio margin calculations. */
-      ignorePortfolioMargin: v.pipe(
-        v.optional(v.boolean(), false),
-        v.description("Whether to ignore portfolio margin calculations."),
-      ),
-    }),
-    v.description("Subscription to spot state events for a specific user."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("spotState"),
+    /** User address. */
+    user: Address,
+    /** Whether to ignore portfolio margin calculations. */
+    ignorePortfolioMargin: v.optional(v.boolean(), false),
+  });
 })();
 export type SpotStateRequest = v.InferOutput<typeof SpotStateRequest>;
 
 /** Event of user spot state. */
 export const SpotStateEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-      /** Account summary for spot trading. */
-      spotState: v.pipe(
-        SpotClearinghouseStateResponse,
-        v.description("Account summary for spot trading."),
-      ),
-    }),
-    v.description("Event of user spot state."),
-  );
+  return v.object({
+    /** User address. */
+    user: Address,
+    /** Account summary for spot trading. */
+    spotState: SpotClearinghouseStateResponse,
+  });
 })();
 export type SpotStateEvent = v.InferOutput<typeof SpotStateEvent>;
 

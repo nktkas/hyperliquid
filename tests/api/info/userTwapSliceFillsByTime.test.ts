@@ -1,7 +1,7 @@
 import * as v from "@valibot/valibot";
 import { UserTwapSliceFillsByTimeRequest, UserTwapSliceFillsByTimeResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
 
 runTest({
   name: "userTwapSliceFillsByTime",
@@ -12,12 +12,10 @@ runTest({
         startTime: Date.now() - 1000 * 60 * 60 * 24 * 365 * 5,
       }),
     ]);
-    schemaCoverage(UserTwapSliceFillsByTimeResponse, data, {
-      ignoreDefinedTypes: [
-        "#/items/properties/fill/properties/twapId",
-        "#/items/properties/fill/properties/builderFee",
-      ],
-    });
+    schemaCoverage(UserTwapSliceFillsByTimeResponse, data, [
+      "#/items/properties/fill/properties/builderFee/defined",
+      "#/items/properties/fill/properties/twapId/defined",
+    ]);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

@@ -1,7 +1,7 @@
 import * as v from "@valibot/valibot";
 import { SpotSendRequest, SpotSendResponse } from "@nktkas/hyperliquid/api/exchange";
-import { excludeErrorResponse, runTest, topUpSpot } from "./_t.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { runTest, topUpSpot } from "./_t.ts";
+import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
 
 runTest({
   name: "spotSend",

@@ -10,105 +10,51 @@ import { PerpsAtOpenInterestCapResponse } from "../../info/_methods/perpsAtOpenI
 
 /** Subscription to comprehensive user and market data events. */
 export const WebData3Request = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("webData3"),
-        v.description("Type of subscription."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Subscription to comprehensive user and market data events."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("webData3"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type WebData3Request = v.InferOutput<typeof WebData3Request>;
 
 /** Event of comprehensive user and market data. */
 export const WebData3Event = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** User state information. */
-      userState: v.pipe(
-        v.object({
-          /** Agent address if one exists. */
-          agentAddress: v.pipe(
-            v.nullable(Address),
-            v.description("Agent address if one exists."),
-          ),
-          /** Timestamp until which the agent is valid. */
-          agentValidUntil: v.pipe(
-            v.nullable(UnsignedInteger),
-            v.description("Timestamp until which the agent is valid."),
-          ),
-          /** Cumulative ledger value. */
-          cumLedger: v.pipe(
-            UnsignedDecimal,
-            v.description("Cumulative ledger value."),
-          ),
-          /** Server timestamp (in ms since epoch). */
-          serverTime: v.pipe(
-            UnsignedInteger,
-            v.description("Server timestamp (in ms since epoch)."),
-          ),
-          /** Whether this account is a vault. */
-          isVault: v.pipe(
-            v.boolean(),
-            v.description("Whether this account is a vault."),
-          ),
-          /** User address. */
-          user: v.pipe(
-            Address,
-            v.description("User address."),
-          ),
-          /** Whether the user has opted out of spot dusting. */
-          optOutOfSpotDusting: v.pipe(
-            v.optional(v.literal(true)),
-            v.description("Whether the user has opted out of spot dusting."),
-          ),
-          /** Whether DEX abstraction is enabled. */
-          dexAbstractionEnabled: v.pipe(
-            v.optional(v.boolean()),
-            v.description("Whether DEX abstraction is enabled."),
-          ),
-          /** Abstraction mode for the user account. */
-          abstraction: v.pipe(
-            v.optional(v.picklist(["dexAbstraction", "unifiedAccount", "disabled"])),
-            v.description("Abstraction mode for the user account."),
-          ),
-        }),
-        v.description("User state information."),
-      ),
-      /** Array of perpetual DEX states. */
-      perpDexStates: v.pipe(
-        v.array(
-          v.object({
-            /** Total equity in vaults. */
-            totalVaultEquity: v.pipe(
-              UnsignedDecimal,
-              v.description("Total equity in vaults."),
-            ),
-            /** Assets currently at their open interest cap. */
-            perpsAtOpenInterestCap: v.pipe(
-              v.optional(PerpsAtOpenInterestCapResponse),
-              v.description("Assets currently at their open interest cap."),
-            ),
-            /** Array of leading vaults. */
-            leadingVaults: v.pipe(
-              v.optional(LeadingVaultsResponse),
-              v.description("Array of leading vaults."),
-            ),
-          }),
-        ),
-        v.description("Array of perpetual DEX states."),
-      ),
+  return v.object({
+    /** User state information. */
+    userState: v.object({
+      /** Agent address if one exists. */
+      agentAddress: v.nullable(Address),
+      /** Timestamp until which the agent is valid. */
+      agentValidUntil: v.nullable(UnsignedInteger),
+      /** Cumulative ledger value. */
+      cumLedger: UnsignedDecimal,
+      /** Server timestamp (in ms since epoch). */
+      serverTime: UnsignedInteger,
+      /** Whether this account is a vault. */
+      isVault: v.boolean(),
+      /** User address. */
+      user: Address,
+      /** Whether the user has opted out of spot dusting. */
+      optOutOfSpotDusting: v.optional(v.literal(true)),
+      /** Whether DEX abstraction is enabled. */
+      dexAbstractionEnabled: v.optional(v.boolean()),
+      /** Abstraction mode for the user account. */
+      abstraction: v.optional(v.picklist(["dexAbstraction", "unifiedAccount", "disabled"])),
     }),
-    v.description("Event of comprehensive user and market data."),
-  );
+    /** Array of perpetual DEX states. */
+    perpDexStates: v.array(
+      v.object({
+        /** Total equity in vaults. */
+        totalVaultEquity: UnsignedDecimal,
+        /** Assets currently at their open interest cap. */
+        perpsAtOpenInterestCap: v.optional(PerpsAtOpenInterestCapResponse),
+        /** Array of leading vaults. */
+        leadingVaults: v.optional(LeadingVaultsResponse),
+      }),
+    ),
+  });
 })();
 export type WebData3Event = v.InferOutput<typeof WebData3Event>;
 

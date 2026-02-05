@@ -11,21 +11,12 @@ import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.t
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-history
  */
 export const DelegatorHistoryRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("delegatorHistory"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request user staking history."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("delegatorHistory"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type DelegatorHistoryRequest = v.InferOutput<typeof DelegatorHistoryRequest>;
 
@@ -34,83 +25,43 @@ export type DelegatorHistoryRequest = v.InferOutput<typeof DelegatorHistoryReque
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-history
  */
 export const DelegatorHistoryResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(
-      v.object({
-        /** Timestamp of the delegation event (in ms since epoch). */
-        time: v.pipe(
-          UnsignedInteger,
-          v.description("Timestamp of the delegation event (in ms since epoch)."),
-        ),
-        /** Transaction hash of the delegation event. */
-        hash: v.pipe(
-          Hex,
-          v.length(66),
-          v.description("Transaction hash of the delegation event."),
-        ),
-        /** Details of the update. */
-        delta: v.pipe(
-          v.union([
-            v.object({
-              /** Delegation operation details. */
-              delegate: v.pipe(
-                v.object({
-                  /** Address of the validator receiving or losing delegation. */
-                  validator: v.pipe(
-                    Address,
-                    v.description("Address of the validator receiving or losing delegation."),
-                  ),
-                  /** Amount of tokens being delegated or undelegated. */
-                  amount: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Amount of tokens being delegated or undelegated."),
-                  ),
-                  /** Whether this is an undelegation operation. */
-                  isUndelegate: v.pipe(
-                    v.boolean(),
-                    v.description("Whether this is an undelegation operation."),
-                  ),
-                }),
-                v.description("Delegation operation details."),
-              ),
-            }),
-            v.object({
-              /** Deposit details. */
-              cDeposit: v.pipe(
-                v.object({
-                  /** Amount of tokens being deposited. */
-                  amount: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Amount of tokens being deposited."),
-                  ),
-                }),
-                v.description("Deposit details."),
-              ),
-            }),
-            v.object({
-              /** Withdrawal details. */
-              withdrawal: v.pipe(
-                v.object({
-                  /** Amount of tokens being withdrawn. */
-                  amount: v.pipe(
-                    UnsignedDecimal,
-                    v.description("Amount of tokens being withdrawn."),
-                  ),
-                  /** Phase of the withdrawal process. */
-                  phase: v.pipe(
-                    v.picklist(["initiated", "finalized"]),
-                    v.description("Phase of the withdrawal process."),
-                  ),
-                }),
-                v.description("Withdrawal details."),
-              ),
-            }),
-          ]),
-          v.description("Details of the update."),
-        ),
-      }),
-    ),
-    v.description("Array of records of staking events by a delegator."),
+  return v.array(
+    v.object({
+      /** Timestamp of the delegation event (in ms since epoch). */
+      time: UnsignedInteger,
+      /** Transaction hash of the delegation event. */
+      hash: v.pipe(Hex, v.length(66)),
+      /** Details of the update. */
+      delta: v.union([
+        v.object({
+          /** Delegation operation details. */
+          delegate: v.object({
+            /** Address of the validator receiving or losing delegation. */
+            validator: Address,
+            /** Amount of tokens being delegated or undelegated. */
+            amount: UnsignedDecimal,
+            /** Whether this is an undelegation operation. */
+            isUndelegate: v.boolean(),
+          }),
+        }),
+        v.object({
+          /** Deposit details. */
+          cDeposit: v.object({
+            /** Amount of tokens being deposited. */
+            amount: UnsignedDecimal,
+          }),
+        }),
+        v.object({
+          /** Withdrawal details. */
+          withdrawal: v.object({
+            /** Amount of tokens being withdrawn. */
+            amount: UnsignedDecimal,
+            /** Phase of the withdrawal process. */
+            phase: v.picklist(["initiated", "finalized"]),
+          }),
+        }),
+      ]),
+    }),
   );
 })();
 export type DelegatorHistoryResponse = v.InferOutput<typeof DelegatorHistoryResponse>;

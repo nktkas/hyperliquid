@@ -1,7 +1,7 @@
 import * as v from "@valibot/valibot";
 import { L2BookRequest, L2BookResponse } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
 
 runTest({
   name: "l2Book",

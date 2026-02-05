@@ -11,16 +11,10 @@ import { UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-information-about-the-perp-deploy-auction
  */
 export const PerpDeployAuctionStatusRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("perpDeployAuctionStatus"),
-        v.description("Type of request."),
-      ),
-    }),
-    v.description("Request for the status of the perpetual deploy auction."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("perpDeployAuctionStatus"),
+  });
 })();
 export type PerpDeployAuctionStatusRequest = v.InferOutput<typeof PerpDeployAuctionStatusRequest>;
 
@@ -29,36 +23,18 @@ export type PerpDeployAuctionStatusRequest = v.InferOutput<typeof PerpDeployAuct
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-information-about-the-perp-deploy-auction
  */
 export const PerpDeployAuctionStatusResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Current gas. */
-      currentGas: v.pipe(
-        v.nullable(UnsignedDecimal),
-        v.description("Current gas."),
-      ),
-      /** Duration in seconds. */
-      durationSeconds: v.pipe(
-        UnsignedInteger,
-        v.description("Duration in seconds."),
-      ),
-      /** Ending gas. */
-      endGas: v.pipe(
-        v.nullable(UnsignedDecimal),
-        v.description("Ending gas."),
-      ),
-      /** Starting gas. */
-      startGas: v.pipe(
-        UnsignedDecimal,
-        v.description("Starting gas."),
-      ),
-      /** Auction start time (seconds since epoch). */
-      startTimeSeconds: v.pipe(
-        UnsignedInteger,
-        v.description("Auction start time (seconds since epoch)."),
-      ),
-    }),
-    v.description("Status of the perpetual deploy auction."),
-  );
+  return v.object({
+    /** Current gas. */
+    currentGas: v.nullable(UnsignedDecimal),
+    /** Duration in seconds. */
+    durationSeconds: UnsignedInteger,
+    /** Ending gas. */
+    endGas: v.nullable(UnsignedDecimal),
+    /** Starting gas. */
+    startGas: UnsignedDecimal,
+    /** Auction start time (seconds since epoch). */
+    startTimeSeconds: UnsignedInteger,
+  });
 })();
 export type PerpDeployAuctionStatusResponse = v.InferOutput<typeof PerpDeployAuctionStatusResponse>;
 

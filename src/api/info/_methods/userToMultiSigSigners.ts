@@ -10,21 +10,12 @@ import { Address, UnsignedInteger } from "../../_schemas.ts";
  * Request multi-sig signers for a user.
  */
 export const UserToMultiSigSignersRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("userToMultiSigSigners"),
-        v.description("Type of request."),
-      ),
-      /** User address. */
-      user: v.pipe(
-        Address,
-        v.description("User address."),
-      ),
-    }),
-    v.description("Request multi-sig signers for a user."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("userToMultiSigSigners"),
+    /** User address. */
+    user: Address,
+  });
 })();
 export type UserToMultiSigSignersRequest = v.InferOutput<typeof UserToMultiSigSignersRequest>;
 
@@ -32,24 +23,13 @@ export type UserToMultiSigSignersRequest = v.InferOutput<typeof UserToMultiSigSi
  * Multi-sig signers for a user or null if the user does not have any multi-sig signers.
  */
 export const UserToMultiSigSignersResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.nullable(
-      v.object({
-        /** Authorized users addresses. */
-        authorizedUsers: v.pipe(
-          v.array(Address),
-          v.nonEmpty(),
-          v.description("Authorized users addresses."),
-        ),
-        /** Threshold number of signatures required. */
-        threshold: v.pipe(
-          UnsignedInteger,
-          v.minValue(1),
-          v.description("Threshold number of signatures required."),
-        ),
-      }),
-    ),
-    v.description("Multi-sig signers for a user or null if the user does not have any multi-sig signers."),
+  return v.nullable(
+    v.object({
+      /** Authorized users addresses. */
+      authorizedUsers: v.pipe(v.array(Address), v.nonEmpty()),
+      /** Threshold number of signatures required. */
+      threshold: v.pipe(UnsignedInteger, v.minValue(1)),
+    }),
   );
 })();
 export type UserToMultiSigSignersResponse = v.InferOutput<typeof UserToMultiSigSignersResponse>;

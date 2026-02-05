@@ -11,16 +11,10 @@ import { VaultRelationshipSchema } from "./_base/commonSchemas.ts";
  * Request a list of vaults less than 2 hours old.
  */
 export const VaultSummariesRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of request. */
-      type: v.pipe(
-        v.literal("vaultSummaries"),
-        v.description("Type of request."),
-      ),
-    }),
-    v.description("Request a list of vaults less than 2 hours old."),
-  );
+  return v.object({
+    /** Type of request. */
+    type: v.literal("vaultSummaries"),
+  });
 })();
 export type VaultSummariesRequest = v.InferOutput<typeof VaultSummariesRequest>;
 
@@ -28,47 +22,23 @@ export type VaultSummariesRequest = v.InferOutput<typeof VaultSummariesRequest>;
  * Array of vaults less than 2 hours old.
  */
 export const VaultSummariesResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(
-      v.object({
-        /** Vault name. */
-        name: v.pipe(
-          v.string(),
-          v.description("Vault name."),
-        ),
-        /** Vault address. */
-        vaultAddress: v.pipe(
-          Address,
-          v.description("Vault address."),
-        ),
-        /** Leader address. */
-        leader: v.pipe(
-          Address,
-          v.description("Leader address."),
-        ),
-        /** Total value locked. */
-        tvl: v.pipe(
-          UnsignedDecimal,
-          v.description("Total value locked."),
-        ),
-        /** Vault closure status. */
-        isClosed: v.pipe(
-          v.boolean(),
-          v.description("Vault closure status."),
-        ),
-        /** Vault relationship type. */
-        relationship: v.pipe(
-          VaultRelationshipSchema,
-          v.description("Vault relationship type."),
-        ),
-        /** Creation timestamp. */
-        createTimeMillis: v.pipe(
-          UnsignedInteger,
-          v.description("Creation timestamp."),
-        ),
-      }),
-    ),
-    v.description("Array of vaults less than 2 hours old."),
+  return v.array(
+    v.object({
+      /** Vault name. */
+      name: v.string(),
+      /** Vault address. */
+      vaultAddress: Address,
+      /** Leader address. */
+      leader: Address,
+      /** Total value locked. */
+      tvl: UnsignedDecimal,
+      /** Vault closure status. */
+      isClosed: v.boolean(),
+      /** Vault relationship type. */
+      relationship: VaultRelationshipSchema,
+      /** Creation timestamp. */
+      createTimeMillis: UnsignedInteger,
+    }),
   );
 })();
 export type VaultSummariesResponse = v.InferOutput<typeof VaultSummariesResponse>;

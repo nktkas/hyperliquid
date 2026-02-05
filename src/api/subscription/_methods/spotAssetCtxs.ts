@@ -8,25 +8,16 @@ import { SpotAssetCtxSchema } from "../../info/_methods/_base/commonSchemas.ts";
 
 /** Subscription to context events for all spot assets. */
 export const SpotAssetCtxsRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Type of subscription. */
-      type: v.pipe(
-        v.literal("spotAssetCtxs"),
-        v.description("Type of subscription."),
-      ),
-    }),
-    v.description("Subscription to context events for all spot assets."),
-  );
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("spotAssetCtxs"),
+  });
 })();
 export type SpotAssetCtxsRequest = v.InferOutput<typeof SpotAssetCtxsRequest>;
 
 /** Event of spot asset contexts. */
 export const SpotAssetCtxsEvent = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.array(SpotAssetCtxSchema),
-    v.description("Event of spot asset contexts."),
-  );
+  return v.array(SpotAssetCtxSchema);
 })();
 export type SpotAssetCtxsEvent = v.InferOutput<typeof SpotAssetCtxsEvent>;
 

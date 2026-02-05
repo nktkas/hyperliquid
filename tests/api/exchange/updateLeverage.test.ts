@@ -1,14 +1,14 @@
 import * as v from "@valibot/valibot";
 import { UpdateLeverageRequest, UpdateLeverageResponse } from "@nktkas/hyperliquid/api/exchange";
-import { excludeErrorResponse, runTest, symbolConverter } from "./_t.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { runTest, symbolConverter } from "./_t.ts";
+import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
 
 runTest({
   name: "updateLeverage",
   codeTestFn: async (_t, exchClient) => {
     const data = await Promise.all([
       exchClient.updateLeverage({
-        asset: symbolConverter.getAssetId("ETH")!,
+        asset: symbolConverter.getAssetId("SOL")!,
         isCross: true,
         leverage: 1,
       }),

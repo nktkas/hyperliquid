@@ -12,52 +12,25 @@ import { SignatureSchema } from "./_base/commonSchemas.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order
  */
 export const TwapCancelRequest = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Action to perform. */
-      action: v.pipe(
-        v.object({
-          /** Type of action. */
-          type: v.pipe(
-            v.literal("twapCancel"),
-            v.description("Type of action."),
-          ),
-          /** Asset ID. */
-          a: v.pipe(
-            UnsignedInteger,
-            v.description("Asset ID."),
-          ),
-          /** Twap ID. */
-          t: v.pipe(
-            UnsignedInteger,
-            v.description("Twap ID."),
-          ),
-        }),
-        v.description("Action to perform."),
-      ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
-      nonce: v.pipe(
-        UnsignedInteger,
-        v.description("Nonce (timestamp in ms) used to prevent replay attacks."),
-      ),
-      /** ECDSA signature components. */
-      signature: v.pipe(
-        SignatureSchema,
-        v.description("ECDSA signature components."),
-      ),
-      /** Vault address (for vault trading). */
-      vaultAddress: v.pipe(
-        v.optional(Address),
-        v.description("Vault address (for vault trading)."),
-      ),
-      /** Expiration time of the action. */
-      expiresAfter: v.pipe(
-        v.optional(UnsignedInteger),
-        v.description("Expiration time of the action."),
-      ),
+  return v.object({
+    /** Action to perform. */
+    action: v.object({
+      /** Type of action. */
+      type: v.literal("twapCancel"),
+      /** Asset ID. */
+      a: UnsignedInteger,
+      /** Twap ID. */
+      t: UnsignedInteger,
     }),
-    v.description("Cancel a TWAP order."),
-  );
+    /** Nonce (timestamp in ms) used to prevent replay attacks. */
+    nonce: UnsignedInteger,
+    /** ECDSA signature components. */
+    signature: SignatureSchema,
+    /** Vault address (for vault trading). */
+    vaultAddress: v.optional(Address),
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
+  });
 })();
 export type TwapCancelRequest = v.InferOutput<typeof TwapCancelRequest>;
 
@@ -66,47 +39,26 @@ export type TwapCancelRequest = v.InferOutput<typeof TwapCancelRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order
  */
 export const TwapCancelResponse = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.object({
-      /** Successful status. */
-      status: v.pipe(
-        v.literal("ok"),
-        v.description("Successful status."),
-      ),
-      /** Response details. */
-      response: v.pipe(
-        v.object({
-          /** Type of response. */
-          type: v.pipe(
-            v.literal("twapCancel"),
-            v.description("Type of response."),
-          ),
-          /** Specific data. */
-          data: v.pipe(
-            v.object({
-              /** Status of the operation or error message. */
-              status: v.pipe(
-                v.union([
-                  v.string(),
-                  v.object({
-                    /** Error message. */
-                    error: v.pipe(
-                      v.string(),
-                      v.description("Error message."),
-                    ),
-                  }),
-                ]),
-                v.description("Status of the operation or error message."),
-              ),
-            }),
-            v.description("Specific data."),
-          ),
-        }),
-        v.description("Response details."),
-      ),
+  return v.object({
+    /** Successful status. */
+    status: v.literal("ok"),
+    /** Response details. */
+    response: v.object({
+      /** Type of response. */
+      type: v.literal("twapCancel"),
+      /** Specific data. */
+      data: v.object({
+        /** Status of the operation or error message. */
+        status: v.union([
+          v.string(),
+          v.object({
+            /** Error message. */
+            error: v.string(),
+          }),
+        ]),
+      }),
     }),
-    v.description("Response for canceling a TWAP order."),
-  );
+  });
 })();
 export type TwapCancelResponse = v.InferOutput<typeof TwapCancelResponse>;
 

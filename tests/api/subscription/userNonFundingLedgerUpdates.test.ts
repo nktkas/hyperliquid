@@ -1,6 +1,6 @@
 import { UserNonFundingLedgerUpdatesEvent } from "@nktkas/hyperliquid/api/subscription";
 import { collectEventsOverTime, runTest } from "./_t.ts";
-import { schemaCoverage } from "../_schemaCoverage.ts";
+import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
 
 runTest({
   name: "userNonFundingLedgerUpdates",
@@ -12,14 +12,18 @@ runTest({
       await client.userNonFundingLedgerUpdates({ user: "0x4993a3a6b03414ae9cf02a545db7a04af7c9f291" }, cb);
       await client.userNonFundingLedgerUpdates({ user: "0x11fe8a3dbc48b7b8138cdc9538015e2b928b86e8" }, cb);
     }, 10_000);
-    schemaCoverage(UserNonFundingLedgerUpdatesEvent, data, {
-      ignoreBranches: {
-        "#/properties/nonFundingLedgerUpdates/items/properties/delta": [1, 3, 4, 6, 7, 8, 10, 11, 14],
-      },
-      ignoreUndefinedTypes: ["#/properties/isSnapshot"],
-      ignoreNullTypes: [
-        "#/properties/nonFundingLedgerUpdates/items/properties/delta/variant/5/properties/nonce", // HACK: The equivalent API method in the info endpoint does not have this problem
-      ],
-    });
+    schemaCoverage(UserNonFundingLedgerUpdatesEvent, data, [
+      "#/properties/nonFundingLedgerUpdates/items/properties/delta/variant/1",
+      "#/properties/nonFundingLedgerUpdates/items/properties/delta/variant/3",
+      "#/properties/nonFundingLedgerUpdates/items/properties/delta/variant/4",
+      "#/properties/nonFundingLedgerUpdates/items/properties/delta/variant/5/properties/nonce/null",
+      "#/properties/nonFundingLedgerUpdates/items/properties/delta/variant/6",
+      "#/properties/nonFundingLedgerUpdates/items/properties/delta/variant/7",
+      "#/properties/nonFundingLedgerUpdates/items/properties/delta/variant/8",
+      "#/properties/nonFundingLedgerUpdates/items/properties/delta/variant/10",
+      "#/properties/nonFundingLedgerUpdates/items/properties/delta/variant/11",
+      "#/properties/nonFundingLedgerUpdates/items/properties/delta/variant/14",
+      "#/properties/isSnapshot/undefined",
+    ]);
   },
 });
