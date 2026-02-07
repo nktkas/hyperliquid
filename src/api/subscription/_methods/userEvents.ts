@@ -4,12 +4,14 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Decimal, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { UserTwapSliceFillsResponse } from "../../info/_methods/userTwapSliceFills.ts";
-import { UserFillsResponse } from "../../info/_methods/userFills.ts";
-import { TwapHistoryResponse } from "../../info/_methods/twapHistory.ts";
+import { Address } from "../../_schemas.ts";
+import type { UserTwapSliceFillsResponse } from "../../info/_methods/userTwapSliceFills.ts";
+import type { UserFillsResponse } from "../../info/_methods/userFills.ts";
+import type { TwapHistoryResponse } from "../../info/_methods/twapHistory.ts";
 
-/** Subscription to user events for a specific user. */
+/**
+ * Subscription to user events for a specific user.
+ */
 export const UserEventsRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -20,72 +22,82 @@ export const UserEventsRequest = /* @__PURE__ */ (() => {
 })();
 export type UserEventsRequest = v.InferOutput<typeof UserEventsRequest>;
 
-/** Event of one of possible user events. */
-export const UserEventsEvent = /* @__PURE__ */ (() => {
-  return v.union([
-    /** Event of array of user trade fills. */
-    v.object({
-      /** Array of user trade fills. */
-      fills: UserFillsResponse,
-    }),
-    /** Event of user funding update. */
-    v.object({
-      /** Funding update details. */
-      funding: v.object({
-        /** Asset symbol. */
-        coin: v.string(),
-        /** Amount transferred in USDC. */
-        usdc: Decimal,
-        /** Signed position size. */
-        szi: Decimal,
-        /** Applied funding rate. */
-        fundingRate: Decimal,
-        /** Number of samples. */
-        nSamples: v.nullable(UnsignedInteger),
-      }),
-    }),
-    /** Event of user liquidation. */
-    v.object({
-      /** Liquidation details. */
-      liquidation: v.object({
-        /** Unique liquidation ID. */
-        lid: UnsignedInteger,
-        /** Address of the liquidator. */
-        liquidator: Address,
-        /** Address of the liquidated user. */
-        liquidated_user: Address,
-        /** Notional position size that was liquidated. */
-        liquidated_ntl_pos: UnsignedDecimal,
-        /** Account value at time of liquidation. */
-        liquidated_account_value: UnsignedDecimal,
-      }),
-    }),
-    /** Event of array of non-user initiated order cancellations. */
-    v.object({
-      /** Array of non-user initiated order cancellations. */
-      nonUserCancel: v.array(
-        /** Cancelled order not initiated by the user. */
-        v.object({
-          /** Asset symbol (e.g., BTC). */
-          coin: v.string(),
-          /** Order ID. */
-          oid: UnsignedInteger,
-        }),
-      ),
-    }),
-    /** Event of a TWAP history entry. */
-    v.object({
-      /** Array of user's TWAP history. */
-      twapHistory: TwapHistoryResponse,
-    }),
-    /** Event of TWAP slice fills. */
-    v.object({
-      /** Array of user's twap slice fills. */
-      twapSliceFills: UserTwapSliceFillsResponse,
-    }),
-  ]);
-})();
-export type UserEventsEvent = v.InferOutput<typeof UserEventsEvent>;
+/**
+ * Event of one of possible user events.
+ */
+export type UserEventsEvent =
+  | {
+    /** Array of user trade fills. */
+    fills: UserFillsResponse;
+  }
+  | {
+    /** Funding update details. */
+    funding: {
+      /** Asset symbol. */
+      coin: string;
+      /**
+       * Amount transferred in USDC.
+       * @pattern ^-?[0-9]+(\.[0-9]+)?$
+       */
+      usdc: string;
+      /**
+       * Signed position size.
+       * @pattern ^-?[0-9]+(\.[0-9]+)?$
+       */
+      szi: string;
+      /**
+       * Applied funding rate.
+       * @pattern ^-?[0-9]+(\.[0-9]+)?$
+       */
+      fundingRate: string;
+      /** Number of samples. */
+      nSamples: number | null;
+    };
+  }
+  | {
+    /** Liquidation details. */
+    liquidation: {
+      /** Unique liquidation ID. */
+      lid: number;
+      /**
+       * Address of the liquidator.
+       * @pattern ^0x[a-fA-F0-9]{40}$
+       */
+      liquidator: `0x${string}`;
+      /**
+       * Address of the liquidated user.
+       * @pattern ^0x[a-fA-F0-9]{40}$
+       */
+      liquidated_user: `0x${string}`;
+      /**
+       * Notional position size that was liquidated.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      liquidated_ntl_pos: string;
+      /**
+       * Account value at time of liquidation.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      liquidated_account_value: string;
+    };
+  }
+  | {
+    /** Array of non-user initiated order cancellations. */
+    nonUserCancel: {
+      /** Asset symbol (e.g., BTC). */
+      coin: string;
+      /** Order ID. */
+      oid: number;
+    }[];
+  }
+  | {
+    /** Array of user's TWAP history. */
+    twapHistory: TwapHistoryResponse;
+  }
+  | {
+    /** Array of user's twap slice fills. */
+    twapSliceFills: UserTwapSliceFillsResponse;
+  };
 
 // ============================================================
 // Execution Logic

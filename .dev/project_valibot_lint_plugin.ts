@@ -304,7 +304,7 @@ export default {
      */
     "require-name-suffix": {
       create(context) {
-        const allowedSuffixes = ["Request", "Response", "Schema", "Event", "Parameters"];
+        const allowedSuffixes = ["Request", "Schema", "Event", "Parameters"];
 
         return {
           VariableDeclarator(node) {
@@ -323,8 +323,7 @@ export default {
             context.report({
               node: node.id,
               message: `Valibot schema '${node.id.name}' must end with one of: ${allowedSuffixes.join(", ")}`,
-              hint:
-                `Rename to '${node.id.name}Schema', '${node.id.name}Request', '${node.id.name}Response', or '${node.id.name}Event'`,
+              hint: `Rename to '${node.id.name}Schema', '${node.id.name}Request', or '${node.id.name}Event'`,
             });
           },
         };

@@ -5,9 +5,11 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
-/** Jail or unjail self as a validator signer. */
+/**
+ * Jail or unjail self as a validator signer.
+ */
 export const CSignerActionRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Action to jail or unjail the signer. */
@@ -35,11 +37,10 @@ export const CSignerActionRequest = /* @__PURE__ */ (() => {
 })();
 export type CSignerActionRequest = v.InferOutput<typeof CSignerActionRequest>;
 
-/** Successful response without specific data or error response. */
-export const CSignerActionResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type CSignerActionResponse = v.InferOutput<typeof CSignerActionResponse>;
+/**
+ * Successful response without specific data or error response.
+ */
+export type CSignerActionResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

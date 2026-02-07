@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Request supply, rate, and pending payment information for an aligned quote token.
@@ -22,26 +22,29 @@ export type AlignedQuoteTokenInfoRequest = v.InferOutput<typeof AlignedQuoteToke
 /**
  * Supply, rate, and pending payment information for an aligned quote token.
  */
-export const AlignedQuoteTokenInfoResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Whether the token is aligned. */
-    isAligned: v.boolean(),
-    /** Timestamp (in ms since epoch) when the token was first aligned. */
-    firstAlignedTime: UnsignedInteger,
-    /** Total EVM minted supply. */
-    evmMintedSupply: UnsignedDecimal,
-    /** Daily amount owed as an array of [date, amount] tuples. */
-    dailyAmountOwed: v.array(
-      v.tuple([
-        v.pipe(v.string(), v.isoDate()),
-        UnsignedDecimal,
-      ]),
-    ),
-    /** Predicted rate. */
-    predictedRate: UnsignedDecimal,
-  });
-})();
-export type AlignedQuoteTokenInfoResponse = v.InferOutput<typeof AlignedQuoteTokenInfoResponse>;
+export type AlignedQuoteTokenInfoResponse = {
+  /** Whether the token is aligned. */
+  isAligned: boolean;
+  /** Timestamp (in ms since epoch) when the token was first aligned. */
+  firstAlignedTime: number;
+  /**
+   * Total EVM minted supply.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  evmMintedSupply: string;
+  /** Daily amount owed as an array of [date, amount] tuples. */
+  dailyAmountOwed: [
+    /** Date in YYYY-MM-DD format. */
+    date: string,
+    /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+    amount: string,
+  ][];
+  /**
+   * Predicted rate.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  predictedRate: string;
+};
 
 // ============================================================
 // Execution Logic

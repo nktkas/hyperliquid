@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { OrderStatusRequest, OrderStatusResponse } from "@nktkas/hyperliquid/api/info";
+import { OrderStatusRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/orderStatus.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "OrderStatusResponse");
 
 runTest({
   name: "orderStatus",
@@ -37,32 +41,33 @@ runTest({
         oid: "0xd4bb069b673a48161bca56cfc88deb6b",
       }),
     ]);
-    schemaCoverage(OrderStatusResponse, data, [
-      "#/variant/0/properties/order/properties/order/properties/children/array",
-      "#/variant/0/properties/order/properties/status/picklist/3",
-      "#/variant/0/properties/order/properties/status/picklist/5",
-      "#/variant/0/properties/order/properties/status/picklist/6",
-      "#/variant/0/properties/order/properties/status/picklist/7",
-      "#/variant/0/properties/order/properties/status/picklist/8",
-      "#/variant/0/properties/order/properties/status/picklist/10",
-      "#/variant/0/properties/order/properties/status/picklist/11",
-      "#/variant/0/properties/order/properties/status/picklist/12",
-      "#/variant/0/properties/order/properties/status/picklist/13",
-      "#/variant/0/properties/order/properties/status/picklist/14",
-      "#/variant/0/properties/order/properties/status/picklist/15",
-      "#/variant/0/properties/order/properties/status/picklist/16",
-      "#/variant/0/properties/order/properties/status/picklist/17",
-      "#/variant/0/properties/order/properties/status/picklist/18",
-      "#/variant/0/properties/order/properties/status/picklist/19",
-      "#/variant/0/properties/order/properties/status/picklist/20",
-      "#/variant/0/properties/order/properties/status/picklist/21",
-      "#/variant/0/properties/order/properties/status/picklist/22",
-      "#/variant/0/properties/order/properties/status/picklist/23",
-      "#/variant/0/properties/order/properties/status/picklist/24",
-      "#/variant/0/properties/order/properties/status/picklist/25",
-      "#/variant/0/properties/order/properties/status/picklist/26",
-      "#/variant/0/properties/order/properties/status/picklist/27",
-      "#/variant/0/properties/order/properties/status/picklist/28",
+    schemaCoverage(typeSchema, data, [
+      "#/anyOf/0/properties/order/properties/order/properties/children/array",
+      "#/anyOf/0/properties/order/properties/order/properties/tif/enum/5",
+      "#/anyOf/0/properties/order/properties/status/enum/3",
+      "#/anyOf/0/properties/order/properties/status/enum/5",
+      "#/anyOf/0/properties/order/properties/status/enum/6",
+      "#/anyOf/0/properties/order/properties/status/enum/7",
+      "#/anyOf/0/properties/order/properties/status/enum/8",
+      "#/anyOf/0/properties/order/properties/status/enum/10",
+      "#/anyOf/0/properties/order/properties/status/enum/11",
+      "#/anyOf/0/properties/order/properties/status/enum/12",
+      "#/anyOf/0/properties/order/properties/status/enum/13",
+      "#/anyOf/0/properties/order/properties/status/enum/14",
+      "#/anyOf/0/properties/order/properties/status/enum/15",
+      "#/anyOf/0/properties/order/properties/status/enum/16",
+      "#/anyOf/0/properties/order/properties/status/enum/17",
+      "#/anyOf/0/properties/order/properties/status/enum/18",
+      "#/anyOf/0/properties/order/properties/status/enum/19",
+      "#/anyOf/0/properties/order/properties/status/enum/20",
+      "#/anyOf/0/properties/order/properties/status/enum/21",
+      "#/anyOf/0/properties/order/properties/status/enum/22",
+      "#/anyOf/0/properties/order/properties/status/enum/23",
+      "#/anyOf/0/properties/order/properties/status/enum/24",
+      "#/anyOf/0/properties/order/properties/status/enum/25",
+      "#/anyOf/0/properties/order/properties/status/enum/26",
+      "#/anyOf/0/properties/order/properties/status/enum/27",
+      "#/anyOf/0/properties/order/properties/status/enum/28",
     ]);
   },
   cliTestFn: async (_t, runCommand) => {

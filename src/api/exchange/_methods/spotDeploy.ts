@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Percent, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Deploying HIP-1 and HIP-2 assets.
@@ -133,10 +133,7 @@ export type SpotDeployRequest = v.InferOutput<typeof SpotDeployRequest>;
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
  */
-export const SpotDeployResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type SpotDeployResponse = v.InferOutput<typeof SpotDeployResponse>;
+export type SpotDeployResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

@@ -5,7 +5,12 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Hex, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import {
+  type ErrorResponse,
+  HyperliquidChainSchema,
+  SignatureSchema,
+  type SuccessResponse,
+} from "./_base/commonSchemas.ts";
 
 /**
  * Transfer native token from staking into the user's spot account.
@@ -38,10 +43,7 @@ export type CWithdrawRequest = v.InferOutput<typeof CWithdrawRequest>;
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#withdraw-from-staking
  */
-export const CWithdrawResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type CWithdrawResponse = v.InferOutput<typeof CWithdrawResponse>;
+export type CWithdrawResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

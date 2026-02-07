@@ -4,8 +4,6 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Decimal, UnsignedInteger } from "../../_schemas.ts";
-
 /**
  * Request predicted funding rates.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-predicted-funding-rates-for-different-venues
@@ -22,33 +20,27 @@ export type PredictedFundingsRequest = v.InferOutput<typeof PredictedFundingsReq
  * Array of tuples of asset symbols and their predicted funding data.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-predicted-funding-rates-for-different-venues
  */
-export const PredictedFundingsResponse = /* @__PURE__ */ (() => {
-  return v.array(
-    v.tuple([
-      // Asset symbol
-      v.string(),
-      // Array of predicted funding data for each exchange
-      v.array(
-        v.tuple([
-          // Exchange symbol
-          v.string(),
-          // Predicted funding data (if available)
-          v.nullable(
-            v.object({
-              /** Predicted funding rate. */
-              fundingRate: Decimal,
-              /** Next funding time (ms since epoch). */
-              nextFundingTime: UnsignedInteger,
-              /** Funding interval in hours. */
-              fundingIntervalHours: v.optional(UnsignedInteger),
-            }),
-          ),
-        ]),
-      ),
-    ]),
-  );
-})();
-export type PredictedFundingsResponse = v.InferOutput<typeof PredictedFundingsResponse>;
+export type PredictedFundingsResponse = [
+  /** Asset symbol */
+  asset: string,
+  /** Array of predicted funding data for each exchange */
+  exchanges: [
+    /** Exchange symbol */
+    exchange: string,
+    /** Predicted funding data (if available) */
+    data: {
+      /**
+       * Predicted funding rate.
+       * @pattern ^-?[0-9]+(\.[0-9]+)?$
+       */
+      fundingRate: string;
+      /** Next funding time (ms since epoch). */
+      nextFundingTime: number;
+      /** Funding interval in hours. */
+      fundingIntervalHours?: number;
+    } | null,
+  ][],
+][];
 
 // ============================================================
 // Execution Logic

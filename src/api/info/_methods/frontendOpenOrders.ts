@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import { FrontendOpenOrderSchema } from "./_base/commonSchemas.ts";
+import type { FrontendOpenOrderSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Request frontend open orders.
@@ -27,10 +27,7 @@ export type FrontendOpenOrdersRequest = v.InferOutput<typeof FrontendOpenOrdersR
  * Array of open orders with additional display information.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders-with-additional-frontend-info
  */
-export const FrontendOpenOrdersResponse = /* @__PURE__ */ (() => {
-  return v.array(FrontendOpenOrderSchema);
-})();
-export type FrontendOpenOrdersResponse = v.InferOutput<typeof FrontendOpenOrdersResponse>;
+export type FrontendOpenOrdersResponse = FrontendOpenOrderSchema[];
 
 // ============================================================
 // Execution Logic

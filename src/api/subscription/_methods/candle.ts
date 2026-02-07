@@ -4,9 +4,9 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-
-/** Subscription to candlestick events for a specific asset and time interval. */
+/**
+ * Subscription to candlestick events for a specific asset and time interval.
+ */
 export const CandleRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -19,32 +19,46 @@ export const CandleRequest = /* @__PURE__ */ (() => {
 })();
 export type CandleRequest = v.InferOutput<typeof CandleRequest>;
 
-/** Event of candlestick data point. */
-export const CandleEvent = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Opening timestamp (ms since epoch). */
-    t: UnsignedInteger,
-    /** Closing timestamp (ms since epoch). */
-    T: UnsignedInteger,
-    /** Asset symbol. */
-    s: v.string(),
-    /** Time interval. */
-    i: v.picklist(["1m", "3m", "5m", "15m", "30m", "1h", "2h", "4h", "8h", "12h", "1d", "3d", "1w", "1M"]),
-    /** Opening price. */
-    o: UnsignedDecimal,
-    /** Closing price. */
-    c: UnsignedDecimal,
-    /** Highest price. */
-    h: UnsignedDecimal,
-    /** Lowest price. */
-    l: UnsignedDecimal,
-    /** Total volume traded in base currency. */
-    v: UnsignedDecimal,
-    /** Number of trades executed. */
-    n: UnsignedInteger,
-  });
-})();
-export type CandleEvent = v.InferOutput<typeof CandleEvent>;
+/**
+ * Event of candlestick data point.
+ */
+export type CandleEvent = {
+  /** Opening timestamp (ms since epoch). */
+  t: number;
+  /** Closing timestamp (ms since epoch). */
+  T: number;
+  /** Asset symbol. */
+  s: string;
+  /** Time interval. */
+  i: "1m" | "3m" | "5m" | "15m" | "30m" | "1h" | "2h" | "4h" | "8h" | "12h" | "1d" | "3d" | "1w" | "1M";
+  /**
+   * Opening price.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  o: string;
+  /**
+   * Closing price.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  c: string;
+  /**
+   * Highest price.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  h: string;
+  /**
+   * Lowest price.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  l: string;
+  /**
+   * Total volume traded in base currency.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  v: string;
+  /** Number of trades executed. */
+  n: number;
+};
 
 // ============================================================
 // Execution Logic

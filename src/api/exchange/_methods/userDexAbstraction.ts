@@ -5,7 +5,12 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import {
+  type ErrorResponse,
+  HyperliquidChainSchema,
+  SignatureSchema,
+  type SuccessResponse,
+} from "./_base/commonSchemas.ts";
 
 /**
  * Enable/disable HIP-3 DEX abstraction.
@@ -40,10 +45,7 @@ export type UserDexAbstractionRequest = v.InferOutput<typeof UserDexAbstractionR
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction
  */
-export const UserDexAbstractionResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type UserDexAbstractionResponse = v.InferOutput<typeof UserDexAbstractionResponse>;
+export type UserDexAbstractionResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

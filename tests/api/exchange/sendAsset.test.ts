@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { SendAssetRequest, SendAssetResponse } from "@nktkas/hyperliquid/api/exchange";
+import { SendAssetRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest } from "./_t.ts";
-import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/exchange/_methods/sendAsset.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "SendAssetSuccessResponse");
 
 runTest({
   name: "sendAsset",
@@ -16,7 +20,7 @@ runTest({
         fromSubAccount: "",
       }),
     ]);
-    schemaCoverage(excludeErrorResponse(SendAssetResponse), data);
+    schemaCoverage(typeSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

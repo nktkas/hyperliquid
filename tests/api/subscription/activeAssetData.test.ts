@@ -1,6 +1,10 @@
-import { ActiveAssetDataEvent } from "@nktkas/hyperliquid/api/subscription";
+import type { ActiveAssetDataEvent } from "@nktkas/hyperliquid/api/subscription";
 import { collectEventsOverTime, runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/subscription/_methods/activeAssetData.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "ActiveAssetDataEvent");
 
 runTest({
   name: "activeAssetData",
@@ -10,6 +14,6 @@ runTest({
       await client.activeAssetData({ coin: "GALA", user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" }, cb);
       await client.activeAssetData({ coin: "NEAR", user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" }, cb);
     }, 10_000);
-    schemaCoverage(ActiveAssetDataEvent, data);
+    schemaCoverage(typeSchema, data);
   },
 });

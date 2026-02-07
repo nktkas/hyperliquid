@@ -5,9 +5,11 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import { HistoricalOrdersResponse } from "../../info/_methods/historicalOrders.ts";
+import type { HistoricalOrdersResponse } from "../../info/_methods/historicalOrders.ts";
 
-/** Subscription to user historical orders for a specific user. */
+/**
+ * Subscription to user historical orders for a specific user.
+ */
 export const UserHistoricalOrdersRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -18,18 +20,20 @@ export const UserHistoricalOrdersRequest = /* @__PURE__ */ (() => {
 })();
 export type UserHistoricalOrdersRequest = v.InferOutput<typeof UserHistoricalOrdersRequest>;
 
-/** Event of user historical orders. */
-export const UserHistoricalOrdersEvent = /* @__PURE__ */ (() => {
-  return v.object({
-    /** User address. */
-    user: Address,
-    /** Array of frontend orders with current processing status. */
-    orderHistory: HistoricalOrdersResponse,
-    /** Whether this is an initial snapshot. */
-    isSnapshot: v.optional(v.literal(true)),
-  });
-})();
-export type UserHistoricalOrdersEvent = v.InferOutput<typeof UserHistoricalOrdersEvent>;
+/**
+ * vent of user historical orders.
+ */
+export type UserHistoricalOrdersEvent = {
+  /**
+   * User address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  user: `0x${string}`;
+  /** Array of frontend orders with current processing status. */
+  orderHistory: HistoricalOrdersResponse;
+  /** Whether this is an initial snapshot. */
+  isSnapshot?: true;
+};
 
 // ============================================================
 // Execution Logic

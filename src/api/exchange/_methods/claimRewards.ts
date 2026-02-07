@@ -5,9 +5,11 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
-/** Claim rewards from referral program. */
+/**
+ * Claim rewards from referral program.
+ */
 export const ClaimRewardsRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Action to perform. */
@@ -25,11 +27,10 @@ export const ClaimRewardsRequest = /* @__PURE__ */ (() => {
 })();
 export type ClaimRewardsRequest = v.InferOutput<typeof ClaimRewardsRequest>;
 
-/** Successful response without specific data or error response. */
-export const ClaimRewardsResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type ClaimRewardsResponse = v.InferOutput<typeof ClaimRewardsResponse>;
+/**
+ * Successful response without specific data or error response.
+ */
+export type ClaimRewardsResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

@@ -6,7 +6,7 @@ import * as v from "@valibot/valibot";
 
 import { Address, Cloid, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
 import { SignatureSchema } from "./_base/commonSchemas.ts";
-import { OrderResponse } from "./order.ts";
+import type { OrderResponse } from "./order.ts";
 
 /**
  * Modify multiple orders.
@@ -91,9 +91,6 @@ export type BatchModifyRequest = v.InferOutput<typeof BatchModifyRequest>;
  * Response for order batch modifications.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-multiple-orders
  */
-export const BatchModifyResponse = /* @__PURE__ */ (() => {
-  return OrderResponse;
-})();
 export type BatchModifyResponse = OrderResponse;
 
 // ============================================================

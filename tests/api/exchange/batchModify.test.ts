@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { BatchModifyRequest, BatchModifyResponse } from "@nktkas/hyperliquid/api/exchange";
+import { BatchModifyRequest } from "@nktkas/hyperliquid/api/exchange";
 import { openOrder, runTest } from "./_t.ts";
-import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/exchange/_methods/batchModify.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "BatchModifySuccessResponse");
 
 runTest({
   name: "batchModify",
@@ -98,9 +102,9 @@ runTest({
         });
       })(),
     ]);
-    schemaCoverage(excludeErrorResponse(BatchModifyResponse), data, [
-      "#/properties/response/properties/data/properties/statuses/items/union/2",
-      "#/properties/response/properties/data/properties/statuses/items/union/3",
+    schemaCoverage(typeSchema, data, [
+      "#/properties/response/properties/data/properties/statuses/items/anyOf/2",
+      "#/properties/response/properties/data/properties/statuses/items/anyOf/3",
     ]);
   },
   cliTestFn: async (_t, runCommand) => {

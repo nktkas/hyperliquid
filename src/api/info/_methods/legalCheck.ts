@@ -22,17 +22,14 @@ export type LegalCheckRequest = v.InferOutput<typeof LegalCheckRequest>;
 /**
  * Legal verification status for a user.
  */
-export const LegalCheckResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Whether the user IP address is allowed. */
-    ipAllowed: v.boolean(),
-    /** Whether the user has accepted the terms of service. */
-    acceptedTerms: v.boolean(),
-    /** Whether the user is allowed to use the platform. */
-    userAllowed: v.boolean(),
-  });
-})();
-export type LegalCheckResponse = v.InferOutput<typeof LegalCheckResponse>;
+export type LegalCheckResponse = {
+  /** Whether the user IP address is allowed. */
+  ipAllowed: boolean;
+  /** Whether the user has accepted the terms of service. */
+  acceptedTerms: boolean;
+  /** Whether the user is allowed to use the platform. */
+  userAllowed: boolean;
+};
 
 // ============================================================
 // Execution Logic

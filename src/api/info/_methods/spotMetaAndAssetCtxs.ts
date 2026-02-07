@@ -4,8 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { SpotAssetCtxSchema } from "./_base/commonSchemas.ts";
-import { SpotMetaResponse } from "./spotMeta.ts";
+import type { SpotAssetCtxSchema } from "./_base/commonSchemas.ts";
+import type { SpotMetaResponse } from "./spotMeta.ts";
 
 /**
  * Request spot metadata and asset contexts.
@@ -23,10 +23,7 @@ export type SpotMetaAndAssetCtxsRequest = v.InferOutput<typeof SpotMetaAndAssetC
  * Tuple of spot metadata and asset contexts.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-asset-contexts
  */
-export const SpotMetaAndAssetCtxsResponse = /* @__PURE__ */ (() => {
-  return v.tuple([SpotMetaResponse, v.array(SpotAssetCtxSchema)]);
-})();
-export type SpotMetaAndAssetCtxsResponse = v.InferOutput<typeof SpotMetaAndAssetCtxsResponse>;
+export type SpotMetaAndAssetCtxsResponse = [meta: SpotMetaResponse, assetCtxs: SpotAssetCtxSchema[]];
 
 // ============================================================
 // Execution Logic

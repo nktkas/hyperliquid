@@ -1,7 +1,11 @@
-import { NotificationEvent } from "@nktkas/hyperliquid/api/subscription";
+import type { NotificationEvent } from "@nktkas/hyperliquid/api/subscription";
 import { getWalletAddress } from "@nktkas/hyperliquid/signing";
 import { collectEventsOverTime, createTWAP, runTestWithExchange } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/subscription/_methods/notification.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "NotificationEvent");
 
 runTestWithExchange({
   name: "notification",
@@ -13,6 +17,6 @@ runTestWithExchange({
       await client.subs.notification({ user }, cb);
       await createTWAP(client.exch);
     }, 10_000);
-    schemaCoverage(NotificationEvent, data);
+    schemaCoverage(typeSchema, data);
   },
 });

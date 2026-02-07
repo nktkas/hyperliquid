@@ -4,8 +4,6 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { UnsignedDecimal } from "../../_schemas.ts";
-
 /**
  * Request builder deployed perpetual market limits.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-builder-deployed-perp-market-limits
@@ -24,21 +22,29 @@ export type PerpDexLimitsRequest = v.InferOutput<typeof PerpDexLimitsRequest>;
  * Builder deployed perpetual market limits.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-builder-deployed-perp-market-limits
  */
-export const PerpDexLimitsResponse = /* @__PURE__ */ (() => {
-  return v.nullable(
-    v.object({
-      /** Total open interest cap. */
-      totalOiCap: UnsignedDecimal,
-      /** Open interest size cap per perpetual. */
-      oiSzCapPerPerp: UnsignedDecimal,
-      /** Maximum transfer notional amount. */
-      maxTransferNtl: UnsignedDecimal,
-      /** Coin to open interest cap mapping. */
-      coinToOiCap: v.array(v.tuple([v.string(), UnsignedDecimal])),
-    }),
-  );
-})();
-export type PerpDexLimitsResponse = v.InferOutput<typeof PerpDexLimitsResponse>;
+export type PerpDexLimitsResponse = {
+  /**
+   * Total open interest cap.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  totalOiCap: string;
+  /**
+   * Open interest size cap per perpetual.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  oiSzCapPerPerp: string;
+  /**
+   * Maximum transfer notional amount.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  maxTransferNtl: string;
+  /** Coin to open interest cap mapping. */
+  coinToOiCap: [
+    coin: string,
+    /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+    oiCap: string,
+  ][];
+} | null;
 
 // ============================================================
 // Execution Logic

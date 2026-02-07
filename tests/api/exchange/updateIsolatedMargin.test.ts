@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { UpdateIsolatedMarginRequest, UpdateIsolatedMarginResponse } from "@nktkas/hyperliquid/api/exchange";
+import { UpdateIsolatedMarginRequest } from "@nktkas/hyperliquid/api/exchange";
 import { openOrder, runTest, symbolConverter } from "./_t.ts";
-import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/exchange/_methods/updateIsolatedMargin.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "UpdateIsolatedMarginSuccessResponse");
 
 runTest({
   name: "updateIsolatedMargin",
@@ -18,14 +22,14 @@ runTest({
       const data = await Promise.all([
         exchClient.updateIsolatedMargin({ asset: id, isBuy: true, ntli: 2 * 1e6 }),
       ]);
-      schemaCoverage(excludeErrorResponse(UpdateIsolatedMarginResponse), data);
+      schemaCoverage(typeSchema, data);
     });
 
     await t.step("Decrease isolated margin", async () => {
       const data = await Promise.all([
         exchClient.updateIsolatedMargin({ asset: id, isBuy: true, ntli: -1 * 1e6 }),
       ]);
-      schemaCoverage(excludeErrorResponse(UpdateIsolatedMarginResponse), data);
+      schemaCoverage(typeSchema, data);
     });
   },
   cliTestFn: async (_t, runCommand) => {

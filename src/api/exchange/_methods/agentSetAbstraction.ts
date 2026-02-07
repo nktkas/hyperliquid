@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Set User abstraction mode (method for agent wallet).
@@ -39,10 +39,7 @@ export type AgentSetAbstractionRequest = v.InferOutput<typeof AgentSetAbstractio
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction-agent
  */
-export const AgentSetAbstractionResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type AgentSetAbstractionResponse = v.InferOutput<typeof AgentSetAbstractionResponse>;
+export type AgentSetAbstractionResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

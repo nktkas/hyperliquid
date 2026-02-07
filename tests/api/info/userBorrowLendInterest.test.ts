@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { UserBorrowLendInterestRequest, UserBorrowLendInterestResponse } from "@nktkas/hyperliquid/api/info";
+import { UserBorrowLendInterestRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/userBorrowLendInterest.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "UserBorrowLendInterestResponse");
 
 runTest({
   name: "userBorrowLendInterest",
@@ -12,7 +16,7 @@ runTest({
         startTime: Date.now() - 1000 * 60 * 60 * 24 * 365 * 5,
       }),
     ]);
-    schemaCoverage(UserBorrowLendInterestResponse, data);
+    schemaCoverage(typeSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

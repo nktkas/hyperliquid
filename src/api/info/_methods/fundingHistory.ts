@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Decimal, UnsignedInteger } from "../../_schemas.ts";
+import { UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Request funding history.
@@ -28,21 +28,22 @@ export type FundingHistoryRequest = v.InferOutput<typeof FundingHistoryRequest>;
  * Array of historical funding rate records for an asset.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-historical-funding-rates
  */
-export const FundingHistoryResponse = /* @__PURE__ */ (() => {
-  return v.array(
-    v.object({
-      /** Asset symbol. */
-      coin: v.string(),
-      /** Funding rate. */
-      fundingRate: Decimal,
-      /** Premium price. */
-      premium: Decimal,
-      /** Funding record timestamp (ms since epoch). */
-      time: UnsignedInteger,
-    }),
-  );
-})();
-export type FundingHistoryResponse = v.InferOutput<typeof FundingHistoryResponse>;
+export type FundingHistoryResponse = {
+  /** Asset symbol. */
+  coin: string;
+  /**
+   * Funding rate.
+   * @pattern ^-?[0-9]+(\.[0-9]+)?$
+   */
+  fundingRate: string;
+  /**
+   * Premium price.
+   * @pattern ^-?[0-9]+(\.[0-9]+)?$
+   */
+  premium: string;
+  /** Funding record timestamp (ms since epoch). */
+  time: number;
+}[];
 
 // ============================================================
 // Execution Logic

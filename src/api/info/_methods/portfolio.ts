@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Decimal, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address } from "../../_schemas.ts";
 
 /**
  * Request user portfolio.
@@ -21,34 +21,40 @@ export const PortfolioRequest = /* @__PURE__ */ (() => {
 export type PortfolioRequest = v.InferOutput<typeof PortfolioRequest>;
 
 /** Portfolio metrics snapshot. */
-const PortfolioSchema = /* @__PURE__ */ (() => {
-  return v.object({
-    /** History entries for account value as [timestamp, value]. */
-    accountValueHistory: v.array(v.tuple([UnsignedInteger, UnsignedDecimal])),
-    /** History entries for profit and loss as [timestamp, value]. */
-    pnlHistory: v.array(v.tuple([UnsignedInteger, Decimal])),
-    /** Volume metric for the portfolio. */
-    vlm: UnsignedDecimal,
-  });
-})();
+type Portfolio = {
+  /** History entries for account value as [timestamp, value]. */
+  accountValueHistory: [
+    timestamp: number,
+    /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+    value: string,
+  ][];
+  /** History entries for profit and loss as [timestamp, value]. */
+  pnlHistory: [
+    timestamp: number,
+    /** @pattern ^-?[0-9]+(\.[0-9]+)?$ */
+    value: string,
+  ][];
+  /**
+   * Volume metric for the portfolio.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  vlm: string;
+};
 
 /**
  * Portfolio metrics grouped by time periods.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-portfolio
  */
-export const PortfolioResponse = /* @__PURE__ */ (() => {
-  return v.tuple([
-    v.tuple([v.literal("day"), PortfolioSchema]),
-    v.tuple([v.literal("week"), PortfolioSchema]),
-    v.tuple([v.literal("month"), PortfolioSchema]),
-    v.tuple([v.literal("allTime"), PortfolioSchema]),
-    v.tuple([v.literal("perpDay"), PortfolioSchema]),
-    v.tuple([v.literal("perpWeek"), PortfolioSchema]),
-    v.tuple([v.literal("perpMonth"), PortfolioSchema]),
-    v.tuple([v.literal("perpAllTime"), PortfolioSchema]),
-  ]);
-})();
-export type PortfolioResponse = v.InferOutput<typeof PortfolioResponse>;
+export type PortfolioResponse = [
+  [period: "day", data: Portfolio],
+  [period: "week", data: Portfolio],
+  [period: "month", data: Portfolio],
+  [period: "allTime", data: Portfolio],
+  [period: "perpDay", data: Portfolio],
+  [period: "perpWeek", data: Portfolio],
+  [period: "perpMonth", data: Portfolio],
+  [period: "perpAllTime", data: Portfolio],
+];
 
 // ============================================================
 // Execution Logic

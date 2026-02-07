@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { UserNonFundingLedgerUpdatesRequest, UserNonFundingLedgerUpdatesResponse } from "@nktkas/hyperliquid/api/info";
+import { UserNonFundingLedgerUpdatesRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/userNonFundingLedgerUpdates.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "UserNonFundingLedgerUpdatesResponse");
 
 runTest({
   name: "userNonFundingLedgerUpdates",
@@ -12,8 +16,8 @@ runTest({
       client.userNonFundingLedgerUpdates({ user: "0x4993a3a6b03414ae9cf02a545db7a04af7c9f291" }),
       client.userNonFundingLedgerUpdates({ user: "0x11fe8a3dbc48b7b8138cdc9538015e2b928b86e8" }),
     ]);
-    schemaCoverage(UserNonFundingLedgerUpdatesResponse, data, [
-      "#/items/properties/delta/variant/3/properties/leverageType/picklist/0",
+    schemaCoverage(typeSchema, data, [
+      "#/items/properties/delta/anyOf/3/properties/leverageType/enum/0",
     ]);
   },
   cliTestFn: async (_t, runCommand) => {

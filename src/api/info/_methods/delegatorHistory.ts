@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address } from "../../_schemas.ts";
 
 /**
  * Request user staking history.
@@ -24,47 +24,53 @@ export type DelegatorHistoryRequest = v.InferOutput<typeof DelegatorHistoryReque
  * Array of records of staking events by a delegator.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-history
  */
-export const DelegatorHistoryResponse = /* @__PURE__ */ (() => {
-  return v.array(
-    v.object({
-      /** Timestamp of the delegation event (in ms since epoch). */
-      time: UnsignedInteger,
-      /** Transaction hash of the delegation event. */
-      hash: v.pipe(Hex, v.length(66)),
-      /** Details of the update. */
-      delta: v.union([
-        v.object({
-          /** Delegation operation details. */
-          delegate: v.object({
-            /** Address of the validator receiving or losing delegation. */
-            validator: Address,
-            /** Amount of tokens being delegated or undelegated. */
-            amount: UnsignedDecimal,
-            /** Whether this is an undelegation operation. */
-            isUndelegate: v.boolean(),
-          }),
-        }),
-        v.object({
-          /** Deposit details. */
-          cDeposit: v.object({
-            /** Amount of tokens being deposited. */
-            amount: UnsignedDecimal,
-          }),
-        }),
-        v.object({
-          /** Withdrawal details. */
-          withdrawal: v.object({
-            /** Amount of tokens being withdrawn. */
-            amount: UnsignedDecimal,
-            /** Phase of the withdrawal process. */
-            phase: v.picklist(["initiated", "finalized"]),
-          }),
-        }),
-      ]),
-    }),
-  );
-})();
-export type DelegatorHistoryResponse = v.InferOutput<typeof DelegatorHistoryResponse>;
+export type DelegatorHistoryResponse = {
+  /** Timestamp of the delegation event (in ms since epoch). */
+  time: number;
+  /**
+   * Transaction hash of the delegation event.
+   * @pattern ^0x[a-fA-F0-9]{64}$
+   */
+  hash: `0x${string}`;
+  /** Details of the update. */
+  delta: {
+    /** Delegation operation details. */
+    delegate: {
+      /**
+       * Address of the validator receiving or losing delegation.
+       * @pattern ^0x[a-fA-F0-9]{40}$
+       */
+      validator: `0x${string}`;
+      /**
+       * Amount of tokens being delegated or undelegated.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      amount: string;
+      /** Whether this is an undelegation operation. */
+      isUndelegate: boolean;
+    };
+  } | {
+    /** Deposit details. */
+    cDeposit: {
+      /**
+       * Amount of tokens being deposited.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      amount: string;
+    };
+  } | {
+    /** Withdrawal details. */
+    withdrawal: {
+      /**
+       * Amount of tokens being withdrawn.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      amount: string;
+      /** Phase of the withdrawal process. */
+      phase: "initiated" | "finalized";
+    };
+  };
+}[];
 
 // ============================================================
 // Execution Logic

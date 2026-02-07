@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { EvmUserModifyRequest, EvmUserModifyResponse } from "@nktkas/hyperliquid/api/exchange";
+import { EvmUserModifyRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest } from "./_t.ts";
-import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/exchange/_methods/evmUserModify.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "EvmUserModifySuccessResponse");
 
 runTest({
   name: "evmUserModify",
@@ -9,7 +13,7 @@ runTest({
     const data = await Promise.all([
       exchClient.evmUserModify({ usingBigBlocks: true }),
     ]);
-    schemaCoverage(excludeErrorResponse(EvmUserModifyResponse), data);
+    schemaCoverage(typeSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

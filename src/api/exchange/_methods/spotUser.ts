@@ -5,9 +5,11 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
-/** Opt Out of Spot Dusting. */
+/**
+ * Opt Out of Spot Dusting.
+ */
 export const SpotUserRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Action to perform. */
@@ -30,11 +32,10 @@ export const SpotUserRequest = /* @__PURE__ */ (() => {
 })();
 export type SpotUserRequest = v.InferOutput<typeof SpotUserRequest>;
 
-/** Successful response without specific data or error response. */
-export const SpotUserResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type SpotUserResponse = v.InferOutput<typeof SpotUserResponse>;
+/**
+ * Successful response without specific data or error response.
+ */
+export type SpotUserResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

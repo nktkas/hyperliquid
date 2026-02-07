@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { VaultDetailsRequest, VaultDetailsResponse } from "@nktkas/hyperliquid/api/info";
+import { VaultDetailsRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/vaultDetails.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "VaultDetailsResponse");
 
 runTest({
   name: "vaultDetails",
@@ -14,7 +18,7 @@ runTest({
         user: "0xe019d6167E7e324aEd003d94098496b6d986aB05",
       }),
     ]);
-    schemaCoverage(VaultDetailsResponse, data);
+    schemaCoverage(typeSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

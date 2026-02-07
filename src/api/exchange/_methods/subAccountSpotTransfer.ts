@@ -5,9 +5,11 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
-/** Transfer between sub-accounts (spot). */
+/**
+ * Transfer between sub-accounts (spot).
+ */
 export const SubAccountSpotTransferRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Action to perform. */
@@ -33,11 +35,10 @@ export const SubAccountSpotTransferRequest = /* @__PURE__ */ (() => {
 })();
 export type SubAccountSpotTransferRequest = v.InferOutput<typeof SubAccountSpotTransferRequest>;
 
-/** Successful response without specific data or error response. */
-export const SubAccountSpotTransferResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type SubAccountSpotTransferResponse = v.InferOutput<typeof SubAccountSpotTransferResponse>;
+/**
+ * Successful response without specific data or error response.
+ */
+export type SubAccountSpotTransferResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

@@ -22,17 +22,15 @@ export type LeadingVaultsRequest = v.InferOutput<typeof LeadingVaultsRequest>;
 /**
  * Array of leading vaults for a user.
  */
-export const LeadingVaultsResponse = /* @__PURE__ */ (() => {
-  return v.array(
-    v.object({
-      /** Vault address. */
-      address: Address,
-      /** Vault name. */
-      name: v.string(),
-    }),
-  );
-})();
-export type LeadingVaultsResponse = v.InferOutput<typeof LeadingVaultsResponse>;
+export type LeadingVaultsResponse = {
+  /**
+   * Vault address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  address: `0x${string}`;
+  /** Vault name. */
+  name: string;
+}[];
 
 // ============================================================
 // Execution Logic

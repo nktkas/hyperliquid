@@ -4,8 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { SpotPairDeployAuctionStatusResponse } from "./spotPairDeployAuctionStatus.ts";
+import { Address } from "../../_schemas.ts";
+import type { SpotPairDeployAuctionStatusResponse } from "./spotPairDeployAuctionStatus.ts";
 
 /**
  * Request spot deploy state.
@@ -25,47 +25,66 @@ export type SpotDeployStateRequest = v.InferOutput<typeof SpotDeployStateRequest
  * Deploy state for spot tokens.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-deploy-auction
  */
-export const SpotDeployStateResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Array of deploy states for tokens. */
-    states: v.array(
-      v.object({
-        /** Token ID. */
-        token: UnsignedInteger,
-        /** Token specification. */
-        spec: v.object({
-          /** Name of the token. */
-          name: v.string(),
-          /** Minimum decimal places for order sizes. */
-          szDecimals: UnsignedInteger,
-          /** Number of decimals for the token's smallest unit. */
-          weiDecimals: UnsignedInteger,
-        }),
-        /** Full name of the token. */
-        fullName: v.nullable(v.string()),
-        /** Deployer trading fee share for the token. */
-        deployerTradingFeeShare: UnsignedDecimal,
-        /** Spot indices for the token. */
-        spots: v.array(UnsignedInteger),
-        /** Maximum supply of the token. */
-        maxSupply: v.nullable(UnsignedDecimal),
-        /** Hyperliquidity genesis balance of the token. */
-        hyperliquidityGenesisBalance: UnsignedDecimal,
-        /** Total genesis balance (in wei) for the token. */
-        totalGenesisBalanceWei: UnsignedDecimal,
-        /** User genesis balances for the token. */
-        userGenesisBalances: v.array(v.tuple([Address, UnsignedDecimal])),
-        /** Existing token genesis balances for the token. */
-        existingTokenGenesisBalances: v.array(v.tuple([UnsignedInteger, UnsignedDecimal])),
-        /** Blacklisted users for the token. */
-        blacklistUsers: v.array(Address),
-      }),
-    ),
-    /** Status of the spot deploy auction. */
-    gasAuction: SpotPairDeployAuctionStatusResponse,
-  });
-})();
-export type SpotDeployStateResponse = v.InferOutput<typeof SpotDeployStateResponse>;
+export type SpotDeployStateResponse = {
+  /** Array of deploy states for tokens. */
+  states: {
+    /** Token ID. */
+    token: number;
+    /** Token specification. */
+    spec: {
+      /** Name of the token. */
+      name: string;
+      /** Minimum decimal places for order sizes. */
+      szDecimals: number;
+      /** Number of decimals for the token's smallest unit. */
+      weiDecimals: number;
+    };
+    /** Full name of the token. */
+    fullName: string | null;
+    /**
+     * Deployer trading fee share for the token.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    deployerTradingFeeShare: string;
+    /** Spot indices for the token. */
+    spots: number[];
+    /**
+     * Maximum supply of the token.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    maxSupply: string | null;
+    /**
+     * Hyperliquidity genesis balance of the token.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    hyperliquidityGenesisBalance: string;
+    /**
+     * Total genesis balance (in wei) for the token.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    totalGenesisBalanceWei: string;
+    /** User genesis balances for the token. */
+    userGenesisBalances: [
+      /** @pattern ^0x[a-fA-F0-9]{40}$ */
+      address: `0x${string}`,
+      /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+      balance: string,
+    ][];
+    /** Existing token genesis balances for the token. */
+    existingTokenGenesisBalances: [
+      token: number,
+      /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+      balance: string,
+    ][];
+    /**
+     * Blacklisted users for the token.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
+    blacklistUsers: `0x${string}`[];
+  }[];
+  /** Status of the spot deploy auction. */
+  gasAuction: SpotPairDeployAuctionStatusResponse;
+};
 
 // ============================================================
 // Execution Logic

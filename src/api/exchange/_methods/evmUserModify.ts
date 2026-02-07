@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Configure block type for EVM transactions.
@@ -34,10 +34,7 @@ export type EvmUserModifyRequest = v.InferOutput<typeof EvmUserModifyRequest>;
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/hyperevm/dual-block-architecture
  */
-export const EvmUserModifyResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type EvmUserModifyResponse = v.InferOutput<typeof EvmUserModifyResponse>;
+export type EvmUserModifyResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

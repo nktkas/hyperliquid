@@ -102,8 +102,8 @@ const User = /* @__PURE__ */ (() => {
 `,
     [
       {
-        message: "Valibot schema 'User' must end with one of: Request, Response, Schema, Event, Parameters",
-        hint: "Rename to 'UserSchema', 'UserRequest', 'UserResponse', or 'UserEvent'",
+        message: "Valibot schema 'User' must end with one of: Request, Schema, Event, Parameters",
+        hint: "Rename to 'UserSchema', 'UserRequest', or 'UserEvent'",
       },
     ],
   );

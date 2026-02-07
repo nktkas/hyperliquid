@@ -5,7 +5,12 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import {
+  type ErrorResponse,
+  HyperliquidChainSchema,
+  SignatureSchema,
+  type SuccessResponse,
+} from "./_base/commonSchemas.ts";
 
 /**
  * Send spot assets to another address.
@@ -42,10 +47,7 @@ export type SpotSendRequest = v.InferOutput<typeof SpotSendRequest>;
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-spot-transfer
  */
-export const SpotSendResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type SpotSendResponse = v.InferOutput<typeof SpotSendResponse>;
+export type SpotSendResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

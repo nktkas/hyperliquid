@@ -4,14 +4,14 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { PerpAssetCtxSchema, SpotAssetCtxSchema, TwapStateSchema } from "./_base/commonSchemas.ts";
-import { ClearinghouseStateResponse } from "./clearinghouseState.ts";
-import { MetaResponse } from "./meta.ts";
-import { SpotClearinghouseStateResponse } from "./spotClearinghouseState.ts";
-import { FrontendOpenOrdersResponse } from "./frontendOpenOrders.ts";
-import { LeadingVaultsResponse } from "./leadingVaults.ts";
-import { PerpsAtOpenInterestCapResponse } from "./perpsAtOpenInterestCap.ts";
+import { Address } from "../../_schemas.ts";
+import type { PerpAssetCtxSchema, SpotAssetCtxSchema, TwapStateSchema } from "./_base/commonSchemas.ts";
+import type { ClearinghouseStateResponse } from "./clearinghouseState.ts";
+import type { MetaResponse } from "./meta.ts";
+import type { SpotClearinghouseStateResponse } from "./spotClearinghouseState.ts";
+import type { FrontendOpenOrdersResponse } from "./frontendOpenOrders.ts";
+import type { LeadingVaultsResponse } from "./leadingVaults.ts";
+import type { PerpsAtOpenInterestCapResponse } from "./perpsAtOpenInterestCap.ts";
 
 /**
  * Request comprehensive user and market data.
@@ -29,45 +29,54 @@ export type WebData2Request = v.InferOutput<typeof WebData2Request>;
 /**
  * Comprehensive user and market data.
  */
-export const WebData2Response = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Account summary for perpetual trading. */
-    clearinghouseState: ClearinghouseStateResponse,
-    /** Array of leading vaults for a user. */
-    leadingVaults: LeadingVaultsResponse,
-    /** Total equity in vaults. */
-    totalVaultEquity: UnsignedDecimal,
-    /** Array of open orders with additional display information. */
-    openOrders: FrontendOpenOrdersResponse,
-    /** Agent address if one exists. */
-    agentAddress: v.nullable(Address),
-    /** Timestamp until which the agent is valid. */
-    agentValidUntil: v.nullable(UnsignedInteger),
-    /** Cumulative ledger value. */
-    cumLedger: UnsignedDecimal,
-    /** Metadata for perpetual assets. */
-    meta: MetaResponse,
-    /** Array of contexts for each perpetual asset. */
-    assetCtxs: v.array(PerpAssetCtxSchema),
-    /** Server timestamp (in ms since epoch). */
-    serverTime: UnsignedInteger,
-    /** Whether this account is a vault. */
-    isVault: v.boolean(),
-    /** User address. */
-    user: Address,
-    /** Array of tuples containing TWAP order ID and its state. */
-    twapStates: v.array(v.tuple([UnsignedInteger, TwapStateSchema])),
-    /** Account summary for spot trading. */
-    spotState: v.optional(SpotClearinghouseStateResponse),
-    /** Asset context for each spot asset. */
-    spotAssetCtxs: v.array(SpotAssetCtxSchema),
-    /** Whether the user has opted out of spot dusting. */
-    optOutOfSpotDusting: v.optional(v.literal(true)),
-    /** Assets currently at their open interest cap. */
-    perpsAtOpenInterestCap: v.optional(PerpsAtOpenInterestCapResponse),
-  });
-})();
-export type WebData2Response = v.InferOutput<typeof WebData2Response>;
+export type WebData2Response = {
+  /** Account summary for perpetual trading. */
+  clearinghouseState: ClearinghouseStateResponse;
+  /** Array of leading vaults for a user. */
+  leadingVaults: LeadingVaultsResponse;
+  /** T
+   * otal equity in vaults.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  totalVaultEquity: string;
+  /** Array of open orders with additional display information. */
+  openOrders: FrontendOpenOrdersResponse;
+  /**
+   * Agent address if one exists.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  agentAddress: `0x${string}` | null;
+  /** Timestamp until which the agent is valid. */
+  agentValidUntil: number | null;
+  /**
+   * Cumulative ledger value.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  cumLedger: string;
+  /** Metadata for perpetual assets. */
+  meta: MetaResponse;
+  /** Array of contexts for each perpetual asset. */
+  assetCtxs: PerpAssetCtxSchema[];
+  /** Server timestamp (in ms since epoch). */
+  serverTime: number;
+  /** Whether this account is a vault. */
+  isVault: boolean;
+  /**
+   * User address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  user: `0x${string}`;
+  /** Array of tuples containing TWAP order ID and its state. */
+  twapStates: [id: number, state: TwapStateSchema][];
+  /** Account summary for spot trading. */
+  spotState?: SpotClearinghouseStateResponse;
+  /** Asset context for each spot asset. */
+  spotAssetCtxs: SpotAssetCtxSchema[];
+  /** Whether the user has opted out of spot dusting. */
+  optOutOfSpotDusting?: true;
+  /** Assets currently at their open interest cap. */
+  perpsAtOpenInterestCap?: PerpsAtOpenInterestCapResponse;
+};
 
 // ============================================================
 // Execution Logic

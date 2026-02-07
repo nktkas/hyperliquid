@@ -4,10 +4,12 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema } from "./_base/commonSchemas.ts";
+import { UnsignedInteger } from "../../_schemas.ts";
+import { type ErrorResponse, SignatureSchema } from "./_base/commonSchemas.ts";
 
-/** Create a sub-account. */
+/**
+ * Create a sub-account.
+ */
 export const CreateSubAccountRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Action to perform. */
@@ -27,24 +29,23 @@ export const CreateSubAccountRequest = /* @__PURE__ */ (() => {
 })();
 export type CreateSubAccountRequest = v.InferOutput<typeof CreateSubAccountRequest>;
 
-/** Response for creating a sub-account. */
-export const CreateSubAccountResponse = /* @__PURE__ */ (() => {
-  return v.union([
-    v.object({
-      /** Successful status. */
-      status: v.literal("ok"),
-      /** Response details. */
-      response: v.object({
-        /** Type of response. */
-        type: v.literal("createSubAccount"),
-        /** Sub-account address. */
-        data: Address,
-      }),
-    }),
-    ErrorResponse,
-  ]);
-})();
-export type CreateSubAccountResponse = v.InferOutput<typeof CreateSubAccountResponse>;
+/**
+ * Response for creating a sub-account.
+ */
+export type CreateSubAccountResponse = {
+  /** Successful status. */
+  status: "ok";
+  /** Response details. */
+  response: {
+    /** Type of response. */
+    type: "createSubAccount";
+    /**
+     * Sub-account address.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
+    data: `0x${string}`;
+  };
+} | ErrorResponse;
 
 // ============================================================
 // Execution Logic

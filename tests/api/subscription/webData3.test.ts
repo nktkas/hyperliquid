@@ -1,6 +1,10 @@
-import { WebData3Event } from "@nktkas/hyperliquid/api/subscription";
+import type { WebData3Event } from "@nktkas/hyperliquid/api/subscription";
 import { collectEventsOverTime, runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/subscription/_methods/webData3.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "WebData3Event");
 
 runTest({
   name: "webData3",
@@ -13,6 +17,6 @@ runTest({
       await client.webData3({ user: "0x6b043579b088d44400dffa1ef1c5e3e3bfbdf9d2" }, cb); // portfolioMargin
       await client.webData3({ user: "0x8c9c52889ab9d259195a52fd412c250f8183c960" }, cb); // unifiedAccount
     }, 10_000);
-    schemaCoverage(WebData3Event, data.flat());
+    schemaCoverage(typeSchema, data.flat());
   },
 });

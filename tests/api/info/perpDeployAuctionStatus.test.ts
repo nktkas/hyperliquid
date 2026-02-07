@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { PerpDeployAuctionStatusRequest, PerpDeployAuctionStatusResponse } from "@nktkas/hyperliquid/api/info";
+import { PerpDeployAuctionStatusRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/perpDeployAuctionStatus.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "PerpDeployAuctionStatusResponse");
 
 runTest({
   name: "perpDeployAuctionStatus",
@@ -9,7 +13,7 @@ runTest({
     const data = await Promise.all([
       client.perpDeployAuctionStatus(),
     ]);
-    schemaCoverage(PerpDeployAuctionStatusResponse, data, [
+    schemaCoverage(typeSchema, data, [
       "#/properties/currentGas/defined",
       "#/properties/endGas/null",
       "#/properties/currentGas/null",

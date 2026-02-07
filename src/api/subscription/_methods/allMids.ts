@@ -4,9 +4,11 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { AllMidsResponse } from "../../info/_methods/allMids.ts";
+import type { AllMidsResponse } from "../../info/_methods/allMids.ts";
 
-/** Subscription to mid price events for all coins. */
+/**
+ * Subscription to mid price events for all coins.
+ */
 export const AllMidsRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -17,16 +19,15 @@ export const AllMidsRequest = /* @__PURE__ */ (() => {
 })();
 export type AllMidsRequest = v.InferOutput<typeof AllMidsRequest>;
 
-/** Event of mid prices for all assets. */
-export const AllMidsEvent = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Mapping of coin symbols to mid prices. */
-    mids: AllMidsResponse,
-    /** DEX name (empty string for main dex). */
-    dex: v.optional(v.string()),
-  });
-})();
-export type AllMidsEvent = v.InferOutput<typeof AllMidsEvent>;
+/**
+ * Event of mid prices for all assets.
+ */
+export type AllMidsEvent = {
+  /** Mapping of coin symbols to mid prices. */
+  mids: AllMidsResponse;
+  /** DEX name (empty string for main dex). */
+  dex?: string;
+};
 
 // ============================================================
 // Execution Logic

@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { PerpDeployAuctionStatusResponse } from "./perpDeployAuctionStatus.ts";
+import type { PerpDeployAuctionStatusResponse } from "./perpDeployAuctionStatus.ts";
 
 /**
  * Request for the status of the spot deploy auction.
@@ -22,10 +22,7 @@ export type SpotPairDeployAuctionStatusRequest = v.InferOutput<typeof SpotPairDe
  * Status of the spot deploy auction.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-pair-deploy-auction
  */
-export const SpotPairDeployAuctionStatusResponse = /* @__PURE__ */ (() => {
-  return PerpDeployAuctionStatusResponse;
-})();
-export type SpotPairDeployAuctionStatusResponse = v.InferOutput<typeof SpotPairDeployAuctionStatusResponse>;
+export type SpotPairDeployAuctionStatusResponse = PerpDeployAuctionStatusResponse;
 
 // ============================================================
 // Execution Logic

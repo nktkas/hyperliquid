@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { NoopRequest, NoopResponse } from "@nktkas/hyperliquid/api/exchange";
+import { NoopRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest } from "./_t.ts";
-import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/exchange/_methods/noop.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "NoopSuccessResponse");
 
 runTest({
   name: "noop",
@@ -9,7 +13,7 @@ runTest({
     const data = await Promise.all([
       exchClient.noop(),
     ]);
-    schemaCoverage(excludeErrorResponse(NoopResponse), data);
+    schemaCoverage(typeSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

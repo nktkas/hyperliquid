@@ -18,10 +18,7 @@ export type GossipRootIpsRequest = v.InferOutput<typeof GossipRootIpsRequest>;
 /**
  * Array of gossip root IPs.
  */
-export const GossipRootIpsResponse = /* @__PURE__ */ (() => {
-  return v.array(v.pipe(v.string(), v.ipv4()));
-})();
-export type GossipRootIpsResponse = v.InferOutput<typeof GossipRootIpsResponse>;
+export type GossipRootIpsResponse = `${number}.${number}.${number}.${number}`[];
 
 // ============================================================
 // Execution Logic

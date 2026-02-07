@@ -5,9 +5,11 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
-/** Set the display name in the leaderboard. */
+/**
+ * Set the display name in the leaderboard.
+ */
 export const SetDisplayNameRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Action to perform. */
@@ -30,11 +32,10 @@ export const SetDisplayNameRequest = /* @__PURE__ */ (() => {
 })();
 export type SetDisplayNameRequest = v.InferOutput<typeof SetDisplayNameRequest>;
 
-/** Successful response without specific data or error response. */
-export const SetDisplayNameResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type SetDisplayNameResponse = v.InferOutput<typeof SetDisplayNameResponse>;
+/**
+ * Successful response without specific data or error response.
+ */
+export type SetDisplayNameResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

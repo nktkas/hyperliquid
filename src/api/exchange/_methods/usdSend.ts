@@ -5,7 +5,12 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import {
+  type ErrorResponse,
+  HyperliquidChainSchema,
+  SignatureSchema,
+  type SuccessResponse,
+} from "./_base/commonSchemas.ts";
 
 /**
  * Send usd to another address.
@@ -40,10 +45,7 @@ export type UsdSendRequest = v.InferOutput<typeof UsdSendRequest>;
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-usdc-transfer
  */
-export const UsdSendResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type UsdSendResponse = v.InferOutput<typeof UsdSendResponse>;
+export type UsdSendResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

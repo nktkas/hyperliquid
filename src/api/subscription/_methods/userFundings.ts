@@ -4,9 +4,11 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Decimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address } from "../../_schemas.ts";
 
-/** Subscription to user funding events for a specific user. */
+/**
+ * Subscription to user funding events for a specific user.
+ */
 export const UserFundingsRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -17,33 +19,42 @@ export const UserFundingsRequest = /* @__PURE__ */ (() => {
 })();
 export type UserFundingsRequest = v.InferOutput<typeof UserFundingsRequest>;
 
-/** Event of user fundings. */
-export const UserFundingsEvent = /* @__PURE__ */ (() => {
-  return v.object({
-    /** User address. */
-    user: Address,
-    /** Array of user funding ledger updates. */
-    fundings: v.array(
-      v.object({
-        /** Timestamp of the update (in ms since epoch). */
-        time: UnsignedInteger,
-        /** Asset symbol. */
-        coin: v.string(),
-        /** Amount transferred in USDC. */
-        usdc: Decimal,
-        /** Signed position size. */
-        szi: Decimal,
-        /** Applied funding rate. */
-        fundingRate: Decimal,
-        /** Number of samples. */
-        nSamples: v.nullable(UnsignedInteger),
-      }),
-    ),
-    /** Whether this is an initial snapshot. */
-    isSnapshot: v.optional(v.literal(true)),
-  });
-})();
-export type UserFundingsEvent = v.InferOutput<typeof UserFundingsEvent>;
+/**
+ * Event of user fundings.
+ */
+export type UserFundingsEvent = {
+  /**
+   * User address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  user: `0x${string}`;
+  /** Array of user funding ledger updates. */
+  fundings: {
+    /** Timestamp of the update (in ms since epoch). */
+    time: number;
+    /** Asset symbol. */
+    coin: string;
+    /**
+     * Amount transferred in USDC.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
+    usdc: string;
+    /**
+     * Signed position size.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
+    szi: string;
+    /**
+     * Applied funding rate.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
+    fundingRate: string;
+    /** Number of samples. */
+    nSamples: number | null;
+  }[];
+  /** Whether this is an initial snapshot. */
+  isSnapshot?: true | undefined;
+};
 
 // ============================================================
 // Execution Logic

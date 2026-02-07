@@ -4,8 +4,6 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Integer } from "../../_schemas.ts";
-
 /**
  * Request validator L1 votes.
  */
@@ -20,28 +18,21 @@ export type ValidatorL1VotesRequest = v.InferOutput<typeof ValidatorL1VotesReque
 /**
  * Array of L1 governance votes cast by validators.
  */
-export const ValidatorL1VotesResponse = /* @__PURE__ */ (() => {
-  return v.array(
-    v.object({
-      /** Timestamp when the vote expires (in ms since epoch). */
-      expireTime: Integer,
-      /** Type of the vote. */
-      action: v.union([
-        v.object({
-          // deno-lint-ignore valibot-project/require-jsdoc
-          D: v.string(),
-        }),
-        v.object({
-          // deno-lint-ignore valibot-project/require-jsdoc
-          C: v.array(v.string()),
-        }),
-      ]),
-      /** List of validator addresses that cast this vote. */
-      votes: v.array(Address),
-    }),
-  );
-})();
-export type ValidatorL1VotesResponse = v.InferOutput<typeof ValidatorL1VotesResponse>;
+export type ValidatorL1VotesResponse = {
+  /** Timestamp when the vote expires (in ms since epoch). */
+  expireTime: number;
+  /** Type of the vote. */
+  action: {
+    D: string;
+  } | {
+    C: string[];
+  };
+  /**
+   * List of validator addresses that cast this vote.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  votes: `0x${string}`[];
+}[];
 
 // ============================================================
 // Execution Logic

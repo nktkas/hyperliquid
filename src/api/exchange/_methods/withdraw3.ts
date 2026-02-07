@@ -5,7 +5,12 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import {
+  type ErrorResponse,
+  HyperliquidChainSchema,
+  SignatureSchema,
+  type SuccessResponse,
+} from "./_base/commonSchemas.ts";
 
 /**
  * Initiate a withdrawal request.
@@ -40,10 +45,7 @@ export type Withdraw3Request = v.InferOutput<typeof Withdraw3Request>;
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#initiate-a-withdrawal-request
  */
-export const Withdraw3Response = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type Withdraw3Response = v.InferOutput<typeof Withdraw3Response>;
+export type Withdraw3Response = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

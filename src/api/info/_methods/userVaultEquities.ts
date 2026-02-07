@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address } from "../../_schemas.ts";
 
 /**
  * Request user vault deposits.
@@ -24,19 +24,20 @@ export type UserVaultEquitiesRequest = v.InferOutput<typeof UserVaultEquitiesReq
  * Array of user's vault deposits.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-vault-deposits
  */
-export const UserVaultEquitiesResponse = /* @__PURE__ */ (() => {
-  return v.array(
-    v.object({
-      /** Vault address. */
-      vaultAddress: Address,
-      /** User deposited equity. */
-      equity: UnsignedDecimal,
-      /** Timestamp when the user can withdraw their equity. */
-      lockedUntilTimestamp: UnsignedInteger,
-    }),
-  );
-})();
-export type UserVaultEquitiesResponse = v.InferOutput<typeof UserVaultEquitiesResponse>;
+export type UserVaultEquitiesResponse = {
+  /**
+   * Vault address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  vaultAddress: `0x${string}`;
+  /**
+   * User deposited equity.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  equity: string;
+  /** Timestamp when the user can withdraw their equity. */
+  lockedUntilTimestamp: number;
+}[];
 
 // ============================================================
 // Execution Logic

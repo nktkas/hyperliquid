@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Enable HIP-3 DEX abstraction.
@@ -32,10 +32,7 @@ export type AgentEnableDexAbstractionRequest = v.InferOutput<typeof AgentEnableD
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction-agent
  */
-export const AgentEnableDexAbstractionResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type AgentEnableDexAbstractionResponse = v.InferOutput<typeof AgentEnableDexAbstractionResponse>;
+export type AgentEnableDexAbstractionResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

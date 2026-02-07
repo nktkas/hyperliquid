@@ -4,8 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Cloid, UnsignedDecimal } from "../../_schemas.ts";
-import { UserFillSchema } from "./_base/commonSchemas.ts";
+import { Address } from "../../_schemas.ts";
+import type { UserFillSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Request array of user fills.
@@ -27,29 +27,28 @@ export type UserFillsRequest = v.InferOutput<typeof UserFillsRequest>;
  * Array of user trade fills.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills
  */
-export const UserFillsResponse = /* @__PURE__ */ (() => {
-  return v.array(
-    v.intersect([
-      UserFillSchema,
-      v.object({
-        /** Client Order ID. */
-        cloid: v.optional(Cloid),
-        /** Liquidation details. */
-        liquidation: v.optional(
-          v.object({
-            /** Address of the liquidated user. */
-            liquidatedUser: Address,
-            /** Mark price at the time of liquidation. */
-            markPx: UnsignedDecimal,
-            /** Liquidation method. */
-            method: v.picklist(["market", "backstop"]),
-          }),
-        ),
-      }),
-    ]),
-  );
-})();
-export type UserFillsResponse = v.InferOutput<typeof UserFillsResponse>;
+export type UserFillsResponse = (UserFillSchema & {
+  /**
+   * Client Order ID.
+   * @pattern ^0x[a-fA-F0-9]{32}$
+   */
+  cloid?: `0x${string}`;
+  /** Liquidation details. */
+  liquidation?: {
+    /**
+     * Address of the liquidated user.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
+    liquidatedUser: `0x${string}`;
+    /**
+     * Mark price at the time of liquidation.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    markPx: string;
+    /** Liquidation method. */
+    method: "market" | "backstop";
+  };
+})[];
 
 // ============================================================
 // Execution Logic

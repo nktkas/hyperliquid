@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { UserVaultEquitiesRequest, UserVaultEquitiesResponse } from "@nktkas/hyperliquid/api/info";
+import { UserVaultEquitiesRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/userVaultEquities.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "UserVaultEquitiesResponse");
 
 runTest({
   name: "userVaultEquities",
@@ -9,7 +13,7 @@ runTest({
     const data = await Promise.all([
       client.userVaultEquities({ user: "0xe019d6167E7e324aEd003d94098496b6d986aB05" }),
     ]);
-    schemaCoverage(UserVaultEquitiesResponse, data);
+    schemaCoverage(typeSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

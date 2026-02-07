@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { CancelByCloidRequest, CancelByCloidResponse } from "@nktkas/hyperliquid/api/exchange";
+import { CancelByCloidRequest } from "@nktkas/hyperliquid/api/exchange";
 import { openOrder, runTest } from "./_t.ts";
-import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/exchange/_methods/cancelByCloid.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "CancelByCloidSuccessResponse");
 
 runTest({
   name: "cancelByCloid",
@@ -15,7 +19,7 @@ runTest({
     const data = await Promise.all([
       exchClient.cancelByCloid({ cancels: [{ asset: order.a, cloid: order.cloid }] }),
     ]);
-    schemaCoverage(excludeErrorResponse(CancelByCloidResponse), data);
+    schemaCoverage(typeSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

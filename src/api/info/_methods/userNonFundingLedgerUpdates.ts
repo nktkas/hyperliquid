@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Decimal, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address, UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Request user non-funding ledger updates.
@@ -28,251 +28,369 @@ export type UserNonFundingLedgerUpdatesRequest = v.InferOutput<typeof UserNonFun
  * Array of user's non-funding ledger update.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates
  */
-export const UserNonFundingLedgerUpdatesResponse = /* @__PURE__ */ (() => {
-  return v.array(
-    v.object({
-      /** Timestamp of the update (in ms since epoch). */
-      time: UnsignedInteger,
-      /** L1 transaction hash. */
-      hash: v.pipe(Hex, v.length(66)),
-      /** Update details. */
-      delta: v.variant("type", [
-        /** Transfer between spot and perpetual accounts. */
-        v.object({
-          /** Update type. */
-          type: v.literal("accountClassTransfer"),
-          /** Amount transferred in USDC. */
-          usdc: UnsignedDecimal,
-          /** Indicates if the transfer is to the perpetual account. */
-          toPerp: v.boolean(),
-        }),
-        /** Deposit to an account. */
-        v.object({
-          /** Update type. */
-          type: v.literal("deposit"),
-          /** Amount deposited in USDC. */
-          usdc: UnsignedDecimal,
-        }),
-        /** Internal transfer between accounts. */
-        v.object({
-          /** Update type. */
-          type: v.literal("internalTransfer"),
-          /** Amount transferred in USDC. */
-          usdc: UnsignedDecimal,
-          /** Initiator address. */
-          user: Address,
-          /** Destination address. */
-          destination: Address,
-          /** Transfer fee. */
-          fee: UnsignedDecimal,
-        }),
-        /** Liquidation event. */
-        v.object({
-          /** Update type. */
-          type: v.literal("liquidation"),
-          /** Total notional value of liquidated positions. */
-          liquidatedNtlPos: UnsignedDecimal,
-          /** Account value at liquidation time. */
-          accountValue: UnsignedDecimal,
-          /** Leverage type for liquidated positions. */
-          leverageType: v.picklist(["Cross", "Isolated"]),
-          /** Details of each liquidated position. */
-          liquidatedPositions: v.array(
-            v.object({
-              /** Asset symbol of the liquidated position. */
-              coin: v.string(),
-              /** Signed position size liquidated. */
-              szi: Decimal,
-            }),
-          ),
-        }),
-        /** Rewards claim event. */
-        v.object({
-          /** Update type. */
-          type: v.literal("rewardsClaim"),
-          /** Amount of rewards claimed. */
-          amount: UnsignedDecimal,
-          /** Token symbol. */
-          token: v.string(),
-        }),
-        /** Spot transfer between accounts. */
-        v.object({
-          /** Update type. */
-          type: v.literal("spotTransfer"),
-          /** Token symbol. */
-          token: v.string(),
-          /** Amount transferred. */
-          amount: UnsignedDecimal,
-          /** Equivalent USDC value. */
-          usdcValue: UnsignedDecimal,
-          /** Initiator address. */
-          user: Address,
-          /** Destination address. */
-          destination: Address,
-          /** Transfer fee. */
-          fee: UnsignedDecimal,
-          /** Fee in native token. */
-          nativeTokenFee: UnsignedDecimal,
-          /** Nonce of the transfer. */
-          nonce: v.nullable(UnsignedInteger),
-          /** Token in which the fee is denominated (e.g., "USDC"). */
-          feeToken: v.string(),
-        }),
-        /** Transfer between sub-accounts. */
-        v.object({
-          /** Update type. */
-          type: v.literal("subAccountTransfer"),
-          /** Amount transferred in USDC. */
-          usdc: UnsignedDecimal,
-          /** Initiator address. */
-          user: Address,
-          /** Destination address. */
-          destination: Address,
-        }),
-        /** Vault creation event. */
-        v.object({
-          /** Update type. */
-          type: v.literal("vaultCreate"),
-          /** Address of the created vault. */
-          vault: Address,
-          /** Initial allocated amount in USDC. */
-          usdc: UnsignedDecimal,
-          /** Vault creation fee. */
-          fee: UnsignedDecimal,
-        }),
-        /** Vault deposit event. */
-        v.object({
-          /** Update type. */
-          type: v.literal("vaultDeposit"),
-          /** Address of the target vault. */
-          vault: Address,
-          /** Amount deposited in USDC. */
-          usdc: UnsignedDecimal,
-        }),
-        /** Vault distribution event. */
-        v.object({
-          /** Update type. */
-          type: v.literal("vaultDistribution"),
-          /** Address of the vault distributing funds. */
-          vault: Address,
-          /** Amount distributed in USDC. */
-          usdc: UnsignedDecimal,
-        }),
-        /** Vault withdrawal event. */
-        v.object({
-          /** Update type. */
-          type: v.literal("vaultWithdraw"),
-          /** Vault address. */
-          vault: Address,
-          /** Address of the user withdrawing funds. */
-          user: Address,
-          /** Withdrawal request amount in USD. */
-          requestedUsd: UnsignedDecimal,
-          /** Withdrawal commission fee. */
-          commission: UnsignedDecimal,
-          /** Closing cost associated with positions. */
-          closingCost: UnsignedDecimal,
-          /** Basis value for withdrawal calculation. */
-          basis: UnsignedDecimal,
-          /** Net withdrawn amount in USD after fees and costs. */
-          netWithdrawnUsd: UnsignedDecimal,
-        }),
-        /** Withdrawal from an account. */
-        v.object({
-          /** Update type. */
-          type: v.literal("withdraw"),
-          /** Amount withdrawn in USDC. */
-          usdc: UnsignedDecimal,
-          /** Nonce (timestamp in ms) used to prevent replay attacks. */
-          nonce: UnsignedInteger,
-          /** Withdrawal fee. */
-          fee: UnsignedDecimal,
-        }),
-        /** Transfer tokens between different perp DEXs, spot balance, users, and/or sub-accounts. */
-        v.object({
-          /** Update type. */
-          type: v.literal("send"),
-          /** Address of the sender. */
-          user: Address,
-          /** Destination address. */
-          destination: Address,
-          /** Source DEX ("" for default USDC perp DEX, "spot" for spot). */
-          sourceDex: v.string(),
-          /** Destination DEX ("" for default USDC perp DEX, "spot" for spot). */
-          destinationDex: v.string(),
-          /** Token identifier. */
-          token: v.string(),
-          /** Amount to send (not in wei). */
-          amount: UnsignedDecimal,
-          /** Equivalent USDC value. */
-          usdcValue: UnsignedDecimal,
-          /** Transfer fee. */
-          fee: UnsignedDecimal,
-          /** Fee in native token. */
-          nativeTokenFee: UnsignedDecimal,
-          /** Nonce of the transfer. */
-          nonce: UnsignedInteger,
-          /** Token in which the fee is denominated (e.g., "USDC"). */
-          feeToken: v.string(),
-        }),
-        /** Deploy gas auction update. */
-        v.object({
-          /** Update type. */
-          type: v.literal("deployGasAuction"),
-          /** Token symbol. */
-          token: v.string(),
-          /** Amount in the specified token. */
-          amount: UnsignedDecimal,
-        }),
-        /** C-staking transfer update. */
-        v.object({
-          /** Update type. */
-          type: v.literal("cStakingTransfer"),
-          /** Token symbol. */
-          token: v.string(),
-          /** Amount in the specified token. */
-          amount: UnsignedDecimal,
-          /** `true` for deposit, `false` for withdrawal. */
-          isDeposit: v.boolean(),
-        }),
-        /** Borrow/lend operation update. */
-        v.object({
-          /** Update type. */
-          type: v.literal("borrowLend"),
-          /** Token symbol. */
-          token: v.string(),
-          /** Operation type. */
-          operation: v.picklist(["supply", "withdraw", "repay", "borrow"]),
-          /** Amount in the specified token. */
-          amount: UnsignedDecimal,
-          /** Interest amount in the specified token. */
-          interestAmount: UnsignedDecimal,
-        }),
-        /** Spot genesis operation update. */
-        v.object({
-          /** Update type. */
-          type: v.literal("spotGenesis"),
-          /** Token symbol. */
-          token: v.string(),
-          /** Amount in the specified token. */
-          amount: UnsignedDecimal,
-        }),
-        /** Activate DEX abstraction update. */
-        v.object({
-          /** Update type. */
-          type: v.literal("activateDexAbstraction"),
-          /** Name of the dex. */
-          dex: v.string(),
-          /** Token symbol. */
-          token: v.string(),
-          /** Amount in the specified token. */
-          amount: UnsignedDecimal,
-        }),
-      ]),
-    }),
-  );
-})();
-export type UserNonFundingLedgerUpdatesResponse = v.InferOutput<typeof UserNonFundingLedgerUpdatesResponse>;
+export type UserNonFundingLedgerUpdatesResponse = {
+  /** Timestamp of the update (in ms since epoch). */
+  time: number;
+  /**
+   * L1 transaction hash.
+   * @pattern ^0x[a-fA-F0-9]{64}$
+   */
+  hash: `0x${string}`;
+  /** Update details. */
+  delta:
+    | {
+      /** Update type. */
+      type: "accountClassTransfer";
+      /**
+       * Amount transferred in USDC.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      usdc: string;
+      /** Indicates if the transfer is to the perpetual account. */
+      toPerp: boolean;
+    }
+    | {
+      /** Update type. */
+      type: "deposit";
+      /**
+       * Amount deposited in USDC.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      usdc: string;
+    }
+    | {
+      /** Update type. */
+      type: "internalTransfer";
+      /**
+       * Amount transferred in USDC.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      usdc: string;
+      /**
+       * Initiator address.
+       * @pattern ^0x[a-fA-F0-9]{40}$
+       */
+      user: `0x${string}`;
+      /**
+       * Destination address.
+       * @pattern ^0x[a-fA-F0-9]{40}$
+       */
+      destination: `0x${string}`;
+      /**
+       * Transfer fee.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      fee: string;
+    }
+    | {
+      /** Update type. */
+      type: "liquidation";
+      /**
+       * Total notional value of liquidated positions.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      liquidatedNtlPos: string;
+      /**
+       * Account value at liquidation time.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      accountValue: string;
+      /** Leverage type for liquidated positions. */
+      leverageType: "Cross" | "Isolated";
+      /** Details of each liquidated position. */
+      liquidatedPositions: {
+        /** Asset symbol of the liquidated position. */
+        coin: string;
+        /**
+         * Signed position size liquidated.
+         * @pattern ^-?[0-9]+(\.[0-9]+)?$
+         */
+        szi: string;
+      }[];
+    }
+    | {
+      /** Update type. */
+      type: "rewardsClaim";
+      /**
+       * Amount of rewards claimed.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      amount: string;
+      /** Token symbol. */
+      token: string;
+    }
+    | {
+      /** Update type. */
+      type: "spotTransfer";
+      /** Token symbol. */
+      token: string;
+      /**
+       * Amount transferred.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      amount: string;
+      /**
+       * Equivalent USDC value.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      usdcValue: string;
+      /**
+       * Initiator address.
+       * @pattern ^0x[a-fA-F0-9]{40}$
+       */
+      user: `0x${string}`;
+      /**
+       * Destination address.
+       * @pattern ^0x[a-fA-F0-9]{40}$
+       */
+      destination: `0x${string}`;
+      /**
+       * Transfer fee.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      fee: string;
+      /**
+       * Fee in native token.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      nativeTokenFee: string;
+      /** Nonce of the transfer. */
+      nonce: number | null;
+      /** Token in which the fee is denominated (e.g., "USDC"). */
+      feeToken: string;
+    }
+    | {
+      /** Update type. */
+      type: "subAccountTransfer";
+      /**
+       * Amount transferred in USDC.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      usdc: string;
+      /**
+       * Initiator address.
+       * @pattern ^0x[a-fA-F0-9]{40}$
+       */
+      user: `0x${string}`;
+      /**
+       * Destination address.
+       * @pattern ^0x[a-fA-F0-9]{40}$
+       */
+      destination: `0x${string}`;
+    }
+    | {
+      /** Update type. */
+      type: "vaultCreate";
+      /**
+       * Address of the created vault.
+       * @pattern ^0x[a-fA-F0-9]{40}$
+       */
+      vault: `0x${string}`;
+      /**
+       * Initial allocated amount in USDC.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      usdc: string;
+      /**
+       * Vault creation fee.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      fee: string;
+    }
+    | {
+      /** Update type. */
+      type: "vaultDeposit";
+      /**
+       * Address of the target vault.
+       * @pattern ^0x[a-fA-F0-9]{40}$
+       */
+      vault: `0x${string}`;
+      /**
+       * Amount deposited in USDC.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      usdc: string;
+    }
+    | {
+      /** Update type. */
+      type: "vaultDistribution";
+      /**
+       * Address of the vault distributing funds.
+       * @pattern ^0x[a-fA-F0-9]{40}$
+       */
+      vault: `0x${string}`;
+      /**
+       * Amount distributed in USDC.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      usdc: string;
+    }
+    | {
+      /** Update type. */
+      type: "vaultWithdraw";
+      /**
+       * Vault address.
+       * @pattern ^0x[a-fA-F0-9]{40}$
+       */
+      vault: `0x${string}`;
+      /**
+       * Address of the user withdrawing funds.
+       * @pattern ^0x[a-fA-F0-9]{40}$
+       */
+      user: `0x${string}`;
+      /**
+       * Withdrawal request amount in USD.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      requestedUsd: string;
+      /**
+       * Withdrawal commission fee.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      commission: string;
+      /**
+       * Closing cost associated with positions.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      closingCost: string;
+      /**
+       * Basis value for withdrawal calculation.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      basis: string;
+      /**
+       * Net withdrawn amount in USD after fees and costs.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      netWithdrawnUsd: string;
+    }
+    | {
+      /** Update type. */
+      type: "withdraw";
+      /**
+       * Amount withdrawn in USDC.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      usdc: string;
+      /** Nonce (timestamp in ms) used to prevent replay attacks. */
+      nonce: number;
+      /**
+       * Withdrawal fee.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      fee: string;
+    }
+    | {
+      /** Update type. */
+      type: "send";
+      /**
+       * Address of the sender.
+       * @pattern ^0x[a-fA-F0-9]{40}$
+       */
+      user: `0x${string}`;
+      /**
+       * Destination address.
+       * @pattern ^0x[a-fA-F0-9]{40}$
+       */
+      destination: `0x${string}`;
+      /** Source DEX ("" for default USDC perp DEX, "spot" for spot). */
+      sourceDex: string;
+      /** Destination DEX ("" for default USDC perp DEX, "spot" for spot). */
+      destinationDex: string;
+      /** Token identifier. */
+      token: string;
+      /**
+       * Amount to send (not in wei).
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      amount: string;
+      /**
+       * Equivalent USDC value.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      usdcValue: string;
+      /**
+       * Transfer fee.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      fee: string;
+      /**
+       * Fee in native token.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      nativeTokenFee: string;
+      /** Nonce of the transfer. */
+      nonce: number;
+      /** Token in which the fee is denominated (e.g., "USDC"). */
+      feeToken: string;
+    }
+    | {
+      /** Update type. */
+      type: "deployGasAuction";
+      /** Token symbol. */
+      token: string;
+      /**
+       * Amount in the specified token.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      amount: string;
+    }
+    | {
+      /** Update type. */
+      type: "cStakingTransfer";
+      /** Token symbol. */
+      token: string;
+      /**
+       * Amount in the specified token.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      amount: string;
+      /** `true` for deposit, `false` for withdrawal. */
+      isDeposit: boolean;
+    }
+    | {
+      /** Update type. */
+      type: "borrowLend";
+      /** Token symbol. */
+      token: string;
+      /** Operation type. */
+      operation: "supply" | "withdraw" | "repay" | "borrow";
+      /**
+       * Amount in the specified token.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      amount: string;
+      /**
+       * Interest amount in the specified token.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      interestAmount: string;
+    }
+    | {
+      /** Update type. */
+      type: "spotGenesis";
+      /** Token symbol. */
+      token: string;
+      /**
+       * Amount in the specified token.
+       * @pattern ^-?[0-9]+(\.[0-9]+)?$
+       */
+      amount: string;
+    }
+    | {
+      /** Update type. */
+      type: "activateDexAbstraction";
+      /** Name of the dex. */
+      dex: string;
+      /** Token symbol. */
+      token: string;
+      /**
+       * Amount in the specified token.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      amount: string;
+    };
+}[];
 
 // ============================================================
 // Execution Logic

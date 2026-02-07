@@ -1,8 +1,12 @@
 import * as v from "@valibot/valibot";
-import { OrderRequest, OrderResponse } from "@nktkas/hyperliquid/api/exchange";
+import { OrderRequest } from "@nktkas/hyperliquid/api/exchange";
 import { formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
 import { allMids, runTest, symbolConverter, topUpPerp } from "./_t.ts";
-import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/exchange/_methods/order.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "OrderSuccessResponse");
 
 runTest({
   name: "order",
@@ -101,8 +105,8 @@ runTest({
         grouping: "normalTpsl",
       }),
     ]);
-    schemaCoverage(excludeErrorResponse(OrderResponse), data, [
-      "#/properties/response/properties/data/properties/statuses/items/union/2",
+    schemaCoverage(typeSchema, data, [
+      "#/properties/response/properties/data/properties/statuses/items/anyOf/2",
     ]);
   },
   cliTestFn: async (_t, runCommand) => {

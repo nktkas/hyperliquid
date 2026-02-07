@@ -4,10 +4,12 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { OpenOrderSchema, OrderProcessingStatusSchema } from "../../info/_methods/_base/commonSchemas.ts";
+import { Address } from "../../_schemas.ts";
+import type { OpenOrderSchema, OrderProcessingStatusSchema } from "../../info/_methods/_base/commonSchemas.ts";
 
-/** Subscription to order updates for a specific user. */
+/**
+ * Subscription to order updates for a specific user.
+ */
 export const OrderUpdatesRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -18,51 +20,48 @@ export const OrderUpdatesRequest = /* @__PURE__ */ (() => {
 })();
 export type OrderUpdatesRequest = v.InferOutput<typeof OrderUpdatesRequest>;
 
-/** Event of array of orders with their current processing status. */
-export const OrderUpdatesEvent = /* @__PURE__ */ (() => {
-  return v.array(
-    v.object({
-      /** Order details. */
-      order: OpenOrderSchema,
-      /**
-       * Order processing status.
-       * - `"open"`: Order active and waiting to be filled.
-       * - `"filled"`: Order fully executed.
-       * - `"canceled"`: Order canceled by the user.
-       * - `"triggered"`: Order triggered and awaiting execution.
-       * - `"rejected"`: Order rejected by the system.
-       * - `"marginCanceled"`: Order canceled due to insufficient margin.
-       * - `"vaultWithdrawalCanceled"`: Canceled due to a user withdrawal from vault.
-       * - `"openInterestCapCanceled"`: Canceled due to order being too aggressive when open interest was at cap.
-       * - `"selfTradeCanceled"`: Canceled due to self-trade prevention.
-       * - `"reduceOnlyCanceled"`: Canceled reduced-only order that does not reduce position.
-       * - `"siblingFilledCanceled"`: Canceled due to sibling ordering being filled.
-       * - `"delistedCanceled"`: Canceled due to asset delisting.
-       * - `"liquidatedCanceled"`: Canceled due to liquidation.
-       * - `"scheduledCancel"`: Canceled due to exceeding scheduled cancel deadline (dead man's switch).
-       * - `"tickRejected"`: Rejected due to invalid tick price.
-       * - `"minTradeNtlRejected"`: Rejected due to order notional below minimum.
-       * - `"perpMarginRejected"`: Rejected due to insufficient margin.
-       * - `"reduceOnlyRejected"`: Rejected due to reduce only.
-       * - `"badAloPxRejected"`: Rejected due to post-only immediate match.
-       * - `"iocCancelRejected"`: Rejected due to IOC not able to match.
-       * - `"badTriggerPxRejected"`: Rejected due to invalid TP/SL price.
-       * - `"marketOrderNoLiquidityRejected"`: Rejected due to lack of liquidity for market order.
-       * - `"positionIncreaseAtOpenInterestCapRejected"`: Rejected due to open interest cap.
-       * - `"positionFlipAtOpenInterestCapRejected"`: Rejected due to open interest cap.
-       * - `"tooAggressiveAtOpenInterestCapRejected"`: Rejected due to price too aggressive at open interest cap.
-       * - `"openInterestIncreaseRejected"`: Rejected due to open interest cap.
-       * - `"insufficientSpotBalanceRejected"`: Rejected due to insufficient spot balance.
-       * - `"oracleRejected"`: Rejected due to price too far from oracle.
-       * - `"perpMaxPositionRejected"`: Rejected due to exceeding margin tier limit at current leverage.
-       */
-      status: OrderProcessingStatusSchema,
-      /** Timestamp when the status was last updated (in ms since epoch). */
-      statusTimestamp: UnsignedInteger,
-    }),
-  );
-})();
-export type OrderUpdatesEvent = v.InferOutput<typeof OrderUpdatesEvent>;
+/**
+ * Event of array of orders with their current processing status.
+ */
+export type OrderUpdatesEvent = {
+  /** Order details. */
+  order: OpenOrderSchema;
+  /**
+   * Order processing status.
+   * - `"open"`: Order active and waiting to be filled.
+   * - `"filled"`: Order fully executed.
+   * - `"canceled"`: Order canceled by the user.
+   * - `"triggered"`: Order triggered and awaiting execution.
+   * - `"rejected"`: Order rejected by the system.
+   * - `"marginCanceled"`: Order canceled due to insufficient margin.
+   * - `"vaultWithdrawalCanceled"`: Canceled due to a user withdrawal from vault.
+   * - `"openInterestCapCanceled"`: Canceled due to order being too aggressive when open interest was at cap.
+   * - `"selfTradeCanceled"`: Canceled due to self-trade prevention.
+   * - `"reduceOnlyCanceled"`: Canceled reduced-only order that does not reduce position.
+   * - `"siblingFilledCanceled"`: Canceled due to sibling ordering being filled.
+   * - `"delistedCanceled"`: Canceled due to asset delisting.
+   * - `"liquidatedCanceled"`: Canceled due to liquidation.
+   * - `"scheduledCancel"`: Canceled due to exceeding scheduled cancel deadline (dead man's switch).
+   * - `"tickRejected"`: Rejected due to invalid tick price.
+   * - `"minTradeNtlRejected"`: Rejected due to order notional below minimum.
+   * - `"perpMarginRejected"`: Rejected due to insufficient margin.
+   * - `"reduceOnlyRejected"`: Rejected due to reduce only.
+   * - `"badAloPxRejected"`: Rejected due to post-only immediate match.
+   * - `"iocCancelRejected"`: Rejected due to IOC not able to match.
+   * - `"badTriggerPxRejected"`: Rejected due to invalid TP/SL price.
+   * - `"marketOrderNoLiquidityRejected"`: Rejected due to lack of liquidity for market order.
+   * - `"positionIncreaseAtOpenInterestCapRejected"`: Rejected due to open interest cap.
+   * - `"positionFlipAtOpenInterestCapRejected"`: Rejected due to open interest cap.
+   * - `"tooAggressiveAtOpenInterestCapRejected"`: Rejected due to price too aggressive at open interest cap.
+   * - `"openInterestIncreaseRejected"`: Rejected due to open interest cap.
+   * - `"insufficientSpotBalanceRejected"`: Rejected due to insufficient spot balance.
+   * - `"oracleRejected"`: Rejected due to price too far from oracle.
+   * - `"perpMaxPositionRejected"`: Rejected due to exceeding margin tier limit at current leverage.
+   */
+  status: OrderProcessingStatusSchema;
+  /** Timestamp when the status was last updated (in ms since epoch). */
+  statusTimestamp: number;
+}[];
 
 // ============================================================
 // Execution Logic

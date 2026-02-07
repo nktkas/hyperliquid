@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address } from "../../_schemas.ts";
 
 /**
  * Request user staking delegations.
@@ -24,19 +24,20 @@ export type DelegationsRequest = v.InferOutput<typeof DelegationsRequest>;
  * Array of user's delegations to validators.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-delegations
  */
-export const DelegationsResponse = /* @__PURE__ */ (() => {
-  return v.array(
-    v.object({
-      /** Validator address. */
-      validator: Address,
-      /** Amount of tokens delegated to the validator. */
-      amount: UnsignedDecimal,
-      /** Locked until timestamp (in ms since epoch). */
-      lockedUntilTimestamp: UnsignedInteger,
-    }),
-  );
-})();
-export type DelegationsResponse = v.InferOutput<typeof DelegationsResponse>;
+export type DelegationsResponse = {
+  /**
+   * Validator address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  validator: `0x${string}`;
+  /**
+   * Amount of tokens delegated to the validator.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  amount: string;
+  /** Locked until timestamp (in ms since epoch). */
+  lockedUntilTimestamp: number;
+}[];
 
 // ============================================================
 // Execution Logic

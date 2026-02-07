@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { BorrowLendRequest, BorrowLendResponse } from "@nktkas/hyperliquid/api/exchange";
+import { BorrowLendRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest, topUpSpot } from "./_t.ts";
-import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/exchange/_methods/borrowLend.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "BorrowLendSuccessResponse");
 
 runTest({
   name: "borrowLend",
@@ -16,14 +20,14 @@ runTest({
       const data = await Promise.all([
         exchClient.borrowLend({ operation: "supply", token: 0, amount: "30" }),
       ]);
-      schemaCoverage(excludeErrorResponse(BorrowLendResponse), data);
+      schemaCoverage(typeSchema, data);
     });
 
     await t.step("withdraw", async () => {
       const data = await Promise.all([
         exchClient.borrowLend({ operation: "withdraw", token: 0, amount: null }),
       ]);
-      schemaCoverage(excludeErrorResponse(BorrowLendResponse), data);
+      schemaCoverage(typeSchema, data);
     });
   },
   cliTestFn: async (_t, runCommand) => {

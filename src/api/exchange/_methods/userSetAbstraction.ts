@@ -5,7 +5,12 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import {
+  type ErrorResponse,
+  HyperliquidChainSchema,
+  SignatureSchema,
+  type SuccessResponse,
+} from "./_base/commonSchemas.ts";
 
 /**
  * Set User abstraction mode.
@@ -40,10 +45,7 @@ export type UserSetAbstractionRequest = v.InferOutput<typeof UserSetAbstractionR
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction
  */
-export const UserSetAbstractionResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type UserSetAbstractionResponse = v.InferOutput<typeof UserSetAbstractionResponse>;
+export type UserSetAbstractionResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

@@ -4,8 +4,6 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { UnsignedInteger } from "../../_schemas.ts";
-
 /**
  * Request exchange system status information.
  */
@@ -20,15 +18,12 @@ export type ExchangeStatusRequest = v.InferOutput<typeof ExchangeStatusRequest>;
 /**
  * Exchange system status information.
  */
-export const ExchangeStatusResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Server time (in ms since epoch). */
-    time: UnsignedInteger,
-    /** Special statuses of the exchange system. */
-    specialStatuses: v.nullable(v.unknown()),
-  });
-})();
-export type ExchangeStatusResponse = v.InferOutput<typeof ExchangeStatusResponse>;
+export type ExchangeStatusResponse = {
+  /** Server time (in ms since epoch). */
+  time: number;
+  /** Special statuses of the exchange system. */
+  specialStatuses: unknown | null;
+};
 
 // ============================================================
 // Execution Logic

@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Integer, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Add or remove margin from isolated position.
@@ -40,10 +40,7 @@ export type UpdateIsolatedMarginRequest = v.InferOutput<typeof UpdateIsolatedMar
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin
  */
-export const UpdateIsolatedMarginResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type UpdateIsolatedMarginResponse = v.InferOutput<typeof UpdateIsolatedMarginResponse>;
+export type UpdateIsolatedMarginResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

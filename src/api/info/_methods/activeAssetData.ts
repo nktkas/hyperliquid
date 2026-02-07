@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Decimal, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address } from "../../_schemas.ts";
 
 /**
  * Request user active asset data.
@@ -26,38 +26,51 @@ export type ActiveAssetDataRequest = v.InferOutput<typeof ActiveAssetDataRequest
  * User active asset data.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-active-asset-data
  */
-export const ActiveAssetDataResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** User address. */
-    user: Address,
-    /** Asset symbol (e.g., BTC). */
-    coin: v.string(),
-    /** Leverage configuration. */
-    leverage: v.variant("type", [
-      v.object({
-        /** Leverage type. */
-        type: v.literal("isolated"),
-        /** Leverage value used. */
-        value: v.pipe(UnsignedInteger, v.minValue(1)),
-        /** Amount of USD used (1 = $1). */
-        rawUsd: Decimal,
-      }),
-      v.object({
-        /** Leverage type. */
-        type: v.literal("cross"),
-        /** Leverage value used. */
-        value: v.pipe(UnsignedInteger, v.minValue(1)),
-      }),
-    ]),
-    /** Maximum trade size range [min, max]. */
-    maxTradeSzs: v.tuple([UnsignedDecimal, UnsignedDecimal]),
-    /** Available to trade range [min, max]. */
-    availableToTrade: v.tuple([UnsignedDecimal, UnsignedDecimal]),
-    /** Mark price. */
-    markPx: UnsignedDecimal,
-  });
-})();
-export type ActiveAssetDataResponse = v.InferOutput<typeof ActiveAssetDataResponse>;
+export type ActiveAssetDataResponse = {
+  /**
+   * User address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  user: `0x${string}`;
+  /** Asset symbol (e.g., BTC). */
+  coin: string;
+  /** Leverage configuration. */
+  leverage: {
+    /** Leverage type. */
+    type: "isolated";
+    /** Leverage value used. */
+    value: number;
+    /**
+     * Amount of USD used (1 = $1).
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
+    rawUsd: string;
+  } | {
+    /** Leverage type. */
+    type: "cross";
+    /** Leverage value used. */
+    value: number;
+  };
+  /** Maximum trade size range [min, max]. */
+  maxTradeSzs: [
+    /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+    min: string,
+    /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+    max: string,
+  ];
+  /** Available to trade range [min, max]. */
+  availableToTrade: [
+    /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+    min: string,
+    /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+    max: string,
+  ];
+  /**
+   * Mark price.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  markPx: string;
+};
 
 // ============================================================
 // Execution Logic

@@ -5,7 +5,12 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import {
+  type ErrorResponse,
+  HyperliquidChainSchema,
+  SignatureSchema,
+  type SuccessResponse,
+} from "./_base/commonSchemas.ts";
 
 /** Multi-sig config or `null` to revert to single-sig. */
 const ConvertToMultiSigUserRequestSignersSchema = /* @__PURE__ */ (() => {
@@ -66,10 +71,7 @@ export type ConvertToMultiSigUserRequest = v.InferOutput<typeof ConvertToMultiSi
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig
  */
-export const ConvertToMultiSigUserResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type ConvertToMultiSigUserResponse = v.InferOutput<typeof ConvertToMultiSigUserResponse>;
+export type ConvertToMultiSigUserResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

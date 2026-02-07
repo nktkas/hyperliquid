@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { UserTwapSliceFillsByTimeRequest, UserTwapSliceFillsByTimeResponse } from "@nktkas/hyperliquid/api/info";
+import { UserTwapSliceFillsByTimeRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/userTwapSliceFillsByTime.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "UserTwapSliceFillsByTimeResponse");
 
 runTest({
   name: "userTwapSliceFillsByTime",
@@ -12,8 +16,8 @@ runTest({
         startTime: Date.now() - 1000 * 60 * 60 * 24 * 365 * 5,
       }),
     ]);
-    schemaCoverage(UserTwapSliceFillsByTimeResponse, data, [
-      "#/items/properties/fill/properties/builderFee/defined",
+    schemaCoverage(typeSchema, data, [
+      "#/items/properties/fill/properties/builderFee/present",
       "#/items/properties/fill/properties/twapId/defined",
     ]);
   },

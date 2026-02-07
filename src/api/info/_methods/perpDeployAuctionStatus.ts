@@ -4,8 +4,6 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-
 /**
  * Request for the status of the perpetual deploy auction.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-information-about-the-perp-deploy-auction
@@ -22,21 +20,27 @@ export type PerpDeployAuctionStatusRequest = v.InferOutput<typeof PerpDeployAuct
  * Status of the perpetual deploy auction.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-information-about-the-perp-deploy-auction
  */
-export const PerpDeployAuctionStatusResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Current gas. */
-    currentGas: v.nullable(UnsignedDecimal),
-    /** Duration in seconds. */
-    durationSeconds: UnsignedInteger,
-    /** Ending gas. */
-    endGas: v.nullable(UnsignedDecimal),
-    /** Starting gas. */
-    startGas: UnsignedDecimal,
-    /** Auction start time (seconds since epoch). */
-    startTimeSeconds: UnsignedInteger,
-  });
-})();
-export type PerpDeployAuctionStatusResponse = v.InferOutput<typeof PerpDeployAuctionStatusResponse>;
+export type PerpDeployAuctionStatusResponse = {
+  /**
+   * Current gas.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  currentGas: string | null;
+  /** Duration in seconds. */
+  durationSeconds: number;
+  /**
+   * Ending gas.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  endGas: string | null;
+  /**
+   * Starting gas.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  startGas: string;
+  /** Auction start time (seconds since epoch). */
+  startTimeSeconds: number;
+};
 
 // ============================================================
 // Execution Logic

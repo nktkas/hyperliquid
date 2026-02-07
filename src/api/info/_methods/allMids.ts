@@ -4,8 +4,6 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { UnsignedDecimal } from "../../_schemas.ts";
-
 /**
  * Request mid coin prices.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-mids-for-all-coins
@@ -24,10 +22,10 @@ export type AllMidsRequest = v.InferOutput<typeof AllMidsRequest>;
  * Mapping of coin symbols to mid prices.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-mids-for-all-coins
  */
-export const AllMidsResponse = /* @__PURE__ */ (() => {
-  return v.record(v.string(), UnsignedDecimal);
-})();
-export type AllMidsResponse = v.InferOutput<typeof AllMidsResponse>;
+export type AllMidsResponse = {
+  /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+  [x: string]: string;
+};
 
 // ============================================================
 // Execution Logic

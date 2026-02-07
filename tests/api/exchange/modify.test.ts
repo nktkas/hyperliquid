@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { ModifyRequest, ModifyResponse } from "@nktkas/hyperliquid/api/exchange";
+import { ModifyRequest } from "@nktkas/hyperliquid/api/exchange";
 import { openOrder, runTest } from "./_t.ts";
-import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/exchange/_methods/modify.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "ModifySuccessResponse");
 
 runTest({
   name: "modify",
@@ -25,7 +29,7 @@ runTest({
         },
       }),
     ]);
-    schemaCoverage(excludeErrorResponse(ModifyResponse), data);
+    schemaCoverage(typeSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

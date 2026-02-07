@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Update cross or isolated leverage on a coin.
@@ -40,10 +40,7 @@ export type UpdateLeverageRequest = v.InferOutput<typeof UpdateLeverageRequest>;
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-leverage
  */
-export const UpdateLeverageResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type UpdateLeverageResponse = v.InferOutput<typeof UpdateLeverageResponse>;
+export type UpdateLeverageResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

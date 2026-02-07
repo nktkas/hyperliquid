@@ -5,9 +5,11 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import { WebData2Response } from "../../info/_methods/webData2.ts";
+import type { WebData2Response } from "../../info/_methods/webData2.ts";
 
-/** Subscription to comprehensive user and market data events. */
+/**
+ * Subscription to comprehensive user and market data events.
+ */
 export const WebData2Request = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -18,11 +20,10 @@ export const WebData2Request = /* @__PURE__ */ (() => {
 })();
 export type WebData2Request = v.InferOutput<typeof WebData2Request>;
 
-/** Event of comprehensive user and market data. */
-export const WebData2Event = /* @__PURE__ */ (() => {
-  return WebData2Response;
-})();
-export type WebData2Event = v.InferOutput<typeof WebData2Event>;
+/**
+ * Event of comprehensive user and market data.
+ */
+export type WebData2Event = WebData2Response;
 
 // ============================================================
 // Execution Logic

@@ -18,10 +18,7 @@ export type LiquidatableRequest = v.InferOutput<typeof LiquidatableRequest>;
 /**
  * Response for liquidatable request.
  */
-export const LiquidatableResponse = /* @__PURE__ */ (() => {
-  return v.array(v.unknown());
-})();
-export type LiquidatableResponse = v.InferOutput<typeof LiquidatableResponse>;
+export type LiquidatableResponse = unknown[];
 
 // ============================================================
 // Execution Logic

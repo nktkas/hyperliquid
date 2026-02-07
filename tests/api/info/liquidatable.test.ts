@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { LiquidatableRequest, LiquidatableResponse } from "@nktkas/hyperliquid/api/info";
+import { LiquidatableRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/liquidatable.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "LiquidatableResponse");
 
 runTest({
   name: "liquidatable",
@@ -9,7 +13,7 @@ runTest({
     const data = await Promise.all([
       client.liquidatable(),
     ]);
-    schemaCoverage(LiquidatableResponse, data, [
+    schemaCoverage(typeSchema, data, [
       "#/array",
     ]);
   },

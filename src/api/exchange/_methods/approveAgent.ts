@@ -5,7 +5,12 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import {
+  type ErrorResponse,
+  HyperliquidChainSchema,
+  SignatureSchema,
+  type SuccessResponse,
+} from "./_base/commonSchemas.ts";
 
 /**
  * Approve an agent to sign on behalf of the master account.
@@ -56,10 +61,7 @@ export type ApproveAgentRequest = v.InferOutput<typeof ApproveAgentRequest>;
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet
  */
-export const ApproveAgentResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type ApproveAgentResponse = v.InferOutput<typeof ApproveAgentResponse>;
+export type ApproveAgentResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

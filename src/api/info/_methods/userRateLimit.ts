@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address } from "../../_schemas.ts";
 
 /**
  * Request user rate limits.
@@ -24,19 +24,19 @@ export type UserRateLimitRequest = v.InferOutput<typeof UserRateLimitRequest>;
  * User rate limits.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-rate-limits
  */
-export const UserRateLimitResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Cumulative trading volume. */
-    cumVlm: UnsignedDecimal,
-    /** Number of API requests used. */
-    nRequestsUsed: UnsignedInteger,
-    /** Maximum allowed API requests. */
-    nRequestsCap: UnsignedInteger,
-    /** Number of surplus API requests. */
-    nRequestsSurplus: UnsignedInteger,
-  });
-})();
-export type UserRateLimitResponse = v.InferOutput<typeof UserRateLimitResponse>;
+export type UserRateLimitResponse = {
+  /**
+   * Cumulative trading volume.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  cumVlm: string;
+  /** Number of API requests used. */
+  nRequestsUsed: number;
+  /** Maximum allowed API requests. */
+  nRequestsCap: number;
+  /** Number of surplus API requests. */
+  nRequestsSurplus: number;
+};
 
 // ============================================================
 // Execution Logic

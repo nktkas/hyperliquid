@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { PerpsAtOpenInterestCapRequest, PerpsAtOpenInterestCapResponse } from "@nktkas/hyperliquid/api/info";
+import { PerpsAtOpenInterestCapRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/perpsAtOpenInterestCap.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "PerpsAtOpenInterestCapResponse");
 
 runTest({
   name: "perpsAtOpenInterestCap",
@@ -9,7 +13,7 @@ runTest({
     const data = await Promise.all([
       client.perpsAtOpenInterestCap(),
     ]);
-    schemaCoverage(PerpsAtOpenInterestCapResponse, data, [
+    schemaCoverage(typeSchema, data, [
       "#/array",
     ]);
   },

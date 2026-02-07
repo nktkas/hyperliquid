@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import { ExplorerTransactionSchema } from "./_base/commonSchemas.ts";
+import type { ExplorerTransactionSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Request array of user transaction details.
@@ -23,15 +23,12 @@ export type UserDetailsRequest = v.InferOutput<typeof UserDetailsRequest>;
 /**
  * Response array of user transaction details.
  */
-export const UserDetailsResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Type of response. */
-    type: v.literal("userDetails"),
-    /** Array of user transaction details. */
-    txs: v.array(ExplorerTransactionSchema),
-  });
-})();
-export type UserDetailsResponse = v.InferOutput<typeof UserDetailsResponse>;
+export type UserDetailsResponse = {
+  /** Type of response. */
+  type: "userDetails";
+  /** Array of user transaction details. */
+  txs: ExplorerTransactionSchema[];
+};
 
 // ============================================================
 // Execution Logic

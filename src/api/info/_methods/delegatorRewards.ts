@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address } from "../../_schemas.ts";
 
 /**
  * Request user staking rewards.
@@ -24,19 +24,17 @@ export type DelegatorRewardsRequest = v.InferOutput<typeof DelegatorRewardsReque
  * Array of rewards received from staking activities.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-rewards
  */
-export const DelegatorRewardsResponse = /* @__PURE__ */ (() => {
-  return v.array(
-    v.object({
-      /** Timestamp when the reward was received (in ms since epoch). */
-      time: UnsignedInteger,
-      /** Source of the reward. */
-      source: v.picklist(["delegation", "commission"]),
-      /** Total reward amount. */
-      totalAmount: UnsignedDecimal,
-    }),
-  );
-})();
-export type DelegatorRewardsResponse = v.InferOutput<typeof DelegatorRewardsResponse>;
+export type DelegatorRewardsResponse = {
+  /** Timestamp when the reward was received (in ms since epoch). */
+  time: number;
+  /** Source of the reward. */
+  source: "delegation" | "commission";
+  /**
+   * Total reward amount.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  totalAmount: string;
+}[];
 
 // ============================================================
 // Execution Logic

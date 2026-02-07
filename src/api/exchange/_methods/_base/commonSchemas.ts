@@ -2,29 +2,23 @@ import * as v from "@valibot/valibot";
 import { Hex } from "../../../_schemas.ts";
 
 /** Error response for failed operations. */
-export const ErrorResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Error status. */
-    status: v.literal("err"),
-    /** Error message. */
-    response: v.string(),
-  });
-})();
-export type ErrorResponse = v.InferOutput<typeof ErrorResponse>;
+export type ErrorResponse = {
+  /** Error status. */
+  status: "err";
+  /** Error message. */
+  response: string;
+};
 
 /** Successful response without specific data. */
-export const SuccessResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Successful status. */
-    status: v.literal("ok"),
-    /** Response details. */
-    response: v.object({
-      /** Type of response. */
-      type: v.literal("default"),
-    }),
-  });
-})();
-export type SuccessResponse = v.InferOutput<typeof SuccessResponse>;
+export type SuccessResponse = {
+  /** Successful status. */
+  status: "ok";
+  /** Response details. */
+  response: {
+    /** Type of response. */
+    type: "default";
+  };
+};
 
 /** ECDSA signature components. */
 export const SignatureSchema = /* @__PURE__ */ (() => {

@@ -5,9 +5,11 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import { UserNonFundingLedgerUpdatesResponse } from "../../info/_methods/userNonFundingLedgerUpdates.ts";
+import type { UserNonFundingLedgerUpdatesResponse } from "../../info/_methods/userNonFundingLedgerUpdates.ts";
 
-/** Subscription to user non-funding ledger updates for a specific user. */
+/**
+ * Subscription to user non-funding ledger updates for a specific user.
+ */
 export const UserNonFundingLedgerUpdatesRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -18,18 +20,20 @@ export const UserNonFundingLedgerUpdatesRequest = /* @__PURE__ */ (() => {
 })();
 export type UserNonFundingLedgerUpdatesRequest = v.InferOutput<typeof UserNonFundingLedgerUpdatesRequest>;
 
-/** Event of user non-funding ledger updates. */
-export const UserNonFundingLedgerUpdatesEvent = /* @__PURE__ */ (() => {
-  return v.object({
-    /** User address. */
-    user: Address,
-    /** Array of user's non-funding ledger update. */
-    nonFundingLedgerUpdates: UserNonFundingLedgerUpdatesResponse,
-    /** Whether this is an initial snapshot. */
-    isSnapshot: v.optional(v.literal(true)),
-  });
-})();
-export type UserNonFundingLedgerUpdatesEvent = v.InferOutput<typeof UserNonFundingLedgerUpdatesEvent>;
+/**
+ * Event of user non-funding ledger updates.
+ */
+export type UserNonFundingLedgerUpdatesEvent = {
+  /**
+   * User address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  user: `0x${string}`;
+  /** Array of user's non-funding ledger update. */
+  nonFundingLedgerUpdates: UserNonFundingLedgerUpdatesResponse;
+  /** Whether this is an initial snapshot. */
+  isSnapshot?: true;
+};
 
 // ============================================================
 // Execution Logic

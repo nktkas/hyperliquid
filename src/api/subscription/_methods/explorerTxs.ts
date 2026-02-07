@@ -4,9 +4,11 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { ExplorerTransactionSchema } from "../../info/_methods/_base/commonSchemas.ts";
+import type { ExplorerTransactionSchema } from "../../info/_methods/_base/commonSchemas.ts";
 
-/** Subscription to explorer transaction events. */
+/**
+ * Subscription to explorer transaction events.
+ */
 export const ExplorerTxsRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -15,11 +17,10 @@ export const ExplorerTxsRequest = /* @__PURE__ */ (() => {
 })();
 export type ExplorerTxsRequest = v.InferOutput<typeof ExplorerTxsRequest>;
 
-/** Event of array of transaction details. */
-export const ExplorerTxsEvent = /* @__PURE__ */ (() => {
-  return v.array(ExplorerTransactionSchema);
-})();
-export type ExplorerTxsEvent = v.InferOutput<typeof ExplorerTxsEvent>;
+/**
+ * Event of array of transaction details.
+ */
+export type ExplorerTxsEvent = ExplorerTransactionSchema[];
 
 // ============================================================
 // Execution Logic

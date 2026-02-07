@@ -6,7 +6,7 @@ import * as v from "@valibot/valibot";
 
 import { Address, Cloid, UnsignedInteger } from "../../_schemas.ts";
 import { SignatureSchema } from "./_base/commonSchemas.ts";
-import { CancelResponse } from "./cancel.ts";
+import type { CancelResponse } from "./cancel.ts";
 
 /**
  * Cancel order(s) by cloid.
@@ -44,10 +44,7 @@ export type CancelByCloidRequest = v.InferOutput<typeof CancelByCloidRequest>;
  * Response for order cancellation by cloid.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid
  */
-export const CancelByCloidResponse = /* @__PURE__ */ (() => {
-  return CancelResponse;
-})();
-export type CancelByCloidResponse = v.InferOutput<typeof CancelByCloidResponse>;
+export type CancelByCloidResponse = CancelResponse;
 
 // ============================================================
 // Execution Logic

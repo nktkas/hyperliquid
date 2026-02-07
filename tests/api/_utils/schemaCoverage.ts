@@ -1,65 +1,97 @@
 /**
- * Schema coverage testing utility for validating valibot schemas.
+ * Universal JSON Schema coverage checker.
  *
- * Ensures that test data covers all branches, values, and edge cases in a schema.
- * This helps verify that test samples are comprehensive and exercise all schema paths.
+ * Validates that test samples exercise all branches, values, and structural
+ * elements defined in a JSON Schema. Helps verify that test data is
+ * comprehensive and covers all schema paths.
+ *
+ * Supports JSON Schema Draft-07 features including:
+ * - Composition: anyOf, oneOf, allOf, if/then/else
+ * - Types: object, array, tuple (items array), enum, const
+ * - Nullable: type arrays with null, anyOf/oneOf with null branches
+ * - References: $ref with definitions resolution
+ * - Optional properties: required array checking
  *
  * @example Basic usage
  * ```ts
  * import { schemaCoverage } from "./schemaCoverage.ts";
- * import * as v from "@valibot/valibot";
  *
- * const schema = v.union([v.literal("a"), v.literal("b")]);
- * schemaCoverage(schema, ["a", "b"] as const); // passes - all branches covered
+ * const schema = { anyOf: [{ const: "a" }, { const: "b" }] };
+ * schemaCoverage(schema, ["a", "b"]); // passes - all branches covered
  * ```
  *
- * @example Handling coverage issues
+ * @example Coverage issues
  * ```ts
  * // @ts-nocheck
  * import { schemaCoverage, SchemaCoverageError } from "./schemaCoverage.ts";
- * import * as v from "@valibot/valibot";
  *
- * const schema = v.union([v.literal("a"), v.literal("b")]);
+ * const schema = { anyOf: [{ const: "a" }, { const: "b" }] };
  * try {
- *   schemaCoverage(schema, ["a"]); // throws - branch "b" uncovered
+ *   schemaCoverage(schema, ["a"]); // throws - branch for "b" uncovered
  * } catch (e) {
  *   if (e instanceof SchemaCoverageError) {
- *     console.log(e.issues); // [{ path: "#", type: "BRANCH_UNCOVERED", ... }]
+ *     console.log(e.issues); // [{ path: "#/anyOf/1", type: "BRANCH_UNCOVERED", ... }]
  *   }
  * }
  * ```
  *
- * @example Ignoring specific paths
+ * @example Ignoring paths
  * ```ts
- * // @ts-nocheck
  * import { schemaCoverage } from "./schemaCoverage.ts";
- * import * as v from "@valibot/valibot";
  *
- * const schema = v.union([v.literal("a"), v.literal("b")]);
- * schemaCoverage(schema, ["a"], ["#/union/1"]); // passes - branch 1 ignored
+ * const schema = { anyOf: [{ const: "a" }, { const: "b" }] };
+ * schemaCoverage(schema, ["a"], ["#/anyOf/1"]); // passes - branch 1 ignored
  * ```
  */
 
-// deno-lint-ignore-file camelcase
-
-import * as v from "@valibot/valibot";
+import Ajv from "npm:ajv@8";
 
 // =============================================================================
 // Types & Interfaces
 // =============================================================================
 
+/** Subset of JSON Schema handled by this module. */
+export interface JsonSchema {
+  // Type
+  type?: string | string[];
+  const?: unknown;
+  enum?: unknown[];
+  // Object
+  properties?: Record<string, JsonSchema>;
+  required?: string[];
+  additionalProperties?: boolean | JsonSchema;
+  patternProperties?: Record<string, JsonSchema>;
+  // Array
+  items?: JsonSchema | JsonSchema[];
+  minItems?: number;
+  maxItems?: number;
+  // Composition
+  anyOf?: JsonSchema[];
+  oneOf?: JsonSchema[];
+  allOf?: JsonSchema[];
+  if?: JsonSchema;
+  then?: JsonSchema;
+  else?: JsonSchema;
+  // Reference
+  $ref?: string;
+  // Metadata
+  description?: string;
+  // Index signature for additional JSON Schema keywords
+  [key: string]: unknown;
+}
+
 /** Types of coverage issues that can be detected. */
 export type IssueType =
   | "BRANCH_UNCOVERED"
-  | "ARRAY_EMPTY"
   | "VALUE_UNCOVERED"
-  | "NULL_TYPE_UNCOVERED"
-  | "UNDEFINED_TYPE_UNCOVERED"
-  | "DEFINED_TYPE_UNCOVERED";
+  | "ARRAY_EMPTY"
+  | "NULL_UNCOVERED"
+  | "DEFINED_UNCOVERED"
+  | "MISSING_UNCOVERED";
 
 /** A single coverage issue found during schema validation. */
 export interface CoverageIssue {
-  /** JSON pointer path to the schema location (e.g., "#/properties/name"). */
+  /** JSON Pointer-like path to the schema location. */
   path: string;
   /** Type of coverage issue. */
   type: IssueType;
@@ -79,106 +111,20 @@ export class SchemaCoverageError extends Error {
   }
 }
 
-/**
- * Type-level equality check for distributive conditional types.
- * Used to ensure compile-time type safety between schema output and sample data.
- */
-type Equal<T, U> = (<G>() => G extends T ? 1 : 2) extends (<G>() => G extends U ? 1 : 2) ? true : false;
-
 // =============================================================================
-// Utility Functions
+// Internal Types
 // =============================================================================
 
-/** Schema types that wrap another schema with null/undefined handling. */
-type WrapperType = "nullable" | "optional" | "nullish" | "undefinedable" | "exact_optional";
-
-/**
- * Check if a value is "defined" for a given wrapper type.
- * - nullable: defined means not null
- * - optional/undefinedable/exact_optional: defined means not undefined
- * - nullish: defined means not null AND not undefined
- */
-function isDefined(value: unknown, wrapperType: WrapperType): boolean {
-  switch (wrapperType) {
-    case "nullable":
-      return value !== null;
-    case "optional":
-    case "undefinedable":
-    case "exact_optional":
-      return value !== undefined;
-    case "nullish":
-      return value !== null && value !== undefined;
-  }
-}
-
-/** Collect only defined (non-null/non-undefined) samples based on wrapper type. */
-function collectDefinedSamples(samples: unknown[], wrapperType: WrapperType): unknown[] {
-  return samples.filter((s) => isDefined(s, wrapperType));
-}
-
-/** Check if any sample is defined based on wrapper type. */
-function hasDefinedSample(samples: unknown[], wrapperType: WrapperType): boolean {
-  return samples.some((s) => isDefined(s, wrapperType));
-}
-
-/** Type guard for object records (non-array objects). */
-function isObjectRecord(s: unknown): s is Record<string, unknown> {
-  return typeof s === "object" && s !== null && !Array.isArray(s);
-}
-
-// =============================================================================
-// Type Helpers for Schema Access
-// =============================================================================
-
-// deno-lint-ignore no-explicit-any
-type AnySchema = any;
-
-interface WrappedSchema {
-  wrapped: v.GenericSchema;
-  default?: unknown;
-}
-
-interface ItemSchema {
-  item: v.GenericSchema;
-}
-
-interface ValueSchema {
-  value: v.GenericSchema;
-}
-
-interface KeyValueSchema {
-  key: v.GenericSchema;
-  value: v.GenericSchema;
-}
-
-interface OptionsSchema {
-  options: v.GenericSchema[];
-}
-
-interface EntriesSchema {
-  entries: Record<string, v.GenericSchema>;
-  pipe?: v.GenericPipeAction[];
-}
-
-interface ItemsSchema {
-  items: v.GenericSchema[];
-  pipe?: v.GenericPipeAction[];
-}
-
-interface RestSchema {
-  rest: v.GenericSchema;
-}
-
-interface GetterSchema {
-  getter: () => v.GenericSchema;
-}
-
-interface EnumSchema {
-  enum: Record<string, unknown>;
-}
-
-interface PicklistOptionsSchema {
-  options: unknown[];
+/** Internal context threaded through recursive coverage checking. */
+interface CoverageContext {
+  /** Ajv instance for branch matching validation. */
+  ajv: InstanceType<typeof Ajv.default>;
+  /** Top-level definitions for $ref resolution. */
+  defs?: Record<string, JsonSchema>;
+  /** Set of paths to skip during coverage checking. */
+  ignorePaths: Set<string>;
+  /** Cache of compiled Ajv validators keyed by original schema object. */
+  validatorCache: Map<JsonSchema, (data: unknown) => boolean>;
 }
 
 // =============================================================================
@@ -186,42 +132,50 @@ interface PicklistOptionsSchema {
 // =============================================================================
 
 /**
- * Validates samples against a valibot schema and checks for coverage issues.
+ * Validate samples against a JSON Schema and check for coverage issues.
  *
- * Coverage checking ensures that all branches, values, and edge cases in the schema
- * are exercised by the provided samples. This helps verify that test data is comprehensive.
+ * Coverage checking ensures that all branches, values, and edge cases in the
+ * schema are exercised by the provided samples.
  *
- * @param schema - The valibot schema to validate against
- * @param samples - Array of data samples (must match schema output type)
- * @param ignorePaths - Paths to ignore during coverage checking
- * @throws {Error} If samples are invalid or empty
+ * @param schema - The JSON Schema to validate against
+ * @param samples - Array of data samples to check
+ * @param ignorePaths - Paths to skip during coverage checking
+ * @throws {Error} If samples are empty or fail schema validation
  * @throws {SchemaCoverageError} If coverage issues are found
- *
- * @example
- * ```ts
- * // @ts-nocheck
- * import { schemaCoverage } from "./schemaCoverage.ts";
- * import * as v from "@valibot/valibot";
- *
- * const schema = v.union([v.literal("a"), v.literal("b")]);
- * schemaCoverage(schema, ["a", "b"]); // passes
- * schemaCoverage(schema, ["a"]); // throws: BRANCH_UNCOVERED
- * schemaCoverage(schema, ["a"], ["#"]); // passes: root path ignored
- * ```
  */
-export function schemaCoverage<TSchema extends v.GenericSchema, TSample>(
-  schema: TSchema,
-  samples: TSample[] & (Equal<TSample, v.InferOutput<TSchema>> extends true ? TSample[] : never),
+export function schemaCoverage(
+  schema: JsonSchema,
+  samples: unknown[],
   ignorePaths: string[] = [],
 ): void {
-  // Validate samples against strictified schema
-  const validationResult = v.safeParse(v.pipe(v.array(strictify(schema)), v.nonEmpty()), samples);
-  if (!validationResult.success) {
-    throw new Error(JSON.stringify(samples) + "\n\n" + v.summarize(validationResult.issues));
+  if (samples.length === 0) {
+    throw new Error("Samples array must not be empty");
+  }
+
+  // Validate all samples against the schema
+  const ajv = new Ajv.default({ strict: false, allErrors: true });
+  const validate = ajv.compile(schema);
+
+  for (let i = 0; i < samples.length; i++) {
+    if (!validate(samples[i])) {
+      throw new Error(
+        `Sample at index ${i} failed validation:\n` +
+          JSON.stringify(samples[i], null, 2) + "\n\n" +
+          "Errors:\n" + JSON.stringify(validate.errors, null, 2),
+      );
+    }
   }
 
   // Check coverage
-  const issues = checkCoverage(schema, samples, ignorePaths, "#");
+  const ctx: CoverageContext = {
+    ajv,
+    defs: schema["definitions"] as Record<string, JsonSchema> | undefined,
+    ignorePaths: new Set(ignorePaths),
+    validatorCache: new Map(),
+  };
+
+  const issues = checkCoverage(schema, samples, "#", ctx);
+
   if (issues.length > 0) {
     const details = issues.map((i) => `- ${i.path}: ${i.type} - ${i.message}`).join("\n");
     throw new SchemaCoverageError(`Schema coverage issues:\n${details}`, issues);
@@ -229,761 +183,483 @@ export function schemaCoverage<TSchema extends v.GenericSchema, TSample>(
 }
 
 // =============================================================================
-// Schema Transformation
-// =============================================================================
-
-/** Options for creating a schema transformer. */
-export interface SchemaTransformOptions {
-  /**
-   * Called before standard handling. Return a schema to use it, or null to continue with standard handling.
-   * The recurse function should be called to transform nested schemas.
-   */
-  preTransform?: (schema: v.GenericSchema, recurse: (s: v.GenericSchema) => v.GenericSchema) => v.GenericSchema | null;
-  /** Factory for creating object schemas. Defaults to v.object. */
-  objectFactory?: (entries: Record<string, v.GenericSchema>) => v.GenericSchema;
-  /** Factory for creating tuple schemas. Defaults to v.tuple. */
-  tupleFactory?: (items: v.GenericSchema[]) => v.GenericSchema;
-  /** If true, intersect options are transformed. Defaults to false (intersect returned as-is). */
-  transformIntersect?: boolean;
-}
-
-/** Transform handler type. */
-type TransformHandler = (s: AnySchema, transform: (schema: v.GenericSchema) => v.GenericSchema) => v.GenericSchema;
-
-/** Transform entries helper. */
-function transformEntries(
-  entries: Record<string, v.GenericSchema>,
-  transform: (s: v.GenericSchema) => v.GenericSchema,
-): Record<string, v.GenericSchema> {
-  return Object.fromEntries(
-    Object.entries(entries).map(([k, val]) => [k, transform(val)]),
-  );
-}
-
-/** Apply pipe if present. */
-function withPipe(schema: v.GenericSchema, s: AnySchema): v.GenericSchema {
-  return s.pipe ? v.pipe(schema, ...s.pipe) : schema;
-}
-
-/** Create wrapper handler (optional, nullable, etc.) */
-function createWrapperHandler(
-  factory: (wrapped: v.GenericSchema) => v.GenericSchema,
-  factoryWithDefault: (wrapped: v.GenericSchema, def: unknown) => v.GenericSchema,
-): TransformHandler {
-  return (s, transform) => {
-    const wrapped = transform(s.wrapped);
-    return s.default !== undefined ? factoryWithDefault(wrapped, s.default) : factory(wrapped);
-  };
-}
-
-/** Create transform handlers map with given factories. */
-function createTransformHandlers(
-  objectFactory: (entries: Record<string, v.GenericSchema>) => v.GenericSchema,
-  tupleFactory: (items: v.GenericSchema[]) => v.GenericSchema,
-  transformIntersect: boolean,
-): Record<string, TransformHandler> {
-  return {
-    // Wrapper schemas with default preservation
-    optional: createWrapperHandler(v.optional, v.optional),
-    nullable: createWrapperHandler(v.nullable, v.nullable),
-    nullish: createWrapperHandler(v.nullish, v.nullish),
-    undefinedable: createWrapperHandler(v.undefinedable, v.undefinedable),
-    exact_optional: createWrapperHandler(v.exactOptional, v.exactOptional),
-
-    // Non-wrapper schemas
-    non_nullable: (s, transform) => v.nonNullable(transform(s.wrapped)),
-    non_nullish: (s, transform) => v.nonNullish(transform(s.wrapped)),
-    non_optional: (s, transform) => v.nonOptional(transform(s.wrapped)),
-
-    // Collection schemas
-    array: (s, transform) => v.array(transform(s.item)),
-    set: (s, transform) => v.set(transform(s.value)),
-    map: (s, transform) => v.map(transform(s.key), transform(s.value)),
-    record: (s, transform) => {
-      const key = s.key ? transform(s.key) : v.string();
-      return v.record(key as v.GenericSchema<string, string | number | symbol>, transform(s.value));
-    },
-
-    // Composite schemas
-    union: (s, transform) => v.union(s.options.map(transform)),
-    variant: (s, transform) => v.variant(s.key, s.options.map(transform) as v.VariantOptions<string>),
-    intersect: (s, transform) => transformIntersect ? v.intersect(s.options.map(transform) as v.IntersectOptions) : s,
-
-    // Lazy schema
-    lazy: (s, transform) => v.lazy(() => transform(s.getter())),
-
-    // Object schemas
-    object: (s, transform) => withPipe(objectFactory(transformEntries(s.entries, transform)), s),
-    strict_object: (s, transform) => withPipe(objectFactory(transformEntries(s.entries, transform)), s),
-    loose_object: (s, transform) => withPipe(v.looseObject(transformEntries(s.entries, transform)), s),
-    object_with_rest: (s, transform) =>
-      withPipe(v.objectWithRest(transformEntries(s.entries, transform), transform(s.rest)), s),
-
-    // Tuple schemas
-    tuple: (s, transform) => withPipe(tupleFactory(s.items.map(transform)), s),
-    strict_tuple: (s, transform) => withPipe(tupleFactory(s.items.map(transform)), s),
-    loose_tuple: (s, transform) => withPipe(v.looseTuple(s.items.map(transform)), s),
-    tuple_with_rest: (s, transform) => withPipe(v.tupleWithRest(s.items.map(transform), transform(s.rest)), s),
-  };
-}
-
-/**
- * Creates a schema transformer function that recursively transforms schemas.
- * Used internally for strictification and can be used by wrappers for custom transformations.
- *
- * @param options - Transformation options
- * @returns A function that transforms schemas
- */
-export function createSchemaTransformer(
-  options: SchemaTransformOptions = {},
-): (schema: v.GenericSchema) => v.GenericSchema {
-  const {
-    preTransform,
-    objectFactory = v.object,
-    tupleFactory = v.tuple,
-    transformIntersect = false,
-  } = options;
-
-  const handlers = createTransformHandlers(objectFactory, tupleFactory, transformIntersect);
-
-  function transform(schema: v.GenericSchema): v.GenericSchema {
-    // Pre-transform hook
-    if (preTransform) {
-      const result = preTransform(schema, transform);
-      if (result !== null) return result;
-    }
-
-    const s = schema as AnySchema;
-    const type = s.type as string | undefined;
-    if (!type) return schema;
-
-    const handler = handlers[type];
-    return handler ? handler(s, transform) : schema;
-  }
-
-  return transform;
-}
-
-/** Convert a schema to its strict version (no extra properties/items allowed). */
-const strictify = createSchemaTransformer({
-  objectFactory: v.strictObject,
-  tupleFactory: v.strictTuple,
-});
-
-// =============================================================================
 // Coverage Checking
 // =============================================================================
-
-/** Handler for checking coverage of a specific schema type. */
-type CoverageHandler = (schema: AnySchema, samples: unknown[], ignorePaths: string[], path: string) => CoverageIssue[];
-
-/** Handlers for checking coverage of specific schema types. */
-const coverageHandlers: Record<string, CoverageHandler> = {
-  // Branch schemas (union/variant)
-  union: handleBranchSchema,
-  variant: handleBranchSchema,
-
-  // Enumeration schemas
-  picklist: handlePicklistSchema,
-  enum: handleEnumSchema,
-
-  // Collection schemas
-  array: handleArraySchema,
-  set: handleSetSchema,
-  map: handleMapSchema,
-  record: handleRecordSchema,
-
-  // Tuple schemas
-  tuple: handleTupleSchema,
-  strict_tuple: handleTupleSchema,
-  loose_tuple: handleTupleSchema,
-  tuple_with_rest: handleTupleWithRestSchema,
-
-  // Object schemas
-  object: handleObjectSchema,
-  strict_object: handleObjectSchema,
-  loose_object: handleObjectSchema,
-  object_with_rest: handleObjectWithRestSchema,
-
-  // Composite schemas
-  intersect: handleIntersectSchema,
-
-  // Wrapper schemas (nullable/optional/nullish/undefinedable)
-  nullable: handleWrapperSchema,
-  optional: handleWrapperSchema,
-  nullish: handleWrapperSchema,
-  undefinedable: handleWrapperSchema,
-  exact_optional: handleExactOptionalSchema,
-
-  // Non-wrapper schemas (unwrap and check inner)
-  non_nullable: handleNonWrapperSchema,
-  non_nullish: handleNonWrapperSchema,
-  non_optional: handleNonWrapperSchema,
-
-  // Lazy schemas
-  lazy: handleLazySchema,
-};
 
 /**
  * Recursively check schema coverage against samples.
  * @returns Array of coverage issues found
  */
 function checkCoverage(
-  schema: v.GenericSchema,
+  schema: JsonSchema,
   samples: unknown[],
-  ignorePaths: string[],
   path: string,
+  ctx: CoverageContext,
 ): CoverageIssue[] {
-  // Skip ignored paths
-  if (ignorePaths.includes(path)) {
-    return [];
+  if (ctx.ignorePaths.has(path)) return [];
+
+  // Resolve $ref
+  if (schema.$ref) {
+    return checkCoverage(resolveRef(schema.$ref, ctx.defs), samples, path, ctx);
   }
 
-  // Handle pipe schemas - find the base schema
-  if ("pipe" in schema && Array.isArray(schema.pipe)) {
-    const baseSchema = schema.pipe.find((item) =>
-      typeof item === "object" && item !== null && "kind" in item && item.kind === "schema" && "type" in item
-    );
-    if (baseSchema) {
-      return checkCoverage(baseSchema, samples, ignorePaths, path);
-    }
+  // Nullable type array: type: ["string", "null"]
+  if (isNullableTypeArray(schema)) {
+    return handleNullableTypeArray(schema, samples, path, ctx);
   }
 
-  // Dispatch to handler
-  const type = (schema as { type?: string }).type;
-  if (type) {
-    const handler = coverageHandlers[type];
-    if (handler) {
-      return handler(schema, samples, ignorePaths, path);
-    }
-  }
-
-  return [];
-}
-
-// =============================================================================
-// Coverage Handlers - Shared Helpers
-// =============================================================================
-
-/** Check that all expected values are covered by samples. */
-function checkValuesCoverage(
-  expectedValues: unknown[],
-  samples: unknown[],
-  ignorePaths: string[],
-  path: string,
-  schemaType: string,
-): CoverageIssue[] {
   const issues: CoverageIssue[] = [];
-  const sampleSet = new Set(samples);
 
-  expectedValues.forEach((value, idx) => {
-    const valuePath = `${path}/${schemaType}/${idx}`;
-    if (ignorePaths.includes(valuePath)) return;
-
-    if (!sampleSet.has(value)) {
-      issues.push({
-        path: valuePath,
-        type: "VALUE_UNCOVERED",
-        message: `Value '${String(value)}' is not covered by samples`,
-      });
+  // Composition keywords (mutually exclusive at the same level for coverage purposes)
+  if (schema.anyOf) issues.push(...handleComposition("anyOf", schema.anyOf, samples, path, ctx));
+  else if (schema.oneOf) issues.push(...handleComposition("oneOf", schema.oneOf, samples, path, ctx));
+  else if (schema.allOf) issues.push(...handleAllOf(schema.allOf, samples, path, ctx));
+  else if (schema.enum) issues.push(...handleEnum(schema.enum, samples, path, ctx));
+  else {
+    // Type-specific keywords
+    if (schema.type === "object" || schema.properties) {
+      issues.push(...handleObject(schema, samples, path, ctx));
     }
-  });
+    if (schema.type === "array") {
+      issues.push(...handleArray(schema, samples, path, ctx));
+    }
+  }
+
+  // if/then/else (can coexist with other keywords)
+  if (schema.if && (schema.then || schema.else)) {
+    issues.push(...handleIfThenElse(schema, samples, path, ctx));
+  }
 
   return issues;
 }
 
-/** Check coverage for tuple items (shared between tuple and tuple_with_rest handlers). */
-function checkTupleItemsCoverage(
-  items: v.GenericSchema[],
-  arrays: unknown[][],
-  ignorePaths: string[],
+// =============================================================================
+// Coverage Handlers - Composition
+// =============================================================================
+
+/** Handle anyOf and oneOf schemas - check all branches are covered. */
+function handleComposition(
+  keyword: "anyOf" | "oneOf",
+  branches: JsonSchema[],
+  samples: unknown[],
   path: string,
+  ctx: CoverageContext,
 ): CoverageIssue[] {
   const issues: CoverageIssue[] = [];
-  items.forEach((itemSchema, idx) => {
-    const itemSamples = arrays.filter((arr) => arr.length > idx).map((arr) => arr[idx]);
-    if (itemSamples.length > 0) {
-      issues.push(...checkCoverage(itemSchema, itemSamples, ignorePaths, `${path}/items/${idx}`));
-    }
-  });
-  return issues;
-}
 
-/** Check coverage for optional/nullish/exact_optional object properties. */
-function checkOptionalPropertyCoverage(
-  propSchema: v.GenericSchema,
-  propSamples: unknown[],
-  objects: Record<string, unknown>[],
-  key: string,
-  propPath: string,
-  ignorePaths: string[],
-  wrapperType: WrapperType,
-): CoverageIssue[] {
-  // Skip if path is ignored
-  if (ignorePaths.includes(propPath)) {
-    return [];
-  }
+  // Detect nullable: one of the branches is { type: "null" }
+  const nullBranchIndex = branches.findIndex(isNullSchema);
 
-  const issues: CoverageIssue[] = [];
-  const isExactOptional = wrapperType === "exact_optional";
-  const isNullish = wrapperType === "nullish";
+  if (nullBranchIndex !== -1) {
+    // Nullable composition: check null and non-null coverage separately
+    const nullPath = `${path}/null`;
+    const definedPath = `${path}/defined`;
 
-  // Check undefined/missing coverage
-  const undefinedPath = `${propPath}/undefined`;
-  const hasUndefined = isExactOptional
-    ? objects.some((obj) => !(key in obj))
-    : objects.some((obj) => !(key in obj) || obj[key] === undefined);
+    const hasNull = samples.some((s) => s === null);
+    const hasNonNull = samples.some((s) => s !== null);
 
-  if (!hasUndefined && !ignorePaths.includes(undefinedPath)) {
-    issues.push({
-      path: undefinedPath,
-      type: "UNDEFINED_TYPE_UNCOVERED",
-      message: isExactOptional
-        ? "ExactOptional property never appears as missing in samples"
-        : "Optional property never appears as undefined in samples",
-    });
-  }
-
-  // Check null coverage for nullish
-  if (isNullish) {
-    const nullPath = `${propPath}/null`;
-    const hasNull = objects.some((obj) => key in obj && obj[key] === null);
-    if (!hasNull && !ignorePaths.includes(nullPath)) {
+    if (!hasNull && !ctx.ignorePaths.has(nullPath)) {
       issues.push({
         path: nullPath,
-        type: "NULL_TYPE_UNCOVERED",
-        message: "Nullish property never appears as null in samples",
+        type: "NULL_UNCOVERED",
+        message: `Nullable ${keyword} never receives null`,
       });
     }
-  }
 
-  // Check defined coverage
-  const definedPath = `${propPath}/defined`;
-  const hasDefined = isExactOptional
-    ? propSamples.length > 0 && hasDefinedSample(propSamples, wrapperType)
-    : hasDefinedSample(propSamples, wrapperType);
-
-  if (!hasDefined && !ignorePaths.includes(definedPath)) {
-    issues.push({
-      path: definedPath,
-      type: "DEFINED_TYPE_UNCOVERED",
-      message: isExactOptional
-        ? "ExactOptional property never appears with a value in samples"
-        : `${isNullish ? "Nullish" : "Optional"} property never appears with a value in samples`,
-    });
-  }
-
-  // Check wrapped schema
-  const wrappedSchema = (propSchema as unknown as WrappedSchema).wrapped;
-  const definedSamples = collectDefinedSamples(propSamples, wrapperType);
-  if (wrappedSchema && definedSamples.length > 0) {
-    issues.push(...checkCoverage(wrappedSchema, definedSamples, ignorePaths, propPath));
-  }
-
-  return issues;
-}
-
-// =============================================================================
-// Coverage Handlers
-// =============================================================================
-
-/** Handle union and variant schemas - check all branches are covered. */
-function handleBranchSchema(
-  schema: AnySchema,
-  samples: unknown[],
-  ignorePaths: string[],
-  path: string,
-): CoverageIssue[] {
-  const issues: CoverageIssue[] = [];
-  const type = schema.type as string;
-  const schemaOptions = (schema as OptionsSchema).options;
-
-  schemaOptions.forEach((option, idx) => {
-    const branchPath = `${path}/${type}/${idx}`;
-    if (ignorePaths.includes(branchPath)) return;
-
-    const matched = samples.filter((s) => v.safeParse(option, s).success);
-    if (matched.length === 0) {
+    if (!hasNonNull && !ctx.ignorePaths.has(definedPath)) {
       issues.push({
-        path: branchPath,
-        type: "BRANCH_UNCOVERED",
-        message: `Branch ${idx} in ${type} is not covered by samples`,
+        path: definedPath,
+        type: "DEFINED_UNCOVERED",
+        message: `Nullable ${keyword} never receives a non-null value`,
       });
-    } else {
-      issues.push(...checkCoverage(option, matched, ignorePaths, branchPath));
     }
-  });
 
-  return issues;
-}
+    // Check coverage of non-null branches with non-null samples
+    const nonNullBranches = branches.filter((_, i) => i !== nullBranchIndex);
+    const nonNullSamples = samples.filter((s) => s !== null);
 
-/** Handle picklist schemas - check all values are covered. */
-function handlePicklistSchema(
-  schema: AnySchema,
-  samples: unknown[],
-  ignorePaths: string[],
-  path: string,
-): CoverageIssue[] {
-  return checkValuesCoverage((schema as PicklistOptionsSchema).options, samples, ignorePaths, path, "picklist");
-}
+    if (nonNullBranches.length === 1 && nonNullSamples.length > 0) {
+      // Single non-null branch: recurse directly
+      const originalIndex = branches.indexOf(nonNullBranches[0]);
+      issues.push(
+        ...checkCoverage(nonNullBranches[0], nonNullSamples, `${path}/${keyword}/${originalIndex}`, ctx),
+      );
+    } else if (nonNullBranches.length > 1 && nonNullSamples.length > 0) {
+      // Multiple non-null branches: check each is covered
+      for (const branch of nonNullBranches) {
+        const originalIndex = branches.indexOf(branch);
+        const branchPath = `${path}/${keyword}/${originalIndex}`;
+        if (ctx.ignorePaths.has(branchPath)) continue;
 
-/** Handle enum schemas - check all enum values are covered. */
-function handleEnumSchema(
-  schema: AnySchema,
-  samples: unknown[],
-  ignorePaths: string[],
-  path: string,
-): CoverageIssue[] {
-  const enumObj = (schema as EnumSchema).enum;
-  // Filter out reverse mappings for numeric enums (where value -> key mapping exists)
-  const enumValues = Object.keys(enumObj)
-    .filter((key) => isNaN(Number(key)))
-    .map((key) => enumObj[key]);
-  return checkValuesCoverage(enumValues, samples, ignorePaths, path, "enum");
-}
-
-/** Handle array schemas - check arrays are non-empty and items are covered. */
-function handleArraySchema(
-  schema: AnySchema,
-  samples: unknown[],
-  ignorePaths: string[],
-  path: string,
-): CoverageIssue[] {
-  const issues: CoverageIssue[] = [];
-  const itemSchema = (schema as ItemSchema).item;
-  const arrays = samples.filter(Array.isArray);
-
-  // Check for empty arrays
-  const arrayPath = `${path}/array`;
-  if (arrays.length > 0 && arrays.every((arr) => arr.length === 0) && !ignorePaths.includes(arrayPath)) {
-    issues.push({
-      path: arrayPath,
-      type: "ARRAY_EMPTY",
-      message: "Array is empty in all samples",
-    });
-  }
-
-  // Check items coverage
-  const allItems = arrays.flat();
-  if (allItems.length > 0) {
-    issues.push(...checkCoverage(itemSchema, allItems, ignorePaths, `${path}/items`));
-  }
-
-  return issues;
-}
-
-/** Handle set schemas - check set items are covered. */
-function handleSetSchema(
-  schema: AnySchema,
-  samples: unknown[],
-  ignorePaths: string[],
-  path: string,
-): CoverageIssue[] {
-  const issues: CoverageIssue[] = [];
-  const valueSchema = (schema as ValueSchema).value;
-  const sets = samples.filter((s): s is Set<unknown> => s instanceof Set);
-  const allItems: unknown[] = [];
-
-  for (const set of sets) {
-    allItems.push(...set);
-  }
-
-  if (allItems.length > 0) {
-    issues.push(...checkCoverage(valueSchema, allItems, ignorePaths, `${path}/items`));
-  }
-
-  return issues;
-}
-
-/** Handle map schemas - check map keys and values are covered. */
-function handleMapSchema(
-  schema: AnySchema,
-  samples: unknown[],
-  ignorePaths: string[],
-  path: string,
-): CoverageIssue[] {
-  const issues: CoverageIssue[] = [];
-  const mapSchema = schema as KeyValueSchema;
-  const maps = samples.filter((s): s is Map<unknown, unknown> => s instanceof Map);
-
-  const allKeys: unknown[] = [];
-  const allValues: unknown[] = [];
-
-  for (const map of maps) {
-    allKeys.push(...map.keys());
-    allValues.push(...map.values());
-  }
-
-  if (allKeys.length > 0) {
-    issues.push(...checkCoverage(mapSchema.key, allKeys, ignorePaths, `${path}/keys`));
-  }
-  if (allValues.length > 0) {
-    issues.push(...checkCoverage(mapSchema.value, allValues, ignorePaths, `${path}/values`));
-  }
-
-  return issues;
-}
-
-/** Handle record schemas - check record values are covered. */
-function handleRecordSchema(
-  schema: AnySchema,
-  samples: unknown[],
-  ignorePaths: string[],
-  path: string,
-): CoverageIssue[] {
-  const issues: CoverageIssue[] = [];
-  const valueSchema = (schema as ValueSchema).value;
-  const objects = samples.filter(isObjectRecord);
-  const allValues: unknown[] = [];
-
-  for (const obj of objects) {
-    allValues.push(...Object.values(obj));
-  }
-
-  if (allValues.length > 0) {
-    issues.push(...checkCoverage(valueSchema, allValues, ignorePaths, `${path}/values`));
-  }
-
-  return issues;
-}
-
-/** Handle tuple schemas - check all tuple items are covered. */
-function handleTupleSchema(
-  schema: AnySchema,
-  samples: unknown[],
-  ignorePaths: string[],
-  path: string,
-): CoverageIssue[] {
-  const items = (schema as ItemsSchema).items;
-  const arrays = samples.filter(Array.isArray);
-  return checkTupleItemsCoverage(items, arrays, ignorePaths, path);
-}
-
-/** Handle tuple with rest schemas - check items and rest are covered. */
-function handleTupleWithRestSchema(
-  schema: AnySchema,
-  samples: unknown[],
-  ignorePaths: string[],
-  path: string,
-): CoverageIssue[] {
-  const issues: CoverageIssue[] = [];
-  const tupleSchema = schema as ItemsSchema & RestSchema;
-  const arrays = samples.filter(Array.isArray);
-
-  // Check fixed items
-  issues.push(...checkTupleItemsCoverage(tupleSchema.items, arrays, ignorePaths, path));
-
-  // Check rest items
-  const restItems: unknown[] = [];
-  for (const arr of arrays) {
-    if (arr.length > tupleSchema.items.length) {
-      restItems.push(...arr.slice(tupleSchema.items.length));
+        const matched = nonNullSamples.filter((s) => matchesBranch(branch, s, ctx));
+        if (matched.length === 0) {
+          issues.push({
+            path: branchPath,
+            type: "BRANCH_UNCOVERED",
+            message: `Branch ${originalIndex} in ${keyword} is not covered by any sample`,
+          });
+        } else {
+          issues.push(...checkCoverage(branch, matched, branchPath, ctx));
+        }
+      }
     }
-  }
-  if (restItems.length > 0) {
-    issues.push(...checkCoverage(tupleSchema.rest, restItems, ignorePaths, `${path}/rest`));
-  }
+  } else {
+    // Non-nullable: standard branch coverage
+    for (let i = 0; i < branches.length; i++) {
+      const branchPath = `${path}/${keyword}/${i}`;
+      if (ctx.ignorePaths.has(branchPath)) continue;
 
-  return issues;
-}
-
-/** Handle object schemas - check all properties are covered. */
-function handleObjectSchema(
-  schema: AnySchema,
-  samples: unknown[],
-  ignorePaths: string[],
-  path: string,
-): CoverageIssue[] {
-  const issues: CoverageIssue[] = [];
-  const entries = (schema as EntriesSchema).entries;
-  const objects = samples.filter(isObjectRecord);
-
-  for (const [key, propSchema] of Object.entries(entries)) {
-    const propPath = `${path}/properties/${key}`;
-    const propSamples = objects.filter((obj) => key in obj).map((obj) => obj[key]);
-    const propType = (propSchema as { type?: string }).type;
-
-    // Handle optional/nullish/exact_optional properties
-    if (propType === "optional" || propType === "nullish" || propType === "exact_optional") {
-      issues.push(...checkOptionalPropertyCoverage(
-        propSchema,
-        propSamples,
-        objects,
-        key,
-        propPath,
-        ignorePaths,
-        propType as WrapperType,
-      ));
-    } // Handle required properties
-    else if (propSamples.length > 0) {
-      issues.push(...checkCoverage(propSchema, propSamples, ignorePaths, propPath));
-    }
-  }
-
-  return issues;
-}
-
-/** Handle object with rest schemas - check entries and rest are covered. */
-function handleObjectWithRestSchema(
-  schema: AnySchema,
-  samples: unknown[],
-  ignorePaths: string[],
-  path: string,
-): CoverageIssue[] {
-  const issues: CoverageIssue[] = [];
-  const objSchema = schema as EntriesSchema & RestSchema;
-  const objects = samples.filter(isObjectRecord);
-
-  // Check defined entries (required properties only for object_with_rest)
-  for (const [key, propSchema] of Object.entries(objSchema.entries)) {
-    const propPath = `${path}/properties/${key}`;
-    const propSamples = objects.filter((obj) => key in obj).map((obj) => obj[key]);
-    if (propSamples.length > 0) {
-      issues.push(...checkCoverage(propSchema, propSamples, ignorePaths, propPath));
-    }
-  }
-
-  // Check rest values
-  const definedKeys = new Set(Object.keys(objSchema.entries));
-  const restValues: unknown[] = [];
-  for (const obj of objects) {
-    for (const [key, value] of Object.entries(obj)) {
-      if (!definedKeys.has(key)) {
-        restValues.push(value);
+      const matched = samples.filter((s) => matchesBranch(branches[i], s, ctx));
+      if (matched.length === 0) {
+        issues.push({
+          path: branchPath,
+          type: "BRANCH_UNCOVERED",
+          message: `Branch ${i} in ${keyword} is not covered by any sample`,
+        });
+      } else {
+        issues.push(...checkCoverage(branches[i], matched, branchPath, ctx));
       }
     }
   }
-  if (restValues.length > 0) {
-    issues.push(...checkCoverage(objSchema.rest, restValues, ignorePaths, `${path}/rest`));
+
+  return issues;
+}
+
+/** Handle allOf schemas - recurse into each sub-schema. */
+function handleAllOf(
+  schemas: JsonSchema[],
+  samples: unknown[],
+  path: string,
+  ctx: CoverageContext,
+): CoverageIssue[] {
+  const issues: CoverageIssue[] = [];
+  for (let i = 0; i < schemas.length; i++) {
+    issues.push(...checkCoverage(schemas[i], samples, `${path}/allOf/${i}`, ctx));
+  }
+  return issues;
+}
+
+// =============================================================================
+// Coverage Handlers - Enum
+// =============================================================================
+
+/** Handle enum schemas - check all values are covered. */
+function handleEnum(
+  values: unknown[],
+  samples: unknown[],
+  path: string,
+  ctx: CoverageContext,
+): CoverageIssue[] {
+  const issues: CoverageIssue[] = [];
+  const sampleSet = new Set(samples.map((s) => JSON.stringify(s)));
+
+  for (let i = 0; i < values.length; i++) {
+    const valuePath = `${path}/enum/${i}`;
+    if (ctx.ignorePaths.has(valuePath)) continue;
+
+    if (!sampleSet.has(JSON.stringify(values[i]))) {
+      issues.push({
+        path: valuePath,
+        type: "VALUE_UNCOVERED",
+        message: `Enum value '${String(values[i])}' is not covered by any sample`,
+      });
+    }
   }
 
   return issues;
 }
 
-/** Handle intersect schemas - check all intersected schemas are covered. */
-function handleIntersectSchema(
-  schema: AnySchema,
+// =============================================================================
+// Coverage Handlers - Object
+// =============================================================================
+
+/** Handle object schemas - check all properties are covered. */
+function handleObject(
+  schema: JsonSchema,
   samples: unknown[],
-  ignorePaths: string[],
   path: string,
+  ctx: CoverageContext,
 ): CoverageIssue[] {
   const issues: CoverageIssue[] = [];
-  const schemaOptions = (schema as OptionsSchema).options;
+  const properties = schema.properties;
+  if (!properties) return issues;
 
-  schemaOptions.forEach((subschema, idx) => {
-    issues.push(...checkCoverage(subschema, samples, ignorePaths, `${path}/intersect/${idx}`));
-  });
+  const requiredSet = new Set(schema.required ?? []);
+  const objects = samples.filter(isObjectRecord);
+
+  for (const [key, propSchema] of Object.entries(properties)) {
+    const propPath = `${path}/properties/${key}`;
+    if (ctx.ignorePaths.has(propPath)) continue;
+
+    if (requiredSet.has(key)) {
+      // Required property: collect values and recurse
+      const propSamples = objects
+        .filter((obj) => key in obj)
+        .map((obj) => obj[key]);
+
+      if (propSamples.length > 0) {
+        issues.push(...checkCoverage(propSchema, propSamples, propPath, ctx));
+      }
+    } else {
+      // Optional property: check missing and present coverage
+      const missingPath = `${propPath}/missing`;
+      const presentPath = `${propPath}/present`;
+
+      const hasMissing = objects.some((obj) => !(key in obj));
+      const hasPresent = objects.some((obj) => key in obj);
+
+      if (!hasMissing && !ctx.ignorePaths.has(missingPath)) {
+        issues.push({
+          path: missingPath,
+          type: "MISSING_UNCOVERED",
+          message: `Optional property '${key}' is never missing in samples`,
+        });
+      }
+
+      if (!hasPresent && !ctx.ignorePaths.has(presentPath)) {
+        issues.push({
+          path: presentPath,
+          type: "DEFINED_UNCOVERED",
+          message: `Optional property '${key}' is never present in samples`,
+        });
+      }
+
+      // Recurse into present values
+      const presentSamples = objects
+        .filter((obj) => key in obj)
+        .map((obj) => obj[key]);
+
+      if (presentSamples.length > 0) {
+        issues.push(...checkCoverage(propSchema, presentSamples, propPath, ctx));
+      }
+    }
+  }
 
   return issues;
 }
 
-/** Handle wrapper schemas (nullable/optional/nullish/undefinedable). */
-function handleWrapperSchema(
-  schema: AnySchema,
+// =============================================================================
+// Coverage Handlers - Array & Tuple
+// =============================================================================
+
+/** Handle array schemas - check items and non-emptiness. */
+function handleArray(
+  schema: JsonSchema,
   samples: unknown[],
-  ignorePaths: string[],
   path: string,
+  ctx: CoverageContext,
 ): CoverageIssue[] {
   const issues: CoverageIssue[] = [];
-  const wrapperType = schema.type as WrapperType;
-  const wrappedSchema = (schema as WrappedSchema).wrapped;
+  const arrays = samples.filter(Array.isArray);
+
+  // Check for tuple items (items array)
+  const tupleItems = getTupleItems(schema);
+  if (tupleItems) {
+    return handleTuple(tupleItems, arrays, path, ctx);
+  }
+
+  // Homogeneous array: items as single schema
+  if (schema.items && !Array.isArray(schema.items)) {
+    // Check non-empty
+    const arrayPath = `${path}/array`;
+    if (arrays.length > 0 && arrays.every((arr) => arr.length === 0) && !ctx.ignorePaths.has(arrayPath)) {
+      issues.push({
+        path: arrayPath,
+        type: "ARRAY_EMPTY",
+        message: "Array is empty in all samples",
+      });
+    }
+
+    // Recurse into items
+    const allItems = arrays.flat();
+    if (allItems.length > 0) {
+      issues.push(...checkCoverage(schema.items, allItems, `${path}/items`, ctx));
+    }
+  }
+
+  return issues;
+}
+
+/** Handle tuple schemas - check each positional item. */
+function handleTuple(
+  tupleItems: JsonSchema[],
+  arrays: unknown[][],
+  path: string,
+  ctx: CoverageContext,
+): CoverageIssue[] {
+  const issues: CoverageIssue[] = [];
+
+  for (let i = 0; i < tupleItems.length; i++) {
+    const itemPath = `${path}/items/${i}`;
+    if (ctx.ignorePaths.has(itemPath)) continue;
+
+    const itemSamples = arrays
+      .filter((arr) => arr.length > i)
+      .map((arr) => arr[i]);
+
+    if (itemSamples.length > 0) {
+      issues.push(...checkCoverage(tupleItems[i], itemSamples, itemPath, ctx));
+    }
+  }
+
+  return issues;
+}
+
+// =============================================================================
+// Coverage Handlers - Nullable Type Array
+// =============================================================================
+
+/**
+ * Handle nullable type arrays: `type: ["string", "null"]`.
+ * Checks that samples include both null and non-null values.
+ */
+function handleNullableTypeArray(
+  schema: JsonSchema,
+  samples: unknown[],
+  path: string,
+  ctx: CoverageContext,
+): CoverageIssue[] {
+  const issues: CoverageIssue[] = [];
+  const types = schema.type as string[];
+
+  const nullPath = `${path}/null`;
+  const definedPath = `${path}/defined`;
 
   const hasNull = samples.some((s) => s === null);
-  const hasUndefined = samples.some((s) => s === undefined);
-  const hasDefined = hasDefinedSample(samples, wrapperType);
+  const hasNonNull = samples.some((s) => s !== null);
 
-  // Check null coverage for nullable/nullish
-  const nullPath = `${path}/null`;
-  if ((wrapperType === "nullable" || wrapperType === "nullish") && !hasNull && !ignorePaths.includes(nullPath)) {
+  if (!hasNull && !ctx.ignorePaths.has(nullPath)) {
     issues.push({
       path: nullPath,
-      type: "NULL_TYPE_UNCOVERED",
-      message: `Type 'null' in ${wrapperType} is not covered by samples`,
+      type: "NULL_UNCOVERED",
+      message: "Nullable type never receives null",
     });
   }
 
-  // Check undefined coverage for optional/nullish/undefinedable
-  const undefinedPath = `${path}/undefined`;
-  if (
-    (wrapperType === "optional" || wrapperType === "nullish" || wrapperType === "undefinedable") && !hasUndefined &&
-    !ignorePaths.includes(undefinedPath)
-  ) {
-    issues.push({
-      path: undefinedPath,
-      type: "UNDEFINED_TYPE_UNCOVERED",
-      message: `Type 'undefined' in ${wrapperType} is not covered by samples`,
-    });
-  }
-
-  // Check defined coverage
-  const definedPath = `${path}/defined`;
-  if (!hasDefined && !ignorePaths.includes(definedPath)) {
-    const typeDesc = wrapperType === "nullable" ? "Non-null type" : "Defined value";
+  if (!hasNonNull && !ctx.ignorePaths.has(definedPath)) {
     issues.push({
       path: definedPath,
-      type: "DEFINED_TYPE_UNCOVERED",
-      message: `${typeDesc} in ${wrapperType} is not covered by samples`,
+      type: "DEFINED_UNCOVERED",
+      message: "Nullable type never receives a non-null value",
     });
   }
 
-  // Check wrapped schema
-  const definedSamples = collectDefinedSamples(samples, wrapperType);
-  if (definedSamples.length > 0) {
-    issues.push(...checkCoverage(wrappedSchema, definedSamples, ignorePaths, `${path}/wrapped`));
+  // Create non-null schema and recurse with non-null samples
+  const nonNullTypes = types.filter((t) => t !== "null");
+  const nonNullSamples = samples.filter((s) => s !== null);
+
+  if (nonNullTypes.length > 0 && nonNullSamples.length > 0) {
+    const nonNullSchema: JsonSchema = {
+      ...schema,
+      type: nonNullTypes.length === 1 ? nonNullTypes[0] : nonNullTypes,
+    };
+    issues.push(...checkCoverage(nonNullSchema, nonNullSamples, path, ctx));
   }
 
   return issues;
 }
 
-/** Handle exactOptional schemas (missing vs undefined distinction). */
-function handleExactOptionalSchema(
-  schema: AnySchema,
+// =============================================================================
+// Coverage Handlers - if/then/else
+// =============================================================================
+
+/** Handle if/then/else - check both conditional paths are covered. */
+function handleIfThenElse(
+  schema: JsonSchema,
   samples: unknown[],
-  ignorePaths: string[],
   path: string,
+  ctx: CoverageContext,
 ): CoverageIssue[] {
   const issues: CoverageIssue[] = [];
-  const wrappedSchema = (schema as WrappedSchema).wrapped;
 
-  // exactOptional only accepts missing, not undefined, so we only check defined coverage
-  const hasDefined = hasDefinedSample(samples, "exact_optional");
-  const definedPath = `${path}/defined`;
+  const matchesIf = samples.filter((s) => matchesBranch(schema.if!, s, ctx));
+  const notMatchesIf = samples.filter((s) => !matchesBranch(schema.if!, s, ctx));
 
-  if (!hasDefined && !ignorePaths.includes(definedPath)) {
-    issues.push({
-      path: definedPath,
-      type: "DEFINED_TYPE_UNCOVERED",
-      message: "Defined value in exact_optional is not covered by samples",
-    });
+  if (schema.then) {
+    const thenPath = `${path}/then`;
+    if (!ctx.ignorePaths.has(thenPath)) {
+      if (matchesIf.length === 0) {
+        issues.push({
+          path: thenPath,
+          type: "BRANCH_UNCOVERED",
+          message: "No sample matches the 'if' condition to cover 'then' branch",
+        });
+      } else {
+        issues.push(...checkCoverage(schema.then, matchesIf, thenPath, ctx));
+      }
+    }
   }
 
-  // Check wrapped schema for defined samples
-  const definedSamples = collectDefinedSamples(samples, "exact_optional");
-  if (definedSamples.length > 0) {
-    issues.push(...checkCoverage(wrappedSchema, definedSamples, ignorePaths, `${path}/wrapped`));
+  if (schema.else) {
+    const elsePath = `${path}/else`;
+    if (!ctx.ignorePaths.has(elsePath)) {
+      if (notMatchesIf.length === 0) {
+        issues.push({
+          path: elsePath,
+          type: "BRANCH_UNCOVERED",
+          message: "All samples match 'if' condition, 'else' branch is not covered",
+        });
+      } else {
+        issues.push(...checkCoverage(schema.else, notMatchesIf, elsePath, ctx));
+      }
+    }
   }
 
   return issues;
 }
 
-/** Handle non-wrapper schemas (nonNullable/nonNullish/nonOptional) - just check wrapped. */
-function handleNonWrapperSchema(
-  schema: AnySchema,
-  samples: unknown[],
-  ignorePaths: string[],
-  path: string,
-): CoverageIssue[] {
-  const wrappedSchema = (schema as WrappedSchema).wrapped;
-  return checkCoverage(wrappedSchema, samples, ignorePaths, path);
+// =============================================================================
+// Utilities
+// =============================================================================
+
+/** Resolve a $ref pointer to its target schema. */
+function resolveRef(ref: string, defs?: Record<string, JsonSchema>): JsonSchema {
+  const prefix = "#/definitions/";
+  if (ref.startsWith(prefix) && defs) {
+    const name = decodeURIComponent(ref.slice(prefix.length));
+    const resolved = defs[name];
+    if (resolved) return resolved;
+  }
+  throw new Error(`Cannot resolve $ref: ${ref}`);
 }
 
-/** Handle lazy schemas - resolve and check. */
-function handleLazySchema(
-  schema: AnySchema,
-  samples: unknown[],
-  ignorePaths: string[],
-  path: string,
-): CoverageIssue[] {
-  const resolvedSchema = (schema as GetterSchema).getter();
-  return checkCoverage(resolvedSchema, samples, ignorePaths, path);
+/**
+ * Check if a sample matches a schema branch using Ajv validation.
+ * Results are cached per schema object for performance.
+ */
+function matchesBranch(schema: JsonSchema, sample: unknown, ctx: CoverageContext): boolean {
+  let validate = ctx.validatorCache.get(schema);
+  if (!validate) {
+    const withDefs = ctx.defs ? { ...schema, definitions: ctx.defs } : schema;
+    try {
+      const compiled = ctx.ajv.compile(withDefs);
+      validate = (data: unknown) => compiled(data);
+    } catch {
+      // If compilation fails, fall back to always matching
+      validate = () => true;
+    }
+    ctx.validatorCache.set(schema, validate);
+  }
+  return validate(sample);
+}
+
+/** Type guard for object records (non-array objects). */
+function isObjectRecord(s: unknown): s is Record<string, unknown> {
+  return typeof s === "object" && s !== null && !Array.isArray(s);
+}
+
+/** Check if a schema represents the null type. */
+function isNullSchema(schema: JsonSchema): boolean {
+  return schema.type === "null";
+}
+
+/** Check if a schema has a nullable type array (e.g., `type: ["string", "null"]`). */
+function isNullableTypeArray(schema: JsonSchema): boolean {
+  return Array.isArray(schema.type) && schema.type.includes("null");
+}
+
+/** Extract tuple item schemas from items array. */
+function getTupleItems(schema: JsonSchema): JsonSchema[] | null {
+  if (Array.isArray(schema.items)) return schema.items;
+  return null;
 }

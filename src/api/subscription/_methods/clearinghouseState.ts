@@ -5,9 +5,11 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import { ClearinghouseStateResponse } from "../../info/_methods/clearinghouseState.ts";
+import type { ClearinghouseStateResponse } from "../../info/_methods/clearinghouseState.ts";
 
-/** Subscription to clearinghouse state events for a specific user. */
+/**
+ * Subscription to clearinghouse state events for a specific user.
+ */
 export const ClearinghouseStateRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -20,18 +22,20 @@ export const ClearinghouseStateRequest = /* @__PURE__ */ (() => {
 })();
 export type ClearinghouseStateRequest = v.InferOutput<typeof ClearinghouseStateRequest>;
 
-/** Event of clearinghouse state for a specific user. */
-export const ClearinghouseStateEvent = /* @__PURE__ */ (() => {
-  return v.object({
-    /** DEX name (empty string for main dex). */
-    dex: v.string(),
-    /** User address. */
-    user: Address,
-    /** Account summary for perpetual trading. */
-    clearinghouseState: ClearinghouseStateResponse,
-  });
-})();
-export type ClearinghouseStateEvent = v.InferOutput<typeof ClearinghouseStateEvent>;
+/**
+ * Event of clearinghouse state for a specific user.
+ */
+export type ClearinghouseStateEvent = {
+  /** DEX name (empty string for main dex). */
+  dex: string;
+  /**
+   * User address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  user: `0x${string}`;
+  /** Account summary for perpetual trading. */
+  clearinghouseState: ClearinghouseStateResponse;
+};
 
 // ============================================================
 // Execution Logic

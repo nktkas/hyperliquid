@@ -6,7 +6,9 @@ import * as v from "@valibot/valibot";
 
 import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
 
-/** Subscription to explorer block events. */
+/**
+ * Subscription to explorer block events.
+ */
 export const ExplorerBlockRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -15,7 +17,9 @@ export const ExplorerBlockRequest = /* @__PURE__ */ (() => {
 })();
 export type ExplorerBlockRequest = v.InferOutput<typeof ExplorerBlockRequest>;
 
-/** Event of array of block details. */
+/**
+ * Event of array of block details.
+ */
 export const ExplorerBlockEvent = /* @__PURE__ */ (() => {
   return v.array(
     v.object({
@@ -32,7 +36,24 @@ export const ExplorerBlockEvent = /* @__PURE__ */ (() => {
     }),
   );
 })();
-export type ExplorerBlockEvent = v.InferOutput<typeof ExplorerBlockEvent>;
+export type ExplorerBlockEvent = {
+  /** Block creation timestamp. */
+  blockTime: number;
+  /**
+   * Block hash.
+   * @pattern ^0x[a-fA-F0-9]{64}$
+   */
+  hash: `0x${string}`;
+  /** Block height in chain. */
+  height: number;
+  /** Total transactions in block. */
+  numTxs: number;
+  /**
+   * Block proposer address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  proposer: `0x${string}`;
+}[];
 
 // ============================================================
 // Execution Logic

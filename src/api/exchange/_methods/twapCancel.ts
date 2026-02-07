@@ -38,29 +38,23 @@ export type TwapCancelRequest = v.InferOutput<typeof TwapCancelRequest>;
  * Response for canceling a TWAP order.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order
  */
-export const TwapCancelResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Successful status. */
-    status: v.literal("ok"),
-    /** Response details. */
-    response: v.object({
-      /** Type of response. */
-      type: v.literal("twapCancel"),
-      /** Specific data. */
-      data: v.object({
-        /** Status of the operation or error message. */
-        status: v.union([
-          v.string(),
-          v.object({
-            /** Error message. */
-            error: v.string(),
-          }),
-        ]),
-      }),
-    }),
-  });
-})();
-export type TwapCancelResponse = v.InferOutput<typeof TwapCancelResponse>;
+export type TwapCancelResponse = {
+  /** Successful status. */
+  status: "ok";
+  /** Response details. */
+  response: {
+    /** Type of response. */
+    type: "twapCancel";
+    /** Specific data. */
+    data: {
+      /** Status of the operation or error message. */
+      status: string | {
+        /** Error message. */
+        error: string;
+      };
+    };
+  };
+};
 
 // ============================================================
 // Execution Logic

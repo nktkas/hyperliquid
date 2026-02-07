@@ -5,9 +5,11 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import { ActiveAssetDataResponse } from "../../info/_methods/activeAssetData.ts";
+import type { ActiveAssetDataResponse } from "../../info/_methods/activeAssetData.ts";
 
-/** Subscription to active asset data events for a specific user and coin. */
+/**
+ * Subscription to active asset data events for a specific user and coin.
+ */
 export const ActiveAssetDataRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -20,11 +22,10 @@ export const ActiveAssetDataRequest = /* @__PURE__ */ (() => {
 })();
 export type ActiveAssetDataRequest = v.InferOutput<typeof ActiveAssetDataRequest>;
 
-/** Event of user active asset data. */
-export const ActiveAssetDataEvent = /* @__PURE__ */ (() => {
-  return ActiveAssetDataResponse;
-})();
-export type ActiveAssetDataEvent = v.InferOutput<typeof ActiveAssetDataEvent>;
+/**
+ * Event of user active asset data.
+ */
+export type ActiveAssetDataEvent = ActiveAssetDataResponse;
 
 // ============================================================
 // Execution Logic

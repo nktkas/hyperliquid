@@ -4,9 +4,9 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Decimal, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { VaultRelationshipSchema } from "./_base/commonSchemas.ts";
-import { PortfolioResponse } from "./portfolio.ts";
+import { Address } from "../../_schemas.ts";
+import type { VaultRelationshipSchema } from "./_base/commonSchemas.ts";
+import type { PortfolioResponse } from "./portfolio.ts";
 
 /**
  * Request details of a vault.
@@ -28,77 +28,100 @@ export type VaultDetailsRequest = v.InferOutput<typeof VaultDetailsRequest>;
  * Details of a vault or null if the vault does not exist.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-details-for-a-vault
  */
-export const VaultDetailsResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Vault name. */
-    name: v.string(),
-    /** Vault address. */
-    vaultAddress: Address,
-    /** Leader address. */
-    leader: Address,
-    /** Vault description. */
-    description: v.string(),
-    /** Vault portfolio metrics grouped by time periods. */
-    portfolio: PortfolioResponse,
-    /** Annual percentage rate. */
-    apr: v.number(),
-    /** Current user follower state. */
-    followerState: v.nullable(
-      v.object({
-        /** Follower address. */
-        user: Address,
-        /** Follower vault equity. */
-        vaultEquity: UnsignedDecimal,
-        /** Current profit and loss. */
-        pnl: Decimal,
-        /** All-time profit and loss. */
-        allTimePnl: Decimal,
-        /** Subscription duration in days. */
-        daysFollowing: UnsignedInteger,
-        /** Vault entry timestamp. */
-        vaultEntryTime: UnsignedInteger,
-        /** Timestamp when funds become unlocked. */
-        lockupUntil: UnsignedInteger,
-      }),
-    ),
-    /** Ownership percentage held by leader. */
-    leaderFraction: v.number(),
-    /** Leader commission percentage. */
-    leaderCommission: v.number(),
-    /** Array of vault followers. */
-    followers: v.array(
-      v.object({
-        /** Follower address or Leader. */
-        user: v.union([Address, v.literal("Leader")]),
-        /** Follower vault equity. */
-        vaultEquity: UnsignedDecimal,
-        /** Current profit and loss. */
-        pnl: Decimal,
-        /** All-time profit and loss. */
-        allTimePnl: Decimal,
-        /** Subscription duration in days. */
-        daysFollowing: UnsignedInteger,
-        /** Vault entry timestamp. */
-        vaultEntryTime: UnsignedInteger,
-        /** Timestamp when funds become unlocked. */
-        lockupUntil: UnsignedInteger,
-      }),
-    ),
-    /** Maximum distributable amount. */
-    maxDistributable: v.number(),
-    /** Maximum withdrawable amount. */
-    maxWithdrawable: v.number(),
-    /** Vault closure status. */
-    isClosed: v.boolean(),
-    /** Vault relationship type. */
-    relationship: VaultRelationshipSchema,
-    /** Deposit permission status. */
-    allowDeposits: v.boolean(),
-    /** Position closure policy on withdrawal. */
-    alwaysCloseOnWithdraw: v.boolean(),
-  });
-})();
-export type VaultDetailsResponse = v.InferOutput<typeof VaultDetailsResponse>;
+export type VaultDetailsResponse = {
+  /** Vault name. */
+  name: string;
+  /**
+   * Vault address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  vaultAddress: `0x${string}`;
+  /**
+   * Leader address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  leader: `0x${string}`;
+  /** Vault description. */
+  description: string;
+  /** Vault portfolio metrics grouped by time periods. */
+  portfolio: PortfolioResponse;
+  /** Annual percentage rate. */
+  apr: number;
+  /** Current user follower state. */
+  followerState: {
+    /**
+     * Follower address.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
+    user: `0x${string}`;
+    /**
+     * Follower vault equity.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    vaultEquity: string;
+    /**
+     * Current profit and loss.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
+    pnl: string;
+    /**
+     * All-time profit and loss.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
+    allTimePnl: string;
+    /** Subscription duration in days. */
+    daysFollowing: number;
+    /** Vault entry timestamp. */
+    vaultEntryTime: number;
+    /** Timestamp when funds become unlocked. */
+    lockupUntil: number;
+  } | null;
+  /** Ownership percentage held by leader. */
+  leaderFraction: number;
+  /** Leader commission percentage. */
+  leaderCommission: number;
+  /** Array of vault followers. */
+  followers: {
+    /**
+     * Follower address or Leader.
+     * @pattern ^0x[a-fA-F0-9]{40}$|^Leader$
+     */
+    user: `0x${string}` | "Leader";
+    /**
+     * Follower vault equity.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    vaultEquity: string;
+    /**
+     * Current profit and loss.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
+    pnl: string;
+    /**
+     * All-time profit and loss.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
+    allTimePnl: string;
+    /** Subscription duration in days. */
+    daysFollowing: number;
+    /** Vault entry timestamp. */
+    vaultEntryTime: number;
+    /** Timestamp when funds become unlocked. */
+    lockupUntil: number;
+  }[];
+  /** Maximum distributable amount. */
+  maxDistributable: number;
+  /** Maximum withdrawable amount. */
+  maxWithdrawable: number;
+  /** Vault closure status. */
+  isClosed: boolean;
+  /** Vault relationship type. */
+  relationship: VaultRelationshipSchema;
+  /** Deposit permission status. */
+  allowDeposits: boolean;
+  /** Position closure policy on withdrawal. */
+  alwaysCloseOnWithdraw: boolean;
+};
 
 // ============================================================
 // Execution Logic

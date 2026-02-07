@@ -4,8 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { UserFillSchema } from "./_base/commonSchemas.ts";
+import { Address } from "../../_schemas.ts";
+import type { UserFillSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Request user TWAP slice fills.
@@ -25,17 +25,12 @@ export type UserTwapSliceFillsRequest = v.InferOutput<typeof UserTwapSliceFillsR
  * Array of user's twap slice fills.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills
  */
-export const UserTwapSliceFillsResponse = /* @__PURE__ */ (() => {
-  return v.array(
-    v.object({
-      /** TWAP fill record. */
-      fill: UserFillSchema,
-      /** ID of the TWAP. */
-      twapId: UnsignedInteger,
-    }),
-  );
-})();
-export type UserTwapSliceFillsResponse = v.InferOutput<typeof UserTwapSliceFillsResponse>;
+export type UserTwapSliceFillsResponse = {
+  /** TWAP fill record. */
+  fill: UserFillSchema;
+  /** ID of the TWAP. */
+  twapId: number;
+}[];
 
 // ============================================================
 // Execution Logic

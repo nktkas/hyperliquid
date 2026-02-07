@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedInteger } from "../../_schemas.ts";
+import { Address } from "../../_schemas.ts";
 
 /**
  * Request user extra agents.
@@ -22,19 +22,17 @@ export type ExtraAgentsRequest = v.InferOutput<typeof ExtraAgentsRequest>;
 /**
  * Array of extra agent details for a user.
  */
-export const ExtraAgentsResponse = /* @__PURE__ */ (() => {
-  return v.array(
-    v.object({
-      /** Extra agent address. */
-      address: Address,
-      /** Extra agent name. */
-      name: v.pipe(v.string(), v.nonEmpty()),
-      /** Validity period as a timestamp (in ms since epoch). */
-      validUntil: UnsignedInteger,
-    }),
-  );
-})();
-export type ExtraAgentsResponse = v.InferOutput<typeof ExtraAgentsResponse>;
+export type ExtraAgentsResponse = {
+  /**
+   * Extra agent address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  address: `0x${string}`;
+  /** Extra agent name. */
+  name: string;
+  /** Validity period as a timestamp (in ms since epoch). */
+  validUntil: number;
+}[];
 
 // ============================================================
 // Execution Logic

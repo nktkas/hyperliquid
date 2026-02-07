@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { BlockDetailsRequest, BlockDetailsResponse } from "@nktkas/hyperliquid/api/info";
+import { BlockDetailsRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/blockDetails.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "BlockDetailsResponse");
 
 runTest({
   name: "blockDetails",
@@ -9,7 +13,7 @@ runTest({
     const data = await Promise.all([
       client.blockDetails({ height: 300836507 }),
     ]);
-    schemaCoverage(BlockDetailsResponse, data);
+    schemaCoverage(typeSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

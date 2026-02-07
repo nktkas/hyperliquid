@@ -4,9 +4,11 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { PerpAssetCtxSchema } from "../../info/_methods/_base/commonSchemas.ts";
+import type { PerpAssetCtxSchema } from "../../info/_methods/_base/commonSchemas.ts";
 
-/** Subscription to context events for a specific perpetual asset. */
+/**
+ * Subscription to context events for a specific perpetual asset.
+ */
 export const ActiveAssetCtxRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -17,16 +19,15 @@ export const ActiveAssetCtxRequest = /* @__PURE__ */ (() => {
 })();
 export type ActiveAssetCtxRequest = v.InferOutput<typeof ActiveAssetCtxRequest>;
 
-/** Event of active perpetual asset context. */
-export const ActiveAssetCtxEvent = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Asset symbol (e.g., BTC). */
-    coin: v.string(),
-    /** Context for a specific perpetual asset. */
-    ctx: PerpAssetCtxSchema,
-  });
-})();
-export type ActiveAssetCtxEvent = v.InferOutput<typeof ActiveAssetCtxEvent>;
+/**
+ * Event of active perpetual asset context.
+ */
+export type ActiveAssetCtxEvent = {
+  /** Asset symbol (e.g., BTC). */
+  coin: string;
+  /** Context for a specific perpetual asset. */
+  ctx: PerpAssetCtxSchema;
+};
 
 // ============================================================
 // Execution Logic

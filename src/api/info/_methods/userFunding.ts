@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Decimal, Hex, UnsignedInteger } from "../../_schemas.ts";
+import { Address, UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Request array of user funding ledger updates.
@@ -28,32 +28,39 @@ export type UserFundingRequest = v.InferOutput<typeof UserFundingRequest>;
  * Array of user funding ledger updates.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates
  */
-export const UserFundingResponse = /* @__PURE__ */ (() => {
-  return v.array(
-    v.object({
-      /** Timestamp of the update (in ms since epoch). */
-      time: UnsignedInteger,
-      /** L1 transaction hash. */
-      hash: v.pipe(Hex, v.length(66)),
-      /** Update details. */
-      delta: v.object({
-        /** Update type. */
-        type: v.literal("funding"),
-        /** Asset symbol. */
-        coin: v.string(),
-        /** Amount transferred in USDC. */
-        usdc: Decimal,
-        /** Signed position size. */
-        szi: Decimal,
-        /** Applied funding rate. */
-        fundingRate: Decimal,
-        /** Number of samples. */
-        nSamples: v.nullable(UnsignedInteger),
-      }),
-    }),
-  );
-})();
-export type UserFundingResponse = v.InferOutput<typeof UserFundingResponse>;
+export type UserFundingResponse = {
+  /** Timestamp of the update (in ms since epoch). */
+  time: number;
+  /**
+   * L1 transaction hash.
+   * @pattern ^0x[a-fA-F0-9]{64}$
+   */
+  hash: `0x${string}`;
+  /** Update details. */
+  delta: {
+    /** Update type. */
+    type: "funding";
+    /** Asset symbol. */
+    coin: string;
+    /**
+     * Amount transferred in USDC.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
+    usdc: string;
+    /**
+     * Signed position size.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
+    szi: string;
+    /**
+     * Applied funding rate.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
+    fundingRate: string;
+    /** Number of samples. */
+    nSamples: number | null;
+  };
+}[];
 
 // ============================================================
 // Execution Logic

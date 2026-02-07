@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { ValidatorL1VotesRequest, ValidatorL1VotesResponse } from "@nktkas/hyperliquid/api/info";
+import { ValidatorL1VotesRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/validatorL1Votes.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "ValidatorL1VotesResponse");
 
 runTest({
   name: "validatorL1Votes",
@@ -9,7 +13,7 @@ runTest({
     const data = await Promise.all([
       client.validatorL1Votes(),
     ]);
-    schemaCoverage(ValidatorL1VotesResponse, data, [
+    schemaCoverage(typeSchema, data, [
       "#/array",
     ]);
   },

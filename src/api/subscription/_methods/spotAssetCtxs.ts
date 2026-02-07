@@ -4,9 +4,11 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { SpotAssetCtxSchema } from "../../info/_methods/_base/commonSchemas.ts";
+import type { SpotAssetCtxSchema } from "../../info/_methods/_base/commonSchemas.ts";
 
-/** Subscription to context events for all spot assets. */
+/**
+ * Subscription to context events for all spot assets.
+ */
 export const SpotAssetCtxsRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -15,11 +17,10 @@ export const SpotAssetCtxsRequest = /* @__PURE__ */ (() => {
 })();
 export type SpotAssetCtxsRequest = v.InferOutput<typeof SpotAssetCtxsRequest>;
 
-/** Event of spot asset contexts. */
-export const SpotAssetCtxsEvent = /* @__PURE__ */ (() => {
-  return v.array(SpotAssetCtxSchema);
-})();
-export type SpotAssetCtxsEvent = v.InferOutput<typeof SpotAssetCtxsEvent>;
+/**
+ * vent of spot asset contexts.
+ */
+export type SpotAssetCtxsEvent = SpotAssetCtxSchema[];
 
 // ============================================================
 // Execution Logic

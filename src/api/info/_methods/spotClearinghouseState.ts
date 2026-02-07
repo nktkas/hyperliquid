@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address } from "../../_schemas.ts";
 
 /**
  * Request spot clearinghouse state.
@@ -26,39 +26,42 @@ export type SpotClearinghouseStateRequest = v.InferOutput<typeof SpotClearinghou
  * Account summary for spot trading.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-a-users-token-balances
  */
-export const SpotClearinghouseStateResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Array of available token balances. */
-    balances: v.array(
-      v.object({
-        /** Asset symbol. */
-        coin: v.string(),
-        /** Unique identifier for the token. */
-        token: UnsignedInteger,
-        /** Total balance. */
-        total: UnsignedDecimal,
-        /** Amount on hold. */
-        hold: UnsignedDecimal,
-        /** Entry notional value. */
-        entryNtl: UnsignedDecimal,
-      }),
-    ),
-    /** Array of escrowed balances. */
-    evmEscrows: v.optional(
-      v.array(
-        v.object({
-          /** Asset symbol. */
-          coin: v.string(),
-          /** Unique identifier for the token. */
-          token: UnsignedInteger,
-          /** Total balance. */
-          total: UnsignedDecimal,
-        }),
-      ),
-    ),
-  });
-})();
-export type SpotClearinghouseStateResponse = v.InferOutput<typeof SpotClearinghouseStateResponse>;
+export type SpotClearinghouseStateResponse = {
+  /** Array of available token balances. */
+  balances: {
+    /** Asset symbol. */
+    coin: string;
+    /** Unique identifier for the token. */
+    token: number;
+    /**
+     * Total balance.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    total: string;
+    /**
+     * Amount on hold.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    hold: string;
+    /**
+     * Entry notional value.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    entryNtl: string;
+  }[];
+  /** Array of escrowed balances. */
+  evmEscrows?: {
+    /** Asset symbol. */
+    coin: string;
+    /** Unique identifier for the token. */
+    token: number;
+    /**
+     * Total balance.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    total: string;
+  }[];
+};
 
 // ============================================================
 // Execution Logic

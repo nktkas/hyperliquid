@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Cloid, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Modify an order.
@@ -85,10 +85,7 @@ export type ModifyRequest = v.InferOutput<typeof ModifyRequest>;
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order
  */
-export const ModifyResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type ModifyResponse = v.InferOutput<typeof ModifyResponse>;
+export type ModifyResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

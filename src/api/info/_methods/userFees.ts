@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Decimal, UnsignedDecimal } from "../../_schemas.ts";
+import { Address } from "../../_schemas.ts";
 
 /**
  * Request user fees.
@@ -24,118 +24,184 @@ export type UserFeesRequest = v.InferOutput<typeof UserFeesRequest>;
  * User fees.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-fees
  */
-export const UserFeesResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Daily user volume metrics. */
-    dailyUserVlm: v.array(
-      v.object({
-        /** Date in YYYY-M-D format. */
-        date: v.pipe(v.string(), v.isoDate()),
-        /** User cross-trade volume. */
-        userCross: UnsignedDecimal,
-        /** User add-liquidity volume. */
-        userAdd: UnsignedDecimal,
-        /** Exchange total volume. */
-        exchange: UnsignedDecimal,
-      }),
-    ),
-    /** Fee schedule information. */
-    feeSchedule: v.object({
-      /** Cross-trade fee rate. */
-      cross: UnsignedDecimal,
-      /** Add-liquidity fee rate. */
-      add: UnsignedDecimal,
-      /** Spot cross-trade fee rate. */
-      spotCross: UnsignedDecimal,
-      /** Spot add-liquidity fee rate. */
-      spotAdd: UnsignedDecimal,
-      /** Fee tiers details. */
-      tiers: v.object({
-        /** Array of VIP fee tiers. */
-        vip: v.array(
-          v.object({
-            /** Notional volume cutoff. */
-            ntlCutoff: UnsignedDecimal,
-            /** Cross-trade fee rate. */
-            cross: UnsignedDecimal,
-            /** Add-liquidity fee rate. */
-            add: UnsignedDecimal,
-            /** Spot cross-trade fee rate. */
-            spotCross: UnsignedDecimal,
-            /** Spot add-liquidity fee rate. */
-            spotAdd: UnsignedDecimal,
-          }),
-        ),
-        /** Array of market maker fee tiers. */
-        mm: v.array(
-          v.object({
-            /** Maker fraction cutoff. */
-            makerFractionCutoff: UnsignedDecimal,
-            /** Add-liquidity fee rate. */
-            add: Decimal,
-          }),
-        ),
-      }),
-      /** Referral discount rate. */
-      referralDiscount: UnsignedDecimal,
-      /** Array of staking discount tiers. */
-      stakingDiscountTiers: v.array(
-        v.object({
-          /** Basis points of maximum supply. */
-          bpsOfMaxSupply: UnsignedDecimal,
-          /** Discount rate applied. */
-          discount: UnsignedDecimal,
-        }),
-      ),
-    }),
-    /** User cross-trade rate. */
-    userCrossRate: UnsignedDecimal,
-    /** User add-liquidity rate. */
-    userAddRate: UnsignedDecimal,
-    /** User spot cross-trade rate. */
-    userSpotCrossRate: UnsignedDecimal,
-    /** User spot add-liquidity rate. */
-    userSpotAddRate: UnsignedDecimal,
-    /** Active referral discount rate. */
-    activeReferralDiscount: UnsignedDecimal,
-    /** Trial details. */
-    trial: v.nullable(v.unknown()),
-    /** Fee trial escrow amount. */
-    feeTrialEscrow: UnsignedDecimal,
-    /** Timestamp when next trial becomes available. */
-    nextTrialAvailableTimestamp: v.nullable(v.unknown()),
+export type UserFeesResponse = {
+  /** Daily user volume metrics. */
+  dailyUserVlm: {
     /**
-     * Permanent link between staking and trading accounts.
-     * Staking user gains full control of trading account funds.
-     * Staking user forfeits own fee discounts.
+     * Date of the volume metrics.
+     * @pattern ^\d{4}-\d{2}-\d{2}$
      */
-    stakingLink: v.nullable(
-      v.object({
+    date: string;
+    /**
+     * User cross-trade volume.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    userCross: string;
+    /**
+     * User add-liquidity volume.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    userAdd: string;
+    /**
+     * Exchange total volume.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    exchange: string;
+  }[];
+  /** Fee schedule information. */
+  feeSchedule: {
+    /**
+     * Cross-trade fee rate.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    cross: string;
+    /**
+     * Add-liquidity fee rate.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    add: string;
+    /**
+     * Spot cross-trade fee rate.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    spotCross: string;
+    /**
+     * Spot add-liquidity fee rate.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    spotAdd: string;
+    /** Fee tiers details. */
+    tiers: {
+      /** Array of VIP fee tiers. */
+      vip: {
         /**
-         * Linked account address:
-         * - When queried by staking account: contains trading account address.
-         * - When queried by trading account: contains staking account address.
+         * Notional volume cutoff.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
          */
-        stakingUser: Address,
+        ntlCutoff: string;
         /**
-         * Link status:
-         * - `requested` = link initiated by trading user, awaiting staking user confirmation.
-         * - `stakingUser` = response queried by staking account.
-         * - `tradingUser` = response queried by trading account.
+         * Cross-trade fee rate.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
          */
-        type: v.picklist(["requested", "stakingUser", "tradingUser"]),
-      }),
-    ),
-    /** Active staking discount details. */
-    activeStakingDiscount: v.object({
-      /** Basis points of maximum supply. */
-      bpsOfMaxSupply: UnsignedDecimal,
-      /** Discount rate applied. */
-      discount: UnsignedDecimal,
-    }),
-  });
-})();
-export type UserFeesResponse = v.InferOutput<typeof UserFeesResponse>;
+        cross: string;
+        /**
+         * Add-liquidity fee rate.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
+        add: string;
+        /**
+         * Spot cross-trade fee rate.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
+        spotCross: string;
+        /**
+         * Spot add-liquidity fee rate.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
+        spotAdd: string;
+      }[];
+      /** Array of market maker fee tiers. */
+      mm: {
+        /**
+         * Maker fraction cutoff.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
+        makerFractionCutoff: string;
+        /**
+         * Add-liquidity fee rate.
+         * @pattern ^-?[0-9]+(\.[0-9]+)?$
+         */
+        add: string;
+      }[];
+    };
+    /**
+     * Referral discount rate.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    referralDiscount: string;
+    /** Array of staking discount tiers. */
+    stakingDiscountTiers: {
+      /**
+       * Basis points of maximum supply.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      bpsOfMaxSupply: string;
+      /**
+       * Discount rate applied.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      discount: string;
+    }[];
+  };
+  /**
+   * User cross-trade rate.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  userCrossRate: string;
+  /**
+   * User add-liquidity rate.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  userAddRate: string;
+  /**
+   * User spot cross-trade rate.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  userSpotCrossRate: string;
+  /**
+   * User spot add-liquidity rate.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  userSpotAddRate: string;
+  /**
+   * Active referral discount rate.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  activeReferralDiscount: string;
+  /** Trial details. */
+  trial: unknown | null;
+  /**
+   * Fee trial escrow amount.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  feeTrialEscrow: string;
+  /** Timestamp when next trial becomes available. */
+  nextTrialAvailableTimestamp: unknown | null;
+  /**
+   * Permanent link between staking and trading accounts.
+   * Staking user gains full control of trading account funds.
+   * Staking user forfeits own fee discounts.
+   */
+  stakingLink: {
+    /**
+     * Linked account address:
+     * - When queried by staking account: contains trading account address.
+     * - When queried by trading account: contains staking account address.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
+    stakingUser: `0x${string}`;
+    /**
+     * Link status:
+     * - `requested` = link initiated by trading user, awaiting staking user confirmation.
+     * - `stakingUser` = response queried by staking account.
+     * - `tradingUser` = response queried by trading account.
+     */
+    type: "requested" | "stakingUser" | "tradingUser";
+  } | null;
+  /** Active staking discount details. */
+  activeStakingDiscount: {
+    /**
+     * Basis points of maximum supply.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    bpsOfMaxSupply: string;
+    /**
+     * Discount rate applied.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    discount: string;
+  };
+};
 
 // ============================================================
 // Execution Logic

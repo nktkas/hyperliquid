@@ -5,9 +5,11 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
-/** Action related to validator management. */
+/**
+ * Action related to validator management.
+ */
 export const CValidatorActionRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Validator management action. */
@@ -84,11 +86,10 @@ export const CValidatorActionRequest = /* @__PURE__ */ (() => {
 })();
 export type CValidatorActionRequest = v.InferOutput<typeof CValidatorActionRequest>;
 
-/** Successful response without specific data or error response. */
-export const CValidatorActionResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type CValidatorActionResponse = v.InferOutput<typeof CValidatorActionResponse>;
+/**
+ * Successful response without specific data or error response.
+ */
+export type CValidatorActionResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

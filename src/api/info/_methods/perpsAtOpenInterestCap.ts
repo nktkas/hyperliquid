@@ -22,10 +22,7 @@ export type PerpsAtOpenInterestCapRequest = v.InferOutput<typeof PerpsAtOpenInte
  * Array of perpetuals at open interest caps.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#query-perps-at-open-interest-caps
  */
-export const PerpsAtOpenInterestCapResponse = /* @__PURE__ */ (() => {
-  return v.array(v.string());
-})();
-export type PerpsAtOpenInterestCapResponse = v.InferOutput<typeof PerpsAtOpenInterestCapResponse>;
+export type PerpsAtOpenInterestCapResponse = string[];
 
 // ============================================================
 // Execution Logic

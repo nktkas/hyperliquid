@@ -24,10 +24,7 @@ export type UserDexAbstractionRequest = v.InferOutput<typeof UserDexAbstractionR
  * User HIP-3 DEX abstraction state.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-hip-3-dex-abstraction-state
  */
-export const UserDexAbstractionResponse = /* @__PURE__ */ (() => {
-  return v.nullable(v.boolean());
-})();
-export type UserDexAbstractionResponse = v.InferOutput<typeof UserDexAbstractionResponse>;
+export type UserDexAbstractionResponse = boolean | null;
 
 // ============================================================
 // Execution Logic

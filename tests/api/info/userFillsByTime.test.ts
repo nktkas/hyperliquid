@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { UserFillsByTimeRequest, UserFillsByTimeResponse } from "@nktkas/hyperliquid/api/info";
+import { UserFillsByTimeRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/userFillsByTime.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "UserFillsByTimeResponse");
 
 runTest({
   name: "userFillsByTime",
@@ -16,8 +20,8 @@ runTest({
         startTime: Date.now() - 1000 * 60 * 60 * 24 * 365 * 5,
       }),
     ]);
-    schemaCoverage(UserFillsByTimeResponse, data, [
-      "#/items/intersect/0/properties/twapId/defined",
+    schemaCoverage(typeSchema, data, [
+      "#/items/properties/twapId/defined",
     ]);
   },
   cliTestFn: async (_t, runCommand) => {

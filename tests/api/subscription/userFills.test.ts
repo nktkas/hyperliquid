@@ -1,6 +1,10 @@
-import { UserFillsEvent } from "@nktkas/hyperliquid/api/subscription";
+import type { UserFillsEvent } from "@nktkas/hyperliquid/api/subscription";
 import { collectEventsOverTime, runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/subscription/_methods/userFills.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "UserFillsEvent");
 
 runTest({
   name: "userFills",
@@ -10,10 +14,10 @@ runTest({
       await client.userFills({ user: "0xe019d6167E7e324aEd003d94098496b6d986aB05" }, cb);
       await client.userFills({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" }, cb);
     }, 10_000);
-    schemaCoverage(UserFillsEvent, data, [
-      "#/properties/fills/items/intersect/0/properties/builderFee/defined",
-      "#/properties/fills/items/intersect/0/properties/twapId/defined",
-      "#/properties/isSnapshot/undefined",
+    schemaCoverage(typeSchema, data, [
+      "#/properties/fills/items/properties/builderFee/present",
+      "#/properties/fills/items/properties/twapId/defined",
+      "#/properties/isSnapshot/missing",
     ]);
   },
 });

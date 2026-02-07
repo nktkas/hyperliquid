@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { CancelRequest, CancelResponse } from "@nktkas/hyperliquid/api/exchange";
+import { CancelRequest } from "@nktkas/hyperliquid/api/exchange";
 import { openOrder, runTest } from "./_t.ts";
-import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/exchange/_methods/cancel.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "CancelSuccessResponse");
 
 runTest({
   name: "cancel",
@@ -15,7 +19,7 @@ runTest({
     const data = await Promise.all([
       exchClient.cancel({ cancels: [{ a: order.a, o: order.oid }] }),
     ]);
-    schemaCoverage(excludeErrorResponse(CancelResponse), data);
+    schemaCoverage(typeSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

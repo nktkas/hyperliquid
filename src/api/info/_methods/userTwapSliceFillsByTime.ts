@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { UserTwapSliceFillsResponse } from "./userTwapSliceFills.ts";
+import type { UserTwapSliceFillsResponse } from "./userTwapSliceFills.ts";
 
 /**
  * Request user TWAP slice fills by time.
@@ -30,10 +30,7 @@ export type UserTwapSliceFillsByTimeRequest = v.InferOutput<typeof UserTwapSlice
  * Array of user's twap slice fill by time.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills
  */
-export const UserTwapSliceFillsByTimeResponse = /* @__PURE__ */ (() => {
-  return UserTwapSliceFillsResponse;
-})();
-export type UserTwapSliceFillsByTimeResponse = v.InferOutput<typeof UserTwapSliceFillsByTimeResponse>;
+export type UserTwapSliceFillsByTimeResponse = UserTwapSliceFillsResponse;
 
 // ============================================================
 // Execution Logic

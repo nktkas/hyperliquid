@@ -4,8 +4,6 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Hex, Integer, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-
 /**
  * Request spot trading metadata.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-metadata
@@ -22,89 +20,83 @@ export type SpotMetaRequest = v.InferOutput<typeof SpotMetaRequest>;
  * Metadata for spot assets.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-metadata
  */
-export const SpotMetaResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Trading universes available for spot trading. */
-    universe: v.array(
-      v.object({
-        /** Token indices included in this universe. */
-        tokens: v.array(UnsignedInteger),
-        /** Name of the universe. */
-        name: v.string(),
-        /** Unique identifier of the universe. */
-        index: UnsignedInteger,
-        /** Indicates if the token is the primary representation in the system. */
-        isCanonical: v.boolean(),
-      }),
-    ),
-    /** Tokens available for spot trading. */
-    tokens: v.array(
-      v.object({
-        /** Name of the token. */
-        name: v.string(),
-        /** Minimum decimal places for order sizes. */
-        szDecimals: UnsignedInteger,
-        /** Number of decimals for the token's smallest unit. */
-        weiDecimals: UnsignedInteger,
-        /** Unique identifier for the token. */
-        index: UnsignedInteger,
-        /** Token ID. */
-        tokenId: Hex,
-        /** Indicates if the token is the primary representation in the system. */
-        isCanonical: v.boolean(),
-        /** EVM contract details. */
-        evmContract: v.nullable(
-          v.object({
-            /** Contract address. */
-            address: Address,
-            /** Extra decimals in the token's smallest unit. */
-            evm_extra_wei_decimals: Integer,
-          }),
-        ),
-        /** Full display name of the token. */
-        fullName: v.nullable(v.string()),
-        /** Deployer trading fee share for the token. */
-        deployerTradingFeeShare: UnsignedDecimal,
-      }),
-    ),
-    /** Outcome markets available for spot trading. */
-    outcomes: v.array(
-      v.object({
-        /** Unique identifier of the outcome market. */
-        outcome: UnsignedInteger,
-        /** Short name of the outcome market. */
-        name: v.string(),
-        /** Description of the outcome market. */
-        description: v.string(),
-        /** Token specifications for each side of the outcome market. */
-        sideSpecs: v.array(
-          v.object({
-            /** Side name (e.g., "YES", "NO"). */
-            name: v.string(),
-            /** Spot token index corresponding to this side. */
-            token: UnsignedInteger,
-          }),
-        ),
-      }),
-    ),
-    /** Questions for prediction markets. */
-    questions: v.array(
-      v.object({
-        /** Unique identifier of the question. */
-        question: UnsignedInteger,
-        /** Short name of the question. */
-        name: v.string(),
-        /** Description of the question. */
-        description: v.string(),
-        /** Default outcome index if the question is not resolved. */
-        fallbackOutcome: UnsignedInteger,
-        /** Outcome indices associated with this question. */
-        namedOutcomes: v.array(UnsignedInteger),
-      }),
-    ),
-  });
-})();
-export type SpotMetaResponse = v.InferOutput<typeof SpotMetaResponse>;
+export type SpotMetaResponse = {
+  /** Trading universes available for spot trading. */
+  universe: {
+    /** Token indices included in this universe. */
+    tokens: number[];
+    /** Name of the universe. */
+    name: string;
+    /** Unique identifier of the universe. */
+    index: number;
+    /** Indicates if the token is the primary representation in the system. */
+    isCanonical: boolean;
+  }[];
+  /** Tokens available for spot trading. */
+  tokens: {
+    /** Name of the token. */
+    name: string;
+    /** Minimum decimal places for order sizes. */
+    szDecimals: number;
+    /** Number of decimals for the token's smallest unit. */
+    weiDecimals: number;
+    /** Unique identifier for the token. */
+    index: number;
+    /**
+     * Token ID.
+     * @pattern ^0[xX][0-9a-fA-F]{32}$
+     */
+    tokenId: `0x${string}`;
+    /** Indicates if the token is the primary representation in the system. */
+    isCanonical: boolean;
+    /** EVM contract details. */
+    evmContract: {
+      /**
+       * Contract address.
+       * @pattern ^0x[a-fA-F0-9]{40}$
+       */
+      address: `0x${string}`;
+      /** Extra decimals in the token's smallest unit. */
+      evm_extra_wei_decimals: number;
+    } | null;
+    /** Full display name of the token. */
+    fullName: string | null;
+    /**
+     * Deployer trading fee share for the token.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    deployerTradingFeeShare: string;
+  }[];
+  /** Outcome markets available for spot trading. */
+  outcomes: {
+    /** Unique identifier of the outcome market. */
+    outcome: number;
+    /** Short name of the outcome market. */
+    name: string;
+    /** Description of the outcome market. */
+    description: string;
+    /** Token specifications for each side of the outcome market. */
+    sideSpecs: {
+      /** Side name (e.g., "YES", "NO"). */
+      name: string;
+      /** Spot token index corresponding to this side. */
+      token: number;
+    }[];
+  }[];
+  /** Questions for prediction markets. */
+  questions: {
+    /** Unique identifier of the question. */
+    question: number;
+    /** Short name of the question. */
+    name: string;
+    /** Description of the question. */
+    description: string;
+    /** Default outcome index if the question is not resolved. */
+    fallbackOutcome: number;
+    /** Outcome indices associated with this question. */
+    namedOutcomes: number[];
+  }[];
+};
 
 // ============================================================
 // Execution Logic

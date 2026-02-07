@@ -4,8 +4,6 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { UnsignedDecimal } from "../../_schemas.ts";
-
 /**
  * Request perp DEX status.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#get-perp-market-status
@@ -24,13 +22,13 @@ export type PerpDexStatusRequest = v.InferOutput<typeof PerpDexStatusRequest>;
  * Status of a perp DEX.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#get-perp-market-status
  */
-export const PerpDexStatusResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Total net deposit. */
-    totalNetDeposit: UnsignedDecimal,
-  });
-})();
-export type PerpDexStatusResponse = v.InferOutput<typeof PerpDexStatusResponse>;
+export type PerpDexStatusResponse = {
+  /**
+   * Total net deposit.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  totalNetDeposit: string;
+};
 
 // ============================================================
 // Execution Logic

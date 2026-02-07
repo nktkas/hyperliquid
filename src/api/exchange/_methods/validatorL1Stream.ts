@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Validator vote on risk-free rate for aligned quote asset.
@@ -34,10 +34,7 @@ export type ValidatorL1StreamRequest = v.InferOutput<typeof ValidatorL1StreamReq
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#validator-vote-on-risk-free-rate-for-aligned-quote-asset
  */
-export const ValidatorL1StreamResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type ValidatorL1StreamResponse = v.InferOutput<typeof ValidatorL1StreamResponse>;
+export type ValidatorL1StreamResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

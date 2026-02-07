@@ -4,10 +4,12 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { TwapStateSchema } from "../../info/_methods/_base/commonSchemas.ts";
+import { Address } from "../../_schemas.ts";
+import type { TwapStateSchema } from "../../info/_methods/_base/commonSchemas.ts";
 
-/** Subscribe to TWAP states updates for a specific user. */
+/**
+ * Subscribe to TWAP states updates for a specific user.
+ */
 export const TwapStatesRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -20,18 +22,20 @@ export const TwapStatesRequest = /* @__PURE__ */ (() => {
 })();
 export type TwapStatesRequest = v.InferOutput<typeof TwapStatesRequest>;
 
-/** Event of user TWAP states. */
-export const TwapStatesEvent = /* @__PURE__ */ (() => {
-  return v.object({
-    /** DEX name (empty string for main dex). */
-    dex: v.string(),
-    /** User address. */
-    user: Address,
-    /** Array of tuples of TWAP ID and TWAP state. */
-    states: v.array(v.tuple([UnsignedInteger, TwapStateSchema])),
-  });
-})();
-export type TwapStatesEvent = v.InferOutput<typeof TwapStatesEvent>;
+/**
+ * Event of user TWAP states.
+ */
+export type TwapStatesEvent = {
+  /** DEX name (empty string for main dex). */
+  dex: string;
+  /**
+   * User address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  user: `0x${string}`;
+  /** Array of tuples of TWAP ID and TWAP state. */
+  states: [twapId: number, state: TwapStateSchema][];
+};
 
 // ============================================================
 // Execution Logic

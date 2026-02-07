@@ -4,8 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { UnsignedInteger } from "../../_schemas.ts";
-import { BorrowLendReserveStateResponse } from "./borrowLendReserveState.ts";
+import type { BorrowLendReserveStateResponse } from "./borrowLendReserveState.ts";
 
 /**
  * Request all borrow/lend reserve states.
@@ -23,10 +22,7 @@ export type AllBorrowLendReserveStatesRequest = v.InferOutput<typeof AllBorrowLe
  * Array of tuples of reserve IDs and their borrow/lend reserve state.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-all-borrow-lend-reserve-states
  */
-export const AllBorrowLendReserveStatesResponse = /* @__PURE__ */ (() => {
-  return v.array(v.tuple([UnsignedInteger, BorrowLendReserveStateResponse]));
-})();
-export type AllBorrowLendReserveStatesResponse = v.InferOutput<typeof AllBorrowLendReserveStatesResponse>;
+export type AllBorrowLendReserveStatesResponse = [reserveId: number, state: BorrowLendReserveStateResponse][];
 
 // ============================================================
 // Execution Logic

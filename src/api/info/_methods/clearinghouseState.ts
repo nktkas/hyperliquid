@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Decimal, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address } from "../../_schemas.ts";
 
 /**
  * Request clearinghouse state.
@@ -26,93 +26,148 @@ export type ClearinghouseStateRequest = v.InferOutput<typeof ClearinghouseStateR
  * Account summary for perpetual trading.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-perpetuals-account-summary
  */
-export const ClearinghouseStateResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Margin summary details. */
-    marginSummary: v.object({
-      /** Total account value. */
-      accountValue: UnsignedDecimal,
-      /** Total notional position value. */
-      totalNtlPos: UnsignedDecimal,
-      /** Total raw USD value. */
-      totalRawUsd: Decimal,
-      /** Total margin used. */
-      totalMarginUsed: UnsignedDecimal,
-    }),
-    /** Cross-margin summary details. */
-    crossMarginSummary: v.object({
-      /** Total account value. */
-      accountValue: UnsignedDecimal,
-      /** Total notional position value. */
-      totalNtlPos: UnsignedDecimal,
-      /** Total raw USD value. */
-      totalRawUsd: Decimal,
-      /** Total margin used. */
-      totalMarginUsed: UnsignedDecimal,
-    }),
-    /** Maintenance margin used for cross-margin positions. */
-    crossMaintenanceMarginUsed: UnsignedDecimal,
-    /** Amount available for withdrawal. */
-    withdrawable: UnsignedDecimal,
-    /** Array of asset positions. */
-    assetPositions: v.array(
-      v.object({
-        /** Position type. */
-        type: v.literal("oneWay"),
-        /** Position details. */
-        position: v.object({
-          /** Asset symbol. */
-          coin: v.string(),
-          /** Signed position size. */
-          szi: Decimal,
-          /** Leverage details. */
-          leverage: v.variant("type", [
-            v.object({
-              /** Leverage type. */
-              type: v.literal("isolated"),
-              /** Leverage value used. */
-              value: v.pipe(UnsignedInteger, v.minValue(1)),
-              /** Amount of USD used (1 = $1). */
-              rawUsd: Decimal,
-            }),
-            v.object({
-              /** Leverage type. */
-              type: v.literal("cross"),
-              /** Leverage value used. */
-              value: v.pipe(UnsignedInteger, v.minValue(1)),
-            }),
-          ]),
-          /** Average entry price. */
-          entryPx: UnsignedDecimal,
-          /** Position value. */
-          positionValue: UnsignedDecimal,
-          /** Unrealized profit and loss. */
-          unrealizedPnl: Decimal,
-          /** Return on equity. */
-          returnOnEquity: Decimal,
-          /** Liquidation price. */
-          liquidationPx: v.nullable(UnsignedDecimal),
-          /** Margin used. */
-          marginUsed: UnsignedDecimal,
-          /** Maximum allowed leverage. */
-          maxLeverage: v.pipe(UnsignedInteger, v.minValue(1)),
-          /** Cumulative funding details. */
-          cumFunding: v.object({
-            /** Total funding paid or received since account opening. */
-            allTime: Decimal,
-            /** Funding accumulated since the position was opened. */
-            sinceOpen: Decimal,
-            /** Funding accumulated since the last change in position size. */
-            sinceChange: Decimal,
-          }),
-        }),
-      }),
-    ),
-    /** Timestamp when data was retrieved (in ms since epoch). */
-    time: UnsignedInteger,
-  });
-})();
-export type ClearinghouseStateResponse = v.InferOutput<typeof ClearinghouseStateResponse>;
+export type ClearinghouseStateResponse = {
+  /** Margin summary details. */
+  marginSummary: {
+    /**
+     * Total account value.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    accountValue: string;
+    /**
+     * Total notional position value.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    totalNtlPos: string;
+    /**
+     * Total raw USD value.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
+    totalRawUsd: string;
+    /**
+     * Total margin used.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    totalMarginUsed: string;
+  };
+  /** Cross-margin summary details. */
+  crossMarginSummary: {
+    /**
+     *  Total account value.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    accountValue: string;
+    /**
+     * Total notional position value.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    totalNtlPos: string;
+    /**
+     * Total raw USD value.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
+    totalRawUsd: string;
+    /**
+     * Total margin used.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    totalMarginUsed: string;
+  };
+  /**
+   * Maintenance margin used for cross-margin positions.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  crossMaintenanceMarginUsed: string;
+  /**
+   * Amount available for withdrawal.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  withdrawable: string;
+  /** Array of asset positions. */
+  assetPositions: {
+    /** Position type. */
+    type: "oneWay";
+    /** Position details. */
+    position: {
+      /** Asset symbol. */
+      coin: string;
+      /**
+       * Signed position size.
+       * @pattern ^-?[0-9]+(\.[0-9]+)?$
+       */
+      szi: string;
+      /** Leverage details. */
+      leverage: {
+        /** Leverage type. */
+        type: "isolated";
+        /** Leverage value used. */
+        value: number;
+        /**
+         * Amount of USD used (1 = $1).
+         * @pattern ^-?[0-9]+(\.[0-9]+)?$
+         */
+        rawUsd: string;
+      } | {
+        /** Leverage type. */
+        type: "cross";
+        /** Leverage value used. */
+        value: number;
+      };
+      /**
+       * Average entry price.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      entryPx: string;
+      /**
+       * Position value.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      positionValue: string;
+      /**
+       * Unrealized profit and loss.
+       * @pattern ^-?[0-9]+(\.[0-9]+)?$
+       */
+      unrealizedPnl: string;
+      /**
+       * Return on equity.
+       * @pattern ^-?[0-9]+(\.[0-9]+)?$
+       */
+      returnOnEquity: string;
+      /**
+       * Liquidation price.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      liquidationPx: string | null;
+      /**
+       * Margin used.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      marginUsed: string;
+      /** Maximum allowed leverage. */
+      maxLeverage: number;
+      /** Cumulative funding details. */
+      cumFunding: {
+        /**
+         * Total funding paid or received since account opening.
+         * @pattern ^-?[0-9]+(\.[0-9]+)?$
+         */
+        allTime: string;
+        /**
+         * Funding accumulated since the position was opened.
+         * @pattern ^-?[0-9]+(\.[0-9]+)?$
+         */
+        sinceOpen: string;
+        /**
+         * Funding accumulated since the last change in position size.
+         * @pattern ^-?[0-9]+(\.[0-9]+)?$
+         */
+        sinceChange: string;
+      };
+    };
+  }[];
+  /** Timestamp when data was retrieved (in ms since epoch). */
+  time: number;
+};
 
 // ============================================================
 // Execution Logic

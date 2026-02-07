@@ -5,9 +5,11 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
-/** Distribute funds from a vault between followers. */
+/**
+ * Distribute funds from a vault between followers.
+ */
 export const VaultDistributeRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Action to perform. */
@@ -32,11 +34,10 @@ export const VaultDistributeRequest = /* @__PURE__ */ (() => {
 })();
 export type VaultDistributeRequest = v.InferOutput<typeof VaultDistributeRequest>;
 
-/** Successful response without specific data or error response. */
-export const VaultDistributeResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type VaultDistributeResponse = v.InferOutput<typeof VaultDistributeResponse>;
+/**
+ * Successful response without specific data or error response.
+ */
+export type VaultDistributeResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

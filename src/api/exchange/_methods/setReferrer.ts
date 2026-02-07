@@ -5,9 +5,11 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
-/** Set a referral code. */
+/**
+ * Set a referral code.
+ */
 export const SetReferrerRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Action to perform. */
@@ -27,11 +29,10 @@ export const SetReferrerRequest = /* @__PURE__ */ (() => {
 })();
 export type SetReferrerRequest = v.InferOutput<typeof SetReferrerRequest>;
 
-/** Successful response without specific data or error response. */
-export const SetReferrerResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type SetReferrerResponse = v.InferOutput<typeof SetReferrerResponse>;
+/**
+ * Successful response without specific data or error response.
+ */
+export type SetReferrerResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

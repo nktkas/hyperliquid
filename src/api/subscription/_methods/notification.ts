@@ -6,7 +6,9 @@ import * as v from "@valibot/valibot";
 
 import { Address } from "../../_schemas.ts";
 
-/** Subscription to notification events for a specific user. */
+/**
+ * Subscription to notification events for a specific user.
+ */
 export const NotificationRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -17,14 +19,13 @@ export const NotificationRequest = /* @__PURE__ */ (() => {
 })();
 export type NotificationRequest = v.InferOutput<typeof NotificationRequest>;
 
-/** Event of user notification. */
-export const NotificationEvent = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Notification content. */
-    notification: v.string(),
-  });
-})();
-export type NotificationEvent = v.InferOutput<typeof NotificationEvent>;
+/**
+ * Event of user notification.
+ */
+export type NotificationEvent = {
+  /** Notification content. */
+  notification: string;
+};
 
 // ============================================================
 // Execution Logic

@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address } from "../../_schemas.ts";
 
 /**
  * Request user's staking summary.
@@ -24,19 +24,25 @@ export type DelegatorSummaryRequest = v.InferOutput<typeof DelegatorSummaryReque
  * User's staking summary.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-summary
  */
-export const DelegatorSummaryResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Total amount of delegated tokens. */
-    delegated: UnsignedDecimal,
-    /** Total amount of undelegated tokens. */
-    undelegated: UnsignedDecimal,
-    /** Total amount of tokens pending withdrawal. */
-    totalPendingWithdrawal: UnsignedDecimal,
-    /** Number of pending withdrawals. */
-    nPendingWithdrawals: UnsignedInteger,
-  });
-})();
-export type DelegatorSummaryResponse = v.InferOutput<typeof DelegatorSummaryResponse>;
+export type DelegatorSummaryResponse = {
+  /**
+   * Total amount of delegated tokens.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  delegated: string;
+  /**
+   * Total amount of undelegated tokens.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  undelegated: string;
+  /**
+   * Total amount of tokens pending withdrawal.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  totalPendingWithdrawal: string;
+  /** Number of pending withdrawals. */
+  nPendingWithdrawals: number;
+};
 
 // ============================================================
 // Execution Logic

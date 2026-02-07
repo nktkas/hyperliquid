@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Schedule a cancel-all operation at a future time.
@@ -41,10 +41,7 @@ export type ScheduleCancelRequest = v.InferOutput<typeof ScheduleCancelRequest>;
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#schedule-cancel-dead-mans-switch
  */
-export const ScheduleCancelResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type ScheduleCancelResponse = v.InferOutput<typeof ScheduleCancelResponse>;
+export type ScheduleCancelResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

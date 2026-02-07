@@ -5,7 +5,12 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Hex, Percent, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import {
+  type ErrorResponse,
+  HyperliquidChainSchema,
+  SignatureSchema,
+  type SuccessResponse,
+} from "./_base/commonSchemas.ts";
 
 /**
  * Approve a maximum fee rate for a builder.
@@ -40,10 +45,7 @@ export type ApproveBuilderFeeRequest = v.InferOutput<typeof ApproveBuilderFeeReq
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-a-builder-fee
  */
-export const ApproveBuilderFeeResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type ApproveBuilderFeeResponse = v.InferOutput<typeof ApproveBuilderFeeResponse>;
+export type ApproveBuilderFeeResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

@@ -5,7 +5,12 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import {
+  type ErrorResponse,
+  HyperliquidChainSchema,
+  SignatureSchema,
+  type SuccessResponse,
+} from "./_base/commonSchemas.ts";
 
 /**
  * Transfer funds between Spot account and Perp account.
@@ -40,10 +45,7 @@ export type UsdClassTransferRequest = v.InferOutput<typeof UsdClassTransferReque
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa
  */
-export const UsdClassTransferResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type UsdClassTransferResponse = v.InferOutput<typeof UsdClassTransferResponse>;
+export type UsdClassTransferResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

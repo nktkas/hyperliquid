@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { UserDetailsRequest, UserDetailsResponse } from "@nktkas/hyperliquid/api/info";
+import { UserDetailsRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/userDetails.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "UserDetailsResponse");
 
 runTest({
   name: "userDetails",
@@ -9,7 +13,7 @@ runTest({
     const data = await Promise.all([
       client.userDetails({ user: "0x9150749C4cec13Dc7c1555D0d664F08d4d81Be83" }),
     ]);
-    schemaCoverage(UserDetailsResponse, data);
+    schemaCoverage(typeSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

@@ -4,9 +4,11 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { PerpAssetCtxSchema } from "../../info/_methods/_base/commonSchemas.ts";
+import type { PerpAssetCtxSchema } from "../../info/_methods/_base/commonSchemas.ts";
 
-/** Subscription to context events for all perpetual assets. */
+/**
+ * Subscription to context events for all perpetual assets.
+ */
 export const AssetCtxsRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -17,16 +19,15 @@ export const AssetCtxsRequest = /* @__PURE__ */ (() => {
 })();
 export type AssetCtxsRequest = v.InferOutput<typeof AssetCtxsRequest>;
 
-/** Event of asset contexts for all perpetual assets on a specified DEX. */
-export const AssetCtxsEvent = /* @__PURE__ */ (() => {
-  return v.object({
-    /** DEX name (empty string for main dex). */
-    dex: v.string(),
-    /** Array of context information for each perpetual asset. */
-    ctxs: v.array(PerpAssetCtxSchema),
-  });
-})();
-export type AssetCtxsEvent = v.InferOutput<typeof AssetCtxsEvent>;
+/**
+ * Event of asset contexts for all perpetual assets on a specified DEX.
+ */
+export type AssetCtxsEvent = {
+  /** DEX name (empty string for main dex). */
+  dex: string;
+  /** Array of context information for each perpetual asset. */
+  ctxs: PerpAssetCtxSchema[];
+};
 
 // ============================================================
 // Execution Logic

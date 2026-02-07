@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { ExchangeStatusRequest, ExchangeStatusResponse } from "@nktkas/hyperliquid/api/info";
+import { ExchangeStatusRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/exchangeStatus.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "ExchangeStatusResponse");
 
 runTest({
   name: "exchangeStatus",
@@ -9,8 +13,8 @@ runTest({
     const data = await Promise.all([
       client.exchangeStatus(),
     ]);
-    schemaCoverage(ExchangeStatusResponse, data, [
-      "#/properties/specialStatuses",
+    schemaCoverage(typeSchema, data, [
+      "#/properties/specialStatuses/defined",
     ]);
   },
   cliTestFn: async (_t, runCommand) => {

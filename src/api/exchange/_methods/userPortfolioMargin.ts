@@ -5,7 +5,12 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import {
+  type ErrorResponse,
+  HyperliquidChainSchema,
+  SignatureSchema,
+  type SuccessResponse,
+} from "./_base/commonSchemas.ts";
 
 /**
  * Enable/disable user portfolio margin.
@@ -40,10 +45,7 @@ export type UserPortfolioMarginRequest = v.InferOutput<typeof UserPortfolioMargi
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/trading/portfolio-margin
  */
-export const UserPortfolioMarginResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type UserPortfolioMarginResponse = v.InferOutput<typeof UserPortfolioMarginResponse>;
+export type UserPortfolioMarginResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

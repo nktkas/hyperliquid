@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedInteger } from "../../_schemas.ts";
+import { Address } from "../../_schemas.ts";
 
 /**
  * Request multi-sig signers for a user.
@@ -22,17 +22,15 @@ export type UserToMultiSigSignersRequest = v.InferOutput<typeof UserToMultiSigSi
 /**
  * Multi-sig signers for a user or null if the user does not have any multi-sig signers.
  */
-export const UserToMultiSigSignersResponse = /* @__PURE__ */ (() => {
-  return v.nullable(
-    v.object({
-      /** Authorized users addresses. */
-      authorizedUsers: v.pipe(v.array(Address), v.nonEmpty()),
-      /** Threshold number of signatures required. */
-      threshold: v.pipe(UnsignedInteger, v.minValue(1)),
-    }),
-  );
-})();
-export type UserToMultiSigSignersResponse = v.InferOutput<typeof UserToMultiSigSignersResponse>;
+export type UserToMultiSigSignersResponse = {
+  /**
+   * Authorized users addresses.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  authorizedUsers: `0x${string}`[];
+  /** Threshold number of signatures required. */
+  threshold: number;
+} | null;
 
 // ============================================================
 // Execution Logic

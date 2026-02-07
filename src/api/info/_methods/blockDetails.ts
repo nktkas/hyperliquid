@@ -4,8 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
-import { ExplorerTransactionSchema } from "./_base/commonSchemas.ts";
+import { UnsignedInteger } from "../../_schemas.ts";
+import type { ExplorerTransactionSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Request block details by block height.
@@ -23,28 +23,31 @@ export type BlockDetailsRequest = v.InferOutput<typeof BlockDetailsRequest>;
 /**
  * Response containing block information.
  */
-export const BlockDetailsResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Type of response. */
-    type: v.literal("blockDetails"),
-    /** The details of a block. */
-    blockDetails: v.object({
-      /** Block creation timestamp. */
-      blockTime: UnsignedInteger,
-      /** Block hash. */
-      hash: v.pipe(Hex, v.length(66)),
-      /** Block height in chain. */
-      height: UnsignedInteger,
-      /** Total transactions in block. */
-      numTxs: UnsignedInteger,
-      /** Block proposer address. */
-      proposer: Address,
-      /** Array of transactions in the block. */
-      txs: v.array(ExplorerTransactionSchema),
-    }),
-  });
-})();
-export type BlockDetailsResponse = v.InferOutput<typeof BlockDetailsResponse>;
+export type BlockDetailsResponse = {
+  /** Type of response. */
+  type: "blockDetails";
+  /** The details of a block. */
+  blockDetails: {
+    /** Block creation timestamp. */
+    blockTime: number;
+    /**
+     * Block hash.
+     * @pattern ^0x[a-fA-F0-9]{64}$
+     */
+    hash: `0x${string}`;
+    /** Block height in chain. */
+    height: number;
+    /** Total transactions in block. */
+    numTxs: number;
+    /**
+     * Block proposer address.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
+    proposer: `0x${string}`;
+    /** Array of transactions in the block. */
+    txs: ExplorerTransactionSchema[];
+  };
+};
 
 // ============================================================
 // Execution Logic

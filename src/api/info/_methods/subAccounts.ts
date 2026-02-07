@@ -5,8 +5,8 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import { ClearinghouseStateResponse } from "./clearinghouseState.ts";
-import { SpotClearinghouseStateResponse } from "./spotClearinghouseState.ts";
+import type { ClearinghouseStateResponse } from "./clearinghouseState.ts";
+import type { SpotClearinghouseStateResponse } from "./spotClearinghouseState.ts";
 
 /**
  * Request user sub-accounts.
@@ -26,25 +26,24 @@ export type SubAccountsRequest = v.InferOutput<typeof SubAccountsRequest>;
  * Array of user sub-account or null if the user does not have any sub-accounts.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-subaccounts
  */
-export const SubAccountsResponse = /* @__PURE__ */ (() => {
-  return v.nullable(
-    v.array(
-      v.object({
-        /** Sub-account name. */
-        name: v.pipe(v.string(), v.nonEmpty()),
-        /** Sub-account address. */
-        subAccountUser: Address,
-        /** Master account address. */
-        master: Address,
-        /** Perpetual trading clearinghouse state summary. */
-        clearinghouseState: ClearinghouseStateResponse,
-        /** Spot tokens clearinghouse state. */
-        spotState: SpotClearinghouseStateResponse,
-      }),
-    ),
-  );
-})();
-export type SubAccountsResponse = v.InferOutput<typeof SubAccountsResponse>;
+export type SubAccountsResponse = {
+  /** Sub-account name. */
+  name: string;
+  /**
+   * Sub-account address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  subAccountUser: `0x${string}`;
+  /**
+   * Master account address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  master: `0x${string}`;
+  /** Perpetual trading clearinghouse state summary. */
+  clearinghouseState: ClearinghouseStateResponse;
+  /** Spot tokens clearinghouse state. */
+  spotState: SpotClearinghouseStateResponse;
+}[] | null;
 
 // ============================================================
 // Execution Logic

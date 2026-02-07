@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { PerpDexLimitsRequest, PerpDexLimitsResponse } from "@nktkas/hyperliquid/api/info";
+import { PerpDexLimitsRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/perpDexLimits.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "PerpDexLimitsResponse");
 
 runTest({
   name: "perpDexLimits",
@@ -10,7 +14,7 @@ runTest({
       client.perpDexLimits({ dex: "" }),
       client.perpDexLimits({ dex: "vntls" }),
     ]);
-    schemaCoverage(PerpDexLimitsResponse, data);
+    schemaCoverage(typeSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

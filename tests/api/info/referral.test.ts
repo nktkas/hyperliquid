@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { ReferralRequest, ReferralResponse } from "@nktkas/hyperliquid/api/info";
+import { ReferralRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/referral.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "ReferralResponse");
 
 runTest({
   name: "referral",
@@ -13,7 +17,7 @@ runTest({
       client.referral({ user: "0x97c36726668f490fa17eb2957a92D39116f171fE" }), // referrerState.stage = needToCreateCode
       client.referral({ user: "0x0000000000000000000000000000000000000001" }), // referrerState.stage = needToTrade
     ]);
-    schemaCoverage(ReferralResponse, data, [
+    schemaCoverage(typeSchema, data, [
       "#/properties/rewardHistory/array",
     ]);
   },

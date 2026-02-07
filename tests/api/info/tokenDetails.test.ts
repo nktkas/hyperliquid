@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { TokenDetailsRequest, TokenDetailsResponse } from "@nktkas/hyperliquid/api/info";
+import { TokenDetailsRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/tokenDetails.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "TokenDetailsResponse");
 
 runTest({
   name: "tokenDetails",
@@ -19,8 +23,8 @@ runTest({
       client.tokenDetails({ tokenId: "0x3d8a82efa63e86d54a1922c2afdac61e" }), // deployTime = string
       client.tokenDetails({ tokenId: "0xc4bf3f870c0e9465323c0b6ed28096c2" }), // deployTime = null
     ]);
-    schemaCoverage(TokenDetailsResponse, data, [
-      "#/properties/genesis/wrapped/properties/blacklistUsers/array",
+    schemaCoverage(typeSchema, data, [
+      "#/properties/genesis/anyOf/0/properties/blacklistUsers/array",
     ]);
   },
   cliTestFn: async (_t, runCommand) => {

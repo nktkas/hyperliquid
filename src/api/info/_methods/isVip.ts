@@ -22,10 +22,7 @@ export type IsVipRequest = v.InferOutput<typeof IsVipRequest>;
 /**
  * Boolean indicating user's VIP status.
  */
-export const IsVipResponse = /* @__PURE__ */ (() => {
-  return v.nullable(v.boolean());
-})();
-export type IsVipResponse = v.InferOutput<typeof IsVipResponse>;
+export type IsVipResponse = boolean | null;
 
 // ============================================================
 // Execution Logic

@@ -27,11 +27,7 @@ export type MaxBuilderFeeRequest = v.InferOutput<typeof MaxBuilderFeeRequest>;
  * Maximum builder fee approval.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#check-builder-fee-approval
  */
-export const MaxBuilderFeeResponse = /* @__PURE__ */ (() => {
-  return v.number();
-})();
-
-export type MaxBuilderFeeResponse = v.InferOutput<typeof MaxBuilderFeeResponse>;
+export type MaxBuilderFeeResponse = number;
 
 // ============================================================
 // Execution Logic

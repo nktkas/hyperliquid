@@ -4,11 +4,13 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { LeadingVaultsResponse } from "../../info/_methods/leadingVaults.ts";
-import { PerpsAtOpenInterestCapResponse } from "../../info/_methods/perpsAtOpenInterestCap.ts";
+import { Address } from "../../_schemas.ts";
+import type { LeadingVaultsResponse } from "../../info/_methods/leadingVaults.ts";
+import type { PerpsAtOpenInterestCapResponse } from "../../info/_methods/perpsAtOpenInterestCap.ts";
 
-/** Subscription to comprehensive user and market data events. */
+/**
+ * Subscription to comprehensive user and market data events.
+ */
 export const WebData3Request = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -19,44 +21,53 @@ export const WebData3Request = /* @__PURE__ */ (() => {
 })();
 export type WebData3Request = v.InferOutput<typeof WebData3Request>;
 
-/** Event of comprehensive user and market data. */
-export const WebData3Event = /* @__PURE__ */ (() => {
-  return v.object({
-    /** User state information. */
-    userState: v.object({
-      /** Agent address if one exists. */
-      agentAddress: v.nullable(Address),
-      /** Timestamp until which the agent is valid. */
-      agentValidUntil: v.nullable(UnsignedInteger),
-      /** Cumulative ledger value. */
-      cumLedger: UnsignedDecimal,
-      /** Server timestamp (in ms since epoch). */
-      serverTime: UnsignedInteger,
-      /** Whether this account is a vault. */
-      isVault: v.boolean(),
-      /** User address. */
-      user: Address,
-      /** Whether the user has opted out of spot dusting. */
-      optOutOfSpotDusting: v.optional(v.literal(true)),
-      /** Whether DEX abstraction is enabled. */
-      dexAbstractionEnabled: v.optional(v.boolean()),
-      /** Abstraction mode for the user account. */
-      abstraction: v.optional(v.picklist(["dexAbstraction", "unifiedAccount", "portfolioMargin", "disabled"])),
-    }),
-    /** Array of perpetual DEX states. */
-    perpDexStates: v.array(
-      v.object({
-        /** Total equity in vaults. */
-        totalVaultEquity: UnsignedDecimal,
-        /** Assets currently at their open interest cap. */
-        perpsAtOpenInterestCap: v.optional(PerpsAtOpenInterestCapResponse),
-        /** Array of leading vaults. */
-        leadingVaults: v.optional(LeadingVaultsResponse),
-      }),
-    ),
-  });
-})();
-export type WebData3Event = v.InferOutput<typeof WebData3Event>;
+/**
+ * Event of comprehensive user and market data.
+ */
+export type WebData3Event = {
+  /** User state information. */
+  userState: {
+    /**
+     * Agent address if one exists.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
+    agentAddress: `0x${string}` | null;
+    /** Timestamp until which the agent is valid. */
+    agentValidUntil: number | null;
+    /**
+     * Cumulative ledger value.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    cumLedger: string;
+    /** Server timestamp (in ms since epoch). */
+    serverTime: number;
+    /** Whether this account is a vault. */
+    isVault: boolean;
+    /**
+     * User address.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
+    user: `0x${string}`;
+    /** Whether the user has opted out of spot dusting. */
+    optOutOfSpotDusting?: true;
+    /** Whether DEX abstraction is enabled. */
+    dexAbstractionEnabled?: boolean;
+    /** Abstraction mode for the user account. */
+    abstraction?: "dexAbstraction" | "unifiedAccount" | "portfolioMargin" | "disabled";
+  };
+  /** Array of perpetual DEX states. */
+  perpDexStates: {
+    /**
+     * Total equity in vaults.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    totalVaultEquity: string;
+    /** Assets currently at their open interest cap. */
+    perpsAtOpenInterestCap?: PerpsAtOpenInterestCapResponse;
+    /** Array of leading vaults. */
+    leadingVaults?: LeadingVaultsResponse;
+  }[];
+};
 
 // ============================================================
 // Execution Logic

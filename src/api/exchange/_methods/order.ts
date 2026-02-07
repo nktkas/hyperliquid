@@ -104,54 +104,61 @@ export type OrderRequest = v.InferOutput<typeof OrderRequest>;
  * Response for order placement.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-an-order
  */
-export const OrderResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Successful status. */
-    status: v.literal("ok"),
-    /** Response details. */
-    response: v.object({
-      /** Type of response. */
-      type: v.literal("order"),
-      /** Specific data. */
-      data: v.object({
-        /**Array of statuses for each placed order. */
-        statuses: v.array(
-          v.union([
-            v.object({
-              /** Resting order status. */
-              resting: v.object({
-                /** Order ID. */
-                oid: UnsignedInteger,
-                /** Client Order ID. */
-                cloid: v.optional(Cloid),
-              }),
-            }),
-            v.object({
-              /** Filled order status. */
-              filled: v.object({
-                /** Total size filled. */
-                totalSz: UnsignedDecimal,
-                /** Average price of fill. */
-                avgPx: UnsignedDecimal,
-                /** Order ID. */
-                oid: UnsignedInteger,
-                /** Client Order ID. */
-                cloid: v.optional(Cloid),
-              }),
-            }),
-            v.object({
-              /** Error message. */
-              error: v.string(),
-            }),
-            v.literal("waitingForFill"),
-            v.literal("waitingForTrigger"),
-          ]),
-        ),
-      }),
-    }),
-  });
-})();
-export type OrderResponse = v.InferOutput<typeof OrderResponse>;
+export type OrderResponse = {
+  /** Successful status. */
+  status: "ok";
+  /** Response details. */
+  response: {
+    /** Type of response. */
+    type: "order";
+    /** Specific data. */
+    data: {
+      /**Array of statuses for each placed order. */
+      statuses: (
+        | {
+          /** Resting order status. */
+          resting: {
+            /** Order ID. */
+            oid: number;
+            /**
+             * Client Order ID.
+             * @pattern ^0x[a-fA-F0-9]{32}$
+             */
+            cloid?: `0x${string}` | undefined;
+          };
+        }
+        | {
+          /** Filled order status. */
+          filled: {
+            /**
+             * Total size filled.
+             * @pattern ^[0-9]+(\.[0-9]+)?$
+             */
+            totalSz: string;
+            /**
+             * Average price of fill.
+             * @pattern ^[0-9]+(\.[0-9]+)?$
+             */
+            avgPx: string;
+            /** Order ID. */
+            oid: number;
+            /**
+             * Client Order ID.
+             * @pattern ^0x[a-fA-F0-9]{32}$
+             */
+            cloid?: `0x${string}` | undefined;
+          };
+        }
+        | {
+          /** Error message. */
+          error: string;
+        }
+        | "waitingForFill"
+        | "waitingForTrigger"
+      )[];
+    };
+  };
+};
 
 // ============================================================
 // Execution Logic

@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { UserDexAbstractionRequest, UserDexAbstractionResponse } from "@nktkas/hyperliquid/api/info";
+import { UserDexAbstractionRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/userDexAbstraction.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "UserDexAbstractionResponse");
 
 runTest({
   name: "userDexAbstraction",
@@ -10,7 +14,7 @@ runTest({
       client.userDexAbstraction({ user: "0x0000000000000000000000000000000000000001" }), // null
       client.userDexAbstraction({ user: "0x187e15e124b8297a01c355b6a87ae74dd4c0069f" }), // boolean
     ]);
-    schemaCoverage(UserDexAbstractionResponse, data);
+    schemaCoverage(typeSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

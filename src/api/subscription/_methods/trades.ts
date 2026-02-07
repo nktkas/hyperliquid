@@ -4,9 +4,11 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { RecentTradesResponse } from "../../info/_methods/recentTrades.ts";
+import type { RecentTradesResponse } from "../../info/_methods/recentTrades.ts";
 
-/** Subscription to trade events for a specific asset. */
+/**
+ * Subscription to trade events for a specific asset.
+ */
 export const TradesRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -17,11 +19,10 @@ export const TradesRequest = /* @__PURE__ */ (() => {
 })();
 export type TradesRequest = v.InferOutput<typeof TradesRequest>;
 
-/** Event of array of trades for a specific asset. */
-export const TradesEvent = /* @__PURE__ */ (() => {
-  return RecentTradesResponse;
-})();
-export type TradesEvent = v.InferOutput<typeof TradesEvent>;
+/**
+ * Event of array of trades for a specific asset.
+ */
+export type TradesEvent = RecentTradesResponse;
 
 // ============================================================
 // Execution Logic

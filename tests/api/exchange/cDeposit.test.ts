@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { CDepositRequest, CDepositResponse } from "@nktkas/hyperliquid/api/exchange";
+import { CDepositRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest, topUpSpot } from "./_t.ts";
-import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/exchange/_methods/cDeposit.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "CDepositSuccessResponse");
 
 runTest({
   name: "cDeposit",
@@ -15,7 +19,7 @@ runTest({
     const data = await Promise.all([
       exchClient.cDeposit({ wei: 1 }),
     ]);
-    schemaCoverage(excludeErrorResponse(CDepositResponse), data);
+    schemaCoverage(typeSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

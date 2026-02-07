@@ -4,8 +4,8 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { TwapStateSchema } from "./_base/commonSchemas.ts";
+import { Address } from "../../_schemas.ts";
+import type { TwapStateSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Request twap history of a user.
@@ -23,38 +23,30 @@ export type TwapHistoryRequest = v.InferOutput<typeof TwapHistoryRequest>;
 /**
  * Array of user's TWAP history.
  */
-export const TwapHistoryResponse = /* @__PURE__ */ (() => {
-  return v.array(
-    v.object({
-      /** Creation time of the history record (in seconds since epoch). */
-      time: UnsignedInteger,
-      /** State of the TWAP order. */
-      state: TwapStateSchema,
-      /**
-       * Current status of the TWAP order.
-       * - `"finished"`: Fully executed.
-       * - `"activated"`: Active and executing.
-       * - `"terminated"`: Terminated.
-       * - `"error"`: An error occurred.
-       */
-      status: v.variant("status", [
-        v.object({
-          /** Status of the TWAP order. */
-          status: v.picklist(["finished", "activated", "terminated"]),
-        }),
-        v.object({
-          /** Status of the TWAP order. */
-          status: v.literal("error"),
-          /** Error message. */
-          description: v.string(),
-        }),
-      ]),
-      /** ID of the TWAP. */
-      twapId: v.optional(UnsignedInteger),
-    }),
-  );
-})();
-export type TwapHistoryResponse = v.InferOutput<typeof TwapHistoryResponse>;
+export type TwapHistoryResponse = {
+  /** Creation time of the history record (in seconds since epoch). */
+  time: number;
+  /** State of the TWAP order. */
+  state: TwapStateSchema;
+  /**
+   * Current status of the TWAP order.
+   * - `"finished"`: Fully executed.
+   * - `"activated"`: Active and executing.
+   * - `"terminated"`: Terminated.
+   * - `"error"`: An error occurred.
+   */
+  status: {
+    /** Status of the TWAP order. */
+    status: "finished" | "activated" | "terminated";
+  } | {
+    /** Status of the TWAP order. */
+    status: "error";
+    /** Error message. */
+    description: string;
+  };
+  /** ID of the TWAP. */
+  twapId?: number;
+}[];
 
 // ============================================================
 // Execution Logic

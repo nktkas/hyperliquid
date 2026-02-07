@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Reserve additional rate-limited actions for a fee.
@@ -34,10 +34,7 @@ export type ReserveRequestWeightRequest = v.InferOutput<typeof ReserveRequestWei
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#reserve-additional-actions
  */
-export const ReserveRequestWeightResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type ReserveRequestWeightResponse = v.InferOutput<typeof ReserveRequestWeightResponse>;
+export type ReserveRequestWeightResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

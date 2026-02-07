@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address, UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Request user borrow/lend interest.
@@ -28,21 +28,22 @@ export type UserBorrowLendInterestRequest = v.InferOutput<typeof UserBorrowLendI
  * User's borrow/lend interest.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-borrow-lend-user-state
  */
-export const UserBorrowLendInterestResponse = /* @__PURE__ */ (() => {
-  return v.array(
-    v.object({
-      /** Timestamp of the update (in ms since epoch). */
-      time: UnsignedInteger,
-      /** Token symbol. */
-      token: v.string(),
-      /** Borrow interest amount. */
-      borrow: UnsignedDecimal,
-      /** Supply interest amount. */
-      supply: UnsignedDecimal,
-    }),
-  );
-})();
-export type UserBorrowLendInterestResponse = v.InferOutput<typeof UserBorrowLendInterestResponse>;
+export type UserBorrowLendInterestResponse = {
+  /** Timestamp of the update (in ms since epoch). */
+  time: number;
+  /** Token symbol. */
+  token: string;
+  /**
+   * Borrow interest amount.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  borrow: string;
+  /**
+   * Supply interest amount.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  supply: string;
+}[];
 
 // ============================================================
 // Execution Logic

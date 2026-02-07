@@ -5,9 +5,11 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import { SpotClearinghouseStateResponse } from "../../info/_methods/spotClearinghouseState.ts";
+import type { SpotClearinghouseStateResponse } from "../../info/_methods/spotClearinghouseState.ts";
 
-/** Subscription to spot state events for a specific user. */
+/**
+ * Subscription to spot state events for a specific user.
+ */
 export const SpotStateRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -20,16 +22,18 @@ export const SpotStateRequest = /* @__PURE__ */ (() => {
 })();
 export type SpotStateRequest = v.InferOutput<typeof SpotStateRequest>;
 
-/** Event of user spot state. */
-export const SpotStateEvent = /* @__PURE__ */ (() => {
-  return v.object({
-    /** User address. */
-    user: Address,
-    /** Account summary for spot trading. */
-    spotState: SpotClearinghouseStateResponse,
-  });
-})();
-export type SpotStateEvent = v.InferOutput<typeof SpotStateEvent>;
+/**
+ * Event of user spot state.
+ */
+export type SpotStateEvent = {
+  /**
+   * User address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  user: `0x${string}`;
+  /** Account summary for spot trading. */
+  spotState: SpotClearinghouseStateResponse;
+};
 
 // ============================================================
 // Execution Logic

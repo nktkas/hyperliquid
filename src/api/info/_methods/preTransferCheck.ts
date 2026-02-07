@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedDecimal } from "../../_schemas.ts";
+import { Address } from "../../_schemas.ts";
 
 /**
  * Request user existence check before transfer.
@@ -24,19 +24,19 @@ export type PreTransferCheckRequest = v.InferOutput<typeof PreTransferCheckReque
 /**
  * Pre-transfer user existence check result.
  */
-export const PreTransferCheckResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Activation fee. */
-    fee: UnsignedDecimal,
-    /** Whether the user is sanctioned. */
-    isSanctioned: v.boolean(),
-    /** Whether the user exists. */
-    userExists: v.boolean(),
-    /** Whether the user has sent a transaction. */
-    userHasSentTx: v.boolean(),
-  });
-})();
-export type PreTransferCheckResponse = v.InferOutput<typeof PreTransferCheckResponse>;
+export type PreTransferCheckResponse = {
+  /**
+   * Activation fee.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  fee: string;
+  /** Whether the user is sanctioned. */
+  isSanctioned: boolean;
+  /** Whether the user exists. */
+  userExists: boolean;
+  /** Whether the user has sent a transaction. */
+  userHasSentTx: boolean;
+};
 
 // ============================================================
 // Execution Logic

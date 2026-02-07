@@ -5,8 +5,8 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import { ClearinghouseStateResponse } from "./clearinghouseState.ts";
-import { SpotClearinghouseStateResponse } from "./spotClearinghouseState.ts";
+import type { ClearinghouseStateResponse } from "./clearinghouseState.ts";
+import type { SpotClearinghouseStateResponse } from "./spotClearinghouseState.ts";
 
 /**
  * Request user sub-accounts (V2).
@@ -24,28 +24,24 @@ export type SubAccounts2Request = v.InferOutput<typeof SubAccounts2Request>;
 /**
  * Array of user sub-account or null if the user does not have any sub-accounts.
  */
-export const SubAccounts2Response = /* @__PURE__ */ (() => {
-  return v.nullable(
-    v.array(
-      v.object({
-        /** Sub-account name. */
-        name: v.pipe(v.string(), v.nonEmpty()),
-        /** Sub-account address. */
-        subAccountUser: Address,
-        /** Master account address. */
-        master: Address,
-        /** DEX to clearinghouse state mapping. Always includes the main DEX (empty dex name). */
-        dexToClearinghouseState: v.pipe(
-          v.array(v.tuple([v.string(), ClearinghouseStateResponse])),
-          v.nonEmpty(),
-        ),
-        /** Spot tokens clearinghouse state. */
-        spotState: SpotClearinghouseStateResponse,
-      }),
-    ),
-  );
-})();
-export type SubAccounts2Response = v.InferOutput<typeof SubAccounts2Response>;
+export type SubAccounts2Response = {
+  /** Sub-account name. */
+  name: string;
+  /**
+   * Sub-account address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  subAccountUser: `0x${string}`;
+  /**
+   * Master account address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  master: `0x${string}`;
+  /** DEX to clearinghouse state mapping. Always includes the main DEX (empty dex name). */
+  dexToClearinghouseState: [dex: string, state: ClearinghouseStateResponse][];
+  /** Spot tokens clearinghouse state. */
+  spotState: SpotClearinghouseStateResponse;
+}[] | null;
 
 // ============================================================
 // Execution Logic
@@ -54,7 +50,7 @@ export type SubAccounts2Response = v.InferOutput<typeof SubAccounts2Response>;
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode subAccounts2} function. */
-export type SubAccounts2Parameters = Omit<v.InferInput<typeof SubAccounts2Response>, "type">;
+export type SubAccounts2Parameters = Omit<v.InferInput<typeof SubAccounts2Request>, "type">;
 
 /**
  * Request user sub-accounts V2.

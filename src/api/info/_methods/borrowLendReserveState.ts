@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Request borrow/lend reserve states.
@@ -24,27 +24,48 @@ export type BorrowLendReserveStateRequest = v.InferOutput<typeof BorrowLendReser
  * Borrow/lend reserve state.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-borrow-lend-reserve-state
  */
-export const BorrowLendReserveStateResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Borrow interest rate (yearly). */
-    borrowYearlyRate: UnsignedDecimal,
-    /** Supply interest rate (yearly). */
-    supplyYearlyRate: UnsignedDecimal,
-    /** Reserve balance. */
-    balance: UnsignedDecimal,
-    /** Reserve utilization ratio. */
-    utilization: UnsignedDecimal,
-    /** Oracle price. */
-    oraclePx: UnsignedDecimal,
-    /** Loan-to-value (LTV) ratio. */
-    ltv: UnsignedDecimal,
-    /** Total supplied amount. */
-    totalSupplied: UnsignedDecimal,
-    /** Total borrowed amount. */
-    totalBorrowed: UnsignedDecimal,
-  });
-})();
-export type BorrowLendReserveStateResponse = v.InferOutput<typeof BorrowLendReserveStateResponse>;
+export type BorrowLendReserveStateResponse = {
+  /**
+   * Borrow interest rate (yearly).
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  borrowYearlyRate: string;
+  /**
+   * Supply interest rate (yearly).
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  supplyYearlyRate: string;
+  /**
+   * Reserve balance.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  balance: string;
+  /**
+   * Reserve utilization ratio.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  utilization: string;
+  /**
+   * Oracle price.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  oraclePx: string;
+  /**
+   * Loan-to-value (LTV) ratio.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  ltv: string;
+  /**
+   * Total supplied amount.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  totalSupplied: string;
+  /**
+   * Total borrowed amount.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  totalBorrowed: string;
+};
 
 // ============================================================
 // Execution Logic

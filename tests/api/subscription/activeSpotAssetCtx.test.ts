@@ -1,6 +1,10 @@
-import { ActiveSpotAssetCtxEvent } from "@nktkas/hyperliquid/api/subscription";
+import type { ActiveSpotAssetCtxEvent } from "@nktkas/hyperliquid/api/subscription";
 import { collectEventsOverTime, runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/subscription/_methods/activeSpotAssetCtx.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "ActiveSpotAssetCtxEvent");
 
 runTest({
   name: "activeSpotAssetCtx",
@@ -10,6 +14,6 @@ runTest({
       await client.activeSpotAssetCtx({ coin: "@107" }, cb);
       await client.activeSpotAssetCtx({ coin: "@27" }, cb);
     }, 10_000);
-    schemaCoverage(ActiveSpotAssetCtxEvent, data);
+    schemaCoverage(typeSchema, data);
   },
 });

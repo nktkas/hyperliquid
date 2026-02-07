@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { MetaRequest, MetaResponse } from "@nktkas/hyperliquid/api/info";
+import { MetaRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/meta.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "MetaResponse");
 
 runTest({
   name: "meta",
@@ -11,7 +15,7 @@ runTest({
       client.meta({ dex: "gato" }),
       client.meta({ dex: "meng" }),
     ]);
-    schemaCoverage(MetaResponse, data);
+    schemaCoverage(typeSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

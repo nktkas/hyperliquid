@@ -5,7 +5,12 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import {
+  type ErrorResponse,
+  HyperliquidChainSchema,
+  SignatureSchema,
+  type SuccessResponse,
+} from "./_base/commonSchemas.ts";
 
 /**
  * Link staking and trading accounts for fee discount attribution.
@@ -48,10 +53,7 @@ export type LinkStakingUserRequest = v.InferOutput<typeof LinkStakingUserRequest
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/trading/fees#staking-linking
  */
-export const LinkStakingUserResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type LinkStakingUserResponse = v.InferOutput<typeof LinkStakingUserResponse>;
+export type LinkStakingUserResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

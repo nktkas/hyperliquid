@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { ApproveAgentRequest, ApproveAgentResponse } from "@nktkas/hyperliquid/api/exchange";
+import { ApproveAgentRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest } from "./_t.ts";
-import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/exchange/_methods/approveAgent.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "ApproveAgentSuccessResponse");
 
 runTest({
   name: "approveAgent",
@@ -13,7 +17,7 @@ runTest({
           agentName: "agentName",
         }),
       ]);
-      schemaCoverage(excludeErrorResponse(ApproveAgentResponse), data);
+      schemaCoverage(typeSchema, data);
     });
 
     await new Promise((r) => setTimeout(r, 5000)); // waiting to avoid error `ApiRequestError: User has pending agent removal`
@@ -25,7 +29,7 @@ runTest({
           agentName: null,
         }),
       ]);
-      schemaCoverage(excludeErrorResponse(ApproveAgentResponse), data);
+      schemaCoverage(typeSchema, data);
     });
 
     await new Promise((r) => setTimeout(r, 5000)); // waiting to avoid error `ApiRequestError: User has pending agent removal`
@@ -38,7 +42,7 @@ runTest({
           agentName: `test valid_until ${expirationTimestamp}`,
         }),
       ]);
-      schemaCoverage(excludeErrorResponse(ApproveAgentResponse), data);
+      schemaCoverage(typeSchema, data);
     });
   },
   cliTestFn: async (_t, runCommand) => {

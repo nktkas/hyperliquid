@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { WebData2Request, WebData2Response } from "@nktkas/hyperliquid/api/info";
+import { WebData2Request } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/webData2.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "WebData2Response");
 
 runTest({
   name: "webData2",
@@ -12,21 +16,20 @@ runTest({
       client.webData2({ user: "0xe019d6167E7e324aEd003d94098496b6d986aB05" }),
       client.webData2({ user: "0x1defed46db35334232b9f5fd2e5c6180276fb99d" }),
     ]);
-    schemaCoverage(WebData2Response, data, [
-      "#/properties/openOrders/items/properties/orderType/picklist/0",
-      "#/properties/openOrders/items/properties/orderType/picklist/4",
-      "#/properties/openOrders/items/properties/orderType/picklist/5",
-      "#/properties/openOrders/items/properties/tif/wrapped/picklist/1",
-      "#/properties/openOrders/items/properties/tif/wrapped/picklist/3",
-      "#/properties/openOrders/items/properties/tif/wrapped/picklist/4",
-      "#/properties/agentAddress/defined",
-      "#/properties/agentValidUntil/defined",
-      "#/properties/meta/properties/universe/items/properties/marginMode/picklist/1",
-      "#/properties/meta/properties/universe/items/properties/growthMode/defined",
-      "#/properties/meta/properties/universe/items/properties/lastGrowthModeChangeTime/defined",
-      "#/properties/twapStates/array",
-      "#/properties/perpsAtOpenInterestCap/defined",
+    schemaCoverage(typeSchema, data, [
+      "#/properties/openOrders/items/properties/orderType/enum/0",
+      "#/properties/openOrders/items/properties/orderType/enum/4",
+      "#/properties/openOrders/items/properties/orderType/enum/5",
+      "#/properties/openOrders/items/properties/tif/enum/1",
+      "#/properties/openOrders/items/properties/tif/enum/3",
+      "#/properties/openOrders/items/properties/tif/enum/4",
+      "#/properties/openOrders/items/properties/tif/enum/5",
       "#/properties/openOrders/items/properties/cloid/defined",
+      "#/properties/meta/properties/universe/items/properties/marginMode/enum/1",
+      "#/properties/meta/properties/universe/items/properties/growthMode/present",
+      "#/properties/meta/properties/universe/items/properties/lastGrowthModeChangeTime/present",
+      "#/properties/twapStates/array",
+      "#/properties/perpsAtOpenInterestCap/present",
     ]);
   },
   cliTestFn: async (_t, runCommand) => {

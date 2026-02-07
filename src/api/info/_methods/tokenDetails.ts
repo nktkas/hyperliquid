@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Hex } from "../../_schemas.ts";
 
 /**
  * Request token details.
@@ -24,52 +24,97 @@ export type TokenDetailsRequest = v.InferOutput<typeof TokenDetailsRequest>;
  * Details of a token.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-a-token
  */
-export const TokenDetailsResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Name of the token. */
-    name: v.string(),
-    /** Maximum supply of the token. */
-    maxSupply: UnsignedDecimal,
-    /** Total supply of the token. */
-    totalSupply: UnsignedDecimal,
-    /** Circulating supply of the token. */
-    circulatingSupply: UnsignedDecimal,
-    /** Decimal places for the minimum tradable unit. */
-    szDecimals: UnsignedInteger,
-    /** Decimal places for the token's smallest unit. */
-    weiDecimals: UnsignedInteger,
-    /** Mid price of the token. */
-    midPx: UnsignedDecimal,
-    /** Mark price of the token. */
-    markPx: UnsignedDecimal,
-    /** Previous day's price of the token. */
-    prevDayPx: UnsignedDecimal,
-    /** Genesis data for the token. */
-    genesis: v.nullable(
-      v.object({
-        /** User balances. */
-        userBalances: v.array(v.tuple([Address, v.string()])),
-        /** Existing token balances. */
-        existingTokenBalances: v.array(v.tuple([UnsignedInteger, v.string()])),
-        /** Blacklisted users. */
-        blacklistUsers: v.array(Address),
-      }),
-    ),
-    /** Deployer address. */
-    deployer: v.nullable(Address),
-    /** Gas used during token deployment. */
-    deployGas: v.nullable(UnsignedDecimal),
-    /** Deployment time. */
-    deployTime: v.nullable(v.string()),
-    /** Seeded USDC amount for the token. */
-    seededUsdc: UnsignedDecimal,
-    /** Non-circulating user balances of the token. */
-    nonCirculatingUserBalances: v.array(v.tuple([Address, v.string()])),
-    /** Future emissions amount. */
-    futureEmissions: UnsignedDecimal,
-  });
-})();
-export type TokenDetailsResponse = v.InferOutput<typeof TokenDetailsResponse>;
+export type TokenDetailsResponse = {
+  /** Name of the token. */
+  name: string;
+  /**
+   * Maximum supply of the token.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  maxSupply: string;
+  /**
+   * Total supply of the token.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  totalSupply: string;
+  /**
+   * Circulating supply of the token.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  circulatingSupply: string;
+  /** Decimal places for the minimum tradable unit. */
+  szDecimals: number;
+  /** Decimal places for the token's smallest unit. */
+  weiDecimals: number;
+  /**
+   * Mid price of the token.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  midPx: string;
+  /**
+   * Mark price of the token.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  markPx: string;
+  /**
+   * Previous day's price of the token.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  prevDayPx: string;
+  /** Genesis data for the token. */
+  genesis: {
+    /** User balances. */
+    userBalances: [
+      /** @pattern ^0x[a-fA-F0-9]{40}$ */
+      address: `0x${string}`,
+      /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+      balance: string,
+    ][];
+    /** Existing token balances. */
+    existingTokenBalances: [
+      token: number,
+      /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+      balance: string,
+    ][];
+    /**
+     * Blacklisted users.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
+    blacklistUsers: `0x${string}`[];
+  } | null;
+  /**
+   * Deployer address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  deployer: `0x${string}` | null;
+  /**
+   * Gas used during token deployment.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  deployGas: string | null;
+  /**
+   * Timestamp of token deployment.
+   * @pattern ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}$
+   */
+  deployTime: string | null;
+  /**
+   * Seeded USDC amount for the token.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  seededUsdc: string;
+  /** Non-circulating user balances of the token. */
+  nonCirculatingUserBalances: [
+    /** @pattern ^0x[a-fA-F0-9]{40}$ */
+    address: `0x${string}`,
+    /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+    balance: string,
+  ][];
+  /**
+   * Future emissions amount.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  futureEmissions: string;
+};
 
 // ============================================================
 // Execution Logic

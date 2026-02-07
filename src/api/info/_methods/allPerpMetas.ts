@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { MetaResponse } from "./meta.ts";
+import type { MetaResponse } from "./meta.ts";
 
 /**
  * Request trading metadata for all DEXes.
@@ -20,10 +20,7 @@ export type AllPerpMetasRequest = v.InferOutput<typeof AllPerpMetasRequest>;
 /**
  * Metadata for perpetual assets across all DEXes.
  */
-export const AllPerpMetasResponse = /* @__PURE__ */ (() => {
-  return v.array(MetaResponse);
-})();
-export type AllPerpMetasResponse = v.InferOutput<typeof AllPerpMetasResponse>;
+export type AllPerpMetasResponse = MetaResponse[];
 
 // ============================================================
 // Execution Logic

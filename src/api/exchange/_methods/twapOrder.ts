@@ -49,35 +49,29 @@ export type TwapOrderRequest = v.InferOutput<typeof TwapOrderRequest>;
  * Response for creating a TWAP order.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-a-twap-order
  */
-export const TwapOrderResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Successful status. */
-    status: v.literal("ok"),
-    /** Response details. */
-    response: v.object({
-      /** Type of response. */
-      type: v.literal("twapOrder"),
-      /** Specific data. */
-      data: v.object({
-        /** Status of the operation or error message. */
-        status: v.union([
-          v.object({
-            /** Running order status. */
-            running: v.object({
-              /** TWAP ID. */
-              twapId: UnsignedInteger,
-            }),
-          }),
-          v.object({
-            /** Error message. */
-            error: v.string(),
-          }),
-        ]),
-      }),
-    }),
-  });
-})();
-export type TwapOrderResponse = v.InferOutput<typeof TwapOrderResponse>;
+export type TwapOrderResponse = {
+  /** Successful status. */
+  status: "ok";
+  /** Response details. */
+  response: {
+    /** Type of response. */
+    type: "twapOrder";
+    /** Specific data. */
+    data: {
+      /** Status of the operation or error message. */
+      status: {
+        /** Running order status. */
+        running: {
+          /** TWAP ID. */
+          twapId: number;
+        };
+      } | {
+        /** Error message. */
+        error: string;
+      };
+    };
+  };
+};
 
 // ============================================================
 // Execution Logic

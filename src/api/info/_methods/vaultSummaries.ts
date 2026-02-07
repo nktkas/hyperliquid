@@ -4,8 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { VaultRelationshipSchema } from "./_base/commonSchemas.ts";
+import type { VaultRelationshipSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Request a list of vaults less than 2 hours old.
@@ -21,27 +20,31 @@ export type VaultSummariesRequest = v.InferOutput<typeof VaultSummariesRequest>;
 /**
  * Array of vaults less than 2 hours old.
  */
-export const VaultSummariesResponse = /* @__PURE__ */ (() => {
-  return v.array(
-    v.object({
-      /** Vault name. */
-      name: v.string(),
-      /** Vault address. */
-      vaultAddress: Address,
-      /** Leader address. */
-      leader: Address,
-      /** Total value locked. */
-      tvl: UnsignedDecimal,
-      /** Vault closure status. */
-      isClosed: v.boolean(),
-      /** Vault relationship type. */
-      relationship: VaultRelationshipSchema,
-      /** Creation timestamp. */
-      createTimeMillis: UnsignedInteger,
-    }),
-  );
-})();
-export type VaultSummariesResponse = v.InferOutput<typeof VaultSummariesResponse>;
+export type VaultSummariesResponse = {
+  /** Vault name. */
+  name: string;
+  /**
+   * Vault address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  vaultAddress: `0x${string}`;
+  /**
+   * Leader address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  leader: `0x${string}`;
+  /**
+   * Total value locked.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  tvl: string;
+  /** Vault closure status. */
+  isClosed: boolean;
+  /** Vault relationship type. */
+  relationship: VaultRelationshipSchema;
+  /** Creation timestamp. */
+  createTimeMillis: number;
+}[];
 
 // ============================================================
 // Execution Logic

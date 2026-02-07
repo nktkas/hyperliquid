@@ -4,8 +4,6 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { UnsignedInteger } from "../../_schemas.ts";
-
 /**
  * Request maximum market order notionals.
  */
@@ -20,10 +18,7 @@ export type MaxMarketOrderNtlsRequest = v.InferOutput<typeof MaxMarketOrderNtlsR
 /**
  * Array of tuples containing maximum market order notionals and their corresponding asset symbols.
  */
-export const MaxMarketOrderNtlsResponse = /* @__PURE__ */ (() => {
-  return v.array(v.tuple([UnsignedInteger, v.string()]));
-})();
-export type MaxMarketOrderNtlsResponse = v.InferOutput<typeof MaxMarketOrderNtlsResponse>;
+export type MaxMarketOrderNtlsResponse = [notional: number, symbol: string][];
 
 // ============================================================
 // Execution Logic

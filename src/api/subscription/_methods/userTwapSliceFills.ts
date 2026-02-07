@@ -5,9 +5,11 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import { UserTwapSliceFillsResponse } from "../../info/_methods/userTwapSliceFills.ts";
+import type { UserTwapSliceFillsResponse } from "../../info/_methods/userTwapSliceFills.ts";
 
-/** Subscription to user TWAP slice fill events for a specific user. */
+/**
+ * Subscription to user TWAP slice fill events for a specific user.
+ */
 export const UserTwapSliceFillsRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -18,18 +20,20 @@ export const UserTwapSliceFillsRequest = /* @__PURE__ */ (() => {
 })();
 export type UserTwapSliceFillsRequest = v.InferOutput<typeof UserTwapSliceFillsRequest>;
 
-/** Event of user TWAP slice fill. */
-export const UserTwapSliceFillsEvent = /* @__PURE__ */ (() => {
-  return v.object({
-    /** User address. */
-    user: Address,
-    /** Array of user's twap slice fills. */
-    twapSliceFills: UserTwapSliceFillsResponse,
-    /** Whether this is an initial snapshot. */
-    isSnapshot: v.optional(v.literal(true)),
-  });
-})();
-export type UserTwapSliceFillsEvent = v.InferOutput<typeof UserTwapSliceFillsEvent>;
+/**
+ * Event of user TWAP slice fill.
+ */
+export type UserTwapSliceFillsEvent = {
+  /**
+   * User address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  user: `0x${string}`;
+  /** Array of user's twap slice fills. */
+  twapSliceFills: UserTwapSliceFillsResponse;
+  /** Whether this is an initial snapshot. */
+  isSnapshot?: true;
+};
 
 // ============================================================
 // Execution Logic

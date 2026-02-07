@@ -5,9 +5,11 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import { ClearinghouseStateResponse } from "../../info/_methods/clearinghouseState.ts";
+import type { ClearinghouseStateResponse } from "../../info/_methods/clearinghouseState.ts";
 
-/** Subscription to clearinghouse state events for all DEXs for a specific user. */
+/**
+ * Subscription to clearinghouse state events for all DEXs for a specific user.
+ */
 export const AllDexsClearinghouseStateRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -18,16 +20,18 @@ export const AllDexsClearinghouseStateRequest = /* @__PURE__ */ (() => {
 })();
 export type AllDexsClearinghouseStateRequest = v.InferOutput<typeof AllDexsClearinghouseStateRequest>;
 
-/** Event of clearinghouse states for all DEXs for a specific user. */
-export const AllDexsClearinghouseStateEvent = /* @__PURE__ */ (() => {
-  return v.object({
-    /** User address. */
-    user: Address,
-    /** Array of tuples of dex names and clearinghouse states. */
-    clearinghouseStates: v.array(v.tuple([v.string(), ClearinghouseStateResponse])),
-  });
-})();
-export type AllDexsClearinghouseStateEvent = v.InferOutput<typeof AllDexsClearinghouseStateEvent>;
+/**
+ * Event of clearinghouse states for all DEXs for a specific user.
+ */
+export type AllDexsClearinghouseStateEvent = {
+  /**
+   * User address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  user: `0x${string}`;
+  /** Array of tuples of dex names and clearinghouse states. */
+  clearinghouseStates: [dex: string, state: ClearinghouseStateResponse][];
+};
 
 // ============================================================
 // Execution Logic

@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { L2BookRequest, L2BookResponse } from "@nktkas/hyperliquid/api/info";
+import { L2BookRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/l2Book.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "L2BookResponse");
 
 runTest({
   name: "l2Book",
@@ -11,7 +15,7 @@ runTest({
       client.l2Book({ coin: "NONE/EXISTENT" }),
       client.l2Book({ coin: "ETH", nSigFigs: 2 }),
     ]);
-    schemaCoverage(L2BookResponse, data);
+    schemaCoverage(typeSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

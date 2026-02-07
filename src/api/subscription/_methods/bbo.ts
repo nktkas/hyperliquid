@@ -4,9 +4,9 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-
-/** Subscription to best bid and offer events for a specific asset. */
+/**
+ * Subscription to best bid and offer events for a specific asset.
+ */
 export const BboRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -17,29 +17,43 @@ export const BboRequest = /* @__PURE__ */ (() => {
 })();
 export type BboRequest = v.InferOutput<typeof BboRequest>;
 
-const L2BookLevelSchema = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Price. */
-    px: UnsignedDecimal,
-    /** Total size. */
-    sz: UnsignedDecimal,
+/**
+ * Event of best bid and offer.
+ */
+export type BboEvent = {
+  /** Asset symbol (e.g., BTC). */
+  coin: string;
+  /** Time of the BBO update (in ms since epoch). */
+  time: number;
+  /** Best bid and offer tuple [bid, offer], either can be undefined if unavailable. */
+  bbo: [{
+    /**
+     * Price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    px: string;
+    /**
+     * Total size.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    sz: string;
     /** Number of individual orders. */
-    n: UnsignedInteger,
-  });
-})();
-
-/** Event of best bid and offer. */
-export const BboEvent = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Asset symbol (e.g., BTC). */
-    coin: v.string(),
-    /** Time of the BBO update (in ms since epoch). */
-    time: UnsignedInteger,
-    /** Best bid and offer tuple [bid, offer], either can be undefined if unavailable. */
-    bbo: v.tuple([L2BookLevelSchema, L2BookLevelSchema]),
-  });
-})();
-export type BboEvent = v.InferOutput<typeof BboEvent>;
+    n: number;
+  }, {
+    /**
+     * Price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    px: string;
+    /**
+     * Total size.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    sz: string;
+    /** Number of individual orders. */
+    n: number;
+  }];
+};
 
 // ============================================================
 // Execution Logic

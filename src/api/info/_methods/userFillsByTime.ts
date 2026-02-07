@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { UserFillsResponse } from "./userFills.ts";
+import type { UserFillsResponse } from "./userFills.ts";
 
 /**
  * Request array of user fills by time.
@@ -31,10 +31,7 @@ export type UserFillsByTimeRequest = v.InferOutput<typeof UserFillsByTimeRequest
  * Array of user trade fills by time.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills-by-time
  */
-export const UserFillsByTimeResponse = /* @__PURE__ */ (() => {
-  return UserFillsResponse;
-})();
-export type UserFillsByTimeResponse = v.InferOutput<typeof UserFillsByTimeResponse>;
+export type UserFillsByTimeResponse = UserFillsResponse;
 
 // ============================================================
 // Execution Logic

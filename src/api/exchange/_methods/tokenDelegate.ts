@@ -5,7 +5,12 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import {
+  type ErrorResponse,
+  HyperliquidChainSchema,
+  SignatureSchema,
+  type SuccessResponse,
+} from "./_base/commonSchemas.ts";
 
 /**
  * Delegate or undelegate native tokens to or from a validator.
@@ -42,10 +47,7 @@ export type TokenDelegateRequest = v.InferOutput<typeof TokenDelegateRequest>;
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#delegate-or-undelegate-stake-from-validator
  */
-export const TokenDelegateResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type TokenDelegateResponse = v.InferOutput<typeof TokenDelegateResponse>;
+export type TokenDelegateResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

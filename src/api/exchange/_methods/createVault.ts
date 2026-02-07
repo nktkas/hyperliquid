@@ -4,10 +4,12 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema } from "./_base/commonSchemas.ts";
+import { UnsignedInteger } from "../../_schemas.ts";
+import { type ErrorResponse, SignatureSchema } from "./_base/commonSchemas.ts";
 
-/** Create a vault. */
+/**
+ * Create a vault.
+ */
 export const CreateVaultRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Action to perform. */
@@ -33,24 +35,23 @@ export const CreateVaultRequest = /* @__PURE__ */ (() => {
 })();
 export type CreateVaultRequest = v.InferOutput<typeof CreateVaultRequest>;
 
-/** Response for creating a vault. */
-export const CreateVaultResponse = /* @__PURE__ */ (() => {
-  return v.union([
-    v.object({
-      /** Successful status. */
-      status: v.literal("ok"),
-      /** Response details. */
-      response: v.object({
-        /** Type of response. */
-        type: v.literal("createVault"),
-        /** Vault address. */
-        data: Address,
-      }),
-    }),
-    ErrorResponse,
-  ]);
-})();
-export type CreateVaultResponse = v.InferOutput<typeof CreateVaultResponse>;
+/**
+ * Response for creating a vault.
+ */
+export type CreateVaultResponse = {
+  /** Successful status. */
+  status: "ok";
+  /** Response details. */
+  response: {
+    /** Type of response. */
+    type: "createVault";
+    /**
+     * Vault address.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
+    data: `0x${string}`;
+  };
+} | ErrorResponse;
 
 // ============================================================
 // Execution Logic

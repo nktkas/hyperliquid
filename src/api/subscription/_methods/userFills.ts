@@ -5,9 +5,11 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import { UserFillsResponse } from "../../info/_methods/userFills.ts";
+import type { UserFillsResponse } from "../../info/_methods/userFills.ts";
 
-/** Subscription to user fill events for a specific user. */
+/**
+ * Subscription to user fill events for a specific user.
+ */
 export const UserFillsRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -20,18 +22,20 @@ export const UserFillsRequest = /* @__PURE__ */ (() => {
 })();
 export type UserFillsRequest = v.InferOutput<typeof UserFillsRequest>;
 
-/** Event of user trade fill. */
-export const UserFillsEvent = /* @__PURE__ */ (() => {
-  return v.object({
-    /** User address. */
-    user: Address,
-    /** Array of user trade fills. */
-    fills: UserFillsResponse,
-    /** Whether this is an initial snapshot. */
-    isSnapshot: v.optional(v.literal(true)),
-  });
-})();
-export type UserFillsEvent = v.InferOutput<typeof UserFillsEvent>;
+/**
+ * vent of user trade fill.
+ */
+export type UserFillsEvent = {
+  /**
+   * User address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  user: `0x${string}`;
+  /** Array of user trade fills. */
+  fills: UserFillsResponse;
+  /** Whether this is an initial snapshot. */
+  isSnapshot?: true;
+};
 
 // ============================================================
 // Execution Logic

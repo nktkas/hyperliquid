@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
  * Deposit or withdraw from a vault.
@@ -38,10 +38,7 @@ export type VaultTransferRequest = v.InferOutput<typeof VaultTransferRequest>;
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-a-vault
  */
-export const VaultTransferResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type VaultTransferResponse = v.InferOutput<typeof VaultTransferResponse>;
+export type VaultTransferResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

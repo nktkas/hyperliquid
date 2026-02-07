@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { UserFeesRequest, UserFeesResponse } from "@nktkas/hyperliquid/api/info";
+import { UserFeesRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/userFees.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "UserFeesResponse");
 
 runTest({
   name: "userFees",
@@ -9,7 +13,7 @@ runTest({
     const data = await Promise.all([
       client.userFees({ user: "0xe973105a27e17350500926ae664dfcfe6006d924" }),
     ]);
-    schemaCoverage(UserFeesResponse, data, [
+    schemaCoverage(typeSchema, data, [
       "#/properties/trial/defined",
       "#/properties/nextTrialAvailableTimestamp/defined",
       "#/properties/stakingLink/defined",

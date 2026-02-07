@@ -4,8 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { ISO8601WithoutTimezone, UnsignedInteger } from "../../_schemas.ts";
-import { MarginTableResponse } from "./marginTable.ts";
+import type { MarginTableResponse } from "./marginTable.ts";
 
 /**
  * Request trading metadata.
@@ -25,38 +24,33 @@ export type MetaRequest = v.InferOutput<typeof MetaRequest>;
  * Metadata for perpetual assets.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-metadata-universe-and-margin-tables
  */
-export const MetaResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Trading universes available for perpetual trading. */
-    universe: v.array(
-      v.object({
-        /** Minimum decimal places for order sizes. */
-        szDecimals: UnsignedInteger,
-        /** Name of the universe. */
-        name: v.string(),
-        /** Maximum allowed leverage. */
-        maxLeverage: v.pipe(UnsignedInteger, v.minValue(1)),
-        /** Unique identifier for the margin requirements table. */
-        marginTableId: UnsignedInteger,
-        /** Indicates if only isolated margin trading is allowed. */
-        onlyIsolated: v.optional(v.literal(true)),
-        /** Indicates if the universe is delisted. */
-        isDelisted: v.optional(v.literal(true)),
-        /** Trading margin mode constraint. */
-        marginMode: v.optional(v.picklist(["strictIsolated", "noCross"])),
-        /** Indicates if growth mode is enabled. */
-        growthMode: v.optional(v.literal("enabled")),
-        /** Timestamp of the last growth mode change. */
-        lastGrowthModeChangeTime: v.optional(ISO8601WithoutTimezone),
-      }),
-    ),
-    /** Margin requirement tables for different leverage tiers. */
-    marginTables: v.array(v.tuple([UnsignedInteger, MarginTableResponse])),
-    /** Collateral token index. */
-    collateralToken: UnsignedInteger,
-  });
-})();
-export type MetaResponse = v.InferOutput<typeof MetaResponse>;
+export type MetaResponse = {
+  /** Trading universes available for perpetual trading. */
+  universe: {
+    /** Minimum decimal places for order sizes. */
+    szDecimals: number;
+    /** Name of the universe. */
+    name: string;
+    /** Maximum allowed leverage. */
+    maxLeverage: number;
+    /** Unique identifier for the margin requirements table. */
+    marginTableId: number;
+    /** Indicates if only isolated margin trading is allowed. */
+    onlyIsolated?: true;
+    /** Indicates if the universe is delisted. */
+    isDelisted?: true;
+    /** Trading margin mode constraint. */
+    marginMode?: "strictIsolated" | "noCross";
+    /** Indicates if growth mode is enabled. */
+    growthMode?: "enabled";
+    /** Timestamp of the last growth mode change. */
+    lastGrowthModeChangeTime?: string;
+  }[];
+  /** Margin requirement tables for different leverage tiers. */
+  marginTables: [id: number, table: MarginTableResponse][];
+  /** Collateral token index. */
+  collateralToken: number;
+};
 
 // ============================================================
 // Execution Logic

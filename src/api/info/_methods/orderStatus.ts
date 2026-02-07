@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Cloid, UnsignedInteger } from "../../_schemas.ts";
-import { FrontendOpenOrderSchema, OrderProcessingStatusSchema } from "./_base/commonSchemas.ts";
+import type { FrontendOpenOrderSchema, OrderProcessingStatusSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Request order status.
@@ -29,59 +29,53 @@ export type OrderStatusRequest = v.InferOutput<typeof OrderStatusRequest>;
  * - If the order is not found, returns a status of "unknownOid".
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-order-status-by-oid-or-cloid
  */
-export const OrderStatusResponse = /* @__PURE__ */ (() => {
-  return v.variant("status", [
-    v.object({
-      /** Indicates that the order was found. */
-      status: v.literal("order"),
-      /** Order status details. */
-      order: v.object({
-        /** Open order with additional display information. */
-        order: FrontendOpenOrderSchema,
-        /**
-         * Order processing status.
-         * - `"open"`: Order active and waiting to be filled.
-         * - `"filled"`: Order fully executed.
-         * - `"canceled"`: Order canceled by the user.
-         * - `"triggered"`: Order triggered and awaiting execution.
-         * - `"rejected"`: Order rejected by the system.
-         * - `"marginCanceled"`: Order canceled due to insufficient margin.
-         * - `"vaultWithdrawalCanceled"`: Canceled due to a user withdrawal from vault.
-         * - `"openInterestCapCanceled"`: Canceled due to order being too aggressive when open interest was at cap.
-         * - `"selfTradeCanceled"`: Canceled due to self-trade prevention.
-         * - `"reduceOnlyCanceled"`: Canceled reduced-only order that does not reduce position.
-         * - `"siblingFilledCanceled"`: Canceled due to sibling ordering being filled.
-         * - `"delistedCanceled"`: Canceled due to asset delisting.
-         * - `"liquidatedCanceled"`: Canceled due to liquidation.
-         * - `"scheduledCancel"`: Canceled due to exceeding scheduled cancel deadline (dead man's switch).
-         * - `"tickRejected"`: Rejected due to invalid tick price.
-         * - `"minTradeNtlRejected"`: Rejected due to order notional below minimum.
-         * - `"perpMarginRejected"`: Rejected due to insufficient margin.
-         * - `"reduceOnlyRejected"`: Rejected due to reduce only.
-         * - `"badAloPxRejected"`: Rejected due to post-only immediate match.
-         * - `"iocCancelRejected"`: Rejected due to IOC not able to match.
-         * - `"badTriggerPxRejected"`: Rejected due to invalid TP/SL price.
-         * - `"marketOrderNoLiquidityRejected"`: Rejected due to lack of liquidity for market order.
-         * - `"positionIncreaseAtOpenInterestCapRejected"`: Rejected due to open interest cap.
-         * - `"positionFlipAtOpenInterestCapRejected"`: Rejected due to open interest cap.
-         * - `"tooAggressiveAtOpenInterestCapRejected"`: Rejected due to price too aggressive at open interest cap.
-         * - `"openInterestIncreaseRejected"`: Rejected due to open interest cap.
-         * - `"insufficientSpotBalanceRejected"`: Rejected due to insufficient spot balance.
-         * - `"oracleRejected"`: Rejected due to price too far from oracle.
-         * - `"perpMaxPositionRejected"`: Rejected due to exceeding margin tier limit at current leverage.
-         */
-        status: OrderProcessingStatusSchema,
-        /** Timestamp when the status was last updated (in ms since epoch). */
-        statusTimestamp: UnsignedInteger,
-      }),
-    }),
-    v.object({
-      /** Indicates that the order was not found. */
-      status: v.literal("unknownOid"),
-    }),
-  ]);
-})();
-export type OrderStatusResponse = v.InferOutput<typeof OrderStatusResponse>;
+export type OrderStatusResponse = {
+  /** Indicates that the order was found. */
+  status: "order";
+  /** Order status details. */
+  order: {
+    /** Open order with additional display information. */
+    order: FrontendOpenOrderSchema;
+    /**
+     * Order processing status.
+     * - `"open"`: Order active and waiting to be filled.
+     * - `"filled"`: Order fully executed.
+     * - `"canceled"`: Order canceled by the user.
+     * - `"triggered"`: Order triggered and awaiting execution.
+     * - `"rejected"`: Order rejected by the system.
+     * - `"marginCanceled"`: Order canceled due to insufficient margin.
+     * - `"vaultWithdrawalCanceled"`: Canceled due to a user withdrawal from vault.
+     * - `"openInterestCapCanceled"`: Canceled due to order being too aggressive when open interest was at cap.
+     * - `"selfTradeCanceled"`: Canceled due to self-trade prevention.
+     * - `"reduceOnlyCanceled"`: Canceled reduced-only order that does not reduce position.
+     * - `"siblingFilledCanceled"`: Canceled due to sibling ordering being filled.
+     * - `"delistedCanceled"`: Canceled due to asset delisting.
+     * - `"liquidatedCanceled"`: Canceled due to liquidation.
+     * - `"scheduledCancel"`: Canceled due to exceeding scheduled cancel deadline (dead man's switch).
+     * - `"tickRejected"`: Rejected due to invalid tick price.
+     * - `"minTradeNtlRejected"`: Rejected due to order notional below minimum.
+     * - `"perpMarginRejected"`: Rejected due to insufficient margin.
+     * - `"reduceOnlyRejected"`: Rejected due to reduce only.
+     * - `"badAloPxRejected"`: Rejected due to post-only immediate match.
+     * - `"iocCancelRejected"`: Rejected due to IOC not able to match.
+     * - `"badTriggerPxRejected"`: Rejected due to invalid TP/SL price.
+     * - `"marketOrderNoLiquidityRejected"`: Rejected due to lack of liquidity for market order.
+     * - `"positionIncreaseAtOpenInterestCapRejected"`: Rejected due to open interest cap.
+     * - `"positionFlipAtOpenInterestCapRejected"`: Rejected due to open interest cap.
+     * - `"tooAggressiveAtOpenInterestCapRejected"`: Rejected due to price too aggressive at open interest cap.
+     * - `"openInterestIncreaseRejected"`: Rejected due to open interest cap.
+     * - `"insufficientSpotBalanceRejected"`: Rejected due to insufficient spot balance.
+     * - `"oracleRejected"`: Rejected due to price too far from oracle.
+     * - `"perpMaxPositionRejected"`: Rejected due to exceeding margin tier limit at current leverage.
+     */
+    status: OrderProcessingStatusSchema;
+    /** Timestamp when the status was last updated (in ms since epoch). */
+    statusTimestamp: number;
+  };
+} | {
+  /** Indicates that the order was not found. */
+  status: "unknownOid";
+};
 
 // ============================================================
 // Execution Logic

@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { MaxMarketOrderNtlsRequest, MaxMarketOrderNtlsResponse } from "@nktkas/hyperliquid/api/info";
+import { MaxMarketOrderNtlsRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/maxMarketOrderNtls.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "MaxMarketOrderNtlsResponse");
 
 runTest({
   name: "maxMarketOrderNtls",
@@ -9,7 +13,7 @@ runTest({
     const data = await Promise.all([
       client.maxMarketOrderNtls(),
     ]);
-    schemaCoverage(MaxMarketOrderNtlsResponse, data);
+    schemaCoverage(typeSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

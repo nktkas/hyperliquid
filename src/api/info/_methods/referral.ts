@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address } from "../../_schemas.ts";
 
 /**
  * Request user referral.
@@ -24,113 +24,156 @@ export type ReferralRequest = v.InferOutput<typeof ReferralRequest>;
  * Referral details for a user.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-referral-information
  */
-export const ReferralResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Referrer details. */
-    referredBy: v.nullable(
-      v.object({
-        /** Referrer address. */
-        referrer: Address,
-        /** Referral code used. */
-        code: v.pipe(v.string(), v.nonEmpty()),
-      }),
-    ),
-    /** Cumulative traded volume. */
-    cumVlm: UnsignedDecimal,
-    /** Rewards earned but not yet claimed. */
-    unclaimedRewards: UnsignedDecimal,
-    /** Rewards that have been claimed. */
-    claimedRewards: UnsignedDecimal,
-    /** Builder reward amount. */
-    builderRewards: UnsignedDecimal,
-    /** Current state of the referrer. */
-    referrerState: v.variant("stage", [
-      v.object({
-        /** Referrer is ready to receive rewards. */
-        stage: v.literal("ready"),
-        /** Referral program details. */
-        data: v.object({
-          /** Assigned referral code. */
-          code: v.pipe(v.string(), v.nonEmpty()),
-          /** Total number of referrals. */
-          nReferrals: UnsignedInteger,
-          /** Summary of each referral state. */
-          referralStates: v.array(
-            v.object({
-              /** Cumulative traded volume. */
-              cumVlm: UnsignedDecimal,
-              /** Total fees rewarded to the referred user since referral. */
-              cumRewardedFeesSinceReferred: UnsignedDecimal,
-              /** Total fees rewarded to the referrer from referred trades. */
-              cumFeesRewardedToReferrer: UnsignedDecimal,
-              /** Timestamp when the referred user joined (in ms since epoch). */
-              timeJoined: UnsignedInteger,
-              /** Address of the referred user. */
-              user: Address,
-              /** Mapping of token IDs to referral reward states. */
-              tokenToState: v.array(
-                v.tuple([
-                  UnsignedInteger,
-                  v.object({
-                    /** Cumulative traded volume. */
-                    cumVlm: UnsignedDecimal,
-                    /** Total fees rewarded to the referred user since referral. */
-                    cumRewardedFeesSinceReferred: UnsignedDecimal,
-                    /** Total fees rewarded to the referrer from referred trades. */
-                    cumFeesRewardedToReferrer: UnsignedDecimal,
-                  }),
-                ]),
-              ),
-            }),
-          ),
-        }),
-      }),
-      v.object({
-        /** Referrer needs to create a referral code. */
-        stage: v.literal("needToCreateCode"),
-      }),
-      v.object({
-        /** Referrer must complete a trade before earning rewards. */
-        stage: v.literal("needToTrade"),
-        /** Required trading volume details for activation. */
-        data: v.object({
-          /** Required trading volume. */
-          required: UnsignedDecimal,
-        }),
-      }),
-    ]),
-    /** History of referral rewards. */
-    rewardHistory: v.array(
-      v.object({
-        /** Amount of earned rewards. */
-        earned: UnsignedDecimal,
-        /** Traded volume at the time of reward. */
-        vlm: UnsignedDecimal,
-        /** Traded volume via referrals. */
-        referralVlm: UnsignedDecimal,
-        /** Timestamp when the reward was earned (in ms since epoch). */
-        time: UnsignedInteger,
-      }),
-    ),
-    /** Mapping of token IDs to referral reward states. */
-    tokenToState: v.array(
-      v.tuple([
-        UnsignedInteger,
-        v.object({
-          /** Cumulative traded volume. */
-          cumVlm: UnsignedDecimal,
-          /** Rewards earned but not yet claimed. */
-          unclaimedRewards: UnsignedDecimal,
-          /** Rewards that have been claimed. */
-          claimedRewards: UnsignedDecimal,
-          /** Builder reward amount. */
-          builderRewards: UnsignedDecimal,
-        }),
-      ]),
-    ),
-  });
-})();
-export type ReferralResponse = v.InferOutput<typeof ReferralResponse>;
+export type ReferralResponse = {
+  /** Referrer details. */
+  referredBy: {
+    /**
+     * Referrer address.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
+    referrer: `0x${string}`;
+    /** Referral code used. */
+    code: string;
+  } | null;
+  /**
+   * Cumulative traded volume.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  cumVlm: string;
+  /**
+   * Rewards earned but not yet claimed.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  unclaimedRewards: string;
+  /**
+   * Rewards that have been claimed.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  claimedRewards: string;
+  /**
+   * Builder reward amount.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  builderRewards: string;
+  /** Current state of the referrer. */
+  referrerState: {
+    /** Referrer is ready to receive rewards. */
+    stage: "ready";
+    /** Referral program details. */
+    data: {
+      /** Assigned referral code. */
+      code: string;
+      /** Total number of referrals. */
+      nReferrals: number;
+      /** Summary of each referral state. */
+      referralStates: {
+        /**
+         * Cumulative traded volume.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
+        cumVlm: string;
+        /**
+         * Total fees rewarded to the referred user since referral.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
+        cumRewardedFeesSinceReferred: string;
+        /**
+         * Total fees rewarded to the referrer from referred trades.
+         * @pattern ^[0-9]+(\.[0-9]+)?$
+         */
+        cumFeesRewardedToReferrer: string;
+        /** Timestamp when the referred user joined (in ms since epoch). */
+        timeJoined: number;
+        /**
+         * Address of the referred user.
+         * @pattern ^0x[a-fA-F0-9]{40}$
+         */
+        user: `0x${string}`;
+        /** Mapping of token IDs to referral reward states. */
+        tokenToState: [
+          tokenId: number,
+          state: {
+            /**
+             * Cumulative traded volume.
+             * @pattern ^[0-9]+(\.[0-9]+)?$
+             */
+            cumVlm: string;
+            /**
+             * Total fees rewarded to the referred user since referral.
+             * @pattern ^[0-9]+(\.[0-9]+)?$
+             */
+            cumRewardedFeesSinceReferred: string;
+            /**
+             * Total fees rewarded to the referrer from referred trades.
+             * @pattern ^[0-9]+(\.[0-9]+)?$
+             */
+            cumFeesRewardedToReferrer: string;
+          },
+        ][];
+      }[];
+    };
+  } | {
+    /** Referrer needs to create a referral code. */
+    stage: "needToCreateCode";
+  } | {
+    /** Referrer must complete a trade before earning rewards. */
+    stage: "needToTrade";
+    /** Required trading volume details for activation. */
+    data: {
+      /**
+       * Required trading volume.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      required: string;
+    };
+  };
+  /** History of referral rewards. */
+  rewardHistory: {
+    /**
+     * Amount of earned rewards.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    earned: string;
+    /**
+     * Traded volume at the time of reward.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    vlm: string;
+    /**
+     * Traded volume via referrals.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    referralVlm: string;
+    /** Timestamp when the reward was earned (in ms since epoch). */
+    time: number;
+  }[];
+  /** Mapping of token IDs to referral reward states. */
+  tokenToState: [
+    tokenId: number,
+    state: {
+      /**
+       * Cumulative traded volume.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      cumVlm: string;
+      /**
+       * Rewards earned but not yet claimed.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      unclaimedRewards: string;
+      /**
+       * Rewards that have been claimed.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      claimedRewards: string;
+      /**
+       * Builder reward amount.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      builderRewards: string;
+    },
+  ][];
+};
 
 // ============================================================
 // Execution Logic

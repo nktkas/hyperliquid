@@ -5,9 +5,11 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import { TwapHistoryResponse } from "../../info/_methods/twapHistory.ts";
+import type { TwapHistoryResponse } from "../../info/_methods/twapHistory.ts";
 
-/** Subscription to user TWAP history events for a specific user. */
+/**
+ * Subscription to user TWAP history events for a specific user.
+ */
 export const UserTwapHistoryRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -18,18 +20,20 @@ export const UserTwapHistoryRequest = /* @__PURE__ */ (() => {
 })();
 export type UserTwapHistoryRequest = v.InferOutput<typeof UserTwapHistoryRequest>;
 
-/** Event of user TWAP history. */
-export const UserTwapHistoryEvent = /* @__PURE__ */ (() => {
-  return v.object({
-    /** User address. */
-    user: Address,
-    /** Array of user's TWAP history. */
-    history: TwapHistoryResponse,
-    /** Whether this is an initial snapshot. */
-    isSnapshot: v.optional(v.literal(true)),
-  });
-})();
-export type UserTwapHistoryEvent = v.InferOutput<typeof UserTwapHistoryEvent>;
+/**
+ * Event of user TWAP history.
+ */
+export type UserTwapHistoryEvent = {
+  /**
+   * User address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  user: `0x${string}`;
+  /** Array of user's TWAP history. */
+  history: TwapHistoryResponse;
+  /** Whether this is an initial snapshot. */
+  isSnapshot?: true;
+};
 
 // ============================================================
 // Execution Logic

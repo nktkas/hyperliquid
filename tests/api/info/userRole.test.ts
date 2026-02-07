@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { UserRoleRequest, UserRoleResponse } from "@nktkas/hyperliquid/api/info";
+import { UserRoleRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/userRole.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "UserRoleResponse");
 
 runTest({
   name: "userRole",
@@ -13,7 +17,7 @@ runTest({
       client.userRole({ user: "0xb0b3460d7bd6c01a8d7dad8b152292bf1a47883b" }), // role = agent
       client.userRole({ user: "0x22a454d3322060475552e8f922ec0c778b8e5760" }), // role = subAccount
     ]);
-    schemaCoverage(UserRoleResponse, data);
+    schemaCoverage(typeSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

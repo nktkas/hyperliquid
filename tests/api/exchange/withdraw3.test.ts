@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { Withdraw3Request, Withdraw3Response } from "@nktkas/hyperliquid/api/exchange";
+import { Withdraw3Request } from "@nktkas/hyperliquid/api/exchange";
 import { runTest, topUpPerp } from "./_t.ts";
-import { excludeErrorResponse, schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/exchange/_methods/withdraw3.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "Withdraw3SuccessResponse");
 
 runTest({
   name: "withdraw3",
@@ -18,7 +22,7 @@ runTest({
         destination: "0x0000000000000000000000000000000000000001",
       }),
     ]);
-    schemaCoverage(excludeErrorResponse(Withdraw3Response), data);
+    schemaCoverage(typeSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

@@ -5,7 +5,12 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import {
+  type ErrorResponse,
+  HyperliquidChainSchema,
+  SignatureSchema,
+  type SuccessResponse,
+} from "./_base/commonSchemas.ts";
 
 /**
  * Transfer tokens between different perp DEXs, spot balance, users, and/or sub-accounts.
@@ -51,10 +56,7 @@ export type SendAssetRequest = v.InferOutput<typeof SendAssetRequest>;
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset
  */
-export const SendAssetResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type SendAssetResponse = v.InferOutput<typeof SendAssetResponse>;
+export type SendAssetResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

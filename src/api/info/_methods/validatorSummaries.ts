@@ -4,8 +4,6 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-
 /**
  * Request validator summaries.
  */
@@ -18,53 +16,61 @@ export const ValidatorSummariesRequest = /* @__PURE__ */ (() => {
 export type ValidatorSummariesRequest = v.InferOutput<typeof ValidatorSummariesRequest>;
 
 /** Statistics for validator performance over a time period. */
-const ValidatorStatsSchema = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Fraction of time the validator was online. */
-    uptimeFraction: v.string(),
-    /** Predicted annual percentage rate of returns. */
-    predictedApr: UnsignedDecimal,
-    /** Number of samples used for statistics calculation. */
-    nSamples: UnsignedInteger,
-  });
-})();
+type ValidatorStats = {
+  /**
+   * Fraction of time the validator was online.
+   * @pattern ^0(\.\d+)?|1(\.0+)?$
+   */
+  uptimeFraction: string;
+  /**
+   * Predicted annual percentage rate of returns.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  predictedApr: string;
+  /** Number of samples used for statistics calculation. */
+  nSamples: number;
+};
 
 /**
  * Array of validator performance statistics.
  */
-export const ValidatorSummariesResponse = /* @__PURE__ */ (() => {
-  return v.array(
-    v.object({
-      /** Address of the validator. */
-      validator: Address,
-      /** Address of the validator signer. */
-      signer: Address,
-      /** Name of the validator. */
-      name: v.string(),
-      /** Description of the validator. */
-      description: v.string(),
-      /** Number of blocks produced recently. */
-      nRecentBlocks: UnsignedInteger,
-      /** Total amount of tokens staked **(unsafe integer)**. */
-      stake: v.pipe(v.number(), v.integer()),
-      /** Whether the validator is currently jailed. */
-      isJailed: v.boolean(),
-      /** Timestamp when the validator can be unjailed (in ms since epoch). */
-      unjailableAfter: v.nullable(UnsignedInteger),
-      /** Whether the validator is currently active. */
-      isActive: v.boolean(),
-      /** Commission rate charged by the validator. */
-      commission: UnsignedDecimal,
-      /** Performance statistics over different time periods. */
-      stats: v.tuple([
-        v.tuple([v.literal("day"), ValidatorStatsSchema]),
-        v.tuple([v.literal("week"), ValidatorStatsSchema]),
-        v.tuple([v.literal("month"), ValidatorStatsSchema]),
-      ]),
-    }),
-  );
-})();
-export type ValidatorSummariesResponse = v.InferOutput<typeof ValidatorSummariesResponse>;
+export type ValidatorSummariesResponse = {
+  /**
+   * Address of the validator.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  validator: `0x${string}`;
+  /**
+   * Address of the validator signer.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  signer: `0x${string}`;
+  /** Name of the validator. */
+  name: string;
+  /** Description of the validator. */
+  description: string;
+  /** Number of blocks produced recently. */
+  nRecentBlocks: number;
+  /** Total amount of tokens staked **(unsafe integer)**. */
+  stake: number;
+  /** Whether the validator is currently jailed. */
+  isJailed: boolean;
+  /** Timestamp when the validator can be unjailed (in ms since epoch). */
+  unjailableAfter: number | null;
+  /** Whether the validator is currently active. */
+  isActive: boolean;
+  /**
+   * Commission rate charged by the validator.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  commission: string;
+  /** Performance statistics over different time periods. */
+  stats: [
+    [period: "day", stats: ValidatorStats],
+    [period: "week", stats: ValidatorStats],
+    [period: "month", stats: ValidatorStats],
+  ];
+}[];
 
 // ============================================================
 // Execution Logic

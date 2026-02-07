@@ -43,31 +43,22 @@ export type CancelRequest = v.InferOutput<typeof CancelRequest>;
  * Response for order cancellation.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s
  */
-export const CancelResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Successful status. */
-    status: v.literal("ok"),
-    /** Response details. */
-    response: v.object({
-      /** Type of response. */
-      type: v.literal("cancel"),
-      /** Specific data. */
-      data: v.object({
-        /** Array of statuses for each canceled order. */
-        statuses: v.array(
-          v.union([
-            v.literal("success"),
-            v.object({
-              /** Error message returned by the exchange. */
-              error: v.string(),
-            }),
-          ]),
-        ),
-      }),
-    }),
-  });
-})();
-export type CancelResponse = v.InferOutput<typeof CancelResponse>;
+export type CancelResponse = {
+  /** Successful status. */
+  status: "ok";
+  /** Response details. */
+  response: {
+    /** Type of response. */
+    type: "cancel";
+    /** Specific data. */
+    data: {
+      statuses: ("success" | {
+        /** Error message returned by the exchange. */
+        error: string;
+      })[];
+    };
+  };
+};
 
 // ============================================================
 // Execution Logic

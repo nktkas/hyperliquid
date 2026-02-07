@@ -5,9 +5,11 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import { FrontendOpenOrdersResponse } from "../../info/_methods/frontendOpenOrders.ts";
+import type { FrontendOpenOrdersResponse } from "../../info/_methods/frontendOpenOrders.ts";
 
-/** Subscription to open order events for a specific user. */
+/**
+ * Subscription to open order events for a specific user.
+ */
 export const OpenOrdersRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -20,18 +22,20 @@ export const OpenOrdersRequest = /* @__PURE__ */ (() => {
 })();
 export type OpenOrdersRequest = v.InferOutput<typeof OpenOrdersRequest>;
 
-/** Event of open orders for a specific user. */
-export const OpenOrdersEvent = /* @__PURE__ */ (() => {
-  return v.object({
-    /** DEX name (empty string for main dex). */
-    dex: v.string(),
-    /** User address. */
-    user: Address,
-    /** Array of open orders with additional display information. */
-    orders: FrontendOpenOrdersResponse,
-  });
-})();
-export type OpenOrdersEvent = v.InferOutput<typeof OpenOrdersEvent>;
+/**
+ * Event of open orders for a specific user.
+ */
+export type OpenOrdersEvent = {
+  /** DEX name (empty string for main dex). */
+  dex: string;
+  /**
+   * User address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  user: `0x${string}`;
+  /** Array of open orders with additional display information. */
+  orders: FrontendOpenOrdersResponse;
+};
 
 // ============================================================
 // Execution Logic

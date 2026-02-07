@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Request margin table data.
@@ -23,23 +23,20 @@ export type MarginTableRequest = v.InferOutput<typeof MarginTableRequest>;
 /**
  * Margin requirements table with multiple tiers.
  */
-export const MarginTableResponse = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Description of the margin table. */
-    description: v.string(),
-    /** Array of margin tiers defining leverage limits. */
-    marginTiers: v.array(
-      v.object({
-        /** Lower position size boundary for this tier. */
-        lowerBound: UnsignedDecimal,
-        /** Maximum allowed leverage for this tier. */
-        maxLeverage: v.pipe(UnsignedInteger, v.minValue(1)),
-      }),
-    ),
-  });
-})();
-
-export type MarginTableResponse = v.InferOutput<typeof MarginTableResponse>;
+export type MarginTableResponse = {
+  /** Description of the margin table. */
+  description: string;
+  /** Array of margin tiers defining leverage limits. */
+  marginTiers: {
+    /**
+     * Lower position size boundary for this tier.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    lowerBound: string;
+    /** Maximum allowed leverage for this tier. */
+    maxLeverage: number;
+  }[];
+};
 
 // ============================================================
 // Execution Logic

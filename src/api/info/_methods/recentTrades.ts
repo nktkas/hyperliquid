@@ -4,8 +4,6 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-
 /**
  * Request recent trades.
  */
@@ -22,29 +20,38 @@ export type RecentTradesRequest = v.InferOutput<typeof RecentTradesRequest>;
 /**
  * Array of recent trades.
  */
-export const RecentTradesResponse = /* @__PURE__ */ (() => {
-  return v.array(
-    v.object({
-      /** Asset symbol (e.g., BTC). */
-      coin: v.string(),
-      /** Trade side ("B" = Bid/Buy, "A" = Ask/Sell). */
-      side: v.picklist(["B", "A"]),
-      /** Trade price. */
-      px: UnsignedDecimal,
-      /** Trade size. */
-      sz: UnsignedDecimal,
-      /** Trade timestamp (in ms since epoch). */
-      time: UnsignedInteger,
-      /** Transaction hash. */
-      hash: v.pipe(Hex, v.length(66)),
-      /** Trade ID. */
-      tid: UnsignedInteger,
-      /** Addresses of users involved in the trade [Maker, Taker]. */
-      users: v.tuple([Address, Address]),
-    }),
-  );
-})();
-export type RecentTradesResponse = v.InferOutput<typeof RecentTradesResponse>;
+export type RecentTradesResponse = {
+  /** Asset symbol (e.g., BTC). */
+  coin: string;
+  /** Trade side ("B" = Bid/Buy, "A" = Ask/Sell). */
+  side: "B" | "A";
+  /**
+   * Trade price.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  px: string;
+  /**
+   * Trade size.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  sz: string;
+  /** Trade timestamp (in ms since epoch). */
+  time: number;
+  /**
+   * Transaction hash.
+   * @pattern ^0x[a-fA-F0-9]{64}$
+   */
+  hash: `0x${string}`;
+  /** Trade ID. */
+  tid: number;
+  /** Addresses of users involved in the trade [Maker, Taker]. */
+  users: [
+    /** @pattern ^0x[a-fA-F0-9]{40}$ */
+    maker: `0x${string}`,
+    /** @pattern ^0x[a-fA-F0-9]{40}$ */
+    taker: `0x${string}`,
+  ];
+}[];
 
 // ============================================================
 // Execution Logic

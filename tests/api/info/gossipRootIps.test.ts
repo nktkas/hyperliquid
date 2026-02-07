@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { GossipRootIpsRequest, GossipRootIpsResponse } from "@nktkas/hyperliquid/api/info";
+import { GossipRootIpsRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/gossipRootIps.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "GossipRootIpsResponse");
 
 runTest({
   name: "gossipRootIps",
@@ -9,7 +13,7 @@ runTest({
     const data = await Promise.all([
       client.gossipRootIps(),
     ]);
-    schemaCoverage(GossipRootIpsResponse, data, [
+    schemaCoverage(typeSchema, data, [
       "#/array",
     ]);
   },

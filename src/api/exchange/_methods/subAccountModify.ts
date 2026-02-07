@@ -5,9 +5,11 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
-/** Modify a sub-account. */
+/**
+ * Modify a sub-account.
+ */
 export const SubAccountModifyRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Action to perform. */
@@ -29,11 +31,10 @@ export const SubAccountModifyRequest = /* @__PURE__ */ (() => {
 })();
 export type SubAccountModifyRequest = v.InferOutput<typeof SubAccountModifyRequest>;
 
-/** Successful response without specific data or error response. */
-export const SubAccountModifyResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type SubAccountModifyResponse = v.InferOutput<typeof SubAccountModifyResponse>;
+/**
+ * Successful response without specific data or error response.
+ */
+export type SubAccountModifyResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic

@@ -1,7 +1,11 @@
 import * as v from "@valibot/valibot";
-import { FundingHistoryRequest, FundingHistoryResponse } from "@nktkas/hyperliquid/api/info";
+import { FundingHistoryRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
-import { schemaCoverage } from "../_utils/schemaCoverageHyperliquid.ts";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+
+const sourceFile = new URL("../../../src/api/info/_methods/fundingHistory.ts", import.meta.url).pathname;
+const typeSchema = typeToJsonSchema(sourceFile, "FundingHistoryResponse");
 
 runTest({
   name: "fundingHistory",
@@ -12,7 +16,7 @@ runTest({
         startTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
       }),
     ]);
-    schemaCoverage(FundingHistoryResponse, data);
+    schemaCoverage(typeSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

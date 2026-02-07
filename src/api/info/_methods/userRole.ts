@@ -24,33 +24,32 @@ export type UserRoleRequest = v.InferOutput<typeof UserRoleRequest>;
  * User role.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-role
  */
-export const UserRoleResponse = /* @__PURE__ */ (() => {
-  return v.variant("role", [
-    v.object({
-      /** Role identifier. */
-      role: v.picklist(["missing", "user", "vault"]),
-    }),
-    v.object({
-      /** Role identifier. */
-      role: v.literal("agent"),
-      /** Details for agent role. */
-      data: v.object({
-        /** Master account address associated with the agent. */
-        user: Address,
-      }),
-    }),
-    v.object({
-      /** Role identifier. */
-      role: v.literal("subAccount"),
-      /** Details for sub-account role. */
-      data: v.object({
-        /** Master account address associated with the sub-account. */
-        master: Address,
-      }),
-    }),
-  ]);
-})();
-export type UserRoleResponse = v.InferOutput<typeof UserRoleResponse>;
+export type UserRoleResponse = {
+  /** Role identifier. */
+  role: "missing" | "user" | "vault";
+} | {
+  /** Role identifier. */
+  role: "agent";
+  /** Details for agent role. */
+  data: {
+    /**
+     * Master account address associated with the agent.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
+    user: `0x${string}`;
+  };
+} | {
+  /** Role identifier. */
+  role: "subAccount";
+  /** Details for sub-account role. */
+  data: {
+    /**
+     * Master account address associated with the sub-account.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
+    master: `0x${string}`;
+  };
+};
 
 // ============================================================
 // Execution Logic

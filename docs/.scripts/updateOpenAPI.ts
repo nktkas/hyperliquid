@@ -1,7 +1,10 @@
 // deno-lint-ignore-file no-explicit-any no-import-prefix no-console
 
 /**
- * Generates OpenAPI specs from SDK valibot schemas and syncs them to GitBook.
+ * Generates OpenAPI specs from SDK schemas/types and syncs them to GitBook.
+ *
+ * - Request schemas: converted from valibot via `@valibot/to-json-schema`
+ * - Response types: converted from TypeScript via `typeToJsonSchema`
  *
  * Required environment variables:
  * - GITBOOK_TOKEN: GitBook API token
@@ -27,6 +30,8 @@ import type { AbstractWallet } from "@nktkas/hyperliquid/signing";
 import { convert } from "npm:@openapi-contrib/json-schema-to-openapi-schema@4";
 import { type ConversionConfig, type JsonSchema, toJsonSchema } from "jsr:@valibot/to-json-schema@1";
 import * as path from "jsr:@std/path@1";
+
+import { typeToJsonSchema } from "../../tests/api/_utils/typeToJsonSchema.ts";
 
 import { enrichJsonSchema } from "./schemaEnricher.ts";
 import { parseFunctionJSDocFromFile, parseJSDocFromFile } from "./jsdocParser.ts";
@@ -88,13 +93,17 @@ const GITBOOK_API_BASE = "https://api.gitbook.com/v1";
 // =============================================================================
 
 /**
- * Extract all schemas from SDK clients and enrich them with JSDoc descriptions.
+ * Extract all schemas/types from SDK and convert to JSON Schemas.
+ *
+ * Request schemas are extracted from valibot and enriched with JSDoc.
+ * Response types are converted from TypeScript with automatic JSDoc extraction.
+ *
  * @returns Collection of JSON Schemas for all endpoints and methods
  */
 export function getAllSchemas(): AllSchemas {
   console.log("[Schemas] Starting to extract schemas...");
 
-  // Configuration for valibot-to-json-schema conversion
+  // Configuration for valibot-to-json-schema conversion (used for Request schemas only)
   const toJsonConfig: ConversionConfig = {
     // Skip validation errors (some schemas may have unsupported constructs)
     errorMode: "ignore",
@@ -112,7 +121,7 @@ export function getAllSchemas(): AllSchemas {
   const results: AllSchemas = { info: {}, exchange: {}, subscription: {} };
 
   for (const endpoint of ENDPOINTS) {
-    // Get the API module containing valibot schemas (e.g., hlInfo, hlExchange)
+    // Get the API module containing valibot request schemas (e.g., hlInfo, hlExchange)
     const api = API_MODULES[endpoint];
     // Get method names by introspecting the SDK client class
     const methods = getAllMethodsFromClient(endpoint);
@@ -133,15 +142,11 @@ export function getAllSchemas(): AllSchemas {
         requestJSchema = enrichJsonSchema(requestJSchema, requestJSDoc);
       }
 
-      // Convert response valibot schema to JSON Schema and enrich with JSDoc
+      // Convert response TypeScript type to JSON Schema
+      // typeToJsonSchema extracts JSDoc tags (@description, @pattern, etc.) automatically
       // Note: Subscriptions use *Event suffix instead of *Response
       const responseKey = endpoint === "subscription" ? "Event" : "Response";
-      const responseVSchema = api[pascalMethod + responseKey as keyof typeof api] as any;
-      let responseJSchema = toJsonSchema(responseVSchema, toJsonConfig);
-      const responseJSDoc = jsdocData[`${pascalMethod}${responseKey}`];
-      if (responseJSDoc) {
-        responseJSchema = enrichJsonSchema(responseJSchema, responseJSDoc);
-      }
+      const responseJSchema = typeToJsonSchema(sourceFilePath, pascalMethod + responseKey);
 
       // Extract @example from function JSDoc
       const functionJSDoc = parseFunctionJSDocFromFile(sourceFilePath);
@@ -149,7 +154,7 @@ export function getAllSchemas(): AllSchemas {
 
       results[endpoint][method] = {
         request: requestJSchema,
-        response: responseJSchema,
+        response: responseJSchema as JsonSchema,
         codeSamples,
       };
     }
@@ -526,7 +531,7 @@ if (import.meta.main) {
     throw new Error("GITBOOK_TOKEN and GITBOOK_ORG_ID must be set in environment variables");
   }
 
-  // Step 1: Extract JSON Schemas from SDK valibot schemas with JSDoc enrichment
+  // Step 1: Extract JSON Schemas from SDK schemas/types with JSDoc enrichment
   const schemas = getAllSchemas();
   // Step 2: Convert JSON Schemas to OpenAPI specs
   const openapiSpecs = await jsonSchemasToOpenAPIs(schemas);

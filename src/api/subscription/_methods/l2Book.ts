@@ -4,9 +4,11 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Integer, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Integer } from "../../_schemas.ts";
 
-/** Subscription to L2 order book events for a specific asset. */
+/**
+ * Subscription to L2 order book events for a specific asset.
+ */
 export const L2BookRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of subscription. */
@@ -21,31 +23,48 @@ export const L2BookRequest = /* @__PURE__ */ (() => {
 })();
 export type L2BookRequest = v.InferOutput<typeof L2BookRequest>;
 
-const L2BookLevelSchema = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Price. */
-    px: UnsignedDecimal,
-    /** Total size. */
-    sz: UnsignedDecimal,
+/**
+ * Event of L2 order book snapshot.
+ */
+export type L2BookEvent = {
+  /** Asset symbol. */
+  coin: string;
+  /** Timestamp of the snapshot (in ms since epoch). */
+  time: number;
+  /** Bid and ask levels (index 0 = bids, index 1 = asks). */
+  levels: [{
+    /**
+     * Price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    px: string;
+    /**
+     * Total size.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    sz: string;
     /** Number of individual orders. */
-    n: UnsignedInteger,
-  });
-})();
-
-/** Event of L2 order book snapshot. */
-export const L2BookEvent = /* @__PURE__ */ (() => {
-  return v.object({
-    /** Asset symbol. */
-    coin: v.string(),
-    /** Timestamp of the snapshot (in ms since epoch). */
-    time: UnsignedInteger,
-    /** Bid and ask levels (index 0 = bids, index 1 = asks). */
-    levels: v.tuple([v.array(L2BookLevelSchema), v.array(L2BookLevelSchema)]),
-    /** Spread (only present when `nSigFigs` is non-null). */
-    spread: v.optional(UnsignedDecimal),
-  });
-})();
-export type L2BookEvent = v.InferOutput<typeof L2BookEvent>;
+    n: number;
+  }[], {
+    /**
+     * Price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    px: string;
+    /**
+     * Total size.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    sz: string;
+    /** Number of individual orders. */
+    n: number;
+  }[]];
+  /**
+   * Spread (only present when `nSigFigs` is non-null).
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  spread?: string | undefined;
+};
 
 // ============================================================
 // Execution Logic

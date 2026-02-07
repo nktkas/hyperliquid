@@ -5,7 +5,12 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Hex, UnsignedInteger } from "../../_schemas.ts";
-import { ErrorResponse, HyperliquidChainSchema, SignatureSchema, SuccessResponse } from "./_base/commonSchemas.ts";
+import {
+  type ErrorResponse,
+  HyperliquidChainSchema,
+  SignatureSchema,
+  type SuccessResponse,
+} from "./_base/commonSchemas.ts";
 
 /**
  * Transfer native token from the user spot account into staking for delegating to validators.
@@ -38,10 +43,7 @@ export type CDepositRequest = v.InferOutput<typeof CDepositRequest>;
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-into-staking
  */
-export const CDepositResponse = /* @__PURE__ */ (() => {
-  return v.union([SuccessResponse, ErrorResponse]);
-})();
-export type CDepositResponse = v.InferOutput<typeof CDepositResponse>;
+export type CDepositResponse = SuccessResponse | ErrorResponse;
 
 // ============================================================
 // Execution Logic
