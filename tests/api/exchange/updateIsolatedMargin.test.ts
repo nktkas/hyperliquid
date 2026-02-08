@@ -1,36 +1,38 @@
 import * as v from "@valibot/valibot";
-import { UpdateIsolatedMarginRequest } from "@nktkas/hyperliquid/api/exchange";
+import { type UpdateIsolatedMarginParameters, UpdateIsolatedMarginRequest } from "@nktkas/hyperliquid/api/exchange";
 import { openOrder, runTest, symbolConverter } from "./_t.ts";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
 
 const sourceFile = new URL("../../../src/api/exchange/_methods/updateIsolatedMargin.ts", import.meta.url).pathname;
-const typeSchema = typeToJsonSchema(sourceFile, "UpdateIsolatedMarginSuccessResponse");
+const responseSchema = typeToJsonSchema(sourceFile, "UpdateIsolatedMarginSuccessResponse");
+const paramsSchema = valibotToJsonSchema(
+  v.omit(v.object(UpdateIsolatedMarginRequest.entries.action.entries), ["type"]),
+);
 
 runTest({
   name: "updateIsolatedMargin",
-  codeTestFn: async (t, exchClient) => {
-    // ========== Prepare ==========
-
+  codeTestFn: async (_t, exchClient) => {
     const id = symbolConverter.getAssetId("SOL")!;
     await exchClient.updateLeverage({ asset: id, isCross: false, leverage: 1 });
     await openOrder(exchClient, "market", "SOL");
 
-    // ========== Test ==========
+    // increase margin
+    const increase = await (async () => {
+      const params: UpdateIsolatedMarginParameters = { asset: id, isBuy: true, ntli: 2 * 1e6 };
+      return { params, result: await exchClient.updateIsolatedMargin(params) };
+    })();
+    // decrease margin
+    const decrease = await (async () => {
+      const params: UpdateIsolatedMarginParameters = { asset: id, isBuy: true, ntli: -1 * 1e6 };
+      return { params, result: await exchClient.updateIsolatedMargin(params) };
+    })();
 
-    await t.step("Increase isolated margin", async () => {
-      const data = await Promise.all([
-        exchClient.updateIsolatedMargin({ asset: id, isBuy: true, ntli: 2 * 1e6 }),
-      ]);
-      schemaCoverage(typeSchema, data);
-    });
+    const data = [increase, decrease];
 
-    await t.step("Decrease isolated margin", async () => {
-      const data = await Promise.all([
-        exchClient.updateIsolatedMargin({ asset: id, isBuy: true, ntli: -1 * 1e6 }),
-      ]);
-      schemaCoverage(typeSchema, data);
-    });
+    schemaCoverage(paramsSchema, data.map((d) => d.params));
+    schemaCoverage(responseSchema, data.map((d) => d.result));
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

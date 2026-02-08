@@ -5,15 +5,14 @@ import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
 
 const sourceFile = new URL("../../../src/api/info/_methods/maxMarketOrderNtls.ts", import.meta.url).pathname;
-const typeSchema = typeToJsonSchema(sourceFile, "MaxMarketOrderNtlsResponse");
+const responseSchema = typeToJsonSchema(sourceFile, "MaxMarketOrderNtlsResponse");
 
 runTest({
   name: "maxMarketOrderNtls",
   codeTestFn: async (_t, client) => {
-    const data = await Promise.all([
-      client.maxMarketOrderNtls(),
-    ]);
-    schemaCoverage(typeSchema, data);
+    const data = await Promise.all([client.maxMarketOrderNtls()]);
+
+    schemaCoverage(responseSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

@@ -1,19 +1,25 @@
 import * as v from "@valibot/valibot";
-import { HistoricalOrdersRequest } from "@nktkas/hyperliquid/api/info";
+import { type HistoricalOrdersParameters, HistoricalOrdersRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
 
 const sourceFile = new URL("../../../src/api/info/_methods/historicalOrders.ts", import.meta.url).pathname;
-const typeSchema = typeToJsonSchema(sourceFile, "HistoricalOrdersResponse");
+const responseSchema = typeToJsonSchema(sourceFile, "HistoricalOrdersResponse");
+const paramsSchema = valibotToJsonSchema(v.omit(HistoricalOrdersRequest, ["type"]));
 
 runTest({
   name: "historicalOrders",
   codeTestFn: async (_t, client) => {
-    const data = await Promise.all([
-      client.historicalOrders({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" }),
-    ]);
-    schemaCoverage(typeSchema, data, [
+    const params: HistoricalOrdersParameters[] = [
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" },
+    ];
+
+    const data = await Promise.all(params.map((p) => client.historicalOrders(p)));
+
+    schemaCoverage(paramsSchema, params);
+    schemaCoverage(responseSchema, data, [
       "#/items/properties/order/properties/tif/enum/5",
       "#/items/properties/status/enum/5",
       "#/items/properties/status/enum/6",

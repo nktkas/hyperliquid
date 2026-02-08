@@ -1,19 +1,32 @@
-import type { ActiveSpotAssetCtxEvent } from "@nktkas/hyperliquid/api/subscription";
+import * as v from "@valibot/valibot";
+import {
+  type ActiveSpotAssetCtxEvent,
+  type ActiveSpotAssetCtxParameters,
+  ActiveSpotAssetCtxRequest,
+} from "@nktkas/hyperliquid/api/subscription";
 import { collectEventsOverTime, runTest } from "./_t.ts";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
 
 const sourceFile = new URL("../../../src/api/subscription/_methods/activeSpotAssetCtx.ts", import.meta.url).pathname;
-const typeSchema = typeToJsonSchema(sourceFile, "ActiveSpotAssetCtxEvent");
+const responseSchema = typeToJsonSchema(sourceFile, "ActiveSpotAssetCtxEvent");
+const paramsSchema = valibotToJsonSchema(v.omit(ActiveSpotAssetCtxRequest, ["type"]));
 
 runTest({
   name: "activeSpotAssetCtx",
   mode: "api",
   fn: async (_t, client) => {
+    const params: ActiveSpotAssetCtxParameters[] = [
+      { coin: "@107" },
+      { coin: "@27" },
+    ];
+
     const data = await collectEventsOverTime<ActiveSpotAssetCtxEvent>(async (cb) => {
-      await client.activeSpotAssetCtx({ coin: "@107" }, cb);
-      await client.activeSpotAssetCtx({ coin: "@27" }, cb);
+      await Promise.all(params.map((p) => client.activeSpotAssetCtx(p, cb)));
     }, 10_000);
-    schemaCoverage(typeSchema, data);
+
+    schemaCoverage(paramsSchema, params);
+    schemaCoverage(responseSchema, data);
   },
 });

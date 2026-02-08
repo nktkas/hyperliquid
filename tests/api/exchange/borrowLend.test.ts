@@ -1,34 +1,37 @@
 import * as v from "@valibot/valibot";
-import { BorrowLendRequest } from "@nktkas/hyperliquid/api/exchange";
+import { type BorrowLendParameters, BorrowLendRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest, topUpSpot } from "./_t.ts";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
 
 const sourceFile = new URL("../../../src/api/exchange/_methods/borrowLend.ts", import.meta.url).pathname;
-const typeSchema = typeToJsonSchema(sourceFile, "BorrowLendSuccessResponse");
+const responseSchema = typeToJsonSchema(sourceFile, "BorrowLendSuccessResponse");
+const paramsSchema = valibotToJsonSchema(v.omit(v.object(BorrowLendRequest.entries.action.entries), ["type"]));
 
 runTest({
   name: "borrowLend",
-  codeTestFn: async (t, exchClient) => {
-    // ========== Prepare ==========
-
+  codeTestFn: async (_t, exchClient) => {
     await topUpSpot(exchClient, "USDC", "30");
 
-    // ========== Test ==========
+    // supply | amount=string
+    const supply = await (async () => {
+      const params: BorrowLendParameters = { operation: "supply", token: 0, amount: "30" };
+      return { params, result: await exchClient.borrowLend(params) };
+    })();
+    // withdraw | amount=null
+    const withdraw = await (async () => {
+      const params: BorrowLendParameters = { operation: "withdraw", token: 0, amount: null };
+      return { params, result: await exchClient.borrowLend(params) };
+    })();
 
-    await t.step("supply", async () => {
-      const data = await Promise.all([
-        exchClient.borrowLend({ operation: "supply", token: 0, amount: "30" }),
-      ]);
-      schemaCoverage(typeSchema, data);
-    });
+    const data = [supply, withdraw];
 
-    await t.step("withdraw", async () => {
-      const data = await Promise.all([
-        exchClient.borrowLend({ operation: "withdraw", token: 0, amount: null }),
-      ]);
-      schemaCoverage(typeSchema, data);
-    });
+    schemaCoverage(paramsSchema, data.map((d) => d.params), [
+      "#/properties/operation/enum/2", // 'repay' - not available
+      "#/properties/operation/enum/3", // 'borrow' - not available
+    ]);
+    schemaCoverage(responseSchema, data.map((d) => d.result));
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

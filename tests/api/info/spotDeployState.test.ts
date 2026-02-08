@@ -1,22 +1,26 @@
 import * as v from "@valibot/valibot";
-import { SpotDeployStateRequest } from "@nktkas/hyperliquid/api/info";
+import { type SpotDeployStateParameters, SpotDeployStateRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
 
 const sourceFile = new URL("../../../src/api/info/_methods/spotDeployState.ts", import.meta.url).pathname;
-const typeSchema = typeToJsonSchema(sourceFile, "SpotDeployStateResponse");
+const responseSchema = typeToJsonSchema(sourceFile, "SpotDeployStateResponse");
+const paramsSchema = valibotToJsonSchema(v.omit(SpotDeployStateRequest, ["type"]));
 
 runTest({
   name: "spotDeployState",
   codeTestFn: async (_t, client) => {
-    const data = await Promise.all([
-      client.spotDeployState({ user: "0x051dbfc562d44e4a01ebb986da35a47ab4f346db" }), // states.fullName = string
-      client.spotDeployState({ user: "0xd8cb8d9747f50be8e423c698f9104ee090540961" }), // states.fullName = null
-      client.spotDeployState({ user: "0x051dbfc562d44e4a01ebb986da35a47ab4f346db" }), // states.maxSupply = string
-      client.spotDeployState({ user: "0xd8cb8d9747f50be8e423c698f9104ee090540961" }), // states.maxSupply = null
-    ]);
-    schemaCoverage(typeSchema, data, [
+    const params: SpotDeployStateParameters[] = [
+      { user: "0x051dbfc562d44e4a01ebb986da35a47ab4f346db" }, // states.fullName = string, states.maxSupply = string
+      { user: "0xd8cb8d9747f50be8e423c698f9104ee090540961" }, // states.fullName = null, states.maxSupply = null
+    ];
+
+    const data = await Promise.all(params.map((p) => client.spotDeployState(p)));
+
+    schemaCoverage(paramsSchema, params);
+    schemaCoverage(responseSchema, data, [
       "#/properties/states/items/properties/blacklistUsers/array",
       "#/properties/gasAuction/properties/currentGas/defined",
       "#/properties/gasAuction/properties/endGas/null",

@@ -1,24 +1,52 @@
-// deno-lint-ignore-file no-import-prefix
 import * as v from "@valibot/valibot";
 import { assertRejects } from "jsr:@std/assert@1";
-import { VaultModifyRequest } from "@nktkas/hyperliquid/api/exchange";
+import { type VaultModifyParameters, VaultModifyRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest } from "./_t.ts";
 import { ApiRequestError } from "@nktkas/hyperliquid";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
+
+const paramsSchema = valibotToJsonSchema(v.omit(v.object(VaultModifyRequest.entries.action.entries), ["type"]));
 
 runTest({
   name: "vaultModify",
   codeTestFn: async (_t, exchClient) => {
-    await assertRejects(
-      async () => {
-        await exchClient.vaultModify({
-          vaultAddress: "0x457ab3acf4a4e01156ce269545a9d3d05fff2f0b",
-          allowDeposits: null,
-          alwaysCloseOnWithdraw: null,
-        });
+    const params: VaultModifyParameters[] = [
+      // allowDeposits=null | alwaysCloseOnWithdraw=null
+      {
+        vaultAddress: "0x457ab3acf4a4e01156ce269545a9d3d05fff2f0b",
+        allowDeposits: null,
+        alwaysCloseOnWithdraw: null,
       },
-      ApiRequestError,
-      "Only leader can perform this vault action",
-    );
+      // allowDeposits=true | alwaysCloseOnWithdraw=true
+      {
+        vaultAddress: "0x457ab3acf4a4e01156ce269545a9d3d05fff2f0b",
+        allowDeposits: true,
+        alwaysCloseOnWithdraw: true,
+      },
+      // allowDeposits=false | alwaysCloseOnWithdraw=false
+      {
+        vaultAddress: "0x457ab3acf4a4e01156ce269545a9d3d05fff2f0b",
+        allowDeposits: false,
+        alwaysCloseOnWithdraw: false,
+      },
+      // allowDeposits=missing | alwaysCloseOnWithdraw=missing
+      {
+        vaultAddress: "0x457ab3acf4a4e01156ce269545a9d3d05fff2f0b",
+      },
+    ];
+
+    await Promise.all(params.map((p) =>
+      assertRejects(
+        async () => {
+          await exchClient.vaultModify(p);
+        },
+        ApiRequestError,
+        "Only leader can perform this vault action",
+      )
+    ));
+
+    schemaCoverage(paramsSchema, params);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

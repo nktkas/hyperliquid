@@ -1,25 +1,22 @@
 import * as v from "@valibot/valibot";
-import { BatchModifyRequest } from "@nktkas/hyperliquid/api/exchange";
+import { type BatchModifyParameters, BatchModifyRequest } from "@nktkas/hyperliquid/api/exchange";
 import { openOrder, runTest } from "./_t.ts";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
 
 const sourceFile = new URL("../../../src/api/exchange/_methods/batchModify.ts", import.meta.url).pathname;
-const typeSchema = typeToJsonSchema(sourceFile, "BatchModifySuccessResponse");
+const responseSchema = typeToJsonSchema(sourceFile, "BatchModifySuccessResponse");
+const paramsSchema = valibotToJsonSchema(v.omit(v.object(BatchModifyRequest.entries.action.entries), ["type"]));
 
 runTest({
   name: "batchModify",
   codeTestFn: async (_t, exchClient) => {
-    const data = await Promise.all([
-      // resting
+    const [restingGtc, restingAlo, filledGtc] = await Promise.all([
+      // resting | oid number | Gtc | no cloid
       (async () => {
-        // ========== Prepare ==========
-
         const order = await openOrder(exchClient, "limit");
-
-        // ========== Test ==========
-
-        return await exchClient.batchModify({
+        const params: BatchModifyParameters = {
           modifies: [{
             oid: order.oid,
             order: {
@@ -31,17 +28,13 @@ runTest({
               t: { limit: { tif: "Gtc" } },
             },
           }],
-        });
+        };
+        return { params, result: await exchClient.batchModify(params) };
       })(),
-      // resting | cloid
+      // resting | oid cloid | Alo | cloid
       (async () => {
-        // ========== Prepare ==========
-
         const order = await openOrder(exchClient, "limit");
-
-        // ========== Test ==========
-
-        return await exchClient.batchModify({
+        const params: BatchModifyParameters = {
           modifies: [{
             oid: order.cloid,
             order: {
@@ -50,43 +43,17 @@ runTest({
               p: order.p,
               s: order.s,
               r: false,
-              t: { limit: { tif: "Gtc" } },
+              t: { limit: { tif: "Alo" } },
               c: order.cloid,
             },
           }],
-        });
+        };
+        return { params, result: await exchClient.batchModify(params) };
       })(),
-      // filled
+      // filled | oid cloid | Gtc | cloid
       (async () => {
-        // ========== Prepare ==========
-
         const order = await openOrder(exchClient, "limit");
-
-        // ========== Test ==========
-
-        return await exchClient.batchModify({
-          modifies: [{
-            oid: order.oid,
-            order: {
-              a: order.a,
-              b: order.b,
-              p: order.b ? order.pxUp : order.pxDown,
-              s: order.s,
-              r: false,
-              t: { limit: { tif: "Gtc" } },
-            },
-          }],
-        });
-      })(),
-      // filled | cloid
-      (async () => {
-        // ========== Prepare ==========
-
-        const order = await openOrder(exchClient, "limit");
-
-        // ========== Test ==========
-
-        return await exchClient.batchModify({
+        const params: BatchModifyParameters = {
           modifies: [{
             oid: order.cloid,
             order: {
@@ -99,12 +66,89 @@ runTest({
               c: order.cloid,
             },
           }],
-        });
+        };
+        return { params, result: await exchClient.batchModify(params) };
       })(),
     ]);
-    schemaCoverage(typeSchema, data, [
-      "#/properties/response/properties/data/properties/statuses/items/anyOf/2",
-      "#/properties/response/properties/data/properties/statuses/items/anyOf/3",
+    // filled | Ioc
+    const ioc = await (async () => {
+      const order = await openOrder(exchClient, "limit");
+      const params: BatchModifyParameters = {
+        modifies: [{
+          oid: order.oid,
+          order: {
+            a: order.a,
+            b: order.b,
+            p: order.b ? order.pxUp : order.pxDown,
+            s: order.s,
+            r: false,
+            t: { limit: { tif: "Ioc" } },
+          },
+        }],
+      };
+      return { params, result: await exchClient.batchModify(params) };
+    })();
+    // filled | FrontendMarket
+    const frontendMarket = await (async () => {
+      const order = await openOrder(exchClient, "limit");
+      const params: BatchModifyParameters = {
+        modifies: [{
+          oid: order.oid,
+          order: {
+            a: order.a,
+            b: order.b,
+            p: order.b ? order.pxUp : order.pxDown,
+            s: order.s,
+            r: false,
+            t: { limit: { tif: "FrontendMarket" } },
+          },
+        }],
+      };
+      return { params, result: await exchClient.batchModify(params) };
+    })();
+    // resting | trigger | tp
+    const triggerTp = await (async () => {
+      const order = await openOrder(exchClient, "limit");
+      const params: BatchModifyParameters = {
+        modifies: [{
+          oid: order.oid,
+          order: {
+            a: order.a,
+            b: order.b,
+            p: order.p,
+            s: order.s,
+            r: false,
+            t: { trigger: { isMarket: true, triggerPx: order.pxUp, tpsl: "tp" } },
+          },
+        }],
+      };
+      return { params, result: await exchClient.batchModify(params) };
+    })();
+    // resting | trigger | sl
+    const triggerSl = await (async () => {
+      const order = await openOrder(exchClient, "limit");
+      const params: BatchModifyParameters = {
+        modifies: [{
+          oid: order.oid,
+          order: {
+            a: order.a,
+            b: order.b,
+            p: order.p,
+            s: order.s,
+            r: false,
+            t: { trigger: { isMarket: false, triggerPx: order.pxDown, tpsl: "sl" } },
+          },
+        }],
+      };
+      return { params, result: await exchClient.batchModify(params) };
+    })();
+
+    const data = [restingGtc, restingAlo, filledGtc, ioc, frontendMarket, triggerTp, triggerSl];
+
+    schemaCoverage(paramsSchema, data.map((d) => d.params));
+    schemaCoverage(responseSchema, data.map((d) => d.result), [
+      "#/properties/response/properties/data/properties/statuses/items/anyOf/2", // "waitingForFill"
+      "#/properties/response/properties/data/properties/statuses/items/anyOf/3", // "waitingForTrigger"
     ]);
   },
   cliTestFn: async (_t, runCommand) => {

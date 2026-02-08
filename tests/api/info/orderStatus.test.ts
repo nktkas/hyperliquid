@@ -1,47 +1,53 @@
 import * as v from "@valibot/valibot";
-import { OrderStatusRequest } from "@nktkas/hyperliquid/api/info";
+import { type OrderStatusParameters, OrderStatusRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
 
 const sourceFile = new URL("../../../src/api/info/_methods/orderStatus.ts", import.meta.url).pathname;
-const typeSchema = typeToJsonSchema(sourceFile, "OrderStatusResponse");
+const responseSchema = typeToJsonSchema(sourceFile, "OrderStatusResponse");
+const paramsSchema = valibotToJsonSchema(v.omit(OrderStatusRequest, ["type"]));
 
 runTest({
   name: "orderStatus",
   codeTestFn: async (_t, client) => {
-    const data = await Promise.all([
-      client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 0 }), // status = unknownOid
+    const params: OrderStatusParameters[] = [
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 0 }, // status = unknownOid
 
-      client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 27379010444 }), // order.order.side = A
-      client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 15029784876 }), // order.order.side = A
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 27379010444 }, // order.order.side = A
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 15029784876 }, // order.order.side = A
 
-      client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 15029784876 }), // order.order.orderType = Limit
-      client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 15030144135 }), // order.order.orderType = Stop Market
-      client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 14940693141 }), // order.order.orderType = Stop Limit
-      client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 27379010444 }), // order.order.orderType = Take Profit Market
-      client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 27379156434 }), // order.order.orderType = Take Profit Limit
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 15029784876 }, // order.order.orderType = Limit
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 15030144135 }, // order.order.orderType = Stop Market
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 14940693141 }, // order.order.orderType = Stop Limit
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 27379010444 }, // order.order.orderType = Take Profit Market
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 27379156434 }, // order.order.orderType = Take Profit Limit
 
-      client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 15030144135 }), // order.order.tif = null
-      client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 15029784876 }), // order.order.tif = Gtc
-      client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 14947967914 }), // order.order.tif = Alo
-      client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 23629760457 }), // order.order.tif = Ioc
-      client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 20776394366 }), // order.order.tif = FrontendMarket
-      client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 21904297440 }), // order.order.tif = LiquidationMarket
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 15030144135 }, // order.order.tif = null
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 15029784876 }, // order.order.tif = Gtc
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 14947967914 }, // order.order.tif = Alo
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 23629760457 }, // order.order.tif = Ioc
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 20776394366 }, // order.order.tif = FrontendMarket
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 21904297440 }, // order.order.tif = LiquidationMarket
 
-      client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 27379010444 }), // order.status = open
-      client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 15029784876 }), // order.status = filled
-      client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 15030144135 }), // order.status = canceled
-      client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 20776394366 }), // order.status = rejected
-      client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 27378915177 }), // order.status = reduceOnlyRejected
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 27379010444 }, // order.status = open
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 15029784876 }, // order.status = filled
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 15030144135 }, // order.status = canceled
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 20776394366 }, // order.status = rejected
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 27378915177 }, // order.status = reduceOnlyRejected
 
-      client.orderStatus({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 15548036277 }), // order.order.cloid = null
-      client.orderStatus({ // order.order.cloid = hex
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 15548036277 }, // order.order.cloid = null
+      { // order.order.cloid = hex
         user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9",
         oid: "0xd4bb069b673a48161bca56cfc88deb6b",
-      }),
-    ]);
-    schemaCoverage(typeSchema, data, [
+      },
+    ];
+
+    const data = await Promise.all(params.map((p) => client.orderStatus(p)));
+
+    schemaCoverage(paramsSchema, params);
+    schemaCoverage(responseSchema, data, [
       "#/anyOf/0/properties/order/properties/order/properties/children/array",
       "#/anyOf/0/properties/order/properties/order/properties/tif/enum/5",
       "#/anyOf/0/properties/order/properties/status/enum/3",

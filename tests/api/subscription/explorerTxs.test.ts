@@ -4,7 +4,7 @@ import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
 
 const sourceFile = new URL("../../../src/api/subscription/_methods/explorerTxs.ts", import.meta.url).pathname;
-const typeSchema = typeToJsonSchema(sourceFile, "ExplorerTxsEvent");
+const responseSchema = typeToJsonSchema(sourceFile, "ExplorerTxsEvent");
 
 runTest({
   name: "explorerTxs",
@@ -13,7 +13,8 @@ runTest({
     const data = await collectEventsOverTime<ExplorerTxsEvent>(async (cb) => {
       await client.explorerTxs(cb);
     }, 10_000);
-    schemaCoverage(typeSchema, data, [
+
+    schemaCoverage(responseSchema, data, [
       "#/items/properties/error/defined",
     ]);
   },

@@ -4,7 +4,7 @@ import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
 
 const sourceFile = new URL("../../../src/api/subscription/_methods/spotAssetCtxs.ts", import.meta.url).pathname;
-const typeSchema = typeToJsonSchema(sourceFile, "SpotAssetCtxsEvent");
+const responseSchema = typeToJsonSchema(sourceFile, "SpotAssetCtxsEvent");
 
 runTest({
   name: "spotAssetCtxs",
@@ -13,6 +13,7 @@ runTest({
     const data = await collectEventsOverTime<SpotAssetCtxsEvent>(async (cb) => {
       await client.spotAssetCtxs(cb);
     }, 10_000);
-    schemaCoverage(typeSchema, data);
+
+    schemaCoverage(responseSchema, data);
   },
 });

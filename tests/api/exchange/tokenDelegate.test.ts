@@ -1,11 +1,20 @@
 import * as v from "@valibot/valibot";
-import { TokenDelegateRequest } from "@nktkas/hyperliquid/api/exchange";
+import { type TokenDelegateParameters, TokenDelegateRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest, topUpSpot } from "./_t.ts";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
 
 const sourceFile = new URL("../../../src/api/exchange/_methods/tokenDelegate.ts", import.meta.url).pathname;
-const typeSchema = typeToJsonSchema(sourceFile, "TokenDelegateSuccessResponse");
+const responseSchema = typeToJsonSchema(sourceFile, "TokenDelegateSuccessResponse");
+const paramsSchema = valibotToJsonSchema(
+  v.omit(v.object(TokenDelegateRequest.entries.action.entries), [
+    "type",
+    "signatureChainId",
+    "hyperliquidChain",
+    "nonce",
+  ]),
+);
 
 runTest({
   name: "tokenDelegate",
@@ -17,14 +26,19 @@ runTest({
 
     // ========== Test ==========
 
-    const data = await Promise.all([
-      exchClient.tokenDelegate({
+    const params: TokenDelegateParameters[] = [
+      // isUndelegate=false (delegate)
+      {
         validator: "0xa012b9040d83c5cbad9e6ea73c525027b755f596",
         wei: 1,
         isUndelegate: false,
-      }),
-    ]);
-    schemaCoverage(typeSchema, data);
+      },
+    ];
+
+    const data = await Promise.all(params.map((p) => exchClient.tokenDelegate(p)));
+
+    schemaCoverage(paramsSchema, params);
+    schemaCoverage(responseSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

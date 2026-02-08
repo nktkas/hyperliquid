@@ -1,19 +1,25 @@
 import * as v from "@valibot/valibot";
-import { DelegatorSummaryRequest } from "@nktkas/hyperliquid/api/info";
+import { type DelegatorSummaryParameters, DelegatorSummaryRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
 
 const sourceFile = new URL("../../../src/api/info/_methods/delegatorSummary.ts", import.meta.url).pathname;
-const typeSchema = typeToJsonSchema(sourceFile, "DelegatorSummaryResponse");
+const responseSchema = typeToJsonSchema(sourceFile, "DelegatorSummaryResponse");
+const paramsSchema = valibotToJsonSchema(v.omit(DelegatorSummaryRequest, ["type"]));
 
 runTest({
   name: "delegatorSummary",
   codeTestFn: async (_t, client) => {
-    const data = await Promise.all([
-      client.delegatorSummary({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" }),
-    ]);
-    schemaCoverage(typeSchema, data);
+    const params: DelegatorSummaryParameters[] = [
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" },
+    ];
+
+    const data = await Promise.all(params.map((p) => client.delegatorSummary(p)));
+
+    schemaCoverage(paramsSchema, params);
+    schemaCoverage(responseSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

@@ -1,4 +1,3 @@
-// deno-lint-ignore-file no-import-prefix
 import * as v from "@valibot/valibot";
 import { assertRejects } from "jsr:@std/assert@1";
 import { ClaimRewardsRequest } from "@nktkas/hyperliquid/api/exchange";

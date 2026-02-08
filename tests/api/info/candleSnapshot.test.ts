@@ -1,33 +1,42 @@
 import * as v from "@valibot/valibot";
-import { CandleSnapshotRequest } from "@nktkas/hyperliquid/api/info";
+import { type CandleSnapshotParameters, CandleSnapshotRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
 
 const sourceFile = new URL("../../../src/api/info/_methods/candleSnapshot.ts", import.meta.url).pathname;
-const typeSchema = typeToJsonSchema(sourceFile, "CandleSnapshotResponse");
+const responseSchema = typeToJsonSchema(sourceFile, "CandleSnapshotResponse");
+const paramsSchema = valibotToJsonSchema(CandleSnapshotRequest.entries.req);
 
 runTest({
   name: "candleSnapshot",
   codeTestFn: async (_t, client) => {
-    const data = await Promise.all([
-      client.candleSnapshot({ coin: "ETH", interval: "15m", startTime: Date.now() - 1000 * 60 * 60 * 24 }),
-    ]);
-    schemaCoverage(typeSchema, data, [
-      "#/items/properties/i/enum/0",
-      "#/items/properties/i/enum/1",
-      "#/items/properties/i/enum/2",
-      "#/items/properties/i/enum/4",
-      "#/items/properties/i/enum/5",
-      "#/items/properties/i/enum/6",
-      "#/items/properties/i/enum/7",
-      "#/items/properties/i/enum/8",
-      "#/items/properties/i/enum/9",
-      "#/items/properties/i/enum/10",
-      "#/items/properties/i/enum/11",
-      "#/items/properties/i/enum/12",
-      "#/items/properties/i/enum/13",
-    ]);
+    const now = Date.now();
+    const day = 1000 * 60 * 60 * 24;
+    const params: CandleSnapshotParameters[] = [
+      { coin: "ETH", interval: "1m", startTime: now - day },
+      { coin: "ETH", interval: "3m", startTime: now - day },
+      { coin: "ETH", interval: "5m", startTime: now - day },
+      { coin: "ETH", interval: "15m", startTime: now - day },
+      { coin: "ETH", interval: "30m", startTime: now - day },
+      { coin: "ETH", interval: "1h", startTime: now - day },
+      { coin: "ETH", interval: "2h", startTime: now - day },
+      { coin: "ETH", interval: "4h", startTime: now - day },
+      { coin: "ETH", interval: "8h", startTime: now - day },
+      { coin: "ETH", interval: "12h", startTime: now - day },
+      { coin: "ETH", interval: "1d", startTime: now - day },
+      { coin: "ETH", interval: "3d", startTime: now - day },
+      { coin: "ETH", interval: "1w", startTime: now - day },
+      { coin: "ETH", interval: "1M", startTime: now - day },
+      { coin: "ETH", interval: "1m", startTime: now - day, endTime: now },
+      { coin: "ETH", interval: "1m", startTime: now - day, endTime: null },
+    ];
+
+    const data = await Promise.all(params.map((p) => client.candleSnapshot(p)));
+
+    schemaCoverage(paramsSchema, params);
+    schemaCoverage(responseSchema, data);
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

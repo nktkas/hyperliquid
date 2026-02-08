@@ -1,49 +1,70 @@
 import * as v from "@valibot/valibot";
-import { ApproveAgentRequest } from "@nktkas/hyperliquid/api/exchange";
+import { type ApproveAgentParameters, ApproveAgentRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest } from "./_t.ts";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
 
 const sourceFile = new URL("../../../src/api/exchange/_methods/approveAgent.ts", import.meta.url).pathname;
-const typeSchema = typeToJsonSchema(sourceFile, "ApproveAgentSuccessResponse");
+const responseSchema = typeToJsonSchema(sourceFile, "ApproveAgentSuccessResponse");
+const paramsSchema = valibotToJsonSchema(
+  v.omit(v.object(ApproveAgentRequest.entries.action.entries), [
+    "type",
+    "signatureChainId",
+    "hyperliquidChain",
+    "nonce",
+  ]),
+);
 
 runTest({
   name: "approveAgent",
-  codeTestFn: async (t, exchClient) => {
-    await t.step("with 'agentName'", async () => {
-      const data = await Promise.all([
-        exchClient.approveAgent({
-          agentAddress: randomAddress(),
-          agentName: "agentName",
-        }),
-      ]);
-      schemaCoverage(typeSchema, data);
-    });
+  codeTestFn: async (_t, exchClient) => {
+    // agentName=string
+    const withName = await (async () => {
+      const params: ApproveAgentParameters = {
+        agentAddress: randomAddress(),
+        agentName: "agentName",
+      };
+      return { params, result: await exchClient.approveAgent(params) };
+    })();
 
     await new Promise((r) => setTimeout(r, 5000)); // waiting to avoid error `ApiRequestError: User has pending agent removal`
 
-    await t.step("without 'agentName'", async () => {
-      const data = await Promise.all([
-        exchClient.approveAgent({
-          agentAddress: randomAddress(),
-          agentName: null,
-        }),
-      ]);
-      schemaCoverage(typeSchema, data);
-    });
+    // agentName=null
+    const withoutName = await (async () => {
+      const params: ApproveAgentParameters = {
+        agentAddress: randomAddress(),
+        agentName: null,
+      };
+      return { params, result: await exchClient.approveAgent(params) };
+    })();
 
     await new Promise((r) => setTimeout(r, 5000)); // waiting to avoid error `ApiRequestError: User has pending agent removal`
 
-    await t.step("with expiration timestamp in 'agentName'", async () => {
+    // agentName=string (with expiration timestamp)
+    const withExpiration = await (async () => {
       const expirationTimestamp = Date.now() + 24 * 60 * 60 * 1000; // 24 hours from now
-      const data = await Promise.all([
-        exchClient.approveAgent({
-          agentAddress: randomAddress(),
-          agentName: `test valid_until ${expirationTimestamp}`,
-        }),
-      ]);
-      schemaCoverage(typeSchema, data);
-    });
+      const params: ApproveAgentParameters = {
+        agentAddress: randomAddress(),
+        agentName: `test valid_until ${expirationTimestamp}`,
+      };
+      return { params, result: await exchClient.approveAgent(params) };
+    })();
+
+    await new Promise((r) => setTimeout(r, 5000)); // waiting to avoid error `ApiRequestError: User has pending agent removal`
+
+    // agentName=missing
+    const withoutNameMissing = await (async () => {
+      const params: ApproveAgentParameters = {
+        agentAddress: randomAddress(),
+      };
+      return { params, result: await exchClient.approveAgent(params) };
+    })();
+
+    const data = [withName, withoutName, withExpiration, withoutNameMissing];
+
+    schemaCoverage(paramsSchema, data.map((d) => d.params));
+    schemaCoverage(responseSchema, data.map((d) => d.result));
   },
   cliTestFn: async (_t, runCommand) => {
     const data = await runCommand([

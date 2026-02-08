@@ -1,19 +1,26 @@
 import * as v from "@valibot/valibot";
-import { FrontendOpenOrdersRequest } from "@nktkas/hyperliquid/api/info";
+import { type FrontendOpenOrdersParameters, FrontendOpenOrdersRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
 
 const sourceFile = new URL("../../../src/api/info/_methods/frontendOpenOrders.ts", import.meta.url).pathname;
-const typeSchema = typeToJsonSchema(sourceFile, "FrontendOpenOrdersResponse");
+const responseSchema = typeToJsonSchema(sourceFile, "FrontendOpenOrdersResponse");
+const paramsSchema = valibotToJsonSchema(v.omit(FrontendOpenOrdersRequest, ["type"]));
 
 runTest({
   name: "frontendOpenOrders",
   codeTestFn: async (_t, client) => {
-    const data = await Promise.all([
-      client.frontendOpenOrders({ user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" }),
-    ]);
-    schemaCoverage(typeSchema, data, [
+    const params: FrontendOpenOrdersParameters[] = [
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" },
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", dex: "gato" },
+    ];
+
+    const data = await Promise.all(params.map((p) => client.frontendOpenOrders(p)));
+
+    schemaCoverage(paramsSchema, params);
+    schemaCoverage(responseSchema, data, [
       "#/items/properties/orderType/enum/0",
       "#/items/properties/orderType/enum/4",
       "#/items/properties/orderType/enum/5",

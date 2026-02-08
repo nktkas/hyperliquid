@@ -4,7 +4,7 @@ import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
 
 const sourceFile = new URL("../../../src/api/subscription/_methods/explorerBlock.ts", import.meta.url).pathname;
-const typeSchema = typeToJsonSchema(sourceFile, "ExplorerBlockEvent");
+const responseSchema = typeToJsonSchema(sourceFile, "ExplorerBlockEvent");
 
 runTest({
   name: "explorerBlock",
@@ -13,6 +13,7 @@ runTest({
     const data = await collectEventsOverTime<ExplorerBlockEvent>(async (cb) => {
       await client.explorerBlock(cb);
     }, 10_000);
-    schemaCoverage(typeSchema, data);
+
+    schemaCoverage(responseSchema, data);
   },
 });

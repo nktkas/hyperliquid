@@ -43,10 +43,9 @@ export const OrderRequest = /* @__PURE__ */ (() => {
                  * - `"Gtc"`: Remains active until filled or canceled.
                  * - `"Ioc"`: Fills immediately or cancels any unfilled portion.
                  * - `"Alo"`: Adds liquidity only.
-                 * - `"FrontendMarket"`: Similar to Ioc, used in Hyperliquid UI.
-                 * - `"LiquidationMarket"`: Similar to Ioc, used in Hyperliquid UI.
+                 * - `"FrontendMarket"`: Similar to Ioc, but add a note that this is market order.
                  */
-                tif: v.picklist(["Gtc", "Ioc", "Alo", "FrontendMarket", "LiquidationMarket"]),
+                tif: v.picklist(["Gtc", "Ioc", "Alo", "FrontendMarket"]),
               }),
             }),
             v.object({

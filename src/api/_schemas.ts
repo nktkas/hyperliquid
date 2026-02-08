@@ -108,12 +108,3 @@ export const Percent = /* @__PURE__ */ (() => {
   );
 })();
 export type Percent = v.InferOutput<typeof Percent>;
-
-/** ISO 8601 datetime string without timezone (e.g., "2024-01-15T10:30:00"). */
-export const ISO8601WithoutTimezone = /* @__PURE__ */ (() => {
-  return v.pipe(
-    v.string(),
-    v.regex(/^\d{4}-(?:0[1-9]|1[0-2])-(?:[12]\d|0[1-9]|3[01])[T ](?:0\d|1\d|2[0-3])(?::[0-5]\d){2}(?:\.\d{1,9})?$/),
-  );
-})();
-export type ISO8601WithoutTimezone = v.InferOutput<typeof ISO8601WithoutTimezone>;
