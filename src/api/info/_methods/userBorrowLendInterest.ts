@@ -75,7 +75,10 @@ export type UserBorrowLendInterestParameters = Omit<v.InferInput<typeof UserBorr
  *
  * const data = await userBorrowLendInterest(
  *   { transport },
- *   { user: "0x...", startTime: 1725991229384 },
+ *   {
+ *     user: "0x...",
+ *     startTime: Date.now() - 1000 * 60 * 60 * 24,
+ *   },
  * );
  * ```
  *

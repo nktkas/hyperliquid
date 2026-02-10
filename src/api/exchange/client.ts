@@ -306,8 +306,10 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * import * as hl from "@nktkas/hyperliquid";
    * import { ethers } from "npm:ethers";
    *
+   * const wallet = new ethers.Wallet("0x...");
    * const transport = new hl.HttpTransport();
-   * const client = new hl.ExchangeClient({ transport, wallet: new ethers.Wallet("0x...") });
+   *
+   * const client = new hl.ExchangeClient({ transport, wallet });
    * ```
    *
    * @example Multi-sig
@@ -412,7 +414,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
-   * @example
+   * @example Basic usage
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    * import { privateKeyToAccount } from "npm:viem/accounts";
@@ -422,6 +424,21 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
    * await client.approveAgent({ agentAddress: "0x...", agentName: "myAgent" });
+   * ```
+   * @example With expiration timestamp
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * const expirationTimestamp = Date.now() + 24 * 60 * 60 * 1000;
+   * await client.approveAgent({
+   *   agentAddress: "0x...",
+   *   agentName: `myAgent valid_until ${expirationTimestamp}`,
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet
@@ -487,7 +504,21 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * const data = await client.batchModify({ modifies: [ { oid: 123, order: { a: 0, b: true, p: "31000", s: "0.2", r: false, t: { limit: { tif: "Gtc" } } } }, ] });
+   * const data = await client.batchModify({
+   *   modifies: [
+   *     {
+   *       oid: 123,
+   *       order: {
+   *         a: 0,
+   *         b: true,
+   *         p: "31000",
+   *         s: "0.2",
+   *         r: false,
+   *         t: { limit: { tif: "Gtc" } },
+   *       },
+   *     },
+   *   ],
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-multiple-orders
@@ -520,7 +551,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * const data = await client.borrowLend({ operation: "supply", token: 0, amount: "20" });
+   * await client.borrowLend({ operation: "supply", token: 0, amount: "20" });
    * ```
    */
   borrowLend(
@@ -551,7 +582,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * const data = await client.cancel({ cancels: [ { a: 0, o: 123 }, ] });
+   * await client.cancel({ cancels: [{ a: 0, o: 123 }] });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s
@@ -584,7 +615,11 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * const data = await client.cancelByCloid({ cancels: [ { asset: 0, cloid: "0x..." }, ] });
+   * await client.cancelByCloid({
+   *   cancels: [
+   *     { asset: 0, cloid: "0x..." },
+   *   ],
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid
@@ -670,7 +705,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
-   * @example
+   * @example Convert to multi-sig
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    * import { privateKeyToAccount } from "npm:viem/accounts";
@@ -679,10 +714,15 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * await client.convertToMultiSigUser({ signers: { authorizedUsers: ["0x...", "0x...", "0x..."], threshold: 2 } });
+   * await client.convertToMultiSigUser({
+   *   signers: {
+   *     authorizedUsers: ["0x...", "0x...", "0x..."],
+   *     threshold: 2,
+   *   },
+   * });
    * ```
    *
-   * @example
+   * @example Convert to single-sig
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    * import { privateKeyToAccount } from "npm:viem/accounts";
@@ -755,7 +795,12 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * const data = await client.createVault({ name: "...", description: "...", initialUsd: 100 * 1e6, nonce: Date.now() });
+   * const data = await client.createVault({
+   *   name: "...",
+   *   description: "...",
+   *   initialUsd: 100 * 1e6,
+   *   nonce: Date.now(),
+   * });
    * ```
    */
   createVault(
@@ -777,7 +822,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
-   * @example
+   * @example Jail self
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    * import { privateKeyToAccount } from "npm:viem/accounts";
@@ -789,7 +834,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * await client.cSignerAction({ jailSelf: null });
    * ```
    *
-   * @example
+   * @example Unjail self
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    * import { privateKeyToAccount } from "npm:viem/accounts";
@@ -829,7 +874,17 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * await client.cValidatorAction({ changeProfile: { node_ip: { Ip: "1.2.3.4" }, name: "...", description: "...", unjailed: true, disable_delegations: false, commission_bps: null, signer: null } });
+   * await client.cValidatorAction({
+   *   changeProfile: {
+   *     node_ip: { Ip: "1.2.3.4" },
+   *     name: "...",
+   *     description: "...",
+   *     unjailed: true,
+   *     disable_delegations: false,
+   *     commission_bps: null,
+   *     signer: null,
+   *   },
+   * });
    * ```
    */
   cValidatorAction(
@@ -959,7 +1014,17 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * await client.modify({ oid: 123, order: { a: 0, b: true, p: "31000", s: "0.2", r: false, t: { limit: { tif: "Gtc" } }, c: "0x..." } });
+   * await client.modify({
+   *   oid: 123,
+   *   order: {
+   *     a: 0,
+   *     b: true,
+   *     p: "31000",
+   *     s: "0.2",
+   *     r: false,
+   *     t: { limit: { tif: "Gtc" } },
+   *   },
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order
@@ -992,7 +1057,19 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * const data = await client.order({ orders: [ { a: 0, b: true, p: "30000", s: "0.1", r: false, t: { limit: { tif: "Gtc" } }, c: "0x..." }, ], grouping: "na" });
+   * const data = await client.order({
+   *   orders: [
+   *     {
+   *       a: 0,
+   *       b: true,
+   *       p: "30000",
+   *       s: "0.1",
+   *       r: false,
+   *       t: { limit: { tif: "Gtc" } },
+   *     },
+   *   ],
+   *   grouping: "na",
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-an-order
@@ -1057,7 +1134,20 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * await client.perpDeploy({ registerAsset: { maxGas: 1000000, assetRequest: { coin: "USDC", szDecimals: 8, oraclePx: "1", marginTableId: 1, onlyIsolated: false }, dex: "test", schema: null } });
+   * await client.perpDeploy({
+   *   registerAsset: {
+   *     maxGas: 1000000,
+   *     assetRequest: {
+   *       coin: "USDC",
+   *       szDecimals: 8,
+   *       oraclePx: "1",
+   *       marginTableId: 1,
+   *       onlyIsolated: false,
+   *     },
+   *     dex: "test",
+   *     schema: null,
+   *   },
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions
@@ -1197,7 +1287,13 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * await client.sendAsset({ destination: "0x0000000000000000000000000000000000000001", sourceDex: "", destinationDex: "test", token: "USDC:0xeb62eee3685fc4c43992febcd9e75443", amount: "1" });
+   * await client.sendAsset({
+   *   destination: "0x0000000000000000000000000000000000000001",
+   *   sourceDex: "",
+   *   destinationDex: "test",
+   *   token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
+   *   amount: "1",
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset
@@ -1292,7 +1388,17 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * await client.spotDeploy({ registerToken2: { spec: { name: "USDC", szDecimals: 8, weiDecimals: 8 }, maxGas: 1000000, fullName: "USD Coin" } });
+   * await client.spotDeploy({
+   *   registerToken2: {
+   *     spec: {
+   *       name: "USDC",
+   *       szDecimals: 8,
+   *       weiDecimals: 8,
+   *     },
+   *     maxGas: 1000000,
+   *     fullName: "USD Coin",
+   *   },
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets
@@ -1325,7 +1431,11 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * await client.spotSend({ destination: "0x...", token: "USDC:0xeb62eee3685fc4c43992febcd9e75443", amount: "1" });
+   * await client.spotSend({
+   *   destination: "0x...",
+   *   token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
+   *   amount: "1",
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-spot-transfer
@@ -1420,7 +1530,12 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * await client.subAccountSpotTransfer({ subAccountUser: "0x...", isDeposit: true, token: "USDC:0xeb62eee3685fc4c43992febcd9e75443", amount: "1" });
+   * await client.subAccountSpotTransfer({
+   *   subAccountUser: "0x...",
+   *   isDeposit: true,
+   *   token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
+   *   amount: "1",
+   * });
    * ```
    */
   subAccountSpotTransfer(
@@ -1451,7 +1566,11 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * await client.subAccountTransfer({ subAccountUser: "0x...", isDeposit: true, usd: 1 * 1e6 });
+   * await client.subAccountTransfer({
+   *   subAccountUser: "0x...",
+   *   isDeposit: true,
+   *   usd: 1 * 1e6,
+   * });
    * ```
    */
   subAccountTransfer(
@@ -1482,7 +1601,11 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * await client.tokenDelegate({ validator: "0x...", isUndelegate: true, wei: 1 * 1e8 });
+   * await client.tokenDelegate({
+   *   validator: "0x...",
+   *   isUndelegate: true,
+   *   wei: 1 * 1e8,
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#delegate-or-undelegate-stake-from-validator
@@ -1515,7 +1638,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * const data = await client.twapCancel({ a: 0, t: 1 });
+   * await client.twapCancel({ a: 0, t: 1 });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order
@@ -1548,7 +1671,16 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * const data = await client.twapOrder({ twap: { a: 0, b: true, s: "1", r: false, m: 10, t: true } });
+   * const data = await client.twapOrder({
+   *   twap: {
+   *     a: 0,
+   *     b: true,
+   *     s: "1",
+   *     r: false,
+   *     m: 10,
+   *     t: true,
+   *   },
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-a-twap-order
@@ -1878,7 +2010,11 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * await client.vaultModify({ vaultAddress: "0x...", allowDeposits: true, alwaysCloseOnWithdraw: false });
+   * await client.vaultModify({
+   *   vaultAddress: "0x...",
+   *   allowDeposits: true,
+   *   alwaysCloseOnWithdraw: false,
+   * });
    * ```
    */
   vaultModify(
@@ -1909,7 +2045,11 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * await client.vaultTransfer({ vaultAddress: "0x...", isDeposit: true, usd: 10 * 1e6 });
+   * await client.vaultTransfer({
+   *   vaultAddress: "0x...",
+   *   isDeposit: true,
+   *   usd: 10 * 1e6,
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-a-vault

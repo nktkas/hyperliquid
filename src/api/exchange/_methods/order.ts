@@ -215,7 +215,6 @@ export type OrderSuccessResponse = ExcludeErrorResponse<OrderResponse>;
  *         s: "0.1",
  *         r: false,
  *         t: { limit: { tif: "Gtc" } },
- *         c: "0x...",
  *       },
  *     ],
  *     grouping: "na",

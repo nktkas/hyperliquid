@@ -60,7 +60,7 @@ export type AllDexsClearinghouseStateParameters = Omit<v.InferInput<typeof AllDe
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
  * import { allDexsClearinghouseState } from "@nktkas/hyperliquid/api/subscription";
  *
- * const transport = new WebSocketTransport(); // only `WebSocketTransport`
+ * const transport = new WebSocketTransport();
  *
  * const sub = await allDexsClearinghouseState(
  *   { transport },

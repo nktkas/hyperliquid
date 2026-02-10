@@ -109,7 +109,7 @@ export const ApproveAgentTypes = {
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
- * @example
+ * @example Basic usage
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
  * import { approveAgent } from "@nktkas/hyperliquid/api/exchange";
@@ -118,14 +118,21 @@ export const ApproveAgentTypes = {
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * // Basic usage
  * await approveAgent(
  *   { transport, wallet },
  *   { agentAddress: "0x...", agentName: "myAgent" },
  * );
+ * ```
+ * @example With expiration timestamp
+ * ```ts
+ * import { HttpTransport } from "@nktkas/hyperliquid";
+ * import { approveAgent } from "@nktkas/hyperliquid/api/exchange";
+ * import { privateKeyToAccount } from "npm:viem/accounts";
  *
- * // With expiration timestamp
- * const expirationTimestamp = Date.now() + 24 * 60 * 60 * 1000;
+ * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+ * const transport = new HttpTransport(); // or `WebSocketTransport`
+ *
+ * const expirationTimestamp = Date.now() + 24 * 60 * 60 * 1000; // 24 hours from now
  * await approveAgent(
  *   { transport, wallet },
  *   {

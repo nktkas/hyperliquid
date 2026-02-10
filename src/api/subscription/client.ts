@@ -88,7 +88,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    *
    * const subsClient = new hl.SubscriptionClient({ transport });
    * ```
@@ -112,10 +112,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.activeAssetCtx({ coin: "ETH" }, (data) => console.log(data));
+   * const sub = await client.activeAssetCtx({ coin: "ETH" }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -142,10 +144,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.activeAssetData({ coin: "ETH", user: "0x..." }, (data) => console.log(data));
+   * const sub = await client.activeAssetData({ coin: "ETH", user: "0x..." }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -172,10 +176,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.activeSpotAssetCtx({ coin: "@1" }, (data) => console.log(data));
+   * const sub = await client.activeSpotAssetCtx({ coin: "@1" }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -201,10 +207,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.allDexsAssetCtxs((data) => console.log(data));
+   * const sub = await client.allDexsAssetCtxs((data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -230,10 +238,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.allDexsClearinghouseState({ user: "0x..." }, (data) => console.log(data));
+   * const sub = await client.allDexsClearinghouseState({ user: "0x..." }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -260,10 +270,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.allMids((data) => console.log(data));
+   * const sub = await client.allMids((data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -299,10 +311,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.assetCtxs((data) => console.log(data));
+   * const sub = await client.assetCtxs((data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -338,10 +352,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.bbo({ coin: "ETH" }, (data) => console.log(data));
+   * const sub = await client.bbo({ coin: "ETH" }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -368,10 +384,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.candle({ coin: "ETH", interval: "1h" }, (data) => console.log(data));
+   * const sub = await client.candle({ coin: "ETH", interval: "1h" }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -398,10 +416,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.clearinghouseState({ user: "0x..." }, (data) => console.log(data));
+   * const sub = await client.clearinghouseState({ user: "0x..." }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -427,10 +447,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport({ url: "wss://rpc.hyperliquid.xyz/ws" }); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport({ url: "wss://rpc.hyperliquid.xyz/ws" }); // RPC endpoint
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.explorerBlock((data) => console.log(data));
+   * const sub = await client.explorerBlock((data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -455,10 +477,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport({ url: "wss://rpc.hyperliquid.xyz/ws" }); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport({ url: "wss://rpc.hyperliquid.xyz/ws" }); // RPC endpoint
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.explorerTxs((data) => console.log(data));
+   * const sub = await client.explorerTxs((data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -484,10 +508,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.l2Book({ coin: "ETH" }, (data) => console.log(data));
+   * const sub = await client.l2Book({ coin: "ETH" }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -514,10 +540,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.notification({ user: "0x..." }, (data) => console.log(data));
+   * const sub = await client.notification({ user: "0x..." }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -544,10 +572,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.openOrders({ user: "0x..." }, (data) => console.log(data));
+   * const sub = await client.openOrders({ user: "0x..." }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -574,10 +604,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.orderUpdates({ user: "0x..." }, (data) => console.log(data));
+   * const sub = await client.orderUpdates({ user: "0x..." }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -604,10 +636,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.spotAssetCtxs((data) => console.log(data));
+   * const sub = await client.spotAssetCtxs((data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -633,10 +667,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.spotState({ user: "0x..." }, (data) => console.log(data));
+   * const sub = await client.spotState({ user: "0x..." }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -663,10 +699,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.trades({ coin: "ETH" }, (data) => console.log(data));
+   * const sub = await client.trades({ coin: "ETH" }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -693,10 +731,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.twapStates({ user: "0x..." }, (data) => console.log(data));
+   * const sub = await client.twapStates({ user: "0x..." }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -723,10 +763,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.userEvents({ user: "0x..." }, (data) => console.log(data));
+   * const sub = await client.userEvents({ user: "0x..." }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -753,10 +795,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.userFills({ user: "0x..." }, (data) => console.log(data));
+   * const sub = await client.userFills({ user: "0x..." }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -783,10 +827,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.userFundings({ user: "0x..." }, (data) => console.log(data));
+   * const sub = await client.userFundings({ user: "0x..." }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -813,10 +859,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.userHistoricalOrders({ user: "0x..." }, (data) => console.log(data));
+   * const sub = await client.userHistoricalOrders({ user: "0x..." }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -843,10 +891,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.userNonFundingLedgerUpdates({ user: "0x..." }, (data) => console.log(data));
+   * const sub = await client.userNonFundingLedgerUpdates({ user: "0x..." }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -873,10 +923,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.userTwapHistory({ user: "0x..." }, (data) => console.log(data));
+   * const sub = await client.userTwapHistory({ user: "0x..." }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -903,10 +955,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.userTwapSliceFills({ user: "0x..." }, (data) => console.log(data));
+   * const sub = await client.userTwapSliceFills({ user: "0x..." }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -933,10 +987,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.webData2({ user: "0x..." }, (data) => console.log(data));
+   * const sub = await client.webData2({ user: "0x..." }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -963,10 +1019,12 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * ```ts
    * import * as hl from "@nktkas/hyperliquid";
    *
-   * const transport = new hl.WebSocketTransport(); // only `WebSocketTransport`
+   * const transport = new hl.WebSocketTransport();
    * const client = new hl.SubscriptionClient({ transport });
    *
-   * const sub = await client.webData3({ user: "0x..." }, (data) => console.log(data));
+   * const sub = await client.webData3({ user: "0x..." }, (data) => {
+   *   console.log(data);
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions

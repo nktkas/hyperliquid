@@ -75,7 +75,10 @@ export type FundingHistoryParameters = Omit<v.InferInput<typeof FundingHistoryRe
  *
  * const data = await fundingHistory(
  *   { transport },
- *   { coin: "ETH", startTime: Date.now() - 1000 * 60 * 60 * 24 },
+ *   {
+ *     coin: "ETH",
+ *     startTime: Date.now() - 1000 * 60 * 60 * 24,
+ *   },
  * );
  * ```
  *

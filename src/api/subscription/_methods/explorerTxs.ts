@@ -44,7 +44,7 @@ import type { ISubscription } from "../../../transport/mod.ts";
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
  * import { explorerTxs } from "@nktkas/hyperliquid/api/subscription";
  *
- * const transport = new WebSocketTransport({ url: "wss://rpc.hyperliquid.xyz/ws" });  // only `WebSocketTransport`; RPC endpoint
+ * const transport = new WebSocketTransport({ url: "wss://rpc.hyperliquid.xyz/ws" }); // RPC endpoint
  *
  * const sub = await explorerTxs(
  *   { transport },

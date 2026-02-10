@@ -54,7 +54,7 @@ export type ActiveAssetDataParameters = Omit<v.InferInput<typeof ActiveAssetData
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
  * import { activeAssetData } from "@nktkas/hyperliquid/api/subscription";
  *
- * const transport = new WebSocketTransport(); // only `WebSocketTransport`
+ * const transport = new WebSocketTransport();
  *
  * const sub = await activeAssetData(
  *   { transport },

@@ -82,7 +82,7 @@ export type BboParameters = Omit<v.InferInput<typeof BboRequest>, "type">;
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
  * import { bbo } from "@nktkas/hyperliquid/api/subscription";
  *
- * const transport = new WebSocketTransport(); // only `WebSocketTransport`
+ * const transport = new WebSocketTransport();
  *
  * const sub = await bbo(
  *   { transport },

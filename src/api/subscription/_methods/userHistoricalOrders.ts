@@ -62,7 +62,7 @@ export type UserHistoricalOrdersParameters = Omit<v.InferInput<typeof UserHistor
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
  * import { userHistoricalOrders } from "@nktkas/hyperliquid/api/subscription";
  *
- * const transport = new WebSocketTransport(); // only `WebSocketTransport`
+ * const transport = new WebSocketTransport();
  *
  * const sub = await userHistoricalOrders(
  *   { transport },

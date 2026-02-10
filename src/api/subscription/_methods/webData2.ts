@@ -52,7 +52,7 @@ export type WebData2Parameters = Omit<v.InferInput<typeof WebData2Request>, "typ
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
  * import { webData2 } from "@nktkas/hyperliquid/api/subscription";
  *
- * const transport = new WebSocketTransport(); // only `WebSocketTransport`
+ * const transport = new WebSocketTransport();
  *
  * const sub = await webData2(
  *   { transport },

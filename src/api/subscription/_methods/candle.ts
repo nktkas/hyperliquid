@@ -87,7 +87,7 @@ export type CandleParameters = Omit<v.InferInput<typeof CandleRequest>, "type">;
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
  * import { candle } from "@nktkas/hyperliquid/api/subscription";
  *
- * const transport = new WebSocketTransport(); // only `WebSocketTransport`
+ * const transport = new WebSocketTransport();
  *
  * const sub = await candle(
  *   { transport },

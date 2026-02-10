@@ -90,7 +90,7 @@ export type OrderUpdatesParameters = Omit<v.InferInput<typeof OrderUpdatesReques
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
  * import { orderUpdates } from "@nktkas/hyperliquid/api/subscription";
  *
- * const transport = new WebSocketTransport(); // only `WebSocketTransport`
+ * const transport = new WebSocketTransport();
  *
  * const sub = await orderUpdates(
  *   { transport },

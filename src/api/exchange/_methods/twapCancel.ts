@@ -47,8 +47,8 @@ export type TwapCancelResponse = {
     type: "twapCancel";
     /** Specific data. */
     data: {
-      /** Status of the operation or error message. */
-      status: string | {
+      /** Status of the cancel attempt, indicating success or an error message. */
+      status: "success" | {
         /** Error message. */
         error: string;
       };
@@ -101,7 +101,7 @@ export type TwapCancelSuccessResponse = ExcludeErrorResponse<TwapCancelResponse>
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await twapCancel(
+ * await twapCancel(
  *   { transport, wallet },
  *   { a: 0, t: 1 },
  * );

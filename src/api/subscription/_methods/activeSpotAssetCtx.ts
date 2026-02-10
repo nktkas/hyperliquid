@@ -55,7 +55,7 @@ export type ActiveSpotAssetCtxParameters = Omit<v.InferInput<typeof ActiveSpotAs
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
  * import { activeSpotAssetCtx } from "@nktkas/hyperliquid/api/subscription";
  *
- * const transport = new WebSocketTransport(); // only `WebSocketTransport`
+ * const transport = new WebSocketTransport();
  *
  * const sub = await activeSpotAssetCtx(
  *   { transport },

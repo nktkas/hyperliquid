@@ -91,7 +91,7 @@ export type CancelByCloidSuccessResponse = ExcludeErrorResponse<CancelByCloidRes
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await cancelByCloid(
+ * await cancelByCloid(
  *   { transport, wallet },
  *   {
  *     cancels: [

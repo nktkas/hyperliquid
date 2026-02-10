@@ -62,7 +62,7 @@ export type UserTwapHistoryParameters = Omit<v.InferInput<typeof UserTwapHistory
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
  * import { userTwapHistory } from "@nktkas/hyperliquid/api/subscription";
  *
- * const transport = new WebSocketTransport(); // only `WebSocketTransport`
+ * const transport = new WebSocketTransport();
  *
  * const sub = await userTwapHistory(
  *   { transport },

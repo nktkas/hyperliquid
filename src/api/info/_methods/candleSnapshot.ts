@@ -101,7 +101,11 @@ export type CandleSnapshotParameters = v.InferInput<typeof CandleSnapshotRequest
  *
  * const data = await candleSnapshot(
  *   { transport },
- *   { coin: "ETH", interval: "1h", startTime: Date.now() - 1000 * 60 * 60 * 24 },
+ *   {
+ *     coin: "ETH",
+ *     interval: "1h",
+ *     startTime: Date.now() - 1000 * 60 * 60 * 24,
+ *   },
  * );
  * ```
  *

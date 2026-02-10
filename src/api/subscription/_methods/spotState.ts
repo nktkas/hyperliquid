@@ -62,7 +62,7 @@ export type SpotStateParameters = Omit<v.InferInput<typeof SpotStateRequest>, "t
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
  * import { spotState } from "@nktkas/hyperliquid/api/subscription";
  *
- * const transport = new WebSocketTransport(); // only `WebSocketTransport`
+ * const transport = new WebSocketTransport();
  *
  * const sub = await spotState(
  *   { transport },

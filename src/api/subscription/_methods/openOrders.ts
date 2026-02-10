@@ -64,7 +64,7 @@ export type OpenOrdersParameters = Omit<v.InferInput<typeof OpenOrdersRequest>, 
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
  * import { openOrders } from "@nktkas/hyperliquid/api/subscription";
  *
- * const transport = new WebSocketTransport(); // only `WebSocketTransport`
+ * const transport = new WebSocketTransport();
  *
  * const sub = await openOrders(
  *   { transport },

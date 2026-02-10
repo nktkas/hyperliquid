@@ -56,7 +56,7 @@ export type AssetCtxsParameters = Omit<v.InferInput<typeof AssetCtxsRequest>, "t
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
  * import { assetCtxs } from "@nktkas/hyperliquid/api/subscription";
  *
- * const transport = new WebSocketTransport(); // only `WebSocketTransport`
+ * const transport = new WebSocketTransport();
  *
  * const sub = await assetCtxs(
  *   { transport },

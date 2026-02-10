@@ -52,6 +52,7 @@ export type CancelResponse = {
     type: "cancel";
     /** Specific data. */
     data: {
+      /** Array of statuses for each cancel attempt, indicating success or error messages. */
       statuses: ("success" | {
         /** Error message returned by the exchange. */
         error: string;
@@ -105,13 +106,9 @@ export type CancelSuccessResponse = ExcludeErrorResponse<CancelResponse>;
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await cancel(
+ * await cancel(
  *   { transport, wallet },
- *   {
- *     cancels: [
- *       { a: 0, o: 123 },
- *     ],
- *   },
+ *   { cancels: [{ a: 0, o: 123 }] },
  * );
  * ```
  *

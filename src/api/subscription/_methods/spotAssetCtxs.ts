@@ -46,7 +46,7 @@ import type { ISubscription } from "../../../transport/mod.ts";
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
  * import { spotAssetCtxs } from "@nktkas/hyperliquid/api/subscription";
  *
- * const transport = new WebSocketTransport(); // only `WebSocketTransport`
+ * const transport = new WebSocketTransport();
  *
  * const sub = await spotAssetCtxs(
  *   { transport },

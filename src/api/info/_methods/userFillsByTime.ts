@@ -63,7 +63,10 @@ export type UserFillsByTimeParameters = Omit<v.InferInput<typeof UserFillsByTime
  *
  * const data = await userFillsByTime(
  *   { transport },
- *   { user: "0x...", startTime: Date.now() - 1000 * 60 * 60 * 24 },
+ *   {
+ *     user: "0x...",
+ *     startTime: Date.now() - 1000 * 60 * 60 * 24,
+ *   },
  * );
  * ```
  *

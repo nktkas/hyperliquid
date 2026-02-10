@@ -65,7 +65,7 @@ export type UserNonFundingLedgerUpdatesParameters = Omit<
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
  * import { userNonFundingLedgerUpdates } from "@nktkas/hyperliquid/api/subscription";
  *
- * const transport = new WebSocketTransport(); // only `WebSocketTransport`
+ * const transport = new WebSocketTransport();
  *
  * const sub = await userNonFundingLedgerUpdates(
  *   { transport },

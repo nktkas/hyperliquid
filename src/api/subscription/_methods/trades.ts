@@ -51,7 +51,7 @@ export type TradesParameters = Omit<v.InferInput<typeof TradesRequest>, "type">;
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
  * import { trades } from "@nktkas/hyperliquid/api/subscription";
  *
- * const transport = new WebSocketTransport(); // only `WebSocketTransport`
+ * const transport = new WebSocketTransport();
  *
  * const sub = await trades(
  *   { transport },

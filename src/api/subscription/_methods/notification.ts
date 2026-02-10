@@ -54,7 +54,7 @@ export type NotificationParameters = Omit<v.InferInput<typeof NotificationReques
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
  * import { notification } from "@nktkas/hyperliquid/api/subscription";
  *
- * const transport = new WebSocketTransport(); // only `WebSocketTransport`
+ * const transport = new WebSocketTransport();
  *
  * const sub = await notification(
  *   { transport },

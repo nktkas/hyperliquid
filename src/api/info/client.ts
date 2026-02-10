@@ -469,7 +469,11 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.InfoClient({ transport });
    *
-   * const data = await client.candleSnapshot({ coin: "ETH", interval: "1h", startTime: Date.now() - 1000 * 60 * 60 * 24 });
+   * const data = await client.candleSnapshot({
+   *   coin: "ETH",
+   *   interval: "1h",
+   *   startTime: Date.now() - 1000 * 60 * 60 * 24,
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#candle-snapshot
@@ -733,7 +737,10 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.InfoClient({ transport });
    *
-   * const data = await client.fundingHistory({ coin: "ETH", startTime: Date.now() - 1000 * 60 * 60 * 24 });
+   * const data = await client.fundingHistory({
+   *   coin: "ETH",
+   *   startTime: Date.now() - 1000 * 60 * 60 * 24,
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-historical-funding-rates
@@ -1767,7 +1774,10 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.InfoClient({ transport });
    *
-   * const data = await client.userBorrowLendInterest({ user: "0x...", startTime: 1725991229384 });
+   * const data = await client.userBorrowLendInterest({
+   *   user: "0x...",
+   *   startTime: Date.now() - 1000 * 60 * 60 * 24,
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-borrow-lend-user-state
@@ -1915,7 +1925,10 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.InfoClient({ transport });
    *
-   * const data = await client.userFillsByTime({ user: "0x...", startTime: Date.now() - 1000 * 60 * 60 * 24 });
+   * const data = await client.userFillsByTime({
+   *   user: "0x...",
+   *   startTime: Date.now() - 1000 * 60 * 60 * 24,
+   * });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills-by-time
@@ -2123,7 +2136,10 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.InfoClient({ transport });
    *
-   * const data = await client.userTwapSliceFillsByTime({ user: "0x...", startTime: Date.now() - 1000 * 60 * 60 * 24 });
+   * const data = await client.userTwapSliceFillsByTime({
+   *   user: "0x...",
+   *   startTime: Date.now() - 1000 * 60 * 60 * 24,
+   * });
    * ```
    */
   userTwapSliceFillsByTime(

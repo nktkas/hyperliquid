@@ -64,7 +64,7 @@ export type ClearinghouseStateParameters = Omit<v.InferInput<typeof Clearinghous
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
  * import { clearinghouseState } from "@nktkas/hyperliquid/api/subscription";
  *
- * const transport = new WebSocketTransport(); // only `WebSocketTransport`
+ * const transport = new WebSocketTransport();
  *
  * const sub = await clearinghouseState(
  *   { transport },

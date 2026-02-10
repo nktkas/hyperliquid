@@ -64,7 +64,7 @@ export type UserFillsParameters = Omit<v.InferInput<typeof UserFillsRequest>, "t
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
  * import { userFills } from "@nktkas/hyperliquid/api/subscription";
  *
- * const transport = new WebSocketTransport(); // only `WebSocketTransport`
+ * const transport = new WebSocketTransport();
  *
  * const sub = await userFills(
  *   { transport },

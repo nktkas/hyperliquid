@@ -126,7 +126,7 @@ export type UserEventsParameters = Omit<v.InferInput<typeof UserEventsRequest>, 
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
  * import { userEvents } from "@nktkas/hyperliquid/api/subscription";
  *
- * const transport = new WebSocketTransport(); // only `WebSocketTransport`
+ * const transport = new WebSocketTransport();
  *
  * const sub = await userEvents(
  *   { transport },

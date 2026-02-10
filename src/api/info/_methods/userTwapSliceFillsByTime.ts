@@ -62,7 +62,10 @@ export type UserTwapSliceFillsByTimeParameters = Omit<v.InferInput<typeof UserTw
  *
  * const data = await userTwapSliceFillsByTime(
  *   { transport },
- *   { user: "0x...", startTime: Date.now() - 1000 * 60 * 60 * 24 },
+ *   {
+ *     user: "0x...",
+ *     startTime: Date.now() - 1000 * 60 * 60 * 24,
+ *   },
  * );
  * ```
  */

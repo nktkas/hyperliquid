@@ -85,7 +85,7 @@ export type BorrowLendSuccessResponse = ExcludeErrorResponse<BorrowLendResponse>
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await borrowLend(
+ * await borrowLend(
  *   { transport, wallet },
  *   { operation: "supply", token: 0, amount: "20" },
  * );

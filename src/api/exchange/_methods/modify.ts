@@ -142,7 +142,6 @@ export type ModifySuccessResponse = ExcludeErrorResponse<ModifyResponse>;
  *       s: "0.2",
  *       r: false,
  *       t: { limit: { tif: "Gtc" } },
- *       c: "0x...",
  *     },
  *   },
  * );
