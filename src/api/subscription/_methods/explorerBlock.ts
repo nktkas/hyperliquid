@@ -4,8 +4,6 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
-
 /**
  * Subscription to explorer block events.
  */
@@ -20,22 +18,6 @@ export type ExplorerBlockRequest = v.InferOutput<typeof ExplorerBlockRequest>;
 /**
  * Event of array of block details.
  */
-export const ExplorerBlockEvent = /* @__PURE__ */ (() => {
-  return v.array(
-    v.object({
-      /** Block creation timestamp. */
-      blockTime: UnsignedInteger,
-      /** Block hash. */
-      hash: v.pipe(Hex, v.length(66)),
-      /** Block height in chain. */
-      height: UnsignedInteger,
-      /** Total transactions in block. */
-      numTxs: UnsignedInteger,
-      /** Block proposer address. */
-      proposer: Address,
-    }),
-  );
-})();
 export type ExplorerBlockEvent = {
   /** Block creation timestamp. */
   blockTime: number;
