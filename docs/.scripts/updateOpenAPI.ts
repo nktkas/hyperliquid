@@ -34,7 +34,7 @@ import * as path from "jsr:@std/path@1";
 import { typeToJsonSchema } from "../../tests/api/_utils/typeToJsonSchema.ts";
 
 import { enrichJsonSchema } from "./schemaEnricher.ts";
-import { parseFunctionJSDocFromFile, parseJSDocFromFile } from "./jsdocParser.ts";
+import { parseClassMethodJSDocFromFile, parseJSDocFromFile } from "./jsdocParser.ts";
 
 // =============================================================================
 // TYPES
@@ -125,8 +125,13 @@ export function getAllSchemas(): AllSchemas {
     const api = API_MODULES[endpoint];
     // Get method names by introspecting the SDK client class
     const methods = getAllMethodsFromClient(endpoint);
+    // Parse @example from Client class methods (once per endpoint)
+    const clientFilePath = path.join(srcBasePath, endpoint, "client.ts");
+    const clientMethodJSDoc = parseClassMethodJSDocFromFile(clientFilePath);
 
     for (const method of methods) {
+      console.log(`[Schemas] Processing ${endpoint}/${method}...`);
+
       // Convert method name to PascalCase (e.g., "userFills" -> "UserFills")
       const pascalMethod = capitalizeFirst(method);
       // Path to method source file (e.g., src/api/info/_methods/userFills.ts)
@@ -148,9 +153,8 @@ export function getAllSchemas(): AllSchemas {
       const responseKey = endpoint === "subscription" ? "Event" : "Response";
       const responseJSchema = typeToJsonSchema(sourceFilePath, pascalMethod + responseKey);
 
-      // Extract @example from function JSDoc
-      const functionJSDoc = parseFunctionJSDocFromFile(sourceFilePath);
-      const codeSamples = functionJSDoc[method]?.examples;
+      // Extract @example from Client class method JSDoc
+      const codeSamples = clientMethodJSDoc[method]?.examples;
 
       results[endpoint][method] = {
         request: requestJSchema,

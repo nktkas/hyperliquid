@@ -646,16 +646,33 @@ function isValibotCall(node: ts.Node, funcName: string): boolean {
 }
 
 // =============================================================================
-// FUNCTION JSDOC PARSING
+// CLASS METHOD JSDOC PARSING
 // =============================================================================
 
+/** Check if a node has export modifier */
+function isExported(node: ts.Node): boolean {
+  if (!ts.canHaveModifiers(node)) return false;
+  const modifiers = ts.getModifiers(node);
+  return modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword) ?? false;
+}
+
+/** Extract JSDoc data from a node (function or method declaration) */
+function extractFunctionJSDoc(node: ts.Node, sourceFile: ts.SourceFile): FunctionJSDoc | undefined {
+  const rawJSDoc = getRawJSDocText(node, sourceFile);
+  if (!rawJSDoc) return undefined;
+
+  const examples = extractExamples(rawJSDoc);
+  if (!examples) return undefined;
+
+  return { examples };
+}
+
 /**
- * Parse JSDoc comments from exported functions in a TypeScript file.
- * Extracts @example tags from function declarations.
- * @param filePath - Absolute path to the TypeScript file
+ * Parse JSDoc comments from public class methods in a TypeScript file.
+ * Extracts @example tags from method declarations within exported classes.
+ * @param filePath - Absolute path to the TypeScript file containing a class
  */
-export function parseFunctionJSDocFromFile(filePath: string): FunctionJSDocResult {
-  // Read and parse file
+export function parseClassMethodJSDocFromFile(filePath: string): FunctionJSDocResult {
   const sourceText = Deno.readTextFileSync(filePath);
   const sourceFile = ts.createSourceFile(
     filePath,
@@ -667,12 +684,18 @@ export function parseFunctionJSDocFromFile(filePath: string): FunctionJSDocResul
   const result: FunctionJSDocResult = {};
 
   ts.forEachChild(sourceFile, (node) => {
-    // Check for exported function declarations
-    if (ts.isFunctionDeclaration(node) && node.name && isExported(node)) {
-      const funcName = node.name.getText(sourceFile);
-      const funcJSDoc = extractFunctionJSDoc(node, sourceFile);
-      if (funcJSDoc) {
-        result[funcName] = funcJSDoc;
+    if (ts.isClassDeclaration(node) && isExported(node)) {
+      for (const member of node.members) {
+        if (
+          ts.isMethodDeclaration(member) && member.name && ts.isIdentifier(member.name) &&
+          !hasPrivateModifier(member)
+        ) {
+          const methodName = member.name.getText(sourceFile);
+          const methodJSDoc = extractFunctionJSDoc(member, sourceFile);
+          if (methodJSDoc) {
+            result[methodName] = methodJSDoc;
+          }
+        }
       }
     }
   });
@@ -680,20 +703,10 @@ export function parseFunctionJSDocFromFile(filePath: string): FunctionJSDocResul
   return result;
 }
 
-/** Check if a node has export modifier */
-function isExported(node: ts.Node): boolean {
+/** Check if a class member has private or protected modifier */
+function hasPrivateModifier(node: ts.Node): boolean {
   if (!ts.canHaveModifiers(node)) return false;
   const modifiers = ts.getModifiers(node);
-  return modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword) ?? false;
-}
-
-/** Extract JSDoc data from a function declaration */
-function extractFunctionJSDoc(node: ts.FunctionDeclaration, sourceFile: ts.SourceFile): FunctionJSDoc | undefined {
-  const rawJSDoc = getRawJSDocText(node, sourceFile);
-  if (!rawJSDoc) return undefined;
-
-  const examples = extractExamples(rawJSDoc);
-  if (!examples) return undefined;
-
-  return { examples };
+  return modifiers?.some((m) => m.kind === ts.SyntaxKind.PrivateKeyword || m.kind === ts.SyntaxKind.ProtectedKeyword) ??
+    false;
 }
