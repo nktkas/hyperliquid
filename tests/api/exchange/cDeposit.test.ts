@@ -25,12 +25,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "cDeposit",
-      "--wei=1",
-    ]);
-    v.parse(CDepositRequest, data);
-  },
 });

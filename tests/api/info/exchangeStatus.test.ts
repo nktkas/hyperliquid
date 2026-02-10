@@ -1,5 +1,3 @@
-import * as v from "@valibot/valibot";
-import { ExchangeStatusRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
@@ -15,12 +13,5 @@ runTest({
     schemaCoverage(responseSchema, data, [
       "#/properties/specialStatuses/defined",
     ]);
-  },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "exchangeStatus",
-    ]);
-    v.parse(ExchangeStatusRequest, data);
   },
 });

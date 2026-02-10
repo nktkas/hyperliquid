@@ -25,13 +25,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "fundingHistory",
-      "--coin=ETH",
-      "--startTime=1725991126328",
-    ]);
-    v.parse(FundingHistoryRequest, data);
-  },
 });

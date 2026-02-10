@@ -37,13 +37,4 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "linkStakingUser",
-      "--user=0x0000000000000000000000000000000000000001",
-      "--isFinalize=false",
-    ]);
-    v.parse(LinkStakingUserRequest, data);
-  },
 });

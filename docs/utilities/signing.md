@@ -14,34 +14,10 @@ Use these utilities when:
 ```ts
 import {
   createL1ActionHash,
-  PrivateKeySigner,
   signL1Action,
   signMultiSigAction,
   signUserSignedAction,
 } from "@nktkas/hyperliquid/signing";
-```
-
-## PrivateKeySigner
-
-Lightweight signer that doesn't require viem or ethers.
-
-```ts
-import { PrivateKeySigner } from "@nktkas/hyperliquid/signing";
-
-const signer = new PrivateKeySigner("0xabc123...");
-console.log(signer.address); // "0x..."
-```
-
-Use with `ExchangeClient`:
-
-```ts
-import { ExchangeClient, HttpTransport } from "@nktkas/hyperliquid";
-import { PrivateKeySigner } from "@nktkas/hyperliquid/signing";
-
-const client = new ExchangeClient({
-  transport: new HttpTransport(),
-  wallet: new PrivateKeySigner("0x..."),
-});
 ```
 
 ## signL1Action
@@ -76,7 +52,7 @@ const response = await fetch("https://api.hyperliquid.xyz/exchange", {
 
 - **Type:** `AbstractWallet`
 
-Wallet to sign (viem, ethers, or PrivateKeySigner).
+Wallet to sign (viem or ethers).
 
 #### action (required)
 
@@ -162,7 +138,7 @@ const signature = await signUserSignedAction({
 
 - **Type:** `AbstractWallet`
 
-Wallet to sign (viem, ethers, or PrivateKeySigner).
+Wallet to sign (viem or ethers).
 
 #### action (required)
 
@@ -262,8 +238,4 @@ const wallet = privateKeyToAccount("0x...");
 // ethers
 import { Wallet } from "ethers";
 const wallet = new Wallet("0x...");
-
-// SDK (no viem or ethers dependency)
-import { PrivateKeySigner } from "@nktkas/hyperliquid/signing";
-const wallet = new PrivateKeySigner("0x...");
 ```

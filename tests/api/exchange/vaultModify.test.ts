@@ -48,12 +48,4 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "vaultModify",
-      "--vaultAddress=0x457ab3acf4a4e01156ce269545a9d3d05fff2f0b",
-    ]);
-    v.parse(VaultModifyRequest, data);
-  },
 });

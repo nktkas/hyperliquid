@@ -33,14 +33,4 @@ runTest({
     ]);
     schemaCoverage(responseSchema, data.map((d) => d.result));
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "borrowLend",
-      "--operation=supply",
-      "--token=0",
-      "--amount=30",
-    ]);
-    v.parse(BorrowLendRequest, data);
-  },
 });

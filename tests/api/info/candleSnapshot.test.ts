@@ -1,4 +1,3 @@
-import * as v from "@valibot/valibot";
 import { type CandleSnapshotParameters, CandleSnapshotRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
@@ -37,15 +36,5 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
-  },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "candleSnapshot",
-      "--coin=ETH",
-      "--interval=15m",
-      "--startTime=1757440693681",
-    ]);
-    v.parse(CandleSnapshotRequest, data);
   },
 });

@@ -1,5 +1,3 @@
-import * as v from "@valibot/valibot";
-import { SpotPairDeployAuctionStatusRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
@@ -16,12 +14,5 @@ runTest({
       "#/properties/currentGas/null",
       "#/properties/endGas/defined",
     ]);
-  },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "spotPairDeployAuctionStatus",
-    ]);
-    v.parse(SpotPairDeployAuctionStatusRequest, data);
   },
 });

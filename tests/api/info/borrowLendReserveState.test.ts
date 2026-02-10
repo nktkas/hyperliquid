@@ -21,12 +21,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "borrowLendReserveState",
-      "--token=0",
-    ]);
-    v.parse(BorrowLendReserveStateRequest, data);
-  },
 });

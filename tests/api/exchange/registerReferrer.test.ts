@@ -27,12 +27,4 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "registerReferrer",
-      "--code=TESST",
-    ]);
-    v.parse(RegisterReferrerRequest, data);
-  },
 });

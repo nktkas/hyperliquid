@@ -22,12 +22,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "evmUserModify",
-      "--usingBigBlocks=true",
-    ]);
-    v.parse(EvmUserModifyRequest, data);
-  },
 });

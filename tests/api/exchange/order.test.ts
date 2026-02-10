@@ -100,21 +100,4 @@ runTest({
       "#/properties/response/properties/data/properties/statuses/items/anyOf/2", // "waitingForFill"
     ]);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "order",
-      `--orders=${
-        JSON.stringify([{
-          a: 0,
-          b: true,
-          p: "1",
-          s: "1",
-          r: false,
-          t: { limit: { tif: "Gtc" } },
-        }])
-      }`,
-    ]);
-    v.parse(OrderRequest, data);
-  },
 });

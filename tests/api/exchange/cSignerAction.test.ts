@@ -32,12 +32,4 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "cSignerAction",
-      "--jailSelf=null",
-    ]);
-    v.parse(CSignerActionRequest, data);
-  },
 });

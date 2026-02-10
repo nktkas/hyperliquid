@@ -24,14 +24,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "updateLeverage",
-      "--asset=0",
-      "--isCross=true",
-      "--leverage=1",
-    ]);
-    v.parse(UpdateLeverageRequest, data);
-  },
 });

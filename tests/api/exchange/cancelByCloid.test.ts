@@ -23,12 +23,4 @@ runTest({
     schemaCoverage(paramsSchema, data.map((d) => d.params));
     schemaCoverage(responseSchema, data.map((d) => d.result));
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "cancelByCloid",
-      `--cancels=${JSON.stringify([{ asset: 0, cloid: "0x17a5a40306205a0c6d60c7264153781c" }])}`,
-    ]);
-    v.parse(CancelByCloidRequest, data);
-  },
 });

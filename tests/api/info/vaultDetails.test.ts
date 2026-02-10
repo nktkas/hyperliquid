@@ -26,12 +26,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "vaultDetails",
-      "--vaultAddress=0x1719884eb866cb12b2287399b15f7db5e7d775ea",
-    ]);
-    v.parse(VaultDetailsRequest, data);
-  },
 });

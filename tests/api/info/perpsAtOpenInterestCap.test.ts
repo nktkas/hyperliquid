@@ -24,11 +24,4 @@ runTest({
       "#/array",
     ]);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "perpsAtOpenInterestCap",
-    ]);
-    v.parse(PerpsAtOpenInterestCapRequest, data);
-  },
 });

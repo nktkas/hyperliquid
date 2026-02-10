@@ -24,12 +24,4 @@ runTest({
       "#/items/properties/side/enum/1",
     ]);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "recentTrades",
-      "--coin=ETH",
-    ]);
-    v.parse(RecentTradesRequest, data);
-  },
 });

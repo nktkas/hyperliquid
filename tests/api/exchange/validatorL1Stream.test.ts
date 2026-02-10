@@ -27,12 +27,4 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "validatorL1Stream",
-      "--riskFreeRate=0.05",
-    ]);
-    v.parse(ValidatorL1StreamRequest, data);
-  },
 });

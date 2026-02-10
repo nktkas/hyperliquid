@@ -160,25 +160,4 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "perpDeploy",
-      `--registerAsset=${
-        JSON.stringify({
-          maxGas: 1000000000000,
-          assetRequest: {
-            coin: "1",
-            szDecimals: 1,
-            oraclePx: "1",
-            marginTableId: 1,
-            onlyIsolated: true,
-          },
-          dex: "test",
-          schema: null,
-        })
-      }`,
-    ]);
-    v.parse(PerpDeployRequest, data);
-  },
 });

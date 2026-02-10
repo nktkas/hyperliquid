@@ -25,13 +25,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "withdraw3",
-      "--amount=2",
-      "--destination=0x0000000000000000000000000000000000000001",
-    ]);
-    v.parse(Withdraw3Request, data);
-  },
 });

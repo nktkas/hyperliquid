@@ -26,12 +26,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "cWithdraw",
-      "--wei=1",
-    ]);
-    v.parse(CWithdrawRequest, data);
-  },
 });

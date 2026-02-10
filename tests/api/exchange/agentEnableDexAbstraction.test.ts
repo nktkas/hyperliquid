@@ -1,5 +1,3 @@
-import * as v from "@valibot/valibot";
-import { AgentEnableDexAbstractionRequest } from "@nktkas/hyperliquid/api/exchange";
 import { runTest } from "./_t.ts";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
@@ -13,12 +11,5 @@ runTest({
     const data = await Promise.all([exchClient.agentEnableDexAbstraction()]);
 
     schemaCoverage(responseSchema, data);
-  },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "agentEnableDexAbstraction",
-    ]);
-    v.parse(AgentEnableDexAbstractionRequest, data);
   },
 });

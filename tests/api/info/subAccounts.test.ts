@@ -26,12 +26,4 @@ runTest({
       "#/anyOf/0/items/properties/spotState/properties/evmEscrows/present",
     ]);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "subAccounts",
-      "--user=0x563C175E6f11582f65D6d9E360A618699DEe14a9",
-    ]);
-    v.parse(SubAccountsRequest, data);
-  },
 });

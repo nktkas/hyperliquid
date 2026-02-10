@@ -35,21 +35,4 @@ runTest({
     ]);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "twapOrder",
-      `--twap=${
-        JSON.stringify({
-          a: 0,
-          b: true,
-          s: 0,
-          r: false,
-          m: 5,
-          t: false,
-        })
-      }`,
-    ]);
-    v.parse(TwapOrderRequest, data);
-  },
 });

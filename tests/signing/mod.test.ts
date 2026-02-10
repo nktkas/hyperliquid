@@ -6,7 +6,6 @@ import { Wallet as WalletV6 } from "npm:ethers@6";
 import {
   type AbstractWallet,
   createL1ActionHash,
-  PrivateKeySigner,
   signL1Action,
   signMultiSigAction,
   signUserSignedAction,
@@ -122,7 +121,6 @@ Deno.test("signing", async (t) => {
     ["Viem", privateKeyToAccount(PRIVATE_KEY)],
     ["Ethers v6", new WalletV6(PRIVATE_KEY)],
     ["Ethers v5", new WalletV5(PRIVATE_KEY)],
-    ["PrivateKeySigner", new PrivateKeySigner(PRIVATE_KEY)],
   ];
 
   await t.step("createL1ActionHash()", async (t) => {

@@ -1669,5 +1669,4 @@
 ## Other
 
 - [Tree-shaking](other/tree-shaking.md)
-- [CLI](other/cli.md)
 - [FAQ](other/faq.md)

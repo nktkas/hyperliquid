@@ -23,11 +23,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "meta",
-    ]);
-    v.parse(MetaRequest, data);
-  },
 });

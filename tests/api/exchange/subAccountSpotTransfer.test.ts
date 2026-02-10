@@ -42,15 +42,4 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "subAccountSpotTransfer",
-      "--subAccountUser=0xcb3f0bd249a89e45e86a44bcfc7113e4ffe84cd1",
-      "--isDeposit=true",
-      "--token=USDC:0xeb62eee3685fc4c43992febcd9e75443",
-      "--amount=1",
-    ]);
-    v.parse(SubAccountSpotTransferRequest, data);
-  },
 });

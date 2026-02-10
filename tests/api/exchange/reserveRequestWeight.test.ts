@@ -23,12 +23,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "reserveRequestWeight",
-      "--weight=1",
-    ]);
-    v.parse(ReserveRequestWeightRequest, data);
-  },
 });

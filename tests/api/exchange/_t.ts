@@ -34,58 +34,23 @@ export const allMids = await infoClient.allMids();
 // Test
 // =============================================================
 
-/**
- * Help function to run SDK CLI commands
- * @throws {Error} When CLI returns an error message
- */
-async function runCLICommand(args: string[]): Promise<string> {
-  const command = new Deno.Command("deno", {
-    args: ["run", "-A", "bin/cli.ts", "--offline", "--private-key", PRIVATE_KEY!, ...args],
-    stdout: "piped",
-    stderr: "piped",
-  });
-  const { stdout } = await command.output();
-  const output = new TextDecoder().decode(stdout);
-
-  if (output.startsWith("Hyperliquid CLI")) {
-    throw new Error(`Invalid command argument(s)`);
-  }
-
-  return JSON.parse(output);
-}
-
 export function runTest(options: {
   name: string;
   codeTestFn: (
     t: Deno.TestContext,
     exchClient: ExchangeClient<ExchangeSingleWalletConfig | ExchangeMultiSigConfig>,
   ) => Promise<void>;
-  cliTestFn?: (t: Deno.TestContext, runCommand: (args: string[]) => string | Promise<string>) => Promise<void>;
 }): void {
-  const { name, codeTestFn, cliTestFn } = options;
+  const { name, codeTestFn } = options;
 
   Deno.test(name, { ignore: !MAIN_WALLET }, async (t) => {
     await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
-    // Test related to client interaction
-    await t.step("code", async (t) => {
-      for (const clientType of ["user", "multisig"] as const) {
-        const exchClient = await createTempExchangeClient(clientType);
-        await t.step(clientType, async (t) => await codeTestFn(t, exchClient))
-          .finally(async () => {
-            await cleanupTempExchangeClient(exchClient);
-          });
-      }
-    });
-
-    // Test related to CLI interaction
-    await t.step({
-      name: "cli",
-      ignore: !cliTestFn,
-      fn: async () => {
-        await cliTestFn!(t, runCLICommand);
-      },
-    });
+    for (const clientType of ["user", "multisig"] as const) {
+      const exchClient = await createTempExchangeClient(clientType);
+      await t.step(clientType, async (t) => await codeTestFn(t, exchClient));
+      await cleanupTempExchangeClient(exchClient);
+    }
   });
 }
 

@@ -23,12 +23,4 @@ runTest({
     schemaCoverage(paramsSchema, data.map((d) => d.params));
     schemaCoverage(responseSchema, data.map((d) => d.result));
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "cancel",
-      `--cancels=${JSON.stringify([{ a: 0, o: 0 }])}`,
-    ]);
-    v.parse(CancelRequest, data);
-  },
 });

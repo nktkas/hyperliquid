@@ -77,7 +77,6 @@ export {
   getWalletChainId,
   type Signature,
 } from "./_abstractWallet.ts";
-export { PrivateKeySigner } from "./_privateKeySigner.ts";
 
 /** Zero address used as verifyingContract in EIP-712 domains. */
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000" as const;

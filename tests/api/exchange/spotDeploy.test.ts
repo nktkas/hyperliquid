@@ -116,22 +116,4 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "spotDeploy",
-      `--registerToken2=${
-        JSON.stringify({
-          spec: {
-            name: "TestToken",
-            szDecimals: 8,
-            weiDecimals: 8,
-          },
-          maxGas: 1000000,
-          fullName: "TestToken (TT)",
-        })
-      }`,
-    ]);
-    v.parse(SpotDeployRequest, data);
-  },
 });

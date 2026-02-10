@@ -66,14 +66,6 @@ runTest({
     schemaCoverage(paramsSchema, data.map((d) => d.params));
     schemaCoverage(responseSchema, data.map((d) => d.result));
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "approveAgent",
-      "--agentAddress=0x0000000000000000000000000000000000000000",
-    ]);
-    v.parse(ApproveAgentRequest, data);
-  },
 });
 
 function randomAddress(): `0x${string}` {

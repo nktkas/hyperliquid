@@ -30,14 +30,4 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "subAccountTransfer",
-      "--subAccountUser=0xcb3f0bd249a89e45e86a44bcfc7113e4ffe84cd1",
-      "--isDeposit=true",
-      "--usd=1",
-    ]);
-    v.parse(SubAccountTransferRequest, data);
-  },
 });

@@ -1,5 +1,3 @@
-import * as v from "@valibot/valibot";
-import { AllPerpMetasRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
@@ -13,12 +11,5 @@ runTest({
     const data = await Promise.all([client.allPerpMetas()]);
 
     schemaCoverage(responseSchema, data);
-  },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "allPerpMetas",
-    ]);
-    v.parse(AllPerpMetasRequest, data);
   },
 });

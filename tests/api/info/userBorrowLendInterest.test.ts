@@ -25,13 +25,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "userBorrowLendInterest",
-      "--user=0xe019d6167E7e324aEd003d94098496b6d986aB05",
-      "--startTime=1725991229384",
-    ]);
-    v.parse(UserBorrowLendInterestRequest, data);
-  },
 });

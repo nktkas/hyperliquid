@@ -25,12 +25,4 @@ runTest({
       "#/properties/genesis/anyOf/0/properties/blacklistUsers/array",
     ]);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "tokenDetails",
-      "--tokenId=0x3d8a82efa63e86d54a1922c2afdac61e",
-    ]);
-    v.parse(TokenDetailsRequest, data);
-  },
 });

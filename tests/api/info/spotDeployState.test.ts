@@ -28,12 +28,4 @@ runTest({
       "#/properties/gasAuction/properties/endGas/defined",
     ]);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "spotDeployState",
-      "--user=0x051dbfc562d44e4a01ebb986da35a47ab4f346db",
-    ]);
-    v.parse(SpotDeployStateRequest, data);
-  },
 });

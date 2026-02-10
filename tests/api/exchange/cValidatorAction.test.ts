@@ -66,25 +66,4 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "cValidatorAction",
-      `--register=${
-        JSON.stringify({
-          profile: {
-            node_ip: { Ip: "1.2.3.4" },
-            name: "...",
-            description: "...",
-            delegations_disabled: true,
-            commission_bps: 1,
-            signer: "0x0000000000000000000000000000000000000001",
-          },
-          unjailed: false,
-          initial_wei: 1,
-        })
-      }`,
-    ]);
-    v.parse(CValidatorActionRequest, data);
-  },
 });

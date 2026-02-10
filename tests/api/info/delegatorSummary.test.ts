@@ -21,12 +21,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "delegatorSummary",
-      "--user=0x563C175E6f11582f65D6d9E360A618699DEe14a9",
-    ]);
-    v.parse(DelegatorSummaryRequest, data);
-  },
 });

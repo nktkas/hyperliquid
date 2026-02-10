@@ -22,12 +22,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "userToMultiSigSigners",
-      "--user=0x7A8b673a176a430b80cfCDfdFB6b10ED55010Ebb",
-    ]);
-    v.parse(UserToMultiSigSignersRequest, data);
-  },
 });

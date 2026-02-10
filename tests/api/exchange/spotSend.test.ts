@@ -29,14 +29,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "spotSend",
-      "--destination=0x0000000000000000000000000000000000000001",
-      "--token=USDC:0xeb62eee3685fc4c43992febcd9e75443",
-      "--amount=1",
-    ]);
-    v.parse(SpotSendRequest, data);
-  },
 });

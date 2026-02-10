@@ -23,13 +23,4 @@ runTest({
     schemaCoverage(paramsSchema, data.map((d) => d.params));
     schemaCoverage(responseSchema, data.map((d) => d.result));
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "twapCancel",
-      "--a=0",
-      "--t=0",
-    ]);
-    v.parse(TwapCancelRequest, data);
-  },
 });

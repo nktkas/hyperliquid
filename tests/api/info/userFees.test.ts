@@ -25,12 +25,4 @@ runTest({
       "#/properties/stakingLink/defined",
     ]);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "userFees",
-      "--user=0xe973105a27e17350500926ae664dfcfe6006d924",
-    ]);
-    v.parse(UserFeesRequest, data);
-  },
 });

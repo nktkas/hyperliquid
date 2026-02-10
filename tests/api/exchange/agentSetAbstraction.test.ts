@@ -24,12 +24,4 @@ runTest({
     ]);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "agentSetAbstraction",
-      "--abstraction=u",
-    ]);
-    v.parse(AgentSetAbstractionRequest, data);
-  },
 });

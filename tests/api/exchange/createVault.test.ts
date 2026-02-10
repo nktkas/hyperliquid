@@ -32,15 +32,4 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "createVault",
-      "--name=test",
-      "--description=1234567890",
-      "--initialUsd=100000000",
-      "--nonce=1234567890",
-    ]);
-    v.parse(CreateVaultRequest, data);
-  },
 });

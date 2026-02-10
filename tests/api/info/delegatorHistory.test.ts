@@ -21,12 +21,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "delegatorHistory",
-      "--user=0xedc88158266c50628a9ffbaa1db2635376577eea",
-    ]);
-    v.parse(DelegatorHistoryRequest, data);
-  },
 });

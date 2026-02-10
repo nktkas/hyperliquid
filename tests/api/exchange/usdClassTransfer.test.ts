@@ -36,13 +36,4 @@ runTest({
     schemaCoverage(paramsSchema, data.map((d) => d.params));
     schemaCoverage(responseSchema, data.map((d) => d.result));
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "usdClassTransfer",
-      "--amount=1",
-      "--toPerp=false",
-    ]);
-    v.parse(UsdClassTransferRequest, data);
-  },
 });

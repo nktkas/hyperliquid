@@ -23,13 +23,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "usdSend",
-      "--destination=0x0000000000000000000000000000000000000001",
-      "--amount=1",
-    ]);
-    v.parse(UsdSendRequest, data);
-  },
 });

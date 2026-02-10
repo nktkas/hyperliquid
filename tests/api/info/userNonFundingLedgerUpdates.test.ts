@@ -34,13 +34,4 @@ runTest({
       "#/items/properties/delta/anyOf/3/properties/leverageType/enum/0",
     ]);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "userNonFundingLedgerUpdates",
-      "--user=0x563C175E6f11582f65D6d9E360A618699DEe14a9",
-      "--startTime=1725991238683",
-    ]);
-    v.parse(UserNonFundingLedgerUpdatesRequest, data);
-  },
 });

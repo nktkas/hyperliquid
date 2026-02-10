@@ -24,12 +24,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "spotUser",
-      `--toggleSpotDusting=${JSON.stringify({ optOut: true })}`,
-    ]);
-    v.parse(SpotUserRequest, data);
-  },
 });

@@ -21,12 +21,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "marginTable",
-      "--id=1",
-    ]);
-    v.parse(MarginTableRequest, data);
-  },
 });

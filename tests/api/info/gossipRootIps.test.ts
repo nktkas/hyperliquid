@@ -1,5 +1,3 @@
-import * as v from "@valibot/valibot";
-import { GossipRootIpsRequest } from "@nktkas/hyperliquid/api/info";
 import { runTest } from "./_t.ts";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
@@ -15,12 +13,5 @@ runTest({
     schemaCoverage(responseSchema, data, [
       "#/array",
     ]);
-  },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "gossipRootIps",
-    ]);
-    v.parse(GossipRootIpsRequest, data);
   },
 });

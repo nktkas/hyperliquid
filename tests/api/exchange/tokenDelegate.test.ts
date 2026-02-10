@@ -40,14 +40,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "tokenDelegate",
-      "--validator=0xa012b9040d83c5cbad9e6ea73c525027b755f596",
-      "--wei=1",
-      "--isUndelegate=false",
-    ]);
-    v.parse(TokenDelegateRequest, data);
-  },
 });

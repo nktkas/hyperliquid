@@ -76,13 +76,4 @@ runTest({
       "#/anyOf/0/properties/order/properties/status/enum/28",
     ]);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "orderStatus",
-      "--user=0x563C175E6f11582f65D6d9E360A618699DEe14a9",
-      "--oid=27379010444",
-    ]);
-    v.parse(OrderStatusRequest, data);
-  },
 });

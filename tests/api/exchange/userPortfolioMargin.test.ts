@@ -37,13 +37,4 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "userPortfolioMargin",
-      "--user=0xcb3f0bd249a89e45e86a44bcfc7113e4ffe84cd1",
-      "--enabled=true",
-    ]);
-    v.parse(UserPortfolioMarginRequest, data);
-  },
 });

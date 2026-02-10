@@ -37,14 +37,4 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "vaultTransfer",
-      "--vaultAddress=0x457ab3acf4a4e01156ce269545a9d3d05fff2f0b",
-      "--isDeposit=false",
-      "--usd=5000000",
-    ]);
-    v.parse(VaultTransferRequest, data);
-  },
 });

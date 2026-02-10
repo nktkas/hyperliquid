@@ -27,12 +27,4 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "createSubAccount",
-      "--name=12345",
-    ]);
-    v.parse(CreateSubAccountRequest, data);
-  },
 });

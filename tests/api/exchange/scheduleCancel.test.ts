@@ -30,12 +30,4 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "scheduleCancel",
-      "--time=170000000000",
-    ]);
-    v.parse(ScheduleCancelRequest, data);
-  },
 });

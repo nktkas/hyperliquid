@@ -21,7 +21,6 @@ async function modifyImports(): Promise<() => Promise<void>> {
   const jsr2npm = {
     "jsr:@nktkas/rews": "npm:@nktkas/rews",
     "jsr:@noble/hashes": "npm:@noble/hashes",
-    "jsr:@paulmillr/micro-eth-signer": "npm:micro-eth-signer",
     // "jsr:@std/async": "...", // No npm equivalent available
     // "jsr:@std/msgpack": "...", // No npm equivalent available
     "jsr:@valibot/valibot": "npm:valibot",
@@ -45,10 +44,7 @@ const restoreConfig = await modifyImports();
 try {
   await emptyDir("./build/npm");
   await build({
-    entryPoints: [
-      ...Object.entries(denoJson.exports).map(([k, v]) => ({ name: k, path: v })),
-      { name: "@nktkas/hyperliquid", path: "./bin/cli.ts", kind: "bin" },
-    ],
+    entryPoints: Object.entries(denoJson.exports).map(([k, v]) => ({ name: k, path: v })),
     outDir: "./build/npm",
     shims: {},
     typeCheck: "both",

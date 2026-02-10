@@ -21,12 +21,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "alignedQuoteTokenInfo",
-      "--token=1328",
-    ]);
-    v.parse(AlignedQuoteTokenInfoRequest, data);
-  },
 });

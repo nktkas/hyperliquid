@@ -21,12 +21,4 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "info",
-      "blockDetails",
-      "--height=300836507",
-    ]);
-    v.parse(BlockDetailsRequest, data);
-  },
 });

@@ -42,7 +42,6 @@ hype-spot.
 3. Update the `client.ts` file to include the new method.
 4. Add the raw function export to `mod.ts`.
 5. Create a test (use patterns from other tests) and run the test.
-6. Update the helper message (function `printHelp`) in [`bin/cli.ts`](/bin/cli.ts).
 
 ### Update API schemas/types
 

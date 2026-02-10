@@ -117,22 +117,4 @@ runTest({
     schemaCoverage(paramsSchema, data.map((d) => d.params));
     schemaCoverage(responseSchema, data.map((d) => d.result));
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "modify",
-      "--oid=0",
-      `--order=${
-        JSON.stringify({
-          a: 0,
-          b: true,
-          p: "1",
-          s: "1",
-          r: false,
-          t: { limit: { tif: "Gtc" } },
-        })
-      }`,
-    ]);
-    v.parse(ModifyRequest, data);
-  },
 });

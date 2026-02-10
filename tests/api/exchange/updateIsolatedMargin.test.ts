@@ -34,14 +34,4 @@ runTest({
     schemaCoverage(paramsSchema, data.map((d) => d.params));
     schemaCoverage(responseSchema, data.map((d) => d.result));
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "updateIsolatedMargin",
-      "--asset=0",
-      "--isBuy=true",
-      "--ntli=1",
-    ]);
-    v.parse(UpdateIsolatedMarginRequest, data);
-  },
 });

@@ -151,17 +151,4 @@ runTest({
       "#/properties/response/properties/data/properties/statuses/items/anyOf/3", // "waitingForTrigger"
     ]);
   },
-  cliTestFn: async (_t, runCommand) => {
-    const data = await runCommand([
-      "exchange",
-      "batchModify",
-      `--modifies=${
-        JSON.stringify([
-          { oid: 12345, order: { a: 0, b: true, p: "1", s: "1", r: false, t: { limit: { tif: "Gtc" } } } },
-          { oid: 12346, order: { a: 1, b: false, p: "2", s: "2", r: true, t: { limit: { tif: "Alo" } } } },
-        ])
-      }`,
-    ]);
-    v.parse(BatchModifyRequest, data);
-  },
 });
