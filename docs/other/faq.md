@@ -7,30 +7,38 @@ price that guarantees immediate execution:
 
 ```ts
 import { ExchangeClient, HttpTransport, InfoClient } from "@nktkas/hyperliquid";
+import { formatPrice, formatSize, SymbolConverter } from "@nktkas/hyperliquid/utils";
 import { privateKeyToAccount } from "viem/accounts";
 
-const info = new InfoClient({ transport: new HttpTransport() });
-const exchange = new ExchangeClient({
-  transport: new HttpTransport(),
-  wallet: privateKeyToAccount("0x..."),
-});
+const wallet = privateKeyToAccount("0x..."); // viem or ethers
+const transport = new HttpTransport();
+
+const info = new InfoClient({ transport });
+const exchange = new ExchangeClient({ transport, wallet });
+const converter = await SymbolConverter.create({ transport });
+
+const symbol = "ETH";
+const assetId = converter.getAssetId(symbol);
+const szDecimals = converter.getSzDecimals(symbol);
 
 // Get current price
 const mids = await info.allMids();
-const currentPrice = parseFloat(mids["ETH"]);
+const currentPrice = parseFloat(mids[symbol]);
 
 // Buy: set price above current (e.g., +1%)
-const buyPrice = currentPrice * 1.01;
+const buyPrice = formatPrice(currentPrice * 1.01, szDecimals);
 
 // Sell: set price below current (e.g., -1%)
-const sellPrice = currentPrice * 0.99;
+const sellPrice = formatPrice(currentPrice * 0.99, szDecimals);
+
+const size = formatSize("0.1", szDecimals);
 
 await exchange.order({
   orders: [{
-    a: 4,
+    a: assetId,
     b: true,
     p: buyPrice,
-    s: "0.1",
+    s: size,
     r: false,
     t: { limit: { tif: "Ioc" } }, // Immediate or Cancel
   }],

@@ -123,34 +123,35 @@ const subscription = await trades({ transport }, { coin: "BTC" }, (data) => {
 | `@nktkas/hyperliquid/api/exchange`     | Exchange API functions (`order`, `cancel`, `withdraw3`, etc.)      |
 | `@nktkas/hyperliquid/api/subscription` | Subscription functions (`candle`, `trades`, `l2Book`, etc.)        |
 
-## Valibot Schemas
+## Schemas and Types
 
-These exports also include [valibot](https://valibot.dev) schemas for every API method:
+These exports also include [valibot](https://valibot.dev) schemas and types for every API method:
 
 ```ts
 import { ClearinghouseStateRequest, ClearinghouseStateResponse } from "@nktkas/hyperliquid/api/info";
-import { OrderRequest, OrderResponse } from "@nktkas/hyperliquid/api/exchange";
+import { OrderRequest, OrderResponse, OrderSuccessResponse } from "@nktkas/hyperliquid/api/exchange";
 ```
 
-### Available Schemas
+### Available Exports
 
 Each method exports:
 
-- `*Request` - full request schema (with `type`, `nonce`, `signature` for exchange)
-- `*Response` - response schema from API
+- `*Request` - [valibot](https://valibot.dev) schema for the full request
+- `*Response` - TypeScript type for the API response
 
 ### Use Cases
 
 **TypeScript types:**
 
 ```ts
-import { ClearinghouseStateResponse } from "@nktkas/hyperliquid/api/info";
-import * as v from "valibot";
+import type { ClearinghouseStateResponse } from "@nktkas/hyperliquid/api/info";
 
-type State = v.InferOutput<typeof ClearinghouseStateResponse>;
+function handleState(state: ClearinghouseStateResponse) {
+  console.log(state.marginSummary);
+}
 ```
 
-**Runtime validation:**
+**Runtime validation of requests:**
 
 ```ts
 import { OrderRequest } from "@nktkas/hyperliquid/api/exchange";

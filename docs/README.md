@@ -57,7 +57,7 @@ deno add jsr:@nktkas/hyperliquid
   <tbody>
     <tr>
       <td><strong>Type Safe</strong></td>
-      <td>100% TypeScript. Full inference for 140+ API methods.</td>
+      <td>Written in TypeScript with complete type coverage.</td>
     </tr>
     <tr>
       <td><strong>Tested</strong></td>
