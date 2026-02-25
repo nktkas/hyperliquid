@@ -148,6 +148,7 @@ runTest({
       { setMarginModes: [["TEST0", "noCross"], ["TEST1", "strictIsolated"]] },
       { setFeeScale: { dex: "test", scale: "2.5" } },
       { setGrowthModes: [["TEST0", true]] },
+      { setPerpAnnotation: { coin: "TEST0", category: "other", description: "other perps" } },
     ];
 
     await Promise.all(params.map((p) =>

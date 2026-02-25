@@ -189,6 +189,19 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
         /** A list (sorted by key) of asset and growth modes. */
         setGrowthModes: v.array(v.tuple([v.string(), v.boolean()])),
       }),
+      v.object({
+        /** Type of action. */
+        type: v.literal("perpDeploy"),
+        /** Parameters for setting a perp annotation. */
+        setPerpAnnotation: v.object({
+          /** Coin symbol for the asset to annotate. */
+          coin: v.string(),
+          /** Classification label (max 15 characters). */
+          category: v.string(),
+          /** Detailed description (max 400 characters). */
+          description: v.string(),
+        }),
+      }),
     ]),
     /** Nonce (timestamp in ms) used to prevent replay attacks. */
     nonce: UnsignedInteger,
