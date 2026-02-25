@@ -8,7 +8,8 @@ import { Address } from "../../_schemas.ts";
 import type { TwapStateSchema } from "./_base/commonSchemas.ts";
 
 /**
- * Request twap history of a user.
+ * Request TWAP history of a user.
+ * @see null
  */
 export const TwapHistoryRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -22,6 +23,7 @@ export type TwapHistoryRequest = v.InferOutput<typeof TwapHistoryRequest>;
 
 /**
  * Array of user's TWAP history.
+ * @see null
  */
 export type TwapHistoryResponse = {
   /** Creation time of the history record (in seconds since epoch). */
@@ -58,13 +60,12 @@ import type { InfoConfig } from "./_base/types.ts";
 export type TwapHistoryParameters = Omit<v.InferInput<typeof TwapHistoryRequest>, "type">;
 
 /**
- * Request twap history of a user.
+ * Request TWAP history of a user.
  *
- * @param config - General configuration for Info API requests.
- * @param params - Parameters specific to the API request.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Array of user's TWAP history.
+ * @param config General configuration for Info API requests.
+ * @param params Parameters specific to the API request.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Array of user's TWAP history.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -81,6 +82,8 @@ export type TwapHistoryParameters = Omit<v.InferInput<typeof TwapHistoryRequest>
  *   { user: "0x..." },
  * );
  * ```
+ *
+ * @see null
  */
 export function twapHistory(
   config: InfoConfig,

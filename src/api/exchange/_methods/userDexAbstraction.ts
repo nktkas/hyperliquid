@@ -51,8 +51,8 @@ export type UserDexAbstractionResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const UserDexAbstractionParameters = /* @__PURE__ */ (() => {
@@ -61,6 +61,7 @@ const UserDexAbstractionParameters = /* @__PURE__ */ (() => {
     ["type", "signatureChainId", "hyperliquidChain", "nonce"],
   );
 })();
+
 /** Action parameters for the {@linkcode userDexAbstraction} function. */
 export type UserDexAbstractionParameters = v.InferInput<typeof UserDexAbstractionParameters>;
 
@@ -85,13 +86,10 @@ export const UserDexAbstractionTypes = {
 /**
  * Enable/disable HIP-3 DEX abstraction.
  *
- * @deprecated Use {@link userSetAbstraction} instead.
- *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -113,6 +111,8 @@ export const UserDexAbstractionTypes = {
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction
+ *
+ * @deprecated Use {@link userSetAbstraction} instead.
  */
 export function userDexAbstraction(
   config: ExchangeConfig,

@@ -9,6 +9,7 @@ import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_ba
 
 /**
  * Borrow or lend assets.
+ * @see null
  */
 export const BorrowLendRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -37,6 +38,7 @@ export type BorrowLendRequest = v.InferOutput<typeof BorrowLendRequest>;
 
 /**
  * Successful response without specific data or error response.
+ * @see null
  */
 export type BorrowLendResponse = SuccessResponse | ErrorResponse;
 
@@ -44,8 +46,8 @@ export type BorrowLendResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const BorrowLendParameters = /* @__PURE__ */ (() => {
@@ -54,6 +56,7 @@ const BorrowLendParameters = /* @__PURE__ */ (() => {
     ["type"],
   );
 })();
+
 /** Action parameters for the {@linkcode borrowLend} function. */
 export type BorrowLendParameters = v.InferInput<typeof BorrowLendParameters>;
 
@@ -66,11 +69,10 @@ export type BorrowLendSuccessResponse = ExcludeErrorResponse<BorrowLendResponse>
 /**
  * Borrow or lend assets.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -90,6 +92,8 @@ export type BorrowLendSuccessResponse = ExcludeErrorResponse<BorrowLendResponse>
  *   { operation: "supply", token: 0, amount: "20" },
  * );
  * ```
+ *
+ * @see null
  */
 export function borrowLend(
   config: ExchangeConfig,

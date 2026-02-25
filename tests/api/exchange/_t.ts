@@ -1,6 +1,5 @@
 // deno-lint-ignore-file no-import-prefix
-import "jsr:@std/dotenv@^0.225.5/load";
-import { generatePrivateKey, privateKeyToAccount } from "npm:viem@2/accounts";
+
 import {
   ExchangeClient,
   type ExchangeMultiSigConfig,
@@ -10,19 +9,21 @@ import {
 } from "@nktkas/hyperliquid";
 import { getWalletAddress } from "@nktkas/hyperliquid/signing";
 import { formatPrice, formatSize, SymbolConverter } from "@nktkas/hyperliquid/utils";
+import "jsr:@std/dotenv@^0.225.5/load";
+import { generatePrivateKey, privateKeyToAccount } from "npm:viem@2/accounts";
 
-// =============================================================
+// ============================================================
 // Arguments
-// =============================================================
+// ============================================================
 
 const WAIT = 5000;
 
 const PRIVATE_KEY = Deno.env.get("PRIVATE_KEY") as `0x${string}` | undefined;
 const MAIN_WALLET = PRIVATE_KEY ? privateKeyToAccount(PRIVATE_KEY) : undefined;
 
-// =============================================================
+// ============================================================
 // Preparation
-// =============================================================
+// ============================================================
 
 const transport = new HttpTransport({ isTestnet: true, timeout: 30_000 });
 const infoClient = new InfoClient({ transport });
@@ -30,9 +31,9 @@ const infoClient = new InfoClient({ transport });
 export const symbolConverter = await SymbolConverter.create({ transport });
 export const allMids = await infoClient.allMids();
 
-// =============================================================
+// ============================================================
 // Test
-// =============================================================
+// ============================================================
 
 export function runTest(options: {
   name: string;
@@ -54,9 +55,9 @@ export function runTest(options: {
   });
 }
 
-// =============================================================
+// ============================================================
 // Helpers
-// =============================================================
+// ============================================================
 
 export async function createTempExchangeClient(
   type: "user" | "multisig",

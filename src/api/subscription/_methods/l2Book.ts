@@ -8,6 +8,7 @@ import { Integer } from "../../_schemas.ts";
 
 /**
  * Subscription to L2 order book events for a specific asset.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const L2BookRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -25,6 +26,7 @@ export type L2BookRequest = v.InferOutput<typeof L2BookRequest>;
 
 /**
  * Event of L2 order book snapshot.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export type L2BookEvent = {
   /** Asset symbol. */
@@ -70,8 +72,8 @@ export type L2BookEvent = {
 // Execution Logic
 // ============================================================
 
-import type { SubscriptionConfig } from "./_types.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode l2Book} function. */
 export type L2BookParameters = Omit<v.InferInput<typeof L2BookRequest>, "type">;
@@ -79,11 +81,10 @@ export type L2BookParameters = Omit<v.InferInput<typeof L2BookRequest>, "type">;
 /**
  * Subscribe to L2 order book updates for a specific asset.
  *
- * @param config - General configuration for Subscription API subscriptions.
- * @param params - Parameters specific to the API subscription.
- * @param listener - A callback function to be called when the event is received.
- *
- * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+ * @param config General configuration for Subscription API subscriptions.
+ * @param params Parameters specific to the API subscription.
+ * @param listener A callback function to be called when the event is received.
+ * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

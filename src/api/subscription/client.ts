@@ -1,9 +1,14 @@
-import type { SubscriptionConfig } from "./_methods/_types.ts";
-import type { ISubscription } from "../../transport/mod.ts";
+/**
+ * Client for the Hyperliquid Subscription API endpoint.
+ * @module
+ */
 
-// =============================================================
+import type { ISubscription } from "../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_methods/_types.ts";
+
+// ============================================================
 // Methods Imports
-// =============================================================
+// ============================================================
 
 import { activeAssetCtx, type ActiveAssetCtxEvent, type ActiveAssetCtxParameters } from "./_methods/activeAssetCtx.ts";
 import {
@@ -67,9 +72,9 @@ import {
 import { webData2, type WebData2Event, type WebData2Parameters } from "./_methods/webData2.ts";
 import { webData3, type WebData3Event, type WebData3Parameters } from "./_methods/webData3.ts";
 
-// =============================================================
+// ============================================================
 // Client
-// =============================================================
+// ============================================================
 
 /**
  * Real-time data via WebSocket subscriptions.
@@ -82,7 +87,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Creates an instance of the SubscriptionClient.
    *
-   * @param config - Configuration for Subscription API requests. See {@link SubscriptionConfig}.
+   * @param config Configuration for Subscription API requests. See {@link SubscriptionConfig}.
    *
    * @example
    * ```ts
@@ -100,10 +105,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to context updates for a specific perpetual asset.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -132,10 +136,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to trading data updates for a specific asset and user.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -164,10 +167,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to context updates for a specific spot asset.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -196,9 +198,8 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to asset contexts for all DEXs.
    *
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -226,10 +227,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to clearinghouse states for all DEXs for a specific user.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -258,10 +258,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to mid prices for all actively traded assets.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -299,10 +298,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to asset contexts for all perpetual assets.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -340,10 +338,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to best bid and offer updates for a specific asset.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -372,10 +369,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to candlestick data updates for a specific asset.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -404,10 +400,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to clearinghouse state updates for a specific user.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -436,9 +431,8 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to explorer block updates.
    *
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -466,9 +460,8 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to explorer transaction updates.
    *
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -496,10 +489,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to L2 order book updates for a specific asset.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -528,10 +520,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to notification updates for a specific user.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -560,10 +551,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to open orders updates for a specific user.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -592,10 +582,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to order status updates for a specific user.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -624,10 +613,8 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to context updates for all spot assets.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -655,10 +642,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to spot state updates for a specific user.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -687,10 +673,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to real-time trade updates for a specific asset.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -719,10 +704,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to TWAP states updates for a specific user.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -751,10 +735,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to non-order events for a specific user.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -783,10 +766,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to trade fill updates for a specific user.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -815,10 +797,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to funding payment updates for a specific user.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -847,10 +828,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to historical order updates for a specific user.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -879,10 +859,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to non-funding ledger updates for a specific user.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -911,10 +890,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to TWAP order history updates for a specific user.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -943,10 +921,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to TWAP execution updates for a specific user.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -975,10 +952,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to comprehensive user and market data updates.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1007,10 +983,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to comprehensive user and market data updates.
    *
-   * @param params - Parameters specific to the API subscription.
-   * @param listener - A callback function to be called when the event is received.
-   *
-   * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param params Parameters specific to the API subscription.
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1037,9 +1012,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   }
 }
 
-// =============================================================
+// ============================================================
 // Type Re-exports
-// =============================================================
+// ============================================================
 
 export type { SubscriptionConfig } from "./_methods/_types.ts";
 

@@ -1,25 +1,29 @@
 /**
+ * Nonce manager for generating unique, monotonically increasing nonces.
+ * @module
+ */
+
+/**
  * Nonce manager for generating unique nonces per wallet address and network.
- *
  * Uses lazy cleanup: removes entries when Date.now() > lastNonce.
  */
 class NonceManager {
-  #map = new Map<string, number>();
+  private _map = new Map<string, number>();
 
   getNonce(key: string): number {
     const now = Date.now();
-    this.#cleanup(now);
+    this._cleanup(now);
 
-    const lastNonce = this.#map.get(key) ?? 0;
+    const lastNonce = this._map.get(key) ?? 0;
     const nonce = now > lastNonce ? now : lastNonce + 1;
-    this.#map.set(key, nonce);
+    this._map.set(key, nonce);
     return nonce;
   }
 
-  #cleanup(now: number): void {
-    for (const [key, lastNonce] of this.#map) {
+  private _cleanup(now: number): void {
+    for (const [key, lastNonce] of this._map) {
       if (now > lastNonce) {
-        this.#map.delete(key);
+        this._map.delete(key);
       }
     }
   }

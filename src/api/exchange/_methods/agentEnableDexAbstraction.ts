@@ -38,8 +38,8 @@ export type AgentEnableDexAbstractionResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Request options for the {@linkcode agentEnableDexAbstraction} function. */
 export type AgentEnableDexAbstractionOptions = ExtractRequestOptions<
@@ -52,13 +52,9 @@ export type AgentEnableDexAbstractionSuccessResponse = ExcludeErrorResponse<Agen
 /**
  * Enable HIP-3 DEX abstraction.
  *
- * @deprecated Use {@link agentSetAbstraction} instead.
- *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -77,6 +73,8 @@ export type AgentEnableDexAbstractionSuccessResponse = ExcludeErrorResponse<Agen
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction-agent
+ *
+ * @deprecated Use {@link agentSetAbstraction} instead.
  */
 export function agentEnableDexAbstraction(
   config: ExchangeConfig,

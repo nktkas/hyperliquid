@@ -1,5 +1,10 @@
 // deno-lint-ignore-file valibot-project/require-name-suffix
 
+/**
+ * Common valibot schemas for primitive types used across the API.
+ * @module
+ */
+
 import * as v from "@valibot/valibot";
 
 // ============================================================

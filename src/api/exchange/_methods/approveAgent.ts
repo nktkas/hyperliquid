@@ -67,8 +67,8 @@ export type ApproveAgentResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const ApproveAgentParameters = /* @__PURE__ */ (() => {
@@ -77,6 +77,7 @@ const ApproveAgentParameters = /* @__PURE__ */ (() => {
     ["type", "signatureChainId", "hyperliquidChain", "nonce"],
   );
 })();
+
 /** Action parameters for the {@linkcode approveAgent} function. */
 export type ApproveAgentParameters = v.InferInput<typeof ApproveAgentParameters>;
 
@@ -99,11 +100,10 @@ export const ApproveAgentTypes = {
 /**
  * Approve an agent to sign on behalf of the master account.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -123,6 +123,7 @@ export const ApproveAgentTypes = {
  *   { agentAddress: "0x...", agentName: "myAgent" },
  * );
  * ```
+ *
  * @example With expiration timestamp
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";

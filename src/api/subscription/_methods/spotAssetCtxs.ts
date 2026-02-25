@@ -8,6 +8,7 @@ import type { SpotAssetCtxSchema } from "../../info/_methods/_base/commonSchemas
 
 /**
  * Subscription to context events for all spot assets.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const SpotAssetCtxsRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -18,7 +19,8 @@ export const SpotAssetCtxsRequest = /* @__PURE__ */ (() => {
 export type SpotAssetCtxsRequest = v.InferOutput<typeof SpotAssetCtxsRequest>;
 
 /**
- * vent of spot asset contexts.
+ * Event of spot asset contexts.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export type SpotAssetCtxsEvent = SpotAssetCtxSchema[];
 
@@ -26,17 +28,15 @@ export type SpotAssetCtxsEvent = SpotAssetCtxSchema[];
 // Execution Logic
 // ============================================================
 
-import type { SubscriptionConfig } from "./_types.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_types.ts";
 
 /**
  * Subscribe to context updates for all spot assets.
  *
- * @param config - General configuration for Subscription API subscriptions.
- * @param params - Parameters specific to the API subscription.
- * @param listener - A callback function to be called when the event is received.
- *
- * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+ * @param config General configuration for Subscription API subscriptions.
+ * @param listener A callback function to be called when the event is received.
+ * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

@@ -8,6 +8,7 @@ import { Address } from "../../_schemas.ts";
 
 /**
  * Request user existence check before transfer.
+ * @see null
  */
 export const PreTransferCheckRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -23,6 +24,7 @@ export type PreTransferCheckRequest = v.InferOutput<typeof PreTransferCheckReque
 
 /**
  * Pre-transfer user existence check result.
+ * @see null
  */
 export type PreTransferCheckResponse = {
   /**
@@ -50,11 +52,10 @@ export type PreTransferCheckParameters = Omit<v.InferInput<typeof PreTransferChe
 /**
  * Request user existence check before transfer.
  *
- * @param config - General configuration for Info API requests.
- * @param params - Parameters specific to the API request.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Pre-transfer user existence check result.
+ * @param config General configuration for Info API requests.
+ * @param params Parameters specific to the API request.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Pre-transfer user existence check result.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -71,6 +72,8 @@ export type PreTransferCheckParameters = Omit<v.InferInput<typeof PreTransferChe
  *   { user: "0x...", source: "0x..." },
  * );
  * ```
+ *
+ * @see null
  */
 export function preTransferCheck(
   config: InfoConfig,

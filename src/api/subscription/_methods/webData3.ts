@@ -10,6 +10,7 @@ import type { PerpsAtOpenInterestCapResponse } from "../../info/_methods/perpsAt
 
 /**
  * Subscription to comprehensive user and market data events.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const WebData3Request = /* @__PURE__ */ (() => {
   return v.object({
@@ -23,6 +24,7 @@ export type WebData3Request = v.InferOutput<typeof WebData3Request>;
 
 /**
  * Event of comprehensive user and market data.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export type WebData3Event = {
   /** User state information. */
@@ -73,8 +75,8 @@ export type WebData3Event = {
 // Execution Logic
 // ============================================================
 
-import type { SubscriptionConfig } from "./_types.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode webData3} function. */
 export type WebData3Parameters = Omit<v.InferInput<typeof WebData3Request>, "type">;
@@ -82,11 +84,10 @@ export type WebData3Parameters = Omit<v.InferInput<typeof WebData3Request>, "typ
 /**
  * Subscribe to comprehensive user and market data updates.
  *
- * @param config - General configuration for Subscription API subscriptions.
- * @param params - Parameters specific to the API subscription.
- * @param listener - A callback function to be called when the event is received.
- *
- * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+ * @param config General configuration for Subscription API subscriptions.
+ * @param params Parameters specific to the API subscription.
+ * @param listener A callback function to be called when the event is received.
+ * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

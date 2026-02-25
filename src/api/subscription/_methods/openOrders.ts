@@ -9,6 +9,7 @@ import type { FrontendOpenOrdersResponse } from "../../info/_methods/frontendOpe
 
 /**
  * Subscription to open order events for a specific user.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const OpenOrdersRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -24,6 +25,7 @@ export type OpenOrdersRequest = v.InferOutput<typeof OpenOrdersRequest>;
 
 /**
  * Event of open orders for a specific user.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export type OpenOrdersEvent = {
   /** DEX name (empty string for main dex). */
@@ -41,8 +43,8 @@ export type OpenOrdersEvent = {
 // Execution Logic
 // ============================================================
 
-import type { SubscriptionConfig } from "./_types.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode openOrders} function. */
 export type OpenOrdersParameters = Omit<v.InferInput<typeof OpenOrdersRequest>, "type">;
@@ -50,11 +52,10 @@ export type OpenOrdersParameters = Omit<v.InferInput<typeof OpenOrdersRequest>, 
 /**
  * Subscribe to open orders updates for a specific user.
  *
- * @param config - General configuration for Subscription API subscriptions.
- * @param params - Parameters specific to the API subscription.
- * @param listener - A callback function to be called when the event is received.
- *
- * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+ * @param config General configuration for Subscription API subscriptions.
+ * @param params Parameters specific to the API subscription.
+ * @param listener A callback function to be called when the event is received.
+ * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -83,7 +84,7 @@ export function openOrders(
   const payload = v.parse(OpenOrdersRequest, {
     type: "openOrders",
     ...params,
-    dex: params.dex ?? "", // same value as in response
+    dex: params.dex ?? "", // Same value as in response
   });
   return config.transport.subscribe<OpenOrdersEvent>(payload.type, payload, (e) => {
     if (e.detail.user === payload.user && e.detail.dex === payload.dex) {

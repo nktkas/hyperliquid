@@ -1,10 +1,10 @@
-import * as v from "@valibot/valibot";
 import { type TwapOrderParameters, TwapOrderRequest } from "@nktkas/hyperliquid/api/exchange";
 import { formatSize } from "@nktkas/hyperliquid/utils";
-import { allMids, runTest, symbolConverter, topUpPerp } from "./_t.ts";
+import * as v from "@valibot/valibot";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
 import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
+import { allMids, runTest, symbolConverter, topUpPerp } from "./_t.ts";
 
 const sourceFile = new URL("../../../src/api/exchange/_methods/twapOrder.ts", import.meta.url).pathname;
 const responseSchema = typeToJsonSchema(sourceFile, "TwapOrderSuccessResponse");

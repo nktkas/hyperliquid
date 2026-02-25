@@ -8,6 +8,7 @@ import type { VaultRelationshipSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Request a list of vaults less than 2 hours old.
+ * @see null
  */
 export const VaultSummariesRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -19,6 +20,7 @@ export type VaultSummariesRequest = v.InferOutput<typeof VaultSummariesRequest>;
 
 /**
  * Array of vaults less than 2 hours old.
+ * @see null
  */
 export type VaultSummariesResponse = {
   /** Vault name. */
@@ -55,10 +57,9 @@ import type { InfoConfig } from "./_base/types.ts";
 /**
  * Request a list of vaults less than 2 hours old.
  *
- * @param config - General configuration for Info API requests.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Array of vaults less than 2 hours old.
+ * @param config General configuration for Info API requests.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Array of vaults less than 2 hours old.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -72,6 +73,8 @@ import type { InfoConfig } from "./_base/types.ts";
  *
  * const data = await vaultSummaries({ transport });
  * ```
+ *
+ * @see null
  */
 export function vaultSummaries(
   config: InfoConfig,

@@ -1,3 +1,8 @@
+/**
+ * Common types shared across Info API methods.
+ * @module
+ */
+
 /** Perpetual asset context. */
 export type PerpAssetCtxSchema = {
   /**

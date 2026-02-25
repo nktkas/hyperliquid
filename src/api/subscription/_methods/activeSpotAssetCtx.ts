@@ -8,6 +8,7 @@ import type { SpotAssetCtxSchema } from "../../info/_methods/_base/commonSchemas
 
 /**
  * Subscription to context events for a specific spot asset.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const ActiveSpotAssetCtxRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -21,6 +22,7 @@ export type ActiveSpotAssetCtxRequest = v.InferOutput<typeof ActiveSpotAssetCtxR
 
 /**
  * Event of active spot asset context.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export type ActiveSpotAssetCtxEvent = {
   /** Asset ID (e.g., @1). */
@@ -33,8 +35,8 @@ export type ActiveSpotAssetCtxEvent = {
 // Execution Logic
 // ============================================================
 
-import type { SubscriptionConfig } from "./_types.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode activeSpotAssetCtx} function. */
 export type ActiveSpotAssetCtxParameters = Omit<v.InferInput<typeof ActiveSpotAssetCtxRequest>, "type">;
@@ -42,10 +44,10 @@ export type ActiveSpotAssetCtxParameters = Omit<v.InferInput<typeof ActiveSpotAs
 /**
  * Subscribe to context updates for a specific spot asset.
  *
- * @param config - General configuration for Subscription API subscriptions.
- * @param params - Parameters specific to the API subscription.
- * @param listener - A callback function to be called when the event is received.
- * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+ * @param config General configuration for Subscription API subscriptions.
+ * @param params Parameters specific to the API subscription.
+ * @param listener A callback function to be called when the event is received.
+ * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

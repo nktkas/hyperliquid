@@ -53,7 +53,7 @@ export type ClearinghouseStateResponse = {
   /** Cross-margin summary details. */
   crossMarginSummary: {
     /**
-     *  Total account value.
+     * Total account value.
      * @pattern ^[0-9]+(\.[0-9]+)?$
      */
     accountValue: string;
@@ -181,11 +181,10 @@ export type ClearinghouseStateParameters = Omit<v.InferInput<typeof Clearinghous
 /**
  * Request clearinghouse state.
  *
- * @param config - General configuration for Info API requests.
- * @param params - Parameters specific to the API request.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Account summary for perpetual trading.
+ * @param config General configuration for Info API requests.
+ * @param params Parameters specific to the API request.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Account summary for perpetual trading.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

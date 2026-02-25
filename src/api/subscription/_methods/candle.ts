@@ -6,6 +6,7 @@ import * as v from "@valibot/valibot";
 
 /**
  * Subscription to candlestick events for a specific asset and time interval.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const CandleRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -21,6 +22,7 @@ export type CandleRequest = v.InferOutput<typeof CandleRequest>;
 
 /**
  * Event of candlestick data point.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export type CandleEvent = {
   /** Opening timestamp (ms since epoch). */
@@ -64,8 +66,8 @@ export type CandleEvent = {
 // Execution Logic
 // ============================================================
 
-import type { SubscriptionConfig } from "./_types.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode candle} function. */
 export type CandleParameters = Omit<v.InferInput<typeof CandleRequest>, "type">;
@@ -73,11 +75,10 @@ export type CandleParameters = Omit<v.InferInput<typeof CandleRequest>, "type">;
 /**
  * Subscribe to candlestick data updates for a specific asset.
  *
- * @param config - General configuration for Subscription API subscriptions.
- * @param params - Parameters specific to the API subscription.
- * @param listener - A callback function to be called when the event is received.
- *
- * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+ * @param config General configuration for Subscription API subscriptions.
+ * @param params Parameters specific to the API subscription.
+ * @param listener A callback function to be called when the event is received.
+ * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

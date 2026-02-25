@@ -41,11 +41,10 @@ export type FrontendOpenOrdersParameters = Omit<v.InferInput<typeof FrontendOpen
 /**
  * Request frontend open orders.
  *
- * @param config - General configuration for Info API requests.
- * @param params - Parameters specific to the API request.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Array of open orders with additional display information.
+ * @param config General configuration for Info API requests.
+ * @param params Parameters specific to the API request.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Array of open orders with additional display information.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

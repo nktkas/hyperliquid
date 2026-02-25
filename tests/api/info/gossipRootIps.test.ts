@@ -1,6 +1,6 @@
-import { runTest } from "./_t.ts";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+import { runTest } from "./_t.ts";
 
 const sourceFile = new URL("../../../src/api/info/_methods/gossipRootIps.ts", import.meta.url).pathname;
 const responseSchema = typeToJsonSchema(sourceFile, "GossipRootIpsResponse");

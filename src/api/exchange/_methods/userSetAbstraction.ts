@@ -13,7 +13,7 @@ import {
 } from "./_base/commonSchemas.ts";
 
 /**
- * Set User abstraction mode.
+ * Set user abstraction mode.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction
  */
 export const UserSetAbstractionRequest = /* @__PURE__ */ (() => {
@@ -51,8 +51,8 @@ export type UserSetAbstractionResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const UserSetAbstractionParameters = /* @__PURE__ */ (() => {
@@ -61,6 +61,7 @@ const UserSetAbstractionParameters = /* @__PURE__ */ (() => {
     ["type", "signatureChainId", "hyperliquidChain", "nonce"],
   );
 })();
+
 /** Action parameters for the {@linkcode userSetAbstraction} function. */
 export type UserSetAbstractionParameters = v.InferInput<typeof UserSetAbstractionParameters>;
 
@@ -81,13 +82,12 @@ export const UserSetAbstractionTypes = {
 };
 
 /**
- * Set User abstraction mode.
+ * Set user abstraction mode.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

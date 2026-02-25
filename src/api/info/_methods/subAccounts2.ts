@@ -10,6 +10,7 @@ import type { SpotClearinghouseStateResponse } from "./spotClearinghouseState.ts
 
 /**
  * Request user sub-accounts (V2).
+ * @see null
  */
 export const SubAccounts2Request = /* @__PURE__ */ (() => {
   return v.object({
@@ -23,6 +24,7 @@ export type SubAccounts2Request = v.InferOutput<typeof SubAccounts2Request>;
 
 /**
  * Array of user sub-account or null if the user does not have any sub-accounts.
+ * @see null
  */
 export type SubAccounts2Response = {
   /** Sub-account name. */
@@ -55,11 +57,10 @@ export type SubAccounts2Parameters = Omit<v.InferInput<typeof SubAccounts2Reques
 /**
  * Request user sub-accounts V2.
  *
- * @param config - General configuration for Info API requests.
- * @param params - Parameters specific to the API request.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Array of user sub-account or null if the user does not have any sub-accounts.
+ * @param config General configuration for Info API requests.
+ * @param params Parameters specific to the API request.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Array of user sub-account or null if the user does not have any sub-accounts.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -76,6 +77,8 @@ export type SubAccounts2Parameters = Omit<v.InferInput<typeof SubAccounts2Reques
  *   { user: "0x..." },
  * );
  * ```
+ *
+ * @see null
  */
 export function subAccounts2(
   config: InfoConfig,

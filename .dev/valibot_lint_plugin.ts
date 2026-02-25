@@ -2,8 +2,6 @@
 
 /**
  * Lint plugin for {@link https://valibot.dev/ | Valibot} schemas enforcing best practices and preventing common mistakes.
- * @note The list of rules is not exhaustive
- *
  * @module
  */
 

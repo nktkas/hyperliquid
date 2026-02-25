@@ -8,6 +8,7 @@ import { UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Request margin table data.
+ * @see null
  */
 export const MarginTableRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -22,6 +23,7 @@ export type MarginTableRequest = v.InferOutput<typeof MarginTableRequest>;
 
 /**
  * Margin requirements table with multiple tiers.
+ * @see null
  */
 export type MarginTableResponse = {
   /** Description of the margin table. */
@@ -50,11 +52,10 @@ export type MarginTableParameters = Omit<v.InferInput<typeof MarginTableRequest>
 /**
  * Request margin table data.
  *
- * @param config - General configuration for Info API requests.
- * @param params - Parameters specific to the API request.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Margin requirements table with multiple tiers.
+ * @param config General configuration for Info API requests.
+ * @param params Parameters specific to the API request.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Margin requirements table with multiple tiers.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -71,6 +72,8 @@ export type MarginTableParameters = Omit<v.InferInput<typeof MarginTableRequest>
  *   { id: 1 },
  * );
  * ```
+ *
+ * @see null
  */
 export function marginTable(
   config: InfoConfig,

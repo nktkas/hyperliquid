@@ -20,9 +20,9 @@
  * @module
  */
 
+import { ReconnectingWebSocket, type ReconnectingWebSocketOptions } from "@nktkas/rews";
 import type { IRequestTransport, ISubscription, ISubscriptionTransport } from "../_base.ts";
 import { AbortSignal_ } from "../_polyfills.ts";
-import { ReconnectingWebSocket, type ReconnectingWebSocketOptions } from "@nktkas/rews";
 import { HyperliquidEventTarget } from "./_hyperliquidEventTarget.ts";
 import { WebSocketPostRequest, WebSocketRequestError } from "./_postRequest.ts";
 import { WebSocketSubscriptionManager } from "./_subscriptionManager.ts";
@@ -33,7 +33,8 @@ export { WebSocketRequestError };
 export interface WebSocketTransportOptions {
   /**
    * Indicates this transport uses testnet endpoint.
-   * @default false
+   *
+   * Default: `false`
    */
   isTestnet?: boolean;
   /**
@@ -44,19 +45,22 @@ export interface WebSocketTransportOptions {
    * - Testnet:
    *   - API: `wss://api.hyperliquid-testnet.xyz/ws`
    *   - Explorer: `wss://rpc.hyperliquid-testnet.xyz/ws`
-   * @default `wss://api.hyperliquid.xyz/ws` for mainnet, `wss://api.hyperliquid-testnet.xyz/ws` for testnet
+   *
+   * Default: `wss://api.hyperliquid.xyz/ws` for mainnet, `wss://api.hyperliquid-testnet.xyz/ws` for testnet
    */
   url?: string | URL;
   /**
    * Timeout for requests in ms. Set to `null` to disable.
-   * @default 10_000
+   *
+   * Default: `10_000`
    */
   timeout?: number | null;
   /** Reconnection policy configuration for closed connections. */
   reconnect?: ReconnectingWebSocketOptions;
   /**
    * Enable automatic re-subscription to Hyperliquid subscription after reconnection.
-   * @default true
+   *
+   * Default: `true`
    */
   resubscribe?: boolean;
 }
@@ -97,15 +101,15 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
     this._postRequest.timeout = value;
   }
 
-  protected _postRequest: WebSocketPostRequest;
-  protected _hlEvents: HyperliquidEventTarget;
-  protected _subscriptionManager: WebSocketSubscriptionManager;
+  protected readonly _postRequest: WebSocketPostRequest;
+  protected readonly _hlEvents: HyperliquidEventTarget;
+  protected readonly _subscriptionManager: WebSocketSubscriptionManager;
   protected _keepAliveInterval: ReturnType<typeof setInterval> | undefined;
 
   /**
    * Creates a new WebSocket transport instance.
    *
-   * @param options - Configuration options for the WebSocket transport layer.
+   * @param options Configuration options for the WebSocket transport layer.
    */
   constructor(options?: WebSocketTransportOptions) {
     this.isTestnet = options?.isTestnet ?? false;
@@ -138,13 +142,12 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
   /**
    * Sends a request to the Hyperliquid API via WebSocket.
    *
-   * @param endpoint - The API endpoint to send the request to.
-   * @param payload - The payload to send with the request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @param endpoint The API endpoint to send the request to.
+   * @param payload The payload to send with the request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return A promise that resolves with parsed JSON response body.
    *
-   * @returns A promise that resolves with parsed JSON response body.
-   *
-   * @throws {WebSocketRequestError} - An error that occurs when a WebSocket request fails.
+   * @throws {WebSocketRequestError} An error that occurs when a WebSocket request fails.
    */
   async request<T>(endpoint: "info" | "exchange", payload: unknown, signal?: AbortSignal): Promise<T> {
     const payload_ = { type: endpoint === "exchange" ? "action" : endpoint, payload };
@@ -155,13 +158,12 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
    * Subscribes to a Hyperliquid event channel.
    * Sends a subscription request to the server and listens for events.
    *
-   * @param channel - The event channel to listen to.
-   * @param payload - A payload to send with the subscription request.
-   * @param listener - A function to call when the event is dispatched.
+   * @param channel The event channel to listen to.
+   * @param payload A payload to send with the subscription request.
+   * @param listener A function to call when the event is dispatched.
+   * @return A promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @returns A promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
-   *
-   * @throws {WebSocketRequestError} - An error that occurs when a WebSocket request fails.
+   * @throws {WebSocketRequestError} An error that occurs when a WebSocket request fails.
    */
   subscribe<T>(
     channel: string,
@@ -174,9 +176,8 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
   /**
    * Waits until the WebSocket connection is ready.
    *
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the promise.
-   *
-   * @returns A promise that resolves when the connection is ready.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the promise.
+   * @return A promise that resolves when the connection is ready.
    *
    * @throws {WebSocketRequestError} When the connection cannot be established.
    */
@@ -217,9 +218,8 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
   /**
    * Closes the WebSocket connection and waits until it is fully closed.
    *
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the promise.
-   *
-   * @returns A promise that resolves when the connection is fully closed.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the promise.
+   * @return A promise that resolves when the connection is fully closed.
    *
    * @throws {WebSocketRequestError} When the connection cannot be closed.
    */

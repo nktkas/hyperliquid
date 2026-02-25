@@ -33,10 +33,9 @@ import type { InfoConfig } from "./_base/types.ts";
 /**
  * Request for the status of the spot deploy auction.
  *
- * @param config - General configuration for Info API requests.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Status of the spot deploy auction.
+ * @param config General configuration for Info API requests.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Status of the spot deploy auction.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

@@ -28,17 +28,17 @@ export function runTest(options: {
   Deno.test(name, async (t) => {
     await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
-    // ========== Preparation ==========
+    // --- Preparation ------------------------------------------------
 
     const transport = new WebSocketTransport({ url: `wss://${mode}.hyperliquid-testnet.xyz/ws`, isTestnet: true });
     await transport.ready();
     const subsClient = new SubscriptionClient({ transport });
 
-    // ========== Test ==========
+    // --- Test ------------------------------------------------
 
     await fn(t, subsClient)
       .finally(async () => {
-        // ========== Cleanup ==========
+        // --- Cleanup ------------------------------------------------
 
         await transport.close();
       });
@@ -61,7 +61,7 @@ export function runTestWithExchange(options: {
   Deno.test(name, async (t) => {
     await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
-    // ========== Preparation ==========
+    // --- Preparation ------------------------------------------------
 
     const transport = new WebSocketTransport({ isTestnet: true });
     await transport.ready();
@@ -70,11 +70,11 @@ export function runTestWithExchange(options: {
     const infoClient = new InfoClient({ transport });
     const subsClient = new SubscriptionClient({ transport });
 
-    // ========== Test ==========
+    // --- Test ------------------------------------------------
 
     await fn(t, { subs: subsClient, exch: exchClient, info: infoClient })
       .finally(async () => {
-        // ========== Cleanup ==========
+        // --- Cleanup ------------------------------------------------
 
         await cleanupTempExchangeClient(exchClient);
         await transport.close();

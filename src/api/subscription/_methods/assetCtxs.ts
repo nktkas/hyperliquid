@@ -8,6 +8,7 @@ import type { PerpAssetCtxSchema } from "../../info/_methods/_base/commonSchemas
 
 /**
  * Subscription to context events for all perpetual assets.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const AssetCtxsRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -21,6 +22,7 @@ export type AssetCtxsRequest = v.InferOutput<typeof AssetCtxsRequest>;
 
 /**
  * Event of asset contexts for all perpetual assets on a specified DEX.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export type AssetCtxsEvent = {
   /** DEX name (empty string for main dex). */
@@ -33,8 +35,8 @@ export type AssetCtxsEvent = {
 // Execution Logic
 // ============================================================
 
-import type { SubscriptionConfig } from "./_types.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode assetCtxs} function. */
 export type AssetCtxsParameters = Omit<v.InferInput<typeof AssetCtxsRequest>, "type">;
@@ -42,11 +44,10 @@ export type AssetCtxsParameters = Omit<v.InferInput<typeof AssetCtxsRequest>, "t
 /**
  * Subscribe to asset contexts for all perpetual assets.
  *
- * @param config - General configuration for Subscription API subscriptions.
- * @param params - Parameters specific to the API subscription.
- * @param listener - A callback function to be called when the event is received.
- *
- * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+ * @param config General configuration for Subscription API subscriptions.
+ * @param params Parameters specific to the API subscription.
+ * @param listener A callback function to be called when the event is received.
+ * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -86,7 +87,7 @@ export function assetCtxs(
   const payload = v.parse(AssetCtxsRequest, {
     type: "assetCtxs",
     ...params,
-    dex: params.dex ?? "", // same value as in response
+    dex: params.dex ?? "", // Same value as in response
   });
   return config.transport.subscribe<AssetCtxsEvent>(payload.type, payload, (e) => {
     if (e.detail.dex === payload.dex) {

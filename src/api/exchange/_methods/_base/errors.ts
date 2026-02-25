@@ -1,8 +1,58 @@
+/**
+ * Error types and utilities for Exchange API responses.
+ * @module
+ */
+
 import { HyperliquidError } from "../../../../_base.ts";
 
-// =============================================================
+// ============================================================
+// Type Utilities
+// ============================================================
+
+// deno-lint-ignore ban-types
+type Prettify<T> = { [K in keyof T]: T[K] } & {};
+
+/** Exclude error variants from response type. */
+export type ExcludeErrorResponse<T> = T extends { status: "err" } ? never // with error status
+  : T extends { response: { data: { statuses: ReadonlyArray<infer S> } } } // with multiple statuses
+    ? Exclude<S, { error: unknown }> extends never ? never
+    : Prettify<
+      Omit<T, "response"> & {
+        response: Prettify<Omit<T["response"], "data"> & { data: { statuses: Array<Exclude<S, { error: unknown }>> } }>;
+      }
+    >
+  : T extends { response: { data: { status: infer S } } } // with single status
+    ? S extends { error: unknown } ? never
+    : Prettify<
+      Omit<T, "response"> & {
+        response: Prettify<Omit<T["response"], "data"> & { data: { status: Exclude<S, { error: unknown }> } }>;
+      }
+    >
+  : T;
+
+// ============================================================
+// Error Classes
+// ============================================================
+
+/** Thrown when Exchange API returns an error response. */
+export class ApiRequestError extends HyperliquidError {
+  readonly response: unknown;
+
+  /**
+   * @param response Raw API response that contains the error
+   */
+  constructor(response: unknown) {
+    const message = extractErrorMessage(response) ||
+      "An unknown error occurred while processing an API request. See `response` for more details.";
+    super(message);
+    this.name = "ApiRequestError";
+    this.response = response;
+  }
+}
+
+// ============================================================
 // Error Detection (Duck Typing)
-// =============================================================
+// ============================================================
 
 /** Check if value has an error property. */
 function hasError(value: unknown): value is { error: string } {
@@ -54,55 +104,19 @@ function extractErrorMessage(response: unknown): string | undefined {
   return undefined;
 }
 
-// =============================================================
-// Error Classes
-// =============================================================
-
-/** Thrown when Exchange API returns an error response. */
-export class ApiRequestError extends HyperliquidError {
-  readonly response: unknown;
-
-  constructor(response: unknown) {
-    const message = extractErrorMessage(response) ||
-      "An unknown error occurred while processing an API request. See `response` for more details.";
-    super(message);
-    this.name = "ApiRequestError";
-    this.response = response;
-  }
-}
-
-// =============================================================
+// ============================================================
 // Assertions
-// =============================================================
+// ============================================================
 
-/** Assert that response is successful, throw ApiRequestError otherwise. */
+/**
+ * Assert that response is successful, throw ApiRequestError otherwise.
+ *
+ * @param response Raw API response to validate
+ *
+ * @throws {ApiRequestError} If the response contains an error
+ */
 export function assertSuccessResponse(response: unknown): void {
   if (hasErrorStatus(response) || hasStatusesWithErrors(response) || hasSingleStatusWithError(response)) {
     throw new ApiRequestError(response);
   }
 }
-
-// =============================================================
-// Type Utilities
-// =============================================================
-
-// deno-lint-ignore ban-types
-type Prettify<T> = { [K in keyof T]: T[K] } & {};
-
-/** Exclude error variants from response type. */
-export type ExcludeErrorResponse<T> = T extends { status: "err" } ? never // with error status
-  : T extends { response: { data: { statuses: ReadonlyArray<infer S> } } } // with multiple statuses
-    ? Exclude<S, { error: unknown }> extends never ? never
-    : Prettify<
-      Omit<T, "response"> & {
-        response: Prettify<Omit<T["response"], "data"> & { data: { statuses: Array<Exclude<S, { error: unknown }>> } }>;
-      }
-    >
-  : T extends { response: { data: { status: infer S } } } // with single status
-    ? S extends { error: unknown } ? never
-    : Prettify<
-      Omit<T, "response"> & {
-        response: Prettify<Omit<T["response"], "data"> & { data: { status: Exclude<S, { error: unknown }> } }>;
-      }
-    >
-  : T;

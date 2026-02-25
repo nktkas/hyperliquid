@@ -51,8 +51,8 @@ export type ApproveBuilderFeeResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const ApproveBuilderFeeParameters = /* @__PURE__ */ (() => {
@@ -61,6 +61,7 @@ const ApproveBuilderFeeParameters = /* @__PURE__ */ (() => {
     ["type", "signatureChainId", "hyperliquidChain", "nonce"],
   );
 })();
+
 /** Action parameters for the {@linkcode approveBuilderFee} function. */
 export type ApproveBuilderFeeParameters = v.InferInput<typeof ApproveBuilderFeeParameters>;
 
@@ -83,11 +84,10 @@ export const ApproveBuilderFeeTypes = {
 /**
  * Approve a maximum fee rate for a builder.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

@@ -8,6 +8,7 @@ import { Address } from "../../_schemas.ts";
 
 /**
  * Subscription to user funding events for a specific user.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const UserFundingsRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -21,6 +22,7 @@ export type UserFundingsRequest = v.InferOutput<typeof UserFundingsRequest>;
 
 /**
  * Event of user fundings.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export type UserFundingsEvent = {
   /**
@@ -60,8 +62,8 @@ export type UserFundingsEvent = {
 // Execution Logic
 // ============================================================
 
-import type { SubscriptionConfig } from "./_types.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode userFundings} function. */
 export type UserFundingsParameters = Omit<v.InferInput<typeof UserFundingsRequest>, "type">;
@@ -69,11 +71,10 @@ export type UserFundingsParameters = Omit<v.InferInput<typeof UserFundingsReques
 /**
  * Subscribe to funding payment updates for a specific user.
  *
- * @param config - General configuration for Subscription API subscriptions.
- * @param params - Parameters specific to the API subscription.
- * @param listener - A callback function to be called when the event is received.
- *
- * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+ * @param config General configuration for Subscription API subscriptions.
+ * @param params Parameters specific to the API subscription.
+ * @param listener A callback function to be called when the event is received.
+ * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

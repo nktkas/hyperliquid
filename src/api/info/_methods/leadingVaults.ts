@@ -8,6 +8,7 @@ import { Address } from "../../_schemas.ts";
 
 /**
  * Request leading vaults for a user.
+ * @see null
  */
 export const LeadingVaultsRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -21,6 +22,7 @@ export type LeadingVaultsRequest = v.InferOutput<typeof LeadingVaultsRequest>;
 
 /**
  * Array of leading vaults for a user.
+ * @see null
  */
 export type LeadingVaultsResponse = {
   /**
@@ -44,11 +46,10 @@ export type LeadingVaultsParameters = Omit<v.InferInput<typeof LeadingVaultsRequ
 /**
  * Request leading vaults for a user.
  *
- * @param config - General configuration for Info API requests.
- * @param params - Parameters specific to the API request.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Array of leading vaults for a user.
+ * @param config General configuration for Info API requests.
+ * @param params Parameters specific to the API request.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Array of leading vaults for a user.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -65,6 +66,8 @@ export type LeadingVaultsParameters = Omit<v.InferInput<typeof LeadingVaultsRequ
  *   { user: "0x..." },
  * );
  * ```
+ *
+ * @see null
  */
 export function leadingVaults(
   config: InfoConfig,

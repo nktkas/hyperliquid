@@ -1,10 +1,8 @@
 // deno-lint-ignore-file no-import-prefix explicit-function-return-type
 
 /**
- * Lint plugin that enforces the {@link https://docs.deno.com/runtime/contributing/style_guide/ | Deno Style Guide}
- *
+ * Lint plugin that enforces the {@link https://docs.deno.com/runtime/contributing/style_guide/ | Deno Style Guide}.
  * @see https://github.com/denoland/std/blob/f70379ed733789fc08c7cedf67d7b06908faafe5/_tools/lint_plugin.ts
- *
  * @module
  */
 
@@ -31,33 +29,6 @@ const CONTRACTION_REGEXP = /\S'\S/;
 export default {
   name: "deno-style-guide",
   rules: {
-    // https://docs.deno.com/runtime/contributing/style_guide/#prefer-%23-over-private-keyword
-    "prefer-private-field": {
-      create(context) {
-        return {
-          MethodDefinition(node) {
-            if (node.accessibility !== "private") return;
-            context.report({
-              node,
-              range: node.range,
-              message: "Method uses `private` keyword",
-              hint:
-                "Use private field (`#`) instead of the `private` keyword. E.g. Use `#foo()` instead of `private foo()`.",
-            });
-          },
-          PropertyDefinition(node) {
-            if (node.accessibility !== "private") return;
-            context.report({
-              node,
-              range: node.range,
-              message: "Property uses `private` keyword",
-              hint:
-                "Use private field (`#`) instead of the `private` keyword. E.g. Use `#foo` instead of `private foo`.",
-            });
-          },
-        };
-      },
-    },
     // https://docs.deno.com/runtime/contributing/style_guide/#top-level-functions-should-not-use-arrow-syntax
     "no-top-level-arrow-syntax": {
       create(context) {

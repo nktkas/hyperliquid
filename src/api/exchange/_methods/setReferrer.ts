@@ -9,6 +9,7 @@ import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_ba
 
 /**
  * Set a referral code.
+ * @see null
  */
 export const SetReferrerRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -31,6 +32,7 @@ export type SetReferrerRequest = v.InferOutput<typeof SetReferrerRequest>;
 
 /**
  * Successful response without specific data or error response.
+ * @see null
  */
 export type SetReferrerResponse = SuccessResponse | ErrorResponse;
 
@@ -38,8 +40,8 @@ export type SetReferrerResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const SetReferrerParameters = /* @__PURE__ */ (() => {
@@ -48,6 +50,7 @@ const SetReferrerParameters = /* @__PURE__ */ (() => {
     ["type"],
   );
 })();
+
 /** Action parameters for the {@linkcode setReferrer} function. */
 export type SetReferrerParameters = v.InferInput<typeof SetReferrerParameters>;
 
@@ -60,11 +63,10 @@ export type SetReferrerSuccessResponse = ExcludeErrorResponse<SetReferrerRespons
 /**
  * Set a referral code.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -84,6 +86,8 @@ export type SetReferrerSuccessResponse = ExcludeErrorResponse<SetReferrerRespons
  *   { code: "..." },
  * );
  * ```
+ *
+ * @see null
  */
 export function setReferrer(
   config: ExchangeConfig,

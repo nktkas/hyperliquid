@@ -9,6 +9,7 @@ import type { ExplorerTransactionSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Request block details by block height.
+ * @see null
  */
 export const BlockDetailsRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -22,6 +23,7 @@ export type BlockDetailsRequest = v.InferOutput<typeof BlockDetailsRequest>;
 
 /**
  * Response containing block information.
+ * @see null
  */
 export type BlockDetailsResponse = {
   /** Type of response. */
@@ -61,11 +63,10 @@ export type BlockDetailsParameters = Omit<v.InferInput<typeof BlockDetailsReques
 /**
  * Request block details by block height.
  *
- * @param config - General configuration for Info API requests.
- * @param params - Parameters specific to the API request.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Response containing block information.
+ * @param config General configuration for Info API requests.
+ * @param params Parameters specific to the API request.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Response containing block information.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -81,6 +82,8 @@ export type BlockDetailsParameters = Omit<v.InferInput<typeof BlockDetailsReques
  *   { height: 123 },
  * );
  * ```
+ *
+ * @see null
  */
 export function blockDetails(
   config: InfoConfig,

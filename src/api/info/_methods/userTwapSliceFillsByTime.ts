@@ -9,6 +9,7 @@ import type { UserTwapSliceFillsResponse } from "./userTwapSliceFills.ts";
 
 /**
  * Request user TWAP slice fills by time.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills
  */
 export const UserTwapSliceFillsByTimeRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -27,7 +28,7 @@ export const UserTwapSliceFillsByTimeRequest = /* @__PURE__ */ (() => {
 export type UserTwapSliceFillsByTimeRequest = v.InferOutput<typeof UserTwapSliceFillsByTimeRequest>;
 
 /**
- * Array of user's twap slice fill by time.
+ * Array of user's TWAP slice fill by time.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills
  */
 export type UserTwapSliceFillsByTimeResponse = UserTwapSliceFillsResponse;
@@ -44,11 +45,10 @@ export type UserTwapSliceFillsByTimeParameters = Omit<v.InferInput<typeof UserTw
 /**
  * Request user TWAP slice fills by time.
  *
- * @param config - General configuration for Info API requests.
- * @param params - Parameters specific to the API request.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Array of user's twap slice fill by time.
+ * @param config General configuration for Info API requests.
+ * @param params Parameters specific to the API request.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Array of user's TWAP slice fill by time.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -68,6 +68,8 @@ export type UserTwapSliceFillsByTimeParameters = Omit<v.InferInput<typeof UserTw
  *   },
  * );
  * ```
+ *
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills
  */
 export function userTwapSliceFillsByTime(
   config: InfoConfig,

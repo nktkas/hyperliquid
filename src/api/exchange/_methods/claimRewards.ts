@@ -9,6 +9,7 @@ import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_ba
 
 /**
  * Claim rewards from referral program.
+ * @see null
  */
 export const ClaimRewardsRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -29,6 +30,7 @@ export type ClaimRewardsRequest = v.InferOutput<typeof ClaimRewardsRequest>;
 
 /**
  * Successful response without specific data or error response.
+ * @see null
  */
 export type ClaimRewardsResponse = SuccessResponse | ErrorResponse;
 
@@ -36,8 +38,8 @@ export type ClaimRewardsResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Request options for the {@linkcode claimRewards} function. */
 export type ClaimRewardsOptions = ExtractRequestOptions<v.InferInput<typeof ClaimRewardsRequest>>;
@@ -48,9 +50,9 @@ export type ClaimRewardsSuccessResponse = ExcludeErrorResponse<ClaimRewardsRespo
 /**
  * Claim rewards from referral program.
  *
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -67,6 +69,8 @@ export type ClaimRewardsSuccessResponse = ExcludeErrorResponse<ClaimRewardsRespo
  *
  * await claimRewards({ transport, wallet });
  * ```
+ *
+ * @see null
  */
 export function claimRewards(
   config: ExchangeConfig,

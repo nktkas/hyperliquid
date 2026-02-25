@@ -6,6 +6,7 @@ import * as v from "@valibot/valibot";
 
 /**
  * Subscription to best bid and offer events for a specific asset.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const BboRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -19,6 +20,7 @@ export type BboRequest = v.InferOutput<typeof BboRequest>;
 
 /**
  * Event of best bid and offer.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export type BboEvent = {
   /** Asset symbol (e.g., BTC). */
@@ -59,8 +61,8 @@ export type BboEvent = {
 // Execution Logic
 // ============================================================
 
-import type { SubscriptionConfig } from "./_types.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode bbo} function. */
 export type BboParameters = Omit<v.InferInput<typeof BboRequest>, "type">;
@@ -68,11 +70,10 @@ export type BboParameters = Omit<v.InferInput<typeof BboRequest>, "type">;
 /**
  * Subscribe to best bid and offer updates for a specific asset.
  *
- * @param config - General configuration for Subscription API subscriptions.
- * @param params - Parameters specific to the API subscription.
- * @param listener - A callback function to be called when the event is received.
- *
- * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+ * @param config General configuration for Subscription API subscriptions.
+ * @param params Parameters specific to the API subscription.
+ * @param listener A callback function to be called when the event is received.
+ * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

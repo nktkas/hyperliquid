@@ -9,6 +9,7 @@ import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_ba
 
 /**
  * Set the display name in the leaderboard.
+ * @see null
  */
 export const SetDisplayNameRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -34,6 +35,7 @@ export type SetDisplayNameRequest = v.InferOutput<typeof SetDisplayNameRequest>;
 
 /**
  * Successful response without specific data or error response.
+ * @see null
  */
 export type SetDisplayNameResponse = SuccessResponse | ErrorResponse;
 
@@ -41,8 +43,8 @@ export type SetDisplayNameResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const SetDisplayNameParameters = /* @__PURE__ */ (() => {
@@ -51,6 +53,7 @@ const SetDisplayNameParameters = /* @__PURE__ */ (() => {
     ["type"],
   );
 })();
+
 /** Action parameters for the {@linkcode setDisplayName} function. */
 export type SetDisplayNameParameters = v.InferInput<typeof SetDisplayNameParameters>;
 
@@ -63,11 +66,10 @@ export type SetDisplayNameSuccessResponse = ExcludeErrorResponse<SetDisplayNameR
 /**
  * Set the display name in the leaderboard.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -87,6 +89,8 @@ export type SetDisplayNameSuccessResponse = ExcludeErrorResponse<SetDisplayNameR
  *   { displayName: "..." },
  * );
  * ```
+ *
+ * @see null
  */
 export function setDisplayName(
   config: ExchangeConfig,

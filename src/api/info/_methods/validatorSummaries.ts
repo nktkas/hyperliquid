@@ -6,6 +6,7 @@ import * as v from "@valibot/valibot";
 
 /**
  * Request validator summaries.
+ * @see null
  */
 export const ValidatorSummariesRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -33,6 +34,7 @@ type ValidatorStats = {
 
 /**
  * Array of validator performance statistics.
+ * @see null
  */
 export type ValidatorSummariesResponse = {
   /**
@@ -81,10 +83,9 @@ import type { InfoConfig } from "./_base/types.ts";
 /**
  * Request validator summaries.
  *
- * @param config - General configuration for Info API requests.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Array of validator performance statistics.
+ * @param config General configuration for Info API requests.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Array of validator performance statistics.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -98,6 +99,8 @@ import type { InfoConfig } from "./_base/types.ts";
  *
  * const data = await validatorSummaries({ transport });
  * ```
+ *
+ * @see null
  */
 export function validatorSummaries(
   config: InfoConfig,

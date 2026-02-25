@@ -1,9 +1,14 @@
+/**
+ * Abstract wallet interfaces and signing utilities for EIP-712 typed data.
+ * @module
+ */
+
 import * as v from "@valibot/valibot";
 import { HyperliquidError } from "../_base.ts";
 
-// =============================================================
+// ============================================================
 // Common Types
-// =============================================================
+// ============================================================
 
 /** Common domain type for EIP-712 typed data signing. */
 interface TypedDataDomain {
@@ -18,11 +23,11 @@ interface TypedDataTypes {
   [key: string]: { name: string; type: string }[];
 }
 
-// =============================================================
+// ============================================================
 // Ethers V6
-// =============================================================
+// ============================================================
 
-/** Abstract interface for an {@link https://docs.ethers.org/v6/api/providers/#Signer | ethers.js v6} */
+/** Abstract interface for an {@link https://docs.ethers.org/v6/api/providers/#Signer | ethers.js v6}. */
 export interface AbstractEthersV6Signer {
   signTypedData(
     domain: TypedDataDomain,
@@ -46,11 +51,11 @@ const AbstractEthersV6SignerSchema = /* @__PURE__ */ (() => {
   });
 })();
 
-// =============================================================
+// ============================================================
 // Ethers V5
-// =============================================================
+// ============================================================
 
-/** Abstract interface for an {@link https://docs.ethers.org/v5/api/signer/ | ethers.js v5} */
+/** Abstract interface for an {@link https://docs.ethers.org/v5/api/signer/ | ethers.js v5}. */
 export interface AbstractEthersV5Signer {
   _signTypedData(
     domain: TypedDataDomain,
@@ -74,9 +79,9 @@ const AbstractEthersV5SignerSchema = /* @__PURE__ */ (() => {
   });
 })();
 
-// =============================================================
+// ============================================================
 // Viem
-// =============================================================
+// ============================================================
 
 /** Viem-style typed data parameters. */
 interface ViemTypedDataParams {
@@ -125,9 +130,9 @@ const AbstractViemLocalAccountSchema = /* @__PURE__ */ (() => {
   });
 })();
 
-// =============================================================
+// ============================================================
 // Abstract Signer
-// =============================================================
+// ============================================================
 
 /** Abstract interface for a wallet that can sign typed data. */
 export type AbstractWallet =
@@ -138,11 +143,11 @@ export type AbstractWallet =
 
 /** ECDSA signature components. */
 export interface Signature {
-  /** First 32-byte component of ECDSA signature */
+  /** First 32-byte component of ECDSA signature. */
   r: `0x${string}`;
-  /** Second 32-byte component of ECDSA signature */
+  /** Second 32-byte component of ECDSA signature. */
   s: `0x${string}`;
-  /** Recovery identifier */
+  /** Recovery identifier. */
   v: 27 | 28;
 }
 
@@ -154,6 +159,14 @@ export class AbstractWalletError extends HyperliquidError {
   }
 }
 
+/**
+ * Signs EIP-712 typed data using the provided wallet.
+ *
+ * @param args The wallet, domain, types, primary type, and message to sign
+ * @return The ECDSA signature components
+ *
+ * @throws {AbstractWalletError} If the wallet type is unknown or signing fails
+ */
 export async function signTypedData(args: {
   wallet: AbstractWallet;
   domain: TypedDataDomain;
@@ -207,11 +220,18 @@ function splitSignature(signature: `0x${string}`): Signature {
   return { r, s, v };
 }
 
-// =============================================================
+// ============================================================
 // Helpers
-// =============================================================
+// ============================================================
 
-/** Get the chain ID of the wallet. */
+/**
+ * Gets the chain ID of the wallet.
+ *
+ * @param wallet The wallet to query
+ * @return The chain ID as a hex string
+ *
+ * @throws {AbstractWalletError} If getting the chain ID fails
+ */
 export async function getWalletChainId(wallet: AbstractWallet): Promise<`0x${string}`> {
   try {
     // Viem JSON-RPC account has getChainId method
@@ -234,7 +254,14 @@ export async function getWalletChainId(wallet: AbstractWallet): Promise<`0x${str
   return "0x1";
 }
 
-/** Get the lowercase wallet address from various wallet types. */
+/**
+ * Gets the lowercase wallet address from various wallet types.
+ *
+ * @param wallet The wallet to query
+ * @return The lowercase wallet address as a hex string
+ *
+ * @throws {AbstractWalletError} If getting the address fails or wallet type is unknown
+ */
 export async function getWalletAddress(wallet: AbstractWallet): Promise<`0x${string}`> {
   try {
     // Viem JSON-RPC account uses getAddresses()

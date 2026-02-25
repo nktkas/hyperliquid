@@ -8,6 +8,7 @@ import { Address } from "../../_schemas.ts";
 
 /**
  * Request legal verification status of a user.
+ * @see null
  */
 export const LegalCheckRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -21,6 +22,7 @@ export type LegalCheckRequest = v.InferOutput<typeof LegalCheckRequest>;
 
 /**
  * Legal verification status for a user.
+ * @see null
  */
 export type LegalCheckResponse = {
   /** Whether the user IP address is allowed. */
@@ -43,11 +45,10 @@ export type LegalCheckParameters = Omit<v.InferInput<typeof LegalCheckRequest>, 
 /**
  * Request legal verification status of a user.
  *
- * @param config - General configuration for Info API requests.
- * @param params - Parameters specific to the API request.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Legal verification status for a user.
+ * @param config General configuration for Info API requests.
+ * @param params Parameters specific to the API request.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Legal verification status for a user.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -64,6 +65,8 @@ export type LegalCheckParameters = Omit<v.InferInput<typeof LegalCheckRequest>, 
  *   { user: "0x..." },
  * );
  * ```
+ *
+ * @see null
  */
 export function legalCheck(
   config: InfoConfig,

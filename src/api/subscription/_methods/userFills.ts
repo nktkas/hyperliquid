@@ -9,6 +9,7 @@ import type { UserFillsResponse } from "../../info/_methods/userFills.ts";
 
 /**
  * Subscription to user fill events for a specific user.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const UserFillsRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -23,7 +24,8 @@ export const UserFillsRequest = /* @__PURE__ */ (() => {
 export type UserFillsRequest = v.InferOutput<typeof UserFillsRequest>;
 
 /**
- * vent of user trade fill.
+ * Event of user trade fill.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export type UserFillsEvent = {
   /**
@@ -41,8 +43,8 @@ export type UserFillsEvent = {
 // Execution Logic
 // ============================================================
 
-import type { SubscriptionConfig } from "./_types.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode userFills} function. */
 export type UserFillsParameters = Omit<v.InferInput<typeof UserFillsRequest>, "type">;
@@ -50,11 +52,10 @@ export type UserFillsParameters = Omit<v.InferInput<typeof UserFillsRequest>, "t
 /**
  * Subscribe to trade fill updates for a specific user.
  *
- * @param config - General configuration for Subscription API subscriptions.
- * @param params - Parameters specific to the API subscription.
- * @param listener - A callback function to be called when the event is received.
- *
- * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+ * @param config General configuration for Subscription API subscriptions.
+ * @param params Parameters specific to the API subscription.
+ * @param listener A callback function to be called when the event is received.
+ * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

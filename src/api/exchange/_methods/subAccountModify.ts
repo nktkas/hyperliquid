@@ -9,6 +9,7 @@ import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_ba
 
 /**
  * Modify a sub-account.
+ * @see null
  */
 export const SubAccountModifyRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -33,6 +34,7 @@ export type SubAccountModifyRequest = v.InferOutput<typeof SubAccountModifyReque
 
 /**
  * Successful response without specific data or error response.
+ * @see null
  */
 export type SubAccountModifyResponse = SuccessResponse | ErrorResponse;
 
@@ -40,8 +42,8 @@ export type SubAccountModifyResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const SubAccountModifyParameters = /* @__PURE__ */ (() => {
@@ -50,6 +52,7 @@ const SubAccountModifyParameters = /* @__PURE__ */ (() => {
     ["type"],
   );
 })();
+
 /** Action parameters for the {@linkcode subAccountModify} function. */
 export type SubAccountModifyParameters = v.InferInput<typeof SubAccountModifyParameters>;
 
@@ -62,11 +65,10 @@ export type SubAccountModifySuccessResponse = ExcludeErrorResponse<SubAccountMod
 /**
  * Modify a sub-account.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -86,6 +88,8 @@ export type SubAccountModifySuccessResponse = ExcludeErrorResponse<SubAccountMod
  *   { subAccountUser: "0x...", name: "..."  },
  * );
  * ```
+ *
+ * @see null
  */
 export function subAccountModify(
   config: ExchangeConfig,

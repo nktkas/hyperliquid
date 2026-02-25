@@ -1,10 +1,10 @@
+import { ApiRequestError } from "@nktkas/hyperliquid";
+import { type VaultModifyParameters, VaultModifyRequest } from "@nktkas/hyperliquid/api/exchange";
 import * as v from "@valibot/valibot";
 import { assertRejects } from "jsr:@std/assert@1";
-import { type VaultModifyParameters, VaultModifyRequest } from "@nktkas/hyperliquid/api/exchange";
-import { runTest } from "./_t.ts";
-import { ApiRequestError } from "@nktkas/hyperliquid";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
+import { runTest } from "./_t.ts";
 
 const paramsSchema = valibotToJsonSchema(v.omit(v.object(VaultModifyRequest.entries.action.entries), ["type"]));
 

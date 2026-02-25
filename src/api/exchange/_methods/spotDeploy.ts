@@ -139,8 +139,8 @@ export type SpotDeployResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const SpotDeployParameters = /* @__PURE__ */ (() => {
@@ -148,6 +148,7 @@ const SpotDeployParameters = /* @__PURE__ */ (() => {
     SpotDeployRequest.entries.action.options.map((option) => v.omit(option, ["type"])),
   );
 })();
+
 /** Action parameters for the {@linkcode spotDeploy} function. */
 export type SpotDeployParameters = v.InferInput<typeof SpotDeployParameters>;
 
@@ -160,11 +161,10 @@ export type SpotDeploySuccessResponse = ExcludeErrorResponse<SpotDeployResponse>
 /**
  * Deploying HIP-1 and HIP-2 assets.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

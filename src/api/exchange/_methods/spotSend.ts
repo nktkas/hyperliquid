@@ -53,8 +53,8 @@ export type SpotSendResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const SpotSendParameters = /* @__PURE__ */ (() => {
@@ -63,6 +63,7 @@ const SpotSendParameters = /* @__PURE__ */ (() => {
     ["type", "signatureChainId", "hyperliquidChain", "time"],
   );
 })();
+
 /** Action parameters for the {@linkcode spotSend} function. */
 export type SpotSendParameters = v.InferInput<typeof SpotSendParameters>;
 
@@ -86,11 +87,10 @@ export const SpotSendTypes = {
 /**
  * Send spot assets to another address.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

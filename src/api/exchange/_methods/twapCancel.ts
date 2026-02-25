@@ -60,8 +60,8 @@ export type TwapCancelResponse = {
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const TwapCancelParameters = /* @__PURE__ */ (() => {
@@ -70,6 +70,7 @@ const TwapCancelParameters = /* @__PURE__ */ (() => {
     ["type"],
   );
 })();
+
 /** Action parameters for the {@linkcode twapCancel} function. */
 export type TwapCancelParameters = v.InferInput<typeof TwapCancelParameters>;
 
@@ -82,11 +83,10 @@ export type TwapCancelSuccessResponse = ExcludeErrorResponse<TwapCancelResponse>
 /**
  * Cancel a TWAP order.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful variant of {@link TwapCancelResponse} without error status.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful variant of {@link TwapCancelResponse} without error status.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

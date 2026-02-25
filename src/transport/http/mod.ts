@@ -19,6 +19,45 @@
 import { type IRequestTransport, TransportError } from "../_base.ts";
 import { AbortSignal_ } from "../_polyfills.ts";
 
+/** Configuration options for the HTTP transport layer. */
+export interface HttpTransportOptions {
+  /**
+   * Indicates this transport uses testnet endpoint.
+   *
+   * Default: false
+   */
+  isTestnet?: boolean;
+  /**
+   * Request timeout in ms. Set to `null` to disable.
+   *
+   * Default: `10_000`
+   */
+  timeout?: number | null;
+  /**
+   * Custom API URL for requests.
+   *
+   * Default: `https://api.hyperliquid.xyz` for mainnet, `https://api.hyperliquid-testnet.xyz` for testnet.
+   */
+  apiUrl?: string | URL;
+  /**
+   * Custom RPC URL for explorer requests.
+   *
+   * Default: `https://rpc.hyperliquid.xyz` for mainnet, `https://rpc.hyperliquid-testnet.xyz` for testnet.
+   */
+  rpcUrl?: string | URL;
+  /** A custom {@link https://developer.mozilla.org/en-US/docs/Web/API/RequestInit | RequestInit} that is merged with a fetch request. */
+  fetchOptions?: Omit<RequestInit, "body" | "method">;
+}
+
+/** Mainnet API URL. */
+export const MAINNET_API_URL = "https://api.hyperliquid.xyz";
+/** Testnet API URL. */
+export const TESTNET_API_URL = "https://api.hyperliquid-testnet.xyz";
+/** Mainnet RPC URL. */
+export const MAINNET_RPC_URL = "https://rpc.hyperliquid.xyz";
+/** Testnet RPC URL. */
+export const TESTNET_RPC_URL = "https://rpc.hyperliquid-testnet.xyz";
+
 /** Error thrown when an HTTP request fails. */
 export class HttpRequestError extends TransportError {
   /** The HTTP response that caused the error. */
@@ -29,10 +68,10 @@ export class HttpRequestError extends TransportError {
   /**
    * Creates a new HTTP request error.
    *
-   * @param args - The error arguments.
-   * @param args.response - The HTTP response that caused the error.
-   * @param args.body - The response body text.
-   * @param options - The error options.
+   * @param args The error arguments.
+   * @param args.response The HTTP response that caused the error.
+   * @param args.body The response body text.
+   * @param options The error options.
    */
   constructor(args?: { response?: Response; body?: string }, options?: ErrorOptions) {
     const { response, body } = args ?? {};
@@ -51,41 +90,6 @@ export class HttpRequestError extends TransportError {
     this.body = body;
   }
 }
-
-/** Configuration options for the HTTP transport layer. */
-export interface HttpTransportOptions {
-  /**
-   * Indicates this transport uses testnet endpoint.
-   * @default false
-   */
-  isTestnet?: boolean;
-  /**
-   * Request timeout in ms. Set to `null` to disable.
-   * @default 10_000
-   */
-  timeout?: number | null;
-  /**
-   * Custom API URL for requests.
-   * @default `https://api.hyperliquid.xyz` for mainnet, `https://api.hyperliquid-testnet.xyz` for testnet.
-   */
-  apiUrl?: string | URL;
-  /**
-   * Custom RPC URL for explorer requests.
-   * @default `https://rpc.hyperliquid.xyz` for mainnet, `https://rpc.hyperliquid-testnet.xyz` for testnet.
-   */
-  rpcUrl?: string | URL;
-  /** A custom {@link https://developer.mozilla.org/en-US/docs/Web/API/RequestInit | RequestInit} that is merged with a fetch request. */
-  fetchOptions?: Omit<RequestInit, "body" | "method">;
-}
-
-/** Mainnet API URL. */
-export const MAINNET_API_URL = "https://api.hyperliquid.xyz";
-/** Testnet API URL. */
-export const TESTNET_API_URL = "https://api.hyperliquid-testnet.xyz";
-/** Mainnet RPC URL. */
-export const MAINNET_RPC_URL = "https://rpc.hyperliquid.xyz";
-/** Testnet RPC URL. */
-export const TESTNET_RPC_URL = "https://rpc.hyperliquid-testnet.xyz";
 
 /**
  * HTTP transport for Hyperliquid API.
@@ -108,7 +112,7 @@ export class HttpTransport implements IRequestTransport {
   /**
    * Creates a new HTTP transport instance.
    *
-   * @param options - Configuration options for the HTTP transport layer.
+   * @param options Configuration options for the HTTP transport layer.
    */
   constructor(options?: HttpTransportOptions) {
     this.isTestnet = options?.isTestnet ?? false;
@@ -121,11 +125,10 @@ export class HttpTransport implements IRequestTransport {
   /**
    * Sends a request to the Hyperliquid API via {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API | fetch}.
    *
-   * @param endpoint - The API endpoint to send the request to.
-   * @param payload - The payload to send with the request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns A promise that resolves with parsed JSON response body.
+   * @param endpoint The API endpoint to send the request to.
+   * @param payload The payload to send with the request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return A promise that resolves with parsed JSON response body.
    *
    * @throws {HttpRequestError} Thrown when the HTTP request fails.
    */

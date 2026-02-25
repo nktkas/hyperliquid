@@ -1,8 +1,7 @@
 // deno-lint-ignore-file no-irregular-whitespace explicit-function-return-type
 
 /**
- * Lint plugin for {@link https://valibot.dev/ | Valibot} schemas enforcing project-specific conventions
- *
+ * Lint plugin for {@link https://valibot.dev/ | Valibot} schemas enforcing project-specific conventions.
  * @module
  */
 

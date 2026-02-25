@@ -9,6 +9,7 @@ import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_ba
 
 /**
  * Action related to validator management.
+ * @see null
  */
 export const CValidatorActionRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -88,6 +89,7 @@ export type CValidatorActionRequest = v.InferOutput<typeof CValidatorActionReque
 
 /**
  * Successful response without specific data or error response.
+ * @see null
  */
 export type CValidatorActionResponse = SuccessResponse | ErrorResponse;
 
@@ -95,8 +97,8 @@ export type CValidatorActionResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const CValidatorActionParameters = /* @__PURE__ */ (() => {
@@ -104,6 +106,7 @@ const CValidatorActionParameters = /* @__PURE__ */ (() => {
     CValidatorActionRequest.entries.action.options.map((option) => v.omit(option, ["type"])),
   );
 })();
+
 /** Action parameters for the {@linkcode cValidatorAction} function. */
 export type CValidatorActionParameters = v.InferInput<typeof CValidatorActionParameters>;
 
@@ -116,11 +119,10 @@ export type CValidatorActionSuccessResponse = ExcludeErrorResponse<CValidatorAct
 /**
  * Action related to validator management.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -150,6 +152,8 @@ export type CValidatorActionSuccessResponse = ExcludeErrorResponse<CValidatorAct
  *   },
  * );
  * ```
+ *
+ * @see null
  */
 export function cValidatorAction(
   config: ExchangeConfig,

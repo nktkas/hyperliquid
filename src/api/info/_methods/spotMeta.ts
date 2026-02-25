@@ -68,7 +68,7 @@ export type SpotMetaResponse = {
     deployerTradingFeeShare: string;
   }[];
   /** Outcome markets available for spot trading. */
-  outcomes: {
+  outcomes?: {
     /** Unique identifier of the outcome market. */
     outcome: number;
     /** Short name of the outcome market. */
@@ -84,7 +84,7 @@ export type SpotMetaResponse = {
     }[];
   }[];
   /** Questions for prediction markets. */
-  questions: {
+  questions?: {
     /** Unique identifier of the question. */
     question: number;
     /** Short name of the question. */
@@ -107,10 +107,9 @@ import type { InfoConfig } from "./_base/types.ts";
 /**
  * Request spot trading metadata.
  *
- * @param config - General configuration for Info API requests.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Metadata for spot assets.
+ * @param config General configuration for Info API requests.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Metadata for spot assets.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

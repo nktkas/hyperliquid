@@ -1,8 +1,13 @@
+/**
+ * Client for the Hyperliquid Info API endpoint.
+ * @module
+ */
+
 import type { InfoConfig } from "./_methods/_base/types.ts";
 
-// =============================================================
+// ============================================================
 // Methods Imports
-// =============================================================
+// ============================================================
 
 import {
   activeAssetData,
@@ -182,9 +187,9 @@ import { vaultDetails, type VaultDetailsParameters, type VaultDetailsResponse } 
 import { vaultSummaries, type VaultSummariesResponse } from "./_methods/vaultSummaries.ts";
 import { webData2, type WebData2Parameters, type WebData2Response } from "./_methods/webData2.ts";
 
-// =============================================================
+// ============================================================
 // Client
-// =============================================================
+// ============================================================
 
 /**
  * Read-only access to market data, user state, and other public information.
@@ -197,7 +202,7 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Creates an instance of the InfoClient.
    *
-   * @param config - Configuration for Info API requests. See {@link InfoConfig}.
+   * @param config Configuration for Info API requests. See {@link InfoConfig}.
    *
    * @example
    * ```ts
@@ -215,10 +220,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request user active asset data.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns User active asset data.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return User active asset data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -245,10 +249,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request supply, rate, and pending payment information for an aligned quote token.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Supply, rate, and pending payment information for an aligned quote token.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Supply, rate, and pending payment information for an aligned quote token.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -262,6 +265,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.alignedQuoteTokenInfo({ token: 1328 });
    * ```
+   *
+   * @see null
    */
   alignedQuoteTokenInfo(
     params: AlignedQuoteTokenInfoParameters,
@@ -273,9 +278,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request all borrow/lend reserve states.
    *
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of tuples of reserve IDs and their borrow/lend reserve state.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of tuples of reserve IDs and their borrow/lend reserve state.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -301,10 +305,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request mid coin prices.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Mapping of coin symbols to mid prices.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Mapping of coin symbols to mid prices.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -340,9 +343,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request trading metadata for all DEXes.
    *
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Metadata for perpetual assets across all DEXes.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Metadata for perpetual assets across all DEXes.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -356,6 +358,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.allPerpMetas();
    * ```
+   *
+   * @see null
    */
   allPerpMetas(
     signal?: AbortSignal,
@@ -366,10 +370,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request block details by block height.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Response containing block information.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Response containing block information.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -383,6 +386,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.blockDetails({ height: 123 });
    * ```
+   *
+   * @see null
    */
   blockDetails(
     params: BlockDetailsParameters,
@@ -394,10 +399,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request borrow/lend reserve state.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Borrow/lend reserve state.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Borrow/lend reserve state.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -424,10 +428,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request borrow/lend user state.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns User's borrow/lend state.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return User's borrow/lend state.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -454,10 +457,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request candlestick snapshots.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of candlestick data points.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of candlestick data points.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -488,10 +490,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request clearinghouse state.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Account summary for perpetual trading.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Account summary for perpetual trading.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -518,10 +519,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request user staking delegations.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of user's delegations to validators.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of user's delegations to validators.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -548,10 +548,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request user staking history.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of records of staking events by a delegator.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of records of staking events by a delegator.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -578,10 +577,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request user staking rewards.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of rewards received from staking activities.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of rewards received from staking activities.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -608,10 +606,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request user's staking summary.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns User's staking summary.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return User's staking summary.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -638,9 +635,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request exchange system status information.
    *
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Exchange system status information.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Exchange system status information.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -654,6 +650,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.exchangeStatus();
    * ```
+   *
+   * @see null
    */
   exchangeStatus(
     signal?: AbortSignal,
@@ -664,10 +662,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request user extra agents.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of extra agent details for a user.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of extra agent details for a user.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -681,6 +678,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.extraAgents({ user: "0x..." });
    * ```
+   *
+   * @see null
    */
   extraAgents(
     params: ExtraAgentsParameters,
@@ -692,10 +691,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request frontend open orders.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of open orders with additional display information.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of open orders with additional display information.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -722,10 +720,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request funding history.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of historical funding rate records for an asset.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of historical funding rate records for an asset.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -755,9 +752,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request gossip root IPs.
    *
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of gossip root IPs.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of gossip root IPs.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -771,6 +767,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.gossipRootIps();
    * ```
+   *
+   * @see null
    */
   gossipRootIps(
     signal?: AbortSignal,
@@ -781,10 +779,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request user historical orders.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of frontend orders with current processing status.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of frontend orders with current processing status.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -811,10 +808,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request to check if a user is a VIP.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Boolean indicating user's VIP status.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Boolean indicating user's VIP status.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -828,6 +824,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.isVip({ user: "0x..." });
    * ```
+   *
+   * @see null
    */
   isVip(
     params: IsVipParameters,
@@ -839,10 +837,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request L2 order book.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns L2 order book snapshot.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return L2 order book snapshot.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -869,10 +866,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request leading vaults for a user.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of leading vaults for a user.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of leading vaults for a user.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -886,6 +882,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.leadingVaults({ user: "0x..." });
    * ```
+   *
+   * @see null
    */
   leadingVaults(
     params: LeadingVaultsParameters,
@@ -897,10 +895,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request legal verification status of a user.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Legal verification status for a user.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Legal verification status for a user.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -914,6 +911,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.legalCheck({ user: "0x..." });
    * ```
+   *
+   * @see null
    */
   legalCheck(
     params: LegalCheckParameters,
@@ -925,9 +924,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request liquidatable.
    *
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns unknown
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Unknown array.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -941,6 +939,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.liquidatable();
    * ```
+   *
+   * @see null
    */
   liquidatable(
     signal?: AbortSignal,
@@ -951,10 +951,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request margin table data.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Margin requirements table with multiple tiers.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Margin requirements table with multiple tiers.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -968,6 +967,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.marginTable({ id: 1 });
    * ```
+   *
+   * @see null
    */
   marginTable(
     params: MarginTableParameters,
@@ -979,10 +980,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request builder fee approval.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Maximum builder fee approval.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Maximum builder fee approval.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1009,9 +1009,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request maximum market order notionals.
    *
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Maximum market order notionals.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Maximum market order notionals.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1025,6 +1024,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.maxMarketOrderNtls();
    * ```
+   *
+   * @see null
    */
   maxMarketOrderNtls(
     signal?: AbortSignal,
@@ -1035,10 +1036,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request trading metadata.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Metadata for perpetual assets.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Metadata for perpetual assets.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1074,9 +1074,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request metadata and asset contexts.
    *
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Metadata and context for perpetual assets.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Metadata and context for perpetual assets.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1112,10 +1112,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request open orders.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of open orders.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of open orders.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1142,10 +1141,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request order status.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Order status response.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Order status response.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1172,9 +1170,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request for the status of the perpetual deploy auction.
    *
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Status of the perpetual deploy auction.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Status of the perpetual deploy auction.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1200,10 +1197,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request builder deployed perpetual market limits.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Builder deployed perpetual market limits.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Builder deployed perpetual market limits.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1230,9 +1226,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request all perpetual dexs.
    *
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of perpetual dexes (null is main dex).
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of perpetual dexes (null is main dex).
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1258,10 +1253,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request perp DEX status.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - An {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} can be used to cancel the request.
-   *
-   * @returns Status of a perp DEX.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Status of a perp DEX.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1288,10 +1282,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request perpetuals at open interest cap.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of perpetuals at open interest caps.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of perpetuals at open interest caps.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1327,10 +1320,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request user portfolio.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Portfolio metrics grouped by time periods.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Portfolio metrics grouped by time periods.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1357,9 +1349,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request predicted funding rates.
    *
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of predicted funding rates.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of predicted funding rates.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1385,10 +1376,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request user existence check before transfer.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Pre-transfer user existence check result.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Pre-transfer user existence check result.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1402,6 +1392,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.preTransferCheck({ user: "0x...", source: "0x..." });
    * ```
+   *
+   * @see null
    */
   preTransferCheck(
     params: PreTransferCheckParameters,
@@ -1413,10 +1405,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request recent trades.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of recent trades.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of recent trades.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1430,6 +1421,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.recentTrades({ coin: "ETH" });
    * ```
+   *
+   * @see null
    */
   recentTrades(
     params: RecentTradesParameters,
@@ -1441,10 +1434,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request user referral.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Referral details for a user.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Referral details for a user.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1471,10 +1463,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request spot clearinghouse state.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Account summary for spot trading.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Account summary for spot trading.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1501,10 +1492,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request spot deploy state.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Deploy state for spot tokens.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Deploy state for spot tokens.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1531,9 +1521,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request spot trading metadata.
    *
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Metadata for spot assets.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Metadata for spot assets.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1559,9 +1548,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request spot metadata and asset contexts.
    *
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Metadata and context for spot assets.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Metadata and context for spot assets.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1587,9 +1575,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request for the status of the spot deploy auction.
    *
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Status of the spot deploy auction.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Status of the spot deploy auction.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1615,10 +1602,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request user sub-accounts.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of user sub-account or null if the user does not have any sub-accounts.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of user sub-account or null if the user does not have any sub-accounts.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1645,10 +1631,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request user sub-accounts V2.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of user sub-account or null if the user does not have any sub-accounts.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of user sub-account or null if the user does not have any sub-accounts.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1662,6 +1647,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.subAccounts2({ user: "0x..." });
    * ```
+   *
+   * @see null
    */
   subAccounts2(
     params: SubAccounts2Parameters,
@@ -1673,10 +1660,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request token details.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Details of a token.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Details of a token.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1701,12 +1687,11 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   }
 
   /**
-   * Request twap history of a user.
+   * Request TWAP history of a user.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of user's TWAP history.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of user's TWAP history.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1720,6 +1705,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.twapHistory({ user: "0x..." });
    * ```
+   *
+   * @see null
    */
   twapHistory(
     params: TwapHistoryParameters,
@@ -1731,10 +1718,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request transaction details by transaction hash.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Transaction details.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Transaction details.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1748,6 +1734,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.txDetails({ hash: "0x..." });
    * ```
+   *
+   * @see null
    */
   txDetails(
     params: TxDetailsParameters,
@@ -1759,10 +1747,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request borrow/lend user interest.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns User's borrow/lend interest.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return User's borrow/lend interest.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1792,10 +1779,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request array of user transaction details.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of user transaction details.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of user transaction details.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1809,6 +1795,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.userDetails({ user: "0x..." });
    * ```
+   *
+   * @see null
    */
   userDetails(
     params: UserDetailsParameters,
@@ -1820,10 +1808,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request user HIP-3 DEX abstraction state.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns User HIP-3 DEX abstraction state.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return User HIP-3 DEX abstraction state.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1850,10 +1837,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request user fees.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns User fees.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return User fees.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1880,10 +1866,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request array of user fills.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of user trade fills.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of user trade fills.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1910,10 +1895,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request array of user fills by time.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of user trade fills by time.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of user trade fills by time.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1943,10 +1927,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request array of user funding ledger updates.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of user funding ledger updates.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of user funding ledger updates.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1973,10 +1956,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request user non-funding ledger updates.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of user's non-funding ledger update.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of user's non-funding ledger update.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -2003,10 +1985,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request user rate limits.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns User rate limits.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return User rate limits.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -2033,10 +2014,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request user role.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns User role.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return User role.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -2063,10 +2043,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request multi-sig signers for a user.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Multi-sig signers for a user or null if the user does not have any multi-sig signers.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Multi-sig signers for a user or null if the user does not have any multi-sig signers.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -2080,6 +2059,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.userToMultiSigSigners({ user: "0x..." });
    * ```
+   *
+   * @see null
    */
   userToMultiSigSigners(
     params: UserToMultiSigSignersParameters,
@@ -2091,10 +2072,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request user TWAP slice fills.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of user's twap slice fills.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of user's TWAP slice fills.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -2121,10 +2101,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request user TWAP slice fills by time.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of user's twap slice fill by time.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of user's TWAP slice fill by time.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -2141,6 +2120,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *   startTime: Date.now() - 1000 * 60 * 60 * 24,
    * });
    * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills
    */
   userTwapSliceFillsByTime(
     params: UserTwapSliceFillsByTimeParameters,
@@ -2152,10 +2133,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request user vault deposits.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of user's vault deposits.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of user's vault deposits.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -2182,9 +2162,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request validator L1 votes.
    *
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of L1 governance votes cast by validators.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of L1 governance votes cast by validators.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -2198,6 +2177,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.validatorL1Votes();
    * ```
+   *
+   * @see null
    */
   validatorL1Votes(
     signal?: AbortSignal,
@@ -2208,9 +2189,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request validator summaries.
    *
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of validator performance statistics.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of validator performance statistics.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -2224,6 +2204,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.validatorSummaries();
    * ```
+   *
+   * @see null
    */
   validatorSummaries(
     signal?: AbortSignal,
@@ -2234,10 +2216,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request details of a vault.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Details of a vault or null if the vault does not exist.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Details of a vault or null if the vault does not exist.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -2264,9 +2245,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request a list of vaults less than 2 hours old.
    *
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Array of vaults less than 2 hours old.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of vaults less than 2 hours old.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -2280,6 +2260,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.vaultSummaries();
    * ```
+   *
+   * @see null
    */
   vaultSummaries(
     signal?: AbortSignal,
@@ -2290,10 +2272,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   /**
    * Request comprehensive user and market data.
    *
-   * @param params - Parameters specific to the API request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns Comprehensive user and market data.
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Comprehensive user and market data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -2307,6 +2288,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * const data = await client.webData2({ user: "0x..." });
    * ```
+   *
+   * @see null
    */
   webData2(
     params: WebData2Parameters,
@@ -2316,9 +2299,9 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   }
 }
 
-// =============================================================
+// ============================================================
 // Type Re-exports
-// =============================================================
+// ============================================================
 
 export type { InfoConfig } from "./_methods/_base/types.ts";
 

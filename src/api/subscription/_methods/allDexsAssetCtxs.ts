@@ -8,6 +8,7 @@ import type { PerpAssetCtxSchema } from "../../info/_methods/_base/commonSchemas
 
 /**
  * Subscription to asset context events for all DEXs.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const AllDexsAssetCtxsRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -19,6 +20,7 @@ export type AllDexsAssetCtxsRequest = v.InferOutput<typeof AllDexsAssetCtxsReque
 
 /**
  * Event of asset contexts for all DEXs.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export type AllDexsAssetCtxsEvent = {
   /** Array of tuples of dex names and contexts for each perpetual asset. */
@@ -29,16 +31,15 @@ export type AllDexsAssetCtxsEvent = {
 // Execution Logic
 // ============================================================
 
-import type { SubscriptionConfig } from "./_types.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_types.ts";
 
 /**
  * Subscribe to asset contexts for all DEXs.
  *
- * @param config - General configuration for Subscription API subscriptions.
- * @param listener - A callback function to be called when the event is received.
- *
- * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+ * @param config General configuration for Subscription API subscriptions.
+ * @param listener A callback function to be called when the event is received.
+ * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

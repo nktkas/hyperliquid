@@ -22,7 +22,7 @@ export const UserTwapSliceFillsRequest = /* @__PURE__ */ (() => {
 export type UserTwapSliceFillsRequest = v.InferOutput<typeof UserTwapSliceFillsRequest>;
 
 /**
- * Array of user's twap slice fills.
+ * Array of user's TWAP slice fills.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills
  */
 export type UserTwapSliceFillsResponse = {
@@ -44,11 +44,10 @@ export type UserTwapSliceFillsParameters = Omit<v.InferInput<typeof UserTwapSlic
 /**
  * Request user TWAP slice fills.
  *
- * @param config - General configuration for Info API requests.
- * @param params - Parameters specific to the API request.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Array of user's twap slice fills.
+ * @param config General configuration for Info API requests.
+ * @param params Parameters specific to the API request.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Array of user's TWAP slice fills.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

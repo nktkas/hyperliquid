@@ -9,6 +9,7 @@ import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_ba
 
 /**
  * Transfer between sub-accounts (perpetual).
+ * @see null
  */
 export const SubAccountTransferRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -35,6 +36,7 @@ export type SubAccountTransferRequest = v.InferOutput<typeof SubAccountTransferR
 
 /**
  * Successful response without specific data or error response.
+ * @see null
  */
 export type SubAccountTransferResponse = SuccessResponse | ErrorResponse;
 
@@ -42,8 +44,8 @@ export type SubAccountTransferResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const SubAccountTransferParameters = /* @__PURE__ */ (() => {
@@ -52,6 +54,7 @@ const SubAccountTransferParameters = /* @__PURE__ */ (() => {
     ["type"],
   );
 })();
+
 /** Action parameters for the {@linkcode subAccountTransfer} function. */
 export type SubAccountTransferParameters = v.InferInput<typeof SubAccountTransferParameters>;
 
@@ -64,11 +67,10 @@ export type SubAccountTransferSuccessResponse = ExcludeErrorResponse<SubAccountT
 /**
  * Transfer between sub-accounts (perpetual).
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -88,6 +90,8 @@ export type SubAccountTransferSuccessResponse = ExcludeErrorResponse<SubAccountT
  *   { subAccountUser: "0x...", isDeposit: true, usd: 1 * 1e6 },
  * );
  * ```
+ *
+ * @see null
  */
 export function subAccountTransfer(
   config: ExchangeConfig,

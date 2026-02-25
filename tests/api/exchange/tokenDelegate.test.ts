@@ -1,9 +1,9 @@
-import * as v from "@valibot/valibot";
 import { type TokenDelegateParameters, TokenDelegateRequest } from "@nktkas/hyperliquid/api/exchange";
-import { runTest, topUpSpot } from "./_t.ts";
+import * as v from "@valibot/valibot";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
 import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
+import { runTest, topUpSpot } from "./_t.ts";
 
 const sourceFile = new URL("../../../src/api/exchange/_methods/tokenDelegate.ts", import.meta.url).pathname;
 const responseSchema = typeToJsonSchema(sourceFile, "TokenDelegateSuccessResponse");
@@ -19,12 +19,12 @@ const paramsSchema = valibotToJsonSchema(
 runTest({
   name: "tokenDelegate",
   codeTestFn: async (_t, exchClient) => {
-    // ========== Prepare ==========
+    // --- Prepare ---------------------------------------------------
 
     await topUpSpot(exchClient, "HYPE", "0.00000001");
     await exchClient.cDeposit({ wei: 1 });
 
-    // ========== Test ==========
+    // --- Test ------------------------------------------------------
 
     const params: TokenDelegateParameters[] = [
       // isUndelegate=false (delegate)

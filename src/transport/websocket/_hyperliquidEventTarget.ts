@@ -56,8 +56,8 @@ interface HyperliquidEventMap {
   post: CustomEvent<PostResponse>;
   error: CustomEvent<string>;
   pong: CustomEvent<undefined>;
-  _explorerBlock: CustomEvent<BlockDetails[]>;
-  _explorerTxs: CustomEvent<TxDetails[]>;
+  explorerBlock_: CustomEvent<BlockDetails[]>;
+  explorerTxs_: CustomEvent<TxDetails[]>;
   // deno-lint-ignore no-explicit-any
   [key: string]: CustomEvent<any>;
 }
@@ -119,9 +119,9 @@ export class HyperliquidEventTarget extends EventTarget {
         } else if (v.is(PongEventSchema, msg)) {
           this.dispatchEvent(new CustomEvent_("pong", { detail: undefined }));
         } else if (v.is(ExplorerBlockEventSchema, msg)) {
-          this.dispatchEvent(new CustomEvent_("_explorerBlock", { detail: msg }));
+          this.dispatchEvent(new CustomEvent_("explorerBlock_", { detail: msg }));
         } else if (v.is(ExplorerTxsEventSchema, msg)) {
-          this.dispatchEvent(new CustomEvent_("_explorerTxs", { detail: msg }));
+          this.dispatchEvent(new CustomEvent_("explorerTxs_", { detail: msg }));
         }
       } catch {
         // Ignore JSON parsing errors

@@ -3,12 +3,6 @@ import type { ISubscription } from "../_base.ts";
 import type { HyperliquidEventTarget } from "./_hyperliquidEventTarget.ts";
 import { WebSocketPostRequest, WebSocketRequestError } from "./_postRequest.ts";
 
-/** Maximum number of subscriptions allowed by Hyperliquid. */
-const MAX_SUBSCRIPTIONS = 1000;
-
-/** Maximum number of unique user subscriptions allowed by Hyperliquid. */
-const MAX_UNIQUE_USER_SUBSCRIPTIONS = 10;
-
 /** Internal state for managing a subscription. */
 interface SubscriptionState {
   /** Map of event listeners to their unsubscribe functions. */
@@ -21,6 +15,12 @@ interface SubscriptionState {
   failureController: AbortController;
 }
 
+/** Maximum number of subscriptions allowed by Hyperliquid. */
+const MAX_SUBSCRIPTIONS = 1000;
+
+/** Maximum number of unique user subscriptions allowed by Hyperliquid. */
+const MAX_UNIQUE_USER_SUBSCRIPTIONS = 10;
+
 /**
  * Manages WebSocket subscriptions to Hyperliquid event channels.
  * Handles subscription lifecycle, resubscription on reconnect, and cleanup.
@@ -29,9 +29,9 @@ export class WebSocketSubscriptionManager {
   /** Enable automatic re-subscription to Hyperliquid subscription after reconnection. */
   resubscribe: boolean;
 
-  protected _socket: ReconnectingWebSocket;
-  protected _postRequest: WebSocketPostRequest;
-  protected _hlEvents: HyperliquidEventTarget;
+  protected readonly _socket: ReconnectingWebSocket;
+  protected readonly _postRequest: WebSocketPostRequest;
+  protected readonly _hlEvents: HyperliquidEventTarget;
   protected _subscriptions: Map<string, SubscriptionState> = new Map();
 
   constructor(
@@ -59,13 +59,12 @@ export class WebSocketSubscriptionManager {
    * Subscribes to a Hyperliquid event channel.
    * Sends a subscription request to the server and listens for events.
    *
-   * @param channel - The event channel to listen to.
-   * @param payload - A payload to send with the subscription request.
-   * @param listener - A function to call when the event is dispatched.
+   * @param channel The event channel to listen to.
+   * @param payload A payload to send with the subscription request.
+   * @param listener A function to call when the event is dispatched.
+   * @return A promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @returns A promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
-   *
-   * @throws {WebSocketRequestError} - An error that occurs when a WebSocket request fails.
+   * @throws {WebSocketRequestError} An error that occurs when a WebSocket request fails.
    */
   async subscribe<T>(
     channel: string,
@@ -142,11 +141,11 @@ export class WebSocketSubscriptionManager {
   // Socket event handlers
   // ============================================================
 
-  /** Resubscribe to all existing subscriptions if auto-resubscribe is enabled. */
+  /** Resubscribes to all existing subscriptions if auto-resubscribe is enabled. */
   protected _handleOpen(): void {
     if (this.resubscribe) {
       for (const [id, subscription] of this._subscriptions.entries()) {
-        // reconnect only previously connected subscriptions to avoid double subscriptions due to message buffering
+        // Reconnect only previously connected subscriptions to avoid double subscriptions due to message buffering
         if (subscription.promiseFinished) {
           subscription.promise = this._postRequest.request("subscribe", JSON.parse(id))
             .catch((error) => subscription.failureController.abort(error))
@@ -157,7 +156,7 @@ export class WebSocketSubscriptionManager {
     }
   }
 
-  /** Cleanup subscriptions if resubscribe is disabled or socket is terminated. */
+  /** Cleans up subscriptions if resubscribe is disabled or socket is terminated. */
   protected _handleClose(): void {
     if (!this.resubscribe || this._socket.terminationSignal.aborted) {
       for (const subscriptionInfo of this._subscriptions.values()) {

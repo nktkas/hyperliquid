@@ -9,6 +9,7 @@ import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_ba
 
 /**
  * Modify a vault's configuration.
+ * @see null
  */
 export const VaultModifyRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -35,6 +36,7 @@ export type VaultModifyRequest = v.InferOutput<typeof VaultModifyRequest>;
 
 /**
  * Successful response without specific data or error response.
+ * @see null
  */
 export type VaultModifyResponse = SuccessResponse | ErrorResponse;
 
@@ -42,8 +44,8 @@ export type VaultModifyResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const VaultModifyParameters = /* @__PURE__ */ (() => {
@@ -52,6 +54,7 @@ const VaultModifyParameters = /* @__PURE__ */ (() => {
     ["type"],
   );
 })();
+
 /** Action parameters for the {@linkcode vaultModify} function. */
 export type VaultModifyParameters = v.InferInput<typeof VaultModifyParameters>;
 
@@ -64,11 +67,10 @@ export type VaultModifySuccessResponse = ExcludeErrorResponse<VaultModifyRespons
 /**
  * Modify a vault's configuration.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -92,6 +94,8 @@ export type VaultModifySuccessResponse = ExcludeErrorResponse<VaultModifyRespons
  *   },
  * );
  * ```
+ *
+ * @see null
  */
 export function vaultModify(
   config: ExchangeConfig,

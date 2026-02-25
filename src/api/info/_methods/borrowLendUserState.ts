@@ -58,7 +58,7 @@ export type BorrowLendUserStateResponse = {
     },
   ][];
   /** Account health status. */
-  health: "healthy"; // FIXME: presumably there are other literals
+  health: "healthy"; // FIXME: Presumably there are other literals
   /** Health factor. */
   healthFactor: null;
 };
@@ -75,11 +75,10 @@ export type BorrowLendUserStateParameters = Omit<v.InferInput<typeof BorrowLendU
 /**
  * Request borrow/lend user state.
  *
- * @param config - General configuration for Info API requests.
- * @param params - Parameters specific to the API request.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns User's borrow/lend state.
+ * @param config General configuration for Info API requests.
+ * @param params Parameters specific to the API request.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return User's borrow/lend state.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

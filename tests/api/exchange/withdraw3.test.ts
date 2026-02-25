@@ -1,9 +1,9 @@
-import * as v from "@valibot/valibot";
 import { type Withdraw3Parameters, Withdraw3Request } from "@nktkas/hyperliquid/api/exchange";
-import { runTest, topUpPerp } from "./_t.ts";
+import * as v from "@valibot/valibot";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
 import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
+import { runTest, topUpPerp } from "./_t.ts";
 
 const sourceFile = new URL("../../../src/api/exchange/_methods/withdraw3.ts", import.meta.url).pathname;
 const responseSchema = typeToJsonSchema(sourceFile, "Withdraw3SuccessResponse");

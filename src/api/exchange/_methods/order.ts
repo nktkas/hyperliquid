@@ -27,7 +27,7 @@ export const OrderRequest = /* @__PURE__ */ (() => {
           /** Price. */
           p: v.pipe(
             UnsignedDecimal,
-            v.check((input) => Number(input) > 0, "Value must be greater than zero."),
+            v.check((input) => Number(input) > 0, "Value must be greater than zero"),
           ),
           /** Size (in base currency units). */
           s: UnsignedDecimal,
@@ -56,7 +56,7 @@ export const OrderRequest = /* @__PURE__ */ (() => {
                 /** Trigger price. */
                 triggerPx: v.pipe(
                   UnsignedDecimal,
-                  v.check((input) => Number(input) > 0, "Value must be greater than zero."),
+                  v.check((input) => Number(input) > 0, "Value must be greater than zero"),
                 ),
                 /** Indicates whether it is take profit or stop loss. */
                 tpsl: v.picklist(["tp", "sl"]),
@@ -112,7 +112,7 @@ export type OrderResponse = {
     type: "order";
     /** Specific data. */
     data: {
-      /**Array of statuses for each placed order. */
+      /** Array of statuses for each placed order. */
       statuses: (
         | {
           /** Resting order status. */
@@ -163,8 +163,8 @@ export type OrderResponse = {
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const OrderParameters = /* @__PURE__ */ (() => {
@@ -173,6 +173,7 @@ const OrderParameters = /* @__PURE__ */ (() => {
     ["type"],
   );
 })();
+
 /** Action parameters for the {@linkcode order} function. */
 export type OrderParameters = v.InferInput<typeof OrderParameters>;
 
@@ -185,11 +186,10 @@ export type OrderSuccessResponse = ExcludeErrorResponse<OrderResponse>;
 /**
  * Place an order(s).
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful variant of {@link OrderResponse} without error statuses.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful variant of {@link OrderResponse} without error statuses.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

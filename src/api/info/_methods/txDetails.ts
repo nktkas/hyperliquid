@@ -9,6 +9,7 @@ import type { ExplorerTransactionSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Request transaction details by transaction hash.
+ * @see null
  */
 export const TxDetailsRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -22,6 +23,7 @@ export type TxDetailsRequest = v.InferOutput<typeof TxDetailsRequest>;
 
 /**
  * Response with transaction details.
+ * @see null
  */
 export type TxDetailsResponse = {
   /** Response type. */
@@ -42,11 +44,10 @@ export type TxDetailsParameters = Omit<v.InferInput<typeof TxDetailsRequest>, "t
 /**
  * Request transaction details by transaction hash.
  *
- * @param config - General configuration for Info API requests.
- * @param params - Parameters specific to the API request.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Transaction details.
+ * @param config General configuration for Info API requests.
+ * @param params Parameters specific to the API request.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Transaction details.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -62,6 +63,8 @@ export type TxDetailsParameters = Omit<v.InferInput<typeof TxDetailsRequest>, "t
  *   { hash: "0x..." },
  * );
  * ```
+ *
+ * @see null
  */
 export function txDetails(
   config: InfoConfig,

@@ -46,8 +46,8 @@ export type UpdateLeverageResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const UpdateLeverageParameters = /* @__PURE__ */ (() => {
@@ -56,6 +56,7 @@ const UpdateLeverageParameters = /* @__PURE__ */ (() => {
     ["type"],
   );
 })();
+
 /** Action parameters for the {@linkcode updateLeverage} function. */
 export type UpdateLeverageParameters = v.InferInput<typeof UpdateLeverageParameters>;
 
@@ -68,11 +69,10 @@ export type UpdateLeverageSuccessResponse = ExcludeErrorResponse<UpdateLeverageR
 /**
  * Update cross or isolated leverage on a coin.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

@@ -8,6 +8,7 @@ import type { ExplorerTransactionSchema } from "../../info/_methods/_base/common
 
 /**
  * Subscription to explorer transaction events.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const ExplorerTxsRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -19,6 +20,7 @@ export type ExplorerTxsRequest = v.InferOutput<typeof ExplorerTxsRequest>;
 
 /**
  * Event of array of transaction details.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export type ExplorerTxsEvent = ExplorerTransactionSchema[];
 
@@ -26,15 +28,15 @@ export type ExplorerTxsEvent = ExplorerTransactionSchema[];
 // Execution Logic
 // ============================================================
 
-import type { SubscriptionConfig } from "./_types.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_types.ts";
 
 /**
  * Subscribe to explorer transaction updates.
  *
- * @param config - General configuration for Subscription API subscriptions.
- * @param listener - A callback function to be called when the event is received.
- * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+ * @param config General configuration for Subscription API subscriptions.
+ * @param listener A callback function to be called when the event is received.
+ * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -59,7 +61,7 @@ export function explorerTxs(
   listener: (data: ExplorerTxsEvent) => void,
 ): Promise<ISubscription> {
   const payload = v.parse(ExplorerTxsRequest, { type: "explorerTxs" });
-  return config.transport.subscribe<ExplorerTxsEvent>("_explorerTxs", payload, (e) => { // Internal channel as it does not have its own channel
+  return config.transport.subscribe<ExplorerTxsEvent>("explorerTxs_", payload, (e) => { // Internal channel as it does not have its own channel
     listener(e.detail);
   });
 }

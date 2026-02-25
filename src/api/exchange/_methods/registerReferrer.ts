@@ -9,6 +9,7 @@ import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_ba
 
 /**
  * Create a referral code.
+ * @see null
  */
 export const RegisterReferrerRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -31,6 +32,7 @@ export type RegisterReferrerRequest = v.InferOutput<typeof RegisterReferrerReque
 
 /**
  * Successful response without specific data or error response.
+ * @see null
  */
 export type RegisterReferrerResponse = SuccessResponse | ErrorResponse;
 
@@ -38,8 +40,8 @@ export type RegisterReferrerResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const RegisterReferrerParameters = /* @__PURE__ */ (() => {
@@ -48,6 +50,7 @@ const RegisterReferrerParameters = /* @__PURE__ */ (() => {
     ["type"],
   );
 })();
+
 /** Action parameters for the {@linkcode registerReferrer} function. */
 export type RegisterReferrerParameters = v.InferInput<typeof RegisterReferrerParameters>;
 
@@ -60,11 +63,10 @@ export type RegisterReferrerSuccessResponse = ExcludeErrorResponse<RegisterRefer
 /**
  * Create a referral code.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -84,6 +86,8 @@ export type RegisterReferrerSuccessResponse = ExcludeErrorResponse<RegisterRefer
  *   { code: "..." },
  * );
  * ```
+ *
+ * @see null
  */
 export function registerReferrer(
   config: ExchangeConfig,

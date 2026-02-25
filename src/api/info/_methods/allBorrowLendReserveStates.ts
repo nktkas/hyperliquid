@@ -33,10 +33,9 @@ import type { InfoConfig } from "./_base/types.ts";
 /**
  * Request all borrow/lend reserve states.
  *
- * @param config - General configuration for Info API requests.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Array of tuples of reserve IDs and their borrow/lend reserve state.
+ * @param config General configuration for Info API requests.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Array of tuples of reserve IDs and their borrow/lend reserve state.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

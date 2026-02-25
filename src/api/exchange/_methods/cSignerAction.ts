@@ -9,6 +9,7 @@ import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_ba
 
 /**
  * Jail or unjail self as a validator signer.
+ * @see null
  */
 export const CSignerActionRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -39,6 +40,7 @@ export type CSignerActionRequest = v.InferOutput<typeof CSignerActionRequest>;
 
 /**
  * Successful response without specific data or error response.
+ * @see null
  */
 export type CSignerActionResponse = SuccessResponse | ErrorResponse;
 
@@ -46,8 +48,8 @@ export type CSignerActionResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const CSignerActionParameters = /* @__PURE__ */ (() => {
@@ -55,6 +57,7 @@ const CSignerActionParameters = /* @__PURE__ */ (() => {
     CSignerActionRequest.entries.action.options.map((option) => v.omit(option, ["type"])),
   );
 })();
+
 /** Action parameters for the {@linkcode cSignerAction} function. */
 export type CSignerActionParameters = v.InferInput<typeof CSignerActionParameters>;
 
@@ -67,11 +70,10 @@ export type CSignerActionSuccessResponse = ExcludeErrorResponse<CSignerActionRes
 /**
  * Jail or unjail self as a validator signer.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -91,6 +93,7 @@ export type CSignerActionSuccessResponse = ExcludeErrorResponse<CSignerActionRes
  *   { jailSelf: null },
  * );
  * ```
+ *
  * @example Unjail self
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
@@ -105,6 +108,8 @@ export type CSignerActionSuccessResponse = ExcludeErrorResponse<CSignerActionRes
  *   { unjailSelf: null },
  * );
  * ```
+ *
+ * @see null
  */
 export function cSignerAction(
   config: ExchangeConfig,

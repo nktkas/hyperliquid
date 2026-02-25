@@ -5,11 +5,11 @@
  * to convert type aliases, interfaces, and any other TypeScript type construct to JSON Schema.
  *
  * JSDoc tags are extracted automatically:
- * - Text: `@description`, `@pattern`, `@format`, `@comment`
+ * - Text:    `@description`, `@pattern`, `@format`, `@comment`
  * - Numeric: `@minimum`, `@maximum`, `@minLength`, `@maxLength`, `@minItems`, `@maxItems`,
  *            `@exclusiveMinimum`, `@exclusiveMaximum`, `@multipleOf`, `@minProperties`, `@maxProperties`
  * - Boolean: `@deprecated`, `@readOnly`, `@writeOnly`, `@uniqueItems`
- * - JSON: `@default`, `@examples`, `@const`
+ * - JSON:    `@default`, `@examples`, `@const`
  * - Special: `@nullable`, `@discriminator`
  *
  * Output format:
@@ -17,12 +17,14 @@
  * - Top-level `$ref` is unwrapped: the root schema is the type definition itself
  * - Shared types are placed in `definitions` and referenced via `$ref: "#/definitions/TypeName"`
  *
- * @example Basic usage
+ * @example
  * ```ts
  * import { typeToJsonSchema } from "./typeToJsonSchema.ts";
  *
  * const schema = typeToJsonSchema("/path/to/file.ts", "MyResponse");
  * ```
+ *
+ * @module
  */
 
 import { type Config, createGenerator } from "npm:ts-json-schema-generator@2";
@@ -31,30 +33,9 @@ import type { JsonSchema } from "./schemaCoverage.ts";
 
 export type { JsonSchema } from "./schemaCoverage.ts";
 
-// =============================================================================
-// Public API
-// =============================================================================
-
-/**
- * Convert a named TypeScript type to JSON Schema.
- *
- * @param filePath - Absolute path to the TypeScript source file.
- * @param typeName - Name of the exported type alias or interface.
- * @returns JSON Schema representation of the type.
- * @throws {Error} If the type is not found or cannot be resolved.
- */
-export function typeToJsonSchema(filePath: string, typeName: string): JsonSchema {
-  // On Windows, URL.pathname gives "/C:/..." - strip the leading slash for TypeScript
-  const normalizedPath = filePath.replace(/^\/([A-Za-z]:)/, "$1");
-  const tsProgram = ts.createProgram([normalizedPath], compilerOptions);
-  const schemaGen = createGenerator({ ...generatorConfig, tsProgram });
-  const rawTypeSchema = schemaGen.createSchema(typeName);
-  return normalizeSchema(rawTypeSchema as Record<string, unknown>);
-}
-
-// =============================================================================
+// ============================================================
 // Configuration
-// =============================================================================
+// ============================================================
 
 /** Compiler options for the TypeScript program. */
 const compilerOptions: ts.CompilerOptions = {
@@ -67,7 +48,7 @@ const compilerOptions: ts.CompilerOptions = {
   skipLibCheck: true,
 };
 
-/** ts-json-schema-generator configuration. */
+/** Configuration for ts-json-schema-generator. */
 const generatorConfig: Config = {
   skipTypeCheck: true,
   jsDoc: "extended",
@@ -78,12 +59,34 @@ const generatorConfig: Config = {
   expose: "all",
 };
 
-// =============================================================================
-// Schema Normalization
-// =============================================================================
+// ============================================================
+// Public API
+// ============================================================
 
 /**
- * Unwrap the top-level `$ref` produced by ts-json-schema-generator.
+ * Converts a named TypeScript type to JSON Schema.
+ *
+ * @param filePath Absolute path to the TypeScript source file
+ * @param typeName Name of the exported type alias or interface
+ * @return JSON Schema representation of the type
+ *
+ * @throws {Error} If the type is not found or cannot be resolved
+ */
+export function typeToJsonSchema(filePath: string, typeName: string): JsonSchema {
+  // On Windows, URL.pathname gives "/C:/..." - strip the leading slash for TypeScript
+  const normalizedPath = filePath.replace(/^\/([A-Za-z]:)/, "$1");
+  const tsProgram = ts.createProgram([normalizedPath], compilerOptions);
+  const schemaGen = createGenerator({ ...generatorConfig, tsProgram });
+  const rawTypeSchema = schemaGen.createSchema(typeName);
+  return normalizeSchema(rawTypeSchema as Record<string, unknown>);
+}
+
+// ============================================================
+// Schema Normalization
+// ============================================================
+
+/**
+ * Unwraps the top-level `$ref` produced by ts-json-schema-generator.
  *
  * The generator outputs `{ "$ref": "#/definitions/TypeName", "definitions": { ... } }`.
  * This function inlines the root definition so the schema directly describes the type.
@@ -110,7 +113,7 @@ function normalizeSchema(raw: Record<string, unknown>): JsonSchema {
   return { ...rest, ...(defs ? { definitions: defs } : {}) };
 }
 
-/** Extract type name from a `#/definitions/` ref string. */
+/** Extracts type name from a `#/definitions/` ref string. */
 function extractRefName(ref: string): string | null {
   const prefix = "#/definitions/";
   if (ref.startsWith(prefix)) {

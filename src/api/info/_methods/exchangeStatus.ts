@@ -6,6 +6,7 @@ import * as v from "@valibot/valibot";
 
 /**
  * Request exchange system status information.
+ * @see null
  */
 export const ExchangeStatusRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -17,6 +18,7 @@ export type ExchangeStatusRequest = v.InferOutput<typeof ExchangeStatusRequest>;
 
 /**
  * Exchange system status information.
+ * @see null
  */
 export type ExchangeStatusResponse = {
   /** Server time (in ms since epoch). */
@@ -34,10 +36,9 @@ import type { InfoConfig } from "./_base/types.ts";
 /**
  * Request exchange system status information.
  *
- * @param config - General configuration for Info API requests.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Exchange system status information.
+ * @param config General configuration for Info API requests.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Exchange system status information.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -51,6 +52,8 @@ import type { InfoConfig } from "./_base/types.ts";
  *
  * const data = await exchangeStatus({ transport });
  * ```
+ *
+ * @see null
  */
 export function exchangeStatus(
   config: InfoConfig,

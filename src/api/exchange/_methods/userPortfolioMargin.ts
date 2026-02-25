@@ -51,8 +51,8 @@ export type UserPortfolioMarginResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const UserPortfolioMarginParameters = /* @__PURE__ */ (() => {
@@ -61,6 +61,7 @@ const UserPortfolioMarginParameters = /* @__PURE__ */ (() => {
     ["type", "signatureChainId", "hyperliquidChain", "nonce"],
   );
 })();
+
 /** Action parameters for the {@linkcode userPortfolioMargin} function. */
 export type UserPortfolioMarginParameters = v.InferInput<typeof UserPortfolioMarginParameters>;
 
@@ -70,7 +71,7 @@ export type UserPortfolioMarginOptions = ExtractRequestOptions<v.InferInput<type
 /** Successful variant of {@linkcode UserPortfolioMarginResponse} without errors. */
 export type UserPortfolioMarginSuccessResponse = ExcludeErrorResponse<UserPortfolioMarginResponse>;
 
-/** EIP-712 types for the {@linkcode UserPortfolioMargin} function. */
+/** EIP-712 types for the {@linkcode userPortfolioMargin} function. */
 export const UserPortfolioMarginTypes = {
   "HyperliquidTransaction:UserPortfolioMargin": [
     { name: "hyperliquidChain", type: "string" },
@@ -83,11 +84,10 @@ export const UserPortfolioMarginTypes = {
 /**
  * Enable/disable user portfolio margin.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

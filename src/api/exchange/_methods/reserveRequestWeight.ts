@@ -18,7 +18,7 @@ export const ReserveRequestWeightRequest = /* @__PURE__ */ (() => {
       /** Type of action. */
       type: v.literal("reserveRequestWeight"),
       /** Amount of request weight to reserve. */
-      weight: v.pipe(UnsignedInteger, v.maxValue(1844674407370955)), // truncated max uint64 / 1000
+      weight: v.pipe(UnsignedInteger, v.maxValue(1844674407370955)), // Truncated max uint64 / 1000
     }),
     /** Nonce (timestamp in ms) used to prevent replay attacks. */
     nonce: UnsignedInteger,
@@ -40,8 +40,8 @@ export type ReserveRequestWeightResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const ReserveRequestWeightParameters = /* @__PURE__ */ (() => {
@@ -50,6 +50,7 @@ const ReserveRequestWeightParameters = /* @__PURE__ */ (() => {
     ["type"],
   );
 })();
+
 /** Action parameters for the {@linkcode reserveRequestWeight} function. */
 export type ReserveRequestWeightParameters = v.InferInput<typeof ReserveRequestWeightParameters>;
 
@@ -62,11 +63,10 @@ export type ReserveRequestWeightSuccessResponse = ExcludeErrorResponse<ReserveRe
 /**
  * Reserve additional rate-limited actions for a fee.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

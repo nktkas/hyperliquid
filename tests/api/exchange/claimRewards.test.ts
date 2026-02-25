@@ -1,6 +1,6 @@
+import { ApiRequestError } from "@nktkas/hyperliquid";
 import { assertRejects } from "jsr:@std/assert@1";
 import { runTest } from "./_t.ts";
-import { ApiRequestError } from "@nktkas/hyperliquid";
 
 runTest({
   name: "claimRewards",

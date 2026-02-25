@@ -47,8 +47,8 @@ export type ScheduleCancelResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const ScheduleCancelParameters = /* @__PURE__ */ (() => {
@@ -57,6 +57,7 @@ const ScheduleCancelParameters = /* @__PURE__ */ (() => {
     ["type"],
   );
 })();
+
 /** Action parameters for the {@linkcode scheduleCancel} function. */
 export type ScheduleCancelParameters = v.InferInput<typeof ScheduleCancelParameters>;
 
@@ -69,11 +70,10 @@ export type ScheduleCancelSuccessResponse = ExcludeErrorResponse<ScheduleCancelR
 /**
  * Schedule a cancel-all operation at a future time.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

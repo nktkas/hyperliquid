@@ -9,6 +9,7 @@ import { type ErrorResponse, SignatureSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Create a vault.
+ * @see null
  */
 export const CreateVaultRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -37,6 +38,7 @@ export type CreateVaultRequest = v.InferOutput<typeof CreateVaultRequest>;
 
 /**
  * Response for creating a vault.
+ * @see null
  */
 export type CreateVaultResponse = {
   /** Successful status. */
@@ -57,8 +59,8 @@ export type CreateVaultResponse = {
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const CreateVaultParameters = /* @__PURE__ */ (() => {
@@ -67,6 +69,7 @@ const CreateVaultParameters = /* @__PURE__ */ (() => {
     ["type"],
   );
 })();
+
 /** Action parameters for the {@linkcode createVault} function. */
 export type CreateVaultParameters = v.InferInput<typeof CreateVaultParameters>;
 
@@ -79,11 +82,10 @@ export type CreateVaultSuccessResponse = ExcludeErrorResponse<CreateVaultRespons
 /**
  * Create a vault.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Response for creating a vault.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Response for creating a vault.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -108,6 +110,8 @@ export type CreateVaultSuccessResponse = ExcludeErrorResponse<CreateVaultRespons
  *   },
  * );
  * ```
+ *
+ * @see null
  */
 export function createVault(
   config: ExchangeConfig,

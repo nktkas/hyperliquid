@@ -6,6 +6,7 @@ import * as v from "@valibot/valibot";
 
 /**
  * Request gossip root IPs.
+ * @see null
  */
 export const GossipRootIpsRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -17,6 +18,7 @@ export type GossipRootIpsRequest = v.InferOutput<typeof GossipRootIpsRequest>;
 
 /**
  * Array of gossip root IPs.
+ * @see null
  */
 export type GossipRootIpsResponse = `${number}.${number}.${number}.${number}`[];
 
@@ -29,10 +31,9 @@ import type { InfoConfig } from "./_base/types.ts";
 /**
  * Request gossip root IPs.
  *
- * @param config - General configuration for Info API requests.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Array of gossip root IPs.
+ * @param config General configuration for Info API requests.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Array of gossip root IPs.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -46,6 +47,8 @@ import type { InfoConfig } from "./_base/types.ts";
  *
  * const data = await gossipRootIps({ transport });
  * ```
+ *
+ * @see null
  */
 export function gossipRootIps(
   config: InfoConfig,

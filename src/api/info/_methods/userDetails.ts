@@ -9,6 +9,7 @@ import type { ExplorerTransactionSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Request array of user transaction details.
+ * @see null
  */
 export const UserDetailsRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -22,6 +23,7 @@ export type UserDetailsRequest = v.InferOutput<typeof UserDetailsRequest>;
 
 /**
  * Response array of user transaction details.
+ * @see null
  */
 export type UserDetailsResponse = {
   /** Type of response. */
@@ -42,11 +44,10 @@ export type UserDetailsParameters = Omit<v.InferInput<typeof UserDetailsRequest>
 /**
  * Request array of user transaction details.
  *
- * @param config - General configuration for Info API requests.
- * @param params - Parameters specific to the API request.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Array of user transaction details.
+ * @param config General configuration for Info API requests.
+ * @param params Parameters specific to the API request.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Array of user transaction details.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -62,6 +63,8 @@ export type UserDetailsParameters = Omit<v.InferInput<typeof UserDetailsRequest>
  *   { user: "0x..." },
  * );
  * ```
+ *
+ * @see null
  */
 export function userDetails(
   config: InfoConfig,

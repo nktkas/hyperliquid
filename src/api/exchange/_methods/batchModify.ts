@@ -32,7 +32,7 @@ export const BatchModifyRequest = /* @__PURE__ */ (() => {
             /** Price. */
             p: v.pipe(
               UnsignedDecimal,
-              v.check((input) => Number(input) > 0, "Value must be greater than zero."),
+              v.check((input) => Number(input) > 0, "Value must be greater than zero"),
             ),
             /** Size (in base currency units). */
             s: UnsignedDecimal,
@@ -61,7 +61,7 @@ export const BatchModifyRequest = /* @__PURE__ */ (() => {
                   /** Trigger price. */
                   triggerPx: v.pipe(
                     UnsignedDecimal,
-                    v.check((input) => Number(input) > 0, "Value must be greater than zero."),
+                    v.check((input) => Number(input) > 0, "Value must be greater than zero"),
                   ),
                   /** Indicates whether it is take profit or stop loss. */
                   tpsl: v.picklist(["tp", "sl"]),
@@ -96,8 +96,8 @@ export type BatchModifyResponse = OrderResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const BatchModifyParameters = /* @__PURE__ */ (() => {
@@ -106,6 +106,7 @@ const BatchModifyParameters = /* @__PURE__ */ (() => {
     ["type"],
   );
 })();
+
 /** Action parameters for the {@linkcode batchModify} function. */
 export type BatchModifyParameters = v.InferInput<typeof BatchModifyParameters>;
 
@@ -118,11 +119,10 @@ export type BatchModifySuccessResponse = ExcludeErrorResponse<BatchModifyRespons
 /**
  * Modify multiple orders.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful variant of {@link OrderResponse} without error statuses.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful variant of {@link OrderResponse} without error statuses.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

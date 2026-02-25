@@ -9,6 +9,7 @@ import type { HistoricalOrdersResponse } from "../../info/_methods/historicalOrd
 
 /**
  * Subscription to user historical orders for a specific user.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const UserHistoricalOrdersRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -21,7 +22,8 @@ export const UserHistoricalOrdersRequest = /* @__PURE__ */ (() => {
 export type UserHistoricalOrdersRequest = v.InferOutput<typeof UserHistoricalOrdersRequest>;
 
 /**
- * vent of user historical orders.
+ * Event of user historical orders.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export type UserHistoricalOrdersEvent = {
   /**
@@ -39,8 +41,8 @@ export type UserHistoricalOrdersEvent = {
 // Execution Logic
 // ============================================================
 
-import type { SubscriptionConfig } from "./_types.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode userHistoricalOrders} function. */
 export type UserHistoricalOrdersParameters = Omit<v.InferInput<typeof UserHistoricalOrdersRequest>, "type">;
@@ -48,11 +50,10 @@ export type UserHistoricalOrdersParameters = Omit<v.InferInput<typeof UserHistor
 /**
  * Subscribe to historical order updates for a specific user.
  *
- * @param config - General configuration for Subscription API subscriptions.
- * @param params - Parameters specific to the API subscription.
- * @param listener - A callback function to be called when the event is received.
- *
- * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+ * @param config General configuration for Subscription API subscriptions.
+ * @param params Parameters specific to the API subscription.
+ * @param listener A callback function to be called when the event is received.
+ * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

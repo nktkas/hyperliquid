@@ -9,6 +9,7 @@ import type { ClearinghouseStateResponse } from "../../info/_methods/clearinghou
 
 /**
  * Subscription to clearinghouse state events for a specific user.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const ClearinghouseStateRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -24,6 +25,7 @@ export type ClearinghouseStateRequest = v.InferOutput<typeof ClearinghouseStateR
 
 /**
  * Event of clearinghouse state for a specific user.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export type ClearinghouseStateEvent = {
   /** DEX name (empty string for main dex). */
@@ -41,8 +43,8 @@ export type ClearinghouseStateEvent = {
 // Execution Logic
 // ============================================================
 
-import type { SubscriptionConfig } from "./_types.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode clearinghouseState} function. */
 export type ClearinghouseStateParameters = Omit<v.InferInput<typeof ClearinghouseStateRequest>, "type">;
@@ -50,11 +52,10 @@ export type ClearinghouseStateParameters = Omit<v.InferInput<typeof Clearinghous
 /**
  * Subscribe to clearinghouse state updates for a specific user.
  *
- * @param config - General configuration for Subscription API subscriptions.
- * @param params - Parameters specific to the API subscription.
- * @param listener - A callback function to be called when the event is received.
- *
- * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+ * @param config General configuration for Subscription API subscriptions.
+ * @param params Parameters specific to the API subscription.
+ * @param listener A callback function to be called when the event is received.
+ * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -83,7 +84,7 @@ export function clearinghouseState(
   const payload = v.parse(ClearinghouseStateRequest, {
     type: "clearinghouseState",
     ...params,
-    dex: params.dex ?? "", // same value as in response
+    dex: params.dex ?? "", // Same value as in response
   });
   return config.transport.subscribe<ClearinghouseStateEvent>(payload.type, payload, (e) => {
     if (e.detail.user === payload.user && e.detail.dex === payload.dex) {

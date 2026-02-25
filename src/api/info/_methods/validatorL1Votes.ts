@@ -6,6 +6,7 @@ import * as v from "@valibot/valibot";
 
 /**
  * Request validator L1 votes.
+ * @see null
  */
 export const ValidatorL1VotesRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -17,6 +18,7 @@ export type ValidatorL1VotesRequest = v.InferOutput<typeof ValidatorL1VotesReque
 
 /**
  * Array of L1 governance votes cast by validators.
+ * @see null
  */
 export type ValidatorL1VotesResponse = {
   /** Timestamp when the vote expires (in ms since epoch). */
@@ -43,10 +45,9 @@ import type { InfoConfig } from "./_base/types.ts";
 /**
  * Request validator L1 votes.
  *
- * @param config - General configuration for Info API requests.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Array of L1 governance votes cast by validators.
+ * @param config General configuration for Info API requests.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Array of L1 governance votes cast by validators.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -60,6 +61,8 @@ import type { InfoConfig } from "./_base/types.ts";
  *
  * const data = await validatorL1Votes({ transport });
  * ```
+ *
+ * @see null
  */
 export function validatorL1Votes(
   config: InfoConfig,

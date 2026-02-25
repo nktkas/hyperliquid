@@ -1,4 +1,3 @@
-import type { IRequestTransport } from "../transport/mod.ts";
 import {
   meta,
   type MetaResponse,
@@ -7,6 +6,7 @@ import {
   spotMeta,
   type SpotMetaResponse,
 } from "../api/info/mod.ts";
+import type { IRequestTransport } from "../transport/mod.ts";
 
 /** Options for creating a {@link SymbolConverter} instance. */
 export interface SymbolConverterOptions {
@@ -45,29 +45,28 @@ export interface SymbolConverterOptions {
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/asset-ids
  */
 export class SymbolConverter {
-  #transport: IRequestTransport;
-  #dexOption: string[] | boolean;
-  #nameToAssetId = new Map<string, number>();
-  #nameToSzDecimals = new Map<string, number>();
-  #nameToSpotPairId = new Map<string, string>();
+  private _transport: IRequestTransport;
+  private _dexOption: string[] | boolean;
+  private _nameToAssetId = new Map<string, number>();
+  private _nameToSzDecimals = new Map<string, number>();
+  private _nameToSpotPairId = new Map<string, string>();
 
   /**
    * Creates a new SymbolConverter instance, but does not initialize it.
    * Run {@link reload} to load asset data or use {@link create} to create and initialize in one step.
    *
-   * @param options - Configuration options including transport and optional dex support.
+   * @param options Configuration options including transport and optional dex support.
    */
   constructor(options: SymbolConverterOptions) {
-    this.#transport = options.transport;
-    this.#dexOption = options.dexs ?? false;
+    this._transport = options.transport;
+    this._dexOption = options.dexs ?? false;
   }
 
   /**
    * Create and initialize a SymbolConverter instance.
    *
-   * @param options - Configuration options including transport and optional dex support.
-   *
-   * @returns Initialized SymbolConverter instance.
+   * @param options Configuration options including transport and optional dex support.
+   * @return Initialized SymbolConverter instance.
    *
    * @example
    * ```ts
@@ -90,8 +89,8 @@ export class SymbolConverter {
    * Useful for refreshing data when new assets are added.
    */
   async reload(): Promise<void> {
-    const config = { transport: this.#transport };
-    const needDexs = this.#dexOption === true || (Array.isArray(this.#dexOption) && this.#dexOption.length > 0);
+    const config = { transport: this._transport };
+    const needDexs = this._dexOption === true || (Array.isArray(this._dexOption) && this._dexOption.length > 0);
 
     const [perpMetaData, spotMetaData, perpDexsData] = await Promise.all([
       meta(config),
@@ -107,27 +106,27 @@ export class SymbolConverter {
       throw new Error("Invalid spot metadata response");
     }
 
-    this.#nameToAssetId.clear();
-    this.#nameToSzDecimals.clear();
-    this.#nameToSpotPairId.clear();
+    this._nameToAssetId.clear();
+    this._nameToSzDecimals.clear();
+    this._nameToSpotPairId.clear();
 
-    this.#processDefaultPerps(perpMetaData);
-    this.#processSpotAssets(spotMetaData);
+    this._processDefaultPerps(perpMetaData);
+    this._processSpotAssets(spotMetaData);
 
     // Only process builder dexs if dex support is enabled
     if (perpDexsData) {
-      await this.#processBuilderDexs(perpDexsData);
+      await this._processBuilderDexs(perpDexsData);
     }
   }
 
-  #processDefaultPerps(perpMetaData: MetaResponse): void {
+  private _processDefaultPerps(perpMetaData: MetaResponse): void {
     perpMetaData.universe.forEach((asset, index) => {
-      this.#nameToAssetId.set(asset.name, index);
-      this.#nameToSzDecimals.set(asset.name, asset.szDecimals);
+      this._nameToAssetId.set(asset.name, index);
+      this._nameToSzDecimals.set(asset.name, asset.szDecimals);
     });
   }
 
-  async #processBuilderDexs(perpDexsData: PerpDexsResponse): Promise<void> {
+  private async _processBuilderDexs(perpDexsData: PerpDexsResponse): Promise<void> {
     if (!perpDexsData || perpDexsData.length <= 1) return;
 
     const builderDexs = perpDexsData
@@ -139,34 +138,34 @@ export class SymbolConverter {
     if (builderDexs.length === 0) return;
 
     // Filter dexs based on the dexOption
-    const dexsToProcess = Array.isArray(this.#dexOption)
-      ? builderDexs.filter((item) => (this.#dexOption as string[]).includes(item.dex.name))
+    const dexsToProcess = Array.isArray(this._dexOption)
+      ? builderDexs.filter((item) => (this._dexOption as string[]).includes(item.dex.name))
       : builderDexs; // true means process all
 
     if (dexsToProcess.length === 0) return;
 
-    const config = { transport: this.#transport };
+    const config = { transport: this._transport };
     const results = await Promise.allSettled(
       dexsToProcess.map((item) => meta(config, { dex: item.dex.name })),
     );
 
     results.forEach((result, idx) => {
       if (result.status !== "fulfilled") return;
-      this.#processBuilderDexResult(result.value, dexsToProcess[idx].index);
+      this._processBuilderDexResult(result.value, dexsToProcess[idx].index);
     });
   }
 
-  #processBuilderDexResult(dexMeta: MetaResponse, perpDexIndex: number): void {
+  private _processBuilderDexResult(dexMeta: MetaResponse, perpDexIndex: number): void {
     const offset = 100000 + perpDexIndex * 10000;
 
     dexMeta.universe.forEach((asset, index) => {
       const assetId = offset + index;
-      this.#nameToAssetId.set(asset.name, assetId);
-      this.#nameToSzDecimals.set(asset.name, asset.szDecimals);
+      this._nameToAssetId.set(asset.name, assetId);
+      this._nameToSzDecimals.set(asset.name, asset.szDecimals);
     });
   }
 
-  #processSpotAssets(spotMetaData: SpotMetaResponse): void {
+  private _processSpotAssets(spotMetaData: SpotMetaResponse): void {
     const tokenMap = new Map<number, { name: string; szDecimals: number }>();
     spotMetaData.tokens.forEach((token) => {
       tokenMap.set(token.index, { name: token.name, szDecimals: token.szDecimals });
@@ -180,9 +179,9 @@ export class SymbolConverter {
 
       const assetId = 10000 + market.index;
       const baseQuoteKey = `${baseToken.name}/${quoteToken.name}`;
-      this.#nameToAssetId.set(baseQuoteKey, assetId);
-      this.#nameToSzDecimals.set(baseQuoteKey, baseToken.szDecimals);
-      this.#nameToSpotPairId.set(baseQuoteKey, market.name);
+      this._nameToAssetId.set(baseQuoteKey, assetId);
+      this._nameToSzDecimals.set(baseQuoteKey, baseToken.szDecimals);
+      this._nameToSpotPairId.set(baseQuoteKey, market.name);
     });
   }
 
@@ -192,10 +191,21 @@ export class SymbolConverter {
    * - For Spot markets, use the "BASE/QUOTE" format (e.g., "HYPE/USDC").
    * - For Builder Dex assets, use the "DEX_NAME:ASSET_NAME" format (e.g., "test:ABC").
    *
-   * @example "BTC" → 0, "HYPE/USDC" → 10107, "test:ABC" → 110000
+   * @example
+   * ```ts
+   * import { HttpTransport } from "@nktkas/hyperliquid";
+   * import { SymbolConverter } from "@nktkas/hyperliquid/utils";
+   *
+   * const transport = new HttpTransport(); // or `WebSocketTransport`
+   * const converter = await SymbolConverter.create({ transport });
+   *
+   * converter.getAssetId("BTC"); // → 0
+   * converter.getAssetId("HYPE/USDC"); // → 10107
+   * converter.getAssetId("test:ABC"); // → 110000
+   * ```
    */
   getAssetId(name: string): number | undefined {
-    return this.#nameToAssetId.get(name);
+    return this._nameToAssetId.get(name);
   }
 
   /**
@@ -204,10 +214,21 @@ export class SymbolConverter {
    * - For Spot markets, use the "BASE/QUOTE" format (e.g., "HYPE/USDC").
    * - For Builder Dex assets, use the "DEX_NAME:ASSET_NAME" format (e.g., "test:ABC").
    *
-   * @example "BTC" → 5, "HYPE/USDC" → 2, "test:ABC" → 0
+   * @example
+   * ```ts
+   * import { HttpTransport } from "@nktkas/hyperliquid";
+   * import { SymbolConverter } from "@nktkas/hyperliquid/utils";
+   *
+   * const transport = new HttpTransport(); // or `WebSocketTransport`
+   * const converter = await SymbolConverter.create({ transport });
+   *
+   * converter.getSzDecimals("BTC"); // → 5
+   * converter.getSzDecimals("HYPE/USDC"); // → 2
+   * converter.getSzDecimals("test:ABC"); // → 0
+   * ```
    */
   getSzDecimals(name: string): number | undefined {
-    return this.#nameToSzDecimals.get(name);
+    return this._nameToSzDecimals.get(name);
   }
 
   /**
@@ -215,9 +236,19 @@ export class SymbolConverter {
    *
    * Accepts spot markets in the "BASE/QUOTE" format (e.g., "HFUN/USDC").
    *
-   * @example "HFUN/USDC" → "@2", "PURR/USDC" → "PURR/USDC"
+   * @example
+   * ```ts
+   * import { HttpTransport } from "@nktkas/hyperliquid";
+   * import { SymbolConverter } from "@nktkas/hyperliquid/utils";
+   *
+   * const transport = new HttpTransport(); // or `WebSocketTransport`
+   * const converter = await SymbolConverter.create({ transport });
+   *
+   * converter.getSpotPairId("HFUN/USDC"); // → "@2"
+   * converter.getSpotPairId("PURR/USDC"); // → "PURR/USDC" (exceptions exist for some pairs)
+   * ```
    */
   getSpotPairId(name: string): string | undefined {
-    return this.#nameToSpotPairId.get(name);
+    return this._nameToSpotPairId.get(name);
   }
 }

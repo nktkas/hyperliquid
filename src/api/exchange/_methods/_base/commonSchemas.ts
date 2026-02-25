@@ -1,3 +1,8 @@
+/**
+ * Common schemas and types shared across Exchange API methods.
+ * @module
+ */
+
 import * as v from "@valibot/valibot";
 import { Hex } from "../../../_schemas.ts";
 

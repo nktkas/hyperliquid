@@ -1,9 +1,9 @@
-import * as v from "@valibot/valibot";
 import { type SendAssetParameters, SendAssetRequest } from "@nktkas/hyperliquid/api/exchange";
-import { runTest } from "./_t.ts";
+import * as v from "@valibot/valibot";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
 import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
+import { runTest } from "./_t.ts";
 
 const sourceFile = new URL("../../../src/api/exchange/_methods/sendAsset.ts", import.meta.url).pathname;
 const responseSchema = typeToJsonSchema(sourceFile, "SendAssetSuccessResponse");

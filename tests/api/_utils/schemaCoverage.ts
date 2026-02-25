@@ -12,7 +12,7 @@
  * - References: $ref with definitions resolution
  * - Optional properties: required array checking
  *
- * @example Basic usage
+ * @example
  * ```ts
  * import { schemaCoverage } from "./schemaCoverage.ts";
  *
@@ -20,7 +20,7 @@
  * schemaCoverage(schema, ["a", "b"]); // passes - all branches covered
  * ```
  *
- * @example Coverage issues
+ * @example
  * ```ts
  * // @ts-nocheck
  * import { schemaCoverage, SchemaCoverageError } from "./schemaCoverage.ts";
@@ -35,20 +35,22 @@
  * }
  * ```
  *
- * @example Ignoring paths
+ * @example
  * ```ts
  * import { schemaCoverage } from "./schemaCoverage.ts";
  *
  * const schema = { anyOf: [{ const: "a" }, { const: "b" }] };
  * schemaCoverage(schema, ["a"], ["#/anyOf/1"]); // passes - branch 1 ignored
  * ```
+ *
+ * @module
  */
 
 import Ajv from "npm:ajv@8";
 
-// =============================================================================
+// ============================================================
 // Types & Interfaces
-// =============================================================================
+// ============================================================
 
 /** Subset of JSON Schema handled by this module. */
 export interface JsonSchema {
@@ -99,22 +101,6 @@ export interface CoverageIssue {
   message: string;
 }
 
-/** Error thrown when schema coverage issues are found. */
-export class SchemaCoverageError extends Error {
-  /** Array of coverage issues found. */
-  issues: CoverageIssue[];
-
-  constructor(message: string, issues: CoverageIssue[]) {
-    super(message);
-    this.name = "SchemaCoverageError";
-    this.issues = issues;
-  }
-}
-
-// =============================================================================
-// Internal Types
-// =============================================================================
-
 /** Internal context threaded through recursive coverage checking. */
 interface CoverageContext {
   /** Ajv instance for branch matching validation. */
@@ -127,19 +113,36 @@ interface CoverageContext {
   validatorCache: Map<JsonSchema, (data: unknown) => boolean>;
 }
 
-// =============================================================================
+// ============================================================
+// Classes
+// ============================================================
+
+/** Error thrown when schema coverage issues are found. */
+export class SchemaCoverageError extends Error {
+  /** Array of coverage issues found. */
+  issues: CoverageIssue[];
+
+  constructor(message: string, issues: CoverageIssue[]) {
+    super(message);
+    this.name = "SchemaCoverageError";
+    this.issues = issues;
+  }
+}
+
+// ============================================================
 // Main API
-// =============================================================================
+// ============================================================
 
 /**
- * Validate samples against a JSON Schema and check for coverage issues.
+ * Validates samples against a JSON Schema and checks for coverage issues.
  *
  * Coverage checking ensures that all branches, values, and edge cases in the
  * schema are exercised by the provided samples.
  *
- * @param schema - The JSON Schema to validate against
- * @param samples - Array of data samples to check
- * @param ignorePaths - Paths to skip during coverage checking
+ * @param schema The JSON Schema to validate against
+ * @param samples Array of data samples to check
+ * @param ignorePaths Paths to skip during coverage checking
+ *
  * @throws {Error} If samples are empty or fail schema validation
  * @throws {SchemaCoverageError} If coverage issues are found
  */
@@ -182,13 +185,14 @@ export function schemaCoverage(
   }
 }
 
-// =============================================================================
+// ============================================================
 // Coverage Checking
-// =============================================================================
+// ============================================================
 
 /**
- * Recursively check schema coverage against samples.
- * @returns Array of coverage issues found
+ * Recursively checks schema coverage against samples.
+ *
+ * @return Array of coverage issues found
  */
 function checkCoverage(
   schema: JsonSchema,
@@ -225,7 +229,7 @@ function checkCoverage(
     }
   }
 
-  // if/then/else (can coexist with other keywords)
+  // Handle if/then/else (can coexist with other keywords)
   if (schema.if && (schema.then || schema.else)) {
     issues.push(...handleIfThenElse(schema, samples, path, ctx));
   }
@@ -233,11 +237,11 @@ function checkCoverage(
   return issues;
 }
 
-// =============================================================================
+// ============================================================
 // Coverage Handlers - Composition
-// =============================================================================
+// ============================================================
 
-/** Handle anyOf and oneOf schemas - check all branches are covered. */
+/** Handles anyOf and oneOf schemas - checks all branches are covered. */
 function handleComposition(
   keyword: "anyOf" | "oneOf",
   branches: JsonSchema[],
@@ -325,7 +329,7 @@ function handleComposition(
   return issues;
 }
 
-/** Handle allOf schemas - recurse into each sub-schema. */
+/** Handles allOf schemas - recurses into each sub-schema. */
 function handleAllOf(
   schemas: JsonSchema[],
   samples: unknown[],
@@ -339,11 +343,11 @@ function handleAllOf(
   return issues;
 }
 
-// =============================================================================
+// ============================================================
 // Coverage Handlers - Enum
-// =============================================================================
+// ============================================================
 
-/** Handle enum schemas - check all values are covered. */
+/** Handles enum schemas - checks all values are covered. */
 function handleEnum(
   values: unknown[],
   samples: unknown[],
@@ -369,11 +373,11 @@ function handleEnum(
   return issues;
 }
 
-// =============================================================================
+// ============================================================
 // Coverage Handlers - Object
-// =============================================================================
+// ============================================================
 
-/** Handle object schemas - check all properties are covered. */
+/** Handles object schemas - checks all properties are covered. */
 function handleObject(
   schema: JsonSchema,
   samples: unknown[],
@@ -438,11 +442,11 @@ function handleObject(
   return issues;
 }
 
-// =============================================================================
+// ============================================================
 // Coverage Handlers - Array & Tuple
-// =============================================================================
+// ============================================================
 
-/** Handle array schemas - check items and non-emptiness. */
+/** Handles array schemas - checks items and non-emptiness. */
 function handleArray(
   schema: JsonSchema,
   samples: unknown[],
@@ -480,7 +484,7 @@ function handleArray(
   return issues;
 }
 
-/** Handle tuple schemas - check each positional item. */
+/** Handles tuple schemas - checks each positional item. */
 function handleTuple(
   tupleItems: JsonSchema[],
   arrays: unknown[][],
@@ -505,12 +509,12 @@ function handleTuple(
   return issues;
 }
 
-// =============================================================================
+// ============================================================
 // Coverage Handlers - Nullable Type Array
-// =============================================================================
+// ============================================================
 
 /**
- * Handle nullable type arrays: `type: ["string", "null"]`.
+ * Handles nullable type arrays: `type: ["string", "null"]`.
  * Checks that samples include both null and non-null values.
  */
 function handleNullableTypeArray(
@@ -559,11 +563,11 @@ function handleNullableTypeArray(
   return issues;
 }
 
-// =============================================================================
+// ============================================================
 // Coverage Handlers - if/then/else
-// =============================================================================
+// ============================================================
 
-/** Handle if/then/else - check both conditional paths are covered. */
+/** Handles if/then/else - checks both conditional paths are covered. */
 function handleIfThenElse(
   schema: JsonSchema,
   samples: unknown[],
@@ -608,11 +612,11 @@ function handleIfThenElse(
   return issues;
 }
 
-// =============================================================================
+// ============================================================
 // Utilities
-// =============================================================================
+// ============================================================
 
-/** Resolve a $ref pointer to its target schema. */
+/** Resolves a $ref pointer to its target schema. */
 function resolveRef(ref: string, defs?: Record<string, JsonSchema>): JsonSchema {
   const prefix = "#/definitions/";
   if (ref.startsWith(prefix) && defs) {
@@ -624,7 +628,7 @@ function resolveRef(ref: string, defs?: Record<string, JsonSchema>): JsonSchema 
 }
 
 /**
- * Check if a sample matches a schema branch using Ajv validation.
+ * Checks if a sample matches a schema branch using Ajv validation.
  * Results are cached per schema object for performance.
  */
 function matchesBranch(schema: JsonSchema, sample: unknown, ctx: CoverageContext): boolean {
@@ -648,17 +652,17 @@ function isObjectRecord(s: unknown): s is Record<string, unknown> {
   return typeof s === "object" && s !== null && !Array.isArray(s);
 }
 
-/** Check if a schema represents the null type. */
+/** Checks if a schema represents the null type. */
 function isNullSchema(schema: JsonSchema): boolean {
   return schema.type === "null";
 }
 
-/** Check if a schema has a nullable type array (e.g., `type: ["string", "null"]`). */
+/** Checks if a schema has a nullable type array (e.g., `type: ["string", "null"]`). */
 function isNullableTypeArray(schema: JsonSchema): boolean {
   return Array.isArray(schema.type) && schema.type.includes("null");
 }
 
-/** Extract tuple item schemas from items array. */
+/** Extracts tuple item schemas from items array. */
 function getTupleItems(schema: JsonSchema): JsonSchema[] | null {
   if (Array.isArray(schema.items)) return schema.items;
   return null;

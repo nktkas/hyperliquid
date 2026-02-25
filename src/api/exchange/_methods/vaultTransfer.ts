@@ -44,8 +44,8 @@ export type VaultTransferResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const VaultTransferParameters = /* @__PURE__ */ (() => {
@@ -54,6 +54,7 @@ const VaultTransferParameters = /* @__PURE__ */ (() => {
     ["type"],
   );
 })();
+
 /** Action parameters for the {@linkcode vaultTransfer} function. */
 export type VaultTransferParameters = v.InferInput<typeof VaultTransferParameters>;
 
@@ -66,11 +67,10 @@ export type VaultTransferSuccessResponse = ExcludeErrorResponse<VaultTransferRes
 /**
  * Deposit or withdraw from a vault.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

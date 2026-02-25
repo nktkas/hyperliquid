@@ -9,6 +9,7 @@ import { type ErrorResponse, SignatureSchema } from "./_base/commonSchemas.ts";
 
 /**
  * Create a sub-account.
+ * @see null
  */
 export const CreateSubAccountRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -31,6 +32,7 @@ export type CreateSubAccountRequest = v.InferOutput<typeof CreateSubAccountReque
 
 /**
  * Response for creating a sub-account.
+ * @see null
  */
 export type CreateSubAccountResponse = {
   /** Successful status. */
@@ -51,8 +53,8 @@ export type CreateSubAccountResponse = {
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const CreateSubAccountParameters = /* @__PURE__ */ (() => {
@@ -61,6 +63,7 @@ const CreateSubAccountParameters = /* @__PURE__ */ (() => {
     ["type"],
   );
 })();
+
 /** Action parameters for the {@linkcode createSubAccount} function. */
 export type CreateSubAccountParameters = v.InferInput<typeof CreateSubAccountParameters>;
 
@@ -73,11 +76,10 @@ export type CreateSubAccountSuccessResponse = ExcludeErrorResponse<CreateSubAcco
 /**
  * Create a sub-account.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Response for creating a sub-account.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Response for creating a sub-account.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -97,6 +99,8 @@ export type CreateSubAccountSuccessResponse = ExcludeErrorResponse<CreateSubAcco
  *   { name: "..." },
  * );
  * ```
+ *
+ * @see null
  */
 export function createSubAccount(
   config: ExchangeConfig,

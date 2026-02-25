@@ -1,6 +1,9 @@
+/**
+ * Execute helpers for L1 and user-signed Exchange API actions.
+ * @module
+ */
+
 import * as v from "@valibot/valibot";
-import type { IRequestTransport } from "../../../../transport/mod.ts";
-import { Address, Hex, UnsignedInteger } from "../../../_schemas.ts";
 import {
   type AbstractWallet,
   getWalletAddress,
@@ -9,14 +12,16 @@ import {
   signMultiSigAction,
   signUserSignedAction,
 } from "../../../../signing/mod.ts";
-import { assertSuccessResponse } from "./errors.ts";
+import type { IRequestTransport } from "../../../../transport/mod.ts";
+import { Address, Hex, UnsignedInteger } from "../../../_schemas.ts";
 import { globalNonceManager } from "./_nonce.ts";
 import { withLock } from "./_semaphore.ts";
 import type { SignatureSchema } from "./commonSchemas.ts";
+import { assertSuccessResponse } from "./errors.ts";
 
-// =============================================================
+// ============================================================
 // Type Utilities
-// =============================================================
+// ============================================================
 
 type MaybePromise<T> = T | Promise<T>;
 
@@ -35,9 +40,9 @@ export type ExtractRequestOptions<T extends { action: Record<string, unknown> }>
   & Omit<T, "action" | "nonce" | "signature">
 >;
 
-// =============================================================
+// ============================================================
 // Config
-// =============================================================
+// ============================================================
 
 /** Base configuration shared by single-wallet and multi-sig configs. */
 interface BaseConfig<T extends IRequestTransport = IRequestTransport> {
@@ -84,13 +89,21 @@ export interface ExchangeMultiSigConfig<T extends IRequestTransport = IRequestTr
 /** Union type for all Exchange API configurations. */
 export type ExchangeConfig = ExchangeSingleWalletConfig | ExchangeMultiSigConfig;
 
-// =============================================================
+// ============================================================
 // Execute L1 Action
-// =============================================================
+// ============================================================
 
 /**
  * Execute an L1 action on the Hyperliquid Exchange.
+ *
  * Handles both single-wallet and multi-sig signing.
+ *
+ * @param config Exchange API configuration
+ * @param action Action payload to execute
+ * @param options Additional options for the request
+ * @return API response
+ *
+ * @throws {ApiRequestError} If the API returns an error response
  */
 export async function executeL1Action<T>(
   config: ExchangeConfig,
@@ -152,9 +165,9 @@ export async function executeL1Action<T>(
   });
 }
 
-// =============================================================
+// ============================================================
 // Execute User-Signed Action
-// =============================================================
+// ============================================================
 
 /** Extract nonce field name from EIP-712 types ("nonce" or "time"). */
 function getNonceFieldName(types: Record<string, { name: string; type: string }[]>): "nonce" | "time" {
@@ -168,8 +181,17 @@ function getNonceFieldName(types: Record<string, { name: string; type: string }[
 
 /**
  * Execute a user-signed action (EIP-712) on the Hyperliquid Exchange.
+ *
  * Handles both single-wallet and multi-sig signing.
  * Automatically adds signatureChainId, hyperliquidChain, and nonce/time.
+ *
+ * @param config Exchange API configuration
+ * @param action Action payload to execute
+ * @param types EIP-712 type definitions for signing
+ * @param options Additional options for the request
+ * @return API response
+ *
+ * @throws {ApiRequestError} If the API returns an error response
  */
 export async function executeUserSignedAction<T>(
   config: ExchangeConfig,
@@ -192,7 +214,7 @@ export async function executeUserSignedAction<T>(
     // Add system fields for user-signed actions
     const { type, ...restAction } = action;
     const nonceFieldName = getNonceFieldName(types);
-    const fullAction = { // key order is important for multi-sig
+    const fullAction = { // Key order is important for multi-sig
       type,
       signatureChainId: await getSignatureChainId(config),
       hyperliquidChain: transport.isTestnet ? "Testnet" : "Mainnet",
@@ -216,9 +238,9 @@ export async function executeUserSignedAction<T>(
   });
 }
 
-// =============================================================
+// ============================================================
 // Multi-sig signing
-// =============================================================
+// ============================================================
 
 /** Remove leading zeros from signature components (required by Hyperliquid). */
 function trimSignature(sig: SignatureSchema): SignatureSchema {
@@ -329,9 +351,9 @@ async function signMultiSigUserSigned(
   return [multiSigAction, signature];
 }
 
-// =============================================================
+// ============================================================
 // Helpers
-// =============================================================
+// ============================================================
 
 /** Get the leader wallet (first signer for the single wallet, or multi-sig). */
 function getLeader(config: ExchangeConfig): AbstractWallet {

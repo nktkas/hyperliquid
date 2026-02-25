@@ -8,6 +8,7 @@ import type { MetaResponse } from "./meta.ts";
 
 /**
  * Request trading metadata for all DEXes.
+ * @see null
  */
 export const AllPerpMetasRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -19,6 +20,7 @@ export type AllPerpMetasRequest = v.InferOutput<typeof AllPerpMetasRequest>;
 
 /**
  * Metadata for perpetual assets across all DEXes.
+ * @see null
  */
 export type AllPerpMetasResponse = MetaResponse[];
 
@@ -31,10 +33,9 @@ import type { InfoConfig } from "./_base/types.ts";
 /**
  * Request trading metadata for all DEXes.
  *
- * @param config - General configuration for Info API requests.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Metadata for perpetual assets across all DEXes.
+ * @param config General configuration for Info API requests.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Metadata for perpetual assets across all DEXes.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -48,6 +49,8 @@ import type { InfoConfig } from "./_base/types.ts";
  *
  * const data = await allPerpMetas({ transport });
  * ```
+ *
+ * @see null
  */
 export function allPerpMetas(
   config: InfoConfig,

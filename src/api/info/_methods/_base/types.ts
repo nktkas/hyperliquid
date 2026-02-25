@@ -1,3 +1,8 @@
+/**
+ * Configuration types for the Info API.
+ * @module
+ */
+
 import type { IRequestTransport } from "../../../../transport/mod.ts";
 
 /** Configuration for Info API requests. */

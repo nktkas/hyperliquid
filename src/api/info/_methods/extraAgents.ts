@@ -8,6 +8,7 @@ import { Address } from "../../_schemas.ts";
 
 /**
  * Request user extra agents.
+ * @see null
  */
 export const ExtraAgentsRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -21,6 +22,7 @@ export type ExtraAgentsRequest = v.InferOutput<typeof ExtraAgentsRequest>;
 
 /**
  * Array of extra agent details for a user.
+ * @see null
  */
 export type ExtraAgentsResponse = {
   /**
@@ -46,11 +48,10 @@ export type ExtraAgentsParameters = Omit<v.InferInput<typeof ExtraAgentsRequest>
 /**
  * Request user extra agents.
  *
- * @param config - General configuration for Info API requests.
- * @param params - Parameters specific to the API request.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Array of extra agent details for a user.
+ * @param config General configuration for Info API requests.
+ * @param params Parameters specific to the API request.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Array of extra agent details for a user.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -67,6 +68,8 @@ export type ExtraAgentsParameters = Omit<v.InferInput<typeof ExtraAgentsRequest>
  *   { user: "0x..." },
  * );
  * ```
+ *
+ * @see null
  */
 export function extraAgents(
   config: InfoConfig,

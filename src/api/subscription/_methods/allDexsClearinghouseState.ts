@@ -9,6 +9,7 @@ import type { ClearinghouseStateResponse } from "../../info/_methods/clearinghou
 
 /**
  * Subscription to clearinghouse state events for all DEXs for a specific user.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const AllDexsClearinghouseStateRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -22,6 +23,7 @@ export type AllDexsClearinghouseStateRequest = v.InferOutput<typeof AllDexsClear
 
 /**
  * Event of clearinghouse states for all DEXs for a specific user.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export type AllDexsClearinghouseStateEvent = {
   /**
@@ -37,8 +39,8 @@ export type AllDexsClearinghouseStateEvent = {
 // Execution Logic
 // ============================================================
 
-import type { SubscriptionConfig } from "./_types.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode allDexsClearinghouseState} function. */
 export type AllDexsClearinghouseStateParameters = Omit<v.InferInput<typeof AllDexsClearinghouseStateRequest>, "type">;
@@ -46,11 +48,10 @@ export type AllDexsClearinghouseStateParameters = Omit<v.InferInput<typeof AllDe
 /**
  * Subscribe to clearinghouse states for all DEXs for a specific user.
  *
- * @param config - General configuration for Subscription API subscriptions.
- * @param params - Parameters specific to the API subscription.
- * @param listener - A callback function to be called when the event is received.
- *
- * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+ * @param config General configuration for Subscription API subscriptions.
+ * @param params Parameters specific to the API subscription.
+ * @param listener A callback function to be called when the event is received.
+ * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

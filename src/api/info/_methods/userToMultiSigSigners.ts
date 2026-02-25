@@ -8,6 +8,7 @@ import { Address } from "../../_schemas.ts";
 
 /**
  * Request multi-sig signers for a user.
+ * @see null
  */
 export const UserToMultiSigSignersRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -21,6 +22,7 @@ export type UserToMultiSigSignersRequest = v.InferOutput<typeof UserToMultiSigSi
 
 /**
  * Multi-sig signers for a user or null if the user does not have any multi-sig signers.
+ * @see null
  */
 export type UserToMultiSigSignersResponse = {
   /**
@@ -44,11 +46,10 @@ export type UserToMultiSigSignersParameters = Omit<v.InferInput<typeof UserToMul
 /**
  * Request multi-sig signers for a user.
  *
- * @param config - General configuration for Info API requests.
- * @param params - Parameters specific to the API request.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Multi-sig signers for a user or null if the user does not have any multi-sig signers.
+ * @param config General configuration for Info API requests.
+ * @param params Parameters specific to the API request.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Multi-sig signers for a user or null if the user does not have any multi-sig signers.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -65,6 +66,8 @@ export type UserToMultiSigSignersParameters = Omit<v.InferInput<typeof UserToMul
  *   { user: "0x..." },
  * );
  * ```
+ *
+ * @see null
  */
 export function userToMultiSigSigners(
   config: InfoConfig,

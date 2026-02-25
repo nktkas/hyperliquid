@@ -1,6 +1,6 @@
+import type { ReconnectingWebSocket } from "@nktkas/rews";
 import { TransportError } from "../_base.ts";
 import { AbortSignal_, Promise_ } from "../_polyfills.ts";
-import type { ReconnectingWebSocket } from "@nktkas/rews";
 import type { HyperliquidEventTarget } from "./_hyperliquidEventTarget.ts";
 
 interface PostRequest {
@@ -40,16 +40,16 @@ export class WebSocketPostRequest {
   /** Timeout for requests in ms. Set to `null` to disable. */
   timeout: number | null;
 
-  protected _socket: ReconnectingWebSocket;
+  protected readonly _socket: ReconnectingWebSocket;
   protected _lastId = 0;
   protected _queue: PendingRequest[] = [];
 
   /**
    * Creates a new WebSocket async request handler.
    *
-   * @param socket - WebSocket connection instance for sending requests to the Hyperliquid WebSocket API
-   * @param hlEvents - Used to recognize Hyperliquid responses and match them with sent requests
-   * @param timeout - Timeout for requests in ms. Set to `null` to disable.
+   * @param socket WebSocket connection instance for sending requests to the Hyperliquid WebSocket API
+   * @param hlEvents Used to recognize Hyperliquid responses and match them with sent requests
+   * @param timeout Timeout for requests in ms. Set to `null` to disable.
    */
   constructor(socket: ReconnectingWebSocket, hlEvents: HyperliquidEventTarget, timeout: number | null) {
     this.timeout = timeout;
@@ -58,7 +58,7 @@ export class WebSocketPostRequest {
     // Monitor responses and match the pending request
     hlEvents.addEventListener("subscriptionResponse", (event) => {
       this._queue
-        // NOTE: API may add new fields over time, so perform a loose check of the payload.
+        // NOTE: API may add new fields over time, so perform a loose check of the payload
         .find((x) => typeof x.id === "string" && isSubset(JSON.parse(x.id), event.detail))
         ?.resolve(event.detail);
     });
@@ -160,7 +160,7 @@ export class WebSocketPostRequest {
   /**
    * Sends a request to the Hyperliquid API.
    *
-   * @returns A promise that resolves with the parsed JSON response body.
+   * @return A promise that resolves with the parsed JSON response body.
    */
   async request(method: "ping", signal?: AbortSignal): Promise<void>;
   async request<T>(method: "post" | "subscribe" | "unsubscribe", payload: unknown, signal?: AbortSignal): Promise<T>;
@@ -180,7 +180,7 @@ export class WebSocketPostRequest {
 
       // Reject the request if the signal is aborted
       if (signal?.aborted) return Promise.reject(signal.reason);
-      // or if the WebSocket connection is permanently closed
+      // Or if the WebSocket connection is permanently closed
       if (this._socket.terminationSignal.aborted) {
         return Promise.reject(this._socket.terminationSignal.reason);
       }

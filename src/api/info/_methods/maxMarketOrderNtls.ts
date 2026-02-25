@@ -6,6 +6,7 @@ import * as v from "@valibot/valibot";
 
 /**
  * Request maximum market order notionals.
+ * @see null
  */
 export const MaxMarketOrderNtlsRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -17,6 +18,7 @@ export type MaxMarketOrderNtlsRequest = v.InferOutput<typeof MaxMarketOrderNtlsR
 
 /**
  * Array of tuples containing maximum market order notionals and their corresponding asset symbols.
+ * @see null
  */
 export type MaxMarketOrderNtlsResponse = [notional: number, symbol: string][];
 
@@ -29,10 +31,9 @@ import type { InfoConfig } from "./_base/types.ts";
 /**
  * Request maximum market order notionals.
  *
- * @param config - General configuration for Info API requests.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Maximum market order notionals.
+ * @param config General configuration for Info API requests.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Maximum market order notionals.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -46,6 +47,8 @@ import type { InfoConfig } from "./_base/types.ts";
  *
  * const data = await maxMarketOrderNtls({ transport });
  * ```
+ *
+ * @see null
  */
 export function maxMarketOrderNtls(
   config: InfoConfig,

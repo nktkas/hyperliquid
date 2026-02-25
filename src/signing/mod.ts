@@ -82,7 +82,11 @@ export {
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000" as const;
 
 /**
- * Create a hash of the L1 action.
+ * Creates a hash of the L1 action.
+ *
+ * @param args The action and metadata to hash
+ * @return The keccak256 hash as a hex string
+ *
  * @example
  * ```ts
  * import { createL1ActionHash } from "@nktkas/hyperliquid/signing";
@@ -177,7 +181,13 @@ function removeUndefinedKeys(obj: ValueType): ValueType {
 }
 
 /**
- * Sign an L1 action.
+ * Signs an L1 action.
+ *
+ * @param args The wallet, action, and signing parameters
+ * @return The ECDSA signature components
+ *
+ * @throws {AbstractWalletError} If signing fails
+ *
  * @example
  * ```ts
  * import { signL1Action } from "@nktkas/hyperliquid/signing";
@@ -215,7 +225,8 @@ export async function signL1Action(args: {
   nonce: number;
   /**
    * Indicates if the action is for the testnet.
-   * @default false
+   *
+   * Default: `false`
    */
   isTestnet?: boolean;
   /** Optional vault address used in the action. */
@@ -247,7 +258,13 @@ export async function signL1Action(args: {
 }
 
 /**
- * Sign a user-signed action.
+ * Signs a user-signed action.
+ *
+ * @param args The wallet, action, and EIP-712 types
+ * @return The ECDSA signature components
+ *
+ * @throws {AbstractWalletError} If signing fails
+ *
  * @example
  * ```ts
  * import { signUserSignedAction } from "@nktkas/hyperliquid/signing";
@@ -286,7 +303,7 @@ export async function signUserSignedAction(args: {
       signatureChainId: `0x${string}`;
       [key: string]: unknown;
     }
-    // special case for multi-sign payload
+    // Special case for multi-sign payload
     & (
       | { payloadMultiSigUser: `0x${string}`; outerSigner: `0x${string}` }
       | { payloadMultiSigUser?: undefined; outerSigner?: undefined }
@@ -302,14 +319,14 @@ export async function signUserSignedAction(args: {
   let { wallet, action, types } = args;
   const primaryType = Object.keys(types)[0];
 
-  // Special case: for `approveAgent`
-  // If `agentName` is null or undefined, set it to an empty string
+  // Special case for `approveAgent`,
+  // if `agentName` is null or undefined, set it to an empty string
   if (action.type === "approveAgent" && !action.agentName) {
     action = { ...action, agentName: "" };
   }
 
-  // Special case: for multi-sign payload
-  // If the action contains `payloadMultiSigUser` and `outerSigner`, add them to the types
+  // Special case for multi-sign payload,
+  // if the action contains `payloadMultiSigUser` and `outerSigner`, add them to the types
   if ("payloadMultiSigUser" in action && "outerSigner" in action) {
     const primaryTypeArray = types[primaryType];
     types = {
@@ -323,8 +340,8 @@ export async function signUserSignedAction(args: {
     };
   }
 
-  // Special case: for some wallets
-  // If the action has extra keys not in the types, filter them out
+  // Special case for some wallets,
+  // if the action has extra keys not in the types, filter them out
   const knownKeys = new Set(types[primaryType].map((f) => f.name));
   const message = Object.fromEntries(Object.entries(action).filter(([k]) => knownKeys.has(k)));
 
@@ -343,7 +360,13 @@ export async function signUserSignedAction(args: {
 }
 
 /**
- * Sign a multi-signature action.
+ * Signs a multi-signature action.
+ *
+ * @param args The wallet, action, and signing parameters
+ * @return The ECDSA signature components
+ *
+ * @throws {AbstractWalletError} If signing fails
+ *
  * @example
  * ```ts
  * import { signL1Action, signMultiSigAction } from "@nktkas/hyperliquid/signing";
@@ -416,7 +439,8 @@ export async function signMultiSigAction(args: {
   nonce: number;
   /**
    * Indicates if the action is for the testnet.
-   * @default false
+   *
+   * Default: `false`
    */
   isTestnet?: boolean;
   /** Optional vault address used in the action. */

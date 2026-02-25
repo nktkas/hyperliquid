@@ -4,10 +4,12 @@
  * - Maximum 6 (for perp) or 8 (for spot) - `szDecimals` decimal places
  * - Integer prices are always allowed regardless of significant figures
  *
- * @param price - The price to format (as string or number).
- * @param szDecimals - The size decimals of the asset.
- * @param type - The market type: "perp" for perpetuals or "spot" for spot markets. Default is "perp".
+ * @param price The price to format (as string or number).
+ * @param szDecimals The size decimals of the asset.
+ * @param type The market type: "perp" for perpetuals or "spot" for spot markets. Default: `"perp"`.
+ * @return Formatted price string
  *
+ * @throws {TypeError} If price is not a valid number string
  * @throws {RangeError} If the formatted price is 0
  *
  * @example
@@ -41,9 +43,11 @@ export function formatPrice(price: string | number, szDecimals: number, type: "p
  * Format size according to Hyperliquid {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/tick-and-lot-size | rules}:
  * - Truncate decimal places to `szDecimals`
  *
- * @param size - The size to format (as string or number).
- * @param szDecimals - The size decimals of the asset.
+ * @param size The size to format (as string or number).
+ * @param szDecimals The size decimals of the asset.
+ * @return Formatted size string
  *
+ * @throws {TypeError} If size is not a valid number string
  * @throws {RangeError} If the formatted size is 0
  *
  * @example
@@ -67,9 +71,9 @@ export function formatSize(size: string | number, szDecimals: number): string {
   return size;
 }
 
-/** String-based Math operations for arbitrary precision */
+/** String-based Math operations for arbitrary precision. */
 const StringMath = {
-  /** Floor log10 (magnitude): position of most significant digit */
+  /** Floor log10 (magnitude): position of most significant digit. */
   log10Floor(value: string): number {
     const abs = value[0] === "-" ? value.slice(1) : value;
 
@@ -90,7 +94,7 @@ const StringMath = {
     return -(leadingZeros + 1);
   },
 
-  /** Multiply by 10^exp: shift decimal point left (negative) or right (positive) */
+  /** Multiply by 10^exp: shift decimal point left (negative) or right (positive). */
   multiplyByPow10(value: string, exp: number): string {
     if (!Number.isInteger(exp)) throw new RangeError("Exponent must be an integer");
     if (exp === 0) return formatDecimalString(value);
@@ -123,13 +127,13 @@ const StringMath = {
     return formatDecimalString((neg ? "-" : "") + result);
   },
 
-  /** Returns the integer part of a number by removing any fractional digits */
+  /** Returns the integer part of a number by removing any fractional digits. */
   trunc(value: string): string {
     const dotIndex = value.indexOf(".");
     return dotIndex === -1 ? value : value.slice(0, dotIndex) || "0";
   },
 
-  /** Truncate to a certain number of significant figures */
+  /** Truncate to a certain number of significant figures. */
   toPrecisionTruncate(value: string, precision: number): string {
     if (!Number.isInteger(precision)) throw new RangeError("Precision must be an integer");
     if (precision < 1) throw new RangeError("Precision must be positive");
@@ -147,11 +151,11 @@ const StringMath = {
     const truncated = StringMath.trunc(shifted);
     const result = StringMath.multiplyByPow10(truncated, -shiftAmount);
 
-    // build final result and trim zeros
+    // Build final result and trim zeros
     return formatDecimalString(neg ? "-" + result : result);
   },
 
-  /** Truncate to a certain number of decimal places */
+  /** Truncate to a certain number of decimal places. */
   toFixedTruncate(value: string, decimals: number): string {
     if (!Number.isInteger(decimals)) throw new RangeError("Decimals must be an integer");
     if (decimals < 0) throw new RangeError("Decimals must be non-negative");

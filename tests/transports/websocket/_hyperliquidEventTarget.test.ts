@@ -1,4 +1,5 @@
 // deno-lint-ignore-file no-import-prefix
+
 import { assertEquals, assertFalse } from "jsr:@std/assert@1";
 import { HyperliquidEventTarget } from "../../../src/transport/websocket/_hyperliquidEventTarget.ts";
 
@@ -61,12 +62,12 @@ Deno.test("HyperliquidEventTarget", async (t) => {
       assertEquals(received, MESSAGES.hyperliquidEvent.data);
     });
 
-    await t.step("ExplorerBlock dispatches to _explorerBlock", () => {
+    await t.step("ExplorerBlock dispatches to explorerBlock_", () => {
       const socket = createFakeSocket();
       const target = new HyperliquidEventTarget(socket);
 
       let received: unknown;
-      target.addEventListener("_explorerBlock", (e) => {
+      target.addEventListener("explorerBlock_", (e) => {
         received = e.detail;
       });
 
@@ -74,12 +75,12 @@ Deno.test("HyperliquidEventTarget", async (t) => {
       assertEquals(received, MESSAGES.explorerBlock);
     });
 
-    await t.step("ExplorerTxs dispatches to _explorerTxs", () => {
+    await t.step("ExplorerTxs dispatches to explorerTxs_", () => {
       const socket = createFakeSocket();
       const target = new HyperliquidEventTarget(socket);
 
       let received: unknown;
-      target.addEventListener("_explorerTxs", (e) => {
+      target.addEventListener("explorerTxs_", (e) => {
         received = e.detail;
       });
 

@@ -1,7 +1,7 @@
 import type { AllDexsAssetCtxsEvent } from "@nktkas/hyperliquid/api/subscription";
-import { collectEventsOverTime, runTest } from "./_t.ts";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+import { collectEventsOverTime, runTest } from "./_t.ts";
 
 const sourceFile = new URL("../../../src/api/subscription/_methods/allDexsAssetCtxs.ts", import.meta.url).pathname;
 const responseSchema = typeToJsonSchema(sourceFile, "AllDexsAssetCtxsEvent");

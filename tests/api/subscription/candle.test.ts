@@ -1,9 +1,9 @@
-import * as v from "@valibot/valibot";
 import { type CandleEvent, type CandleParameters, CandleRequest } from "@nktkas/hyperliquid/api/subscription";
-import { collectEventsOverTime, runTest } from "./_t.ts";
+import * as v from "@valibot/valibot";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
 import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
+import { collectEventsOverTime, runTest } from "./_t.ts";
 
 const sourceFile = new URL("../../../src/api/subscription/_methods/candle.ts", import.meta.url).pathname;
 const responseSchema = typeToJsonSchema(sourceFile, "CandleEvent");
@@ -36,10 +36,15 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data, [
+      "#/properties/i/enum/1",
       "#/properties/i/enum/2",
+      "#/properties/i/enum/4",
       "#/properties/i/enum/5",
+      "#/properties/i/enum/7",
       "#/properties/i/enum/8",
+      "#/properties/i/enum/10",
       "#/properties/i/enum/11",
+      "#/properties/i/enum/13",
     ]);
   },
 });

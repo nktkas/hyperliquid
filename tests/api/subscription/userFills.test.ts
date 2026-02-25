@@ -1,9 +1,9 @@
-import * as v from "@valibot/valibot";
 import { type UserFillsEvent, type UserFillsParameters, UserFillsRequest } from "@nktkas/hyperliquid/api/subscription";
-import { collectEventsOverTime, runTest } from "./_t.ts";
+import * as v from "@valibot/valibot";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
 import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
+import { collectEventsOverTime, runTest } from "./_t.ts";
 
 const sourceFile = new URL("../../../src/api/subscription/_methods/userFills.ts", import.meta.url).pathname;
 const responseSchema = typeToJsonSchema(sourceFile, "UserFillsEvent");

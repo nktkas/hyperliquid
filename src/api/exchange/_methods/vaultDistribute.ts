@@ -9,6 +9,7 @@ import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_ba
 
 /**
  * Distribute funds from a vault between followers.
+ * @see null
  */
 export const VaultDistributeRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -36,6 +37,7 @@ export type VaultDistributeRequest = v.InferOutput<typeof VaultDistributeRequest
 
 /**
  * Successful response without specific data or error response.
+ * @see null
  */
 export type VaultDistributeResponse = SuccessResponse | ErrorResponse;
 
@@ -43,8 +45,8 @@ export type VaultDistributeResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const VaultDistributeParameters = /* @__PURE__ */ (() => {
@@ -53,6 +55,7 @@ const VaultDistributeParameters = /* @__PURE__ */ (() => {
     ["type"],
   );
 })();
+
 /** Action parameters for the {@linkcode vaultDistribute} function. */
 export type VaultDistributeParameters = v.InferInput<typeof VaultDistributeParameters>;
 
@@ -65,11 +68,10 @@ export type VaultDistributeSuccessResponse = ExcludeErrorResponse<VaultDistribut
 /**
  * Distribute funds from a vault between followers.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -89,6 +91,8 @@ export type VaultDistributeSuccessResponse = ExcludeErrorResponse<VaultDistribut
  *   { vaultAddress: "0x...", usd: 10 * 1e6 },
  * );
  * ```
+ *
+ * @see null
  */
 export function vaultDistribute(
   config: ExchangeConfig,

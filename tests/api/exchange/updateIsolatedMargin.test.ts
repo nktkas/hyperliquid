@@ -1,9 +1,9 @@
-import * as v from "@valibot/valibot";
 import { type UpdateIsolatedMarginParameters, UpdateIsolatedMarginRequest } from "@nktkas/hyperliquid/api/exchange";
-import { openOrder, runTest, symbolConverter } from "./_t.ts";
+import * as v from "@valibot/valibot";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
 import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
+import { openOrder, runTest, symbolConverter } from "./_t.ts";
 
 const sourceFile = new URL("../../../src/api/exchange/_methods/updateIsolatedMargin.ts", import.meta.url).pathname;
 const responseSchema = typeToJsonSchema(sourceFile, "UpdateIsolatedMarginSuccessResponse");
@@ -18,12 +18,12 @@ runTest({
     await exchClient.updateLeverage({ asset: id, isCross: false, leverage: 1 });
     await openOrder(exchClient, "market", "SOL");
 
-    // increase margin
+    // Increase margin
     const increase = await (async () => {
       const params: UpdateIsolatedMarginParameters = { asset: id, isBuy: true, ntli: 2 * 1e6 };
       return { params, result: await exchClient.updateIsolatedMargin(params) };
     })();
-    // decrease margin
+    // Decrease margin
     const decrease = await (async () => {
       const params: UpdateIsolatedMarginParameters = { asset: id, isBuy: true, ntli: -1 * 1e6 };
       return { params, result: await exchClient.updateIsolatedMargin(params) };

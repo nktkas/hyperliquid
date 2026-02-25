@@ -6,6 +6,7 @@ import * as v from "@valibot/valibot";
 
 /**
  * Request liquidatable.
+ * @see null
  */
 export const LiquidatableRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -17,6 +18,7 @@ export type LiquidatableRequest = v.InferOutput<typeof LiquidatableRequest>;
 
 /**
  * Response for liquidatable request.
+ * @see null
  */
 export type LiquidatableResponse = unknown[];
 
@@ -29,10 +31,9 @@ import type { InfoConfig } from "./_base/types.ts";
 /**
  * Request liquidatable.
  *
- * @param config - General configuration for Info API requests.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns unknown
+ * @param config General configuration for Info API requests.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Unknown array.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -46,6 +47,8 @@ import type { InfoConfig } from "./_base/types.ts";
  *
  * const data = await liquidatable({ transport });
  * ```
+ *
+ * @see null
  */
 export function liquidatable(
   config: InfoConfig,

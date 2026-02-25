@@ -37,8 +37,8 @@
  * @module
  */
 
-export type { ExchangeMultiSigConfig, ExchangeSingleWalletConfig } from "./_methods/_base/execute.ts";
 export { ApiRequestError } from "./_methods/_base/errors.ts";
+export type { ExchangeMultiSigConfig, ExchangeSingleWalletConfig } from "./_methods/_base/execute.ts";
 
 export * from "./_methods/agentEnableDexAbstraction.ts";
 export * from "./_methods/agentSetAbstraction.ts";
@@ -59,8 +59,8 @@ export * from "./_methods/cWithdraw.ts";
 export * from "./_methods/evmUserModify.ts";
 export * from "./_methods/linkStakingUser.ts";
 export * from "./_methods/modify.ts";
-export * from "./_methods/order.ts";
 export * from "./_methods/noop.ts";
+export * from "./_methods/order.ts";
 export * from "./_methods/perpDeploy.ts";
 export * from "./_methods/registerReferrer.ts";
 export * from "./_methods/reserveRequestWeight.ts";

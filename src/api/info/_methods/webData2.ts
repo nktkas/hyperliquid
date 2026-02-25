@@ -7,14 +7,15 @@ import * as v from "@valibot/valibot";
 import { Address } from "../../_schemas.ts";
 import type { PerpAssetCtxSchema, SpotAssetCtxSchema, TwapStateSchema } from "./_base/commonSchemas.ts";
 import type { ClearinghouseStateResponse } from "./clearinghouseState.ts";
-import type { MetaResponse } from "./meta.ts";
-import type { SpotClearinghouseStateResponse } from "./spotClearinghouseState.ts";
 import type { FrontendOpenOrdersResponse } from "./frontendOpenOrders.ts";
 import type { LeadingVaultsResponse } from "./leadingVaults.ts";
+import type { MetaResponse } from "./meta.ts";
 import type { PerpsAtOpenInterestCapResponse } from "./perpsAtOpenInterestCap.ts";
+import type { SpotClearinghouseStateResponse } from "./spotClearinghouseState.ts";
 
 /**
  * Request comprehensive user and market data.
+ * @see null
  */
 export const WebData2Request = /* @__PURE__ */ (() => {
   return v.object({
@@ -28,14 +29,15 @@ export type WebData2Request = v.InferOutput<typeof WebData2Request>;
 
 /**
  * Comprehensive user and market data.
+ * @see null
  */
 export type WebData2Response = {
   /** Account summary for perpetual trading. */
   clearinghouseState: ClearinghouseStateResponse;
   /** Array of leading vaults for a user. */
   leadingVaults: LeadingVaultsResponse;
-  /** T
-   * otal equity in vaults.
+  /**
+   * Total equity in vaults.
    * @pattern ^[0-9]+(\.[0-9]+)?$
    */
   totalVaultEquity: string;
@@ -90,11 +92,10 @@ export type WebData2Parameters = Omit<v.InferInput<typeof WebData2Request>, "typ
 /**
  * Request comprehensive user and market data.
  *
- * @param config - General configuration for Info API requests.
- * @param params - Parameters specific to the API request.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Comprehensive user and market data.
+ * @param config General configuration for Info API requests.
+ * @param params Parameters specific to the API request.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Comprehensive user and market data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -111,6 +112,8 @@ export type WebData2Parameters = Omit<v.InferInput<typeof WebData2Request>, "typ
  *   { user: "0x..." },
  * );
  * ```
+ *
+ * @see null
  */
 export function webData2(
   config: InfoConfig,

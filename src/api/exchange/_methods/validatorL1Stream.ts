@@ -40,8 +40,8 @@ export type ValidatorL1StreamResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const ValidatorL1StreamParameters = /* @__PURE__ */ (() => {
@@ -50,6 +50,7 @@ const ValidatorL1StreamParameters = /* @__PURE__ */ (() => {
     ["type"],
   );
 })();
+
 /** Action parameters for the {@linkcode validatorL1Stream} function. */
 export type ValidatorL1StreamParameters = v.InferInput<typeof ValidatorL1StreamParameters>;
 
@@ -62,11 +63,10 @@ export type ValidatorL1StreamSuccessResponse = ExcludeErrorResponse<ValidatorL1S
 /**
  * Validator vote on risk-free rate for aligned quote asset.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

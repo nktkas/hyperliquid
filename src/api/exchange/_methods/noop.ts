@@ -38,8 +38,8 @@ export type NoopResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Request options for the {@linkcode noop} function. */
 export type NoopOptions = ExtractRequestOptions<v.InferInput<typeof NoopRequest>>;
@@ -50,11 +50,9 @@ export type NoopSuccessResponse = ExcludeErrorResponse<NoopResponse>;
 /**
  * This action does not do anything (no operation), but causes the nonce to be marked as used.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

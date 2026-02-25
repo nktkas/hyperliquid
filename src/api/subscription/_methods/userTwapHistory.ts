@@ -9,6 +9,7 @@ import type { TwapHistoryResponse } from "../../info/_methods/twapHistory.ts";
 
 /**
  * Subscription to user TWAP history events for a specific user.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const UserTwapHistoryRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -22,6 +23,7 @@ export type UserTwapHistoryRequest = v.InferOutput<typeof UserTwapHistoryRequest
 
 /**
  * Event of user TWAP history.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export type UserTwapHistoryEvent = {
   /**
@@ -39,8 +41,8 @@ export type UserTwapHistoryEvent = {
 // Execution Logic
 // ============================================================
 
-import type { SubscriptionConfig } from "./_types.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_types.ts";
 
 /** Request parameters for the {@linkcode userTwapHistory} function. */
 export type UserTwapHistoryParameters = Omit<v.InferInput<typeof UserTwapHistoryRequest>, "type">;
@@ -48,11 +50,10 @@ export type UserTwapHistoryParameters = Omit<v.InferInput<typeof UserTwapHistory
 /**
  * Subscribe to TWAP order history updates for a specific user.
  *
- * @param config - General configuration for Subscription API subscriptions.
- * @param params - Parameters specific to the API subscription.
- * @param listener - A callback function to be called when the event is received.
- *
- * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+ * @param config General configuration for Subscription API subscriptions.
+ * @param params Parameters specific to the API subscription.
+ * @param listener A callback function to be called when the event is received.
+ * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

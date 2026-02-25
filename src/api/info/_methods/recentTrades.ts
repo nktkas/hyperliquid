@@ -6,6 +6,7 @@ import * as v from "@valibot/valibot";
 
 /**
  * Request recent trades.
+ * @see null
  */
 export const RecentTradesRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -19,6 +20,7 @@ export type RecentTradesRequest = v.InferOutput<typeof RecentTradesRequest>;
 
 /**
  * Array of recent trades.
+ * @see null
  */
 export type RecentTradesResponse = {
   /** Asset symbol (e.g., BTC). */
@@ -65,11 +67,10 @@ export type RecentTradesParameters = Omit<v.InferInput<typeof RecentTradesReques
 /**
  * Request recent trades.
  *
- * @param config - General configuration for Info API requests.
- * @param params - Parameters specific to the API request.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Array of recent trades.
+ * @param config General configuration for Info API requests.
+ * @param params Parameters specific to the API request.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Array of recent trades.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -86,6 +87,8 @@ export type RecentTradesParameters = Omit<v.InferInput<typeof RecentTradesReques
  *   { coin: "ETH" },
  * );
  * ```
+ *
+ * @see null
  */
 export function recentTrades(
   config: InfoConfig,

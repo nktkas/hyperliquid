@@ -6,6 +6,7 @@ import * as v from "@valibot/valibot";
 
 /**
  * Subscription to explorer block events.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export const ExplorerBlockRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -17,6 +18,7 @@ export type ExplorerBlockRequest = v.InferOutput<typeof ExplorerBlockRequest>;
 
 /**
  * Event of array of block details.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export type ExplorerBlockEvent = {
   /** Block creation timestamp. */
@@ -41,16 +43,15 @@ export type ExplorerBlockEvent = {
 // Execution Logic
 // ============================================================
 
-import type { SubscriptionConfig } from "./_types.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_types.ts";
 
 /**
  * Subscribe to explorer block updates.
  *
- * @param config - General configuration for Subscription API subscriptions.
- * @param listener - A callback function to be called when the event is received.
- *
- * @returns A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+ * @param config General configuration for Subscription API subscriptions.
+ * @param listener A callback function to be called when the event is received.
+ * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -75,7 +76,7 @@ export function explorerBlock(
   listener: (data: ExplorerBlockEvent) => void,
 ): Promise<ISubscription> {
   const payload = v.parse(ExplorerBlockRequest, { type: "explorerBlock" });
-  return config.transport.subscribe<ExplorerBlockEvent>("_explorerBlock", payload, (e) => { // Internal channel as it does not have its own channel
+  return config.transport.subscribe<ExplorerBlockEvent>("explorerBlock_", payload, (e) => { // Internal channel as it does not have its own channel
     listener(e.detail);
   });
 }

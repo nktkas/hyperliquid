@@ -1,8 +1,13 @@
+/**
+ * Client for the Hyperliquid Exchange API endpoint.
+ * @module
+ */
+
 import type { ExchangeConfig, ExchangeSingleWalletConfig } from "./_methods/_base/execute.ts";
 
-// =============================================================
+// ============================================================
 // Methods Imports
-// =============================================================
+// ============================================================
 
 import {
   agentEnableDexAbstraction,
@@ -102,8 +107,8 @@ import {
   type LinkStakingUserSuccessResponse,
 } from "./_methods/linkStakingUser.ts";
 import { modify, type ModifyOptions, type ModifyParameters, type ModifySuccessResponse } from "./_methods/modify.ts";
-import { order, type OrderOptions, type OrderParameters, type OrderSuccessResponse } from "./_methods/order.ts";
 import { noop, type NoopOptions, type NoopSuccessResponse } from "./_methods/noop.ts";
+import { order, type OrderOptions, type OrderParameters, type OrderSuccessResponse } from "./_methods/order.ts";
 import {
   perpDeploy,
   type PerpDeployOptions,
@@ -231,17 +236,17 @@ import {
   type UserDexAbstractionSuccessResponse,
 } from "./_methods/userDexAbstraction.ts";
 import {
-  userSetAbstraction,
-  type UserSetAbstractionOptions,
-  type UserSetAbstractionParameters,
-  type UserSetAbstractionSuccessResponse,
-} from "./_methods/userSetAbstraction.ts";
-import {
   userPortfolioMargin,
   type UserPortfolioMarginOptions,
   type UserPortfolioMarginParameters,
   type UserPortfolioMarginSuccessResponse,
 } from "./_methods/userPortfolioMargin.ts";
+import {
+  userSetAbstraction,
+  type UserSetAbstractionOptions,
+  type UserSetAbstractionParameters,
+  type UserSetAbstractionSuccessResponse,
+} from "./_methods/userSetAbstraction.ts";
 import {
   validatorL1Stream,
   type ValidatorL1StreamOptions,
@@ -273,9 +278,9 @@ import {
   type Withdraw3SuccessResponse,
 } from "./_methods/withdraw3.ts";
 
-// =============================================================
+// ============================================================
 // Client
-// =============================================================
+// ============================================================
 
 /**
  * Execute actions: place orders, cancel orders, transfer funds, etc.
@@ -288,7 +293,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Creates an instance of the ExchangeClient.
    *
-   * @param config - Configuration for Exchange API requests. See {@link ExchangeConfig}.
+   * @param config Configuration for Exchange API requests. See {@link ExchangeConfig}.
    *
    * @example [viem](https://viem.sh/docs/clients/wallet#local-accounts-private-key-mnemonic-etc)
    * ```ts
@@ -338,12 +343,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Enable HIP-3 DEX abstraction.
    *
-   * @deprecated Use {@link agentSetAbstraction} instead.
-   *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -362,6 +363,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction-agent
+   *
+   * @deprecated Use {@link agentSetAbstraction} instead.
    */
   agentEnableDexAbstraction(
     opts?: AgentEnableDexAbstractionOptions,
@@ -372,10 +375,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Set User abstraction mode (method for agent wallet).
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -405,10 +407,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Approve an agent to sign on behalf of the master account.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -453,10 +454,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Approve a maximum fee rate for a builder.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -486,10 +486,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Modify multiple orders.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful variant of {@link OrderResponse} without error statuses.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful variant of {@link OrderResponse} without error statuses.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -533,10 +532,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Borrow or lend assets.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -553,6 +551,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    *
    * await client.borrowLend({ operation: "supply", token: 0, amount: "20" });
    * ```
+   *
+   * @see null
    */
   borrowLend(
     params: BorrowLendParameters,
@@ -564,10 +564,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Cancel order(s).
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful variant of {@link CancelResponse} without error statuses.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful variant of {@link CancelResponse} without error statuses.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -597,10 +596,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Cancel order(s) by cloid.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful variant of {@link CancelResponse} without error statuses.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful variant of {@link CancelResponse} without error statuses.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -634,10 +632,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Transfer native token from the user spot account into staking for delegating to validators.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -667,9 +664,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Claim rewards from referral program.
    *
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -686,6 +682,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    *
    * await client.claimRewards();
    * ```
+   *
+   * @see null
    */
   claimRewards(
     opts?: ClaimRewardsOptions,
@@ -696,10 +694,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Convert a single-signature account to a multi-signature account or vice versa.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -746,10 +743,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Create a sub-account.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Response for creating a sub-account.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Response for creating a sub-account.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -766,6 +762,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    *
    * const data = await client.createSubAccount({ name: "..." });
    * ```
+   *
+   * @see null
    */
   createSubAccount(
     params: CreateSubAccountParameters,
@@ -777,10 +775,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Create a vault.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Response for creating a vault.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Response for creating a vault.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -802,6 +799,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    *   nonce: Date.now(),
    * });
    * ```
+   *
+   * @see null
    */
   createVault(
     params: CreateVaultParameters,
@@ -813,10 +812,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Jail or unjail self as a validator signer.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -845,6 +843,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    *
    * await client.cSignerAction({ unjailSelf: null });
    * ```
+   *
+   * @see null
    */
   cSignerAction(
     params: CSignerActionParameters,
@@ -856,10 +856,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Action related to validator management.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -886,6 +885,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    *   },
    * });
    * ```
+   *
+   * @see null
    */
   cValidatorAction(
     params: CValidatorActionParameters,
@@ -897,10 +898,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Transfer native token from staking into the user's spot account.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -930,10 +930,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Configure block type for EVM transactions.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -963,10 +962,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Link staking and trading accounts for fee discount attribution.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -996,10 +994,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Modify an order.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1039,10 +1036,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Place an order(s).
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful variant of {@link OrderResponse} without error statuses.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful variant of {@link OrderResponse} without error statuses.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1084,10 +1080,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * This action does not do anything (no operation), but causes the nonce to be marked as used.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1116,10 +1110,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Deploying HIP-3 assets.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1162,10 +1155,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Create a referral code.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1182,6 +1174,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    *
    * await client.registerReferrer({ code: "..." });
    * ```
+   *
+   * @see null
    */
   registerReferrer(
     params: RegisterReferrerParameters,
@@ -1193,10 +1187,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Reserve additional rate-limited actions for a fee.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1226,10 +1219,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Schedule a cancel-all operation at a future time.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1269,10 +1261,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Transfer tokens between different perp DEXs, spot balance, users, and/or sub-accounts.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1308,10 +1299,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Set the display name in the leaderboard.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1328,6 +1318,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    *
    * await client.setDisplayName({ displayName: "..." });
    * ```
+   *
+   * @see null
    */
   setDisplayName(
     params: SetDisplayNameParameters,
@@ -1339,10 +1331,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Set a referral code.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1359,6 +1350,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    *
    * await client.setReferrer({ code: "..." });
    * ```
+   *
+   * @see null
    */
   setReferrer(
     params: SetReferrerParameters,
@@ -1370,10 +1363,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Deploying HIP-1 and HIP-2 assets.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1413,10 +1405,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Send spot assets to another address.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1450,10 +1441,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Opt Out of Spot Dusting.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1470,6 +1460,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    *
    * await client.spotUser({ toggleSpotDusting: { optOut: false } });
    * ```
+   *
+   * @see null
    */
   spotUser(
     params: SpotUserParameters,
@@ -1481,10 +1473,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Modify a sub-account.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1501,6 +1492,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    *
    * await client.subAccountModify({ subAccountUser: "0x...", name: "..." });
    * ```
+   *
+   * @see null
    */
   subAccountModify(
     params: SubAccountModifyParameters,
@@ -1512,10 +1505,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Transfer between sub-accounts (spot).
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1537,6 +1529,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    *   amount: "1",
    * });
    * ```
+   *
+   * @see null
    */
   subAccountSpotTransfer(
     params: SubAccountSpotTransferParameters,
@@ -1548,10 +1542,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Transfer between sub-accounts (perpetual).
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1572,6 +1565,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    *   usd: 1 * 1e6,
    * });
    * ```
+   *
+   * @see null
    */
   subAccountTransfer(
     params: SubAccountTransferParameters,
@@ -1583,10 +1578,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Delegate or undelegate native tokens to or from a validator.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1620,10 +1614,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Cancel a TWAP order.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful variant of {@link TwapCancelResponse} without error status.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful variant of {@link TwapCancelResponse} without error status.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1653,10 +1646,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Place a TWAP order.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful variant of {@link TwapOrderResponse} without error status.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful variant of {@link TwapOrderResponse} without error status.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1695,10 +1687,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Add or remove margin from isolated position.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1728,10 +1719,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Update cross or isolated leverage on a coin.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1761,10 +1751,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Transfer funds between Spot account and Perp account.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1794,10 +1783,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Send usd to another address.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1827,12 +1815,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Enable/disable HIP-3 DEX abstraction.
    *
-   * @deprecated Use {@link userSetAbstraction} instead.
-   *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1851,6 +1836,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction
+   *
+   * @deprecated Use {@link userSetAbstraction} instead.
    */
   userDexAbstraction(
     params: UserDexAbstractionParameters,
@@ -1860,12 +1847,11 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   }
 
   /**
-   * Set User abstraction mode.
+   * Set user abstraction mode.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1895,10 +1881,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Enable/disable user portfolio margin.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1928,10 +1913,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Validator vote on risk-free rate for aligned quote asset.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1961,10 +1945,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Distribute funds from a vault between followers.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -1981,6 +1964,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    *
    * await client.vaultDistribute({ vaultAddress: "0x...", usd: 10 * 1e6 });
    * ```
+   *
+   * @see null
    */
   vaultDistribute(
     params: VaultDistributeParameters,
@@ -1992,10 +1977,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Modify a vault's configuration.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -2016,6 +2000,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    *   alwaysCloseOnWithdraw: false,
    * });
    * ```
+   *
+   * @see null
    */
   vaultModify(
     params: VaultModifyParameters,
@@ -2027,10 +2013,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Deposit or withdraw from a vault.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -2064,10 +2049,9 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Initiate a withdrawal request.
    *
-   * @param params - Parameters specific to the API request.
-   * @param opts - Request execution options.
-   *
-   * @returns Successful response without specific data.
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
    *
    * @throws {ValiError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -2095,12 +2079,12 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   }
 }
 
-// =============================================================
+// ============================================================
 // Type Re-exports
-// =============================================================
+// ============================================================
 
-export type { ExchangeMultiSigConfig, ExchangeSingleWalletConfig } from "./_methods/_base/execute.ts";
 export { ApiRequestError } from "./_methods/_base/errors.ts";
+export type { ExchangeMultiSigConfig, ExchangeSingleWalletConfig } from "./_methods/_base/execute.ts";
 
 export type {
   AgentEnableDexAbstractionOptions,
@@ -2164,8 +2148,8 @@ export type {
   LinkStakingUserSuccessResponse,
 } from "./_methods/linkStakingUser.ts";
 export type { ModifyOptions, ModifyParameters, ModifySuccessResponse } from "./_methods/modify.ts";
-export type { OrderOptions, OrderParameters, OrderSuccessResponse } from "./_methods/order.ts";
 export type { NoopOptions, NoopSuccessResponse } from "./_methods/noop.ts";
+export type { OrderOptions, OrderParameters, OrderSuccessResponse } from "./_methods/order.ts";
 export type { PerpDeployOptions, PerpDeployParameters, PerpDeploySuccessResponse } from "./_methods/perpDeploy.ts";
 export type {
   RegisterReferrerOptions,
@@ -2239,15 +2223,15 @@ export type {
   UserDexAbstractionSuccessResponse as UserDexAbstractionExchangeSuccessResponse,
 } from "./_methods/userDexAbstraction.ts";
 export type {
-  UserSetAbstractionOptions,
-  UserSetAbstractionParameters,
-  UserSetAbstractionSuccessResponse,
-} from "./_methods/userSetAbstraction.ts";
-export type {
   UserPortfolioMarginOptions,
   UserPortfolioMarginParameters,
   UserPortfolioMarginSuccessResponse,
 } from "./_methods/userPortfolioMargin.ts";
+export type {
+  UserSetAbstractionOptions,
+  UserSetAbstractionParameters,
+  UserSetAbstractionSuccessResponse,
+} from "./_methods/userSetAbstraction.ts";
 export type {
   ValidatorL1StreamOptions,
   ValidatorL1StreamParameters,

@@ -9,6 +9,7 @@ import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_ba
 
 /**
  * Opt Out of Spot Dusting.
+ * @see null
  */
 export const SpotUserRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -34,6 +35,7 @@ export type SpotUserRequest = v.InferOutput<typeof SpotUserRequest>;
 
 /**
  * Successful response without specific data or error response.
+ * @see null
  */
 export type SpotUserResponse = SuccessResponse | ErrorResponse;
 
@@ -41,8 +43,8 @@ export type SpotUserResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
+import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
 /** Schema for user-provided action parameters (excludes system fields). */
 const SpotUserParameters = /* @__PURE__ */ (() => {
@@ -51,6 +53,7 @@ const SpotUserParameters = /* @__PURE__ */ (() => {
     ["type"],
   );
 })();
+
 /** Action parameters for the {@linkcode spotUser} function. */
 export type SpotUserParameters = v.InferInput<typeof SpotUserParameters>;
 
@@ -63,11 +66,10 @@ export type SpotUserSuccessResponse = ExcludeErrorResponse<SpotUserResponse>;
 /**
  * Opt Out of Spot Dusting.
  *
- * @param config - General configuration for Exchange API requests.
- * @param params - Parameters specific to the API request.
- * @param opts - Request execution options.
- *
- * @returns Successful response without specific data.
+ * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
+ * @param opts Request execution options.
+ * @return Successful response without specific data.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -87,6 +89,8 @@ export type SpotUserSuccessResponse = ExcludeErrorResponse<SpotUserResponse>;
  *   { toggleSpotDusting: { optOut: false } },
  * );
  * ```
+ *
+ * @see null
  */
 export function spotUser(
   config: ExchangeConfig,

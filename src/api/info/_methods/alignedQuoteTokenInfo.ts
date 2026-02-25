@@ -8,6 +8,7 @@ import { UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Request supply, rate, and pending payment information for an aligned quote token.
+ * @see null
  */
 export const AlignedQuoteTokenInfoRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -21,6 +22,7 @@ export type AlignedQuoteTokenInfoRequest = v.InferOutput<typeof AlignedQuoteToke
 
 /**
  * Supply, rate, and pending payment information for an aligned quote token.
+ * @see null
  */
 export type AlignedQuoteTokenInfoResponse = {
   /** Whether the token is aligned. */
@@ -58,11 +60,10 @@ export type AlignedQuoteTokenInfoParameters = Omit<v.InferInput<typeof AlignedQu
 /**
  * Request supply, rate, and pending payment information for an aligned quote token.
  *
- * @param config - General configuration for Info API requests.
- * @param params - Parameters specific to the API request.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Supply, rate, and pending payment information for an aligned quote token.
+ * @param config General configuration for Info API requests.
+ * @param params Parameters specific to the API request.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Supply, rate, and pending payment information for an aligned quote token.
  *
  * @throws {ValiError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
@@ -79,6 +80,8 @@ export type AlignedQuoteTokenInfoParameters = Omit<v.InferInput<typeof AlignedQu
  *   { token: 1328 },
  * );
  * ```
+ *
+ * @see null
  */
 export function alignedQuoteTokenInfo(
   config: InfoConfig,

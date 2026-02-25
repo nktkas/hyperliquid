@@ -1,13 +1,13 @@
-import * as v from "@valibot/valibot";
 import {
   type UserHistoricalOrdersEvent,
   type UserHistoricalOrdersParameters,
   UserHistoricalOrdersRequest,
 } from "@nktkas/hyperliquid/api/subscription";
-import { collectEventsOverTime, runTest } from "./_t.ts";
+import * as v from "@valibot/valibot";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
 import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
+import { collectEventsOverTime, runTest } from "./_t.ts";
 
 const sourceFile = new URL("../../../src/api/subscription/_methods/userHistoricalOrders.ts", import.meta.url).pathname;
 const responseSchema = typeToJsonSchema(sourceFile, "UserHistoricalOrdersEvent");
@@ -40,6 +40,7 @@ runTest({
       "#/properties/orderHistory/items/properties/status/enum/12",
       "#/properties/orderHistory/items/properties/status/enum/13",
       "#/properties/orderHistory/items/properties/status/enum/14",
+      "#/properties/orderHistory/items/properties/status/enum/15",
       "#/properties/orderHistory/items/properties/status/enum/16",
       "#/properties/orderHistory/items/properties/status/enum/17",
       "#/properties/orderHistory/items/properties/status/enum/18",
@@ -49,6 +50,7 @@ runTest({
       "#/properties/orderHistory/items/properties/status/enum/22",
       "#/properties/orderHistory/items/properties/status/enum/23",
       "#/properties/orderHistory/items/properties/status/enum/24",
+      "#/properties/orderHistory/items/properties/status/enum/25",
       "#/properties/orderHistory/items/properties/status/enum/26",
       "#/properties/orderHistory/items/properties/status/enum/27",
       "#/properties/orderHistory/items/properties/status/enum/28",

@@ -1,5 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 
+/** @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise */
 export const Promise_ = /* @__PURE__ */ (() => {
   return {
     /** @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/withResolvers */
@@ -22,6 +23,7 @@ export const DOMException_ = /* @__PURE__ */ (() => {
   };
 })();
 
+/** @see https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal */
 export const AbortSignal_ = /* @__PURE__ */ (() => {
   return {
     /** @see https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal/any_static */

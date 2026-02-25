@@ -13,11 +13,10 @@ export interface IRequestTransport {
   /**
    * Sends a request to the Hyperliquid API.
    *
-   * @param endpoint - The API endpoint to send the request to.
-   * @param payload - The payload to send with the request.
-   * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   *
-   * @returns A promise that resolves with parsed JSON response body.
+   * @param endpoint The API endpoint to send the request to.
+   * @param payload The payload to send with the request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return A promise that resolves with parsed JSON response body.
    */
   request<T>(endpoint: "info" | "exchange" | "explorer", payload: unknown, signal?: AbortSignal): Promise<T>;
 }
@@ -31,11 +30,10 @@ export interface ISubscriptionTransport {
   /**
    * Subscribes to a Hyperliquid event channel.
    *
-   * @param channel - The event channel to listen to.
-   * @param payload - The payload to send with the subscription request.
-   * @param listener - The function to call when the event is dispatched.
-   *
-   * @returns A promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   * @param channel The event channel to listen to.
+   * @param payload The payload to send with the subscription request.
+   * @param listener The function to call when the event is dispatched.
+   * @return A promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    */
   subscribe<T>(channel: string, payload: unknown, listener: (data: CustomEvent<T>) => void): Promise<ISubscription>;
 }
