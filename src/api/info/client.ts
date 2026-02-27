@@ -25,6 +25,11 @@ import {
 } from "./_methods/allBorrowLendReserveStates.ts";
 import { allMids, type AllMidsParameters, type AllMidsResponse } from "./_methods/allMids.ts";
 import { allPerpMetas, type AllPerpMetasResponse } from "./_methods/allPerpMetas.ts";
+import {
+  approvedBuilders,
+  type ApprovedBuildersParameters,
+  type ApprovedBuildersResponse,
+} from "./_methods/approvedBuilders.ts";
 import { blockDetails, type BlockDetailsParameters, type BlockDetailsResponse } from "./_methods/blockDetails.ts";
 import {
   borrowLendReserveState,
@@ -370,6 +375,35 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     signal?: AbortSignal,
   ): Promise<AllPerpMetasResponse> {
     return allPerpMetas(this.config_, signal);
+  }
+
+  /**
+   * Request approved builders for a user.
+   *
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of approved builder addresses.
+   *
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.approvedBuilders({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-approved-builders-for-user
+   */
+  approvedBuilders(
+    params: ApprovedBuildersParameters,
+    signal?: AbortSignal,
+  ): Promise<ApprovedBuildersResponse> {
+    return approvedBuilders(this.config_, params, signal);
   }
 
   /**
@@ -2347,6 +2381,7 @@ export type {
 export type { AllBorrowLendReserveStatesResponse } from "./_methods/allBorrowLendReserveStates.ts";
 export type { AllMidsParameters, AllMidsResponse } from "./_methods/allMids.ts";
 export type { AllPerpMetasResponse } from "./_methods/allPerpMetas.ts";
+export type { ApprovedBuildersParameters, ApprovedBuildersResponse } from "./_methods/approvedBuilders.ts";
 export type { BlockDetailsParameters, BlockDetailsResponse } from "./_methods/blockDetails.ts";
 export type {
   BorrowLendReserveStateParameters,

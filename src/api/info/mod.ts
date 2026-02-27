@@ -29,6 +29,7 @@ export * from "./_methods/alignedQuoteTokenInfo.ts";
 export * from "./_methods/allBorrowLendReserveStates.ts";
 export * from "./_methods/allMids.ts";
 export * from "./_methods/allPerpMetas.ts";
+export * from "./_methods/approvedBuilders.ts";
 export * from "./_methods/blockDetails.ts";
 export * from "./_methods/borrowLendReserveState.ts";
 export * from "./_methods/borrowLendUserState.ts";
