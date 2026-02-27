@@ -37,17 +37,20 @@ export const allMids = await infoClient.allMids();
 
 export function runTest(options: {
   name: string;
+  skipMultiSig?: boolean;
   codeTestFn: (
     t: Deno.TestContext,
     exchClient: ExchangeClient<ExchangeSingleWalletConfig | ExchangeMultiSigConfig>,
   ) => Promise<void>;
 }): void {
-  const { name, codeTestFn } = options;
+  const { name, skipMultiSig, codeTestFn } = options;
+
+  const clientTypes = skipMultiSig ? ["user"] as const : ["user", "multisig"] as const;
 
   Deno.test(name, { ignore: !MAIN_WALLET }, async (t) => {
     await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
-    for (const clientType of ["user", "multisig"] as const) {
+    for (const clientType of clientTypes) {
       const exchClient = await createTempExchangeClient(clientType);
       await t.step(clientType, async (t) => await codeTestFn(t, exchClient));
       await cleanupTempExchangeClient(exchClient);

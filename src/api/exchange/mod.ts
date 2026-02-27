@@ -66,6 +66,7 @@ export * from "./_methods/registerReferrer.ts";
 export * from "./_methods/reserveRequestWeight.ts";
 export * from "./_methods/scheduleCancel.ts";
 export * from "./_methods/sendAsset.ts";
+export * from "./_methods/sendToEvmWithData.ts";
 export * from "./_methods/setDisplayName.ts";
 export * from "./_methods/setReferrer.ts";
 export * from "./_methods/spotDeploy.ts";

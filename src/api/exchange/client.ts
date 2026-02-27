@@ -140,6 +140,12 @@ import {
   type SendAssetSuccessResponse,
 } from "./_methods/sendAsset.ts";
 import {
+  sendToEvmWithData,
+  type SendToEvmWithDataOptions,
+  type SendToEvmWithDataParameters,
+  type SendToEvmWithDataSuccessResponse,
+} from "./_methods/sendToEvmWithData.ts";
+import {
   setDisplayName,
   type SetDisplayNameOptions,
   type SetDisplayNameParameters,
@@ -1297,6 +1303,47 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   }
 
   /**
+   * Transfer tokens from Core to EVM with an additional data payload for `ICoreReceiveWithData` contracts.
+   *
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
+   *
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.sendToEvmWithData({
+   *   token: "USDC",
+   *   amount: "1",
+   *   sourceDex: "spot",
+   *   destinationRecipient: "0x...",
+   *   addressEncoding: "hex",
+   *   destinationChainId: 42161,
+   *   gasLimit: 200000,
+   *   data: "0x",
+   * });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-to-evm-with-data
+   */
+  sendToEvmWithData(
+    params: SendToEvmWithDataParameters,
+    opts?: SendToEvmWithDataOptions,
+  ): Promise<SendToEvmWithDataSuccessResponse> {
+    return sendToEvmWithData(this.config_, params, opts);
+  }
+
+  /**
    * Set the display name in the leaderboard.
    *
    * @param params Parameters specific to the API request.
@@ -2167,6 +2214,11 @@ export type {
   ScheduleCancelSuccessResponse,
 } from "./_methods/scheduleCancel.ts";
 export type { SendAssetOptions, SendAssetParameters, SendAssetSuccessResponse } from "./_methods/sendAsset.ts";
+export type {
+  SendToEvmWithDataOptions,
+  SendToEvmWithDataParameters,
+  SendToEvmWithDataSuccessResponse,
+} from "./_methods/sendToEvmWithData.ts";
 export type {
   SetDisplayNameOptions,
   SetDisplayNameParameters,
