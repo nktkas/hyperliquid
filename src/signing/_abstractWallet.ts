@@ -3,7 +3,6 @@
  * @module
  */
 
-import * as v from "@valibot/valibot";
 import { HyperliquidError } from "../_base.ts";
 
 // ============================================================
@@ -40,16 +39,11 @@ export interface AbstractEthersV6Signer {
     | null;
 }
 
-const AbstractEthersV6SignerSchema = /* @__PURE__ */ (() => {
-  return v.object({
-    signTypedData: v.pipe(
-      v.function(),
-      v.check((fn) => fn.length === 3, "Number of arguments must be 3"),
-    ),
-    getAddress: v.function(),
-    provider: v.nullish(v.object({ getNetwork: v.function() })),
-  });
-})();
+function isEthersV6Signer(wallet: AbstractWallet): wallet is AbstractEthersV6Signer {
+  return "signTypedData" in wallet && typeof wallet.signTypedData === "function" &&
+    wallet.signTypedData.length === 3 &&
+    "getAddress" in wallet && typeof wallet.getAddress === "function";
+}
 
 // ============================================================
 // Ethers V5
@@ -68,16 +62,11 @@ export interface AbstractEthersV5Signer {
     | null;
 }
 
-const AbstractEthersV5SignerSchema = /* @__PURE__ */ (() => {
-  return v.object({
-    _signTypedData: v.pipe(
-      v.function(),
-      v.check((fn) => fn.length === 3, "Number of arguments must be 3"),
-    ),
-    getAddress: v.function(),
-    provider: v.nullish(v.object({ getNetwork: v.function() })),
-  });
-})();
+function isEthersV5Signer(wallet: AbstractWallet): wallet is AbstractEthersV5Signer {
+  return "_signTypedData" in wallet && typeof wallet._signTypedData === "function" &&
+    wallet._signTypedData.length === 3 &&
+    "getAddress" in wallet && typeof wallet.getAddress === "function";
+}
 
 // ============================================================
 // Viem
@@ -103,16 +92,12 @@ export interface AbstractViemJsonRpcAccount {
   getChainId(): Promise<number>;
 }
 
-const AbstractViemJsonRpcAccountSchema = /* @__PURE__ */ (() => {
-  return v.object({
-    signTypedData: v.pipe(
-      v.function(),
-      v.check((fn) => fn.length === 1 || fn.length === 2, "Number of arguments must be 1 or 2"),
-    ),
-    getAddresses: v.function(),
-    getChainId: v.function(),
-  });
-})();
+function isViemJsonRpcAccount(wallet: AbstractWallet): wallet is AbstractViemJsonRpcAccount {
+  return "signTypedData" in wallet && typeof wallet.signTypedData === "function" &&
+    (wallet.signTypedData.length === 1 || wallet.signTypedData.length === 2) &&
+    "getAddresses" in wallet && typeof wallet.getAddresses === "function" &&
+    "getChainId" in wallet && typeof wallet.getChainId === "function";
+}
 
 /** Abstract interface for a {@link https://viem.sh/docs/accounts/local | viem Local Account}. */
 export interface AbstractViemLocalAccount {
@@ -120,15 +105,11 @@ export interface AbstractViemLocalAccount {
   address: `0x${string}`;
 }
 
-const AbstractViemLocalAccountSchema = /* @__PURE__ */ (() => {
-  return v.object({
-    signTypedData: v.pipe(
-      v.function(),
-      v.check((fn) => fn.length === 1 || fn.length === 2, "Number of arguments must be 1 or 2"),
-    ),
-    address: v.string(),
-  });
-})();
+function isViemLocalAccount(wallet: AbstractWallet): wallet is AbstractViemLocalAccount {
+  return "signTypedData" in wallet && typeof wallet.signTypedData === "function" &&
+    (wallet.signTypedData.length === 1 || wallet.signTypedData.length === 2) &&
+    "address" in wallet && typeof wallet.address === "string";
+}
 
 // ============================================================
 // Abstract Signer
@@ -176,9 +157,9 @@ export async function signTypedData(args: {
 }): Promise<Signature> {
   const { wallet, domain, types, primaryType, message } = args;
 
-  const isViemWallet = v.is(AbstractViemJsonRpcAccountSchema, wallet) || v.is(AbstractViemLocalAccountSchema, wallet);
-  const isEthersV6 = v.is(AbstractEthersV6SignerSchema, wallet);
-  const isEthersV5 = v.is(AbstractEthersV5SignerSchema, wallet);
+  const isViemWallet = isViemJsonRpcAccount(wallet) || isViemLocalAccount(wallet);
+  const isEthersV6 = isEthersV6Signer(wallet);
+  const isEthersV5 = isEthersV5Signer(wallet);
 
   let signature: `0x${string}`;
   try {
@@ -235,13 +216,13 @@ function splitSignature(signature: `0x${string}`): Signature {
 export async function getWalletChainId(wallet: AbstractWallet): Promise<`0x${string}`> {
   try {
     // Viem JSON-RPC account has getChainId method
-    if (v.is(AbstractViemJsonRpcAccountSchema, wallet)) {
+    if (isViemJsonRpcAccount(wallet)) {
       const chainId = await wallet.getChainId() as number;
       return `0x${chainId.toString(16)}`;
     }
 
     // Ethers signers use provider.getNetwork()
-    const isEthersSigner = v.is(AbstractEthersV6SignerSchema, wallet) || v.is(AbstractEthersV5SignerSchema, wallet);
+    const isEthersSigner = isEthersV6Signer(wallet) || isEthersV5Signer(wallet);
     if (isEthersSigner && wallet.provider) {
       const network = await wallet.provider.getNetwork() as { chainId: number | bigint };
       return `0x${network.chainId.toString(16)}`;
@@ -265,18 +246,18 @@ export async function getWalletChainId(wallet: AbstractWallet): Promise<`0x${str
 export async function getWalletAddress(wallet: AbstractWallet): Promise<`0x${string}`> {
   try {
     // Viem JSON-RPC account uses getAddresses()
-    if (v.is(AbstractViemJsonRpcAccountSchema, wallet)) {
+    if (isViemJsonRpcAccount(wallet)) {
       const addresses = await wallet.getAddresses() as `0x${string}`[];
       return addresses[0].toLowerCase() as `0x${string}`;
     }
 
     // Viem local account has address property
-    if (v.is(AbstractViemLocalAccountSchema, wallet)) {
+    if (isViemLocalAccount(wallet)) {
       return wallet.address.toLowerCase() as `0x${string}`;
     }
 
     // Ethers signers use getAddress()
-    if (v.is(AbstractEthersV6SignerSchema, wallet) || v.is(AbstractEthersV5SignerSchema, wallet)) {
+    if (isEthersV6Signer(wallet) || isEthersV5Signer(wallet)) {
       const address = await wallet.getAddress() as string;
       return address.toLowerCase() as `0x${string}`;
     }

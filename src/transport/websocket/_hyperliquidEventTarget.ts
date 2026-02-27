@@ -1,4 +1,3 @@
-import * as v from "@valibot/valibot";
 import { CustomEvent_ } from "../_polyfills.ts";
 
 interface SubscribeUnsubscribeResponse {
@@ -62,37 +61,32 @@ interface HyperliquidEventMap {
   [key: string]: CustomEvent<any>;
 }
 
-const BlockDetailsSchema = /* @__PURE__ */ (() => {
-  return v.looseObject({
-    blockTime: v.unknown(),
-    hash: v.unknown(),
-    height: v.unknown(),
-    numTxs: v.unknown(),
-    proposer: v.unknown(),
-  });
-})();
-const TxDetailsSchema = /* @__PURE__ */ (() => {
-  return v.looseObject({
-    action: v.unknown(),
-    block: v.unknown(),
-    error: v.unknown(),
-    hash: v.unknown(),
-    time: v.unknown(),
-    user: v.unknown(),
-  });
-})();
-const HyperliquidEventSchema = /* @__PURE__ */ (() => {
-  return v.object({ channel: v.string(), data: v.unknown() });
-})();
-const PongEventSchema = /* @__PURE__ */ (() => {
-  return v.object({ channel: v.literal("pong") });
-})();
-const ExplorerBlockEventSchema = /* @__PURE__ */ (() => {
-  return v.pipe(v.array(BlockDetailsSchema), v.nonEmpty());
-})();
-const ExplorerTxsEventSchema = /* @__PURE__ */ (() => {
-  return v.pipe(v.array(TxDetailsSchema), v.nonEmpty());
-})();
+function isHyperliquidEvent(msg: unknown): msg is { channel: string; data: unknown } {
+  return typeof msg === "object" && msg !== null &&
+    "channel" in msg && typeof msg.channel === "string" &&
+    "data" in msg;
+}
+
+function isPongEvent(msg: unknown): msg is { channel: "pong" } {
+  return typeof msg === "object" && msg !== null &&
+    "channel" in msg && msg.channel === "pong";
+}
+
+function isExplorerBlockEvent(msg: unknown): msg is BlockDetails[] {
+  return Array.isArray(msg) && msg.length > 0 &&
+    typeof msg[0] === "object" && msg[0] !== null &&
+    "blockTime" in msg[0] && "hash" in msg[0] &&
+    "height" in msg[0] && "numTxs" in msg[0] &&
+    "proposer" in msg[0];
+}
+
+function isExplorerTxsEvent(msg: unknown): msg is TxDetails[] {
+  return Array.isArray(msg) && msg.length > 0 &&
+    typeof msg[0] === "object" && msg[0] !== null &&
+    "action" in msg[0] && "block" in msg[0] &&
+    "error" in msg[0] && "hash" in msg[0] &&
+    "time" in msg[0] && "user" in msg[0];
+}
 
 /** Listens for WebSocket messages and sends them as Hyperliquid typed events. */
 export interface HyperliquidEventTarget {
@@ -114,13 +108,13 @@ export class HyperliquidEventTarget extends EventTarget {
     socket.addEventListener("message", (event) => {
       try {
         const msg = JSON.parse(event.data);
-        if (v.is(HyperliquidEventSchema, msg)) {
+        if (isHyperliquidEvent(msg)) {
           this.dispatchEvent(new CustomEvent_(msg.channel, { detail: msg.data }));
-        } else if (v.is(PongEventSchema, msg)) {
+        } else if (isPongEvent(msg)) {
           this.dispatchEvent(new CustomEvent_("pong", { detail: undefined }));
-        } else if (v.is(ExplorerBlockEventSchema, msg)) {
+        } else if (isExplorerBlockEvent(msg)) {
           this.dispatchEvent(new CustomEvent_("explorerBlock_", { detail: msg }));
-        } else if (v.is(ExplorerTxsEventSchema, msg)) {
+        } else if (isExplorerTxsEvent(msg)) {
           this.dispatchEvent(new CustomEvent_("explorerTxs_", { detail: msg }));
         }
       } catch {
