@@ -7,9 +7,7 @@ major JS runtimes, written in TypeScript.
 
 {% tabs %}
 
-<!-- deno-fmt-ignore-start -->
-{% tab title="<img src='https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/npm.svg' height='14' style='filter: invert(24%) sepia(98%) saturate(2053%) hue-rotate(344deg) brightness(86%) contrast(88%)'> npm" %}
-<!-- deno-fmt-ignore-end -->
+{% tab title="npm" %}
 
 ```sh
 npm i @nktkas/hyperliquid
@@ -17,7 +15,7 @@ npm i @nktkas/hyperliquid
 
 {% endtab %}
 
-{% tab title="<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pnpm/pnpm-original.svg' height='14'> pnpm" %}
+{% tab title="pnpm" %}
 
 ```sh
 pnpm add @nktkas/hyperliquid
@@ -25,7 +23,7 @@ pnpm add @nktkas/hyperliquid
 
 {% endtab %}
 
-{% tab title="<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/yarn/yarn-original.svg' height='14'> yarn" %}
+{% tab title="yarn" %}
 
 ```sh
 yarn add @nktkas/hyperliquid
@@ -33,7 +31,7 @@ yarn add @nktkas/hyperliquid
 
 {% endtab %}
 
-{% tab title="<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bun/bun-original.svg' height='14'> bun" %}
+{% tab title="bun" %}
 
 ```sh
 bun add @nktkas/hyperliquid
@@ -41,7 +39,7 @@ bun add @nktkas/hyperliquid
 
 {% endtab %}
 
-{% tab title="🦕 deno" %}
+{% tab title="deno" %}
 
 ```sh
 deno add jsr:@nktkas/hyperliquid
@@ -49,7 +47,7 @@ deno add jsr:@nktkas/hyperliquid
 
 {% endtab %}
 
-{% tab title="🌐 CDN" %}
+{% tab title="CDN" %}
 
 ```html
 <script type="module">
