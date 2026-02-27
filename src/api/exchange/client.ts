@@ -200,6 +200,12 @@ import {
   type TokenDelegateSuccessResponse,
 } from "./_methods/tokenDelegate.ts";
 import {
+  topUpIsolatedOnlyMargin,
+  type TopUpIsolatedOnlyMarginOptions,
+  type TopUpIsolatedOnlyMarginParameters,
+  type TopUpIsolatedOnlyMarginSuccessResponse,
+} from "./_methods/topUpIsolatedOnlyMargin.ts";
+import {
   twapCancel,
   type TwapCancelOptions,
   type TwapCancelParameters,
@@ -1659,6 +1665,38 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   }
 
   /**
+   * Top up isolated margin by targeting a specific leverage.
+   *
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
+   *
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.topUpIsolatedOnlyMargin({ asset: 0, leverage: "0.5" });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin
+   */
+  topUpIsolatedOnlyMargin(
+    params: TopUpIsolatedOnlyMarginParameters,
+    opts?: TopUpIsolatedOnlyMarginOptions,
+  ): Promise<TopUpIsolatedOnlyMarginSuccessResponse> {
+    return topUpIsolatedOnlyMargin(this.config_, params, opts);
+  }
+
+  /**
    * Cancel a TWAP order.
    *
    * @param params Parameters specific to the API request.
@@ -2248,6 +2286,11 @@ export type {
   TokenDelegateParameters,
   TokenDelegateSuccessResponse,
 } from "./_methods/tokenDelegate.ts";
+export type {
+  TopUpIsolatedOnlyMarginOptions,
+  TopUpIsolatedOnlyMarginParameters,
+  TopUpIsolatedOnlyMarginSuccessResponse,
+} from "./_methods/topUpIsolatedOnlyMargin.ts";
 export type { TwapCancelOptions, TwapCancelParameters, TwapCancelSuccessResponse } from "./_methods/twapCancel.ts";
 export type { TwapOrderOptions, TwapOrderParameters, TwapOrderSuccessResponse } from "./_methods/twapOrder.ts";
 export type {

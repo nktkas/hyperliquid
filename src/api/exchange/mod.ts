@@ -76,6 +76,7 @@ export * from "./_methods/subAccountModify.ts";
 export * from "./_methods/subAccountSpotTransfer.ts";
 export * from "./_methods/subAccountTransfer.ts";
 export * from "./_methods/tokenDelegate.ts";
+export * from "./_methods/topUpIsolatedOnlyMargin.ts";
 export * from "./_methods/twapCancel.ts";
 export * from "./_methods/twapOrder.ts";
 export * from "./_methods/updateIsolatedMargin.ts";
