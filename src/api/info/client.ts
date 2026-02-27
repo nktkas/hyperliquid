@@ -136,6 +136,11 @@ import { tokenDetails, type TokenDetailsParameters, type TokenDetailsResponse } 
 import { twapHistory, type TwapHistoryParameters, type TwapHistoryResponse } from "./_methods/twapHistory.ts";
 import { txDetails, type TxDetailsParameters, type TxDetailsResponse } from "./_methods/txDetails.ts";
 import {
+  userAbstraction,
+  type UserAbstractionParameters,
+  type UserAbstractionResponse,
+} from "./_methods/userAbstraction.ts";
+import {
   userBorrowLendInterest,
   type UserBorrowLendInterestParameters,
   type UserBorrowLendInterestResponse,
@@ -1745,6 +1750,35 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   }
 
   /**
+   * Request user abstraction state.
+   *
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return User abstraction state.
+   *
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.userAbstraction({ user: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-abstraction-state
+   */
+  userAbstraction(
+    params: UserAbstractionParameters,
+    signal?: AbortSignal,
+  ): Promise<UserAbstractionResponse> {
+    return userAbstraction(this.config_, params, signal);
+  }
+
+  /**
    * Request borrow/lend user interest.
    *
    * @param params Parameters specific to the API request.
@@ -2369,6 +2403,7 @@ export type { SubAccounts2Parameters, SubAccounts2Response } from "./_methods/su
 export type { TokenDetailsParameters, TokenDetailsResponse } from "./_methods/tokenDetails.ts";
 export type { TwapHistoryParameters, TwapHistoryResponse } from "./_methods/twapHistory.ts";
 export type { TxDetailsParameters, TxDetailsResponse } from "./_methods/txDetails.ts";
+export type { UserAbstractionParameters, UserAbstractionResponse } from "./_methods/userAbstraction.ts";
 export type {
   UserBorrowLendInterestParameters,
   UserBorrowLendInterestResponse,

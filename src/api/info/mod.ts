@@ -76,6 +76,7 @@ export * from "./_methods/subAccounts2.ts";
 export * from "./_methods/tokenDetails.ts";
 export * from "./_methods/twapHistory.ts";
 export * from "./_methods/txDetails.ts";
+export * from "./_methods/userAbstraction.ts";
 export * from "./_methods/userBorrowLendInterest.ts";
 export * from "./_methods/userDetails.ts";
 export * from "./_methods/userDexAbstraction.ts";
