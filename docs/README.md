@@ -7,9 +7,9 @@ major JS runtimes, written in TypeScript.
 
 {% tabs %}
 
-{% tab
-title="<img src='https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/npm.svg' height='14' style='filter: invert(24%) sepia(98%) saturate(2053%) hue-rotate(344deg) brightness(86%) contrast(88%)'>
-npm" %}
+<!-- deno-fmt-ignore-start -->
+{% tab title="<img src='https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/npm.svg' height='14' style='filter: invert(24%) sepia(98%) saturate(2053%) hue-rotate(344deg) brightness(86%) contrast(88%)'> npm" %}
+<!-- deno-fmt-ignore-end -->
 
 ```sh
 npm i @nktkas/hyperliquid
