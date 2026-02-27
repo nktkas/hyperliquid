@@ -20,19 +20,15 @@ major JS runtimes, written in TypeScript.
 
 ## Installation (choose your package manager)
 
-```sh
-npm i @nktkas/hyperliquid
-
-pnpm add @nktkas/hyperliquid
-
-yarn add @nktkas/hyperliquid
-
-deno add jsr:@nktkas/hyperliquid
+```
+npm i @nktkas/hyperliquid        # npm / pnpm / yarn
+deno add jsr:@nktkas/hyperliquid # Deno
+bun add @nktkas/hyperliquid      # Bun
 ```
 
 ## Quick Example
 
-### Info endpoint
+### Read data
 
 ```ts
 // 1. Import module
@@ -54,7 +50,7 @@ const openOrders = await info.openOrders({ user: "0x..." });
 const book = await info.l2Book({ coin: "BTC" });
 ```
 
-### Exchange endpoint
+### Trading
 
 ```ts
 // 1. Import modules
@@ -89,7 +85,7 @@ await exchange.updateLeverage({ asset: 0, isCross: true, leverage: 5 });
 await exchange.withdraw3({ destination: "0x...", amount: "1" });
 ```
 
-### Subscription
+### Real-time updates
 
 ```ts
 // 1. Import module
@@ -119,8 +115,7 @@ await subs.l2Book({ coin: "ETH" }, (data) => {
 
 ## Documentation
 
-- [SDK documentation](https://nktkas.gitbook.io/hyperliquid)
-- [Hyperliquid Documentation](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api)
+Full guides, examples, and API reference: [nktkas.gitbook.io/hyperliquid](https://nktkas.gitbook.io/hyperliquid)
 
 ## Star History
 

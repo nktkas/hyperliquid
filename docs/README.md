@@ -3,9 +3,13 @@
 A community-supported [Hyperliquid API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api) SDK for all
 major JS runtimes, written in TypeScript.
 
+## Installation
+
 {% tabs %}
 
-{% tab title="npm" %}
+{% tab
+title="<img src='https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/npm.svg' height='14' style='filter: invert(24%) sepia(98%) saturate(2053%) hue-rotate(344deg) brightness(86%) contrast(88%)'>
+npm" %}
 
 ```sh
 npm i @nktkas/hyperliquid
@@ -13,7 +17,7 @@ npm i @nktkas/hyperliquid
 
 {% endtab %}
 
-{% tab title="pnpm" %}
+{% tab title="<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pnpm/pnpm-original.svg' height='14'> pnpm" %}
 
 ```sh
 pnpm add @nktkas/hyperliquid
@@ -21,7 +25,7 @@ pnpm add @nktkas/hyperliquid
 
 {% endtab %}
 
-{% tab title="yarn" %}
+{% tab title="<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/yarn/yarn-original.svg' height='14'> yarn" %}
 
 ```sh
 yarn add @nktkas/hyperliquid
@@ -29,7 +33,7 @@ yarn add @nktkas/hyperliquid
 
 {% endtab %}
 
-{% tab title="bun" %}
+{% tab title="<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bun/bun-original.svg' height='14'> bun" %}
 
 ```sh
 bun add @nktkas/hyperliquid
@@ -37,7 +41,7 @@ bun add @nktkas/hyperliquid
 
 {% endtab %}
 
-{% tab title="deno" %}
+{% tab title="🦕 deno" %}
 
 ```sh
 deno add jsr:@nktkas/hyperliquid
@@ -45,97 +49,80 @@ deno add jsr:@nktkas/hyperliquid
 
 {% endtab %}
 
+{% tab title="🌐 CDN" %}
+
+```html
+<script type="module">
+  import * as hl from "https://esm.sh/jsr/@nktkas/hyperliquid";
+</script>
+```
+
+{% endtab %}
+
 {% endtabs %}
 
-<table data-view="cards">
-  <thead>
-    <tr>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>Type Safe</strong></td>
-      <td>Written in TypeScript with complete type coverage.</td>
-    </tr>
-    <tr>
-      <td><strong>Tested</strong></td>
-      <td>Types validated against real API responses.</td>
-    </tr>
-    <tr>
-      <td><strong>Minimal</strong></td>
-      <td>Few dependencies. Tree-shakeable.</td>
-    </tr>
-    <tr>
-      <td><strong>Universal</strong></td>
-      <td>Node.js, Deno, Bun, browsers, React Native.</td>
-    </tr>
-    <tr>
-      <td><strong>Transports</strong></td>
-      <td>Native <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">fetch</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebSocket">WebSocket</a>.</td>
-    </tr>
-    <tr>
-      <td><strong>Wallet Support</strong></td>
-      <td>Works with <a href="https://viem.sh">viem</a> and <a href="https://ethers.org">ethers</a>.</td>
-    </tr>
-  </tbody>
-</table>
+## Quick start
 
----
+{% tabs %}
 
-## Examples
+{% tab title="InfoClient" %}
 
-### Read Data
+Read market data, account state, order book. [Learn more](clients.md#read-data)
 
 ```ts
 import { HttpTransport, InfoClient } from "@nktkas/hyperliquid";
 
-const client = new InfoClient({ transport: new HttpTransport() });
+const transport = new HttpTransport();
+const client = new InfoClient({ transport });
 
-// Order book
-const book = await client.l2Book({ coin: "ETH" });
-//    ^? { coin: string, time: number, levels: [{ px: string, sz: string, n: number }[], ...] }
-
-// Account state
-const state = await client.clearinghouseState({ user: "0x..." });
-//    ^? { marginSummary: {...}, assetPositions: [...], withdrawable: string }
+const mids = await client.allMids();
 ```
 
-### Place Orders
+{% endtab %}
+
+{% tab title="ExchangeClient" %}
+
+Place orders, transfer funds, manage accounts. [Learn more](clients.md#trading)
 
 ```ts
 import { ExchangeClient, HttpTransport } from "@nktkas/hyperliquid";
 import { privateKeyToAccount } from "viem/accounts";
 
-const client = new ExchangeClient({
-  transport: new HttpTransport(),
-  wallet: privateKeyToAccount("0x..."),
-});
+const wallet = privateKeyToAccount("0x...");
 
-const result = await client.order({
+const transport = new HttpTransport();
+const client = new ExchangeClient({ transport, wallet });
+
+await client.order({
   orders: [{
-    a: 4, // Asset index (ETH)
-    b: true, // Buy side
-    p: "3000", // Price
-    s: "0.1", // Size
-    r: false, // Reduce only
+    a: 0,
+    b: true,
+    p: "50000",
+    s: "0.01",
+    r: false,
     t: { limit: { tif: "Gtc" } },
   }],
   grouping: "na",
 });
-// ^? { status: "ok", response: { type: "order", data: { statuses: [...] } } }
 ```
 
-### Real-time Updates
+{% endtab %}
+
+{% tab title="SubscriptionClient" %}
+
+Receive real-time updates via WebSocket. [Learn more](clients.md#real-time-updates)
 
 ```ts
 import { SubscriptionClient, WebSocketTransport } from "@nktkas/hyperliquid";
 
-const client = new SubscriptionClient({ transport: new WebSocketTransport() });
+const transport = new WebSocketTransport();
+const client = new SubscriptionClient({ transport });
 
-await client.l2Book({ coin: "ETH" }, (book) => {
-  console.log(book.coin, book.levels[0][0].px);
-  //          ^? { coin: string, time: number, levels: [...] }
+await client.allMids((data) => {
+  console.log(data.mids);
 });
 ```
+
+{% endtab %}
+
+{% endtabs %}
