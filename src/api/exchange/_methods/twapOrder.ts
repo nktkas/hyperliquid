@@ -77,6 +77,7 @@ export type TwapOrderResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -105,7 +106,7 @@ export type TwapOrderSuccessResponse = ExcludeErrorResponse<TwapOrderResponse>;
  * @param opts Request execution options.
  * @return Successful variant of {@link TwapOrderResponse} without error status.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
@@ -140,6 +141,6 @@ export function twapOrder(
   params: TwapOrderParameters,
   opts?: TwapOrderOptions,
 ): Promise<TwapOrderSuccessResponse> {
-  const action = v.parse(TwapOrderParameters, params);
+  const action = parse(TwapOrderParameters, params);
   return executeL1Action(config, { type: "twapOrder", ...action }, opts);
 }

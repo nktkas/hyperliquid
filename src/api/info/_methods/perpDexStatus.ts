@@ -34,6 +34,7 @@ export type PerpDexStatusResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode perpDexStatus} function. */
@@ -47,7 +48,7 @@ export type PerpDexStatusParameters = Omit<v.InferInput<typeof PerpDexStatusRequ
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Status of a perp DEX.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -67,7 +68,7 @@ export function perpDexStatus(
   params: PerpDexStatusParameters,
   signal?: AbortSignal,
 ): Promise<PerpDexStatusResponse> {
-  const request = v.parse(PerpDexStatusRequest, {
+  const request = parse(PerpDexStatusRequest, {
     type: "perpDexStatus",
     ...params,
   });

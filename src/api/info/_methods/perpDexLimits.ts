@@ -50,6 +50,7 @@ export type PerpDexLimitsResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode perpDexLimits} function. */
@@ -63,7 +64,7 @@ export type PerpDexLimitsParameters = Omit<v.InferInput<typeof PerpDexLimitsRequ
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Builder deployed perpetual market limits.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -86,7 +87,7 @@ export function perpDexLimits(
   params: PerpDexLimitsParameters,
   signal?: AbortSignal,
 ): Promise<PerpDexLimitsResponse> {
-  const request = v.parse(PerpDexLimitsRequest, {
+  const request = parse(PerpDexLimitsRequest, {
     type: "perpDexLimits",
     ...params,
   });

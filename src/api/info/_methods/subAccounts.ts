@@ -49,6 +49,7 @@ export type SubAccountsResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode subAccounts} function. */
@@ -62,7 +63,7 @@ export type SubAccountsParameters = Omit<v.InferInput<typeof SubAccountsRequest>
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of user sub-account or null if the user does not have any sub-accounts.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -85,7 +86,7 @@ export function subAccounts(
   params: SubAccountsParameters,
   signal?: AbortSignal,
 ): Promise<SubAccountsResponse> {
-  const request = v.parse(SubAccountsRequest, {
+  const request = parse(SubAccountsRequest, {
     type: "subAccounts",
     ...params,
   });

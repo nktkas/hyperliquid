@@ -43,6 +43,7 @@ export type UserVaultEquitiesResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userVaultEquities} function. */
@@ -56,7 +57,7 @@ export type UserVaultEquitiesParameters = Omit<v.InferInput<typeof UserVaultEqui
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of user's vault deposits.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -79,7 +80,7 @@ export function userVaultEquities(
   params: UserVaultEquitiesParameters,
   signal?: AbortSignal,
 ): Promise<UserVaultEquitiesResponse> {
-  const request = v.parse(UserVaultEquitiesRequest, {
+  const request = parse(UserVaultEquitiesRequest, {
     type: "userVaultEquities",
     ...params,
   });

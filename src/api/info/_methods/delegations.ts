@@ -43,6 +43,7 @@ export type DelegationsResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode delegations} function. */
@@ -56,7 +57,7 @@ export type DelegationsParameters = Omit<v.InferInput<typeof DelegationsRequest>
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of user's delegations to validators.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -79,7 +80,7 @@ export function delegations(
   params: DelegationsParameters,
   signal?: AbortSignal,
 ): Promise<DelegationsResponse> {
-  const request = v.parse(DelegationsRequest, {
+  const request = parse(DelegationsRequest, {
     type: "delegations",
     ...params,
   });

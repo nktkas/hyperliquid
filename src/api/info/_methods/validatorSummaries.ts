@@ -78,6 +78,7 @@ export type ValidatorSummariesResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /**
@@ -87,7 +88,7 @@ import type { InfoConfig } from "./_base/types.ts";
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of validator performance statistics.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -106,7 +107,7 @@ export function validatorSummaries(
   config: InfoConfig,
   signal?: AbortSignal,
 ): Promise<ValidatorSummariesResponse> {
-  const request = v.parse(ValidatorSummariesRequest, {
+  const request = parse(ValidatorSummariesRequest, {
     type: "validatorSummaries",
   });
   return config.transport.request("info", request, signal);

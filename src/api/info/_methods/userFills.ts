@@ -54,6 +54,7 @@ export type UserFillsResponse = (UserFillSchema & {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userFills} function. */
@@ -67,7 +68,7 @@ export type UserFillsParameters = Omit<v.InferInput<typeof UserFillsRequest>, "t
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of user trade fills.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -90,7 +91,7 @@ export function userFills(
   params: UserFillsParameters,
   signal?: AbortSignal,
 ): Promise<UserFillsResponse> {
-  const request = v.parse(UserFillsRequest, {
+  const request = parse(UserFillsRequest, {
     type: "userFills",
     ...params,
   });

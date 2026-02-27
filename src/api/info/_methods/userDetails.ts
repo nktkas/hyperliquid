@@ -36,6 +36,7 @@ export type UserDetailsResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userDetails} function. */
@@ -49,7 +50,7 @@ export type UserDetailsParameters = Omit<v.InferInput<typeof UserDetailsRequest>
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of user transaction details.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -71,7 +72,7 @@ export function userDetails(
   params: UserDetailsParameters,
   signal?: AbortSignal,
 ): Promise<UserDetailsResponse> {
-  const request = v.parse(UserDetailsRequest, {
+  const request = parse(UserDetailsRequest, {
     type: "userDetails",
     ...params,
   });

@@ -163,6 +163,7 @@ export type OrderResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -191,7 +192,7 @@ export type OrderSuccessResponse = ExcludeErrorResponse<OrderResponse>;
  * @param opts Request execution options.
  * @return Successful variant of {@link OrderResponse} without error statuses.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
@@ -229,6 +230,6 @@ export function order(
   params: OrderParameters,
   opts?: OrderOptions,
 ): Promise<OrderSuccessResponse> {
-  const action = v.parse(OrderParameters, params);
+  const action = parse(OrderParameters, params);
   return executeL1Action(config, { type: "order", ...action }, opts);
 }

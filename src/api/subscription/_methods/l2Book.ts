@@ -72,6 +72,7 @@ export type L2BookEvent = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_types.ts";
 
@@ -86,7 +87,7 @@ export type L2BookParameters = Omit<v.InferInput<typeof L2BookRequest>, "type">;
  * @param listener A callback function to be called when the event is received.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -110,7 +111,7 @@ export function l2Book(
   params: L2BookParameters,
   listener: (data: L2BookEvent) => void,
 ): Promise<ISubscription> {
-  const payload = v.parse(L2BookRequest, {
+  const payload = parse(L2BookRequest, {
     type: "l2Book",
     ...params,
     nSigFigs: params.nSigFigs ?? null,

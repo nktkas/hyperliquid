@@ -31,6 +31,7 @@ export type AllDexsAssetCtxsEvent = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_types.ts";
 
@@ -41,7 +42,7 @@ import type { SubscriptionConfig } from "./_types.ts";
  * @param listener A callback function to be called when the event is received.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -63,7 +64,7 @@ export function allDexsAssetCtxs(
   config: SubscriptionConfig,
   listener: (data: AllDexsAssetCtxsEvent) => void,
 ): Promise<ISubscription> {
-  const payload = v.parse(AllDexsAssetCtxsRequest, {
+  const payload = parse(AllDexsAssetCtxsRequest, {
     type: "allDexsAssetCtxs",
   });
   return config.transport.subscribe<AllDexsAssetCtxsEvent>(payload.type, payload, (e) => {

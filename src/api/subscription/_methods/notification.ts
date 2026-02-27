@@ -33,6 +33,7 @@ export type NotificationEvent = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_types.ts";
 
@@ -47,7 +48,7 @@ export type NotificationParameters = Omit<v.InferInput<typeof NotificationReques
  * @param listener A callback function to be called when the event is received.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -71,7 +72,7 @@ export function notification(
   params: NotificationParameters,
   listener: (data: NotificationEvent) => void,
 ): Promise<ISubscription> {
-  const payload = v.parse(NotificationRequest, { type: "notification", ...params });
+  const payload = parse(NotificationRequest, { type: "notification", ...params });
   return config.transport.subscribe<NotificationEvent>(payload.type, payload, (e) => {
     listener(e.detail);
   });

@@ -60,6 +60,7 @@ export type PortfolioResponse = [
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode portfolio} function. */
@@ -73,7 +74,7 @@ export type PortfolioParameters = Omit<v.InferInput<typeof PortfolioRequest>, "t
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Portfolio metrics grouped by time periods.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -96,7 +97,7 @@ export function portfolio(
   params: PortfolioParameters,
   signal?: AbortSignal,
 ): Promise<PortfolioResponse> {
-  const request = v.parse(PortfolioRequest, {
+  const request = parse(PortfolioRequest, {
     type: "portfolio",
     ...params,
   });

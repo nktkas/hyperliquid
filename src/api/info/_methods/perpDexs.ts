@@ -80,6 +80,7 @@ export type PerpDexsResponse = (/** Perpetual dex metadata. */ {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /**
@@ -89,7 +90,7 @@ import type { InfoConfig } from "./_base/types.ts";
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of perpetual dexes (null is main dex).
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -108,7 +109,7 @@ export function perpDexs(
   config: InfoConfig,
   signal?: AbortSignal,
 ): Promise<PerpDexsResponse> {
-  const request = v.parse(PerpDexsRequest, {
+  const request = parse(PerpDexsRequest, {
     type: "perpDexs",
   });
   return config.transport.request("info", request, signal);

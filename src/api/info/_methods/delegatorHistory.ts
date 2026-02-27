@@ -76,6 +76,7 @@ export type DelegatorHistoryResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode delegatorHistory} function. */
@@ -89,7 +90,7 @@ export type DelegatorHistoryParameters = Omit<v.InferInput<typeof DelegatorHisto
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of records of staking events by a delegator.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -112,7 +113,7 @@ export function delegatorHistory(
   params: DelegatorHistoryParameters,
   signal?: AbortSignal,
 ): Promise<DelegatorHistoryResponse> {
-  const request = v.parse(DelegatorHistoryRequest, {
+  const request = parse(DelegatorHistoryRequest, {
     type: "delegatorHistory",
     ...params,
   });

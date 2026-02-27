@@ -46,6 +46,7 @@ export type PerpDeployAuctionStatusResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /**
@@ -55,7 +56,7 @@ import type { InfoConfig } from "./_base/types.ts";
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Status of the perpetual deploy auction.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -74,7 +75,7 @@ export function perpDeployAuctionStatus(
   config: InfoConfig,
   signal?: AbortSignal,
 ): Promise<PerpDeployAuctionStatusResponse> {
-  const request = v.parse(PerpDeployAuctionStatusRequest, {
+  const request = parse(PerpDeployAuctionStatusRequest, {
     type: "perpDeployAuctionStatus",
   });
   return config.transport.request("info", request, signal);

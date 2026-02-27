@@ -102,6 +102,7 @@ export type SpotMetaResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /**
@@ -111,7 +112,7 @@ import type { InfoConfig } from "./_base/types.ts";
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Metadata for spot assets.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -130,7 +131,7 @@ export function spotMeta(
   config: InfoConfig,
   signal?: AbortSignal,
 ): Promise<SpotMetaResponse> {
-  const request = v.parse(SpotMetaRequest, {
+  const request = parse(SpotMetaRequest, {
     type: "spotMeta",
   });
   return config.transport.request("info", request, signal);

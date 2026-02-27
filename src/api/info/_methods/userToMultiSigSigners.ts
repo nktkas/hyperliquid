@@ -38,6 +38,7 @@ export type UserToMultiSigSignersResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userToMultiSigSigners} function. */
@@ -51,7 +52,7 @@ export type UserToMultiSigSignersParameters = Omit<v.InferInput<typeof UserToMul
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Multi-sig signers for a user or null if the user does not have any multi-sig signers.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -74,7 +75,7 @@ export function userToMultiSigSigners(
   params: UserToMultiSigSignersParameters,
   signal?: AbortSignal,
 ): Promise<UserToMultiSigSignersResponse> {
-  const request = v.parse(UserToMultiSigSignersRequest, {
+  const request = parse(UserToMultiSigSignersRequest, {
     type: "userToMultiSigSigners",
     ...params,
   });

@@ -45,6 +45,7 @@ export type VaultDistributeResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -73,7 +74,7 @@ export type VaultDistributeSuccessResponse = ExcludeErrorResponse<VaultDistribut
  * @param opts Request execution options.
  * @return Successful response without specific data.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
@@ -99,6 +100,6 @@ export function vaultDistribute(
   params: VaultDistributeParameters,
   opts?: VaultDistributeOptions,
 ): Promise<VaultDistributeSuccessResponse> {
-  const action = v.parse(VaultDistributeParameters, params);
+  const action = parse(VaultDistributeParameters, params);
   return executeL1Action(config, { type: "vaultDistribute", ...action }, opts);
 }

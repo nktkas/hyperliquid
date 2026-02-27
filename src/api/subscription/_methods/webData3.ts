@@ -75,6 +75,7 @@ export type WebData3Event = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_types.ts";
 
@@ -89,7 +90,7 @@ export type WebData3Parameters = Omit<v.InferInput<typeof WebData3Request>, "typ
  * @param listener A callback function to be called when the event is received.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -113,7 +114,7 @@ export function webData3(
   params: WebData3Parameters,
   listener: (data: WebData3Event) => void,
 ): Promise<ISubscription> {
-  const payload = v.parse(WebData3Request, { type: "webData3", ...params });
+  const payload = parse(WebData3Request, { type: "webData3", ...params });
   return config.transport.subscribe<WebData3Event>(payload.type, payload, (e) => {
     if (e.detail.userState.user === payload.user) {
       listener(e.detail);

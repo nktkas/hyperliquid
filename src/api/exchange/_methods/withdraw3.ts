@@ -51,6 +51,7 @@ export type Withdraw3Response = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -89,7 +90,7 @@ export const Withdraw3Types = {
  * @param opts Request execution options.
  * @return Successful response without specific data.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
@@ -115,7 +116,7 @@ export function withdraw3(
   params: Withdraw3Parameters,
   opts?: Withdraw3Options,
 ): Promise<Withdraw3SuccessResponse> {
-  const action = v.parse(Withdraw3Parameters, params);
+  const action = parse(Withdraw3Parameters, params);
   return executeUserSignedAction(
     config,
     { type: "withdraw3", ...action },

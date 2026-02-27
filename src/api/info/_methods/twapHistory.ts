@@ -54,6 +54,7 @@ export type TwapHistoryResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode twapHistory} function. */
@@ -67,7 +68,7 @@ export type TwapHistoryParameters = Omit<v.InferInput<typeof TwapHistoryRequest>
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of user's TWAP history.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -90,7 +91,7 @@ export function twapHistory(
   params: TwapHistoryParameters,
   signal?: AbortSignal,
 ): Promise<TwapHistoryResponse> {
-  const request = v.parse(TwapHistoryRequest, {
+  const request = parse(TwapHistoryRequest, {
     type: "twapHistory",
     ...params,
   });

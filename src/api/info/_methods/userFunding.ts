@@ -66,6 +66,7 @@ export type UserFundingResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userFunding} function. */
@@ -79,7 +80,7 @@ export type UserFundingParameters = Omit<v.InferInput<typeof UserFundingRequest>
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of user funding ledger updates.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -102,7 +103,7 @@ export function userFunding(
   params: UserFundingParameters,
   signal?: AbortSignal,
 ): Promise<UserFundingResponse> {
-  const request = v.parse(UserFundingRequest, {
+  const request = parse(UserFundingRequest, {
     type: "userFunding",
     ...params,
   });

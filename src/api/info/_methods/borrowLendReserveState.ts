@@ -71,6 +71,7 @@ export type BorrowLendReserveStateResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode borrowLendReserveState} function. */
@@ -84,7 +85,7 @@ export type BorrowLendReserveStateParameters = Omit<v.InferInput<typeof BorrowLe
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Borrow/lend reserve state.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -107,7 +108,7 @@ export function borrowLendReserveState(
   params: BorrowLendReserveStateParameters,
   signal?: AbortSignal,
 ): Promise<BorrowLendReserveStateResponse> {
-  const request = v.parse(BorrowLendReserveStateRequest, {
+  const request = parse(BorrowLendReserveStateRequest, {
     type: "borrowLendReserveState",
     ...params,
   });

@@ -56,7 +56,7 @@ export type AgentEnableDexAbstractionSuccessResponse = ExcludeErrorResponse<Agen
  * @param opts Request execution options.
  * @return Successful response without specific data.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *

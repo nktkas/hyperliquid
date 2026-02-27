@@ -4,6 +4,7 @@
  */
 
 import * as v from "@valibot/valibot";
+import { parse } from "../../../../_base.ts";
 import {
   type AbstractWallet,
   getWalletAddress,
@@ -124,11 +125,11 @@ export async function executeL1Action<T>(
     const nonce = await (config.nonceManager?.(walletAddress) ?? globalNonceManager.getNonce(key));
 
     // Validate and resolve options
-    const vaultAddress = v.parse(
+    const vaultAddress = parse(
       v.optional(Address),
       options?.vaultAddress ?? config.defaultVaultAddress,
     );
-    const expiresAfter = v.parse(
+    const expiresAfter = parse(
       v.optional(UnsignedInteger),
       options?.expiresAfter ??
         (typeof config.defaultExpiresAfter === "number"
@@ -261,8 +262,8 @@ async function signMultiSigL1(
   expiresAfter?: number,
 ): Promise<[Record<string, unknown>, SignatureSchema]> {
   const { transport: { isTestnet }, signers, multiSigUser } = config;
-  const multiSigUser_ = v.parse(Address, multiSigUser);
-  const outerSigner_ = v.parse(Address, outerSigner);
+  const multiSigUser_ = parse(Address, multiSigUser);
+  const outerSigner_ = parse(Address, outerSigner);
 
   // Collect signatures from all signers
   const signatures = await Promise.all(signers.map(async (signer) => {
@@ -311,8 +312,8 @@ async function signMultiSigUserSigned(
   nonce: number,
 ): Promise<[Record<string, unknown>, SignatureSchema]> {
   const { signers, multiSigUser, transport: { isTestnet } } = config;
-  const multiSigUser_ = v.parse(Address, multiSigUser);
-  const outerSigner_ = v.parse(Address, outerSigner);
+  const multiSigUser_ = parse(Address, multiSigUser);
+  const outerSigner_ = parse(Address, outerSigner);
 
   // Collect signatures from all signers
   const signatures = await Promise.all(signers.map(async (signer) => {
@@ -366,7 +367,7 @@ async function getSignatureChainId(config: ExchangeConfig): Promise<`0x${string}
     const id = typeof config.signatureChainId === "function"
       ? await config.signatureChainId()
       : config.signatureChainId;
-    return v.parse(Hex, id);
+    return parse(Hex, id);
   }
   return getWalletChainId(getLeader(config));
 }

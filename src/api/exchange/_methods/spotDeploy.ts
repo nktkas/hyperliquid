@@ -139,6 +139,7 @@ export type SpotDeployResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -166,7 +167,7 @@ export type SpotDeploySuccessResponse = ExcludeErrorResponse<SpotDeployResponse>
  * @param opts Request execution options.
  * @return Successful response without specific data.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
@@ -202,6 +203,6 @@ export function spotDeploy(
   params: SpotDeployParameters,
   opts?: SpotDeployOptions,
 ): Promise<SpotDeploySuccessResponse> {
-  const action = v.parse(SpotDeployParameters, params);
+  const action = parse(SpotDeployParameters, params);
   return executeL1Action(config, { type: "spotDeploy", ...action }, opts);
 }

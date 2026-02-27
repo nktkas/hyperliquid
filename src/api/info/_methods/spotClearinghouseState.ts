@@ -67,6 +67,7 @@ export type SpotClearinghouseStateResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode spotClearinghouseState} function. */
@@ -80,7 +81,7 @@ export type SpotClearinghouseStateParameters = Omit<v.InferInput<typeof SpotClea
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Account summary for spot trading.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -103,7 +104,7 @@ export function spotClearinghouseState(
   params: SpotClearinghouseStateParameters,
   signal?: AbortSignal,
 ): Promise<SpotClearinghouseStateResponse> {
-  const request = v.parse(SpotClearinghouseStateRequest, {
+  const request = parse(SpotClearinghouseStateRequest, {
     type: "spotClearinghouseState",
     ...params,
   });

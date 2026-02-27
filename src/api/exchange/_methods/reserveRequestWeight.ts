@@ -40,6 +40,7 @@ export type ReserveRequestWeightResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -68,7 +69,7 @@ export type ReserveRequestWeightSuccessResponse = ExcludeErrorResponse<ReserveRe
  * @param opts Request execution options.
  * @return Successful response without specific data.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
@@ -94,6 +95,6 @@ export function reserveRequestWeight(
   params: ReserveRequestWeightParameters,
   opts?: ReserveRequestWeightOptions,
 ): Promise<ReserveRequestWeightSuccessResponse> {
-  const action = v.parse(ReserveRequestWeightParameters, params);
+  const action = parse(ReserveRequestWeightParameters, params);
   return executeL1Action(config, { type: "reserveRequestWeight", ...action }, opts);
 }

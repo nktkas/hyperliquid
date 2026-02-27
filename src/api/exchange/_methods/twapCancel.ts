@@ -60,6 +60,7 @@ export type TwapCancelResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -88,7 +89,7 @@ export type TwapCancelSuccessResponse = ExcludeErrorResponse<TwapCancelResponse>
  * @param opts Request execution options.
  * @return Successful variant of {@link TwapCancelResponse} without error status.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
@@ -114,6 +115,6 @@ export function twapCancel(
   params: TwapCancelParameters,
   opts?: TwapCancelOptions,
 ): Promise<TwapCancelSuccessResponse> {
-  const action = v.parse(TwapCancelParameters, params);
+  const action = parse(TwapCancelParameters, params);
   return executeL1Action(config, { type: "twapCancel", ...action }, opts);
 }

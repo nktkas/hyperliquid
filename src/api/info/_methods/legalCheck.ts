@@ -37,6 +37,7 @@ export type LegalCheckResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode legalCheck} function. */
@@ -50,7 +51,7 @@ export type LegalCheckParameters = Omit<v.InferInput<typeof LegalCheckRequest>, 
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Legal verification status for a user.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -73,7 +74,7 @@ export function legalCheck(
   params: LegalCheckParameters,
   signal?: AbortSignal,
 ): Promise<LegalCheckResponse> {
-  const request = v.parse(LegalCheckRequest, {
+  const request = parse(LegalCheckRequest, {
     type: "legalCheck",
     ...params,
   });

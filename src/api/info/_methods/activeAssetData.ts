@@ -76,6 +76,7 @@ export type ActiveAssetDataResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode activeAssetData} function. */
@@ -89,7 +90,7 @@ export type ActiveAssetDataParameters = Omit<v.InferInput<typeof ActiveAssetData
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return User active asset data.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -112,7 +113,7 @@ export function activeAssetData(
   params: ActiveAssetDataParameters,
   signal?: AbortSignal,
 ): Promise<ActiveAssetDataResponse> {
-  const request = v.parse(ActiveAssetDataRequest, {
+  const request = parse(ActiveAssetDataRequest, {
     type: "activeAssetData",
     ...params,
   });

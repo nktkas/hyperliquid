@@ -31,6 +31,7 @@ export type MetaAndAssetCtxsResponse = [meta: MetaResponse, assetCtxs: PerpAsset
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode metaAndAssetCtxs} function. */
@@ -44,7 +45,7 @@ export type MetaAndAssetCtxsParameters = Omit<v.InferInput<typeof MetaAndAssetCt
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Metadata and context for perpetual assets.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -76,7 +77,7 @@ export function metaAndAssetCtxs(
   const params = paramsOrSignal instanceof AbortSignal ? {} : paramsOrSignal;
   const signal = paramsOrSignal instanceof AbortSignal ? paramsOrSignal : maybeSignal;
 
-  const request = v.parse(MetaAndAssetCtxsRequest, {
+  const request = parse(MetaAndAssetCtxsRequest, {
     type: "metaAndAssetCtxs",
     ...params,
   });

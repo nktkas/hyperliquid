@@ -59,6 +59,7 @@ export type CreateVaultResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -87,7 +88,7 @@ export type CreateVaultSuccessResponse = ExcludeErrorResponse<CreateVaultRespons
  * @param opts Request execution options.
  * @return Response for creating a vault.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
@@ -118,6 +119,6 @@ export function createVault(
   params: CreateVaultParameters,
   opts?: CreateVaultOptions,
 ): Promise<CreateVaultSuccessResponse> {
-  const action = v.parse(CreateVaultParameters, params);
+  const action = parse(CreateVaultParameters, params);
   return executeL1Action(config, { type: "createVault", ...action }, opts);
 }

@@ -46,6 +46,7 @@ export type UpdateLeverageResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -74,7 +75,7 @@ export type UpdateLeverageSuccessResponse = ExcludeErrorResponse<UpdateLeverageR
  * @param opts Request execution options.
  * @return Successful response without specific data.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
@@ -100,6 +101,6 @@ export function updateLeverage(
   params: UpdateLeverageParameters,
   opts?: UpdateLeverageOptions,
 ): Promise<UpdateLeverageSuccessResponse> {
-  const action = v.parse(UpdateLeverageParameters, params);
+  const action = parse(UpdateLeverageParameters, params);
   return executeL1Action(config, { type: "updateLeverage", ...action }, opts);
 }

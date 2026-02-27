@@ -41,6 +41,7 @@ export type UserHistoricalOrdersEvent = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_types.ts";
 
@@ -55,7 +56,7 @@ export type UserHistoricalOrdersParameters = Omit<v.InferInput<typeof UserHistor
  * @param listener A callback function to be called when the event is received.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -79,7 +80,7 @@ export function userHistoricalOrders(
   params: UserHistoricalOrdersParameters,
   listener: (data: UserHistoricalOrdersEvent) => void,
 ): Promise<ISubscription> {
-  const payload = v.parse(UserHistoricalOrdersRequest, { type: "userHistoricalOrders", ...params });
+  const payload = parse(UserHistoricalOrdersRequest, { type: "userHistoricalOrders", ...params });
   return config.transport.subscribe<UserHistoricalOrdersEvent>(payload.type, payload, (e) => {
     if (e.detail.user === payload.user) {
       listener(e.detail);

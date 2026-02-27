@@ -96,6 +96,7 @@ export type BatchModifyResponse = OrderResponse;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -124,7 +125,7 @@ export type BatchModifySuccessResponse = ExcludeErrorResponse<BatchModifyRespons
  * @param opts Request execution options.
  * @return Successful variant of {@link OrderResponse} without error statuses.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
@@ -164,6 +165,6 @@ export function batchModify(
   params: BatchModifyParameters,
   opts?: BatchModifyOptions,
 ): Promise<BatchModifySuccessResponse> {
-  const action = v.parse(BatchModifyParameters, params);
+  const action = parse(BatchModifyParameters, params);
   return executeL1Action(config, { type: "batchModify", ...action }, opts);
 }

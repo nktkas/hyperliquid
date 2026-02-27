@@ -62,6 +62,7 @@ export type SendAssetResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -104,7 +105,7 @@ export const SendAssetTypes = {
  * @param opts Request execution options.
  * @return Successful response without specific data.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
@@ -136,7 +137,7 @@ export function sendAsset(
   params: SendAssetParameters,
   opts?: SendAssetOptions,
 ): Promise<SendAssetSuccessResponse> {
-  const action = v.parse(SendAssetParameters, params);
+  const action = parse(SendAssetParameters, params);
   return executeUserSignedAction(
     config,
     { type: "sendAsset", ...action },

@@ -55,6 +55,7 @@ export type BlockDetailsResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode blockDetails} function. */
@@ -68,7 +69,7 @@ export type BlockDetailsParameters = Omit<v.InferInput<typeof BlockDetailsReques
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Response containing block information.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -90,7 +91,7 @@ export function blockDetails(
   params: BlockDetailsParameters,
   signal?: AbortSignal,
 ): Promise<BlockDetailsResponse> {
-  const request = v.parse(BlockDetailsRequest, {
+  const request = parse(BlockDetailsRequest, {
     type: "blockDetails",
     ...params,
   });

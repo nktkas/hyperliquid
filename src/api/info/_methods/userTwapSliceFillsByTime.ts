@@ -37,6 +37,7 @@ export type UserTwapSliceFillsByTimeResponse = UserTwapSliceFillsResponse;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userTwapSliceFillsByTime} function. */
@@ -50,7 +51,7 @@ export type UserTwapSliceFillsByTimeParameters = Omit<v.InferInput<typeof UserTw
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of user's TWAP slice fill by time.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -76,7 +77,7 @@ export function userTwapSliceFillsByTime(
   params: UserTwapSliceFillsByTimeParameters,
   signal?: AbortSignal,
 ): Promise<UserTwapSliceFillsByTimeResponse> {
-  const request = v.parse(UserTwapSliceFillsByTimeRequest, {
+  const request = parse(UserTwapSliceFillsByTimeRequest, {
     type: "userTwapSliceFillsByTime",
     ...params,
   });

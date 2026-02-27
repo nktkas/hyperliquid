@@ -28,6 +28,7 @@ export type PerpsAtOpenInterestCapResponse = string[];
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode perpsAtOpenInterestCap} function. */
@@ -41,7 +42,7 @@ export type PerpsAtOpenInterestCapParameters = Omit<v.InferInput<typeof PerpsAtO
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of perpetuals at open interest caps.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -73,7 +74,7 @@ export function perpsAtOpenInterestCap(
   const params = paramsOrSignal instanceof AbortSignal ? {} : paramsOrSignal;
   const signal = paramsOrSignal instanceof AbortSignal ? paramsOrSignal : maybeSignal;
 
-  const request = v.parse(PerpsAtOpenInterestCapRequest, {
+  const request = parse(PerpsAtOpenInterestCapRequest, {
     type: "perpsAtOpenInterestCap",
     ...params,
   });

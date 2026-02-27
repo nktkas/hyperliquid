@@ -109,7 +109,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -140,7 +140,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -171,7 +171,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -201,7 +201,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -231,7 +231,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -262,7 +262,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -302,7 +302,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -342,7 +342,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -373,7 +373,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -404,7 +404,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -434,7 +434,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -463,7 +463,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -493,7 +493,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -524,7 +524,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -555,7 +555,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -586,7 +586,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -616,7 +616,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -646,7 +646,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -677,7 +677,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -708,7 +708,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -739,7 +739,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -770,7 +770,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -801,7 +801,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -832,7 +832,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -863,7 +863,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -894,7 +894,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -925,7 +925,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -956,7 +956,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example
@@ -987,7 +987,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * @param listener A callback function to be called when the event is received.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
    * @example

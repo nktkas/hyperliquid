@@ -81,6 +81,7 @@ export type OrderStatusResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode orderStatus} function. */
@@ -94,7 +95,7 @@ export type OrderStatusParameters = Omit<v.InferInput<typeof OrderStatusRequest>
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Order status response.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -117,7 +118,7 @@ export function orderStatus(
   params: OrderStatusParameters,
   signal?: AbortSignal,
 ): Promise<OrderStatusResponse> {
-  const request = v.parse(OrderStatusRequest, {
+  const request = parse(OrderStatusRequest, {
     type: "orderStatus",
     ...params,
   });

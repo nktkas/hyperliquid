@@ -49,6 +49,7 @@ export type CDepositResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -86,7 +87,7 @@ export const CDepositTypes = {
  * @param opts Request execution options.
  * @return Successful response without specific data.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
@@ -112,7 +113,7 @@ export function cDeposit(
   params: CDepositParameters,
   opts?: CDepositOptions,
 ): Promise<CDepositSuccessResponse> {
-  const action = v.parse(CDepositParameters, params);
+  const action = parse(CDepositParameters, params);
   return executeUserSignedAction(
     config,
     { type: "cDeposit", ...action },

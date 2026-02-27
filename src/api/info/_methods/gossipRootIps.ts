@@ -26,6 +26,7 @@ export type GossipRootIpsResponse = `${number}.${number}.${number}.${number}`[];
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /**
@@ -35,7 +36,7 @@ import type { InfoConfig } from "./_base/types.ts";
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of gossip root IPs.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -54,7 +55,7 @@ export function gossipRootIps(
   config: InfoConfig,
   signal?: AbortSignal,
 ): Promise<GossipRootIpsResponse> {
-  const request = v.parse(GossipRootIpsRequest, {
+  const request = parse(GossipRootIpsRequest, {
     type: "gossipRootIps",
   });
   return config.transport.request("info", request, signal);

@@ -33,6 +33,7 @@ export type MaxBuilderFeeResponse = number;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode maxBuilderFee} function. */
@@ -46,7 +47,7 @@ export type MaxBuilderFeeParameters = Omit<v.InferInput<typeof MaxBuilderFeeRequ
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Maximum builder fee approval.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -69,7 +70,7 @@ export function maxBuilderFee(
   params: MaxBuilderFeeParameters,
   signal?: AbortSignal,
 ): Promise<MaxBuilderFeeResponse> {
-  const request = v.parse(MaxBuilderFeeRequest, {
+  const request = parse(MaxBuilderFeeRequest, {
     type: "maxBuilderFee",
     ...params,
   });

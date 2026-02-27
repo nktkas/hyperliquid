@@ -43,6 +43,7 @@ export type UserFillsEvent = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_types.ts";
 
@@ -57,7 +58,7 @@ export type UserFillsParameters = Omit<v.InferInput<typeof UserFillsRequest>, "t
  * @param listener A callback function to be called when the event is received.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -81,7 +82,7 @@ export function userFills(
   params: UserFillsParameters,
   listener: (data: UserFillsEvent) => void,
 ): Promise<ISubscription> {
-  const payload = v.parse(UserFillsRequest, {
+  const payload = parse(UserFillsRequest, {
     type: "userFills",
     ...params,
     aggregateByTime: params.aggregateByTime ?? false,

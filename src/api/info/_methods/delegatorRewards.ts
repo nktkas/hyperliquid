@@ -40,6 +40,7 @@ export type DelegatorRewardsResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode delegatorRewards} function. */
@@ -53,7 +54,7 @@ export type DelegatorRewardsParameters = Omit<v.InferInput<typeof DelegatorRewar
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of rewards received from staking activities.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -76,7 +77,7 @@ export function delegatorRewards(
   params: DelegatorRewardsParameters,
   signal?: AbortSignal,
 ): Promise<DelegatorRewardsResponse> {
-  const request = v.parse(DelegatorRewardsRequest, {
+  const request = parse(DelegatorRewardsRequest, {
     type: "delegatorRewards",
     ...params,
   });

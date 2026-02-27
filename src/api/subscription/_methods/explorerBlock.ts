@@ -43,6 +43,7 @@ export type ExplorerBlockEvent = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_types.ts";
 
@@ -53,7 +54,7 @@ import type { SubscriptionConfig } from "./_types.ts";
  * @param listener A callback function to be called when the event is received.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -75,7 +76,7 @@ export function explorerBlock(
   config: SubscriptionConfig,
   listener: (data: ExplorerBlockEvent) => void,
 ): Promise<ISubscription> {
-  const payload = v.parse(ExplorerBlockRequest, { type: "explorerBlock" });
+  const payload = parse(ExplorerBlockRequest, { type: "explorerBlock" });
   return config.transport.subscribe<ExplorerBlockEvent>("explorerBlock_", payload, (e) => { // Internal channel as it does not have its own channel
     listener(e.detail);
   });

@@ -59,6 +59,7 @@ export type L2BookResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode l2Book} function. */
@@ -72,7 +73,7 @@ export type L2BookParameters = Omit<v.InferInput<typeof L2BookRequest>, "type">;
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return L2 order book snapshot.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -95,7 +96,7 @@ export function l2Book(
   params: L2BookParameters,
   signal?: AbortSignal,
 ): Promise<L2BookResponse> {
-  const request = v.parse(L2BookRequest, {
+  const request = parse(L2BookRequest, {
     type: "l2Book",
     ...params,
   });

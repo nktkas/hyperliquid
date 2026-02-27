@@ -30,6 +30,7 @@ export type IsVipResponse = boolean | null;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode isVip} function. */
@@ -43,7 +44,7 @@ export type IsVipParameters = Omit<v.InferInput<typeof IsVipRequest>, "type">;
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Boolean indicating user's VIP status.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -66,7 +67,7 @@ export function isVip(
   params: IsVipParameters,
   signal?: AbortSignal,
 ): Promise<IsVipResponse> {
-  const request = v.parse(IsVipRequest, {
+  const request = parse(IsVipRequest, {
     type: "isVip",
     ...params,
   });

@@ -90,6 +90,7 @@ export type SpotDeployStateResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode spotDeployState} function. */
@@ -103,7 +104,7 @@ export type SpotDeployStateParameters = Omit<v.InferInput<typeof SpotDeployState
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Deploy state for spot tokens.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -126,7 +127,7 @@ export function spotDeployState(
   params: SpotDeployStateParameters,
   signal?: AbortSignal,
 ): Promise<SpotDeployStateResponse> {
-  const request = v.parse(SpotDeployStateRequest, {
+  const request = parse(SpotDeployStateRequest, {
     type: "spotDeployState",
     ...params,
   });

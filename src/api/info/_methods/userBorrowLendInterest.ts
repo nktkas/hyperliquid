@@ -49,6 +49,7 @@ export type UserBorrowLendInterestResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userBorrowLendInterest} function. */
@@ -62,7 +63,7 @@ export type UserBorrowLendInterestParameters = Omit<v.InferInput<typeof UserBorr
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return User's borrow/lend interest.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -88,7 +89,7 @@ export function userBorrowLendInterest(
   params: UserBorrowLendInterestParameters,
   signal?: AbortSignal,
 ): Promise<UserBorrowLendInterestResponse> {
-  const request = v.parse(UserBorrowLendInterestRequest, {
+  const request = parse(UserBorrowLendInterestRequest, {
     type: "userBorrowLendInterest",
     ...params,
   });

@@ -46,6 +46,7 @@ export type PredictedFundingsResponse = [
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /**
@@ -55,7 +56,7 @@ import type { InfoConfig } from "./_base/types.ts";
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of predicted funding rates.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -74,7 +75,7 @@ export function predictedFundings(
   config: InfoConfig,
   signal?: AbortSignal,
 ): Promise<PredictedFundingsResponse> {
-  const request = v.parse(PredictedFundingsRequest, {
+  const request = parse(PredictedFundingsRequest, {
     type: "predictedFundings",
   });
   return config.transport.request("info", request, signal);

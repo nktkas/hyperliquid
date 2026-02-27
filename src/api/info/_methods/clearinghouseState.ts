@@ -173,6 +173,7 @@ export type ClearinghouseStateResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode clearinghouseState} function. */
@@ -186,7 +187,7 @@ export type ClearinghouseStateParameters = Omit<v.InferInput<typeof Clearinghous
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Account summary for perpetual trading.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -209,7 +210,7 @@ export function clearinghouseState(
   params: ClearinghouseStateParameters,
   signal?: AbortSignal,
 ): Promise<ClearinghouseStateResponse> {
-  const request = v.parse(ClearinghouseStateRequest, {
+  const request = parse(ClearinghouseStateRequest, {
     type: "clearinghouseState",
     ...params,
   });

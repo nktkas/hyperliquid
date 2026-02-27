@@ -30,6 +30,7 @@ export type UserDexAbstractionResponse = boolean | null;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userDexAbstraction} function. */
@@ -43,7 +44,7 @@ export type UserDexAbstractionParameters = Omit<v.InferInput<typeof UserDexAbstr
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return User HIP-3 DEX abstraction state.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -66,7 +67,7 @@ export function userDexAbstraction(
   params: UserDexAbstractionParameters,
   signal?: AbortSignal,
 ): Promise<UserDexAbstractionResponse> {
-  const request = v.parse(UserDexAbstractionRequest, {
+  const request = parse(UserDexAbstractionRequest, {
     type: "userDexAbstraction",
     ...params,
   });

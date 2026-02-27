@@ -59,6 +59,7 @@ export type RecentTradesResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode recentTrades} function. */
@@ -72,7 +73,7 @@ export type RecentTradesParameters = Omit<v.InferInput<typeof RecentTradesReques
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of recent trades.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -95,7 +96,7 @@ export function recentTrades(
   params: RecentTradesParameters,
   signal?: AbortSignal,
 ): Promise<RecentTradesResponse> {
-  const request = v.parse(RecentTradesRequest, {
+  const request = parse(RecentTradesRequest, {
     type: "recentTrades",
     ...params,
   });

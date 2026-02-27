@@ -38,6 +38,7 @@ export type LeadingVaultsResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode leadingVaults} function. */
@@ -51,7 +52,7 @@ export type LeadingVaultsParameters = Omit<v.InferInput<typeof LeadingVaultsRequ
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of leading vaults for a user.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -74,7 +75,7 @@ export function leadingVaults(
   params: LeadingVaultsParameters,
   signal?: AbortSignal,
 ): Promise<LeadingVaultsResponse> {
-  const request = v.parse(LeadingVaultsRequest, {
+  const request = parse(LeadingVaultsRequest, {
     type: "leadingVaults",
     ...params,
   });

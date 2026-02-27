@@ -75,6 +75,7 @@ export type CandleSnapshotResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode candleSnapshot} function. */
@@ -88,7 +89,7 @@ export type CandleSnapshotParameters = v.InferInput<typeof CandleSnapshotRequest
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of candlestick data points.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -115,7 +116,7 @@ export function candleSnapshot(
   params: CandleSnapshotParameters,
   signal?: AbortSignal,
 ): Promise<CandleSnapshotResponse> {
-  const request = v.parse(CandleSnapshotRequest, {
+  const request = parse(CandleSnapshotRequest, {
     type: "candleSnapshot",
     req: params,
   });

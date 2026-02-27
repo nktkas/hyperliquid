@@ -28,6 +28,7 @@ export type AllBorrowLendReserveStatesResponse = [reserveId: number, state: Borr
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /**
@@ -37,7 +38,7 @@ import type { InfoConfig } from "./_base/types.ts";
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of tuples of reserve IDs and their borrow/lend reserve state.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -56,7 +57,7 @@ export function allBorrowLendReserveStates(
   config: InfoConfig,
   signal?: AbortSignal,
 ): Promise<AllBorrowLendReserveStatesResponse> {
-  const request = v.parse(AllBorrowLendReserveStatesRequest, {
+  const request = parse(AllBorrowLendReserveStatesRequest, {
     type: "allBorrowLendReserveStates",
   });
   return config.transport.request("info", request, signal);

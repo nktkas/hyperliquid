@@ -66,6 +66,7 @@ export type CandleEvent = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_types.ts";
 
@@ -80,7 +81,7 @@ export type CandleParameters = Omit<v.InferInput<typeof CandleRequest>, "type">;
  * @param listener A callback function to be called when the event is received.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -104,7 +105,7 @@ export function candle(
   params: CandleParameters,
   listener: (data: CandleEvent) => void,
 ): Promise<ISubscription> {
-  const payload = v.parse(CandleRequest, { type: "candle", ...params });
+  const payload = parse(CandleRequest, { type: "candle", ...params });
   return config.transport.subscribe<CandleEvent>(payload.type, payload, (e) => {
     if (e.detail.s === payload.coin && e.detail.i === payload.interval) {
       listener(e.detail);

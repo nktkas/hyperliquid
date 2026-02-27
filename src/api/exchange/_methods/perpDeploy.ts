@@ -204,6 +204,7 @@ export type PerpDeployResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -231,7 +232,7 @@ export type PerpDeploySuccessResponse = ExcludeErrorResponse<PerpDeployResponse>
  * @param opts Request execution options.
  * @return Successful response without specific data.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
@@ -270,6 +271,6 @@ export function perpDeploy(
   params: PerpDeployParameters,
   opts?: PerpDeployOptions,
 ): Promise<PerpDeploySuccessResponse> {
-  const action = v.parse(PerpDeployParameters, params);
+  const action = parse(PerpDeployParameters, params);
   return executeL1Action(config, { type: "perpDeploy", ...action }, opts);
 }

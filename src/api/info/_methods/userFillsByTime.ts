@@ -37,6 +37,7 @@ export type UserFillsByTimeResponse = UserFillsResponse;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userFillsByTime} function. */
@@ -50,7 +51,7 @@ export type UserFillsByTimeParameters = Omit<v.InferInput<typeof UserFillsByTime
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of user trade fills by time.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -76,7 +77,7 @@ export function userFillsByTime(
   params: UserFillsByTimeParameters,
   signal?: AbortSignal,
 ): Promise<UserFillsByTimeResponse> {
-  const request = v.parse(UserFillsByTimeRequest, {
+  const request = parse(UserFillsByTimeRequest, {
     type: "userFillsByTime",
     ...params,
   });

@@ -207,6 +207,7 @@ export type UserFeesResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userFees} function. */
@@ -220,7 +221,7 @@ export type UserFeesParameters = Omit<v.InferInput<typeof UserFeesRequest>, "typ
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return User fees.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -243,7 +244,7 @@ export function userFees(
   params: UserFeesParameters,
   signal?: AbortSignal,
 ): Promise<UserFeesResponse> {
-  const request = v.parse(UserFeesRequest, {
+  const request = parse(UserFeesRequest, {
     type: "userFees",
     ...params,
   });

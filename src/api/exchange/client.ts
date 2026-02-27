@@ -346,7 +346,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -379,7 +379,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -411,7 +411,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -458,7 +458,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -490,7 +490,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful variant of {@link OrderResponse} without error statuses.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -536,7 +536,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -568,7 +568,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful variant of {@link CancelResponse} without error statuses.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -600,7 +600,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful variant of {@link CancelResponse} without error statuses.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -636,7 +636,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -667,7 +667,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -698,7 +698,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -747,7 +747,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Response for creating a sub-account.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -779,7 +779,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Response for creating a vault.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -816,7 +816,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -860,7 +860,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -902,7 +902,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -934,7 +934,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -966,7 +966,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -998,7 +998,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1040,7 +1040,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful variant of {@link OrderResponse} without error statuses.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1083,7 +1083,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1114,7 +1114,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1159,7 +1159,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1191,7 +1191,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1223,7 +1223,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1265,7 +1265,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1303,7 +1303,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1335,7 +1335,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1367,7 +1367,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1409,7 +1409,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1445,7 +1445,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1477,7 +1477,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1509,7 +1509,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1546,7 +1546,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1582,7 +1582,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1618,7 +1618,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful variant of {@link TwapCancelResponse} without error status.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1650,7 +1650,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful variant of {@link TwapOrderResponse} without error status.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1691,7 +1691,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1723,7 +1723,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1755,7 +1755,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1787,7 +1787,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1819,7 +1819,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1853,7 +1853,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1885,7 +1885,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1917,7 +1917,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1949,7 +1949,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -1981,7 +1981,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -2017,7 +2017,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
@@ -2053,7 +2053,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
-   * @throws {ValiError} When the request parameters fail validation (before sending).
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *

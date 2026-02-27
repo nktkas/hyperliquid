@@ -47,6 +47,7 @@ export type ScheduleCancelResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -75,7 +76,7 @@ export type ScheduleCancelSuccessResponse = ExcludeErrorResponse<ScheduleCancelR
  * @param opts Request execution options.
  * @return Successful response without specific data.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
@@ -114,6 +115,6 @@ export function scheduleCancel(
   const params = isFirstArgParams ? paramsOrOpts : {};
   const opts = isFirstArgParams ? maybeOpts : paramsOrOpts as ScheduleCancelOptions;
 
-  const action = v.parse(ScheduleCancelParameters, params);
+  const action = parse(ScheduleCancelParameters, params);
   return executeL1Action(config, { type: "scheduleCancel", ...action }, opts);
 }

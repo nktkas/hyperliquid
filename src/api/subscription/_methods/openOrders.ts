@@ -43,6 +43,7 @@ export type OpenOrdersEvent = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_types.ts";
 
@@ -57,7 +58,7 @@ export type OpenOrdersParameters = Omit<v.InferInput<typeof OpenOrdersRequest>, 
  * @param listener A callback function to be called when the event is received.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -81,7 +82,7 @@ export function openOrders(
   params: OpenOrdersParameters,
   listener: (data: OpenOrdersEvent) => void,
 ): Promise<ISubscription> {
-  const payload = v.parse(OpenOrdersRequest, {
+  const payload = parse(OpenOrdersRequest, {
     type: "openOrders",
     ...params,
     dex: params.dex ?? "", // Same value as in response

@@ -31,6 +31,7 @@ export type AllMidsResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode allMids} function. */
@@ -44,7 +45,7 @@ export type AllMidsParameters = Omit<v.InferInput<typeof AllMidsRequest>, "type"
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Mapping of coin symbols to mid prices.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -76,7 +77,7 @@ export function allMids(
   const params = paramsOrSignal instanceof AbortSignal ? {} : paramsOrSignal;
   const signal = paramsOrSignal instanceof AbortSignal ? paramsOrSignal : maybeSignal;
 
-  const request = v.parse(AllMidsRequest, {
+  const request = parse(AllMidsRequest, {
     type: "allMids",
     ...params,
   });

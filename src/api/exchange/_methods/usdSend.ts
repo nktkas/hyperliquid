@@ -51,6 +51,7 @@ export type UsdSendResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -89,7 +90,7 @@ export const UsdSendTypes = {
  * @param opts Request execution options.
  * @return Successful response without specific data.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
@@ -115,7 +116,7 @@ export function usdSend(
   params: UsdSendParameters,
   opts?: UsdSendOptions,
 ): Promise<UsdSendSuccessResponse> {
-  const action = v.parse(UsdSendParameters, params);
+  const action = parse(UsdSendParameters, params);
   return executeUserSignedAction(
     config,
     { type: "usdSend", ...action },

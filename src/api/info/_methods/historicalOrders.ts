@@ -69,6 +69,7 @@ export type HistoricalOrdersResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode historicalOrders} function. */
@@ -82,7 +83,7 @@ export type HistoricalOrdersParameters = Omit<v.InferInput<typeof HistoricalOrde
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of frontend orders with current processing status.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -105,7 +106,7 @@ export function historicalOrders(
   params: HistoricalOrdersParameters,
   signal?: AbortSignal,
 ): Promise<HistoricalOrdersResponse> {
-  const request = v.parse(HistoricalOrdersRequest, {
+  const request = parse(HistoricalOrdersRequest, {
     type: "historicalOrders",
     ...params,
   });

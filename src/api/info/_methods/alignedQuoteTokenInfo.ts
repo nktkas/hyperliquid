@@ -52,6 +52,7 @@ export type AlignedQuoteTokenInfoResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode alignedQuoteTokenInfo} function. */
@@ -65,7 +66,7 @@ export type AlignedQuoteTokenInfoParameters = Omit<v.InferInput<typeof AlignedQu
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Supply, rate, and pending payment information for an aligned quote token.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -88,7 +89,7 @@ export function alignedQuoteTokenInfo(
   params: AlignedQuoteTokenInfoParameters,
   signal?: AbortSignal,
 ): Promise<AlignedQuoteTokenInfoResponse> {
-  const request = v.parse(AlignedQuoteTokenInfoRequest, {
+  const request = parse(AlignedQuoteTokenInfoRequest, {
     type: "alignedQuoteTokenInfo",
     ...params,
   });

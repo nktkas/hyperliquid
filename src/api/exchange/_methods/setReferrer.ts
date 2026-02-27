@@ -40,6 +40,7 @@ export type SetReferrerResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -68,7 +69,7 @@ export type SetReferrerSuccessResponse = ExcludeErrorResponse<SetReferrerRespons
  * @param opts Request execution options.
  * @return Successful response without specific data.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
@@ -94,6 +95,6 @@ export function setReferrer(
   params: SetReferrerParameters,
   opts?: SetReferrerOptions,
 ): Promise<SetReferrerSuccessResponse> {
-  const action = v.parse(SetReferrerParameters, params);
+  const action = parse(SetReferrerParameters, params);
   return executeL1Action(config, { type: "setReferrer", ...action }, opts);
 }

@@ -65,6 +65,7 @@ export type CancelResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -93,7 +94,7 @@ export type CancelSuccessResponse = ExcludeErrorResponse<CancelResponse>;
  * @param opts Request execution options.
  * @return Successful variant of {@link CancelResponse} without error statuses.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
@@ -119,6 +120,6 @@ export function cancel(
   params: CancelParameters,
   opts?: CancelOptions,
 ): Promise<CancelSuccessResponse> {
-  const action = v.parse(CancelParameters, params);
+  const action = parse(CancelParameters, params);
   return executeL1Action(config, { type: "cancel", ...action }, opts);
 }

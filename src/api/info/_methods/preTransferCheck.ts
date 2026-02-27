@@ -44,6 +44,7 @@ export type PreTransferCheckResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode preTransferCheck} function. */
@@ -57,7 +58,7 @@ export type PreTransferCheckParameters = Omit<v.InferInput<typeof PreTransferChe
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Pre-transfer user existence check result.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -80,7 +81,7 @@ export function preTransferCheck(
   params: PreTransferCheckParameters,
   signal?: AbortSignal,
 ): Promise<PreTransferCheckResponse> {
-  const request = v.parse(PreTransferCheckRequest, {
+  const request = parse(PreTransferCheckRequest, {
     type: "preTransferCheck",
     ...params,
   });

@@ -53,6 +53,7 @@ export type SpotSendResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -92,7 +93,7 @@ export const SpotSendTypes = {
  * @param opts Request execution options.
  * @return Successful response without specific data.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
@@ -122,7 +123,7 @@ export function spotSend(
   params: SpotSendParameters,
   opts?: SpotSendOptions,
 ): Promise<SpotSendSuccessResponse> {
-  const action = v.parse(SpotSendParameters, params);
+  const action = parse(SpotSendParameters, params);
   return executeUserSignedAction(
     config,
     { type: "spotSend", ...action },

@@ -36,6 +36,7 @@ export type TxDetailsResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode txDetails} function. */
@@ -49,7 +50,7 @@ export type TxDetailsParameters = Omit<v.InferInput<typeof TxDetailsRequest>, "t
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Transaction details.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -71,7 +72,7 @@ export function txDetails(
   params: TxDetailsParameters,
   signal?: AbortSignal,
 ): Promise<TxDetailsResponse> {
-  const request = v.parse(TxDetailsRequest, {
+  const request = parse(TxDetailsRequest, {
     type: "txDetails",
     ...params,
   });

@@ -84,6 +84,7 @@ export type WebData2Response = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode webData2} function. */
@@ -97,7 +98,7 @@ export type WebData2Parameters = Omit<v.InferInput<typeof WebData2Request>, "typ
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Comprehensive user and market data.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -120,7 +121,7 @@ export function webData2(
   params: WebData2Parameters,
   signal?: AbortSignal,
 ): Promise<WebData2Response> {
-  const request = v.parse(WebData2Request, {
+  const request = parse(WebData2Request, {
     type: "webData2",
     ...params,
   });

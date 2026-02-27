@@ -53,6 +53,7 @@ export type CreateSubAccountResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -81,7 +82,7 @@ export type CreateSubAccountSuccessResponse = ExcludeErrorResponse<CreateSubAcco
  * @param opts Request execution options.
  * @return Response for creating a sub-account.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
@@ -107,6 +108,6 @@ export function createSubAccount(
   params: CreateSubAccountParameters,
   opts?: CreateSubAccountOptions,
 ): Promise<CreateSubAccountSuccessResponse> {
-  const action = v.parse(CreateSubAccountParameters, params);
+  const action = parse(CreateSubAccountParameters, params);
   return executeL1Action(config, { type: "createSubAccount", ...action }, opts);
 }

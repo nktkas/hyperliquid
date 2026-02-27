@@ -55,6 +55,7 @@ export type UserRoleResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode userRole} function. */
@@ -68,7 +69,7 @@ export type UserRoleParameters = Omit<v.InferInput<typeof UserRoleRequest>, "typ
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return User role.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -91,7 +92,7 @@ export function userRole(
   params: UserRoleParameters,
   signal?: AbortSignal,
 ): Promise<UserRoleResponse> {
-  const request = v.parse(UserRoleRequest, {
+  const request = parse(UserRoleRequest, {
     type: "userRole",
     ...params,
   });

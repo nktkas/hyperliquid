@@ -33,6 +33,7 @@ export type FrontendOpenOrdersResponse = FrontendOpenOrderSchema[];
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode frontendOpenOrders} function. */
@@ -46,7 +47,7 @@ export type FrontendOpenOrdersParameters = Omit<v.InferInput<typeof FrontendOpen
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of open orders with additional display information.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -69,7 +70,7 @@ export function frontendOpenOrders(
   params: FrontendOpenOrdersParameters,
   signal?: AbortSignal,
 ): Promise<FrontendOpenOrdersResponse> {
-  const request = v.parse(FrontendOpenOrdersRequest, {
+  const request = parse(FrontendOpenOrdersRequest, {
     type: "frontendOpenOrders",
     ...params,
   });

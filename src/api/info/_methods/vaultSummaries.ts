@@ -52,6 +52,7 @@ export type VaultSummariesResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /**
@@ -61,7 +62,7 @@ import type { InfoConfig } from "./_base/types.ts";
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of vaults less than 2 hours old.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -80,7 +81,7 @@ export function vaultSummaries(
   config: InfoConfig,
   signal?: AbortSignal,
 ): Promise<VaultSummariesResponse> {
-  const request = v.parse(VaultSummariesRequest, {
+  const request = parse(VaultSummariesRequest, {
     type: "vaultSummaries",
   });
   return config.transport.request("info", request, signal);

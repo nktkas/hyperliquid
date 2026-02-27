@@ -35,6 +35,7 @@ export type ActiveAssetCtxEvent = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_types.ts";
 
@@ -49,7 +50,7 @@ export type ActiveAssetCtxParameters = Omit<v.InferInput<typeof ActiveAssetCtxRe
  * @param listener A callback function to be called when the event is received.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -73,7 +74,7 @@ export function activeAssetCtx(
   params: ActiveAssetCtxParameters,
   listener: (data: ActiveAssetCtxEvent) => void,
 ): Promise<ISubscription> {
-  const payload = v.parse(ActiveAssetCtxRequest, { type: "activeAssetCtx", ...params });
+  const payload = parse(ActiveAssetCtxRequest, { type: "activeAssetCtx", ...params });
   return config.transport.subscribe<ActiveAssetCtxEvent>(payload.type, payload, (e) => {
     if (e.detail.coin === payload.coin) {
       listener(e.detail);

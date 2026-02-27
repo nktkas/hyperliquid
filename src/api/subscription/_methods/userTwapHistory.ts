@@ -41,6 +41,7 @@ export type UserTwapHistoryEvent = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_types.ts";
 
@@ -55,7 +56,7 @@ export type UserTwapHistoryParameters = Omit<v.InferInput<typeof UserTwapHistory
  * @param listener A callback function to be called when the event is received.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -79,7 +80,7 @@ export function userTwapHistory(
   params: UserTwapHistoryParameters,
   listener: (data: UserTwapHistoryEvent) => void,
 ): Promise<ISubscription> {
-  const payload = v.parse(UserTwapHistoryRequest, { type: "userTwapHistory", ...params });
+  const payload = parse(UserTwapHistoryRequest, { type: "userTwapHistory", ...params });
   return config.transport.subscribe<UserTwapHistoryEvent>(payload.type, payload, (e) => {
     if (e.detail.user === payload.user) {
       listener(e.detail);

@@ -44,6 +44,7 @@ export type MarginTableResponse = {
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode marginTable} function. */
@@ -57,7 +58,7 @@ export type MarginTableParameters = Omit<v.InferInput<typeof MarginTableRequest>
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Margin requirements table with multiple tiers.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -80,7 +81,7 @@ export function marginTable(
   params: MarginTableParameters,
   signal?: AbortSignal,
 ): Promise<MarginTableResponse> {
-  const request = v.parse(MarginTableRequest, {
+  const request = parse(MarginTableRequest, {
     type: "marginTable",
     ...params,
   });

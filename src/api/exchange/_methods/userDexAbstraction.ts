@@ -51,6 +51,7 @@ export type UserDexAbstractionResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -91,7 +92,7 @@ export const UserDexAbstractionTypes = {
  * @param opts Request execution options.
  * @return Successful response without specific data.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
@@ -119,7 +120,7 @@ export function userDexAbstraction(
   params: UserDexAbstractionParameters,
   opts?: UserDexAbstractionOptions,
 ): Promise<UserDexAbstractionSuccessResponse> {
-  const action = v.parse(UserDexAbstractionParameters, params);
+  const action = parse(UserDexAbstractionParameters, params);
   return executeUserSignedAction(
     config,
     { type: "userDexAbstraction", ...action },
