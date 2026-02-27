@@ -46,10 +46,10 @@
     "exclude": [".dev", ".github", "docs", "tests"]
   },
   "imports": {
-    "@nktkas/rews": "jsr:@nktkas/rews@^1.2.3",
-    "@noble/hashes": "jsr:@noble/hashes@^2.0.1",
+    "@nktkas/rews": "jsr:@nktkas/rews@^2",
+    "@noble/hashes": "jsr:@noble/hashes@^2",
     "@std/async/unstable-semaphore": "jsr:@std/async@1.1.1/unstable-semaphore",
-    "@std/msgpack/encode": "jsr:@std/msgpack@^1.0.3/encode",
+    "@std/msgpack/encode": "jsr:@std/msgpack@^1/encode",
     "@valibot/valibot": "jsr:@valibot/valibot@1.2.0"
   },
   "lock": false
