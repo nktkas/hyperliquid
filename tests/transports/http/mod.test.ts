@@ -135,16 +135,14 @@ Deno.test("HttpTransport", async (t) => {
         await assertRejects(() => transport.request("info", {}), HttpRequestError);
       });
 
-      await t.step("response body is consumed on error", async () => {
-        mockFetch(async () => {
-          const response = new Response("error body", { status: 500 });
-          await response.text();
-          return response;
-        });
+      await t.step("response body is readable on error", async () => {
+        mockFetch(() => new Response("error body", { status: 500 }));
 
         const transport = new HttpTransport();
         const error = await assertRejects(() => transport.request("info", {}), HttpRequestError);
-        assert(error.response?.bodyUsed);
+        assert(error.response);
+        assertEquals(error.response.bodyUsed, false);
+        assertEquals(await error.response.text(), "error body");
       });
 
       await t.step("unknown error wraps in HttpRequestError", async () => {

@@ -62,24 +62,22 @@ export const TESTNET_RPC_URL = "https://rpc.hyperliquid-testnet.xyz";
 export class HttpRequestError extends TransportError {
   /** The HTTP response that caused the error. */
   response?: Response;
-  /** The response body text. */
-  body?: string;
 
   /**
    * Creates a new HTTP request error.
    *
    * @param args The error arguments.
    * @param args.response The HTTP response that caused the error.
-   * @param args.body The response body text.
+   * @param args.message Optional message to append after the status line.
    * @param options The error options.
    */
-  constructor(args?: { response?: Response; body?: string }, options?: ErrorOptions) {
-    const { response, body } = args ?? {};
+  constructor(args?: { response?: Response; message?: string }, options?: ErrorOptions) {
+    const { response, message: detail } = args ?? {};
 
     let message: string;
     if (response) {
       message = `${response.status} ${response.statusText}`.trim();
-      if (body) message += ` - ${body}`;
+      if (detail) message += ` - ${detail}`;
     } else {
       message = `Unknown HTTP request error: ${options?.cause}`;
     }
@@ -87,7 +85,6 @@ export class HttpRequestError extends TransportError {
     super(message, options);
     this.name = "HttpRequestError";
     this.response = response;
-    this.body = body;
   }
 }
 
@@ -156,17 +153,18 @@ export class HttpTransport implements IRequestTransport {
 
       // Validate the Response
       if (!response.ok || !response.headers.get("Content-Type")?.includes("application/json")) {
-        // Unload the response body to prevent memory leaks
-        const body = await response.text().catch(() => undefined);
-        throw new HttpRequestError({ response, body });
+        const clone = response.clone();
+        const body = await response.text().catch(() => undefined); // releases connection, clone stays readable
+        throw new HttpRequestError({ response: clone, message: body });
       }
 
       // Parse the response body
+      const clone = response.clone();
       const body = await response.json();
 
       // Check if the response is an error
       if (body?.type === "error") {
-        throw new HttpRequestError({ response, body: body?.message });
+        throw new HttpRequestError({ response: clone, message: body?.message });
       }
 
       // Return the response body
