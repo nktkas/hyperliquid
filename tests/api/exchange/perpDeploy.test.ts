@@ -125,6 +125,7 @@ runTest({
         },
       },
       { setFundingMultipliers: [["TEST0", "1"]] },
+      { setFundingInterestRates: [["TEST0", "0.005"], ["TEST1", "-0.005"]] },
       { haltTrading: { coin: "TEST0", isHalted: true } },
       { setMarginTableIds: [["TEST0", 1]] },
       {

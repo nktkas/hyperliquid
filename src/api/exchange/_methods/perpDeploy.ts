@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address, Decimal, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
 import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
 
 /**
@@ -105,6 +105,12 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
         type: v.literal("perpDeploy"),
         /** A list (sorted by key) of asset and funding multiplier. */
         setFundingMultipliers: v.array(v.tuple([v.string(), UnsignedDecimal])),
+      }),
+      v.object({
+        /** Type of action. */
+        type: v.literal("perpDeploy"),
+        /** A list (sorted by key) of asset and 8-hour funding interest rate (between -0.01 and 0.01). */
+        setFundingInterestRates: v.array(v.tuple([v.string(), Decimal])),
       }),
       v.object({
         /** Type of action. */
