@@ -18,10 +18,9 @@ runTest({
   name: "topUpIsolatedOnlyMargin",
   codeTestFn: async (_t, exchClient) => {
     // Use a strictIsolated asset
-    const id = symbolConverter.getAssetId("HYPE")!;
+    const id = symbolConverter.getAssetId("ANIME")!;
     await topUpPerp(exchClient, "30");
-    await exchClient.updateLeverage({ asset: id, isCross: false, leverage: 1 });
-    await openOrder(exchClient, "market", "HYPE");
+    await openOrder(exchClient, "market", "ANIME");
 
     const params: TopUpIsolatedOnlyMarginParameters[] = [
       { asset: id, leverage: "0.5" },
