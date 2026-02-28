@@ -21,6 +21,8 @@ runTest({
       { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", startTime: now - fiveYears, endTime: null },
       { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", startTime: now - fiveYears, aggregateByTime: true },
       { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", startTime: now - fiveYears, aggregateByTime: false },
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", startTime: now - fiveYears, reversed: true },
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", startTime: now - fiveYears, reversed: false },
     ];
 
     const data = await Promise.all(params.map((p) => client.userFillsByTime(p)));

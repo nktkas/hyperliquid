@@ -23,6 +23,8 @@ export const UserFillsByTimeRequest = /* @__PURE__ */ (() => {
     endTime: v.nullish(UnsignedInteger),
     /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
     aggregateByTime: v.optional(v.boolean()),
+    /** If true, fills are returned in reverse chronological order (newest first). */
+    reversed: v.optional(v.boolean()),
   });
 })();
 export type UserFillsByTimeRequest = v.InferOutput<typeof UserFillsByTimeRequest>;
