@@ -101,6 +101,7 @@ import {
 } from "./_methods/metaAndAssetCtxs.ts";
 import { openOrders, type OpenOrdersParameters, type OpenOrdersResponse } from "./_methods/openOrders.ts";
 import { orderStatus, type OrderStatusParameters, type OrderStatusResponse } from "./_methods/orderStatus.ts";
+import { perpCategories, type PerpCategoriesResponse } from "./_methods/perpCategories.ts";
 import { perpDeployAuctionStatus, type PerpDeployAuctionStatusResponse } from "./_methods/perpDeployAuctionStatus.ts";
 import { perpDexLimits, type PerpDexLimitsParameters, type PerpDexLimitsResponse } from "./_methods/perpDexLimits.ts";
 import { perpDexs, type PerpDexsResponse } from "./_methods/perpDexs.ts";
@@ -1204,6 +1205,33 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     signal?: AbortSignal,
   ): Promise<OrderStatusResponse> {
     return orderStatus(this.config_, params, signal);
+  }
+
+  /**
+   * Request all perpetual asset categories.
+   *
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of tuples mapping coin names to their categories.
+   *
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.perpCategories();
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetual-asset-categories
+   */
+  perpCategories(
+    signal?: AbortSignal,
+  ): Promise<PerpCategoriesResponse> {
+    return perpCategories(this.config_, signal);
   }
 
   /**
@@ -2412,6 +2440,7 @@ export type { MetaParameters, MetaResponse } from "./_methods/meta.ts";
 export type { MetaAndAssetCtxsParameters, MetaAndAssetCtxsResponse } from "./_methods/metaAndAssetCtxs.ts";
 export type { OpenOrdersParameters, OpenOrdersResponse } from "./_methods/openOrders.ts";
 export type { OrderStatusParameters, OrderStatusResponse } from "./_methods/orderStatus.ts";
+export type { PerpCategoriesResponse } from "./_methods/perpCategories.ts";
 export type { PerpDeployAuctionStatusResponse } from "./_methods/perpDeployAuctionStatus.ts";
 export type { PerpDexLimitsParameters, PerpDexLimitsResponse } from "./_methods/perpDexLimits.ts";
 export type { PerpDexsResponse } from "./_methods/perpDexs.ts";
