@@ -81,6 +81,17 @@
       spec:
         ref:
           kind: openapi
+          spec: hl-info-approvedBuilders
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
           spec: hl-info-blockDetails
     ```
   - ```yaml
@@ -378,6 +389,28 @@
       spec:
         ref:
           kind: openapi
+          spec: hl-info-outcomeMeta
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-info-perpCategories
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
           spec: hl-info-perpDeployAuctionStatus
     ```
   - ```yaml
@@ -588,6 +621,17 @@
         ref:
           kind: openapi
           spec: hl-info-txDetails
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-info-userAbstraction
     ```
   - ```yaml
     type: builtin:openapi
@@ -1095,6 +1139,17 @@
       spec:
         ref:
           kind: openapi
+          spec: hl-exchange-sendToEvmWithData
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
           spec: hl-exchange-setDisplayName
     ```
   - ```yaml
@@ -1184,6 +1239,17 @@
         ref:
           kind: openapi
           spec: hl-exchange-tokenDelegate
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-exchange-topUpIsolatedOnlyMargin
     ```
   - ```yaml
     type: builtin:openapi
