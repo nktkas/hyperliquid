@@ -9,11 +9,11 @@ validation, transport, API, or wallet errors.
 Error
 └─ HyperliquidError
    ├─ ValidationError
+   ├─ AbstractWalletError
    ├─ TransportError
    │  ├─ HttpRequestError
    │  └─ WebSocketRequestError
-   ├─ ApiRequestError
-   └─ AbstractWalletError
+   └─ ApiRequestError
 ```
 
 ## Transport errors
@@ -125,6 +125,8 @@ timeouts and user-initiated cancellations produce a
 
 ```ts
 import { TransportError } from "@nktkas/hyperliquid";
+//       ^^^^^^^^^^^^^^
+//       universal transport error superclass for both HTTP and WebSocket transports
 
 try {
   await client.allMids();
@@ -156,22 +158,23 @@ import {
 try {
   await client.order({ orders: [/* ... */], grouping: "na" });
 } catch (error) {
-  if (error instanceof ValidationError) {
-    // Invalid parameters - check error.message / error.cause
-  } else if (error instanceof ApiRequestError) {
-    // API rejected the action - check error.message
-  } else if (error instanceof AbstractWalletError) {
-    // Wallet failed - check error.cause
-  } else if (error instanceof TransportError) {
-    if (error instanceof HttpRequestError) {
-      // HTTP failure - check error.response, error.cause
-    } else if (error instanceof WebSocketRequestError) {
-      // WebSocket failure - check error.message
+  if (error instanceof HyperliquidError) {
+    if (error instanceof ValidationError) {
+      // Invalid parameters - check error.message, error.cause
+    } else if (error instanceof ApiRequestError) {
+      // API rejected the action - check error.message
+    } else if (error instanceof AbstractWalletError) {
+      // Wallet failed - check error.cause
+    } else if (error instanceof TransportError) {
+      if (error instanceof HttpRequestError) {
+        // HTTP failure - check error.response, error.cause
+      } else if (error instanceof WebSocketRequestError) {
+        // WebSocket failure - check error.message
+      }
+    } else {
+      // Unexpected HyperliquidError subclass - check error.message
     }
-  } else if (error instanceof HyperliquidError) {
-    // Other SDK error
-  } else {
-    throw error;
   }
+  throw error; // re-throw unexpected errors
 }
 ```
