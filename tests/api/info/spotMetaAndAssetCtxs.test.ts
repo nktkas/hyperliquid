@@ -10,9 +10,6 @@ runTest({
   codeTestFn: async (_t, client) => {
     const data = await Promise.all([client.spotMetaAndAssetCtxs()]);
 
-    schemaCoverage(responseSchema, data, [
-      "#/items/0/properties/outcomes/present",
-      "#/items/0/properties/questions/present",
-    ]);
+    schemaCoverage(responseSchema, data);
   },
 });

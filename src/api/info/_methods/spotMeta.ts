@@ -67,35 +67,6 @@ export type SpotMetaResponse = {
      */
     deployerTradingFeeShare: string;
   }[];
-  /** Outcome markets available for spot trading. */
-  outcomes?: {
-    /** Unique identifier of the outcome market. */
-    outcome: number;
-    /** Short name of the outcome market. */
-    name: string;
-    /** Description of the outcome market. */
-    description: string;
-    /** Token specifications for each side of the outcome market. */
-    sideSpecs: {
-      /** Side name (e.g., "YES", "NO"). */
-      name: string;
-      /** Spot token index corresponding to this side. */
-      token: number;
-    }[];
-  }[];
-  /** Questions for prediction markets. */
-  questions?: {
-    /** Unique identifier of the question. */
-    question: number;
-    /** Short name of the question. */
-    name: string;
-    /** Description of the question. */
-    description: string;
-    /** Default outcome index if the question is not resolved. */
-    fallbackOutcome: number;
-    /** Outcome indices associated with this question. */
-    namedOutcomes: number[];
-  }[];
 };
 
 // ============================================================
