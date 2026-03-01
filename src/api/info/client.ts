@@ -102,6 +102,11 @@ import {
 import { openOrders, type OpenOrdersParameters, type OpenOrdersResponse } from "./_methods/openOrders.ts";
 import { orderStatus, type OrderStatusParameters, type OrderStatusResponse } from "./_methods/orderStatus.ts";
 import { outcomeMeta, type OutcomeMetaResponse } from "./_methods/outcomeMeta.ts";
+import {
+  perpAnnotation,
+  type PerpAnnotationParameters,
+  type PerpAnnotationResponse,
+} from "./_methods/perpAnnotation.ts";
 import { perpCategories, type PerpCategoriesResponse } from "./_methods/perpCategories.ts";
 import { perpDeployAuctionStatus, type PerpDeployAuctionStatusResponse } from "./_methods/perpDeployAuctionStatus.ts";
 import { perpDexLimits, type PerpDexLimitsParameters, type PerpDexLimitsResponse } from "./_methods/perpDexLimits.ts";
@@ -1213,7 +1218,6 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
    * @return Prediction market outcome metadata including outcomes and questions.
-   *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *
@@ -1233,6 +1237,35 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     signal?: AbortSignal,
   ): Promise<OutcomeMetaResponse> {
     return outcomeMeta(this.config_, signal);
+  }
+
+  /**
+   * Request perp annotation.
+   *
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Perp annotation for an asset.
+   *
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.perpAnnotation({ coin: "BTC" });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perp-annotation
+   */
+  perpAnnotation(
+    params: PerpAnnotationParameters,
+    signal?: AbortSignal,
+  ): Promise<PerpAnnotationResponse> {
+    return perpAnnotation(this.config_, params, signal);
   }
 
   /**
@@ -2469,6 +2502,7 @@ export type { MetaAndAssetCtxsParameters, MetaAndAssetCtxsResponse } from "./_me
 export type { OpenOrdersParameters, OpenOrdersResponse } from "./_methods/openOrders.ts";
 export type { OrderStatusParameters, OrderStatusResponse } from "./_methods/orderStatus.ts";
 export type { OutcomeMetaResponse } from "./_methods/outcomeMeta.ts";
+export type { PerpAnnotationParameters, PerpAnnotationResponse } from "./_methods/perpAnnotation.ts";
 export type { PerpCategoriesResponse } from "./_methods/perpCategories.ts";
 export type { PerpDeployAuctionStatusResponse } from "./_methods/perpDeployAuctionStatus.ts";
 export type { PerpDexLimitsParameters, PerpDexLimitsResponse } from "./_methods/perpDexLimits.ts";
