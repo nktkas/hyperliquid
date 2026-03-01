@@ -42,11 +42,10 @@ export type PerpAnnotationParameters = Omit<v.InferInput<typeof PerpAnnotationRe
 /**
  * Request perp annotation.
  *
- * @param config - General configuration for Info API requests.
- * @param params - Parameters specific to the API request.
- * @param signal - {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- *
- * @returns Perp annotation for an asset.
+ * @param config General configuration for Info API requests.
+ * @param params Parameters specific to the API request.
+ * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+ * @return Perp annotation for an asset.
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
