@@ -27,12 +27,13 @@ export type PerpAnnotationResponse = {
   category: string;
   /** Human-readable description of the category. */
   description: string;
-};
+} | null;
 
 // ============================================================
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/types.ts";
 
 /** Request parameters for the {@linkcode perpAnnotation} function. */
@@ -47,7 +48,7 @@ export type PerpAnnotationParameters = Omit<v.InferInput<typeof PerpAnnotationRe
  *
  * @returns Perp annotation for an asset.
  *
- * @throws {ValiError} When the request parameters fail validation (before sending).
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
  *
  * @example
@@ -67,7 +68,7 @@ export function perpAnnotation(
   params: PerpAnnotationParameters,
   signal?: AbortSignal,
 ): Promise<PerpAnnotationResponse> {
-  const request = v.parse(PerpAnnotationRequest, {
+  const request = parse(PerpAnnotationRequest, {
     type: "perpAnnotation",
     ...params,
   });
