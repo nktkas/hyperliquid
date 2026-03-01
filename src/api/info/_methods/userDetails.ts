@@ -59,6 +59,7 @@ export type UserDetailsParameters = Omit<v.InferInput<typeof UserDetailsRequest>
  * import { userDetails } from "@nktkas/hyperliquid/api/info";
  *
  * const transport = new HttpTransport(); // only `HttpTransport` supports this API
+ *
  * const data = await userDetails(
  *   { transport },
  *   { user: "0x..." },

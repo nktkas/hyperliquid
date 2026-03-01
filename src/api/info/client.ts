@@ -1218,6 +1218,7 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    *
    * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
    * @return Prediction market outcome metadata including outcomes and questions.
+   *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
    *

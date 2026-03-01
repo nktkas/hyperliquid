@@ -78,6 +78,7 @@ export type BlockDetailsParameters = Omit<v.InferInput<typeof BlockDetailsReques
  * import { blockDetails } from "@nktkas/hyperliquid/api/info";
  *
  * const transport = new HttpTransport(); // only `HttpTransport` supports this API
+ *
  * const data = await blockDetails(
  *   { transport },
  *   { height: 123 },

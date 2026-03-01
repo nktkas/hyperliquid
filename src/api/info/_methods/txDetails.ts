@@ -59,6 +59,7 @@ export type TxDetailsParameters = Omit<v.InferInput<typeof TxDetailsRequest>, "t
  * import { txDetails } from "@nktkas/hyperliquid/api/info";
  *
  * const transport = new HttpTransport(); // only `HttpTransport` supports this API
+ *
  * const data = await txDetails(
  *   { transport },
  *   { hash: "0x..." },
