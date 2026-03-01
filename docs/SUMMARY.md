@@ -400,6 +400,17 @@
       spec:
         ref:
           kind: openapi
+          spec: hl-info-perpAnnotation
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
           spec: hl-info-perpCategories
     ```
   - ```yaml
