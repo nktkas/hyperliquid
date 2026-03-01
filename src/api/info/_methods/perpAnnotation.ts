@@ -27,6 +27,10 @@ export type PerpAnnotationResponse = {
   category: string;
   /** Human-readable description of the category. */
   description: string;
+  /** Display name for frontends to use instead of the L1 name. */
+  displayName?: string;
+  /** Keywords used as hints to match against searches. */
+  keywords?: string[];
 } | null;
 
 // ============================================================

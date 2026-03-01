@@ -200,6 +200,10 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
           category: v.string(),
           /** Detailed description (max 400 characters). */
           description: v.string(),
+          /** Display name for frontends to use instead of the L1 name, or null to ignore. */
+          displayName: v.nullable(v.string()),
+          /** Keywords used as hints to match against searches. */
+          keywords: v.array(v.string()),
         }),
       }),
     ]),
