@@ -389,6 +389,20 @@ export type UserNonFundingLedgerUpdatesResponse = {
        * @pattern ^[0-9]+(\.[0-9]+)?$
        */
       amount: string;
+    }
+    | {
+      /** Update type. */
+      type: "vaultLeaderCommission";
+      /**
+       * Address of the leader.
+       * @pattern ^0x[a-fA-F0-9]{40}$
+       */
+      user: `0x${string}`;
+      /**
+       * Amount earned in USDC.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      usdc: string;
     };
 }[];
 
