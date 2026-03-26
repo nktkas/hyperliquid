@@ -23,7 +23,7 @@ runTest({
       { user: "0xc65008a70F511ae0407D26022ff1516422AceA94" },
       { user: "0x4993a3a6b03414ae9cf02a545db7a04af7c9f291" },
       { user: "0x11fe8a3dbc48b7b8138cdc9538015e2b928b86e8" },
-      { user: "0x288ed4efc8fbd1e42a06fe083ea942d20c90b336" },
+      { user: "0x33199a11ddb431fd8175ad5f20d989662527a3e6" },
     ];
 
     const data = await collectEventsOverTime<UserNonFundingLedgerUpdatesEvent>(async (cb) => {
