@@ -25,6 +25,7 @@ runTest({
       { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", startTime: now - fiveYears }, // startTime present
       { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", startTime: now - fiveYears, endTime: now }, // endTime present
       { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", startTime: now - fiveYears, endTime: null }, // endTime null
+      { user: "0x33199a11ddb431fd8175ad5f20d989662527a3e6", startTime: now - fiveYears }, // vaultLeaderCommission
     ];
 
     const data = await Promise.all(params.map((p) => client.userNonFundingLedgerUpdates(p)));
