@@ -164,7 +164,7 @@ export function schemaCoverage(
       throw new Error(
         `Sample at index ${i} failed validation:\n` +
           JSON.stringify(samples[i], null, 2) + "\n\n" +
-          "Errors:\n" + JSON.stringify(validate.errors, null, 2),
+          "Errors:\n" + JSON.stringify(filterAjvErrors(validate.errors ?? []), null, 2),
       );
     }
   }
@@ -615,6 +615,51 @@ function handleIfThenElse(
 // ============================================================
 // Utilities
 // ============================================================
+
+/**
+ * Filters AJV errors to reduce noise from anyOf/oneOf branches.
+ * Keeps only the best-matching branch (fewest errors) per anyOf/oneOf group.
+ */
+function filterAjvErrors(errors: { instancePath: string; schemaPath: string; keyword: string }[]): typeof errors {
+  // groupKey -> branchIndex -> errors[]
+  const groups = new Map<string, Map<string, typeof errors>>();
+  const result: typeof errors = [];
+
+  for (const error of errors) {
+    // Match: (schemaPrefix)/(anyOf|oneOf)/(branchIndex)(optionalSubPath)
+    const m = error.schemaPath.match(/^(.+)\/(anyOf|oneOf)\/(\d+)(\/.*)?$/);
+
+    // Pass through non-anyOf/oneOf errors, drop summary errors (keyword "anyOf"/"oneOf")
+    if (!m) {
+      if (error.keyword !== "anyOf" && error.keyword !== "oneOf") result.push(error);
+      continue;
+    }
+
+    // Errors inside a branch can have deeper instancePaths (e.g. /delta/accountValue vs /delta).
+    // Count /properties/ segments in the sub-path to determine how many instancePath segments to strip,
+    // so all errors from the same anyOf validation are grouped together.
+    const depth = m[4] ? (m[4].match(/\/properties\//g) ?? []).length : 0;
+    const base = error.instancePath.split("/").slice(0, depth ? -depth : undefined).join("/");
+    const key = `${base}||${m[1]}/${m[2]}`;
+
+    if (!groups.has(key)) groups.set(key, new Map());
+    const group = groups.get(key)!;
+
+    if (!group.has(m[3])) group.set(m[3], []);
+    group.get(m[3])!.push(error);
+  }
+
+  // From each anyOf/oneOf group, keep only the best-matching branch (fewest errors)
+  for (const group of groups.values()) {
+    let best: typeof errors = [];
+    for (const branch of group.values()) {
+      if (!best.length || branch.length < best.length) best = branch;
+    }
+    result.push(...best);
+  }
+
+  return result;
+}
 
 /** Resolves a $ref pointer to its target schema. */
 function resolveRef(ref: string, defs?: Record<string, JsonSchema>): JsonSchema {
