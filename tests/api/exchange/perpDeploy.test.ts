@@ -157,6 +157,15 @@ runTest({
           keywords: [],
         },
       },
+      {
+        setPerpAnnotation: {
+          coin: "TEST0",
+          category: "other",
+          description: "other perps",
+          displayName: "Some Perp",
+          keywords: ["perp", "other"],
+        },
+      },
     ];
 
     await Promise.all(params.map((p) =>
