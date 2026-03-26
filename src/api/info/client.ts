@@ -108,6 +108,7 @@ import {
   type PerpAnnotationResponse,
 } from "./_methods/perpAnnotation.ts";
 import { perpCategories, type PerpCategoriesResponse } from "./_methods/perpCategories.ts";
+import { perpConciseAnnotations, type PerpConciseAnnotationsResponse } from "./_methods/perpConciseAnnotations.ts";
 import { perpDeployAuctionStatus, type PerpDeployAuctionStatusResponse } from "./_methods/perpDeployAuctionStatus.ts";
 import { perpDexLimits, type PerpDexLimitsParameters, type PerpDexLimitsResponse } from "./_methods/perpDexLimits.ts";
 import { perpDexs, type PerpDexsResponse } from "./_methods/perpDexs.ts";
@@ -1294,6 +1295,33 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     signal?: AbortSignal,
   ): Promise<PerpCategoriesResponse> {
     return perpCategories(this.config_, signal);
+  }
+
+  /**
+   * Request concise annotations for all perpetual assets.
+   *
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of tuples mapping coin names to their concise annotations.
+   *
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.perpConciseAnnotations();
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-concise-perp-annotations
+   */
+  perpConciseAnnotations(
+    signal?: AbortSignal,
+  ): Promise<PerpConciseAnnotationsResponse> {
+    return perpConciseAnnotations(this.config_, signal);
   }
 
   /**
@@ -2505,6 +2533,7 @@ export type { OrderStatusParameters, OrderStatusResponse } from "./_methods/orde
 export type { OutcomeMetaResponse } from "./_methods/outcomeMeta.ts";
 export type { PerpAnnotationParameters, PerpAnnotationResponse } from "./_methods/perpAnnotation.ts";
 export type { PerpCategoriesResponse } from "./_methods/perpCategories.ts";
+export type { PerpConciseAnnotationsResponse } from "./_methods/perpConciseAnnotations.ts";
 export type { PerpDeployAuctionStatusResponse } from "./_methods/perpDeployAuctionStatus.ts";
 export type { PerpDexLimitsParameters, PerpDexLimitsResponse } from "./_methods/perpDexLimits.ts";
 export type { PerpDexsResponse } from "./_methods/perpDexs.ts";

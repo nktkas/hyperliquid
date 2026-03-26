@@ -60,6 +60,7 @@ export * from "./_methods/orderStatus.ts";
 export * from "./_methods/outcomeMeta.ts";
 export * from "./_methods/perpAnnotation.ts";
 export * from "./_methods/perpCategories.ts";
+export * from "./_methods/perpConciseAnnotations.ts";
 export * from "./_methods/perpDeployAuctionStatus.ts";
 export * from "./_methods/perpDexLimits.ts";
 export * from "./_methods/perpDexs.ts";
