@@ -18,7 +18,7 @@ export const SpotStateRequest = /* @__PURE__ */ (() => {
     /** User address. */
     user: Address,
     /** Whether to ignore portfolio margin calculations. */
-    ignorePortfolioMargin: v.optional(v.boolean(), false),
+    ignorePortfolioMargin: v.optional(v.boolean()),
   });
 })();
 export type SpotStateRequest = v.InferOutput<typeof SpotStateRequest>;
@@ -80,7 +80,7 @@ export function spotState(
   params: SpotStateParameters,
   listener: (data: SpotStateEvent) => void,
 ): Promise<ISubscription> {
-  const payload = parse(SpotStateRequest, { type: "spotState", user: params.user });
+  const payload = parse(SpotStateRequest, { type: "spotState", ...params });
   return config.transport.subscribe<SpotStateEvent>(payload.type, payload, (e) => {
     if (e.detail.user === payload.user) {
       listener(e.detail);
