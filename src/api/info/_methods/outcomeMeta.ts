@@ -34,7 +34,7 @@ export type OutcomeMetaResponse = {
       /** Name of the side. */
       name: string;
       /** Token identifier for this side. */
-      token: number;
+      token?: number;
     }[];
   }[];
   /** Array of prediction market questions. */
@@ -49,6 +49,8 @@ export type OutcomeMetaResponse = {
     fallbackOutcome: number;
     /** Array of named outcome identifiers. */
     namedOutcomes: number[];
+    /** Array of settled named outcome identifiers. */
+    settledNamedOutcomes: number[];
   }[];
 };
 

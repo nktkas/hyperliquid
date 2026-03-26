@@ -10,6 +10,9 @@ runTest({
   codeTestFn: async (_t, client) => {
     const data = await Promise.all([client.outcomeMeta()]);
 
-    schemaCoverage(responseSchema, data);
+    schemaCoverage(responseSchema, data, [
+      "#/properties/outcomes/items/properties/sideSpecs/items/properties/token/present",
+      "#/properties/questions/items/properties/settledNamedOutcomes/array",
+    ]);
   },
 });
