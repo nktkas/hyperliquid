@@ -88,10 +88,11 @@ export type UpdateLeverageSuccessResponse = ExcludeErrorResponse<UpdateLeverageR
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await updateLeverage(
- *   { transport, wallet },
- *   { asset: 0, isCross: true, leverage: 5 },
- * );
+ * await updateLeverage({ transport, wallet }, {
+ *   asset: 0,
+ *   isCross: true,
+ *   leverage: 5,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-leverage

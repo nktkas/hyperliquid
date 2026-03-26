@@ -128,15 +128,12 @@ export const ConvertToMultiSigUserTypes = {
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await convertToMultiSigUser(
- *   { transport, wallet },
- *   {
- *     signers: {
- *       authorizedUsers: ["0x...", "0x...", "0x..."],
- *       threshold: 2,
- *     },
+ * await convertToMultiSigUser({ transport, wallet }, {
+ *   signers: {
+ *     authorizedUsers: ["0x...", "0x...", "0x..."],
+ *     threshold: 2,
  *   },
- * );
+ * });
  * ```
  *
  * @example Convert to single-sig user
@@ -148,10 +145,9 @@ export const ConvertToMultiSigUserTypes = {
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await convertToMultiSigUser(
- *   { transport, wallet },
- *   { signers: null },
- * );
+ * await convertToMultiSigUser({ transport, wallet }, {
+ *   signers: null,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig

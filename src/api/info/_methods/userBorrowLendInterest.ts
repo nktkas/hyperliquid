@@ -73,13 +73,10 @@ export type UserBorrowLendInterestParameters = Omit<v.InferInput<typeof UserBorr
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await userBorrowLendInterest(
- *   { transport },
- *   {
- *     user: "0x...",
- *     startTime: Date.now() - 1000 * 60 * 60 * 24,
- *   },
- * );
+ * const data = await userBorrowLendInterest({ transport }, {
+ *   user: "0x...",
+ *   startTime: Date.now() - 1000 * 60 * 60 * 24,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-borrow-lend-user-state

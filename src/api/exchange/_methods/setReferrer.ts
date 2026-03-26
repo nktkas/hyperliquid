@@ -82,10 +82,9 @@ export type SetReferrerSuccessResponse = ExcludeErrorResponse<SetReferrerRespons
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await setReferrer(
- *   { transport, wallet },
- *   { code: "..." },
- * );
+ * await setReferrer({ transport, wallet }, {
+ *   code: "...",
+ * });
  * ```
  *
  * @see null

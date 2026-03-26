@@ -57,10 +57,9 @@ export type OpenOrdersParameters = Omit<v.InferInput<typeof OpenOrdersRequest>, 
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await openOrders(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await openOrders({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders

@@ -114,10 +114,9 @@ export type SpotDeployStateParameters = Omit<v.InferInput<typeof SpotDeployState
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await spotDeployState(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await spotDeployState({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-deploy-auction

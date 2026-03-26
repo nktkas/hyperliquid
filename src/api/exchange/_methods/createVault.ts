@@ -101,15 +101,12 @@ export type CreateVaultSuccessResponse = ExcludeErrorResponse<CreateVaultRespons
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await createVault(
- *   { transport, wallet },
- *   {
- *     name: "...",
- *     description: "...",
- *     initialUsd: 100 * 1e6,
- *     nonce: Date.now(),
- *   },
- * );
+ * const data = await createVault({ transport, wallet }, {
+ *   name: "...",
+ *   description: "...",
+ *   initialUsd: 100 * 1e6,
+ *   nonce: Date.now(),
+ * });
  * ```
  *
  * @see null

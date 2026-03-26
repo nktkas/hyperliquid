@@ -83,10 +83,9 @@ export type RecentTradesParameters = Omit<v.InferInput<typeof RecentTradesReques
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await recentTrades(
- *   { transport },
- *   { coin: "ETH" },
- * );
+ * const data = await recentTrades({ transport }, {
+ *   coin: "ETH",
+ * });
  * ```
  *
  * @see null

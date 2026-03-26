@@ -99,14 +99,11 @@ export type CandleSnapshotParameters = v.InferInput<typeof CandleSnapshotRequest
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await candleSnapshot(
- *   { transport },
- *   {
- *     coin: "ETH",
- *     interval: "1h",
- *     startTime: Date.now() - 1000 * 60 * 60 * 24,
- *   },
- * );
+ * const data = await candleSnapshot({ transport }, {
+ *   coin: "ETH",
+ *   interval: "1h",
+ *   startTime: Date.now() - 1000 * 60 * 60 * 24,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#candle-snapshot

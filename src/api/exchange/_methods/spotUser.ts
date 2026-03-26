@@ -85,10 +85,9 @@ export type SpotUserSuccessResponse = ExcludeErrorResponse<SpotUserResponse>;
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await spotUser(
- *   { transport, wallet },
- *   { toggleSpotDusting: { optOut: false } },
- * );
+ * await spotUser({ transport, wallet }, {
+ *   toggleSpotDusting: { optOut: false },
+ * });
  * ```
  *
  * @see null

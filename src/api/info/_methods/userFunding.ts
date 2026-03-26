@@ -90,10 +90,9 @@ export type UserFundingParameters = Omit<v.InferInput<typeof UserFundingRequest>
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await userFunding(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await userFunding({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates

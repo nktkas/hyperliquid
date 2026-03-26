@@ -88,10 +88,11 @@ export type UpdateIsolatedMarginSuccessResponse = ExcludeErrorResponse<UpdateIso
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await updateIsolatedMargin(
- *   { transport, wallet },
- *   { asset: 0, isBuy: true, ntli: 1 * 1e6 },
- * );
+ * await updateIsolatedMargin({ transport, wallet }, {
+ *   asset: 0,
+ *   isBuy: true,
+ *   ntli: 1 * 1e6,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin

@@ -132,20 +132,17 @@ export type ModifySuccessResponse = ExcludeErrorResponse<ModifyResponse>;
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await modify(
- *   { transport, wallet },
- *   {
- *     oid: 123,
- *     order: {
- *       a: 0,
- *       b: true,
- *       p: "31000",
- *       s: "0.2",
- *       r: false,
- *       t: { limit: { tif: "Gtc" } },
- *     },
+ * await modify({ transport, wallet }, {
+ *   oid: 123,
+ *   order: {
+ *     a: 0,
+ *     b: true,
+ *     p: "31000",
+ *     s: "0.2",
+ *     r: false,
+ *     t: { limit: { tif: "Gtc" } },
  *   },
- * );
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order

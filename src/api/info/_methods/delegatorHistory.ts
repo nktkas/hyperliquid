@@ -100,10 +100,9 @@ export type DelegatorHistoryParameters = Omit<v.InferInput<typeof DelegatorHisto
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await delegatorHistory(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await delegatorHistory({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-history

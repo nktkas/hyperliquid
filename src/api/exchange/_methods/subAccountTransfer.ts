@@ -86,10 +86,11 @@ export type SubAccountTransferSuccessResponse = ExcludeErrorResponse<SubAccountT
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await subAccountTransfer(
- *   { transport, wallet },
- *   { subAccountUser: "0x...", isDeposit: true, usd: 1 * 1e6 },
- * );
+ * await subAccountTransfer({ transport, wallet }, {
+ *   subAccountUser: "0x...",
+ *   isDeposit: true,
+ *   usd: 1 * 1e6,
+ * });
  * ```
  *
  * @see null

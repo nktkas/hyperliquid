@@ -197,10 +197,9 @@ export type ClearinghouseStateParameters = Omit<v.InferInput<typeof Clearinghous
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await clearinghouseState(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await clearinghouseState({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-perpetuals-account-summary

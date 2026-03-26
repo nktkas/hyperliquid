@@ -205,22 +205,19 @@ export type OrderSuccessResponse = ExcludeErrorResponse<OrderResponse>;
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await order(
- *   { transport, wallet },
- *   {
- *     orders: [
- *       {
- *         a: 0,
- *         b: true,
- *         p: "30000",
- *         s: "0.1",
- *         r: false,
- *         t: { limit: { tif: "Gtc" } },
- *       },
- *     ],
- *     grouping: "na",
- *   },
- * );
+ * const data = await order({ transport, wallet }, {
+ *   orders: [
+ *     {
+ *       a: 0,
+ *       b: true,
+ *       p: "30000",
+ *       s: "0.1",
+ *       r: false,
+ *       t: { limit: { tif: "Gtc" } },
+ *     },
+ *   ],
+ *   grouping: "na",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-an-order

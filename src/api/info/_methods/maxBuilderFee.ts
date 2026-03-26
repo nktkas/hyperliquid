@@ -57,10 +57,10 @@ export type MaxBuilderFeeParameters = Omit<v.InferInput<typeof MaxBuilderFeeRequ
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await maxBuilderFee(
- *   { transport },
- *   { user: "0x...", builder: "0x..." },
- * );
+ * const data = await maxBuilderFee({ transport }, {
+ *   user: "0x...",
+ *   builder: "0x...",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#check-builder-fee-approval

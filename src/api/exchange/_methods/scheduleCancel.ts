@@ -89,10 +89,9 @@ export type ScheduleCancelSuccessResponse = ExcludeErrorResponse<ScheduleCancelR
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await scheduleCancel(
- *   { transport, wallet },
- *   { time: Date.now() + 10_000 },
- * );
+ * await scheduleCancel({ transport, wallet }, {
+ *   time: Date.now() + 10_000,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#schedule-cancel-dead-mans-switch

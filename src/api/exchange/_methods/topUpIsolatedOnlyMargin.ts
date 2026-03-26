@@ -86,10 +86,10 @@ export type TopUpIsolatedOnlyMarginSuccessResponse = ExcludeErrorResponse<TopUpI
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await topUpIsolatedOnlyMargin(
- *   { transport, wallet },
- *   { asset: 0, leverage: "0.5" },
- * );
+ * await topUpIsolatedOnlyMargin({ transport, wallet }, {
+ *   asset: 0,
+ *   leverage: "0.5",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin

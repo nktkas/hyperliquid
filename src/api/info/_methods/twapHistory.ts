@@ -78,10 +78,9 @@ export type TwapHistoryParameters = Omit<v.InferInput<typeof TwapHistoryRequest>
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await twapHistory(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await twapHistory({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see null

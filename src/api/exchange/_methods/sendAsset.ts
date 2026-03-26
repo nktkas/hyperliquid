@@ -118,16 +118,13 @@ export const SendAssetTypes = {
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await sendAsset(
- *   { transport, wallet },
- *   {
- *     destination: "0x0000000000000000000000000000000000000001",
- *     sourceDex: "",
- *     destinationDex: "test",
- *     token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
- *     amount: "1",
- *   },
- * );
+ * await sendAsset({ transport, wallet }, {
+ *   destination: "0x0000000000000000000000000000000000000001",
+ *   sourceDex: "",
+ *   destinationDex: "test",
+ *   token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
+ *   amount: "1",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset

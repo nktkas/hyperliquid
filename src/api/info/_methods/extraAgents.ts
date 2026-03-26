@@ -64,10 +64,9 @@ export type ExtraAgentsParameters = Omit<v.InferInput<typeof ExtraAgentsRequest>
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await extraAgents(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await extraAgents({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see null

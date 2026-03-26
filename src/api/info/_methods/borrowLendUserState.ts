@@ -91,10 +91,9 @@ export type BorrowLendUserStateParameters = Omit<v.InferInput<typeof BorrowLendU
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await borrowLendUserState(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await borrowLendUserState({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-borrow-lend-user-state

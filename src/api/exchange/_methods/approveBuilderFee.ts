@@ -103,10 +103,10 @@ export const ApproveBuilderFeeTypes = {
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await approveBuilderFee(
- *   { transport, wallet },
- *   { maxFeeRate: "0.01%", builder: "0x..." },
- * );
+ * await approveBuilderFee({ transport, wallet }, {
+ *   maxFeeRate: "0.01%",
+ *   builder: "0x...",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-a-builder-fee

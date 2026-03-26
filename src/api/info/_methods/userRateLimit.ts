@@ -66,10 +66,9 @@ export type UserRateLimitParameters = Omit<v.InferInput<typeof UserRateLimitRequ
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await userRateLimit(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await userRateLimit({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-rate-limits

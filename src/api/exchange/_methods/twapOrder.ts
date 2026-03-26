@@ -119,19 +119,16 @@ export type TwapOrderSuccessResponse = ExcludeErrorResponse<TwapOrderResponse>;
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await twapOrder(
- *   { transport, wallet },
- *   {
- *     twap: {
- *       a: 0,
- *       b: true,
- *       s: "1",
- *       r: false,
- *       m: 10,
- *       t: true,
- *     },
+ * const data = await twapOrder({ transport, wallet }, {
+ *   twap: {
+ *     a: 0,
+ *     b: true,
+ *     s: "1",
+ *     r: false,
+ *     m: 10,
+ *     t: true,
  *   },
- * );
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-a-twap-order

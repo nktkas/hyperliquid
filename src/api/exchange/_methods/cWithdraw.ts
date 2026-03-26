@@ -100,10 +100,9 @@ export const CWithdrawTypes = {
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await cWithdraw(
- *   { transport, wallet },
- *   { wei: 1 * 1e8 },
- * );
+ * await cWithdraw({ transport, wallet }, {
+ *   wei: 1 * 1e8,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#withdraw-from-staking

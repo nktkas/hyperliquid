@@ -73,10 +73,9 @@ export type SubAccounts2Parameters = Omit<v.InferInput<typeof SubAccounts2Reques
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await subAccounts2(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await subAccounts2({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see null

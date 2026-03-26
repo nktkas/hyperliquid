@@ -68,10 +68,10 @@ export type PreTransferCheckParameters = Omit<v.InferInput<typeof PreTransferChe
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await preTransferCheck(
- *   { transport },
- *   { user: "0x...", source: "0x..." },
- * );
+ * const data = await preTransferCheck({ transport }, {
+ *   user: "0x...",
+ *   source: "0x...",
+ * });
  * ```
  *
  * @see null

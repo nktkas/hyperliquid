@@ -105,10 +105,10 @@ export const UserDexAbstractionTypes = {
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await userDexAbstraction(
- *   { transport, wallet },
- *   { user: "0x...", enabled: true },
- * );
+ * await userDexAbstraction({ transport, wallet }, {
+ *   user: "0x...",
+ *   enabled: true,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction

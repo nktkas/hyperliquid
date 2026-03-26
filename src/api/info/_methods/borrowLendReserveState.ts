@@ -95,10 +95,9 @@ export type BorrowLendReserveStateParameters = Omit<v.InferInput<typeof BorrowLe
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await borrowLendReserveState(
- *   { transport },
- *   { token: 0 },
- * );
+ * const data = await borrowLendReserveState({ transport }, {
+ *   token: 0,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-borrow-lend-reserve-state

@@ -89,10 +89,9 @@ export type CSignerActionSuccessResponse = ExcludeErrorResponse<CSignerActionRes
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await cSignerAction(
- *   { transport, wallet },
- *   { jailSelf: null },
- * );
+ * await cSignerAction({ transport, wallet }, {
+ *   jailSelf: null,
+ * });
  * ```
  *
  * @example Unjail self
@@ -104,10 +103,9 @@ export type CSignerActionSuccessResponse = ExcludeErrorResponse<CSignerActionRes
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await cSignerAction(
- *   { transport, wallet },
- *   { unjailSelf: null },
- * );
+ * await cSignerAction({ transport, wallet }, {
+ *   unjailSelf: null,
+ * });
  * ```
  *
  * @see null

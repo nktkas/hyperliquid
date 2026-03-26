@@ -76,10 +76,9 @@ export type AlignedQuoteTokenInfoParameters = Omit<v.InferInput<typeof AlignedQu
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await alignedQuoteTokenInfo(
- *   { transport },
- *   { token: 1328 },
- * );
+ * const data = await alignedQuoteTokenInfo({ transport }, {
+ *   token: 1328,
+ * });
  * ```
  *
  * @see null

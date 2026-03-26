@@ -106,14 +106,11 @@ export const SpotSendTypes = {
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await spotSend(
- *   { transport, wallet },
- *   {
- *     destination: "0x...",
- *     token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
- *     amount: "1",
- *   },
- * );
+ * await spotSend({ transport, wallet }, {
+ *   destination: "0x...",
+ *   token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
+ *   amount: "1",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-spot-transfer

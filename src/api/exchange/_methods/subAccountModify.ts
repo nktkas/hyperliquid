@@ -84,10 +84,10 @@ export type SubAccountModifySuccessResponse = ExcludeErrorResponse<SubAccountMod
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await subAccountModify(
- *   { transport, wallet },
- *   { subAccountUser: "0x...", name: "..."  },
- * );
+ * await subAccountModify({ transport, wallet }, {
+ *   subAccountUser: "0x...",
+ *   name: "...",
+ * });
  * ```
  *
  * @see null

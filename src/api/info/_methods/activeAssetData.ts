@@ -100,10 +100,10 @@ export type ActiveAssetDataParameters = Omit<v.InferInput<typeof ActiveAssetData
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await activeAssetData(
- *   { transport },
- *   { user: "0x...", coin: "ETH" },
- * );
+ * const data = await activeAssetData({ transport }, {
+ *   user: "0x...",
+ *   coin: "ETH",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-active-asset-data

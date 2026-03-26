@@ -89,10 +89,9 @@ export type AgentSetAbstractionSuccessResponse = ExcludeErrorResponse<AgentSetAb
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await agentSetAbstraction(
- *   { transport, wallet },
- *   { abstraction: "u" },
- * );
+ * await agentSetAbstraction({ transport, wallet }, {
+ *   abstraction: "u",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction-agent

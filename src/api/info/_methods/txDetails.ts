@@ -60,10 +60,9 @@ export type TxDetailsParameters = Omit<v.InferInput<typeof TxDetailsRequest>, "t
  *
  * const transport = new HttpTransport(); // only `HttpTransport` supports this API
  *
- * const data = await txDetails(
- *   { transport },
- *   { hash: "0x..." },
- * );
+ * const data = await txDetails({ transport }, {
+ *   hash: "0x...",
+ * });
  * ```
  *
  * @see null

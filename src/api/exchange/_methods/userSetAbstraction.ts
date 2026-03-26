@@ -103,10 +103,10 @@ export const UserSetAbstractionTypes = {
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await userSetAbstraction(
- *   { transport, wallet },
- *   { user: "0x...", abstraction: "dexAbstraction" },
- * );
+ * await userSetAbstraction({ transport, wallet }, {
+ *   user: "0x...",
+ *   abstraction: "dexAbstraction",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction

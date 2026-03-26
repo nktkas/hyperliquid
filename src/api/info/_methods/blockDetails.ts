@@ -79,10 +79,9 @@ export type BlockDetailsParameters = Omit<v.InferInput<typeof BlockDetailsReques
  *
  * const transport = new HttpTransport(); // only `HttpTransport` supports this API
  *
- * const data = await blockDetails(
- *   { transport },
- *   { height: 123 },
- * );
+ * const data = await blockDetails({ transport }, {
+ *   height: 123,
+ * });
  * ```
  *
  * @see null

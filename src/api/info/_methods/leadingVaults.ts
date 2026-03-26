@@ -62,10 +62,9 @@ export type LeadingVaultsParameters = Omit<v.InferInput<typeof LeadingVaultsRequ
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await leadingVaults(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await leadingVaults({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see null

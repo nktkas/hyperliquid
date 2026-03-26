@@ -85,10 +85,9 @@ export type SetDisplayNameSuccessResponse = ExcludeErrorResponse<SetDisplayNameR
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await setDisplayName(
- *   { transport, wallet },
- *   { displayName: "..." },
- * );
+ * await setDisplayName({ transport, wallet }, {
+ *   displayName: "...",
+ * });
  * ```
  *
  * @see null

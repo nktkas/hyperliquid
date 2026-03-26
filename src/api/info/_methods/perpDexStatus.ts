@@ -58,7 +58,9 @@ export type PerpDexStatusParameters = Omit<v.InferInput<typeof PerpDexStatusRequ
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await perpDexStatus({ transport }, { dex: "test" });
+ * const data = await perpDexStatus({ transport }, {
+ *   dex: "test",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#get-perp-market-status

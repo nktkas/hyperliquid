@@ -54,10 +54,9 @@ export type IsVipParameters = Omit<v.InferInput<typeof IsVipRequest>, "type">;
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await isVip(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await isVip({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see null

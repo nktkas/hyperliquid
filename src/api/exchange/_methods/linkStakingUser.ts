@@ -111,10 +111,10 @@ export const LinkStakingUserTypes = {
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await linkStakingUser(
- *   { transport, wallet },
- *   { user: "0x...", isFinalize: false },
- * );
+ * await linkStakingUser({ transport, wallet }, {
+ *   user: "0x...",
+ *   isFinalize: false,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/trading/fees#staking-linking

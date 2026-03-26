@@ -92,14 +92,11 @@ export type CancelByCloidSuccessResponse = ExcludeErrorResponse<CancelByCloidRes
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await cancelByCloid(
- *   { transport, wallet },
- *   {
- *     cancels: [
- *       { asset: 0, cloid: "0x..." },
- *     ],
- *   },
- * );
+ * await cancelByCloid({ transport, wallet }, {
+ *   cancels: [
+ *     { asset: 0, cloid: "0x..." },
+ *   ],
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s-by-cloid

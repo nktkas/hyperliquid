@@ -82,10 +82,9 @@ export type EvmUserModifySuccessResponse = ExcludeErrorResponse<EvmUserModifyRes
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await evmUserModify(
- *   { transport, wallet },
- *   { usingBigBlocks: true },
- * );
+ * await evmUserModify({ transport, wallet }, {
+ *   usingBigBlocks: true,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/hyperevm/dual-block-architecture

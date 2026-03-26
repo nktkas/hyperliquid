@@ -87,10 +87,10 @@ export type VaultDistributeSuccessResponse = ExcludeErrorResponse<VaultDistribut
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await vaultDistribute(
- *   { transport, wallet },
- *   { vaultAddress: "0x...", usd: 10 * 1e6 },
- * );
+ * await vaultDistribute({ transport, wallet }, {
+ *   vaultAddress: "0x...",
+ *   usd: 10 * 1e6,
+ * });
  * ```
  *
  * @see null

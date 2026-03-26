@@ -268,23 +268,20 @@ export type PerpDeploySuccessResponse = ExcludeErrorResponse<PerpDeployResponse>
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await perpDeploy(
- *   { transport, wallet },
- *   {
- *     registerAsset: {
- *       maxGas: 1000000,
- *       assetRequest: {
- *         coin: "USDC",
- *         szDecimals: 8,
- *         oraclePx: "1",
- *         marginTableId: 1,
- *         onlyIsolated: false,
- *       },
- *       dex: "test",
- *       schema: null,
+ * await perpDeploy({ transport, wallet }, {
+ *   registerAsset: {
+ *     maxGas: 1000000,
+ *     assetRequest: {
+ *       coin: "USDC",
+ *       szDecimals: 8,
+ *       oraclePx: "1",
+ *       marginTableId: 1,
+ *       onlyIsolated: false,
  *     },
+ *     dex: "test",
+ *     schema: null,
  *   },
- * );
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions

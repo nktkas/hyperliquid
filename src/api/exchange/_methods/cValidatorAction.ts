@@ -138,20 +138,17 @@ export type CValidatorActionSuccessResponse = ExcludeErrorResponse<CValidatorAct
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await cValidatorAction(
- *   { transport, wallet },
- *   {
- *     changeProfile: {
- *       node_ip: { Ip: "1.2.3.4" },
- *       name: "...",
- *       description: "...",
- *       unjailed: true,
- *       disable_delegations: false,
- *       commission_bps: null,
- *       signer: null,
- *     },
+ * await cValidatorAction({ transport, wallet }, {
+ *   changeProfile: {
+ *     node_ip: { Ip: "1.2.3.4" },
+ *     name: "...",
+ *     description: "...",
+ *     unjailed: true,
+ *     disable_delegations: false,
+ *     commission_bps: null,
+ *     signer: null,
  *   },
- * );
+ * });
  * ```
  *
  * @see null

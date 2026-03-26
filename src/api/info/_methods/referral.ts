@@ -203,10 +203,9 @@ export type ReferralParameters = Omit<v.InferInput<typeof ReferralRequest>, "typ
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await referral(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await referral({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-referral-information

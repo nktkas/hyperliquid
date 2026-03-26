@@ -61,10 +61,9 @@ export type LegalCheckParameters = Omit<v.InferInput<typeof LegalCheckRequest>, 
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await legalCheck(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await legalCheck({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see null

@@ -54,10 +54,9 @@ export type ApprovedBuildersParameters = Omit<v.InferInput<typeof ApprovedBuilde
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await approvedBuilders(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await approvedBuilders({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-approved-builders-for-user

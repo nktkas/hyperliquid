@@ -82,10 +82,9 @@ export type ValidatorL1StreamSuccessResponse = ExcludeErrorResponse<ValidatorL1S
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await validatorL1Stream(
- *   { transport, wallet },
- *   { riskFreeRate: "0.05" },
- * );
+ * await validatorL1Stream({ transport, wallet }, {
+ *   riskFreeRate: "0.05",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#validator-vote-on-risk-free-rate-for-aligned-quote-asset

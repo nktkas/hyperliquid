@@ -82,10 +82,9 @@ export type ReserveRequestWeightSuccessResponse = ExcludeErrorResponse<ReserveRe
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await reserveRequestWeight(
- *   { transport, wallet },
- *   { weight: 10 },
- * );
+ * await reserveRequestWeight({ transport, wallet }, {
+ *   weight: 10,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#reserve-additional-actions

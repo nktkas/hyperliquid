@@ -100,10 +100,9 @@ export const CDepositTypes = {
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await cDeposit(
- *   { transport, wallet },
- *   { wei: 1 * 1e8 },
- * );
+ * await cDeposit({ transport, wallet }, {
+ *   wei: 1 * 1e8,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-into-staking

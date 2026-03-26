@@ -83,10 +83,10 @@ export type L2BookParameters = Omit<v.InferInput<typeof L2BookRequest>, "type">;
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await l2Book(
- *   { transport },
- *   { coin: "ETH", nSigFigs: 2 },
- * );
+ * const data = await l2Book({ transport }, {
+ *   coin: "ETH",
+ *   nSigFigs: 2,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#l2-book-snapshot

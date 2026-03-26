@@ -102,10 +102,10 @@ export type TwapCancelSuccessResponse = ExcludeErrorResponse<TwapCancelResponse>
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await twapCancel(
- *   { transport, wallet },
- *   { a: 0, t: 1 },
- * );
+ * await twapCancel({ transport, wallet }, {
+ *   a: 0,
+ *   t: 1,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order

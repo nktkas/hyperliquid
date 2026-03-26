@@ -60,10 +60,9 @@ export type UserDetailsParameters = Omit<v.InferInput<typeof UserDetailsRequest>
  *
  * const transport = new HttpTransport(); // only `HttpTransport` supports this API
  *
- * const data = await userDetails(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await userDetails({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see null

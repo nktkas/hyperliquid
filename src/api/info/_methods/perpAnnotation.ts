@@ -61,7 +61,9 @@ export type PerpAnnotationParameters = Omit<v.InferInput<typeof PerpAnnotationRe
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await perpAnnotation({ transport }, { coin: "BTC" });
+ * const data = await perpAnnotation({ transport }, {
+ *   coin: "BTC",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perp-annotation

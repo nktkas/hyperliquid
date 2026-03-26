@@ -151,10 +151,9 @@ export type VaultDetailsParameters = Omit<v.InferInput<typeof VaultDetailsReques
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await vaultDetails(
- *   { transport },
- *   { vaultAddress: "0x..." },
- * );
+ * const data = await vaultDetails({ transport }, {
+ *   vaultAddress: "0x...",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-details-for-a-vault

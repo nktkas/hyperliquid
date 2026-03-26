@@ -82,10 +82,9 @@ export type RegisterReferrerSuccessResponse = ExcludeErrorResponse<RegisterRefer
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await registerReferrer(
- *   { transport, wallet },
- *   { code: "..." },
- * );
+ * await registerReferrer({ transport, wallet }, {
+ *   code: "...",
+ * });
  * ```
  *
  * @see null

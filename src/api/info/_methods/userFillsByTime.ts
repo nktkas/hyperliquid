@@ -63,13 +63,10 @@ export type UserFillsByTimeParameters = Omit<v.InferInput<typeof UserFillsByTime
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await userFillsByTime(
- *   { transport },
- *   {
- *     user: "0x...",
- *     startTime: Date.now() - 1000 * 60 * 60 * 24,
- *   },
- * );
+ * const data = await userFillsByTime({ transport }, {
+ *   user: "0x...",
+ *   startTime: Date.now() - 1000 * 60 * 60 * 24,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills-by-time

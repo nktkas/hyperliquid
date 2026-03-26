@@ -91,10 +91,9 @@ export type SpotClearinghouseStateParameters = Omit<v.InferInput<typeof SpotClea
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await spotClearinghouseState(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await spotClearinghouseState({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-a-users-token-balances

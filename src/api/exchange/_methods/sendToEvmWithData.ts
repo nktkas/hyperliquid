@@ -121,19 +121,16 @@ export const SendToEvmWithDataTypes = {
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await sendToEvmWithData(
- *   { transport, wallet },
- *   {
- *     token: "USDC",
- *     amount: "1",
- *     sourceDex: "spot",
- *     destinationRecipient: "0x...",
- *     addressEncoding: "hex",
- *     destinationChainId: 42161,
- *     gasLimit: 200000,
- *     data: "0x",
- *   },
- * );
+ * await sendToEvmWithData({ transport, wallet }, {
+ *   token: "USDC",
+ *   amount: "1",
+ *   sourceDex: "spot",
+ *   destinationRecipient: "0x...",
+ *   addressEncoding: "hex",
+ *   destinationChainId: 42161,
+ *   gasLimit: 200000,
+ *   data: "0x",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-to-evm-with-data

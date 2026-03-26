@@ -73,13 +73,10 @@ export type FundingHistoryParameters = Omit<v.InferInput<typeof FundingHistoryRe
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await fundingHistory(
- *   { transport },
- *   {
- *     coin: "ETH",
- *     startTime: Date.now() - 1000 * 60 * 60 * 24,
- *   },
- * );
+ * const data = await fundingHistory({ transport }, {
+ *   coin: "ETH",
+ *   startTime: Date.now() - 1000 * 60 * 60 * 24,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-historical-funding-rates

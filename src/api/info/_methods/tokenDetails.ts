@@ -144,10 +144,9 @@ export type TokenDetailsParameters = Omit<v.InferInput<typeof TokenDetailsReques
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await tokenDetails(
- *   { transport },
- *   { tokenId: "0x..." },
- * );
+ * const data = await tokenDetails({ transport }, {
+ *   tokenId: "0x...",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-a-token

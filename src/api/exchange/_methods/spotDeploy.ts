@@ -180,20 +180,17 @@ export type SpotDeploySuccessResponse = ExcludeErrorResponse<SpotDeployResponse>
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await spotDeploy(
- *   { transport, wallet },
- *   {
- *     registerToken2: {
- *       spec: {
- *         name: "USDC",
- *         szDecimals: 8,
- *         weiDecimals: 8,
- *       },
- *       maxGas: 1000000,
- *       fullName: "USD Coin",
+ * await spotDeploy({ transport, wallet }, {
+ *   registerToken2: {
+ *     spec: {
+ *       name: "USDC",
+ *       szDecimals: 8,
+ *       weiDecimals: 8,
  *     },
+ *     maxGas: 1000000,
+ *     fullName: "USD Coin",
  *   },
- * );
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets

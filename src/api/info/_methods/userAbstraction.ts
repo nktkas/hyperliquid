@@ -59,10 +59,9 @@ export type UserAbstractionParameters = Omit<v.InferInput<typeof UserAbstraction
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await userAbstraction(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await userAbstraction({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-abstraction-state

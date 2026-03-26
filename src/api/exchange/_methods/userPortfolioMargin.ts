@@ -103,10 +103,10 @@ export const UserPortfolioMarginTypes = {
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await userPortfolioMargin(
- *   { transport, wallet },
- *   { user: "0x...", enabled: true },
- * );
+ * await userPortfolioMargin({ transport, wallet }, {
+ *   user: "0x...",
+ *   enabled: true,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/trading/portfolio-margin

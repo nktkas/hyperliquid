@@ -107,10 +107,9 @@ export type CancelSuccessResponse = ExcludeErrorResponse<CancelResponse>;
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await cancel(
- *   { transport, wallet },
- *   { cancels: [{ a: 0, o: 123 }] },
- * );
+ * await cancel({ transport, wallet }, {
+ *   cancels: [{ a: 0, o: 123 }],
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-order-s

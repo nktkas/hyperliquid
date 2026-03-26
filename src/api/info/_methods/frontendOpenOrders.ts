@@ -57,10 +57,9 @@ export type FrontendOpenOrdersParameters = Omit<v.InferInput<typeof FrontendOpen
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await frontendOpenOrders(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await frontendOpenOrders({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders-with-additional-frontend-info

@@ -105,10 +105,10 @@ export type OrderStatusParameters = Omit<v.InferInput<typeof OrderStatusRequest>
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await orderStatus(
- *   { transport },
- *   { user: "0x...", oid: 12345 },
- * );
+ * const data = await orderStatus({ transport }, {
+ *   user: "0x...",
+ *   oid: 12345,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-order-status-by-oid-or-cloid

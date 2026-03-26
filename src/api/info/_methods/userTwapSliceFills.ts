@@ -60,10 +60,9 @@ export type UserTwapSliceFillsParameters = Omit<v.InferInput<typeof UserTwapSlic
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await userTwapSliceFills(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await userTwapSliceFills({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills

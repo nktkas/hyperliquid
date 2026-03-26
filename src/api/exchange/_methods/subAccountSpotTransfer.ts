@@ -88,15 +88,12 @@ export type SubAccountSpotTransferSuccessResponse = ExcludeErrorResponse<SubAcco
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await subAccountSpotTransfer(
- *   { transport, wallet },
- *   {
- *     subAccountUser: "0x...",
- *     isDeposit: true,
- *     token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
- *     amount: "1",
- *   },
- * );
+ * await subAccountSpotTransfer({ transport, wallet }, {
+ *   subAccountUser: "0x...",
+ *   isDeposit: true,
+ *   token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
+ *   amount: "1",
+ * });
  * ```
  *
  * @see null

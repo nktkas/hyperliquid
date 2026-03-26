@@ -93,10 +93,9 @@ export type HistoricalOrdersParameters = Omit<v.InferInput<typeof HistoricalOrde
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await historicalOrders(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await historicalOrders({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-historical-orders

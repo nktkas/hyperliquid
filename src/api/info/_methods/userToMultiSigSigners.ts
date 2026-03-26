@@ -62,10 +62,9 @@ export type UserToMultiSigSignersParameters = Omit<v.InferInput<typeof UserToMul
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await userToMultiSigSigners(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await userToMultiSigSigners({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see null

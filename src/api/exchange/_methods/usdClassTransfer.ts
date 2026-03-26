@@ -103,10 +103,10 @@ export const UsdClassTransferTypes = {
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await usdClassTransfer(
- *   { transport, wallet },
- *   { amount: "1", toPerp: true },
- * );
+ * await usdClassTransfer({ transport, wallet }, {
+ *   amount: "1",
+ *   toPerp: true,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa

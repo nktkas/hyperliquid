@@ -106,10 +106,11 @@ export const TokenDelegateTypes = {
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await tokenDelegate(
- *   { transport, wallet },
- *   { validator: "0x...", isUndelegate: true, wei: 1 * 1e8 },
- * );
+ * await tokenDelegate({ transport, wallet }, {
+ *   validator: "0x...",
+ *   isUndelegate: true,
+ *   wei: 1 * 1e8,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#delegate-or-undelegate-stake-from-validator

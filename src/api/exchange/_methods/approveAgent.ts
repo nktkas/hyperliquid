@@ -119,10 +119,10 @@ export const ApproveAgentTypes = {
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await approveAgent(
- *   { transport, wallet },
- *   { agentAddress: "0x...", agentName: "myAgent" },
- * );
+ * await approveAgent({ transport, wallet }, {
+ *   agentAddress: "0x...",
+ *   agentName: "myAgent",
+ * });
  * ```
  *
  * @example With expiration timestamp
@@ -135,13 +135,10 @@ export const ApproveAgentTypes = {
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
  * const expirationTimestamp = Date.now() + 24 * 60 * 60 * 1000; // 24 hours from now
- * await approveAgent(
- *   { transport, wallet },
- *   {
- *     agentAddress: "0x...",
- *     agentName: `myAgent valid_until ${expirationTimestamp}`,
- *   },
- * );
+ * await approveAgent({ transport, wallet }, {
+ *   agentAddress: "0x...",
+ *   agentName: `myAgent valid_until ${expirationTimestamp}`,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet

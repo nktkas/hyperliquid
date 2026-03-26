@@ -68,10 +68,9 @@ export type MarginTableParameters = Omit<v.InferInput<typeof MarginTableRequest>
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await marginTable(
- *   { transport },
- *   { id: 1 },
- * );
+ * const data = await marginTable({ transport }, {
+ *   id: 1,
+ * });
  * ```
  *
  * @see null

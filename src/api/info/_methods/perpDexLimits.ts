@@ -74,10 +74,9 @@ export type PerpDexLimitsParameters = Omit<v.InferInput<typeof PerpDexLimitsRequ
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await perpDexLimits(
- *   { transport },
- *   { dex: "test" },
- * );
+ * const data = await perpDexLimits({ transport }, {
+ *   dex: "test",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-builder-deployed-perp-market-limits

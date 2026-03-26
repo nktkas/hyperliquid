@@ -79,10 +79,9 @@ export type UserRoleParameters = Omit<v.InferInput<typeof UserRoleRequest>, "typ
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await userRole(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await userRole({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-role

@@ -86,14 +86,11 @@ export type VaultModifySuccessResponse = ExcludeErrorResponse<VaultModifyRespons
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await vaultModify(
- *   { transport, wallet },
- *   {
- *     vaultAddress: "0x...",
- *     allowDeposits: true,
- *     alwaysCloseOnWithdraw: false,
- *   },
- * );
+ * await vaultModify({ transport, wallet }, {
+ *   vaultAddress: "0x...",
+ *   allowDeposits: true,
+ *   alwaysCloseOnWithdraw: false,
+ * });
  * ```
  *
  * @see null

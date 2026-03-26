@@ -95,10 +95,9 @@ export type CreateSubAccountSuccessResponse = ExcludeErrorResponse<CreateSubAcco
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await createSubAccount(
- *   { transport, wallet },
- *   { name: "..." },
- * );
+ * const data = await createSubAccount({ transport, wallet }, {
+ *   name: "...",
+ * });
  * ```
  *
  * @see null

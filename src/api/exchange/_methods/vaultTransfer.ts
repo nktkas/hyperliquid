@@ -86,10 +86,11 @@ export type VaultTransferSuccessResponse = ExcludeErrorResponse<VaultTransferRes
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await vaultTransfer(
- *   { transport, wallet },
- *   { vaultAddress: "0x...", isDeposit: true, usd: 10 * 1e6 },
- * );
+ * await vaultTransfer({ transport, wallet }, {
+ *   vaultAddress: "0x...",
+ *   isDeposit: true,
+ *   usd: 10 * 1e6,
+ * });
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-a-vault

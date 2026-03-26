@@ -108,10 +108,9 @@ export type WebData2Parameters = Omit<v.InferInput<typeof WebData2Request>, "typ
  *
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * const data = await webData2(
- *   { transport },
- *   { user: "0x..." },
- * );
+ * const data = await webData2({ transport }, {
+ *   user: "0x...",
+ * });
  * ```
  *
  * @see null
