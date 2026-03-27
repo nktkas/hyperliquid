@@ -422,6 +422,17 @@
       spec:
         ref:
           kind: openapi
+          spec: hl-info-perpConciseAnnotations
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
           spec: hl-info-perpDeployAuctionStatus
     ```
   - ```yaml
