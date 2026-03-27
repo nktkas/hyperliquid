@@ -63,16 +63,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const CreateVaultParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(CreateVaultRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const CreateVaultActionSchema = /* @__PURE__ */ (() => {
+  return v.object(CreateVaultRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode createVault} function. */
-export type CreateVaultParameters = v.InferInput<typeof CreateVaultParameters>;
+export type CreateVaultParameters = Omit<v.InferInput<typeof CreateVaultActionSchema>, "type">;
 
 /** Request options for the {@linkcode createVault} function. */
 export type CreateVaultOptions = ExtractRequestOptions<v.InferInput<typeof CreateVaultRequest>>;
@@ -116,6 +113,6 @@ export function createVault(
   params: CreateVaultParameters,
   opts?: CreateVaultOptions,
 ): Promise<CreateVaultSuccessResponse> {
-  const action = parse(CreateVaultParameters, params);
-  return executeL1Action(config, { type: "createVault", ...action }, opts);
+  const action = parse(CreateVaultActionSchema, { type: "createVault", ...params });
+  return executeL1Action(config, action, opts);
 }

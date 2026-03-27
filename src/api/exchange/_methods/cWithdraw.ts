@@ -53,16 +53,16 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const CWithdrawParameters = /* @__PURE__ */ (() => {
+/** Schema for action fields (excludes request-level system fields). */
+const CWithdrawActionSchema = /* @__PURE__ */ (() => {
   return v.omit(
     v.object(CWithdrawRequest.entries.action.entries),
-    ["type", "signatureChainId", "hyperliquidChain", "nonce"],
+    ["signatureChainId", "hyperliquidChain", "nonce"],
   );
 })();
 
 /** Action parameters for the {@linkcode cWithdraw} function. */
-export type CWithdrawParameters = v.InferInput<typeof CWithdrawParameters>;
+export type CWithdrawParameters = Omit<v.InferInput<typeof CWithdrawActionSchema>, "type">;
 
 /** Request options for the {@linkcode cWithdraw} function. */
 export type CWithdrawOptions = ExtractRequestOptions<v.InferInput<typeof CWithdrawRequest>>;
@@ -112,11 +112,6 @@ export function cWithdraw(
   params: CWithdrawParameters,
   opts?: CWithdrawOptions,
 ): Promise<CWithdrawSuccessResponse> {
-  const action = parse(CWithdrawParameters, params);
-  return executeUserSignedAction(
-    config,
-    { type: "cWithdraw", ...action },
-    CWithdrawTypes,
-    opts,
-  );
+  const action = parse(CWithdrawActionSchema, { type: "cWithdraw", ...params });
+  return executeUserSignedAction(config, action, CWithdrawTypes, opts);
 }

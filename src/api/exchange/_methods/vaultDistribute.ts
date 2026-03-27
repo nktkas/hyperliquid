@@ -49,16 +49,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const VaultDistributeParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(VaultDistributeRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const VaultDistributeActionSchema = /* @__PURE__ */ (() => {
+  return v.object(VaultDistributeRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode vaultDistribute} function. */
-export type VaultDistributeParameters = v.InferInput<typeof VaultDistributeParameters>;
+export type VaultDistributeParameters = Omit<v.InferInput<typeof VaultDistributeActionSchema>, "type">;
 
 /** Request options for the {@linkcode vaultDistribute} function. */
 export type VaultDistributeOptions = ExtractRequestOptions<v.InferInput<typeof VaultDistributeRequest>>;
@@ -100,6 +97,6 @@ export function vaultDistribute(
   params: VaultDistributeParameters,
   opts?: VaultDistributeOptions,
 ): Promise<VaultDistributeSuccessResponse> {
-  const action = parse(VaultDistributeParameters, params);
-  return executeL1Action(config, { type: "vaultDistribute", ...action }, opts);
+  const action = parse(VaultDistributeActionSchema, { type: "vaultDistribute", ...params });
+  return executeL1Action(config, action, opts);
 }

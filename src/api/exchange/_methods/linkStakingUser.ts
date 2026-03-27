@@ -63,16 +63,16 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const LinkStakingUserParameters = /* @__PURE__ */ (() => {
+/** Schema for action fields (excludes request-level system fields). */
+const LinkStakingUserActionSchema = /* @__PURE__ */ (() => {
   return v.omit(
     v.object(LinkStakingUserRequest.entries.action.entries),
-    ["type", "signatureChainId", "hyperliquidChain", "nonce"],
+    ["signatureChainId", "hyperliquidChain", "nonce"],
   );
 })();
 
 /** Action parameters for the {@linkcode linkStakingUser} function. */
-export type LinkStakingUserParameters = v.InferInput<typeof LinkStakingUserParameters>;
+export type LinkStakingUserParameters = Omit<v.InferInput<typeof LinkStakingUserActionSchema>, "type">;
 
 /** Request options for the {@linkcode linkStakingUser} function. */
 export type LinkStakingUserOptions = ExtractRequestOptions<v.InferInput<typeof LinkStakingUserRequest>>;
@@ -124,11 +124,6 @@ export function linkStakingUser(
   params: LinkStakingUserParameters,
   opts?: LinkStakingUserOptions,
 ): Promise<LinkStakingUserSuccessResponse> {
-  const action = parse(LinkStakingUserParameters, params);
-  return executeUserSignedAction(
-    config,
-    { type: "linkStakingUser", ...action },
-    LinkStakingUserTypes,
-    opts,
-  );
+  const action = parse(LinkStakingUserActionSchema, { type: "linkStakingUser", ...params });
+  return executeUserSignedAction(config, action, LinkStakingUserTypes, opts);
 }

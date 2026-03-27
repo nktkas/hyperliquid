@@ -44,16 +44,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const EvmUserModifyParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(EvmUserModifyRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const EvmUserModifyActionSchema = /* @__PURE__ */ (() => {
+  return v.object(EvmUserModifyRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode evmUserModify} function. */
-export type EvmUserModifyParameters = v.InferInput<typeof EvmUserModifyParameters>;
+export type EvmUserModifyParameters = Omit<v.InferInput<typeof EvmUserModifyActionSchema>, "type">;
 
 /** Request options for the {@linkcode evmUserModify} function. */
 export type EvmUserModifyOptions = ExtractRequestOptions<v.InferInput<typeof EvmUserModifyRequest>>;
@@ -94,6 +91,6 @@ export function evmUserModify(
   params: EvmUserModifyParameters,
   opts?: EvmUserModifyOptions,
 ): Promise<EvmUserModifySuccessResponse> {
-  const action = parse(EvmUserModifyParameters, params);
-  return executeL1Action(config, { type: "evmUserModify", ...action }, opts);
+  const action = parse(EvmUserModifyActionSchema, { type: "evmUserModify", ...params });
+  return executeL1Action(config, action, opts);
 }

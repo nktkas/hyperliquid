@@ -49,16 +49,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const AgentSetAbstractionParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(AgentSetAbstractionRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const AgentSetAbstractionActionSchema = /* @__PURE__ */ (() => {
+  return v.object(AgentSetAbstractionRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode agentSetAbstraction} function. */
-export type AgentSetAbstractionParameters = v.InferInput<typeof AgentSetAbstractionParameters>;
+export type AgentSetAbstractionParameters = Omit<v.InferInput<typeof AgentSetAbstractionActionSchema>, "type">;
 
 /** Request options for the {@linkcode agentSetAbstraction} function. */
 export type AgentSetAbstractionOptions = ExtractRequestOptions<
@@ -101,6 +98,6 @@ export function agentSetAbstraction(
   params: AgentSetAbstractionParameters,
   opts?: AgentSetAbstractionOptions,
 ): Promise<AgentSetAbstractionSuccessResponse> {
-  const action = parse(AgentSetAbstractionParameters, params);
-  return executeL1Action(config, { type: "agentSetAbstraction", ...action }, opts);
+  const action = parse(AgentSetAbstractionActionSchema, { type: "agentSetAbstraction", ...params });
+  return executeL1Action(config, action, opts);
 }

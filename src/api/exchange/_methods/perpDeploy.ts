@@ -231,15 +231,15 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const PerpDeployParameters = /* @__PURE__ */ (() => {
-  return v.union(
-    PerpDeployRequest.entries.action.options.map((option) => v.omit(option, ["type"])),
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const PerpDeployActionSchema = /* @__PURE__ */ (() => {
+  return v.variant("type", PerpDeployRequest.entries.action.options);
 })();
 
 /** Action parameters for the {@linkcode perpDeploy} function. */
-export type PerpDeployParameters = v.InferInput<typeof PerpDeployParameters>;
+export type PerpDeployParameters = v.InferInput<typeof PerpDeployActionSchema> extends infer T
+  ? T extends unknown ? { [K in Exclude<keyof T, "type">]: T[K] } : never
+  : never;
 
 /** Request options for the {@linkcode perpDeploy} function. */
 export type PerpDeployOptions = ExtractRequestOptions<v.InferInput<typeof PerpDeployRequest>>;
@@ -291,6 +291,6 @@ export function perpDeploy(
   params: PerpDeployParameters,
   opts?: PerpDeployOptions,
 ): Promise<PerpDeploySuccessResponse> {
-  const action = parse(PerpDeployParameters, params);
-  return executeL1Action(config, { type: "perpDeploy", ...action }, opts);
+  const action = parse(PerpDeployActionSchema, { type: "perpDeploy", ...params });
+  return executeL1Action(config, action, opts);
 }

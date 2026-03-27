@@ -57,16 +57,16 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const TokenDelegateParameters = /* @__PURE__ */ (() => {
+/** Schema for action fields (excludes request-level system fields). */
+const TokenDelegateActionSchema = /* @__PURE__ */ (() => {
   return v.omit(
     v.object(TokenDelegateRequest.entries.action.entries),
-    ["type", "signatureChainId", "hyperliquidChain", "nonce"],
+    ["signatureChainId", "hyperliquidChain", "nonce"],
   );
 })();
 
 /** Action parameters for the {@linkcode tokenDelegate} function. */
-export type TokenDelegateParameters = v.InferInput<typeof TokenDelegateParameters>;
+export type TokenDelegateParameters = Omit<v.InferInput<typeof TokenDelegateActionSchema>, "type">;
 
 /** Request options for the {@linkcode tokenDelegate} function. */
 export type TokenDelegateOptions = ExtractRequestOptions<v.InferInput<typeof TokenDelegateRequest>>;
@@ -120,11 +120,6 @@ export function tokenDelegate(
   params: TokenDelegateParameters,
   opts?: TokenDelegateOptions,
 ): Promise<TokenDelegateSuccessResponse> {
-  const action = parse(TokenDelegateParameters, params);
-  return executeUserSignedAction(
-    config,
-    { type: "tokenDelegate", ...action },
-    TokenDelegateTypes,
-    opts,
-  );
+  const action = parse(TokenDelegateActionSchema, { type: "tokenDelegate", ...params });
+  return executeUserSignedAction(config, action, TokenDelegateTypes, opts);
 }

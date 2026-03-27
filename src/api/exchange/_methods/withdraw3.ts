@@ -55,16 +55,16 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const Withdraw3Parameters = /* @__PURE__ */ (() => {
+/** Schema for action fields (excludes request-level system fields). */
+const Withdraw3ActionSchema = /* @__PURE__ */ (() => {
   return v.omit(
     v.object(Withdraw3Request.entries.action.entries),
-    ["type", "signatureChainId", "hyperliquidChain", "time"],
+    ["signatureChainId", "hyperliquidChain", "time"],
   );
 })();
 
 /** Action parameters for the {@linkcode withdraw3} function. */
-export type Withdraw3Parameters = v.InferInput<typeof Withdraw3Parameters>;
+export type Withdraw3Parameters = Omit<v.InferInput<typeof Withdraw3ActionSchema>, "type">;
 
 /** Request options for the {@linkcode withdraw3} function. */
 export type Withdraw3Options = ExtractRequestOptions<v.InferInput<typeof Withdraw3Request>>;
@@ -116,11 +116,6 @@ export function withdraw3(
   params: Withdraw3Parameters,
   opts?: Withdraw3Options,
 ): Promise<Withdraw3SuccessResponse> {
-  const action = parse(Withdraw3Parameters, params);
-  return executeUserSignedAction(
-    config,
-    { type: "withdraw3", ...action },
-    Withdraw3Types,
-    opts,
-  );
+  const action = parse(Withdraw3ActionSchema, { type: "withdraw3", ...params });
+  return executeUserSignedAction(config, action, Withdraw3Types, opts);
 }

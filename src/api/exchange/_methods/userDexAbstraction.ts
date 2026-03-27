@@ -55,16 +55,16 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const UserDexAbstractionParameters = /* @__PURE__ */ (() => {
+/** Schema for action fields (excludes request-level system fields). */
+const UserDexAbstractionActionSchema = /* @__PURE__ */ (() => {
   return v.omit(
     v.object(UserDexAbstractionRequest.entries.action.entries),
-    ["type", "signatureChainId", "hyperliquidChain", "nonce"],
+    ["signatureChainId", "hyperliquidChain", "nonce"],
   );
 })();
 
 /** Action parameters for the {@linkcode userDexAbstraction} function. */
-export type UserDexAbstractionParameters = v.InferInput<typeof UserDexAbstractionParameters>;
+export type UserDexAbstractionParameters = Omit<v.InferInput<typeof UserDexAbstractionActionSchema>, "type">;
 
 /** Request options for the {@linkcode userDexAbstraction} function. */
 export type UserDexAbstractionOptions = ExtractRequestOptions<
@@ -120,11 +120,6 @@ export function userDexAbstraction(
   params: UserDexAbstractionParameters,
   opts?: UserDexAbstractionOptions,
 ): Promise<UserDexAbstractionSuccessResponse> {
-  const action = parse(UserDexAbstractionParameters, params);
-  return executeUserSignedAction(
-    config,
-    { type: "userDexAbstraction", ...action },
-    UserDexAbstractionTypes,
-    opts,
-  );
+  const action = parse(UserDexAbstractionActionSchema, { type: "userDexAbstraction", ...params });
+  return executeUserSignedAction(config, action, UserDexAbstractionTypes, opts);
 }

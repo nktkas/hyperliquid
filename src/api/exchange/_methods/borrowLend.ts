@@ -50,16 +50,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const BorrowLendParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(BorrowLendRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const BorrowLendActionSchema = /* @__PURE__ */ (() => {
+  return v.object(BorrowLendRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode borrowLend} function. */
-export type BorrowLendParameters = v.InferInput<typeof BorrowLendParameters>;
+export type BorrowLendParameters = Omit<v.InferInput<typeof BorrowLendActionSchema>, "type">;
 
 /** Request options for the {@linkcode borrowLend} function. */
 export type BorrowLendOptions = ExtractRequestOptions<v.InferInput<typeof BorrowLendRequest>>;
@@ -102,6 +99,6 @@ export function borrowLend(
   params: BorrowLendParameters,
   opts?: BorrowLendOptions,
 ): Promise<BorrowLendSuccessResponse> {
-  const action = parse(BorrowLendParameters, params);
-  return executeL1Action(config, { type: "borrowLend", ...action }, opts);
+  const action = parse(BorrowLendActionSchema, { type: "borrowLend", ...params });
+  return executeL1Action(config, action, opts);
 }

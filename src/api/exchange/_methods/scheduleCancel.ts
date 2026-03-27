@@ -51,16 +51,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const ScheduleCancelParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(ScheduleCancelRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const ScheduleCancelActionSchema = /* @__PURE__ */ (() => {
+  return v.object(ScheduleCancelRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode scheduleCancel} function. */
-export type ScheduleCancelParameters = v.InferInput<typeof ScheduleCancelParameters>;
+export type ScheduleCancelParameters = Omit<v.InferInput<typeof ScheduleCancelActionSchema>, "type">;
 
 /** Request options for the {@linkcode scheduleCancel} function. */
 export type ScheduleCancelOptions = ExtractRequestOptions<v.InferInput<typeof ScheduleCancelRequest>>;
@@ -114,6 +111,6 @@ export function scheduleCancel(
   const params = isFirstArgParams ? paramsOrOpts : {};
   const opts = isFirstArgParams ? maybeOpts : paramsOrOpts as ScheduleCancelOptions;
 
-  const action = parse(ScheduleCancelParameters, params);
-  return executeL1Action(config, { type: "scheduleCancel", ...action }, opts);
+  const action = parse(ScheduleCancelActionSchema, { type: "scheduleCancel", ...params });
+  return executeL1Action(config, action, opts);
 }

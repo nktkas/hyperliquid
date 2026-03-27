@@ -64,16 +64,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const TwapCancelParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(TwapCancelRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const TwapCancelActionSchema = /* @__PURE__ */ (() => {
+  return v.object(TwapCancelRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode twapCancel} function. */
-export type TwapCancelParameters = v.InferInput<typeof TwapCancelParameters>;
+export type TwapCancelParameters = Omit<v.InferInput<typeof TwapCancelActionSchema>, "type">;
 
 /** Request options for the {@linkcode twapCancel} function. */
 export type TwapCancelOptions = ExtractRequestOptions<v.InferInput<typeof TwapCancelRequest>>;
@@ -115,6 +112,6 @@ export function twapCancel(
   params: TwapCancelParameters,
   opts?: TwapCancelOptions,
 ): Promise<TwapCancelSuccessResponse> {
-  const action = parse(TwapCancelParameters, params);
-  return executeL1Action(config, { type: "twapCancel", ...action }, opts);
+  const action = parse(TwapCancelActionSchema, { type: "twapCancel", ...params });
+  return executeL1Action(config, action, opts);
 }

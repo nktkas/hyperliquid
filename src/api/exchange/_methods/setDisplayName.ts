@@ -47,16 +47,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const SetDisplayNameParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(SetDisplayNameRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const SetDisplayNameActionSchema = /* @__PURE__ */ (() => {
+  return v.object(SetDisplayNameRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode setDisplayName} function. */
-export type SetDisplayNameParameters = v.InferInput<typeof SetDisplayNameParameters>;
+export type SetDisplayNameParameters = Omit<v.InferInput<typeof SetDisplayNameActionSchema>, "type">;
 
 /** Request options for the {@linkcode setDisplayName} function. */
 export type SetDisplayNameOptions = ExtractRequestOptions<v.InferInput<typeof SetDisplayNameRequest>>;
@@ -97,6 +94,6 @@ export function setDisplayName(
   params: SetDisplayNameParameters,
   opts?: SetDisplayNameOptions,
 ): Promise<SetDisplayNameSuccessResponse> {
-  const action = parse(SetDisplayNameParameters, params);
-  return executeL1Action(config, { type: "setDisplayName", ...action }, opts);
+  const action = parse(SetDisplayNameActionSchema, { type: "setDisplayName", ...params });
+  return executeL1Action(config, action, opts);
 }

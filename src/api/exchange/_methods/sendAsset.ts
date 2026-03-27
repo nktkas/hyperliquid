@@ -66,16 +66,16 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const SendAssetParameters = /* @__PURE__ */ (() => {
+/** Schema for action fields (excludes request-level system fields). */
+const SendAssetActionSchema = /* @__PURE__ */ (() => {
   return v.omit(
     v.object(SendAssetRequest.entries.action.entries),
-    ["type", "signatureChainId", "hyperliquidChain", "nonce"],
+    ["signatureChainId", "hyperliquidChain", "nonce"],
   );
 })();
 
 /** Action parameters for the {@linkcode sendAsset} function. */
-export type SendAssetParameters = v.InferInput<typeof SendAssetParameters>;
+export type SendAssetParameters = Omit<v.InferInput<typeof SendAssetActionSchema>, "type">;
 
 /** Request options for the {@linkcode sendAsset} function. */
 export type SendAssetOptions = ExtractRequestOptions<v.InferInput<typeof SendAssetRequest>>;
@@ -134,11 +134,6 @@ export function sendAsset(
   params: SendAssetParameters,
   opts?: SendAssetOptions,
 ): Promise<SendAssetSuccessResponse> {
-  const action = parse(SendAssetParameters, params);
-  return executeUserSignedAction(
-    config,
-    { type: "sendAsset", ...action },
-    SendAssetTypes,
-    opts,
-  );
+  const action = parse(SendAssetActionSchema, { type: "sendAsset", ...params });
+  return executeUserSignedAction(config, action, SendAssetTypes, opts);
 }

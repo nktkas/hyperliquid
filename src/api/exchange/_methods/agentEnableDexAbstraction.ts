@@ -38,8 +38,14 @@ export type AgentEnableDexAbstractionResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
+
+/** Schema for action fields (excludes request-level system fields). */
+const AgentEnableDexAbstractionActionSchema = /* @__PURE__ */ (() => {
+  return v.object(AgentEnableDexAbstractionRequest.entries.action.entries);
+})();
 
 /** Request options for the {@linkcode agentEnableDexAbstraction} function. */
 export type AgentEnableDexAbstractionOptions = ExtractRequestOptions<
@@ -80,5 +86,6 @@ export function agentEnableDexAbstraction(
   config: ExchangeConfig,
   opts?: AgentEnableDexAbstractionOptions,
 ): Promise<AgentEnableDexAbstractionSuccessResponse> {
-  return executeL1Action(config, { type: "agentEnableDexAbstraction" }, opts);
+  const action = parse(AgentEnableDexAbstractionActionSchema, { type: "agentEnableDexAbstraction" });
+  return executeL1Action(config, action, opts);
 }

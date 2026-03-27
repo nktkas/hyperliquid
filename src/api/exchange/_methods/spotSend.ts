@@ -57,16 +57,16 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const SpotSendParameters = /* @__PURE__ */ (() => {
+/** Schema for action fields (excludes request-level system fields). */
+const SpotSendActionSchema = /* @__PURE__ */ (() => {
   return v.omit(
     v.object(SpotSendRequest.entries.action.entries),
-    ["type", "signatureChainId", "hyperliquidChain", "time"],
+    ["signatureChainId", "hyperliquidChain", "time"],
   );
 })();
 
 /** Action parameters for the {@linkcode spotSend} function. */
-export type SpotSendParameters = v.InferInput<typeof SpotSendParameters>;
+export type SpotSendParameters = Omit<v.InferInput<typeof SpotSendActionSchema>, "type">;
 
 /** Request options for the {@linkcode spotSend} function. */
 export type SpotSendOptions = ExtractRequestOptions<v.InferInput<typeof SpotSendRequest>>;
@@ -120,11 +120,6 @@ export function spotSend(
   params: SpotSendParameters,
   opts?: SpotSendOptions,
 ): Promise<SpotSendSuccessResponse> {
-  const action = parse(SpotSendParameters, params);
-  return executeUserSignedAction(
-    config,
-    { type: "spotSend", ...action },
-    SpotSendTypes,
-    opts,
-  );
+  const action = parse(SpotSendActionSchema, { type: "spotSend", ...params });
+  return executeUserSignedAction(config, action, SpotSendTypes, opts);
 }

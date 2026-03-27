@@ -48,16 +48,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const SubAccountTransferParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(SubAccountTransferRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const SubAccountTransferActionSchema = /* @__PURE__ */ (() => {
+  return v.object(SubAccountTransferRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode subAccountTransfer} function. */
-export type SubAccountTransferParameters = v.InferInput<typeof SubAccountTransferParameters>;
+export type SubAccountTransferParameters = Omit<v.InferInput<typeof SubAccountTransferActionSchema>, "type">;
 
 /** Request options for the {@linkcode subAccountTransfer} function. */
 export type SubAccountTransferOptions = ExtractRequestOptions<v.InferInput<typeof SubAccountTransferRequest>>;
@@ -100,6 +97,6 @@ export function subAccountTransfer(
   params: SubAccountTransferParameters,
   opts?: SubAccountTransferOptions,
 ): Promise<SubAccountTransferSuccessResponse> {
-  const action = parse(SubAccountTransferParameters, params);
-  return executeL1Action(config, { type: "subAccountTransfer", ...action }, opts);
+  const action = parse(SubAccountTransferActionSchema, { type: "subAccountTransfer", ...params });
+  return executeL1Action(config, action, opts);
 }

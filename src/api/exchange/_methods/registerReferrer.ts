@@ -44,16 +44,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const RegisterReferrerParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(RegisterReferrerRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const RegisterReferrerActionSchema = /* @__PURE__ */ (() => {
+  return v.object(RegisterReferrerRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode registerReferrer} function. */
-export type RegisterReferrerParameters = v.InferInput<typeof RegisterReferrerParameters>;
+export type RegisterReferrerParameters = Omit<v.InferInput<typeof RegisterReferrerActionSchema>, "type">;
 
 /** Request options for the {@linkcode registerReferrer} function. */
 export type RegisterReferrerOptions = ExtractRequestOptions<v.InferInput<typeof RegisterReferrerRequest>>;
@@ -94,6 +91,6 @@ export function registerReferrer(
   params: RegisterReferrerParameters,
   opts?: RegisterReferrerOptions,
 ): Promise<RegisterReferrerSuccessResponse> {
-  const action = parse(RegisterReferrerParameters, params);
-  return executeL1Action(config, { type: "registerReferrer", ...action }, opts);
+  const action = parse(RegisterReferrerActionSchema, { type: "registerReferrer", ...params });
+  return executeL1Action(config, action, opts);
 }

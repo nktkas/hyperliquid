@@ -55,16 +55,16 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const UserPortfolioMarginParameters = /* @__PURE__ */ (() => {
+/** Schema for action fields (excludes request-level system fields). */
+const UserPortfolioMarginActionSchema = /* @__PURE__ */ (() => {
   return v.omit(
     v.object(UserPortfolioMarginRequest.entries.action.entries),
-    ["type", "signatureChainId", "hyperliquidChain", "nonce"],
+    ["signatureChainId", "hyperliquidChain", "nonce"],
   );
 })();
 
 /** Action parameters for the {@linkcode userPortfolioMargin} function. */
-export type UserPortfolioMarginParameters = v.InferInput<typeof UserPortfolioMarginParameters>;
+export type UserPortfolioMarginParameters = Omit<v.InferInput<typeof UserPortfolioMarginActionSchema>, "type">;
 
 /** Request options for the {@linkcode userPortfolioMargin} function. */
 export type UserPortfolioMarginOptions = ExtractRequestOptions<v.InferInput<typeof UserPortfolioMarginRequest>>;
@@ -116,11 +116,6 @@ export function userPortfolioMargin(
   params: UserPortfolioMarginParameters,
   opts?: UserPortfolioMarginOptions,
 ): Promise<UserPortfolioMarginSuccessResponse> {
-  const action = parse(UserPortfolioMarginParameters, params);
-  return executeUserSignedAction(
-    config,
-    { type: "userPortfolioMargin", ...action },
-    UserPortfolioMarginTypes,
-    opts,
-  );
+  const action = parse(UserPortfolioMarginActionSchema, { type: "userPortfolioMargin", ...params });
+  return executeUserSignedAction(config, action, UserPortfolioMarginTypes, opts);
 }

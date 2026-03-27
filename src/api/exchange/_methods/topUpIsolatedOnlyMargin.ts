@@ -48,16 +48,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const TopUpIsolatedOnlyMarginParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(TopUpIsolatedOnlyMarginRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const TopUpIsolatedOnlyMarginActionSchema = /* @__PURE__ */ (() => {
+  return v.object(TopUpIsolatedOnlyMarginRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode topUpIsolatedOnlyMargin} function. */
-export type TopUpIsolatedOnlyMarginParameters = v.InferInput<typeof TopUpIsolatedOnlyMarginParameters>;
+export type TopUpIsolatedOnlyMarginParameters = Omit<v.InferInput<typeof TopUpIsolatedOnlyMarginActionSchema>, "type">;
 
 /** Request options for the {@linkcode topUpIsolatedOnlyMargin} function. */
 export type TopUpIsolatedOnlyMarginOptions = ExtractRequestOptions<v.InferInput<typeof TopUpIsolatedOnlyMarginRequest>>;
@@ -99,6 +96,6 @@ export function topUpIsolatedOnlyMargin(
   params: TopUpIsolatedOnlyMarginParameters,
   opts?: TopUpIsolatedOnlyMarginOptions,
 ): Promise<TopUpIsolatedOnlyMarginSuccessResponse> {
-  const action = parse(TopUpIsolatedOnlyMarginParameters, params);
-  return executeL1Action(config, { type: "topUpIsolatedOnlyMargin", ...action }, opts);
+  const action = parse(TopUpIsolatedOnlyMarginActionSchema, { type: "topUpIsolatedOnlyMargin", ...params });
+  return executeL1Action(config, action, opts);
 }

@@ -55,16 +55,16 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const ApproveBuilderFeeParameters = /* @__PURE__ */ (() => {
+/** Schema for action fields (excludes request-level system fields). */
+const ApproveBuilderFeeActionSchema = /* @__PURE__ */ (() => {
   return v.omit(
     v.object(ApproveBuilderFeeRequest.entries.action.entries),
-    ["type", "signatureChainId", "hyperliquidChain", "nonce"],
+    ["signatureChainId", "hyperliquidChain", "nonce"],
   );
 })();
 
 /** Action parameters for the {@linkcode approveBuilderFee} function. */
-export type ApproveBuilderFeeParameters = v.InferInput<typeof ApproveBuilderFeeParameters>;
+export type ApproveBuilderFeeParameters = Omit<v.InferInput<typeof ApproveBuilderFeeActionSchema>, "type">;
 
 /** Request options for the {@linkcode approveBuilderFee} function. */
 export type ApproveBuilderFeeOptions = ExtractRequestOptions<v.InferInput<typeof ApproveBuilderFeeRequest>>;
@@ -116,11 +116,6 @@ export function approveBuilderFee(
   params: ApproveBuilderFeeParameters,
   opts?: ApproveBuilderFeeOptions,
 ): Promise<ApproveBuilderFeeSuccessResponse> {
-  const action = parse(ApproveBuilderFeeParameters, params);
-  return executeUserSignedAction(
-    config,
-    { type: "approveBuilderFee", ...action },
-    ApproveBuilderFeeTypes,
-    opts,
-  );
+  const action = parse(ApproveBuilderFeeActionSchema, { type: "approveBuilderFee", ...params });
+  return executeUserSignedAction(config, action, ApproveBuilderFeeTypes, opts);
 }

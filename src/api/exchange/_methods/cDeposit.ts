@@ -53,16 +53,16 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const CDepositParameters = /* @__PURE__ */ (() => {
+/** Schema for action fields (excludes request-level system fields). */
+const CDepositActionSchema = /* @__PURE__ */ (() => {
   return v.omit(
     v.object(CDepositRequest.entries.action.entries),
-    ["type", "signatureChainId", "hyperliquidChain", "nonce"],
+    ["signatureChainId", "hyperliquidChain", "nonce"],
   );
 })();
 
 /** Action parameters for the {@linkcode cDeposit} function. */
-export type CDepositParameters = v.InferInput<typeof CDepositParameters>;
+export type CDepositParameters = Omit<v.InferInput<typeof CDepositActionSchema>, "type">;
 
 /** Request options for the {@linkcode cDeposit} function. */
 export type CDepositOptions = ExtractRequestOptions<v.InferInput<typeof CDepositRequest>>;
@@ -112,11 +112,6 @@ export function cDeposit(
   params: CDepositParameters,
   opts?: CDepositOptions,
 ): Promise<CDepositSuccessResponse> {
-  const action = parse(CDepositParameters, params);
-  return executeUserSignedAction(
-    config,
-    { type: "cDeposit", ...action },
-    CDepositTypes,
-    opts,
-  );
+  const action = parse(CDepositActionSchema, { type: "cDeposit", ...params });
+  return executeUserSignedAction(config, action, CDepositTypes, opts);
 }

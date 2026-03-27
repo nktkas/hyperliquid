@@ -38,8 +38,14 @@ export type NoopResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
+
+/** Schema for action fields (excludes request-level system fields). */
+const NoopActionSchema = /* @__PURE__ */ (() => {
+  return v.object(NoopRequest.entries.action.entries);
+})();
 
 /** Request options for the {@linkcode noop} function. */
 export type NoopOptions = ExtractRequestOptions<v.InferInput<typeof NoopRequest>>;
@@ -76,5 +82,6 @@ export function noop(
   config: ExchangeConfig,
   opts?: NoopOptions,
 ): Promise<NoopSuccessResponse> {
-  return executeL1Action(config, { type: "noop" }, opts);
+  const action = parse(NoopActionSchema, { type: "noop" });
+  return executeL1Action(config, action, opts);
 }

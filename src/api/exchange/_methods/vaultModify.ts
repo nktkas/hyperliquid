@@ -48,16 +48,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const VaultModifyParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(VaultModifyRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const VaultModifyActionSchema = /* @__PURE__ */ (() => {
+  return v.object(VaultModifyRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode vaultModify} function. */
-export type VaultModifyParameters = v.InferInput<typeof VaultModifyParameters>;
+export type VaultModifyParameters = Omit<v.InferInput<typeof VaultModifyActionSchema>, "type">;
 
 /** Request options for the {@linkcode vaultModify} function. */
 export type VaultModifyOptions = ExtractRequestOptions<v.InferInput<typeof VaultModifyRequest>>;
@@ -100,6 +97,6 @@ export function vaultModify(
   params: VaultModifyParameters,
   opts?: VaultModifyOptions,
 ): Promise<VaultModifySuccessResponse> {
-  const action = parse(VaultModifyParameters, params);
-  return executeL1Action(config, { type: "vaultModify", ...action }, opts);
+  const action = parse(VaultModifyActionSchema, { type: "vaultModify", ...params });
+  return executeL1Action(config, action, opts);
 }

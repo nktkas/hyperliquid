@@ -38,8 +38,14 @@ export type ClaimRewardsResponse = SuccessResponse | ErrorResponse;
 // Execution Logic
 // ============================================================
 
+import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
+
+/** Schema for action fields (excludes request-level system fields). */
+const ClaimRewardsActionSchema = /* @__PURE__ */ (() => {
+  return v.object(ClaimRewardsRequest.entries.action.entries);
+})();
 
 /** Request options for the {@linkcode claimRewards} function. */
 export type ClaimRewardsOptions = ExtractRequestOptions<v.InferInput<typeof ClaimRewardsRequest>>;
@@ -76,5 +82,6 @@ export function claimRewards(
   config: ExchangeConfig,
   opts?: ClaimRewardsOptions,
 ): Promise<ClaimRewardsSuccessResponse> {
-  return executeL1Action(config, { type: "claimRewards" }, opts);
+  const action = parse(ClaimRewardsActionSchema, { type: "claimRewards" });
+  return executeL1Action(config, action, opts);
 }

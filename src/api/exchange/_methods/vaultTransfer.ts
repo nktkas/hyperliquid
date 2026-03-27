@@ -48,16 +48,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const VaultTransferParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(VaultTransferRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const VaultTransferActionSchema = /* @__PURE__ */ (() => {
+  return v.object(VaultTransferRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode vaultTransfer} function. */
-export type VaultTransferParameters = v.InferInput<typeof VaultTransferParameters>;
+export type VaultTransferParameters = Omit<v.InferInput<typeof VaultTransferActionSchema>, "type">;
 
 /** Request options for the {@linkcode vaultTransfer} function. */
 export type VaultTransferOptions = ExtractRequestOptions<v.InferInput<typeof VaultTransferRequest>>;
@@ -100,6 +97,6 @@ export function vaultTransfer(
   params: VaultTransferParameters,
   opts?: VaultTransferOptions,
 ): Promise<VaultTransferSuccessResponse> {
-  const action = parse(VaultTransferParameters, params);
-  return executeL1Action(config, { type: "vaultTransfer", ...action }, opts);
+  const action = parse(VaultTransferActionSchema, { type: "vaultTransfer", ...params });
+  return executeL1Action(config, action, opts);
 }

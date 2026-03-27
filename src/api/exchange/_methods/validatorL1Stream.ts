@@ -44,16 +44,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const ValidatorL1StreamParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(ValidatorL1StreamRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const ValidatorL1StreamActionSchema = /* @__PURE__ */ (() => {
+  return v.object(ValidatorL1StreamRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode validatorL1Stream} function. */
-export type ValidatorL1StreamParameters = v.InferInput<typeof ValidatorL1StreamParameters>;
+export type ValidatorL1StreamParameters = Omit<v.InferInput<typeof ValidatorL1StreamActionSchema>, "type">;
 
 /** Request options for the {@linkcode validatorL1Stream} function. */
 export type ValidatorL1StreamOptions = ExtractRequestOptions<v.InferInput<typeof ValidatorL1StreamRequest>>;
@@ -94,6 +91,6 @@ export function validatorL1Stream(
   params: ValidatorL1StreamParameters,
   opts?: ValidatorL1StreamOptions,
 ): Promise<ValidatorL1StreamSuccessResponse> {
-  const action = parse(ValidatorL1StreamParameters, params);
-  return executeL1Action(config, { type: "validatorL1Stream", ...action }, opts);
+  const action = parse(ValidatorL1StreamActionSchema, { type: "validatorL1Stream", ...params });
+  return executeL1Action(config, action, opts);
 }

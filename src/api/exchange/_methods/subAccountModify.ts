@@ -46,16 +46,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const SubAccountModifyParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(SubAccountModifyRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const SubAccountModifyActionSchema = /* @__PURE__ */ (() => {
+  return v.object(SubAccountModifyRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode subAccountModify} function. */
-export type SubAccountModifyParameters = v.InferInput<typeof SubAccountModifyParameters>;
+export type SubAccountModifyParameters = Omit<v.InferInput<typeof SubAccountModifyActionSchema>, "type">;
 
 /** Request options for the {@linkcode subAccountModify} function. */
 export type SubAccountModifyOptions = ExtractRequestOptions<v.InferInput<typeof SubAccountModifyRequest>>;
@@ -97,6 +94,6 @@ export function subAccountModify(
   params: SubAccountModifyParameters,
   opts?: SubAccountModifyOptions,
 ): Promise<SubAccountModifySuccessResponse> {
-  const action = parse(SubAccountModifyParameters, params);
-  return executeL1Action(config, { type: "subAccountModify", ...action }, opts);
+  const action = parse(SubAccountModifyActionSchema, { type: "subAccountModify", ...params });
+  return executeL1Action(config, action, opts);
 }

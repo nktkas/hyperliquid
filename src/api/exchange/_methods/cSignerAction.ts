@@ -52,15 +52,15 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const CSignerActionParameters = /* @__PURE__ */ (() => {
-  return v.union(
-    CSignerActionRequest.entries.action.options.map((option) => v.omit(option, ["type"])),
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const CSignerActionActionSchema = /* @__PURE__ */ (() => {
+  return v.variant("type", CSignerActionRequest.entries.action.options);
 })();
 
 /** Action parameters for the {@linkcode cSignerAction} function. */
-export type CSignerActionParameters = v.InferInput<typeof CSignerActionParameters>;
+export type CSignerActionParameters = v.InferInput<typeof CSignerActionActionSchema> extends infer T
+  ? T extends unknown ? { [K in Exclude<keyof T, "type">]: T[K] } : never
+  : never;
 
 /** Request options for the {@linkcode cSignerAction} function. */
 export type CSignerActionOptions = ExtractRequestOptions<v.InferInput<typeof CSignerActionRequest>>;
@@ -115,6 +115,6 @@ export function cSignerAction(
   params: CSignerActionParameters,
   opts?: CSignerActionOptions,
 ): Promise<CSignerActionSuccessResponse> {
-  const action = parse(CSignerActionParameters, params);
-  return executeL1Action(config, { type: "CSignerAction", ...action }, opts);
+  const action = parse(CSignerActionActionSchema, { type: "CSignerAction", ...params });
+  return executeL1Action(config, action, opts);
 }

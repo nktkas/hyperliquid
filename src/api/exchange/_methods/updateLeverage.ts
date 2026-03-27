@@ -50,16 +50,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const UpdateLeverageParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(UpdateLeverageRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const UpdateLeverageActionSchema = /* @__PURE__ */ (() => {
+  return v.object(UpdateLeverageRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode updateLeverage} function. */
-export type UpdateLeverageParameters = v.InferInput<typeof UpdateLeverageParameters>;
+export type UpdateLeverageParameters = Omit<v.InferInput<typeof UpdateLeverageActionSchema>, "type">;
 
 /** Request options for the {@linkcode updateLeverage} function. */
 export type UpdateLeverageOptions = ExtractRequestOptions<v.InferInput<typeof UpdateLeverageRequest>>;
@@ -102,6 +99,6 @@ export function updateLeverage(
   params: UpdateLeverageParameters,
   opts?: UpdateLeverageOptions,
 ): Promise<UpdateLeverageSuccessResponse> {
-  const action = parse(UpdateLeverageParameters, params);
-  return executeL1Action(config, { type: "updateLeverage", ...action }, opts);
+  const action = parse(UpdateLeverageActionSchema, { type: "updateLeverage", ...params });
+  return executeL1Action(config, action, opts);
 }

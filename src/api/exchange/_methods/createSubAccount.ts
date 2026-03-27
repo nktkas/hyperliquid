@@ -57,16 +57,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const CreateSubAccountParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(CreateSubAccountRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const CreateSubAccountActionSchema = /* @__PURE__ */ (() => {
+  return v.object(CreateSubAccountRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode createSubAccount} function. */
-export type CreateSubAccountParameters = v.InferInput<typeof CreateSubAccountParameters>;
+export type CreateSubAccountParameters = Omit<v.InferInput<typeof CreateSubAccountActionSchema>, "type">;
 
 /** Request options for the {@linkcode createSubAccount} function. */
 export type CreateSubAccountOptions = ExtractRequestOptions<v.InferInput<typeof CreateSubAccountRequest>>;
@@ -107,6 +104,6 @@ export function createSubAccount(
   params: CreateSubAccountParameters,
   opts?: CreateSubAccountOptions,
 ): Promise<CreateSubAccountSuccessResponse> {
-  const action = parse(CreateSubAccountParameters, params);
-  return executeL1Action(config, { type: "createSubAccount", ...action }, opts);
+  const action = parse(CreateSubAccountActionSchema, { type: "createSubAccount", ...params });
+  return executeL1Action(config, action, opts);
 }

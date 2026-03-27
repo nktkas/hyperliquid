@@ -55,16 +55,16 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const UserSetAbstractionParameters = /* @__PURE__ */ (() => {
+/** Schema for action fields (excludes request-level system fields). */
+const UserSetAbstractionActionSchema = /* @__PURE__ */ (() => {
   return v.omit(
     v.object(UserSetAbstractionRequest.entries.action.entries),
-    ["type", "signatureChainId", "hyperliquidChain", "nonce"],
+    ["signatureChainId", "hyperliquidChain", "nonce"],
   );
 })();
 
 /** Action parameters for the {@linkcode userSetAbstraction} function. */
-export type UserSetAbstractionParameters = v.InferInput<typeof UserSetAbstractionParameters>;
+export type UserSetAbstractionParameters = Omit<v.InferInput<typeof UserSetAbstractionActionSchema>, "type">;
 
 /** Request options for the {@linkcode userSetAbstraction} function. */
 export type UserSetAbstractionOptions = ExtractRequestOptions<v.InferInput<typeof UserSetAbstractionRequest>>;
@@ -116,11 +116,6 @@ export function userSetAbstraction(
   params: UserSetAbstractionParameters,
   opts?: UserSetAbstractionOptions,
 ): Promise<UserSetAbstractionSuccessResponse> {
-  const action = parse(UserSetAbstractionParameters, params);
-  return executeUserSignedAction(
-    config,
-    { type: "userSetAbstraction", ...action },
-    UserSetAbstractionTypes,
-    opts,
-  );
+  const action = parse(UserSetAbstractionActionSchema, { type: "userSetAbstraction", ...params });
+  return executeUserSignedAction(config, action, UserSetAbstractionTypes, opts);
 }

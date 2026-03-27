@@ -94,16 +94,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const ModifyParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(ModifyRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const ModifyActionSchema = /* @__PURE__ */ (() => {
+  return v.object(ModifyRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode modify} function. */
-export type ModifyParameters = v.InferInput<typeof ModifyParameters>;
+export type ModifyParameters = Omit<v.InferInput<typeof ModifyActionSchema>, "type">;
 
 /** Request options for the {@linkcode modify} function. */
 export type ModifyOptions = ExtractRequestOptions<v.InferInput<typeof ModifyRequest>>;
@@ -152,6 +149,6 @@ export function modify(
   params: ModifyParameters,
   opts?: ModifyOptions,
 ): Promise<ModifySuccessResponse> {
-  const action = parse(ModifyParameters, params);
-  return executeL1Action(config, { type: "modify", ...action }, opts);
+  const action = parse(ModifyActionSchema, { type: "modify", ...params });
+  return executeL1Action(config, action, opts);
 }

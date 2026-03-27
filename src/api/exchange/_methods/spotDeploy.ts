@@ -143,15 +143,15 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const SpotDeployParameters = /* @__PURE__ */ (() => {
-  return v.union(
-    SpotDeployRequest.entries.action.options.map((option) => v.omit(option, ["type"])),
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const SpotDeployActionSchema = /* @__PURE__ */ (() => {
+  return v.variant("type", SpotDeployRequest.entries.action.options);
 })();
 
 /** Action parameters for the {@linkcode spotDeploy} function. */
-export type SpotDeployParameters = v.InferInput<typeof SpotDeployParameters>;
+export type SpotDeployParameters = v.InferInput<typeof SpotDeployActionSchema> extends infer T
+  ? T extends unknown ? { [K in Exclude<keyof T, "type">]: T[K] } : never
+  : never;
 
 /** Request options for the {@linkcode spotDeploy} function. */
 export type SpotDeployOptions = ExtractRequestOptions<v.InferInput<typeof SpotDeployRequest>>;
@@ -200,6 +200,6 @@ export function spotDeploy(
   params: SpotDeployParameters,
   opts?: SpotDeployOptions,
 ): Promise<SpotDeploySuccessResponse> {
-  const action = parse(SpotDeployParameters, params);
-  return executeL1Action(config, { type: "spotDeploy", ...action }, opts);
+  const action = parse(SpotDeployActionSchema, { type: "spotDeploy", ...params });
+  return executeL1Action(config, action, opts);
 }

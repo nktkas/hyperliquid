@@ -44,16 +44,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const ReserveRequestWeightParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(ReserveRequestWeightRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const ReserveRequestWeightActionSchema = /* @__PURE__ */ (() => {
+  return v.object(ReserveRequestWeightRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode reserveRequestWeight} function. */
-export type ReserveRequestWeightParameters = v.InferInput<typeof ReserveRequestWeightParameters>;
+export type ReserveRequestWeightParameters = Omit<v.InferInput<typeof ReserveRequestWeightActionSchema>, "type">;
 
 /** Request options for the {@linkcode reserveRequestWeight} function. */
 export type ReserveRequestWeightOptions = ExtractRequestOptions<v.InferInput<typeof ReserveRequestWeightRequest>>;
@@ -94,6 +91,6 @@ export function reserveRequestWeight(
   params: ReserveRequestWeightParameters,
   opts?: ReserveRequestWeightOptions,
 ): Promise<ReserveRequestWeightSuccessResponse> {
-  const action = parse(ReserveRequestWeightParameters, params);
-  return executeL1Action(config, { type: "reserveRequestWeight", ...action }, opts);
+  const action = parse(ReserveRequestWeightActionSchema, { type: "reserveRequestWeight", ...params });
+  return executeL1Action(config, action, opts);
 }

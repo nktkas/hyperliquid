@@ -55,16 +55,16 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const UsdSendParameters = /* @__PURE__ */ (() => {
+/** Schema for action fields (excludes request-level system fields). */
+const UsdSendActionSchema = /* @__PURE__ */ (() => {
   return v.omit(
     v.object(UsdSendRequest.entries.action.entries),
-    ["type", "signatureChainId", "hyperliquidChain", "time"],
+    ["signatureChainId", "hyperliquidChain", "time"],
   );
 })();
 
 /** Action parameters for the {@linkcode usdSend} function. */
-export type UsdSendParameters = v.InferInput<typeof UsdSendParameters>;
+export type UsdSendParameters = Omit<v.InferInput<typeof UsdSendActionSchema>, "type">;
 
 /** Request options for the {@linkcode usdSend} function. */
 export type UsdSendOptions = ExtractRequestOptions<v.InferInput<typeof UsdSendRequest>>;
@@ -116,11 +116,6 @@ export function usdSend(
   params: UsdSendParameters,
   opts?: UsdSendOptions,
 ): Promise<UsdSendSuccessResponse> {
-  const action = parse(UsdSendParameters, params);
-  return executeUserSignedAction(
-    config,
-    { type: "usdSend", ...action },
-    UsdSendTypes,
-    opts,
-  );
+  const action = parse(UsdSendActionSchema, { type: "usdSend", ...params });
+  return executeUserSignedAction(config, action, UsdSendTypes, opts);
 }

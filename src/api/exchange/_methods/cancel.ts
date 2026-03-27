@@ -69,16 +69,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const CancelParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(CancelRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const CancelActionSchema = /* @__PURE__ */ (() => {
+  return v.object(CancelRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode cancel} function. */
-export type CancelParameters = v.InferInput<typeof CancelParameters>;
+export type CancelParameters = Omit<v.InferInput<typeof CancelActionSchema>, "type">;
 
 /** Request options for the {@linkcode cancel} function. */
 export type CancelOptions = ExtractRequestOptions<v.InferInput<typeof CancelRequest>>;
@@ -119,6 +116,6 @@ export function cancel(
   params: CancelParameters,
   opts?: CancelOptions,
 ): Promise<CancelSuccessResponse> {
-  const action = parse(CancelParameters, params);
-  return executeL1Action(config, { type: "cancel", ...action }, opts);
+  const action = parse(CancelActionSchema, { type: "cancel", ...params });
+  return executeL1Action(config, action, opts);
 }

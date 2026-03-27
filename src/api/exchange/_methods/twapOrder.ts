@@ -81,16 +81,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const TwapOrderParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(TwapOrderRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const TwapOrderActionSchema = /* @__PURE__ */ (() => {
+  return v.object(TwapOrderRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode twapOrder} function. */
-export type TwapOrderParameters = v.InferInput<typeof TwapOrderParameters>;
+export type TwapOrderParameters = Omit<v.InferInput<typeof TwapOrderActionSchema>, "type">;
 
 /** Request options for the {@linkcode twapOrder} function. */
 export type TwapOrderOptions = ExtractRequestOptions<v.InferInput<typeof TwapOrderRequest>>;
@@ -138,6 +135,6 @@ export function twapOrder(
   params: TwapOrderParameters,
   opts?: TwapOrderOptions,
 ): Promise<TwapOrderSuccessResponse> {
-  const action = parse(TwapOrderParameters, params);
-  return executeL1Action(config, { type: "twapOrder", ...action }, opts);
+  const action = parse(TwapOrderActionSchema, { type: "twapOrder", ...params });
+  return executeL1Action(config, action, opts);
 }

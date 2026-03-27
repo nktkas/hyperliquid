@@ -101,15 +101,15 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const CValidatorActionParameters = /* @__PURE__ */ (() => {
-  return v.union(
-    CValidatorActionRequest.entries.action.options.map((option) => v.omit(option, ["type"])),
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const CValidatorActionActionSchema = /* @__PURE__ */ (() => {
+  return v.variant("type", CValidatorActionRequest.entries.action.options);
 })();
 
 /** Action parameters for the {@linkcode cValidatorAction} function. */
-export type CValidatorActionParameters = v.InferInput<typeof CValidatorActionParameters>;
+export type CValidatorActionParameters = v.InferInput<typeof CValidatorActionActionSchema> extends infer T
+  ? T extends unknown ? { [K in Exclude<keyof T, "type">]: T[K] } : never
+  : never;
 
 /** Request options for the {@linkcode cValidatorAction} function. */
 export type CValidatorActionOptions = ExtractRequestOptions<v.InferInput<typeof CValidatorActionRequest>>;
@@ -158,6 +158,6 @@ export function cValidatorAction(
   params: CValidatorActionParameters,
   opts?: CValidatorActionOptions,
 ): Promise<CValidatorActionSuccessResponse> {
-  const action = parse(CValidatorActionParameters, params);
-  return executeL1Action(config, { type: "CValidatorAction", ...action }, opts);
+  const action = parse(CValidatorActionActionSchema, { type: "CValidatorAction", ...params });
+  return executeL1Action(config, action, opts);
 }

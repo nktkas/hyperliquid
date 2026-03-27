@@ -44,16 +44,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const SetReferrerParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(SetReferrerRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const SetReferrerActionSchema = /* @__PURE__ */ (() => {
+  return v.object(SetReferrerRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode setReferrer} function. */
-export type SetReferrerParameters = v.InferInput<typeof SetReferrerParameters>;
+export type SetReferrerParameters = Omit<v.InferInput<typeof SetReferrerActionSchema>, "type">;
 
 /** Request options for the {@linkcode setReferrer} function. */
 export type SetReferrerOptions = ExtractRequestOptions<v.InferInput<typeof SetReferrerRequest>>;
@@ -94,6 +91,6 @@ export function setReferrer(
   params: SetReferrerParameters,
   opts?: SetReferrerOptions,
 ): Promise<SetReferrerSuccessResponse> {
-  const action = parse(SetReferrerParameters, params);
-  return executeL1Action(config, { type: "setReferrer", ...action }, opts);
+  const action = parse(SetReferrerActionSchema, { type: "setReferrer", ...params });
+  return executeL1Action(config, action, opts);
 }

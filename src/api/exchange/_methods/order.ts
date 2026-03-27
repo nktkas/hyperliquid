@@ -167,16 +167,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const OrderParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(OrderRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const OrderActionSchema = /* @__PURE__ */ (() => {
+  return v.object(OrderRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode order} function. */
-export type OrderParameters = v.InferInput<typeof OrderParameters>;
+export type OrderParameters = Omit<v.InferInput<typeof OrderActionSchema>, "type">;
 
 /** Request options for the {@linkcode order} function. */
 export type OrderOptions = ExtractRequestOptions<v.InferInput<typeof OrderRequest>>;
@@ -227,6 +224,6 @@ export function order(
   params: OrderParameters,
   opts?: OrderOptions,
 ): Promise<OrderSuccessResponse> {
-  const action = parse(OrderParameters, params);
-  return executeL1Action(config, { type: "order", ...action }, opts);
+  const action = parse(OrderActionSchema, { type: "order", ...params });
+  return executeL1Action(config, action, opts);
 }

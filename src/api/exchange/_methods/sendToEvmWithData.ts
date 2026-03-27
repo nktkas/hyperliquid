@@ -67,16 +67,16 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const SendToEvmWithDataParameters = /* @__PURE__ */ (() => {
+/** Schema for action fields (excludes request-level system fields). */
+const SendToEvmWithDataActionSchema = /* @__PURE__ */ (() => {
   return v.omit(
     v.object(SendToEvmWithDataRequest.entries.action.entries),
-    ["type", "signatureChainId", "hyperliquidChain", "nonce"],
+    ["signatureChainId", "hyperliquidChain", "nonce"],
   );
 })();
 
 /** Action parameters for the {@linkcode sendToEvmWithData} function. */
-export type SendToEvmWithDataParameters = v.InferInput<typeof SendToEvmWithDataParameters>;
+export type SendToEvmWithDataParameters = Omit<v.InferInput<typeof SendToEvmWithDataActionSchema>, "type">;
 
 /** Request options for the {@linkcode sendToEvmWithData} function. */
 export type SendToEvmWithDataOptions = ExtractRequestOptions<v.InferInput<typeof SendToEvmWithDataRequest>>;
@@ -140,11 +140,6 @@ export function sendToEvmWithData(
   params: SendToEvmWithDataParameters,
   opts?: SendToEvmWithDataOptions,
 ): Promise<SendToEvmWithDataSuccessResponse> {
-  const action = parse(SendToEvmWithDataParameters, params);
-  return executeUserSignedAction(
-    config,
-    { type: "sendToEvmWithData", ...action },
-    SendToEvmWithDataTypes,
-    opts,
-  );
+  const action = parse(SendToEvmWithDataActionSchema, { type: "sendToEvmWithData", ...params });
+  return executeUserSignedAction(config, action, SendToEvmWithDataTypes, opts);
 }

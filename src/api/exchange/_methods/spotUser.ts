@@ -47,16 +47,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const SpotUserParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(SpotUserRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const SpotUserActionSchema = /* @__PURE__ */ (() => {
+  return v.object(SpotUserRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode spotUser} function. */
-export type SpotUserParameters = v.InferInput<typeof SpotUserParameters>;
+export type SpotUserParameters = Omit<v.InferInput<typeof SpotUserActionSchema>, "type">;
 
 /** Request options for the {@linkcode spotUser} function. */
 export type SpotUserOptions = ExtractRequestOptions<v.InferInput<typeof SpotUserRequest>>;
@@ -97,6 +94,6 @@ export function spotUser(
   params: SpotUserParameters,
   opts?: SpotUserOptions,
 ): Promise<SpotUserSuccessResponse> {
-  const action = parse(SpotUserParameters, params);
-  return executeL1Action(config, { type: "spotUser", ...action }, opts);
+  const action = parse(SpotUserActionSchema, { type: "spotUser", ...params });
+  return executeL1Action(config, action, opts);
 }

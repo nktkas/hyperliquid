@@ -55,16 +55,16 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const UsdClassTransferParameters = /* @__PURE__ */ (() => {
+/** Schema for action fields (excludes request-level system fields). */
+const UsdClassTransferActionSchema = /* @__PURE__ */ (() => {
   return v.omit(
     v.object(UsdClassTransferRequest.entries.action.entries),
-    ["type", "signatureChainId", "hyperliquidChain", "nonce"],
+    ["signatureChainId", "hyperliquidChain", "nonce"],
   );
 })();
 
 /** Action parameters for the {@linkcode usdClassTransfer} function. */
-export type UsdClassTransferParameters = v.InferInput<typeof UsdClassTransferParameters>;
+export type UsdClassTransferParameters = Omit<v.InferInput<typeof UsdClassTransferActionSchema>, "type">;
 
 /** Request options for the {@linkcode usdClassTransfer} function. */
 export type UsdClassTransferOptions = ExtractRequestOptions<v.InferInput<typeof UsdClassTransferRequest>>;
@@ -116,11 +116,6 @@ export function usdClassTransfer(
   params: UsdClassTransferParameters,
   opts?: UsdClassTransferOptions,
 ): Promise<UsdClassTransferSuccessResponse> {
-  const action = parse(UsdClassTransferParameters, params);
-  return executeUserSignedAction(
-    config,
-    { type: "usdClassTransfer", ...action },
-    UsdClassTransferTypes,
-    opts,
-  );
+  const action = parse(UsdClassTransferActionSchema, { type: "usdClassTransfer", ...params });
+  return executeUserSignedAction(config, action, UsdClassTransferTypes, opts);
 }

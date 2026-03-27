@@ -50,16 +50,13 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const UpdateIsolatedMarginParameters = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(UpdateIsolatedMarginRequest.entries.action.entries),
-    ["type"],
-  );
+/** Schema for action fields (excludes request-level system fields). */
+const UpdateIsolatedMarginActionSchema = /* @__PURE__ */ (() => {
+  return v.object(UpdateIsolatedMarginRequest.entries.action.entries);
 })();
 
 /** Action parameters for the {@linkcode updateIsolatedMargin} function. */
-export type UpdateIsolatedMarginParameters = v.InferInput<typeof UpdateIsolatedMarginParameters>;
+export type UpdateIsolatedMarginParameters = Omit<v.InferInput<typeof UpdateIsolatedMarginActionSchema>, "type">;
 
 /** Request options for the {@linkcode updateIsolatedMargin} function. */
 export type UpdateIsolatedMarginOptions = ExtractRequestOptions<v.InferInput<typeof UpdateIsolatedMarginRequest>>;
@@ -102,6 +99,6 @@ export function updateIsolatedMargin(
   params: UpdateIsolatedMarginParameters,
   opts?: UpdateIsolatedMarginOptions,
 ): Promise<UpdateIsolatedMarginSuccessResponse> {
-  const action = parse(UpdateIsolatedMarginParameters, params);
-  return executeL1Action(config, { type: "updateIsolatedMargin", ...action }, opts);
+  const action = parse(UpdateIsolatedMarginActionSchema, { type: "updateIsolatedMargin", ...params });
+  return executeL1Action(config, action, opts);
 }

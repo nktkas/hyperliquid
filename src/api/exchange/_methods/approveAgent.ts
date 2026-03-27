@@ -71,16 +71,16 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const ApproveAgentParameters = /* @__PURE__ */ (() => {
+/** Schema for action fields (excludes request-level system fields). */
+const ApproveAgentActionSchema = /* @__PURE__ */ (() => {
   return v.omit(
     v.object(ApproveAgentRequest.entries.action.entries),
-    ["type", "signatureChainId", "hyperliquidChain", "nonce"],
+    ["signatureChainId", "hyperliquidChain", "nonce"],
   );
 })();
 
 /** Action parameters for the {@linkcode approveAgent} function. */
-export type ApproveAgentParameters = v.InferInput<typeof ApproveAgentParameters>;
+export type ApproveAgentParameters = Omit<v.InferInput<typeof ApproveAgentActionSchema>, "type">;
 
 /** Request options for the {@linkcode approveAgent} function. */
 export type ApproveAgentOptions = ExtractRequestOptions<v.InferInput<typeof ApproveAgentRequest>>;
@@ -148,11 +148,6 @@ export function approveAgent(
   params: ApproveAgentParameters,
   opts?: ApproveAgentOptions,
 ): Promise<ApproveAgentSuccessResponse> {
-  const action = parse(ApproveAgentParameters, params);
-  return executeUserSignedAction(
-    config,
-    { type: "approveAgent", ...action },
-    ApproveAgentTypes,
-    opts,
-  );
+  const action = parse(ApproveAgentActionSchema, { type: "approveAgent", ...params });
+  return executeUserSignedAction(config, action, ApproveAgentTypes, opts);
 }

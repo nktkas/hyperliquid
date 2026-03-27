@@ -81,16 +81,16 @@ import { parse } from "../../../_base.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
-/** Schema for user-provided action parameters (excludes system fields). */
-const ConvertToMultiSigUserParameters = /* @__PURE__ */ (() => {
+/** Schema for action fields (excludes request-level system fields). */
+const ConvertToMultiSigUserActionSchema = /* @__PURE__ */ (() => {
   return v.omit(
     v.object(ConvertToMultiSigUserRequest.entries.action.entries),
-    ["type", "signatureChainId", "hyperliquidChain", "nonce"],
+    ["signatureChainId", "hyperliquidChain", "nonce"],
   );
 })();
 
 /** Action parameters for the {@linkcode convertToMultiSigUser} function. */
-export type ConvertToMultiSigUserParameters = v.InferInput<typeof ConvertToMultiSigUserParameters>;
+export type ConvertToMultiSigUserParameters = Omit<v.InferInput<typeof ConvertToMultiSigUserActionSchema>, "type">;
 
 /** Request options for the {@linkcode convertToMultiSigUser} function. */
 export type ConvertToMultiSigUserOptions = ExtractRequestOptions<v.InferInput<typeof ConvertToMultiSigUserRequest>>;
@@ -157,11 +157,6 @@ export function convertToMultiSigUser(
   params: ConvertToMultiSigUserParameters,
   opts?: ConvertToMultiSigUserOptions,
 ): Promise<ConvertToMultiSigUserSuccessResponse> {
-  const action = parse(ConvertToMultiSigUserParameters, params);
-  return executeUserSignedAction(
-    config,
-    { type: "convertToMultiSigUser", ...action },
-    ConvertToMultiSigUserTypes,
-    opts,
-  );
+  const action = parse(ConvertToMultiSigUserActionSchema, { type: "convertToMultiSigUser", ...params });
+  return executeUserSignedAction(config, action, ConvertToMultiSigUserTypes, opts);
 }
