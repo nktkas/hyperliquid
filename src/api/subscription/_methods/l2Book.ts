@@ -4,8 +4,6 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Integer } from "../../_schemas.ts";
-
 /**
  * Subscription to L2 order book events for a specific asset.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
@@ -17,12 +15,27 @@ export const L2BookRequest = /* @__PURE__ */ (() => {
     /** Asset symbol (e.g., BTC). */
     coin: v.string(),
     /** Number of significant figures. */
-    nSigFigs: v.nullish(v.pipe(Integer, v.picklist([2, 3, 4, 5]))),
+    nSigFigs: v.nullish(v.picklist([2, 3, 4, 5])),
     /** Mantissa for aggregation (if `nSigFigs` is 5). */
-    mantissa: v.nullish(v.pipe(Integer, v.picklist([2, 5]))),
+    mantissa: v.nullish(v.picklist([2, 5])),
   });
 })();
 export type L2BookRequest = v.InferOutput<typeof L2BookRequest>;
+
+type L2BookLevel = {
+  /**
+   * Price.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  px: string;
+  /**
+   * Total size.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  sz: string;
+  /** Number of individual orders. */
+  n: number;
+};
 
 /**
  * Event of L2 order book snapshot.
@@ -34,38 +47,12 @@ export type L2BookEvent = {
   /** Timestamp of the snapshot (in ms since epoch). */
   time: number;
   /** Bid and ask levels (index 0 = bids, index 1 = asks). */
-  levels: [{
-    /**
-     * Price.
-     * @pattern ^[0-9]+(\.[0-9]+)?$
-     */
-    px: string;
-    /**
-     * Total size.
-     * @pattern ^[0-9]+(\.[0-9]+)?$
-     */
-    sz: string;
-    /** Number of individual orders. */
-    n: number;
-  }[], {
-    /**
-     * Price.
-     * @pattern ^[0-9]+(\.[0-9]+)?$
-     */
-    px: string;
-    /**
-     * Total size.
-     * @pattern ^[0-9]+(\.[0-9]+)?$
-     */
-    sz: string;
-    /** Number of individual orders. */
-    n: number;
-  }[]];
+  levels: [bids: L2BookLevel[], asks: L2BookLevel[]];
   /**
    * Spread (only present when `nSigFigs` is non-null).
    * @pattern ^[0-9]+(\.[0-9]+)?$
    */
-  spread?: string | undefined;
+  spread?: string;
 };
 
 // ============================================================

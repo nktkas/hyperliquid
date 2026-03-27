@@ -173,7 +173,7 @@ const StringMath = {
   },
 };
 
-function formatDecimalString(value: string): string {
+export function formatDecimalString(value: string): string {
   return value
     // remove leading/trailing whitespace
     .trim() // "  123.45  " → "123.45"

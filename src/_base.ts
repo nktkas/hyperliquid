@@ -12,7 +12,7 @@ export class HyperliquidError extends Error {
 export class ValidationError extends HyperliquidError {
   override cause: v.ValiError<v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>>;
   constructor(message: string, options: { cause: v.ValiError<v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>> }) {
-    super(message);
+    super(message, options);
     this.name = "ValidationError";
     this.cause = options.cause;
   }

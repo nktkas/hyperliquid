@@ -6,6 +6,7 @@
  */
 
 import * as v from "@valibot/valibot";
+import { formatDecimalString } from "../utils/_format.ts";
 
 // ============================================================
 // Number
@@ -57,22 +58,6 @@ export const UnsignedInteger = /* @__PURE__ */ (() => {
   );
 })();
 export type UnsignedInteger = v.InferOutput<typeof UnsignedInteger>;
-
-function formatDecimalString(value: string): string {
-  return value
-    // remove leading/trailing whitespace
-    .trim() // "  123.45  " → "123.45"
-    // remove leading zeros
-    .replace(/^(-?)0+(?=\d)/, "$1") // "00123" → "123", "-00.5" → "-0.5"
-    // remove trailing zeros
-    .replace(/\.0*$|(\.\d+?)0+$/, "$1") // "1.2000" → "1.2", "5.0" → "5"
-    // add leading zero if starts with decimal point
-    .replace(/^(-?)\./, "$10.") // ".5" → "0.5", "-.5" → "-0.5"
-    // add "0" if string is empty after trimming
-    .replace(/^-?$/, "0") // "" → "0", "-" → "0"
-    // normalize negative zero
-    .replace(/^-0$/, "0"); // "-0" → "0"
-}
 
 // ============================================================
 // Hex

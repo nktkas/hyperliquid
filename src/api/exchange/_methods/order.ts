@@ -123,7 +123,7 @@ export type OrderResponse = {
              * Client Order ID.
              * @pattern ^0x[a-fA-F0-9]{32}$
              */
-            cloid?: `0x${string}` | undefined;
+            cloid?: `0x${string}`;
           };
         }
         | {
@@ -145,7 +145,7 @@ export type OrderResponse = {
              * Client Order ID.
              * @pattern ^0x[a-fA-F0-9]{32}$
              */
-            cloid?: `0x${string}` | undefined;
+            cloid?: `0x${string}`;
           };
         }
         | {

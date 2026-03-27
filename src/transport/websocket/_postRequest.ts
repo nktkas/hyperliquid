@@ -3,6 +3,10 @@ import { TransportError } from "../_base.ts";
 import { AbortSignal_, Promise_ } from "../_polyfills.ts";
 import type { HyperliquidEventTarget } from "./_hyperliquidEventTarget.ts";
 
+// ============================================================
+// Request Types
+// ============================================================
+
 interface PostRequest {
   method: "post";
   id: number;
@@ -24,6 +28,10 @@ interface PendingRequest {
   reject: (reason?: any) => void;
 }
 
+// ============================================================
+// Error Classes
+// ============================================================
+
 /** Error thrown when a WebSocket request fails. */
 export class WebSocketRequestError extends TransportError {
   constructor(message?: string, options?: ErrorOptions) {
@@ -31,6 +39,10 @@ export class WebSocketRequestError extends TransportError {
     this.name = "WebSocketRequestError";
   }
 }
+
+// ============================================================
+// Post Request Manager
+// ============================================================
 
 /**
  * Manages WebSocket post requests to the Hyperliquid API.
@@ -231,6 +243,10 @@ export class WebSocketPostRequest {
     return JSON.stringify(lowercasedHex);
   }
 }
+
+// ============================================================
+// Helpers
+// ============================================================
 
 function recursiveSortObjectKeys<T>(obj: T): T {
   if (Array.isArray(obj)) {

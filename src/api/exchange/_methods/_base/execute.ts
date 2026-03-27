@@ -88,7 +88,9 @@ export interface ExchangeMultiSigConfig<T extends IRequestTransport = IRequestTr
 }
 
 /** Union type for all Exchange API configurations. */
-export type ExchangeConfig = ExchangeSingleWalletConfig | ExchangeMultiSigConfig;
+export type ExchangeConfig<T extends IRequestTransport = IRequestTransport> =
+  | ExchangeSingleWalletConfig<T>
+  | ExchangeMultiSigConfig<T>;
 
 // ============================================================
 // Execute L1 Action

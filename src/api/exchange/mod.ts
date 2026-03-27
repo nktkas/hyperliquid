@@ -38,7 +38,7 @@
  */
 
 export { ApiRequestError } from "./_methods/_base/errors.ts";
-export type { ExchangeMultiSigConfig, ExchangeSingleWalletConfig } from "./_methods/_base/execute.ts";
+export type { ExchangeConfig, ExchangeMultiSigConfig, ExchangeSingleWalletConfig } from "./_methods/_base/execute.ts";
 
 export * from "./_methods/agentEnableDexAbstraction.ts";
 export * from "./_methods/agentSetAbstraction.ts";

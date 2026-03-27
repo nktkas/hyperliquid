@@ -55,7 +55,7 @@ export type UserFundingsEvent = {
     nSamples: number | null;
   }[];
   /** Whether this is an initial snapshot. */
-  isSnapshot?: true | undefined;
+  isSnapshot?: true;
 };
 
 // ============================================================

@@ -24,4 +24,4 @@
  */
 
 export * from "./_symbolConverter.ts";
-export * from "./_format.ts";
+export { formatPrice, formatSize } from "./_format.ts";

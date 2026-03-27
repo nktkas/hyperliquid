@@ -195,9 +195,16 @@ export async function signTypedData(args: {
 }
 
 function splitSignature(signature: `0x${string}`): Signature {
-  const r = `0x${signature.slice(2, 66)}` as const;
-  const s = `0x${signature.slice(66, 130)}` as const;
-  const v = parseInt(signature.slice(130, 132), 16) as 27 | 28;
+  if (signature.length !== 132) {
+    throw new AbstractWalletError(`Expected 65-byte signature (132 hex chars), got ${signature.length}`);
+  }
+  const r = `0x${signature.slice(2, 66)}` as `0x${string}`;
+  const s = `0x${signature.slice(66, 130)}` as `0x${string}`;
+  let v = parseInt(signature.slice(130, 132), 16);
+  if (v === 0 || v === 1) v += 27;
+  if (v !== 27 && v !== 28) {
+    throw new AbstractWalletError(`Invalid signature recovery value: ${v}, expected 27 or 28`);
+  }
   return { r, s, v };
 }
 
@@ -248,6 +255,7 @@ export async function getWalletAddress(wallet: AbstractWallet): Promise<`0x${str
     // Viem JSON-RPC account uses getAddresses()
     if (isViemJsonRpcAccount(wallet)) {
       const addresses = await wallet.getAddresses() as `0x${string}`[];
+      if (!addresses.length) throw new AbstractWalletError("Wallet returned no addresses");
       return addresses[0].toLowerCase() as `0x${string}`;
     }
 
