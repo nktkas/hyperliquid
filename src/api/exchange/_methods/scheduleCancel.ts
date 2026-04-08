@@ -68,6 +68,8 @@ export type ScheduleCancelSuccessResponse = ExcludeErrorResponse<ScheduleCancelR
 /**
  * Schedule a cancel-all operation at a future time.
  *
+ * Signing: L1 Action.
+ *
  * @param config General configuration for Exchange API requests.
  * @param params Parameters specific to the API request.
  * @param opts Request execution options.

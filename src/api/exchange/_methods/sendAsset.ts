@@ -100,6 +100,8 @@ export const SendAssetTypes = {
 /**
  * Transfer tokens between different perp DEXs, spot balance, users, and/or sub-accounts.
  *
+ * Signing: User-Signed EIP-712.
+ *
  * @param config General configuration for Exchange API requests.
  * @param params Parameters specific to the API request.
  * @param opts Request execution options.

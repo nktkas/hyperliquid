@@ -110,6 +110,8 @@ export const ConvertToMultiSigUserTypes = {
 /**
  * Convert a single-signature account to a multi-signature account or vice versa.
  *
+ * Signing: User-Signed EIP-712.
+ *
  * @param config General configuration for Exchange API requests.
  * @param params Parameters specific to the API request.
  * @param opts Request execution options.

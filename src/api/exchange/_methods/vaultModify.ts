@@ -65,6 +65,8 @@ export type VaultModifySuccessResponse = ExcludeErrorResponse<VaultModifyRespons
 /**
  * Modify a vault's configuration.
  *
+ * Signing: L1 Action.
+ *
  * @param config General configuration for Exchange API requests.
  * @param params Parameters specific to the API request.
  * @param opts Request execution options.

@@ -65,6 +65,8 @@ export type TopUpIsolatedOnlyMarginSuccessResponse = ExcludeErrorResponse<TopUpI
 /**
  * Top up isolated margin by targeting a specific leverage.
  *
+ * Signing: L1 Action.
+ *
  * @param config General configuration for Exchange API requests.
  * @param params Parameters specific to the API request.
  * @param opts Request execution options.
