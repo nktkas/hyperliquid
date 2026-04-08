@@ -5,12 +5,6 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
-import {
-  type ErrorResponse,
-  HyperliquidChainSchema,
-  SignatureSchema,
-  type SuccessResponse,
-} from "./_base/commonSchemas.ts";
 
 /**
  * Enable/disable HIP-3 DEX abstraction.
@@ -25,7 +19,7 @@ export const UserDexAbstractionRequest = /* @__PURE__ */ (() => {
       /** Chain ID in hex format for EIP-712 signing. */
       signatureChainId: Hex,
       /** HyperLiquid network type. */
-      hyperliquidChain: HyperliquidChainSchema,
+      hyperliquidChain: v.picklist(["Mainnet", "Testnet"]),
       /** User address. */
       user: Address,
       /** Whether to enable or disable HIP-3 DEX abstraction. */
@@ -36,7 +30,14 @@ export const UserDexAbstractionRequest = /* @__PURE__ */ (() => {
     /** Nonce (timestamp in ms) used to prevent replay attacks. */
     nonce: UnsignedInteger,
     /** ECDSA signature components. */
-    signature: SignatureSchema,
+    signature: v.object({
+      /** First 32-byte component. */
+      r: v.pipe(Hex, v.length(66)),
+      /** Second 32-byte component. */
+      s: v.pipe(Hex, v.length(66)),
+      /** Recovery identifier. */
+      v: v.picklist([27, 28]),
+    }),
   });
 })();
 export type UserDexAbstractionRequest = v.InferOutput<typeof UserDexAbstractionRequest>;
@@ -45,7 +46,22 @@ export type UserDexAbstractionRequest = v.InferOutput<typeof UserDexAbstractionR
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction
  */
-export type UserDexAbstractionResponse = SuccessResponse | ErrorResponse;
+export type UserDexAbstractionResponse =
+  | {
+    /** Successful status. */
+    status: "ok";
+    /** Response details. */
+    response: {
+      /** Type of response. */
+      type: "default";
+    };
+  }
+  | {
+    /** Error status. */
+    status: "err";
+    /** Error message. */
+    response: string;
+  };
 
 // ============================================================
 // Execution Logic

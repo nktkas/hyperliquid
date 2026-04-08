@@ -5,12 +5,6 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Hex, UnsignedInteger } from "../../_schemas.ts";
-import {
-  type ErrorResponse,
-  HyperliquidChainSchema,
-  SignatureSchema,
-  type SuccessResponse,
-} from "./_base/commonSchemas.ts";
 
 /**
  * Transfer native token from staking into the user's spot account.
@@ -25,7 +19,7 @@ export const CWithdrawRequest = /* @__PURE__ */ (() => {
       /** Chain ID in hex format for EIP-712 signing. */
       signatureChainId: Hex,
       /** HyperLiquid network type. */
-      hyperliquidChain: HyperliquidChainSchema,
+      hyperliquidChain: v.picklist(["Mainnet", "Testnet"]),
       /** Amount of wei to withdraw from staking balance (float * 1e8). */
       wei: v.pipe(UnsignedInteger, v.minValue(1)),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
@@ -34,7 +28,14 @@ export const CWithdrawRequest = /* @__PURE__ */ (() => {
     /** Nonce (timestamp in ms) used to prevent replay attacks. */
     nonce: UnsignedInteger,
     /** ECDSA signature components. */
-    signature: SignatureSchema,
+    signature: v.object({
+      /** First 32-byte component. */
+      r: v.pipe(Hex, v.length(66)),
+      /** Second 32-byte component. */
+      s: v.pipe(Hex, v.length(66)),
+      /** Recovery identifier. */
+      v: v.picklist([27, 28]),
+    }),
   });
 })();
 export type CWithdrawRequest = v.InferOutput<typeof CWithdrawRequest>;
@@ -43,7 +44,22 @@ export type CWithdrawRequest = v.InferOutput<typeof CWithdrawRequest>;
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#withdraw-from-staking
  */
-export type CWithdrawResponse = SuccessResponse | ErrorResponse;
+export type CWithdrawResponse =
+  | {
+    /** Successful status. */
+    status: "ok";
+    /** Response details. */
+    response: {
+      /** Type of response. */
+      type: "default";
+    };
+  }
+  | {
+    /** Error status. */
+    status: "err";
+    /** Error message. */
+    response: string;
+  };
 
 // ============================================================
 // Execution Logic

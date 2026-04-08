@@ -5,12 +5,6 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import {
-  type ErrorResponse,
-  HyperliquidChainSchema,
-  SignatureSchema,
-  type SuccessResponse,
-} from "./_base/commonSchemas.ts";
 
 /**
  * Transfer tokens between different perp DEXs, spot balance, users, and/or sub-accounts.
@@ -25,7 +19,7 @@ export const SendAssetRequest = /* @__PURE__ */ (() => {
       /** Chain ID in hex format for EIP-712 signing. */
       signatureChainId: Hex,
       /** HyperLiquid network type. */
-      hyperliquidChain: HyperliquidChainSchema,
+      hyperliquidChain: v.picklist(["Mainnet", "Testnet"]),
       /** Destination address. */
       destination: Address,
       /** Source DEX ("" for default USDC perp DEX, "spot" for spot). */
@@ -47,7 +41,14 @@ export const SendAssetRequest = /* @__PURE__ */ (() => {
     /** Nonce (timestamp in ms) used to prevent replay attacks. */
     nonce: UnsignedInteger,
     /** ECDSA signature components. */
-    signature: SignatureSchema,
+    signature: v.object({
+      /** First 32-byte component. */
+      r: v.pipe(Hex, v.length(66)),
+      /** Second 32-byte component. */
+      s: v.pipe(Hex, v.length(66)),
+      /** Recovery identifier. */
+      v: v.picklist([27, 28]),
+    }),
   });
 })();
 export type SendAssetRequest = v.InferOutput<typeof SendAssetRequest>;
@@ -56,7 +57,22 @@ export type SendAssetRequest = v.InferOutput<typeof SendAssetRequest>;
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset
  */
-export type SendAssetResponse = SuccessResponse | ErrorResponse;
+export type SendAssetResponse =
+  | {
+    /** Successful status. */
+    status: "ok";
+    /** Response details. */
+    response: {
+      /** Type of response. */
+      type: "default";
+    };
+  }
+  | {
+    /** Error status. */
+    status: "err";
+    /** Error message. */
+    response: string;
+  };
 
 // ============================================================
 // Execution Logic

@@ -5,12 +5,6 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import {
-  type ErrorResponse,
-  HyperliquidChainSchema,
-  SignatureSchema,
-  type SuccessResponse,
-} from "./_base/commonSchemas.ts";
 
 /**
  * Transfer tokens from Core to EVM with an additional data payload for `ICoreReceiveWithData` contracts.
@@ -25,7 +19,7 @@ export const SendToEvmWithDataRequest = /* @__PURE__ */ (() => {
       /** Chain ID in hex format for EIP-712 signing. */
       signatureChainId: Hex,
       /** HyperLiquid network type. */
-      hyperliquidChain: HyperliquidChainSchema,
+      hyperliquidChain: v.picklist(["Mainnet", "Testnet"]),
       /** Token identifier (e.g., "USDC"). */
       token: v.string(),
       /** Amount to send (not in wei). */
@@ -48,7 +42,14 @@ export const SendToEvmWithDataRequest = /* @__PURE__ */ (() => {
     /** Nonce (timestamp in ms) used to prevent replay attacks. */
     nonce: UnsignedInteger,
     /** ECDSA signature components. */
-    signature: SignatureSchema,
+    signature: v.object({
+      /** First 32-byte component. */
+      r: v.pipe(Hex, v.length(66)),
+      /** Second 32-byte component. */
+      s: v.pipe(Hex, v.length(66)),
+      /** Recovery identifier. */
+      v: v.picklist([27, 28]),
+    }),
   });
 })();
 export type SendToEvmWithDataRequest = v.InferOutput<typeof SendToEvmWithDataRequest>;
@@ -57,7 +58,22 @@ export type SendToEvmWithDataRequest = v.InferOutput<typeof SendToEvmWithDataReq
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-to-evm-with-data
  */
-export type SendToEvmWithDataResponse = SuccessResponse | ErrorResponse;
+export type SendToEvmWithDataResponse =
+  | {
+    /** Successful status. */
+    status: "ok";
+    /** Response details. */
+    response: {
+      /** Type of response. */
+      type: "default";
+    };
+  }
+  | {
+    /** Error status. */
+    status: "err";
+    /** Error message. */
+    response: string;
+  };
 
 // ============================================================
 // Execution Logic

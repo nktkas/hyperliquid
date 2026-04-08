@@ -4,8 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Cloid, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
+import { Address, Cloid, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Modify an order.
@@ -71,7 +70,14 @@ export const ModifyRequest = /* @__PURE__ */ (() => {
     /** Nonce (timestamp in ms) used to prevent replay attacks. */
     nonce: UnsignedInteger,
     /** ECDSA signature components. */
-    signature: SignatureSchema,
+    signature: v.object({
+      /** First 32-byte component. */
+      r: v.pipe(Hex, v.length(66)),
+      /** Second 32-byte component. */
+      s: v.pipe(Hex, v.length(66)),
+      /** Recovery identifier. */
+      v: v.picklist([27, 28]),
+    }),
     /** Vault address (for vault trading). */
     vaultAddress: v.optional(Address),
     /** Expiration time of the action. */
@@ -84,7 +90,22 @@ export type ModifyRequest = v.InferOutput<typeof ModifyRequest>;
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order
  */
-export type ModifyResponse = SuccessResponse | ErrorResponse;
+export type ModifyResponse =
+  | {
+    /** Successful status. */
+    status: "ok";
+    /** Response details. */
+    response: {
+      /** Type of response. */
+      type: "default";
+    };
+  }
+  | {
+    /** Error status. */
+    status: "err";
+    /** Error message. */
+    response: string;
+  };
 
 // ============================================================
 // Execution Logic

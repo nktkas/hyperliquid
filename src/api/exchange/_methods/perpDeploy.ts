@@ -4,8 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Decimal, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
+import { Address, Decimal, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Deploying HIP-3 assets.
@@ -210,7 +209,14 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
     /** Nonce (timestamp in ms) used to prevent replay attacks. */
     nonce: UnsignedInteger,
     /** ECDSA signature components. */
-    signature: SignatureSchema,
+    signature: v.object({
+      /** First 32-byte component. */
+      r: v.pipe(Hex, v.length(66)),
+      /** Second 32-byte component. */
+      s: v.pipe(Hex, v.length(66)),
+      /** Recovery identifier. */
+      v: v.picklist([27, 28]),
+    }),
     /** Expiration time of the action. */
     expiresAfter: v.optional(UnsignedInteger),
   });
@@ -221,7 +227,22 @@ export type PerpDeployRequest = v.InferOutput<typeof PerpDeployRequest>;
  * Successful response without specific data or error response.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions
  */
-export type PerpDeployResponse = SuccessResponse | ErrorResponse;
+export type PerpDeployResponse =
+  | {
+    /** Successful status. */
+    status: "ok";
+    /** Response details. */
+    response: {
+      /** Type of response. */
+      type: "default";
+    };
+  }
+  | {
+    /** Error status. */
+    status: "err";
+    /** Error message. */
+    response: string;
+  };
 
 // ============================================================
 // Execution Logic

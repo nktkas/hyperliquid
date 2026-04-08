@@ -4,8 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { UnsignedInteger } from "../../_schemas.ts";
-import { type ErrorResponse, SignatureSchema, type SuccessResponse } from "./_base/commonSchemas.ts";
+import { Hex, UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Jail or unjail self as a validator signer.
@@ -31,7 +30,14 @@ export const CSignerActionRequest = /* @__PURE__ */ (() => {
     /** Nonce (timestamp in ms) used to prevent replay attacks. */
     nonce: UnsignedInteger,
     /** ECDSA signature components. */
-    signature: SignatureSchema,
+    signature: v.object({
+      /** First 32-byte component. */
+      r: v.pipe(Hex, v.length(66)),
+      /** Second 32-byte component. */
+      s: v.pipe(Hex, v.length(66)),
+      /** Recovery identifier. */
+      v: v.picklist([27, 28]),
+    }),
     /** Expiration time of the action. */
     expiresAfter: v.optional(UnsignedInteger),
   });
@@ -42,7 +48,22 @@ export type CSignerActionRequest = v.InferOutput<typeof CSignerActionRequest>;
  * Successful response without specific data or error response.
  * @see null
  */
-export type CSignerActionResponse = SuccessResponse | ErrorResponse;
+export type CSignerActionResponse =
+  | {
+    /** Successful status. */
+    status: "ok";
+    /** Response details. */
+    response: {
+      /** Type of response. */
+      type: "default";
+    };
+  }
+  | {
+    /** Error status. */
+    status: "err";
+    /** Error message. */
+    response: string;
+  };
 
 // ============================================================
 // Execution Logic

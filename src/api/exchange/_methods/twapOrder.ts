@@ -4,8 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
-import { SignatureSchema } from "./_base/commonSchemas.ts";
+import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Place a TWAP order.
@@ -36,7 +35,14 @@ export const TwapOrderRequest = /* @__PURE__ */ (() => {
     /** Nonce (timestamp in ms) used to prevent replay attacks. */
     nonce: UnsignedInteger,
     /** ECDSA signature components. */
-    signature: SignatureSchema,
+    signature: v.object({
+      /** First 32-byte component. */
+      r: v.pipe(Hex, v.length(66)),
+      /** Second 32-byte component. */
+      s: v.pipe(Hex, v.length(66)),
+      /** Recovery identifier. */
+      v: v.picklist([27, 28]),
+    }),
     /** Vault address (for vault trading). */
     vaultAddress: v.optional(Address),
     /** Expiration time of the action. */

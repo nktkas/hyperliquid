@@ -17,7 +17,6 @@ import type { IRequestTransport } from "../../../../transport/mod.ts";
 import { Address, Hex, UnsignedInteger } from "../../../_schemas.ts";
 import { globalNonceManager } from "./_nonce.ts";
 import { withLock } from "./_semaphore.ts";
-import type { SignatureSchema } from "./commonSchemas.ts";
 import { assertSuccessResponse } from "./errors.ts";
 
 // ============================================================
@@ -245,8 +244,11 @@ export async function executeUserSignedAction<T>(
 // Multi-sig signing
 // ============================================================
 
+/** ECDSA signature components. */
+type Signature = { r: `0x${string}`; s: `0x${string}`; v: 27 | 28 };
+
 /** Remove leading zeros from signature components (required by Hyperliquid). */
-function trimSignature(sig: SignatureSchema): SignatureSchema {
+function trimSignature(sig: Signature): Signature {
   return {
     r: sig.r.replace(/^0x0+/, "0x") as `0x${string}`,
     s: sig.s.replace(/^0x0+/, "0x") as `0x${string}`,
@@ -262,7 +264,7 @@ async function signMultiSigL1(
   nonce: number,
   vaultAddress?: `0x${string}`,
   expiresAfter?: number,
-): Promise<[Record<string, unknown>, SignatureSchema]> {
+): Promise<[Record<string, unknown>, Signature]> {
   const { transport: { isTestnet }, signers, multiSigUser } = config;
   const multiSigUser_ = parse(Address, multiSigUser);
   const outerSigner_ = parse(Address, outerSigner);
@@ -312,7 +314,7 @@ async function signMultiSigUserSigned(
   types: Record<string, { name: string; type: string }[]>,
   outerSigner: `0x${string}`,
   nonce: number,
-): Promise<[Record<string, unknown>, SignatureSchema]> {
+): Promise<[Record<string, unknown>, Signature]> {
   const { signers, multiSigUser, transport: { isTestnet } } = config;
   const multiSigUser_ = parse(Address, multiSigUser);
   const outerSigner_ = parse(Address, outerSigner);
