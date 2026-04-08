@@ -40,6 +40,8 @@ export interface SymbolConverterOptions {
  * const dexAbcSzDecimals = converter.getSzDecimals("test:ABC"); // builder dex (if enabled) → 0
  *
  * const spotPairId = converter.getSpotPairId("HFUN/USDC"); // → "@2"
+ *
+ * const symbol = converter.getSymbolBySpotPairId("@107"); // → "HYPE/USDC"
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/asset-ids
@@ -50,6 +52,7 @@ export class SymbolConverter {
   private _nameToAssetId = new Map<string, number>();
   private _nameToSzDecimals = new Map<string, number>();
   private _nameToSpotPairId = new Map<string, string>();
+  private _spotPairIdToName = new Map<string, string>();
 
   /**
    * Creates a new SymbolConverter instance, but does not initialize it.
@@ -109,6 +112,7 @@ export class SymbolConverter {
     this._nameToAssetId.clear();
     this._nameToSzDecimals.clear();
     this._nameToSpotPairId.clear();
+    this._spotPairIdToName.clear();
 
     this._processDefaultPerps(perpMetaData);
     this._processSpotAssets(spotMetaData);
@@ -182,6 +186,7 @@ export class SymbolConverter {
       this._nameToAssetId.set(baseQuoteKey, assetId);
       this._nameToSzDecimals.set(baseQuoteKey, baseToken.szDecimals);
       this._nameToSpotPairId.set(baseQuoteKey, market.name);
+      this._spotPairIdToName.set(market.name, baseQuoteKey);
     });
   }
 
@@ -250,5 +255,26 @@ export class SymbolConverter {
    */
   getSpotPairId(name: string): string | undefined {
     return this._nameToSpotPairId.get(name);
+  }
+
+  /**
+   * Get the symbol ("BASE/QUOTE") from a spot pair ID.
+   *
+   * Accepts pair IDs such as "@107" or "PURR/USDC".
+   *
+   * @example
+   * ```ts
+   * import { HttpTransport } from "@nktkas/hyperliquid";
+   * import { SymbolConverter } from "@nktkas/hyperliquid/utils";
+   *
+   * const transport = new HttpTransport(); // or `WebSocketTransport`
+   * const converter = await SymbolConverter.create({ transport });
+   *
+   * converter.getSymbolBySpotPairId("@107"); // → "HYPE/USDC"
+   * converter.getSymbolBySpotPairId("PURR/USDC"); // → "PURR/USDC"
+   * ```
+   */
+  getSymbolBySpotPairId(pairId: string): string | undefined {
+    return this._spotPairIdToName.get(pairId);
   }
 }

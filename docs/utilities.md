@@ -71,6 +71,15 @@ converter.getSpotPairId("HYPE/USDC"); // "@107"
 converter.getSpotPairId("PURR/USDC"); // "PURR/USDC"
 ```
 
+### Symbol from spot pair ID
+
+`getSymbolBySpotPairId` resolves a spot pair ID back to its `"BASE/QUOTE"` symbol:
+
+```ts
+converter.getSymbolBySpotPairId("@107"); // "HYPE/USDC"
+converter.getSymbolBySpotPairId("PURR/USDC"); // "PURR/USDC"
+```
+
 ### Refresh data
 
 Call `reload` to update the symbol mappings when new assets are listed:
