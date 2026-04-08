@@ -88,6 +88,8 @@ export const SpotSendTypes = {
 /**
  * Send spot assets to another address.
  *
+ * Signing: User-Signed EIP-712.
+ *
  * @param config General configuration for Exchange API requests.
  * @param params Parameters specific to the API request.
  * @param opts Request execution options.

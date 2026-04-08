@@ -67,6 +67,8 @@ export type UpdateIsolatedMarginSuccessResponse = ExcludeErrorResponse<UpdateIso
 /**
  * Add or remove margin from isolated position.
  *
+ * Signing: L1 Action.
+ *
  * @param config General configuration for Exchange API requests.
  * @param params Parameters specific to the API request.
  * @param opts Request execution options.

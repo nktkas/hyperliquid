@@ -58,6 +58,8 @@ export type AgentEnableDexAbstractionSuccessResponse = ExcludeErrorResponse<Agen
 /**
  * Enable HIP-3 DEX abstraction.
  *
+ * Signing: L1 Action.
+ *
  * @param config General configuration for Exchange API requests.
  * @param opts Request execution options.
  * @return Successful response without specific data.

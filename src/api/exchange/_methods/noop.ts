@@ -56,6 +56,8 @@ export type NoopSuccessResponse = ExcludeErrorResponse<NoopResponse>;
 /**
  * This action does not do anything (no operation), but causes the nonce to be marked as used.
  *
+ * Signing: L1 Action.
+ *
  * @param config General configuration for Exchange API requests.
  * @param opts Request execution options.
  * @return Successful response without specific data.

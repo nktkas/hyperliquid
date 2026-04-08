@@ -355,6 +355,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Enable HIP-3 DEX abstraction.
    *
+   * Signing: L1 Action.
+   *
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
@@ -387,6 +389,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Set User abstraction mode (method for agent wallet).
    *
+   * Signing: L1 Action.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -418,6 +422,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Approve an agent to sign on behalf of the master account.
+   *
+   * Signing: User-Signed EIP-712.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
@@ -466,6 +472,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Approve a maximum fee rate for a builder.
    *
+   * Signing: User-Signed EIP-712.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -497,6 +505,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Modify multiple orders.
+   *
+   * Signing: L1 Action.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
@@ -544,6 +554,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Borrow or lend assets.
    *
+   * Signing: L1 Action.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -576,6 +588,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Cancel order(s).
    *
+   * Signing: L1 Action.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful variant of {@link CancelResponse} without error statuses.
@@ -607,6 +621,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Cancel order(s) by cloid.
+   *
+   * Signing: L1 Action.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
@@ -644,6 +660,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Transfer native token from the user spot account into staking for delegating to validators.
    *
+   * Signing: User-Signed EIP-712.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -676,6 +694,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Claim rewards from referral program.
    *
+   * Signing: L1 Action.
+   *
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
@@ -705,6 +725,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Convert a single-signature account to a multi-signature account or vice versa.
+   *
+   * Signing: User-Signed EIP-712.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
@@ -755,6 +777,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Create a sub-account.
    *
+   * Signing: L1 Action.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Response for creating a sub-account.
@@ -786,6 +810,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Create a vault.
+   *
+   * Signing: L1 Action.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
@@ -823,6 +849,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Jail or unjail self as a validator signer.
+   *
+   * Signing: L1 Action.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
@@ -868,6 +896,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Action related to validator management.
    *
+   * Signing: L1 Action.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -910,6 +940,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Transfer native token from staking into the user's spot account.
    *
+   * Signing: User-Signed EIP-712.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -941,6 +973,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Configure block type for EVM transactions.
+   *
+   * Signing: L1 Action.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
@@ -974,6 +1008,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Link staking and trading accounts for fee discount attribution.
    *
+   * Signing: User-Signed EIP-712.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -1005,6 +1041,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Modify an order.
+   *
+   * Signing: L1 Action.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
@@ -1047,6 +1085,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Place an order(s).
+   *
+   * Signing: L1 Action.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
@@ -1092,6 +1132,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * This action does not do anything (no operation), but causes the nonce to be marked as used.
    *
+   * Signing: L1 Action.
+   *
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
@@ -1121,6 +1163,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Deploying HIP-3 assets.
+   *
+   * Signing: L1 Action.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
@@ -1167,6 +1211,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Create a referral code.
    *
+   * Signing: L1 Action.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -1199,6 +1245,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Reserve additional rate-limited actions for a fee.
    *
+   * Signing: L1 Action.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -1230,6 +1278,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Schedule a cancel-all operation at a future time.
+   *
+   * Signing: L1 Action.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
@@ -1273,6 +1323,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Transfer tokens between different perp DEXs, spot balance, users, and/or sub-accounts.
    *
+   * Signing: User-Signed EIP-712.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -1310,6 +1362,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Transfer tokens from Core to EVM with an additional data payload for `ICoreReceiveWithData` contracts.
+   *
+   * Signing: User-Signed EIP-712.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
@@ -1352,6 +1406,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Set the display name in the leaderboard.
    *
+   * Signing: L1 Action.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -1384,6 +1440,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Set a referral code.
    *
+   * Signing: L1 Action.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -1415,6 +1473,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Deploying HIP-1 and HIP-2 assets.
+   *
+   * Signing: L1 Action.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
@@ -1458,6 +1518,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Send spot assets to another address.
    *
+   * Signing: User-Signed EIP-712.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -1494,6 +1556,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Opt Out of Spot Dusting.
    *
+   * Signing: L1 Action.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -1526,6 +1590,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Modify a sub-account.
    *
+   * Signing: L1 Action.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -1557,6 +1623,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Transfer between sub-accounts (spot).
+   *
+   * Signing: L1 Action.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
@@ -1595,6 +1663,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Transfer between sub-accounts (perpetual).
    *
+   * Signing: L1 Action.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -1630,6 +1700,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Delegate or undelegate native tokens to or from a validator.
+   *
+   * Signing: User-Signed EIP-712.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
@@ -1667,6 +1739,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Top up isolated margin by targeting a specific leverage.
    *
+   * Signing: L1 Action.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -1699,6 +1773,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Cancel a TWAP order.
    *
+   * Signing: L1 Action.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful variant of {@link TwapCancelResponse} without error status.
@@ -1730,6 +1806,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Place a TWAP order.
+   *
+   * Signing: L1 Action.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
@@ -1772,6 +1850,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Add or remove margin from isolated position.
    *
+   * Signing: L1 Action.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -1803,6 +1883,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Update cross or isolated leverage on a coin.
+   *
+   * Signing: L1 Action.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
@@ -1836,6 +1918,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Transfer funds between Spot account and Perp account.
    *
+   * Signing: User-Signed EIP-712.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -1868,6 +1952,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Send usd to another address.
    *
+   * Signing: User-Signed EIP-712.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -1899,6 +1985,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Enable/disable HIP-3 DEX abstraction.
+   *
+   * Signing: User-Signed EIP-712.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
@@ -1934,6 +2022,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Set user abstraction mode.
    *
+   * Signing: User-Signed EIP-712.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -1965,6 +2055,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Enable/disable user portfolio margin.
+   *
+   * Signing: User-Signed EIP-712.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
@@ -1998,6 +2090,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Validator vote on risk-free rate for aligned quote asset.
    *
+   * Signing: L1 Action.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -2030,6 +2124,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Distribute funds from a vault between followers.
    *
+   * Signing: L1 Action.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -2061,6 +2157,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Modify a vault's configuration.
+   *
+   * Signing: L1 Action.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
@@ -2098,6 +2196,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Deposit or withdraw from a vault.
    *
+   * Signing: L1 Action.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -2133,6 +2233,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Initiate a withdrawal request.
+   *
+   * Signing: User-Signed EIP-712.
    *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.

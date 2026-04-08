@@ -56,6 +56,8 @@ export type ClaimRewardsSuccessResponse = ExcludeErrorResponse<ClaimRewardsRespo
 /**
  * Claim rewards from referral program.
  *
+ * Signing: L1 Action.
+ *
  * @param config General configuration for Exchange API requests.
  * @param opts Request execution options.
  * @return Successful response without specific data.

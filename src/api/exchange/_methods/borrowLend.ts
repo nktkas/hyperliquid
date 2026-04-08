@@ -67,6 +67,8 @@ export type BorrowLendSuccessResponse = ExcludeErrorResponse<BorrowLendResponse>
 /**
  * Borrow or lend assets.
  *
+ * Signing: L1 Action.
+ *
  * @param config General configuration for Exchange API requests.
  * @param params Parameters specific to the API request.
  * @param opts Request execution options.

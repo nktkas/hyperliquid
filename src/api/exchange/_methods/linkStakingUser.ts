@@ -93,6 +93,8 @@ export const LinkStakingUserTypes = {
 /**
  * Link staking and trading accounts for fee discount attribution.
  *
+ * Signing: User-Signed EIP-712.
+ *
  * @param config General configuration for Exchange API requests.
  * @param params Parameters specific to the API request.
  * @param opts Request execution options.

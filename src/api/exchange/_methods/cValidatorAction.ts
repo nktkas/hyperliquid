@@ -120,6 +120,8 @@ export type CValidatorActionSuccessResponse = ExcludeErrorResponse<CValidatorAct
 /**
  * Action related to validator management.
  *
+ * Signing: L1 Action.
+ *
  * @param config General configuration for Exchange API requests.
  * @param params Parameters specific to the API request.
  * @param opts Request execution options.
