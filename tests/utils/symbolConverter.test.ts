@@ -77,6 +77,18 @@ Deno.test("SymbolConverter", async (t) => {
     });
   });
 
+  await t.step("getSymbolBySpotPairId()", async (t) => {
+    await t.step("existing pair id", () => {
+      assertEquals(converter.getSymbolBySpotPairId(SPOT_EXPECTATIONS["PURR/USDC"].pairId), "PURR/USDC");
+      assertEquals(converter.getSymbolBySpotPairId(SPOT_EXPECTATIONS["HYPE/USDC"].pairId), "HYPE/USDC");
+    });
+
+    await t.step("non-existent returns undefined", () => {
+      assertEquals(converter.getSymbolBySpotPairId("@999999"), undefined);
+      assertEquals(converter.getSymbolBySpotPairId("NONEXISTENT"), undefined);
+    });
+  });
+
   await t.step("reload()", async () => {
     const freshConverter = new SymbolConverter({ transport });
 
