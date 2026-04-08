@@ -388,13 +388,16 @@ Optional parameters `vaultAddress` and `expiresAfter` are included in the hash w
 after all signers have signed the inner action. The inner signing differs for L1 and user-signed actions. Use
 `isTestnet: true` when signing for the testnet, as with `signL1Action`.
 
+For convenience, `signMultiSigL1` and `signMultiSigUserSigned` orchestrate the full multi-sig flow (collecting
+signatures, building the wrapper, and signing it) in a single call. The examples below show the manual low-level flow.
+
 ### L1 actions
 
 Each signer signs the `[multiSigUser, outerSigner, action]` tuple via `signL1Action`. The leader (first signer) then
 signs the wrapper via `signMultiSigAction`:
 
 ```ts
-import { signL1Action, signMultiSigAction } from "@nktkas/hyperliquid/signing";
+import { signL1Action, signMultiSigAction, trimSignature } from "@nktkas/hyperliquid/signing";
 import { privateKeyToAccount } from "viem/accounts";
 
 const signers = [
@@ -408,12 +411,13 @@ const nonce = Date.now();
 
 // 1. All signers sign the [user, leader, action] tuple
 const signatures = await Promise.all(signers.map(async (signer) => {
-  return await signL1Action({
+  const sig = await signL1Action({
     wallet: signer,
     action: [multiSigUser.toLowerCase(), signers[0].address.toLowerCase(), action],
     nonce,
     // isTestnet: true,
   });
+  return trimSignature(sig);
 }));
 
 // 2. Wrap and sign with leader
@@ -445,10 +449,11 @@ await fetch("https://api.hyperliquid.xyz/exchange", {
 ### User-signed
 
 Each signer signs the action with embedded `payloadMultiSigUser` and `outerSigner` fields via `signUserSignedAction`.
-The leader then signs the wrapper via `signMultiSigAction`:
+The EIP-712 types must be extended with these fields (inserted after `hyperliquidChain`). The leader then signs the
+wrapper via `signMultiSigAction`:
 
 ```ts
-import { signMultiSigAction, signUserSignedAction } from "@nktkas/hyperliquid/signing";
+import { signMultiSigAction, signUserSignedAction, trimSignature } from "@nktkas/hyperliquid/signing";
 import { UsdSendTypes } from "@nktkas/hyperliquid/api/exchange";
 import { privateKeyToAccount } from "viem/accounts";
 
@@ -467,17 +472,31 @@ const action = {
   time: Date.now(),
 };
 
+// Extend types with multi-sig fields
+const primaryType = Object.keys(UsdSendTypes)[0];
+const primaryTypeArray = UsdSendTypes[primaryType];
+const extendedTypes = {
+  ...UsdSendTypes,
+  [primaryType]: [
+    primaryTypeArray[0], // after hyperliquidChain
+    { name: "payloadMultiSigUser", type: "address" },
+    { name: "outerSigner", type: "address" },
+    ...primaryTypeArray.slice(1),
+  ],
+};
+
 // 1. All signers sign the action with multi-sig fields
 const signatures = await Promise.all(signers.map(async (signer) => {
-  return await signUserSignedAction({
+  const sig = await signUserSignedAction({
     wallet: signer,
     action: {
       payloadMultiSigUser: multiSigUser.toLowerCase() as `0x${string}`,
       outerSigner: signers[0].address.toLowerCase() as `0x${string}`,
       ...action,
     },
-    types: UsdSendTypes,
+    types: extendedTypes,
   });
+  return trimSignature(sig);
 }));
 
 // 2. Wrap and sign with leader

@@ -167,5 +167,6 @@ export function approveAgent(
   opts?: ApproveAgentOptions,
 ): Promise<ApproveAgentSuccessResponse> {
   const action = parse(ApproveAgentActionSchema, { type: "approveAgent", ...params });
+  if (!action.agentName) action.agentName = ""; // EIP-712 requires a string value
   return executeUserSignedAction(config, action, ApproveAgentTypes, opts);
 }

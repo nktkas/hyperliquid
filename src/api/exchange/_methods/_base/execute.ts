@@ -10,7 +10,8 @@ import {
   getWalletAddress,
   getWalletChainId,
   signL1Action,
-  signMultiSigAction,
+  signMultiSigL1,
+  signMultiSigUserSigned,
   signUserSignedAction,
 } from "../../../../signing/mod.ts";
 import type { IRequestTransport } from "../../../../transport/mod.ts";
@@ -152,7 +153,17 @@ export async function executeL1Action<T>(
           expiresAfter,
         }),
       ]
-      : await signMultiSigL1(config, action, walletAddress, nonce, vaultAddress, expiresAfter);
+      : await signMultiSigL1({
+        signers: config.signers,
+        multiSigUser: config.multiSigUser,
+        outerSigner: walletAddress,
+        signatureChainId: await getSignatureChainId(config),
+        action,
+        nonce,
+        isTestnet: transport.isTestnet,
+        vaultAddress,
+        expiresAfter,
+      });
 
     // Send request and validate response
     const response = await transport.request("exchange", {
@@ -174,11 +185,9 @@ export async function executeL1Action<T>(
 /** Extract nonce field name from EIP-712 types ("nonce" or "time"). */
 function getNonceFieldName(types: Record<string, { name: string; type: string }[]>): "nonce" | "time" {
   const primaryType = Object.keys(types)[0];
-  const field = types[primaryType].find((f) => f.name === "nonce" || f.name === "time") as {
-    name: "nonce" | "time";
-    type: string;
-  } | undefined;
-  return field?.name ?? "nonce";
+  const field = types[primaryType].find((f) => f.name === "nonce" || f.name === "time");
+  if (!field) throw new Error(`EIP-712 types must contain a "nonce" or "time" field in "${primaryType}"`);
+  return field.name as "nonce" | "time";
 }
 
 /**
@@ -227,7 +236,15 @@ export async function executeUserSignedAction<T>(
     // Sign action (multi-sig or single wallet)
     const [finalAction, signature] = "wallet" in config
       ? [fullAction, await signUserSignedAction({ wallet: leader, action: fullAction, types })]
-      : await signMultiSigUserSigned(config, fullAction, types, walletAddress, nonce);
+      : await signMultiSigUserSigned({
+        signers: config.signers,
+        multiSigUser: config.multiSigUser,
+        outerSigner: walletAddress,
+        action: fullAction,
+        types,
+        nonce,
+        isTestnet: transport.isTestnet,
+      });
 
     // Send request and validate response
     const response = await transport.request("exchange", {
@@ -238,122 +255,6 @@ export async function executeUserSignedAction<T>(
     assertSuccessResponse(response);
     return response as T;
   });
-}
-
-// ============================================================
-// Multi-sig signing
-// ============================================================
-
-/** ECDSA signature components. */
-type Signature = { r: `0x${string}`; s: `0x${string}`; v: 27 | 28 };
-
-/** Remove leading zeros from signature components (required by Hyperliquid). */
-function trimSignature(sig: Signature): Signature {
-  return {
-    r: sig.r.replace(/^0x0+/, "0x") as `0x${string}`,
-    s: sig.s.replace(/^0x0+/, "0x") as `0x${string}`,
-    v: sig.v,
-  };
-}
-
-/** Sign an L1 action with multi-sig. */
-async function signMultiSigL1(
-  config: ExchangeMultiSigConfig,
-  action: Record<string, unknown>,
-  outerSigner: `0x${string}`,
-  nonce: number,
-  vaultAddress?: `0x${string}`,
-  expiresAfter?: number,
-): Promise<[Record<string, unknown>, Signature]> {
-  const { transport: { isTestnet }, signers, multiSigUser } = config;
-  const multiSigUser_ = parse(Address, multiSigUser);
-  const outerSigner_ = parse(Address, outerSigner);
-
-  // Collect signatures from all signers
-  const signatures = await Promise.all(signers.map(async (signer) => {
-    const signature = await signL1Action({
-      wallet: signer,
-      action: [multiSigUser_, outerSigner_, action],
-      nonce,
-      isTestnet,
-      vaultAddress,
-      expiresAfter,
-    });
-    return trimSignature(signature);
-  }));
-
-  // Build multi-sig action wrapper
-  const multiSigAction = {
-    type: "multiSig",
-    signatureChainId: await getSignatureChainId(config),
-    signatures,
-    payload: {
-      multiSigUser: multiSigUser_,
-      outerSigner: outerSigner_,
-      action,
-    },
-  };
-
-  // Sign the wrapper with the leader
-  const signature = await signMultiSigAction({
-    wallet: signers[0],
-    action: multiSigAction,
-    nonce,
-    isTestnet,
-    vaultAddress,
-    expiresAfter,
-  });
-
-  return [multiSigAction, signature];
-}
-
-/** Sign a user-signed action (EIP-712) with multi-sig. */
-async function signMultiSigUserSigned(
-  config: ExchangeMultiSigConfig,
-  action: Record<string, unknown> & { signatureChainId: `0x${string}` },
-  types: Record<string, { name: string; type: string }[]>,
-  outerSigner: `0x${string}`,
-  nonce: number,
-): Promise<[Record<string, unknown>, Signature]> {
-  const { signers, multiSigUser, transport: { isTestnet } } = config;
-  const multiSigUser_ = parse(Address, multiSigUser);
-  const outerSigner_ = parse(Address, outerSigner);
-
-  // Collect signatures from all signers
-  const signatures = await Promise.all(signers.map(async (signer) => {
-    const signature = await signUserSignedAction({
-      wallet: signer,
-      action: {
-        payloadMultiSigUser: multiSigUser_,
-        outerSigner: outerSigner_,
-        ...action,
-      },
-      types,
-    });
-    return trimSignature(signature);
-  }));
-
-  // Build multi-sig action wrapper
-  const multiSigAction = {
-    type: "multiSig",
-    signatureChainId: await getSignatureChainId(config),
-    signatures,
-    payload: {
-      multiSigUser: multiSigUser_,
-      outerSigner: outerSigner_,
-      action,
-    },
-  };
-
-  // Sign the wrapper with the leader
-  const signature = await signMultiSigAction({
-    wallet: signers[0],
-    action: multiSigAction,
-    nonce,
-    isTestnet,
-  });
-
-  return [multiSigAction, signature];
 }
 
 // ============================================================

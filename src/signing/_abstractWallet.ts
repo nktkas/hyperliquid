@@ -155,7 +155,13 @@ export async function signTypedData(args: {
   primaryType: string;
   message: Record<string, unknown>;
 }): Promise<Signature> {
-  const { wallet, domain, types, primaryType, message } = args;
+  const { wallet, domain, types, primaryType } = args;
+
+  // Filter message to only contain fields defined in types (required by some wallets)
+  const typeFields = types[primaryType];
+  const message = typeFields
+    ? Object.fromEntries(Object.entries(args.message).filter(([k]) => typeFields.some((f) => f.name === k)))
+    : args.message;
 
   const isViemWallet = isViemJsonRpcAccount(wallet) || isViemLocalAccount(wallet);
   const isEthersV6 = isEthersV6Signer(wallet);
