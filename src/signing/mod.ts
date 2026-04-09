@@ -4,18 +4,14 @@
  * @example Signing an L1 action
  * ```ts
  * import { signL1Action } from "@nktkas/hyperliquid/signing";
- * import { CancelRequest } from "@nktkas/hyperliquid/api/exchange";
- * import * as v from "npm:valibot";
  * import { privateKeyToAccount } from "npm:viem/accounts";
  *
- * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+ * const wallet = privateKeyToAccount("0x..."); // viem or ethers or any AbstractWallet
  *
- * const action = v.parse(CancelRequest.entries.action, { // not required, but for correct generation
+ * const action = {
  *   type: "cancel",
- *   cancels: [
- *     { a: 0, o: 12345 },
- *   ],
- * });
+ *   cancels: [{ a: 0, o: 12345 }],
+ * };
  * const nonce = Date.now();
  *
  * const signature = await signL1Action({ wallet, action, nonce });
@@ -32,20 +28,19 @@
  * @example Signing a user-signed action
  * ```ts
  * import { signUserSignedAction } from "@nktkas/hyperliquid/signing";
- * import { ApproveAgentRequest, ApproveAgentTypes } from "@nktkas/hyperliquid/api/exchange";
- * import * as v from "npm:valibot";
+ * import { ApproveAgentTypes } from "@nktkas/hyperliquid/api/exchange";
  * import { privateKeyToAccount } from "npm:viem/accounts";
  *
- * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+ * const wallet = privateKeyToAccount("0x..."); // viem or ethers or any AbstractWallet
  *
- * const action = v.parse(ApproveAgentRequest.entries.action, { // not required, but for correct generation
+ * const action = {
  *   type: "approveAgent",
- *   signatureChainId: "0x66eee",
+ *   signatureChainId: "0x66eee" as const,
  *   hyperliquidChain: "Mainnet",
  *   agentAddress: "0x...",
  *   agentName: "Agent",
  *   nonce: Date.now(),
- * });
+ * };
  *
  * const signature = await signUserSignedAction({ wallet, action, types: ApproveAgentTypes });
  *
