@@ -68,6 +68,7 @@ export type SubAccountSpotTransferResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -123,6 +124,9 @@ export function subAccountSpotTransfer(
   params: SubAccountSpotTransferParameters,
   opts?: SubAccountSpotTransferOptions,
 ): Promise<SubAccountSpotTransferSuccessResponse> {
-  const action = parse(SubAccountSpotTransferActionSchema, { type: "subAccountSpotTransfer", ...params });
+  const action = canonicalize(
+    SubAccountSpotTransferActionSchema,
+    parse(SubAccountSpotTransferActionSchema, { type: "subAccountSpotTransfer", ...params }),
+  );
   return executeL1Action(config, action, opts);
 }

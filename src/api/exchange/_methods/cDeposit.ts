@@ -66,6 +66,7 @@ export type CDepositResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -130,6 +131,9 @@ export function cDeposit(
   params: CDepositParameters,
   opts?: CDepositOptions,
 ): Promise<CDepositSuccessResponse> {
-  const action = parse(CDepositActionSchema, { type: "cDeposit", ...params });
+  const action = canonicalize(
+    CDepositActionSchema,
+    parse(CDepositActionSchema, { type: "cDeposit", ...params }),
+  );
   return executeUserSignedAction(config, action, CDepositTypes, opts);
 }

@@ -62,6 +62,7 @@ export type EvmUserModifyResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -114,6 +115,9 @@ export function evmUserModify(
   params: EvmUserModifyParameters,
   opts?: EvmUserModifyOptions,
 ): Promise<EvmUserModifySuccessResponse> {
-  const action = parse(EvmUserModifyActionSchema, { type: "evmUserModify", ...params });
+  const action = canonicalize(
+    EvmUserModifyActionSchema,
+    parse(EvmUserModifyActionSchema, { type: "evmUserModify", ...params }),
+  );
   return executeL1Action(config, action, opts);
 }

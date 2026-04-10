@@ -68,6 +68,7 @@ export type UsdSendResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -134,6 +135,9 @@ export function usdSend(
   params: UsdSendParameters,
   opts?: UsdSendOptions,
 ): Promise<UsdSendSuccessResponse> {
-  const action = parse(UsdSendActionSchema, { type: "usdSend", ...params });
+  const action = canonicalize(
+    UsdSendActionSchema,
+    parse(UsdSendActionSchema, { type: "usdSend", ...params }),
+  );
   return executeUserSignedAction(config, action, UsdSendTypes, opts);
 }

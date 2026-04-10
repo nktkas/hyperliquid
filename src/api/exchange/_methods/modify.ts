@@ -112,6 +112,7 @@ export type ModifyResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -172,6 +173,9 @@ export function modify(
   params: ModifyParameters,
   opts?: ModifyOptions,
 ): Promise<ModifySuccessResponse> {
-  const action = parse(ModifyActionSchema, { type: "modify", ...params });
+  const action = canonicalize(
+    ModifyActionSchema,
+    parse(ModifyActionSchema, { type: "modify", ...params }),
+  );
   return executeL1Action(config, action, opts);
 }

@@ -68,6 +68,7 @@ export type UpdateIsolatedMarginResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -122,6 +123,9 @@ export function updateIsolatedMargin(
   params: UpdateIsolatedMarginParameters,
   opts?: UpdateIsolatedMarginOptions,
 ): Promise<UpdateIsolatedMarginSuccessResponse> {
-  const action = parse(UpdateIsolatedMarginActionSchema, { type: "updateIsolatedMargin", ...params });
+  const action = canonicalize(
+    UpdateIsolatedMarginActionSchema,
+    parse(UpdateIsolatedMarginActionSchema, { type: "updateIsolatedMargin", ...params }),
+  );
   return executeL1Action(config, action, opts);
 }

@@ -60,6 +60,7 @@ export type ClaimRewardsResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -105,6 +106,9 @@ export function claimRewards(
   config: ExchangeConfig,
   opts?: ClaimRewardsOptions,
 ): Promise<ClaimRewardsSuccessResponse> {
-  const action = parse(ClaimRewardsActionSchema, { type: "claimRewards" });
+  const action = canonicalize(
+    ClaimRewardsActionSchema,
+    parse(ClaimRewardsActionSchema, { type: "claimRewards" }),
+  );
   return executeL1Action(config, action, opts);
 }

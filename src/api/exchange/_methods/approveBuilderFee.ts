@@ -68,6 +68,7 @@ export type ApproveBuilderFeeResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -134,6 +135,9 @@ export function approveBuilderFee(
   params: ApproveBuilderFeeParameters,
   opts?: ApproveBuilderFeeOptions,
 ): Promise<ApproveBuilderFeeSuccessResponse> {
-  const action = parse(ApproveBuilderFeeActionSchema, { type: "approveBuilderFee", ...params });
+  const action = canonicalize(
+    ApproveBuilderFeeActionSchema,
+    parse(ApproveBuilderFeeActionSchema, { type: "approveBuilderFee", ...params }),
+  );
   return executeUserSignedAction(config, action, ApproveBuilderFeeTypes, opts);
 }

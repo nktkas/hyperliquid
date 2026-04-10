@@ -72,6 +72,7 @@ export type CancelResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -124,6 +125,9 @@ export function cancel(
   params: CancelParameters,
   opts?: CancelOptions,
 ): Promise<CancelSuccessResponse> {
-  const action = parse(CancelActionSchema, { type: "cancel", ...params });
+  const action = canonicalize(
+    CancelActionSchema,
+    parse(CancelActionSchema, { type: "cancel", ...params }),
+  );
   return executeL1Action(config, action, opts);
 }

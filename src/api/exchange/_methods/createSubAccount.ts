@@ -65,6 +65,7 @@ export type CreateSubAccountResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -117,6 +118,9 @@ export function createSubAccount(
   params: CreateSubAccountParameters,
   opts?: CreateSubAccountOptions,
 ): Promise<CreateSubAccountSuccessResponse> {
-  const action = parse(CreateSubAccountActionSchema, { type: "createSubAccount", ...params });
+  const action = canonicalize(
+    CreateSubAccountActionSchema,
+    parse(CreateSubAccountActionSchema, { type: "createSubAccount", ...params }),
+  );
   return executeL1Action(config, action, opts);
 }

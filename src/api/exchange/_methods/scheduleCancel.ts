@@ -69,6 +69,7 @@ export type ScheduleCancelResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -134,6 +135,9 @@ export function scheduleCancel(
   const params = isFirstArgParams ? paramsOrOpts : {};
   const opts = isFirstArgParams ? maybeOpts : paramsOrOpts as ScheduleCancelOptions;
 
-  const action = parse(ScheduleCancelActionSchema, { type: "scheduleCancel", ...params });
+  const action = canonicalize(
+    ScheduleCancelActionSchema,
+    parse(ScheduleCancelActionSchema, { type: "scheduleCancel", ...params }),
+  );
   return executeL1Action(config, action, opts);
 }

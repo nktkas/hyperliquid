@@ -103,6 +103,7 @@ export type BatchModifyResponse = OrderResponse;
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -167,6 +168,9 @@ export function batchModify(
   params: BatchModifyParameters,
   opts?: BatchModifyOptions,
 ): Promise<BatchModifySuccessResponse> {
-  const action = parse(BatchModifyActionSchema, { type: "batchModify", ...params });
+  const action = canonicalize(
+    BatchModifyActionSchema,
+    parse(BatchModifyActionSchema, { type: "batchModify", ...params }),
+  );
   return executeL1Action(config, action, opts);
 }

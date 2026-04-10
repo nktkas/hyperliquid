@@ -22,7 +22,7 @@ export const ApproveAgentRequest = /* @__PURE__ */ (() => {
       hyperliquidChain: v.picklist(["Mainnet", "Testnet"]),
       /** Agent address. */
       agentAddress: Address,
-      /** Agent name (min 1 and max 16 characters) or null for unnamed agent. */
+      /** Agent name (min 1 and max 16 characters) or empty string for unnamed agent. */
       agentName: v.nullish(
         v.pipe(
           v.string(),
@@ -38,7 +38,7 @@ export const ApproveAgentRequest = /* @__PURE__ */ (() => {
             },
           ),
         ),
-        null,
+        "",
       ),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
       nonce: UnsignedInteger,
@@ -84,6 +84,7 @@ export type ApproveAgentResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -166,7 +167,9 @@ export function approveAgent(
   params: ApproveAgentParameters,
   opts?: ApproveAgentOptions,
 ): Promise<ApproveAgentSuccessResponse> {
-  const action = parse(ApproveAgentActionSchema, { type: "approveAgent", ...params });
-  if (!action.agentName) action.agentName = ""; // EIP-712 requires a string value
+  const action = canonicalize(
+    ApproveAgentActionSchema,
+    parse(ApproveAgentActionSchema, { type: "approveAgent", ...params }),
+  );
   return executeUserSignedAction(config, action, ApproveAgentTypes, opts);
 }

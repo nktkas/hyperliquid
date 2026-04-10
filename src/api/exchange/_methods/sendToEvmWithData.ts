@@ -80,6 +80,7 @@ export type SendToEvmWithDataResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -158,6 +159,9 @@ export function sendToEvmWithData(
   params: SendToEvmWithDataParameters,
   opts?: SendToEvmWithDataOptions,
 ): Promise<SendToEvmWithDataSuccessResponse> {
-  const action = parse(SendToEvmWithDataActionSchema, { type: "sendToEvmWithData", ...params });
+  const action = canonicalize(
+    SendToEvmWithDataActionSchema,
+    parse(SendToEvmWithDataActionSchema, { type: "sendToEvmWithData", ...params }),
+  );
   return executeUserSignedAction(config, action, SendToEvmWithDataTypes, opts);
 }

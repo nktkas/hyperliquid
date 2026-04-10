@@ -65,6 +65,7 @@ export type SpotUserResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -117,6 +118,9 @@ export function spotUser(
   params: SpotUserParameters,
   opts?: SpotUserOptions,
 ): Promise<SpotUserSuccessResponse> {
-  const action = parse(SpotUserActionSchema, { type: "spotUser", ...params });
+  const action = canonicalize(
+    SpotUserActionSchema,
+    parse(SpotUserActionSchema, { type: "spotUser", ...params }),
+  );
   return executeL1Action(config, action, opts);
 }

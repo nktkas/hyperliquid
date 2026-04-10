@@ -67,6 +67,7 @@ export type VaultDistributeResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -120,6 +121,9 @@ export function vaultDistribute(
   params: VaultDistributeParameters,
   opts?: VaultDistributeOptions,
 ): Promise<VaultDistributeSuccessResponse> {
-  const action = parse(VaultDistributeActionSchema, { type: "vaultDistribute", ...params });
+  const action = canonicalize(
+    VaultDistributeActionSchema,
+    parse(VaultDistributeActionSchema, { type: "vaultDistribute", ...params }),
+  );
   return executeL1Action(config, action, opts);
 }

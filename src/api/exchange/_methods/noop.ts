@@ -60,6 +60,7 @@ export type NoopResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -105,6 +106,9 @@ export function noop(
   config: ExchangeConfig,
   opts?: NoopOptions,
 ): Promise<NoopSuccessResponse> {
-  const action = parse(NoopActionSchema, { type: "noop" });
+  const action = canonicalize(
+    NoopActionSchema,
+    parse(NoopActionSchema, { type: "noop" }),
+  );
   return executeL1Action(config, action, opts);
 }

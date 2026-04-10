@@ -119,6 +119,7 @@ export type CValidatorActionResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -181,6 +182,9 @@ export function cValidatorAction(
   params: CValidatorActionParameters,
   opts?: CValidatorActionOptions,
 ): Promise<CValidatorActionSuccessResponse> {
-  const action = parse(CValidatorActionActionSchema, { type: "CValidatorAction", ...params });
+  const action = canonicalize(
+    CValidatorActionActionSchema,
+    parse(CValidatorActionActionSchema, { type: "CValidatorAction", ...params }),
+  );
   return executeL1Action(config, action, opts);
 }

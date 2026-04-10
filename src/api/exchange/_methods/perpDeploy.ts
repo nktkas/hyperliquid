@@ -249,6 +249,7 @@ export type PerpDeployResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -314,6 +315,9 @@ export function perpDeploy(
   params: PerpDeployParameters,
   opts?: PerpDeployOptions,
 ): Promise<PerpDeploySuccessResponse> {
-  const action = parse(PerpDeployActionSchema, { type: "perpDeploy", ...params });
+  const action = canonicalize(
+    PerpDeployActionSchema,
+    parse(PerpDeployActionSchema, { type: "perpDeploy", ...params }),
+  );
   return executeL1Action(config, action, opts);
 }

@@ -68,6 +68,7 @@ export type UsdClassTransferResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -134,6 +135,9 @@ export function usdClassTransfer(
   params: UsdClassTransferParameters,
   opts?: UsdClassTransferOptions,
 ): Promise<UsdClassTransferSuccessResponse> {
-  const action = parse(UsdClassTransferActionSchema, { type: "usdClassTransfer", ...params });
+  const action = canonicalize(
+    UsdClassTransferActionSchema,
+    parse(UsdClassTransferActionSchema, { type: "usdClassTransfer", ...params }),
+  );
   return executeUserSignedAction(config, action, UsdClassTransferTypes, opts);
 }

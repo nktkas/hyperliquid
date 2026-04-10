@@ -94,6 +94,7 @@ export type ConvertToMultiSigUserResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -175,6 +176,9 @@ export function convertToMultiSigUser(
   params: ConvertToMultiSigUserParameters,
   opts?: ConvertToMultiSigUserOptions,
 ): Promise<ConvertToMultiSigUserSuccessResponse> {
-  const action = parse(ConvertToMultiSigUserActionSchema, { type: "convertToMultiSigUser", ...params });
+  const action = canonicalize(
+    ConvertToMultiSigUserActionSchema,
+    parse(ConvertToMultiSigUserActionSchema, { type: "convertToMultiSigUser", ...params }),
+  );
   return executeUserSignedAction(config, action, ConvertToMultiSigUserTypes, opts);
 }

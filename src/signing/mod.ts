@@ -3,15 +3,16 @@
  *
  * @example Signing an L1 action
  * ```ts
- * import { signL1Action } from "@nktkas/hyperliquid/signing";
+ * import { canonicalize, signL1Action } from "@nktkas/hyperliquid/signing";
+ * import { CancelRequest } from "@nktkas/hyperliquid/api/exchange";
  * import { privateKeyToAccount } from "npm:viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers or any AbstractWallet
  *
- * const action = {
+ * const action = canonicalize(CancelRequest.entries.action, {
  *   type: "cancel",
  *   cancels: [{ a: 0, o: 12345 }],
- * };
+ * });
  * const nonce = Date.now();
  *
  * const signature = await signL1Action({ wallet, action, nonce });
@@ -27,20 +28,20 @@
  *
  * @example Signing a user-signed action
  * ```ts
- * import { signUserSignedAction } from "@nktkas/hyperliquid/signing";
- * import { ApproveAgentTypes } from "@nktkas/hyperliquid/api/exchange";
+ * import { canonicalize, signUserSignedAction } from "@nktkas/hyperliquid/signing";
+ * import { ApproveAgentRequest, ApproveAgentTypes } from "@nktkas/hyperliquid/api/exchange";
  * import { privateKeyToAccount } from "npm:viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers or any AbstractWallet
  *
- * const action = {
+ * const action = canonicalize(ApproveAgentRequest.entries.action, {
  *   type: "approveAgent",
  *   signatureChainId: "0x66eee" as const,
  *   hyperliquidChain: "Mainnet",
  *   agentAddress: "0x...",
  *   agentName: "Agent",
  *   nonce: Date.now(),
- * };
+ * });
  *
  * const signature = await signUserSignedAction({ wallet, action, types: ApproveAgentTypes });
  *
@@ -72,6 +73,7 @@ export {
   getWalletChainId,
   type Signature,
 } from "./_abstractWallet.ts";
+export { canonicalize, CanonicalizeError } from "./_canonicalize.ts";
 
 // ============================================================
 // EIP-712 Constants
@@ -120,12 +122,13 @@ const MULTI_SIG_TYPES = {
  *
  * @example
  * ```ts
- * import { createL1ActionHash } from "@nktkas/hyperliquid/signing";
+ * import { canonicalize, createL1ActionHash } from "@nktkas/hyperliquid/signing";
+ * import { CancelRequest } from "@nktkas/hyperliquid/api/exchange";
  *
- * const action = {
+ * const action = canonicalize(CancelRequest.entries.action, {
  *   type: "cancel",
  *   cancels: [{ a: 0, o: 12345 }],
- * };
+ * });
  * const nonce = Date.now();
  *
  * const actionHash = createL1ActionHash({ action, nonce });
@@ -221,15 +224,16 @@ function removeUndefinedKeys(obj: ValueType): ValueType {
  *
  * @example
  * ```ts
- * import { signL1Action } from "@nktkas/hyperliquid/signing";
+ * import { canonicalize, signL1Action } from "@nktkas/hyperliquid/signing";
+ * import { CancelRequest } from "@nktkas/hyperliquid/api/exchange";
  * import { privateKeyToAccount } from "npm:viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers or any AbstractWallet
  *
- * const action = {
+ * const action = canonicalize(CancelRequest.entries.action, {
  *   type: "cancel",
  *   cancels: [{ a: 0, o: 12345 }],
- * };
+ * });
  * const nonce = Date.now();
  *
  * const signature = await signL1Action({ wallet, action, nonce });
@@ -285,23 +289,22 @@ export async function signL1Action(args: {
  *
  * @example
  * ```ts
- * import { signUserSignedAction } from "@nktkas/hyperliquid/signing";
- * import { ApproveAgentTypes } from "@nktkas/hyperliquid/api/exchange";
+ * import { canonicalize, signUserSignedAction } from "@nktkas/hyperliquid/signing";
+ * import { ApproveAgentRequest, ApproveAgentTypes } from "@nktkas/hyperliquid/api/exchange";
  * import { privateKeyToAccount } from "npm:viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers or any AbstractWallet
  *
- * const action = {
+ * const action = canonicalize(ApproveAgentRequest.entries.action, {
  *   type: "approveAgent",
  *   signatureChainId: "0x66eee" as const,
  *   hyperliquidChain: "Mainnet",
  *   agentAddress: "0x...",
  *   agentName: "Agent",
  *   nonce: Date.now(),
- * };
- * const types = ApproveAgentTypes;
+ * });
  *
- * const signature = await signUserSignedAction({ wallet, action, types });
+ * const signature = await signUserSignedAction({ wallet, action, types: ApproveAgentTypes });
  *
  * // Send the signed action to the Hyperliquid API
  * const response = await fetch("https://api.hyperliquid.xyz/exchange", {
@@ -353,17 +356,17 @@ export async function signUserSignedAction(args: {
  *
  * @example
  * ```ts
- * import { signL1Action, signMultiSigAction, trimSignature } from "@nktkas/hyperliquid/signing";
+ * import { canonicalize, signL1Action, signMultiSigAction, trimSignature } from "@nktkas/hyperliquid/signing";
  * import { ScheduleCancelRequest } from "@nktkas/hyperliquid/api/exchange";
  * import { privateKeyToAccount } from "npm:viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers or any AbstractWallet
  * const multiSigUser = "0x...";
  *
- * const action = {
+ * const action = canonicalize(ScheduleCancelRequest.entries.action, {
  *   type: "scheduleCancel",
  *   time: Date.now() + 10000,
- * };
+ * });
  * const nonce = Date.now();
  *
  * // Create the required number of signatures

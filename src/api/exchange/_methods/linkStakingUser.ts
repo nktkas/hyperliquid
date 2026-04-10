@@ -76,6 +76,7 @@ export type LinkStakingUserResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -142,6 +143,9 @@ export function linkStakingUser(
   params: LinkStakingUserParameters,
   opts?: LinkStakingUserOptions,
 ): Promise<LinkStakingUserSuccessResponse> {
-  const action = parse(LinkStakingUserActionSchema, { type: "linkStakingUser", ...params });
+  const action = canonicalize(
+    LinkStakingUserActionSchema,
+    parse(LinkStakingUserActionSchema, { type: "linkStakingUser", ...params }),
+  );
   return executeUserSignedAction(config, action, LinkStakingUserTypes, opts);
 }

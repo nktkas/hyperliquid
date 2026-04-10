@@ -161,6 +161,7 @@ export type SpotDeployResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -223,6 +224,9 @@ export function spotDeploy(
   params: SpotDeployParameters,
   opts?: SpotDeployOptions,
 ): Promise<SpotDeploySuccessResponse> {
-  const action = parse(SpotDeployActionSchema, { type: "spotDeploy", ...params });
+  const action = canonicalize(
+    SpotDeployActionSchema,
+    parse(SpotDeployActionSchema, { type: "spotDeploy", ...params }),
+  );
   return executeL1Action(config, action, opts);
 }

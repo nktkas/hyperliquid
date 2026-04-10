@@ -66,6 +66,7 @@ export type CWithdrawResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -130,6 +131,9 @@ export function cWithdraw(
   params: CWithdrawParameters,
   opts?: CWithdrawOptions,
 ): Promise<CWithdrawSuccessResponse> {
-  const action = parse(CWithdrawActionSchema, { type: "cWithdraw", ...params });
+  const action = canonicalize(
+    CWithdrawActionSchema,
+    parse(CWithdrawActionSchema, { type: "cWithdraw", ...params }),
+  );
   return executeUserSignedAction(config, action, CWithdrawTypes, opts);
 }

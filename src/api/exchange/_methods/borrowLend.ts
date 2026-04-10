@@ -68,6 +68,7 @@ export type BorrowLendResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -122,6 +123,9 @@ export function borrowLend(
   params: BorrowLendParameters,
   opts?: BorrowLendOptions,
 ): Promise<BorrowLendSuccessResponse> {
-  const action = parse(BorrowLendActionSchema, { type: "borrowLend", ...params });
+  const action = canonicalize(
+    BorrowLendActionSchema,
+    parse(BorrowLendActionSchema, { type: "borrowLend", ...params }),
+  );
   return executeL1Action(config, action, opts);
 }

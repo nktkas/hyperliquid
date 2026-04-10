@@ -67,6 +67,7 @@ export type TwapCancelResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -120,6 +121,9 @@ export function twapCancel(
   params: TwapCancelParameters,
   opts?: TwapCancelOptions,
 ): Promise<TwapCancelSuccessResponse> {
-  const action = parse(TwapCancelActionSchema, { type: "twapCancel", ...params });
+  const action = canonicalize(
+    TwapCancelActionSchema,
+    parse(TwapCancelActionSchema, { type: "twapCancel", ...params }),
+  );
   return executeL1Action(config, action, opts);
 }

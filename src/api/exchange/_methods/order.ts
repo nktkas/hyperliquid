@@ -170,6 +170,7 @@ export type OrderResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -232,6 +233,9 @@ export function order(
   params: OrderParameters,
   opts?: OrderOptions,
 ): Promise<OrderSuccessResponse> {
-  const action = parse(OrderActionSchema, { type: "order", ...params });
+  const action = canonicalize(
+    OrderActionSchema,
+    parse(OrderActionSchema, { type: "order", ...params }),
+  );
   return executeL1Action(config, action, opts);
 }

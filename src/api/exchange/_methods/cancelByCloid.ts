@@ -57,6 +57,7 @@ export type CancelByCloidResponse = CancelResponse;
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -111,6 +112,9 @@ export function cancelByCloid(
   params: CancelByCloidParameters,
   opts?: CancelByCloidOptions,
 ): Promise<CancelByCloidSuccessResponse> {
-  const action = parse(CancelByCloidActionSchema, { type: "cancelByCloid", ...params });
+  const action = canonicalize(
+    CancelByCloidActionSchema,
+    parse(CancelByCloidActionSchema, { type: "cancelByCloid", ...params }),
+  );
   return executeL1Action(config, action, opts);
 }

@@ -70,6 +70,7 @@ export type SpotSendResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -138,6 +139,9 @@ export function spotSend(
   params: SpotSendParameters,
   opts?: SpotSendOptions,
 ): Promise<SpotSendSuccessResponse> {
-  const action = parse(SpotSendActionSchema, { type: "spotSend", ...params });
+  const action = canonicalize(
+    SpotSendActionSchema,
+    parse(SpotSendActionSchema, { type: "spotSend", ...params }),
+  );
   return executeUserSignedAction(config, action, SpotSendTypes, opts);
 }

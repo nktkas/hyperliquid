@@ -62,6 +62,7 @@ export type RegisterReferrerResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -114,6 +115,9 @@ export function registerReferrer(
   params: RegisterReferrerParameters,
   opts?: RegisterReferrerOptions,
 ): Promise<RegisterReferrerSuccessResponse> {
-  const action = parse(RegisterReferrerActionSchema, { type: "registerReferrer", ...params });
+  const action = canonicalize(
+    RegisterReferrerActionSchema,
+    parse(RegisterReferrerActionSchema, { type: "registerReferrer", ...params }),
+  );
   return executeL1Action(config, action, opts);
 }

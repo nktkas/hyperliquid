@@ -68,6 +68,7 @@ export type UpdateLeverageResponse =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
+import { canonicalize } from "../../../signing/mod.ts";
 import type { ExcludeErrorResponse } from "./_base/errors.ts";
 import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
 
@@ -122,6 +123,9 @@ export function updateLeverage(
   params: UpdateLeverageParameters,
   opts?: UpdateLeverageOptions,
 ): Promise<UpdateLeverageSuccessResponse> {
-  const action = parse(UpdateLeverageActionSchema, { type: "updateLeverage", ...params });
+  const action = canonicalize(
+    UpdateLeverageActionSchema,
+    parse(UpdateLeverageActionSchema, { type: "updateLeverage", ...params }),
+  );
   return executeL1Action(config, action, opts);
 }
