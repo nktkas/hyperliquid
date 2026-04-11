@@ -1,59 +1,5 @@
 /**
  * Low-level utilities for signing Hyperliquid transactions.
- *
- * @example Signing an L1 action
- * ```ts
- * import { canonicalize, signL1Action } from "@nktkas/hyperliquid/signing";
- * import { CancelRequest } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
- *
- * const wallet = privateKeyToAccount("0x..."); // viem or ethers or any AbstractWallet
- *
- * const action = canonicalize(CancelRequest.entries.action, {
- *   type: "cancel",
- *   cancels: [{ a: 0, o: 12345 }],
- * });
- * const nonce = Date.now();
- *
- * const signature = await signL1Action({ wallet, action, nonce });
- *
- * // Send the signed action to the Hyperliquid API
- * const response = await fetch("https://api.hyperliquid.xyz/exchange", {
- *   method: "POST",
- *   headers: { "Content-Type": "application/json" },
- *   body: JSON.stringify({ action, signature, nonce }),
- * });
- * const body = await response.json();
- * ```
- *
- * @example Signing a user-signed action
- * ```ts
- * import { canonicalize, signUserSignedAction } from "@nktkas/hyperliquid/signing";
- * import { ApproveAgentRequest, ApproveAgentTypes } from "@nktkas/hyperliquid/api/exchange";
- * import { privateKeyToAccount } from "npm:viem/accounts";
- *
- * const wallet = privateKeyToAccount("0x..."); // viem or ethers or any AbstractWallet
- *
- * const action = canonicalize(ApproveAgentRequest.entries.action, {
- *   type: "approveAgent",
- *   signatureChainId: "0x66eee" as const,
- *   hyperliquidChain: "Mainnet",
- *   agentAddress: "0x...",
- *   agentName: "Agent",
- *   nonce: Date.now(),
- * });
- *
- * const signature = await signUserSignedAction({ wallet, action, types: ApproveAgentTypes });
- *
- * // Send the signed action to the Hyperliquid API
- * const response = await fetch("https://api.hyperliquid.xyz/exchange", {
- *   method: "POST",
- *   headers: { "Content-Type": "application/json" },
- *   body: JSON.stringify({ action, signature, nonce: action.nonce }),
- * });
- * const body = await response.json();
- * ```
- *
  * @module
  */
 

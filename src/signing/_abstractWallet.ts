@@ -87,6 +87,7 @@ interface ViemTypedDataParams {
 
 /** Abstract interface for a {@link https://viem.sh/docs/accounts/jsonRpc#json-rpc-account | viem JSON-RPC Account}. */
 export interface AbstractViemJsonRpcAccount {
+  /** `options` is not in {@link https://viem.sh/docs/actions/wallet/signTypedData | base viem}; accepted for wallet extensions like {@link https://docs.privy.io/wallets/using-wallets/ethereum/sign-typed-data | Privy}. */
   signTypedData(params: ViemTypedDataParams, options?: unknown): Promise<`0x${string}`>;
   getAddresses(): Promise<`0x${string}`[]>;
   getChainId(): Promise<number>;
@@ -101,6 +102,7 @@ function isViemJsonRpcAccount(wallet: AbstractWallet): wallet is AbstractViemJso
 
 /** Abstract interface for a {@link https://viem.sh/docs/accounts/local | viem Local Account}. */
 export interface AbstractViemLocalAccount {
+  /** `options` is not in {@link https://viem.sh/docs/actions/wallet/signTypedData | base viem}; accepted for wallet extensions like {@link https://docs.privy.io/wallets/using-wallets/ethereum/sign-typed-data | Privy}. */
   signTypedData(params: ViemTypedDataParams, options?: unknown): Promise<`0x${string}`>;
   address: `0x${string}`;
 }
@@ -228,13 +230,13 @@ function splitSignature(signature: `0x${string}`): Signature {
  */
 export async function getWalletChainId(wallet: AbstractWallet): Promise<`0x${string}`> {
   try {
-    // Viem JSON-RPC account has getChainId method
+    // Viem JSON-RPC account
     if (isViemJsonRpcAccount(wallet)) {
       const chainId = await wallet.getChainId() as number;
       return `0x${chainId.toString(16)}`;
     }
 
-    // Ethers signers use provider.getNetwork()
+    // Ethers V6 and V5 signer
     const isEthersSigner = isEthersV6Signer(wallet) || isEthersV5Signer(wallet);
     if (isEthersSigner && wallet.provider) {
       const network = await wallet.provider.getNetwork() as { chainId: number | bigint };
@@ -244,7 +246,7 @@ export async function getWalletChainId(wallet: AbstractWallet): Promise<`0x${str
     throw new AbstractWalletError("Failed to get chain ID from wallet", { cause: error });
   }
 
-  // Default chain ID for local accounts or signers without provider
+  // Default chain ID
   return "0x1";
 }
 
@@ -258,19 +260,19 @@ export async function getWalletChainId(wallet: AbstractWallet): Promise<`0x${str
  */
 export async function getWalletAddress(wallet: AbstractWallet): Promise<`0x${string}`> {
   try {
-    // Viem JSON-RPC account uses getAddresses()
+    // Viem JSON-RPC account
     if (isViemJsonRpcAccount(wallet)) {
       const addresses = await wallet.getAddresses() as `0x${string}`[];
       if (!addresses.length) throw new AbstractWalletError("Wallet returned no addresses");
       return addresses[0].toLowerCase() as `0x${string}`;
     }
 
-    // Viem local account has address property
+    // Viem local account
     if (isViemLocalAccount(wallet)) {
       return wallet.address.toLowerCase() as `0x${string}`;
     }
 
-    // Ethers signers use getAddress()
+    // Ethers V6 and V5 signer
     if (isEthersV6Signer(wallet) || isEthersV5Signer(wallet)) {
       const address = await wallet.getAddress() as string;
       return address.toLowerCase() as `0x${string}`;
