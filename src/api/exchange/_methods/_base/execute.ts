@@ -4,93 +4,17 @@
  */
 
 import * as v from "@valibot/valibot";
-import { parse } from "../../../../_base.ts";
+import { HyperliquidError, parse } from "../../../../_base.ts";
 import {
-  type AbstractWallet,
-  getWalletAddress,
   getWalletChainId,
   signL1Action,
   signMultiSigL1,
   signMultiSigUserSigned,
   signUserSignedAction,
 } from "../../../../signing/mod.ts";
-import type { IRequestTransport } from "../../../../transport/mod.ts";
 import { Address, Hex, UnsignedInteger } from "../../../_schemas.ts";
-import { globalNonceManager } from "./_nonce.ts";
-import { withLock } from "./_semaphore.ts";
-import { assertSuccessResponse } from "./errors.ts";
-
-// ============================================================
-// Type Utilities
-// ============================================================
-
-type MaybePromise<T> = T | Promise<T>;
-
-// deno-lint-ignore ban-types
-type Prettify<T> = { [K in keyof T]: T[K] } & {};
-
-/** Options for any execute functions. */
-interface BaseOptions {
-  /** {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel a request. */
-  signal?: AbortSignal;
-}
-
-/** Extract request options from a request type (excludes action, nonce, signature). */
-export type ExtractRequestOptions<T extends { action: Record<string, unknown> }> = Prettify<
-  & BaseOptions
-  & Omit<T, "action" | "nonce" | "signature">
->;
-
-// ============================================================
-// Config
-// ============================================================
-
-/** Base configuration shared by single-wallet and multi-sig configs. */
-interface BaseConfig<T extends IRequestTransport = IRequestTransport> {
-  /** The transport used to connect to the Hyperliquid Exchange API. */
-  transport: T;
-
-  /** Signature chain ID for EIP-712 signing, defaults to wallet's chain ID. */
-  signatureChainId?: `0x${string}` | (() => MaybePromise<`0x${string}`>);
-
-  /**
-   * Default vault address for vault-based operations, used when not specified in action options.
-   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#subaccounts-and-vaults
-   */
-  defaultVaultAddress?: `0x${string}`;
-
-  /**
-   * Default expiration time in milliseconds, used when not specified in action options.
-   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#expires-after
-   */
-  defaultExpiresAfter?: number | (() => MaybePromise<number>);
-
-  /**
-   * Custom nonce generator function.
-   * Defaults to a global manager using timestamp with auto-increment.
-   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/nonces-and-api-wallets#hyperliquid-nonces
-   */
-  nonceManager?: (address: string) => MaybePromise<number>;
-}
-
-/** Configuration for single-wallet Exchange API requests. */
-export interface ExchangeSingleWalletConfig<T extends IRequestTransport = IRequestTransport> extends BaseConfig<T> {
-  /** The wallet used to sign requests. */
-  wallet: AbstractWallet;
-}
-
-/** Configuration for multi-signature Exchange API requests. */
-export interface ExchangeMultiSigConfig<T extends IRequestTransport = IRequestTransport> extends BaseConfig<T> {
-  /** Array of wallets for multi-sig. First wallet is the leader. */
-  signers: readonly [AbstractWallet, ...AbstractWallet[]];
-  /** The multi-signature account address. */
-  multiSigUser: `0x${string}`;
-}
-
-/** Union type for all Exchange API configurations. */
-export type ExchangeConfig<T extends IRequestTransport = IRequestTransport> =
-  | ExchangeSingleWalletConfig<T>
-  | ExchangeMultiSigConfig<T>;
+import type { ExchangeConfig } from "./_config.ts";
+import { executeWithShell } from "./_shell.ts";
 
 // ============================================================
 // Execute L1 Action
@@ -101,12 +25,13 @@ export type ExchangeConfig<T extends IRequestTransport = IRequestTransport> =
  *
  * Handles both single-wallet and multi-sig signing.
  *
- * @param config Exchange API configuration
- * @param action Action payload to execute
- * @param options Additional options for the request
- * @return API response
+ * @param config Exchange API configuration.
+ * @param action Action payload to execute.
+ * @param options Additional options for the request.
+ * @return API response.
  *
- * @throws {ApiRequestError} If the API returns an error response
+ * @throws {ValidationError} If the request options fail validation.
+ * @throws {ApiRequestError} If the API returns an error response.
  */
 export async function executeL1Action<T>(
   config: ExchangeConfig,
@@ -117,166 +42,125 @@ export async function executeL1Action<T>(
     signal?: AbortSignal;
   },
 ): Promise<T> {
-  const { transport } = config;
-  const leader = getLeader(config);
-  const walletAddress = await getWalletAddress(leader);
+  // Validate options before acquiring the lock.
+  const vaultAddress = parse(
+    v.optional(Address),
+    options?.vaultAddress ?? config.defaultVaultAddress,
+  );
+  const expiresAfter = parse(
+    v.optional(UnsignedInteger),
+    options?.expiresAfter ??
+      (typeof config.defaultExpiresAfter === "function"
+        ? await config.defaultExpiresAfter()
+        : config.defaultExpiresAfter),
+  );
 
-  // Semaphore ensures requests arrive at server in nonce order (prevents out-of-order delivery)
-  const key = `${walletAddress}:${transport.isTestnet}`;
-  return await withLock(key, async () => {
-    const nonce = await (config.nonceManager?.(walletAddress) ?? globalNonceManager.getNonce(key));
-
-    // Validate and resolve options
-    const vaultAddress = parse(
-      v.optional(Address),
-      options?.vaultAddress ?? config.defaultVaultAddress,
-    );
-    const expiresAfter = parse(
-      v.optional(UnsignedInteger),
-      options?.expiresAfter ??
-        (typeof config.defaultExpiresAfter === "number"
-          ? config.defaultExpiresAfter
-          : await config.defaultExpiresAfter?.()),
-    );
-    const signal = options?.signal;
-
-    // Sign action (multi-sig or single wallet)
-    let finalAction: unknown;
-    let signature;
+  return executeWithShell<T>(config, async (nonce) => {
     if ("wallet" in config) {
-      finalAction = action;
-      signature = await signL1Action({
-        wallet: leader,
+      const signature = await signL1Action({
+        wallet: config.wallet,
         action,
         nonce,
-        isTestnet: transport.isTestnet,
+        isTestnet: config.transport.isTestnet,
         vaultAddress,
         expiresAfter,
       });
+      return { action, signature, extras: { vaultAddress, expiresAfter } };
     } else {
-      ({ action: finalAction, signature } = await signMultiSigL1({
+      const { action: wrapper, signature } = await signMultiSigL1({
         signers: config.signers,
         multiSigUser: config.multiSigUser,
-        signatureChainId: await getSignatureChainId(config),
+        signatureChainId: await resolveSignatureChainId(config),
         action,
         nonce,
-        isTestnet: transport.isTestnet,
+        isTestnet: config.transport.isTestnet,
         vaultAddress,
         expiresAfter,
-      }));
+      });
+      return { action: wrapper, signature, extras: { vaultAddress, expiresAfter } };
     }
-
-    // Send request and validate response
-    const response = await transport.request("exchange", {
-      action: finalAction,
-      signature,
-      nonce,
-      vaultAddress,
-      expiresAfter,
-    }, signal);
-    assertSuccessResponse(response);
-    return response as T;
-  });
+  }, options?.signal);
 }
 
 // ============================================================
 // Execute User-Signed Action
 // ============================================================
 
-/** Extract nonce field name from EIP-712 types ("nonce" or "time"). */
-function getNonceFieldName(types: Record<string, { name: string; type: string }[]>): "nonce" | "time" {
-  const primaryType = Object.keys(types)[0];
-  const field = types[primaryType].find((f) => f.name === "nonce" || f.name === "time");
-  if (!field) throw new Error(`EIP-712 types must contain a "nonce" or "time" field in "${primaryType}"`);
-  return field.name as "nonce" | "time";
-}
-
 /**
  * Execute a user-signed action (EIP-712) on the Hyperliquid Exchange.
  *
  * Handles both single-wallet and multi-sig signing.
- * Automatically adds signatureChainId, hyperliquidChain, and nonce/time.
  *
- * @param config Exchange API configuration
- * @param action Action payload to execute
- * @param types EIP-712 type definitions for signing
- * @param options Additional options for the request
- * @return API response
+ * @param config Exchange API configuration.
+ * @param action Action payload to execute.
+ * @param types EIP-712 type definitions for signing.
+ * @param options Additional options for the request.
+ * @return API response.
  *
- * @throws {ApiRequestError} If the API returns an error response
+ * @throws {ApiRequestError} If the API returns an error response.
  */
-export async function executeUserSignedAction<T>(
+export function executeUserSignedAction<T>(
   config: ExchangeConfig,
   action: Record<string, unknown>,
-  types: Record<string, { name: string; type: string }[]>,
+  types: Record<string, readonly { name: string; type: string }[]>,
   options?: {
     signal?: AbortSignal;
   },
 ): Promise<T> {
-  const { transport } = config;
-  const leader = getLeader(config);
-  const walletAddress = await getWalletAddress(leader);
-
-  // Semaphore ensures requests arrive at server in nonce order (prevents out-of-order delivery)
-  const key = `${walletAddress}:${transport.isTestnet}`;
-  return withLock(key, async () => {
-    const nonce = await (config.nonceManager?.(walletAddress) ?? globalNonceManager.getNonce(key));
-    const signal = options?.signal;
-
-    // Add system fields for user-signed actions
+  return executeWithShell<T>(config, async (nonce) => {
+    // Construct the full action with: type, system fields, user fields, nonce/time.
     const { type, ...restAction } = action;
-    const nonceFieldName = getNonceFieldName(types);
+    const nonceFieldName = extractNonceFieldName(types);
     const baseFields = {
       type,
-      signatureChainId: await getSignatureChainId(config),
-      hyperliquidChain: transport.isTestnet ? "Testnet" : "Mainnet",
+      signatureChainId: await resolveSignatureChainId(config),
+      hyperliquidChain: config.transport.isTestnet ? "Testnet" : "Mainnet",
     } as const;
     const fullAction = nonceFieldName === "nonce"
       ? { ...baseFields, ...restAction, nonce }
       : { ...baseFields, ...restAction, time: nonce };
 
-    // Sign action (multi-sig or single wallet)
-    let finalAction: unknown;
-    let signature;
     if ("wallet" in config) {
-      finalAction = fullAction;
-      signature = await signUserSignedAction({ wallet: leader, action: fullAction, types });
+      const signature = await signUserSignedAction({
+        wallet: config.wallet,
+        action: fullAction,
+        types,
+      });
+      return { action: fullAction, signature };
     } else {
-      ({ action: finalAction, signature } = await signMultiSigUserSigned({
+      const { action: wrapper, signature } = await signMultiSigUserSigned({
         signers: config.signers,
         multiSigUser: config.multiSigUser,
         action: fullAction,
         types,
-      }));
+      });
+      return { action: wrapper, signature };
     }
-
-    // Send request and validate response
-    const response = await transport.request("exchange", {
-      action: finalAction,
-      signature,
-      nonce,
-    }, signal);
-    assertSuccessResponse(response);
-    return response as T;
-  });
+  }, options?.signal);
 }
 
 // ============================================================
 // Helpers
 // ============================================================
 
-/** Get the leader wallet (first signer for the single wallet, or multi-sig). */
-function getLeader(config: ExchangeConfig): AbstractWallet {
-  return "wallet" in config ? config.wallet : config.signers[0];
+/** Extracts the nonce field name ("nonce" or "time") from EIP-712 type definitions. */
+function extractNonceFieldName(types: Record<string, readonly { name: string; type: string }[]>): "nonce" | "time" {
+  const primaryType = Object.keys(types)[0];
+  const field = types[primaryType].find((f) => f.name === "nonce" || f.name === "time");
+  if (!field) {
+    throw new HyperliquidError(`EIP-712 types must contain a "nonce" or "time" field in "${primaryType}"`);
+  }
+  return field.name as "nonce" | "time";
 }
 
-/** Resolve signature chain ID from config or wallet. */
-async function getSignatureChainId(config: ExchangeConfig): Promise<`0x${string}`> {
+/** Resolves signature chain ID from config, or falls back to the leader wallet's chain ID. */
+async function resolveSignatureChainId(config: ExchangeConfig): Promise<`0x${string}`> {
   if (config.signatureChainId) {
     const id = typeof config.signatureChainId === "function"
       ? await config.signatureChainId()
       : config.signatureChainId;
     return parse(Hex, id);
   }
-  return getWalletChainId(getLeader(config));
+  const leader = "wallet" in config ? config.wallet : config.signers[0];
+  return await getWalletChainId(leader);
 }

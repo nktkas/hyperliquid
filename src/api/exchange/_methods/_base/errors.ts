@@ -6,43 +6,19 @@
 import { HyperliquidError } from "../../../../_base.ts";
 
 // ============================================================
-// Type Utilities
+// Error Class
 // ============================================================
 
-// deno-lint-ignore ban-types
-type Prettify<T> = { [K in keyof T]: T[K] } & {};
-
-/** Exclude error variants from response type. */
-export type ExcludeErrorResponse<T> = T extends { status: "err" } ? never // with error status
-  : T extends { response: { data: { statuses: ReadonlyArray<infer S> } } } // with multiple statuses
-    ? Exclude<S, { error: unknown }> extends never ? never
-    : Prettify<
-      Omit<T, "response"> & {
-        response: Prettify<Omit<T["response"], "data"> & { data: { statuses: Array<Exclude<S, { error: unknown }>> } }>;
-      }
-    >
-  : T extends { response: { data: { status: infer S } } } // with single status
-    ? S extends { error: unknown } ? never
-    : Prettify<
-      Omit<T, "response"> & {
-        response: Prettify<Omit<T["response"], "data"> & { data: { status: Exclude<S, { error: unknown }> } }>;
-      }
-    >
-  : T;
-
-// ============================================================
-// Error Classes
-// ============================================================
-
-/** Thrown when Exchange API returns an error response. */
+/** Thrown when the Exchange API returns an error response. */
 export class ApiRequestError extends HyperliquidError {
+  /** Raw API response that contains the error. */
   readonly response: unknown;
 
   /**
-   * @param response Raw API response that contains the error
+   * @param response Raw API response that contains the error.
    */
   constructor(response: unknown) {
-    const message = extractErrorMessage(response) ||
+    const message = getErrorMessage(response) ??
       "An unknown error occurred while processing an API request. See `response` for more details.";
     super(message);
     this.name = "ApiRequestError";
@@ -51,72 +27,118 @@ export class ApiRequestError extends HyperliquidError {
 }
 
 // ============================================================
-// Error Detection (Duck Typing)
+// Detection (duck-typed)
 // ============================================================
 
-/** Check if value has an error property. */
-function hasError(value: unknown): value is { error: string } {
+/** True if `value` has an `error` field of type string. */
+function hasErrorField(value: unknown): value is { error: string } {
   return typeof value === "object" && value !== null &&
     "error" in value && typeof value.error === "string";
 }
 
-/** Check if response has error status. */
-function hasErrorStatus(response: unknown): response is { status: "err"; response: string } {
-  return typeof response === "object" && response !== null &&
-    "status" in response && response.status === "err";
+/** Top-level error shape. */
+type TopLevelError = { status: "err"; response: string };
+
+/** True if `r` matches `{ status: "err", response: string }`. */
+function isTopLevelError(r: unknown): r is TopLevelError {
+  return typeof r === "object" && r !== null &&
+    "status" in r && r.status === "err";
 }
 
-/** Check if response has statuses array with errors. */
-function hasStatusesWithErrors(response: unknown): boolean {
-  if (typeof response !== "object" || response === null) return false;
-  const r = response as { response?: { data?: { statuses?: unknown[] } } };
-  const statuses = r.response?.data?.statuses;
-  return Array.isArray(statuses) && statuses.some(hasError);
+/** Bulk error shape with array of statuses. */
+type BulkError = { response: { type: string; data: { statuses: unknown[] } } };
+
+/** True if `r` matches `{ response: { type, data: { statuses: [{ error }, ...] } } }` (any error in array). */
+function isBulkError(r: unknown): r is BulkError {
+  if (typeof r !== "object" || r === null) return false;
+  const response = (r as { response?: { type?: unknown; data?: { statuses?: unknown[] } } }).response;
+  if (typeof response?.type !== "string") return false;
+  const statuses = response.data?.statuses;
+  return Array.isArray(statuses) && statuses.some(hasErrorField);
 }
 
-/** Check if response has single status with error. */
-function hasSingleStatusWithError(response: unknown): boolean {
-  if (typeof response !== "object" || response === null) return false;
-  const r = response as { response?: { data?: { status?: unknown } } };
-  return hasError(r.response?.data?.status);
+/** Single error shape with one status. */
+type SingleError = { response: { data: { status: { error: string } } } };
+
+/** True if `r` matches `{ response: { data: { status: { error } } } }`. */
+function isSingleError(r: unknown): r is SingleError {
+  if (typeof r !== "object" || r === null) return false;
+  const status = (r as { response?: { data?: { status?: unknown } } }).response?.data?.status;
+  return hasErrorField(status);
 }
 
-/** Extract error message from response using duck typing. */
-function extractErrorMessage(response: unknown): string | undefined {
-  if (hasErrorStatus(response)) {
-    return response.response;
+/** True if `r` matches any of the three Hyperliquid error response shapes. */
+export function isErrorResponse(r: unknown): r is TopLevelError | BulkError | SingleError {
+  return isTopLevelError(r) || isBulkError(r) || isSingleError(r);
+}
+
+// ============================================================
+// Extraction
+// ============================================================
+
+/** Extract a human-readable error message from an error response, or `undefined` if none. */
+function getErrorMessage(r: unknown): string | undefined {
+  if (isTopLevelError(r)) {
+    return r.response;
   }
-
-  const r = response as { response?: { data?: { statuses?: unknown[]; status?: unknown } } };
-
-  if (Array.isArray(r.response?.data?.statuses)) {
-    const errors = r.response.data.statuses.reduce<string[]>((acc, status, index) => {
-      if (hasError(status)) acc.push(`Order ${index}: ${status.error}`);
-      return acc;
-    }, []);
+  if (isBulkError(r)) {
+    const prefix = r.response.type;
+    const errors = r.response.data.statuses.flatMap((s, i) => hasErrorField(s) ? [`${prefix} ${i}: ${s.error}`] : []);
     if (errors.length > 0) return errors.join(", ");
   }
-
-  if (hasError(r.response?.data?.status)) {
+  if (isSingleError(r)) {
     return r.response.data.status.error;
   }
-
   return undefined;
 }
 
 // ============================================================
-// Assertions
+// Assertion
 // ============================================================
 
 /**
- * Assert that response is successful, throw ApiRequestError otherwise.
+ * Throws {@linkcode ApiRequestError} if the response is an error; otherwise returns void.
  *
- * @param response Raw API response to validate
+ * @param response Raw API response to validate.
  *
- * @throws {ApiRequestError} If the response contains an error
+ * @throws {ApiRequestError} If the response contains an error.
  */
 export function assertSuccessResponse(response: unknown): void {
-  if (hasErrorStatus(response) || hasStatusesWithErrors(response) || hasSingleStatusWithError(response)) {
+  if (isErrorResponse(response)) {
     throw new ApiRequestError(response);
   }
 }
+
+// ============================================================
+// Type-Level Error Filtering
+// ============================================================
+
+/** Flatten an intersection type for cleaner IDE display. */
+// deno-lint-ignore ban-types
+type Prettify<T> = { [K in keyof T]: T[K] } & {};
+
+/** Filter out `{ status: "err" }` top-level error shape. */
+type ExcludeTopLevelError<T> = T extends { status: "err" } ? never : T;
+
+/** Filter out error variants from `response.data.statuses[]` array. */
+type ExcludeBulkError<T> = T extends { response: { data: { statuses: ReadonlyArray<infer S> } } }
+  ? Exclude<S, { error: unknown }> extends never ? never
+  : Prettify<
+    Omit<T, "response"> & {
+      response: Prettify<Omit<T["response"], "data"> & { data: { statuses: Array<Exclude<S, { error: unknown }>> } }>;
+    }
+  >
+  : T;
+
+/** Filter out error variant from `response.data.status` single status. */
+type ExcludeSingleError<T> = T extends { response: { data: { status: infer S } } }
+  ? S extends { error: unknown } ? never
+  : Prettify<
+    Omit<T, "response"> & {
+      response: Prettify<Omit<T["response"], "data"> & { data: { status: Exclude<S, { error: unknown }> } }>;
+    }
+  >
+  : T;
+
+/** Exclude all three Hyperliquid error response shapes from `T`. */
+export type ExcludeErrorResponse<T> = ExcludeTopLevelError<ExcludeBulkError<ExcludeSingleError<T>>>;

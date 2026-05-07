@@ -3,7 +3,7 @@
  * @module
  */
 
-import type { ExchangeConfig, ExchangeSingleWalletConfig } from "./_methods/_base/execute.ts";
+import type { ExchangeConfig, ExchangeSingleWalletConfig } from "./_methods/_base/mod.ts";
 
 // ============================================================
 // Methods Imports
@@ -2270,8 +2270,12 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 // Type Re-exports
 // ============================================================
 
-export { ApiRequestError } from "./_methods/_base/errors.ts";
-export type { ExchangeMultiSigConfig, ExchangeSingleWalletConfig } from "./_methods/_base/execute.ts";
+export {
+  ApiRequestError,
+  type ExchangeConfig,
+  type ExchangeMultiSigConfig,
+  type ExchangeSingleWalletConfig,
+} from "./_methods/_base/mod.ts";
 
 export type {
   AgentEnableDexAbstractionOptions,
