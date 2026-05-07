@@ -38,7 +38,7 @@ export type PerpAnnotationResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode perpAnnotation} function. */
 export type PerpAnnotationParameters = Omit<v.InferInput<typeof PerpAnnotationRequest>, "type">;

@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import type { SpotAssetCtxSchema } from "../../info/_methods/_base/commonSchemas.ts";
+import type { SpotAssetCtx } from "../../info/_methods/_base/mod.ts";
 
 /**
  * Subscription to context events for all spot assets.
@@ -22,7 +22,7 @@ export type SpotAssetCtxsRequest = v.InferOutput<typeof SpotAssetCtxsRequest>;
  * Event of spot asset contexts.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
-export type SpotAssetCtxsEvent = SpotAssetCtxSchema[];
+export type SpotAssetCtxsEvent = SpotAssetCtx[];
 
 // ============================================================
 // Execution Logic
@@ -30,7 +30,7 @@ export type SpotAssetCtxsEvent = SpotAssetCtxSchema[];
 
 import { parse } from "../../../_base.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_types.ts";
+import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /**
  * Subscribe to context updates for all spot assets.

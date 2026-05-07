@@ -34,7 +34,7 @@ export type MaxBuilderFeeResponse = number;
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode maxBuilderFee} function. */
 export type MaxBuilderFeeParameters = Omit<v.InferInput<typeof MaxBuilderFeeRequest>, "type">;

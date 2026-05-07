@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import type { SpotAssetCtxSchema } from "../../info/_methods/_base/commonSchemas.ts";
+import type { SpotAssetCtx } from "../../info/_methods/_base/mod.ts";
 
 /**
  * Subscription to context events for a specific spot asset.
@@ -28,7 +28,7 @@ export type ActiveSpotAssetCtxEvent = {
   /** Asset ID (e.g., @1). */
   coin: string;
   /** Context for a specific spot asset. */
-  ctx: SpotAssetCtxSchema;
+  ctx: SpotAssetCtx;
 };
 
 // ============================================================
@@ -37,7 +37,7 @@ export type ActiveSpotAssetCtxEvent = {
 
 import { parse } from "../../../_base.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_types.ts";
+import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode activeSpotAssetCtx} function. */
 export type ActiveSpotAssetCtxParameters = Omit<v.InferInput<typeof ActiveSpotAssetCtxRequest>, "type">;

@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import type { PerpAssetCtxSchema } from "./_base/commonSchemas.ts";
+import type { PerpAssetCtx } from "./_base/mod.ts";
 import type { MetaResponse } from "./meta.ts";
 
 /**
@@ -25,14 +25,14 @@ export type MetaAndAssetCtxsRequest = v.InferOutput<typeof MetaAndAssetCtxsReque
  * Tuple containing metadata and array of asset contexts.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-asset-contexts-includes-mark-price-current-funding-open-interest-etc
  */
-export type MetaAndAssetCtxsResponse = [meta: MetaResponse, assetCtxs: PerpAssetCtxSchema[]];
+export type MetaAndAssetCtxsResponse = [meta: MetaResponse, assetCtxs: PerpAssetCtx[]];
 
 // ============================================================
 // Execution Logic
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode metaAndAssetCtxs} function. */
 export type MetaAndAssetCtxsParameters = Omit<v.InferInput<typeof MetaAndAssetCtxsRequest>, "type">;

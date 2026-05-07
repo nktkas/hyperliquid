@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import type { TwapStateSchema } from "./_base/commonSchemas.ts";
+import type { TwapState } from "./_base/mod.ts";
 
 /**
  * Request TWAP history of a user.
@@ -29,7 +29,7 @@ export type TwapHistoryResponse = {
   /** Creation time of the history record (in seconds since epoch). */
   time: number;
   /** State of the TWAP order. */
-  state: TwapStateSchema;
+  state: TwapState;
   /**
    * Current status of the TWAP order.
    * - `"finished"`: Fully executed.
@@ -55,7 +55,7 @@ export type TwapHistoryResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode twapHistory} function. */
 export type TwapHistoryParameters = Omit<v.InferInput<typeof TwapHistoryRequest>, "type">;

@@ -23,7 +23,7 @@
  * @module
  */
 
-export type { SubscriptionConfig } from "./_methods/_types.ts";
+export type { SubscriptionConfig } from "./_methods/_base/mod.ts";
 
 export * from "./_methods/activeAssetCtx.ts";
 export * from "./_methods/activeAssetData.ts";

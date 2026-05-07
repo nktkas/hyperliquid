@@ -4,7 +4,7 @@
  */
 
 import type { ISubscription } from "../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_methods/_types.ts";
+import type { SubscriptionConfig } from "./_methods/_base/mod.ts";
 
 // ============================================================
 // Methods Imports
@@ -1016,7 +1016,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
 // Type Re-exports
 // ============================================================
 
-export type { SubscriptionConfig } from "./_methods/_types.ts";
+export type { SubscriptionConfig } from "./_methods/_base/mod.ts";
 
 export type {
   ActiveAssetCtxEvent as ActiveAssetCtxWsEvent,

@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import type { FrontendOpenOrderSchema, OrderProcessingStatusSchema } from "./_base/commonSchemas.ts";
+import type { FrontendOpenOrder, OrderProcessingStatus } from "./_base/mod.ts";
 
 /**
  * Request user historical orders.
@@ -27,7 +27,7 @@ export type HistoricalOrdersRequest = v.InferOutput<typeof HistoricalOrdersReque
  */
 export type HistoricalOrdersResponse = {
   /** Open order with additional display information. */
-  order: FrontendOpenOrderSchema;
+  order: FrontendOpenOrder;
   /**
    * Order processing status.
    * - `"open"`: Order active and waiting to be filled.
@@ -60,7 +60,7 @@ export type HistoricalOrdersResponse = {
    * - `"oracleRejected"`: Rejected due to price too far from oracle.
    * - `"perpMaxPositionRejected"`: Rejected due to exceeding margin tier limit at current leverage.
    */
-  status: OrderProcessingStatusSchema;
+  status: OrderProcessingStatus;
   /** Timestamp when the status was last updated (in ms since epoch). */
   statusTimestamp: number;
 }[];
@@ -70,7 +70,7 @@ export type HistoricalOrdersResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode historicalOrders} function. */
 export type HistoricalOrdersParameters = Omit<v.InferInput<typeof HistoricalOrdersRequest>, "type">;

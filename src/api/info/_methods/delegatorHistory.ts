@@ -77,7 +77,7 @@ export type DelegatorHistoryResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode delegatorHistory} function. */
 export type DelegatorHistoryParameters = Omit<v.InferInput<typeof DelegatorHistoryRequest>, "type">;

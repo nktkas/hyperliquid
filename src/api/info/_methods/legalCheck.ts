@@ -38,7 +38,7 @@ export type LegalCheckResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode legalCheck} function. */
 export type LegalCheckParameters = Omit<v.InferInput<typeof LegalCheckRequest>, "type">;

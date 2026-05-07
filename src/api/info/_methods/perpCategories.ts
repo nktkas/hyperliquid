@@ -32,7 +32,7 @@ export type PerpCategoriesResponse = [
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /**
  * Request all perpetual asset categories.

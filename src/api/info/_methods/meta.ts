@@ -57,7 +57,7 @@ export type MetaResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode meta} function. */
 export type MetaParameters = Omit<v.InferInput<typeof MetaRequest>, "type">;

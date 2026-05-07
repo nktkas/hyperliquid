@@ -43,7 +43,7 @@ export type UserRateLimitResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode userRateLimit} function. */
 export type UserRateLimitParameters = Omit<v.InferInput<typeof UserRateLimitRequest>, "type">;

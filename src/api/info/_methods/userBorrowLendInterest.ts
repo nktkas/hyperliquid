@@ -50,7 +50,7 @@ export type UserBorrowLendInterestResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode userBorrowLendInterest} function. */
 export type UserBorrowLendInterestParameters = Omit<v.InferInput<typeof UserBorrowLendInterestRequest>, "type">;

@@ -38,7 +38,7 @@ export type UserTwapSliceFillsByTimeResponse = UserTwapSliceFillsResponse;
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode userTwapSliceFillsByTime} function. */
 export type UserTwapSliceFillsByTimeParameters = Omit<v.InferInput<typeof UserTwapSliceFillsByTimeRequest>, "type">;

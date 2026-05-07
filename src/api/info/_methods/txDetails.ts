@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Hex } from "../../_schemas.ts";
-import type { ExplorerTransactionSchema } from "./_base/commonSchemas.ts";
+import type { ExplorerTransaction } from "./_base/mod.ts";
 
 /**
  * Request transaction details by transaction hash.
@@ -29,7 +29,7 @@ export type TxDetailsResponse = {
   /** Response type. */
   type: "txDetails";
   /** Transaction details. */
-  tx: ExplorerTransactionSchema;
+  tx: ExplorerTransaction;
 };
 
 // ============================================================
@@ -37,7 +37,7 @@ export type TxDetailsResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode txDetails} function. */
 export type TxDetailsParameters = Omit<v.InferInput<typeof TxDetailsRequest>, "type">;

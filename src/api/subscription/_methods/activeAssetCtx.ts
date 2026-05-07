@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import type { PerpAssetCtxSchema } from "../../info/_methods/_base/commonSchemas.ts";
+import type { PerpAssetCtx } from "../../info/_methods/_base/mod.ts";
 
 /**
  * Subscription to context events for a specific perpetual asset.
@@ -28,7 +28,7 @@ export type ActiveAssetCtxEvent = {
   /** Asset symbol (e.g., BTC). */
   coin: string;
   /** Context for a specific perpetual asset. */
-  ctx: PerpAssetCtxSchema;
+  ctx: PerpAssetCtx;
 };
 
 // ============================================================
@@ -37,7 +37,7 @@ export type ActiveAssetCtxEvent = {
 
 import { parse } from "../../../_base.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_types.ts";
+import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode activeAssetCtx} function. */
 export type ActiveAssetCtxParameters = Omit<v.InferInput<typeof ActiveAssetCtxRequest>, "type">;

@@ -60,7 +60,7 @@ export type RecentTradesResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode recentTrades} function. */
 export type RecentTradesParameters = Omit<v.InferInput<typeof RecentTradesRequest>, "type">;

@@ -76,7 +76,7 @@ export type CandleSnapshotResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode candleSnapshot} function. */
 export type CandleSnapshotParameters = v.InferInput<typeof CandleSnapshotRequest>["req"];

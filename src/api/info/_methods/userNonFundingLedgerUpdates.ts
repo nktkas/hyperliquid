@@ -411,7 +411,7 @@ export type UserNonFundingLedgerUpdatesResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode userNonFundingLedgerUpdates} function. */
 export type UserNonFundingLedgerUpdatesParameters = Omit<

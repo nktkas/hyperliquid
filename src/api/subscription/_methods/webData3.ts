@@ -77,7 +77,7 @@ export type WebData3Event = {
 
 import { parse } from "../../../_base.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_types.ts";
+import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode webData3} function. */
 export type WebData3Parameters = Omit<v.InferInput<typeof WebData3Request>, "type">;

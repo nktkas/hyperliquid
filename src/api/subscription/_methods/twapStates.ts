@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import type { TwapStateSchema } from "../../info/_methods/_base/commonSchemas.ts";
+import type { TwapState } from "../../info/_methods/_base/mod.ts";
 
 /**
  * Subscription to TWAP states updates for a specific user.
@@ -36,7 +36,7 @@ export type TwapStatesEvent = {
    */
   user: `0x${string}`;
   /** Array of tuples of TWAP ID and TWAP state. */
-  states: [twapId: number, state: TwapStateSchema][];
+  states: [twapId: number, state: TwapState][];
 };
 
 // ============================================================
@@ -45,7 +45,7 @@ export type TwapStatesEvent = {
 
 import { parse } from "../../../_base.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_types.ts";
+import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode twapStates} function. */
 export type TwapStatesParameters = Omit<v.InferInput<typeof TwapStatesRequest>, "type">;

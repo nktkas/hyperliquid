@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import type { ExplorerTransactionSchema } from "../../info/_methods/_base/commonSchemas.ts";
+import type { ExplorerTransaction } from "../../info/_methods/_base/mod.ts";
 
 /**
  * Subscription to explorer transaction events.
@@ -22,7 +22,7 @@ export type ExplorerTxsRequest = v.InferOutput<typeof ExplorerTxsRequest>;
  * Event of array of transaction details.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
-export type ExplorerTxsEvent = ExplorerTransactionSchema[];
+export type ExplorerTxsEvent = ExplorerTransaction[];
 
 // ============================================================
 // Execution Logic
@@ -30,7 +30,7 @@ export type ExplorerTxsEvent = ExplorerTransactionSchema[];
 
 import { parse } from "../../../_base.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_types.ts";
+import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /**
  * Subscribe to explorer transaction updates.

@@ -50,7 +50,7 @@ export type FundingHistoryResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode fundingHistory} function. */
 export type FundingHistoryParameters = Omit<v.InferInput<typeof FundingHistoryRequest>, "type">;

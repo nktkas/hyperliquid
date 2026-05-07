@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import type { VaultRelationshipSchema } from "./_base/commonSchemas.ts";
+import type { VaultRelationship } from "./_base/mod.ts";
 
 /**
  * Request a list of vaults less than 2 hours old.
@@ -43,7 +43,7 @@ export type VaultSummariesResponse = {
   /** Vault closure status. */
   isClosed: boolean;
   /** Vault relationship type. */
-  relationship: VaultRelationshipSchema;
+  relationship: VaultRelationship;
   /** Creation timestamp. */
   createTimeMillis: number;
 }[];
@@ -53,7 +53,7 @@ export type VaultSummariesResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /**
  * Request a list of vaults less than 2 hours old.

@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import type { OpenOrderSchema, OrderProcessingStatusSchema } from "../../info/_methods/_base/commonSchemas.ts";
+import type { OpenOrder, OrderProcessingStatus } from "../../info/_methods/_base/mod.ts";
 
 /**
  * Subscription to order updates for a specific user.
@@ -27,7 +27,7 @@ export type OrderUpdatesRequest = v.InferOutput<typeof OrderUpdatesRequest>;
  */
 export type OrderUpdatesEvent = {
   /** Order details. */
-  order: OpenOrderSchema;
+  order: OpenOrder;
   /**
    * Order processing status.
    * - `"open"`: Order active and waiting to be filled.
@@ -60,7 +60,7 @@ export type OrderUpdatesEvent = {
    * - `"oracleRejected"`: Rejected due to price too far from oracle.
    * - `"perpMaxPositionRejected"`: Rejected due to exceeding margin tier limit at current leverage.
    */
-  status: OrderProcessingStatusSchema;
+  status: OrderProcessingStatus;
   /** Timestamp when the status was last updated (in ms since epoch). */
   statusTimestamp: number;
 }[];
@@ -71,7 +71,7 @@ export type OrderUpdatesEvent = {
 
 import { parse } from "../../../_base.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_types.ts";
+import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode orderUpdates} function. */
 export type OrderUpdatesParameters = Omit<v.InferInput<typeof OrderUpdatesRequest>, "type">;

@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import type { VaultRelationshipSchema } from "./_base/commonSchemas.ts";
+import type { VaultRelationship } from "./_base/mod.ts";
 import type { PortfolioResponse } from "./portfolio.ts";
 
 /**
@@ -116,7 +116,7 @@ export type VaultDetailsResponse = {
   /** Vault closure status. */
   isClosed: boolean;
   /** Vault relationship type. */
-  relationship: VaultRelationshipSchema;
+  relationship: VaultRelationship;
   /** Deposit permission status. */
   allowDeposits: boolean;
   /** Position closure policy on withdrawal. */
@@ -128,7 +128,7 @@ export type VaultDetailsResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode vaultDetails} function. */
 export type VaultDetailsParameters = Omit<v.InferInput<typeof VaultDetailsRequest>, "type">;

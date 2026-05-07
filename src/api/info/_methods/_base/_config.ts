@@ -1,5 +1,5 @@
 /**
- * Configuration types for the Info API.
+ * Configuration types for Info API requests.
  * @module
  */
 

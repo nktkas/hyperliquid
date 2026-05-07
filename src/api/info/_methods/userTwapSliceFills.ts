@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import type { UserFillSchema } from "./_base/commonSchemas.ts";
+import type { UserFill } from "./_base/mod.ts";
 
 /**
  * Request user TWAP slice fills.
@@ -27,7 +27,7 @@ export type UserTwapSliceFillsRequest = v.InferOutput<typeof UserTwapSliceFillsR
  */
 export type UserTwapSliceFillsResponse = {
   /** TWAP fill record. */
-  fill: UserFillSchema;
+  fill: UserFill;
   /** ID of the TWAP. */
   twapId: number;
 }[];
@@ -37,7 +37,7 @@ export type UserTwapSliceFillsResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode userTwapSliceFills} function. */
 export type UserTwapSliceFillsParameters = Omit<v.InferInput<typeof UserTwapSliceFillsRequest>, "type">;

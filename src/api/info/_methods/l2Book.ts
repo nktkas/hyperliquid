@@ -60,7 +60,7 @@ export type L2BookResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode l2Book} function. */
 export type L2BookParameters = Omit<v.InferInput<typeof L2BookRequest>, "type">;

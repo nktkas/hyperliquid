@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import type { ExplorerTransactionSchema } from "./_base/commonSchemas.ts";
+import type { ExplorerTransaction } from "./_base/mod.ts";
 
 /**
  * Request array of user transaction details.
@@ -29,7 +29,7 @@ export type UserDetailsResponse = {
   /** Type of response. */
   type: "userDetails";
   /** Array of user transaction details. */
-  txs: ExplorerTransactionSchema[];
+  txs: ExplorerTransaction[];
 };
 
 // ============================================================
@@ -37,7 +37,7 @@ export type UserDetailsResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode userDetails} function. */
 export type UserDetailsParameters = Omit<v.InferInput<typeof UserDetailsRequest>, "type">;

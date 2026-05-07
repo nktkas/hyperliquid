@@ -27,7 +27,7 @@ export type LiquidatableResponse = unknown[];
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /**
  * Request liquidatable.

@@ -67,7 +67,7 @@ export type UserFundingResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode userFunding} function. */
 export type UserFundingParameters = Omit<v.InferInput<typeof UserFundingRequest>, "type">;

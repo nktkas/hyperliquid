@@ -56,7 +56,7 @@ export type UserRoleResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode userRole} function. */
 export type UserRoleParameters = Omit<v.InferInput<typeof UserRoleRequest>, "type">;

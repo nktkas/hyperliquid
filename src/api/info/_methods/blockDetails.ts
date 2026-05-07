@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { UnsignedInteger } from "../../_schemas.ts";
-import type { ExplorerTransactionSchema } from "./_base/commonSchemas.ts";
+import type { ExplorerTransaction } from "./_base/mod.ts";
 
 /**
  * Request block details by block height.
@@ -47,7 +47,7 @@ export type BlockDetailsResponse = {
      */
     proposer: `0x${string}`;
     /** Array of transactions in the block. */
-    txs: ExplorerTransactionSchema[];
+    txs: ExplorerTransaction[];
   };
 };
 
@@ -56,7 +56,7 @@ export type BlockDetailsResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode blockDetails} function. */
 export type BlockDetailsParameters = Omit<v.InferInput<typeof BlockDetailsRequest>, "type">;

@@ -50,7 +50,7 @@ export type SubAccountsResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode subAccounts} function. */
 export type SubAccountsParameters = Omit<v.InferInput<typeof SubAccountsRequest>, "type">;

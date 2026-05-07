@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import type { PerpAssetCtxSchema } from "../../info/_methods/_base/commonSchemas.ts";
+import type { PerpAssetCtx } from "../../info/_methods/_base/mod.ts";
 
 /**
  * Subscription to asset context events for all DEXs.
@@ -24,7 +24,7 @@ export type AllDexsAssetCtxsRequest = v.InferOutput<typeof AllDexsAssetCtxsReque
  */
 export type AllDexsAssetCtxsEvent = {
   /** Array of tuples of dex names and contexts for each perpetual asset. */
-  ctxs: [dex: string, ctx: PerpAssetCtxSchema[]][];
+  ctxs: [dex: string, ctx: PerpAssetCtx[]][];
 };
 
 // ============================================================
@@ -33,7 +33,7 @@ export type AllDexsAssetCtxsEvent = {
 
 import { parse } from "../../../_base.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_types.ts";
+import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /**
  * Subscribe to asset contexts for all DEXs.

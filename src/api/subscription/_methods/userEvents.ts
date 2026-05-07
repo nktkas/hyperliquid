@@ -107,7 +107,7 @@ export type UserEventsEvent =
 
 import { parse } from "../../../_base.ts";
 import type { ISubscription } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_types.ts";
+import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode userEvents} function. */
 export type UserEventsParameters = Omit<v.InferInput<typeof UserEventsRequest>, "type">;

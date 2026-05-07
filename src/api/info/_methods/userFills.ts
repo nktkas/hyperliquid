@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import type { UserFillSchema } from "./_base/commonSchemas.ts";
+import type { UserFill } from "./_base/mod.ts";
 
 /**
  * Request array of user fills.
@@ -27,7 +27,7 @@ export type UserFillsRequest = v.InferOutput<typeof UserFillsRequest>;
  * Array of user trade fills.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills
  */
-export type UserFillsResponse = (UserFillSchema & {
+export type UserFillsResponse = (UserFill & {
   /**
    * Client Order ID.
    * @pattern ^0x[a-fA-F0-9]{32}$
@@ -55,7 +55,7 @@ export type UserFillsResponse = (UserFillSchema & {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode userFills} function. */
 export type UserFillsParameters = Omit<v.InferInput<typeof UserFillsRequest>, "type">;

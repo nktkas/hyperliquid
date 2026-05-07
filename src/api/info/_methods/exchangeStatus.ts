@@ -32,7 +32,7 @@ export type ExchangeStatusResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /**
  * Request exchange system status information.

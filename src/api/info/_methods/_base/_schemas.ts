@@ -4,7 +4,7 @@
  */
 
 /** Perpetual asset context. */
-export type PerpAssetCtxSchema = {
+export type PerpAssetCtx = {
   /**
    * Previous day's closing price.
    * @pattern ^[0-9]+(\.[0-9]+)?$
@@ -58,7 +58,7 @@ export type PerpAssetCtxSchema = {
 };
 
 /** Spot asset context. */
-export type SpotAssetCtxSchema = {
+export type SpotAssetCtx = {
   /**
    * Previous day's closing price.
    * @pattern ^[0-9]+(\.[0-9]+)?$
@@ -99,7 +99,7 @@ export type SpotAssetCtxSchema = {
 };
 
 /** Open order with additional display information. */
-export type FrontendOpenOrderSchema = {
+export type FrontendOpenOrder = {
   /** Asset symbol. */
   coin: string;
   /** Order side ("B" = Bid/Buy, "A" = Ask/Sell). */
@@ -178,7 +178,7 @@ export type FrontendOpenOrderSchema = {
 };
 
 /** Open order. */
-export type OpenOrderSchema = {
+export type OpenOrder = {
   /** Asset symbol. */
   coin: string;
   /** Order side ("B" = Bid/Buy, "A" = Ask/Sell). */
@@ -212,7 +212,7 @@ export type OpenOrderSchema = {
 };
 
 /** TWAP order state. */
-export type TwapStateSchema = {
+export type TwapState = {
   /** Asset symbol. */
   coin: string;
   /**
@@ -248,7 +248,7 @@ export type TwapStateSchema = {
 };
 
 /** Vault relationship type. */
-export type VaultRelationshipSchema = {
+export type VaultRelationship = {
   /** Relationship type. */
   type: "normal" | "child";
 } | {
@@ -265,7 +265,7 @@ export type VaultRelationshipSchema = {
 };
 
 /** Explorer transaction. */
-export type ExplorerTransactionSchema = {
+export type ExplorerTransaction = {
   /** Action performed in transaction. */
   action: {
     /** Action type. */
@@ -291,7 +291,7 @@ export type ExplorerTransactionSchema = {
 };
 
 /** User fill. */
-export type UserFillSchema = {
+export type UserFill = {
   /** Asset symbol. */
   coin: string;
   /**
@@ -379,7 +379,7 @@ export type UserFillSchema = {
  * - `"oracleRejected"`: Rejected due to price too far from oracle.
  * - `"perpMaxPositionRejected"`: Rejected due to exceeding margin tier limit at current leverage.
  */
-export type OrderProcessingStatusSchema =
+export type OrderProcessingStatus =
   | "open"
   | "filled"
   | "canceled"
