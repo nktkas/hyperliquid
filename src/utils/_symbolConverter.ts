@@ -1,6 +1,8 @@
 import {
   meta,
   type MetaResponse,
+  outcomeMeta,
+  type OutcomeMetaResponse,
   perpDexs,
   type PerpDexsResponse,
   spotMeta,
@@ -95,10 +97,11 @@ export class SymbolConverter {
     const config = { transport: this._transport };
     const needDexs = this._dexOption === true || (Array.isArray(this._dexOption) && this._dexOption.length > 0);
 
-    const [perpMetaData, spotMetaData, perpDexsData] = await Promise.all([
+    const [perpMetaData, spotMetaData, perpDexsData, outcomeMetaData] = await Promise.all([
       meta(config),
       spotMeta(config),
       needDexs ? perpDexs(config) : undefined,
+      outcomeMeta(config),
     ]);
 
     if (!perpMetaData?.universe?.length) {
@@ -116,6 +119,7 @@ export class SymbolConverter {
 
     this._processDefaultPerps(perpMetaData);
     this._processSpotAssets(spotMetaData);
+    this._processAllRecurringOutcomeAssets(outcomeMetaData);
 
     // Only process builder dexs if dex support is enabled
     if (perpDexsData) {
@@ -190,6 +194,125 @@ export class SymbolConverter {
     });
   }
 
+  private _processAllRecurringOutcomeAssets(outcomeMetaData: OutcomeMetaResponse): void {
+    this._processBinaryOutcomeAssets(outcomeMetaData);
+    this._processRecurringBucketOutcomeAssets(outcomeMetaData);
+  }
+  /**
+   * Handle the population of binary(priceBinary) outcome market slugs
+   */
+  private _processBinaryOutcomeAssets(outcomeMetaData: OutcomeMetaResponse): void {
+    outcomeMetaData.outcomes.forEach((outcome) => {
+      if (outcome.name !== "Recurring" || !outcome.description.includes("class:priceBinary")) return;
+
+      outcome.sideSpecs.forEach((sideSpec, sideIdx) => {
+        this._populateIndividualBucketOutcome(
+          outcome.outcome,
+          sideSpec.name,
+          sideIdx,
+          outcome.description,
+          0,
+        );
+      });
+    });
+  }
+
+  /**
+   * Handle the population of multi-price(priceBucket) outcome market slugs
+   */
+  private _processRecurringBucketOutcomeAssets(outcomeMetaData: OutcomeMetaResponse): void {
+    outcomeMetaData.questions.forEach((question) => {
+      if (question.name === "Recurring" && question.description.includes("class:priceBucket")) {
+        if (question.namedOutcomes.length !== 3) return;
+
+        question.namedOutcomes.forEach((outcomeId: number, outcomeIndex: number) => {
+          const outcomeObj = outcomeMetaData.outcomes.find((entry) => entry.outcome === outcomeId);
+
+          if (outcomeObj) {
+            outcomeObj.sideSpecs.forEach((sideSpec, sideIdx) => {
+              this._populateIndividualBucketOutcome(
+                outcomeObj.outcome,
+                sideSpec.name,
+                sideIdx,
+                question.description,
+                outcomeIndex,
+              );
+            });
+          }
+        });
+      }
+    });
+  }
+
+  /**
+   * Map the slug to the assetId as per the specification:
+   * {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/asset-ids}
+   */
+  private _populateIndividualBucketOutcome(
+    outcomeId: number,
+    sideSpec: string,
+    sideIdx: number,
+    description: string,
+    outcomeIndex: number,
+  ): void {
+    const slug = this._descriptionToSlug(description, sideSpec, outcomeIndex);
+    if (!slug) return;
+    const encoding = 10 * outcomeId + sideIdx;
+    const assetId = 100000000 + encoding;
+
+    this._nameToAssetId.set(slug, assetId);
+  }
+
+  /**
+   * Generate the appropiate slug for binary and multi-price(bucket) outcome markets
+   * {@link https://hyperliquid.gitbook.io/hyperliquid-docs/trading/contract-specifications}
+   * @param description complete description of an outcome
+   * @param side for the requested slug retrieved from the sideSpecs
+   * @param outcomeIndex for the classification of the bucket: (0 -> below, 1-between, 2-above)
+   * @returns the generated slug
+   */
+  private _descriptionToSlug(description: string, side: string, outcomeIndex: number): string | null {
+    const parts = description.split("|");
+    const lookup: Record<string, string> = {};
+
+    for (const part of parts) {
+      const [key, value] = part.split(":");
+      lookup[key] = value;
+    }
+
+    const { class: assetClass, underlying, expiry } = lookup;
+
+    if (!assetClass || !underlying || !expiry) return null;
+
+    const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+    const monthName = months[parseInt(expiry.slice(4, 6)) - 1];
+    const day = expiry.slice(6, 8);
+    const time = expiry.slice(9, 13);
+    const dateStr = `${monthName}-${day}-${time}`;
+
+    if (assetClass === "priceBinary") {
+      const { targetPrice } = lookup;
+      if (!targetPrice) return null;
+      return `${underlying}-above-${targetPrice}-${side}-${dateStr}`.toLowerCase();
+    }
+
+    if (assetClass === "priceBucket") {
+      const { priceThresholds } = lookup;
+      if (!priceThresholds) return null;
+      const prices = priceThresholds.split(",");
+      if (prices.length !== 2) return null;
+
+      const bucketStr = outcomeIndex === 0
+        ? `below-${prices[0]}`
+        : outcomeIndex === 1
+        ? `${prices[0]}-to-${prices[1]}`
+        : `above-${prices[1]}`;
+
+      return `${underlying}-price-range-${dateStr}-${bucketStr}-${side}`.toLowerCase();
+    }
+    return null;
+  }
+
   /**
    * Get asset ID for a coin.
    * - For Perpetuals, use the coin name (e.g., "BTC").
@@ -207,6 +330,13 @@ export class SymbolConverter {
    * converter.getAssetId("BTC"); // → 0
    * converter.getAssetId("HYPE/USDC"); // → 10107
    * converter.getAssetId("test:ABC"); // → 110000
+   * // Can also be used to retrieve the assetId of outcome markets using the same slug as in the URL
+   * // Examples:
+   * // For binary outcome markets: btc-above-81041-yes-may-08-0600
+   * // For multi-price outcome markets:
+   * //     btc-price-range-may-08-0600-below-79303-yes
+   * //     btc-price-range-may-08-0600-79303-to-82540-yes
+   * //     btc-price-range-may-08-0600-above-82540-yes
    * ```
    */
   getAssetId(name: string): number | undefined {
