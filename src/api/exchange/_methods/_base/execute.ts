@@ -141,29 +141,30 @@ export async function executeL1Action<T>(
     const signal = options?.signal;
 
     // Sign action (multi-sig or single wallet)
-    const [finalAction, signature] = "wallet" in config
-      ? [
-        action,
-        await signL1Action({
-          wallet: leader,
-          action,
-          nonce,
-          isTestnet: transport.isTestnet,
-          vaultAddress,
-          expiresAfter,
-        }),
-      ]
-      : await signMultiSigL1({
-        signers: config.signers,
-        multiSigUser: config.multiSigUser,
-        outerSigner: walletAddress,
-        signatureChainId: await getSignatureChainId(config),
+    let finalAction: unknown;
+    let signature;
+    if ("wallet" in config) {
+      finalAction = action;
+      signature = await signL1Action({
+        wallet: leader,
         action,
         nonce,
         isTestnet: transport.isTestnet,
         vaultAddress,
         expiresAfter,
       });
+    } else {
+      ({ action: finalAction, signature } = await signMultiSigL1({
+        signers: config.signers,
+        multiSigUser: config.multiSigUser,
+        signatureChainId: await getSignatureChainId(config),
+        action,
+        nonce,
+        isTestnet: transport.isTestnet,
+        vaultAddress,
+        expiresAfter,
+      }));
+    }
 
     // Send request and validate response
     const response = await transport.request("exchange", {
@@ -225,26 +226,29 @@ export async function executeUserSignedAction<T>(
     // Add system fields for user-signed actions
     const { type, ...restAction } = action;
     const nonceFieldName = getNonceFieldName(types);
-    const fullAction = { // Key order is important for multi-sig
+    const baseFields = {
       type,
       signatureChainId: await getSignatureChainId(config),
       hyperliquidChain: transport.isTestnet ? "Testnet" : "Mainnet",
-      ...restAction,
-      [nonceFieldName]: nonce,
-    };
+    } as const;
+    const fullAction = nonceFieldName === "nonce"
+      ? { ...baseFields, ...restAction, nonce }
+      : { ...baseFields, ...restAction, time: nonce };
 
     // Sign action (multi-sig or single wallet)
-    const [finalAction, signature] = "wallet" in config
-      ? [fullAction, await signUserSignedAction({ wallet: leader, action: fullAction, types })]
-      : await signMultiSigUserSigned({
+    let finalAction: unknown;
+    let signature;
+    if ("wallet" in config) {
+      finalAction = fullAction;
+      signature = await signUserSignedAction({ wallet: leader, action: fullAction, types });
+    } else {
+      ({ action: finalAction, signature } = await signMultiSigUserSigned({
         signers: config.signers,
         multiSigUser: config.multiSigUser,
-        outerSigner: walletAddress,
         action: fullAction,
         types,
-        nonce,
-        isTestnet: transport.isTestnet,
-      });
+      }));
+    }
 
     // Send request and validate response
     const response = await transport.request("exchange", {
