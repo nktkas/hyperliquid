@@ -182,7 +182,10 @@ export async function signMultiSigL1(args: {
   /** Optional expiration time of the action in ms since the epoch. */
   expiresAfter?: number;
 }): Promise<{ action: MultiSigAction; signature: Signature }> {
+  // --- Resolve leader (outer signer) address ---------------
   const outerSigner = await getWalletAddress(args.signers[0]);
+
+  // --- Collect inner signatures from all signers -----------
   const innerSignatures = await Promise.all(args.signers.map((signer) =>
     signL1Inner({
       signer,
@@ -195,6 +198,8 @@ export async function signMultiSigL1(args: {
       expiresAfter: args.expiresAfter,
     })
   ));
+
+  // --- Build wrapper ---------------------------------------
   const wrapper: MultiSigAction = {
     type: "multiSig",
     signatureChainId: args.signatureChainId,
@@ -205,6 +210,8 @@ export async function signMultiSigL1(args: {
       action: args.action,
     },
   };
+
+  // --- Sign wrapper with leader ----------------------------
   const signature = await signMultiSigOuter({
     leader: args.signers[0],
     wrapper,
@@ -213,6 +220,7 @@ export async function signMultiSigL1(args: {
     vaultAddress: args.vaultAddress,
     expiresAfter: args.expiresAfter,
   });
+
   return { action: wrapper, signature };
 }
 
@@ -316,7 +324,10 @@ export async function signMultiSigUserSigned(args: {
   /** [EIP-712](https://eips.ethereum.org/EIPS/eip-712) type definitions. */
   types: Record<string, readonly { name: string; type: string }[]>;
 }): Promise<{ action: MultiSigAction; signature: Signature }> {
+  // --- Resolve leader (outer signer) address ---------------
   const outerSigner = await getWalletAddress(args.signers[0]);
+
+  // --- Collect inner signatures from all signers -----------
   const innerSignatures = await Promise.all(args.signers.map((signer) =>
     signUserSignedInner({
       signer,
@@ -326,6 +337,8 @@ export async function signMultiSigUserSigned(args: {
       outerSigner,
     })
   ));
+
+  // --- Build wrapper ---------------------------------------
   const wrapper: MultiSigAction = {
     type: "multiSig",
     signatureChainId: args.action.signatureChainId,
@@ -336,12 +349,15 @@ export async function signMultiSigUserSigned(args: {
       action: args.action,
     },
   };
+
+  // --- Sign wrapper with leader ----------------------------
   const signature = await signMultiSigOuter({
     leader: args.signers[0],
     wrapper,
     nonce: args.action.nonce ?? args.action.time,
     isTestnet: args.action.hyperliquidChain === "Testnet",
   });
+
   return { action: wrapper, signature };
 }
 

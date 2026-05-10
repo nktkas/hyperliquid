@@ -109,12 +109,14 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function reorderObject(entries: Record<string, SchemaNode>, value: Record<string, unknown>): Record<string, unknown> {
+  // --- Reject extra keys not in schema ---------------------
   for (const key of Object.keys(value)) {
     if (!(key in entries)) {
       throw new CanonicalizeError(`Key "${key}" exists in data but not in schema`);
     }
   }
 
+  // --- Reject missing required keys ------------------------
   for (const key of Object.keys(entries)) {
     if (!(key in value)) {
       const t = entries[key].type;
@@ -124,6 +126,7 @@ function reorderObject(entries: Record<string, SchemaNode>, value: Record<string
     }
   }
 
+  // --- Build reordered result ------------------------------
   const result: Record<string, unknown> = {};
   for (const key of Object.keys(entries)) {
     if (key in value) {

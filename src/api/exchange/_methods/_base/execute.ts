@@ -97,6 +97,7 @@ export async function executeL1Action<T>(
  * @param options Additional options for the request.
  * @return API response.
  *
+ * @throws {ValidationError} If the request options fail validation.
  * @throws {ApiRequestError} If the API returns an error response.
  */
 export function executeUserSignedAction<T>(
@@ -108,7 +109,7 @@ export function executeUserSignedAction<T>(
   },
 ): Promise<T> {
   return executeWithShell<T>(config, async (nonce) => {
-    // Construct the full action with: type, system fields, user fields, nonce/time.
+    // --- Construct full action (type, system fields, user fields, nonce/time)
     const { type, ...restAction } = action;
     const nonceFieldName = extractNonceFieldName(types);
     const baseFields = {
@@ -120,6 +121,7 @@ export function executeUserSignedAction<T>(
       ? { ...baseFields, ...restAction, nonce }
       : { ...baseFields, ...restAction, time: nonce };
 
+    // --- Sign (single-wallet or multi-sig) -------------------
     if ("wallet" in config) {
       const signature = await signUserSignedAction({
         wallet: config.wallet,

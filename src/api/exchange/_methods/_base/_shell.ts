@@ -42,8 +42,13 @@ export async function executeWithShell<T>(
   // Lock per (wallet × testnet) ensures requests arrive at the server in nonce order.
   const key = `${walletAddress}:${config.transport.isTestnet}`;
   return await withLock(key, async () => {
+    // --- Generate nonce --------------------------------------
     const nonce = await (config.nonceManager?.(walletAddress) ?? globalNonceManager.getNonce(key));
+
+    // --- Build signed payload --------------------------------
     const { action, signature, extras } = await build(nonce);
+
+    // --- Send and validate -----------------------------------
     const response = await config.transport.request<T>("exchange", {
       action,
       signature,
