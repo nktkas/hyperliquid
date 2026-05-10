@@ -2,8 +2,9 @@
 
 import { assertEquals, assertRejects } from "jsr:@std/assert@1";
 import type { ReconnectingWebSocket } from "@nktkas/rews";
-import { WebSocketPostRequest, WebSocketRequestError } from "../../../src/transport/websocket/_postRequest.ts";
-import { HyperliquidEventTarget } from "../../../src/transport/websocket/_hyperliquidEventTarget.ts";
+import { WebSocketDispatcher, WebSocketRequestError } from "../../../src/transport/websocket/_dispatcher.ts";
+import { HyperliquidEventTarget } from "../../../src/transport/websocket/_events.ts";
+import { requestToId } from "../../../src/transport/websocket/_id.ts";
 
 // ============================================================
 // Helpers
@@ -38,14 +39,14 @@ class MockWebSocket extends EventTarget implements ReconnectingWebSocket {
   }
 }
 
-/** Creates a new WebSocketPostRequest with mock socket. */
+/** Creates a new WebSocketDispatcher with mock socket. */
 function createRequester(timeout: number | null = 10_000): {
   socket: MockWebSocket;
-  requester: WebSocketPostRequest;
+  requester: WebSocketDispatcher;
 } {
   const socket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
   const hlEvents = new HyperliquidEventTarget(socket);
-  const requester = new WebSocketPostRequest(socket, hlEvents, timeout);
+  const requester = new WebSocketDispatcher(socket, hlEvents, timeout);
   return { socket, requester };
 }
 
@@ -88,7 +89,7 @@ const RESPONSES = {
 // Tests
 // ============================================================
 
-Deno.test("WebSocketPostRequest", async (t) => {
+Deno.test("WebSocketDispatcher", async (t) => {
   await t.step("request()", async (t) => {
     await t.step("post", async (t) => {
       await t.step("sends request and receives info response", async () => {
@@ -265,7 +266,8 @@ Deno.test("WebSocketPostRequest", async (t) => {
 
         const promise = requester.request("post", { foo: "bar" });
 
-        await assertRejects(() => promise, WebSocketRequestError, "Signal timed out.");
+        const err = await assertRejects(() => promise, WebSocketRequestError);
+        assertEquals((err.cause as Error)?.name, "TimeoutError");
       });
 
       await t.step("timeout: null disables timeout", async () => {
@@ -296,7 +298,7 @@ Deno.test("WebSocketPostRequest", async (t) => {
       arr: [10, "0xF00D", false],
     };
 
-    const result = JSON.parse(WebSocketPostRequest.requestToId(input));
+    const result = JSON.parse(requestToId(input));
 
     // Keys sorted alphabetically
     assertEquals(Object.keys(result), ["Z", "arr", "boolVal", "nested", "textVal"]);

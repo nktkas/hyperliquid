@@ -1,12 +1,17 @@
+/**
+ * Typed event target for Hyperliquid WebSocket messages.
+ * @module
+ */
+
 import { CustomEvent_ } from "../_polyfills.ts";
 
-interface SubscribeUnsubscribeResponse {
+export interface SubscribeUnsubscribeResponse {
   method: "subscribe" | "unsubscribe";
   /** Original subscription request payload. */
   subscription: unknown;
 }
 
-interface PostResponse {
+export interface PostResponse {
   id: number;
   response:
     | {
@@ -49,7 +54,7 @@ interface TxDetails {
   user: string;
 }
 
-/** Base system events and dynamic channel events for Hyperliquid WebSocket API. */
+/** Base system events and dynamic channel events for the Hyperliquid WebSocket API. */
 interface HyperliquidEventMap {
   subscriptionResponse: CustomEvent<SubscribeUnsubscribeResponse>;
   post: CustomEvent<PostResponse>;
@@ -88,7 +93,7 @@ function isExplorerTxsEvent(msg: unknown): msg is TxDetails[] {
     "time" in msg[0] && "user" in msg[0];
 }
 
-/** Listens for WebSocket messages and sends them as Hyperliquid typed events. */
+/** Listens for WebSocket messages and re-dispatches them as typed Hyperliquid events. */
 export interface HyperliquidEventTarget {
   addEventListener<K extends keyof HyperliquidEventMap>(
     type: K,

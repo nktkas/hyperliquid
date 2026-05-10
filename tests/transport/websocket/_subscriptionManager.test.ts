@@ -2,8 +2,8 @@
 
 import { assert, assertEquals, assertFalse, assertRejects } from "jsr:@std/assert@1";
 import type { ReconnectingWebSocket } from "@nktkas/rews";
-import { WebSocketPostRequest, WebSocketRequestError } from "../../../src/transport/websocket/_postRequest.ts";
-import { HyperliquidEventTarget } from "../../../src/transport/websocket/_hyperliquidEventTarget.ts";
+import { WebSocketDispatcher, WebSocketRequestError } from "../../../src/transport/websocket/_dispatcher.ts";
+import { HyperliquidEventTarget } from "../../../src/transport/websocket/_events.ts";
 import { WebSocketSubscriptionManager } from "../../../src/transport/websocket/_subscriptionManager.ts";
 
 // ============================================================
@@ -41,22 +41,30 @@ class MockWebSocket extends EventTarget implements ReconnectingWebSocket {
   }
 }
 
-type ManagerWithInternals = WebSocketSubscriptionManager & {
+/** Strips private/protected modifiers so intersections with internal-state types don't collapse to `never`. */
+type Public<T> = { [K in keyof T]: T[K] };
+type RequesterWithInternals = Public<WebSocketDispatcher> & { _queue: unknown[] };
+type ManagerWithInternals = Public<WebSocketSubscriptionManager> & {
   _subscriptions: Map<string, { listeners: Map<unknown, unknown> }>;
 };
 
 /** Creates a new WebSocketSubscriptionManager with mock socket. */
 function createManager(resubscribe = true): {
   socket: MockWebSocket;
-  requester: WebSocketPostRequest & { _queue: unknown[] };
+  requester: RequesterWithInternals;
   hlEvents: HyperliquidEventTarget;
   manager: ManagerWithInternals;
 } {
   const socket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
   const hlEvents = new HyperliquidEventTarget(socket);
-  const requester = new WebSocketPostRequest(socket, hlEvents, 10_000) as WebSocketPostRequest & { _queue: unknown[] };
-  const manager = new WebSocketSubscriptionManager(socket, requester, hlEvents, resubscribe) as ManagerWithInternals;
-  return { socket, requester, hlEvents, manager };
+  const requester = new WebSocketDispatcher(socket, hlEvents, 10_000);
+  const manager = new WebSocketSubscriptionManager(socket, requester, hlEvents, resubscribe);
+  return {
+    socket,
+    requester: requester as unknown as RequesterWithInternals,
+    hlEvents,
+    manager: manager as unknown as ManagerWithInternals,
+  };
 }
 
 // ============================================================
@@ -260,6 +268,8 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
 
       assertEquals(eventCount1, 2);
       assertEquals(eventCount2, 2);
+
+      socket.terminate();
     });
 
     await t.step("handles resubscription errors", async () => {
@@ -324,6 +334,8 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
 
       assertEquals(eventCount1, 1);
       assertEquals(eventCount2, 1);
+
+      socket.terminate();
     });
   });
 

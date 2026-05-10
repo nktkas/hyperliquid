@@ -1,7 +1,7 @@
 import { HyperliquidError } from "../_base.ts";
 
 /**
- * Transport interface for executing requests to Hyperliquid servers.
+ * Transport interface for executing requests to the Hyperliquid API.
  *
  * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint | Info endpoint}
  * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint | Exchange endpoint}
@@ -14,9 +14,10 @@ export interface IRequestTransport {
    * Sends a request to the Hyperliquid API.
    *
    * @param endpoint The API endpoint to send the request to.
+   *                 The `explorer` endpoint is HTTP-only — calling it on a WebSocket transport will reject.
    * @param payload The payload to send with the request.
    * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   * @return A promise that resolves with parsed JSON response body.
+   * @return A promise that resolves with the parsed JSON response body.
    */
   request<T>(endpoint: "info" | "exchange" | "explorer", payload: unknown, signal?: AbortSignal): Promise<T>;
 }
