@@ -173,6 +173,7 @@ const StringMath = {
   },
 };
 
+/** Normalize a decimal string by trimming unnecessary zeros and formatting edge cases. */
 export function formatDecimalString(value: string): string {
   return value
     // remove leading/trailing whitespace
@@ -190,7 +191,7 @@ export function formatDecimalString(value: string): string {
 }
 
 function assertNumberString(value: string): void {
-  if (!/^-?(\d+\.?\d*|\.\d*)$/.test(value)) {
+  if (!/^-?(\d+\.?\d*|\.\d+)$/.test(value)) {
     throw new TypeError("Invalid number format");
   }
 }

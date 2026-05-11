@@ -71,9 +71,12 @@ Deno.test("formatPrice", async (t) => {
   });
 
   await t.step("invalid input throws", () => {
-    assertThrows(() => formatPrice("0x1A", 0));
-    assertThrows(() => formatPrice("1.23e5", 0));
-    assertThrows(() => formatPrice("abc", 0));
+    assertThrows(() => formatPrice("0x1A", 0), TypeError);
+    assertThrows(() => formatPrice("1.23e5", 0), TypeError);
+    assertThrows(() => formatPrice("abc", 0), TypeError);
+    assertThrows(() => formatPrice(".", 0), TypeError);
+    assertThrows(() => formatPrice("-.", 0), TypeError);
+    assertThrows(() => formatPrice("", 0), TypeError);
   });
 
   await t.step("reference validation", async (t) => {
@@ -121,9 +124,12 @@ Deno.test("formatSize", async (t) => {
   });
 
   await t.step("invalid input throws", () => {
-    assertThrows(() => formatSize("0xFF", 0));
-    assertThrows(() => formatSize("5e-3", 0));
-    assertThrows(() => formatSize("invalid", 0));
+    assertThrows(() => formatSize("0xFF", 0), TypeError);
+    assertThrows(() => formatSize("5e-3", 0), TypeError);
+    assertThrows(() => formatSize("invalid", 0), TypeError);
+    assertThrows(() => formatSize(".", 0), TypeError);
+    assertThrows(() => formatSize("-.", 0), TypeError);
+    assertThrows(() => formatSize("", 0), TypeError);
   });
 
   await t.step("reference validation", async (t) => {
