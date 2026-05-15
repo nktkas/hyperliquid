@@ -12,6 +12,8 @@ runTest({
 
     schemaCoverage(responseSchema, data, [
       "#/properties/currentGas/null",
+      "#/properties/currentGas/defined",
+      "#/properties/endGas/null",
       "#/properties/endGas/defined",
     ]);
   },

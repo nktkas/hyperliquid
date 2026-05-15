@@ -36,6 +36,8 @@ runTest({
       "#/properties/meta/properties/universe/items/properties/lastGrowthModeChangeTime/present",
       "#/properties/twapStates/array",
       "#/properties/perpsAtOpenInterestCap/present",
+      "#/properties/agentAddress/defined",
+      "#/properties/agentValidUntil/defined",
     ]);
   },
 });
