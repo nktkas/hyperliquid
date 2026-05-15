@@ -30,11 +30,11 @@ export const ApproveAgentRequest = /* @__PURE__ */ (() => {
             (input) => {
               // Ignore trailing ` valid_until <timestamp>` when checking length
               const baseName = input.replace(/ valid_until \d+$/, "");
-              return baseName.length >= 1 && baseName.length <= 16;
+              return baseName.length <= 16;
             },
             (issue) => {
               const baseName = issue.input.replace(/ valid_until \d+$/, "");
-              return `Invalid length: Expected >= 1 and <= 16 but received ${baseName.length}`;
+              return `Invalid length: Expected <= 16 but received ${baseName.length}`;
             },
           ),
         ),
