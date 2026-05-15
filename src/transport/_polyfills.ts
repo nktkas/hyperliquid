@@ -60,5 +60,6 @@ export const CustomEvent_ = /* @__PURE__ */ (() => {
       super(type, eventInitDict);
       this.detail = eventInitDict?.detail ?? null;
     }
+    initCustomEvent(): void {}
   };
 })();
