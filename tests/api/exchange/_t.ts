@@ -293,3 +293,19 @@ export async function topUpSpot(
     amount,
   });
 }
+
+export async function createAgentExchangeClient(
+  principalClient: ExchangeClient<ExchangeSingleWalletConfig | ExchangeMultiSigConfig>,
+): Promise<{ agentExch: ExchangeClient<ExchangeSingleWalletConfig>; principal: `0x${string}` }> {
+  const principal = "multiSigUser" in principalClient.config_
+    ? principalClient.config_.multiSigUser
+    : await getWalletAddress(principalClient.config_.wallet);
+
+  const agentAccount = privateKeyToAccount(generatePrivateKey());
+  await principalClient.approveAgent({ agentAddress: agentAccount.address, agentName: null });
+
+  return {
+    agentExch: new ExchangeClient({ wallet: agentAccount, transport }),
+    principal,
+  };
+}

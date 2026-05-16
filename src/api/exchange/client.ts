@@ -15,6 +15,12 @@ import {
   type AgentEnableDexAbstractionSuccessResponse,
 } from "./_methods/agentEnableDexAbstraction.ts";
 import {
+  agentSendAsset,
+  type AgentSendAssetOptions,
+  type AgentSendAssetParameters,
+  type AgentSendAssetSuccessResponse,
+} from "./_methods/agentSendAsset.ts";
+import {
   agentSetAbstraction,
   type AgentSetAbstractionOptions,
   type AgentSetAbstractionParameters,
@@ -100,6 +106,12 @@ import {
   type EvmUserModifyParameters,
   type EvmUserModifySuccessResponse,
 } from "./_methods/evmUserModify.ts";
+import {
+  hip3LiquidatorTransfer,
+  type Hip3LiquidatorTransferOptions,
+  type Hip3LiquidatorTransferParameters,
+  type Hip3LiquidatorTransferSuccessResponse,
+} from "./_methods/hip3LiquidatorTransfer.ts";
 import {
   linkStakingUser,
   type LinkStakingUserOptions,
@@ -387,7 +399,51 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   }
 
   /**
+   * Transfer tokens on behalf of the principal via an agent wallet.
+   *
+   * Like {@link sendAsset} but signed as an L1 action by the agent wallet (instead of EIP-712 by the principal).
+   *
+   * Signing: L1 Action.
+   *
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
+   *
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const agentWallet = privateKeyToAccount("0x..."); // approved agent's private key
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet: agentWallet });
+   *
+   * await client.agentSendAsset({
+   *   destination: "0x0000000000000000000000000000000000000001",
+   *   sourceDex: "",
+   *   destinationDex: "test",
+   *   token: "USDC:0xeb62eee3685fc4c43992febcd9e75443",
+   *   amount: "1",
+   * });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#agent-send-asset
+   */
+  agentSendAsset(
+    params: AgentSendAssetParameters,
+    opts?: AgentSendAssetOptions,
+  ): Promise<AgentSendAssetSuccessResponse> {
+    return agentSendAsset(this.config_, params, opts);
+  }
+
+  /**
    * Set User abstraction mode (method for agent wallet).
+   *
+   * Like {@link userSetAbstraction} but signed as an L1 action by the agent wallet (instead of EIP-712 by the principal).
    *
    * Signing: L1 Action.
    *
@@ -1006,6 +1062,44 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   }
 
   /**
+   * Deposit into or withdraw from the HIP-3 DEX backstop liquidator.
+   *
+   * Signing: L1 Action.
+   *
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
+   *
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.hip3LiquidatorTransfer({
+   *   dex: "test",
+   *   ntl: 1_000_000_000, // 1000 quote tokens (1e-6 units)
+   *   isDeposit: true,
+   * });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#hip-3-backstop-liquidator-transfer
+   */
+  hip3LiquidatorTransfer(
+    params: Hip3LiquidatorTransferParameters,
+    opts?: Hip3LiquidatorTransferOptions,
+  ): Promise<Hip3LiquidatorTransferSuccessResponse> {
+    return hip3LiquidatorTransfer(this.config_, params, opts);
+  }
+
+  /**
    * Link staking and trading accounts for fee discount attribution.
    *
    * Signing: User-Signed EIP-712.
@@ -1322,6 +1416,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
 
   /**
    * Transfer tokens between different perp DEXs, spot balance, users, and/or sub-accounts.
+   *
+   * Like {@link agentSendAsset} but signed via EIP-712 by the principal (instead of as an L1 action by the agent wallet).
    *
    * Signing: User-Signed EIP-712.
    *
@@ -2022,6 +2118,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   /**
    * Set user abstraction mode.
    *
+   * Like {@link agentSetAbstraction} but signed via EIP-712 by the principal (instead of as an L1 action by the agent wallet).
+   *
    * Signing: User-Signed EIP-712.
    *
    * @param params Parameters specific to the API request.
@@ -2282,6 +2380,11 @@ export type {
   AgentEnableDexAbstractionSuccessResponse,
 } from "./_methods/agentEnableDexAbstraction.ts";
 export type {
+  AgentSendAssetOptions,
+  AgentSendAssetParameters,
+  AgentSendAssetSuccessResponse,
+} from "./_methods/agentSendAsset.ts";
+export type {
   AgentSetAbstractionOptions,
   AgentSetAbstractionParameters,
   AgentSetAbstractionSuccessResponse,
@@ -2333,6 +2436,11 @@ export type {
   EvmUserModifyParameters,
   EvmUserModifySuccessResponse,
 } from "./_methods/evmUserModify.ts";
+export type {
+  Hip3LiquidatorTransferOptions,
+  Hip3LiquidatorTransferParameters,
+  Hip3LiquidatorTransferSuccessResponse,
+} from "./_methods/hip3LiquidatorTransfer.ts";
 export type {
   LinkStakingUserOptions,
   LinkStakingUserParameters,

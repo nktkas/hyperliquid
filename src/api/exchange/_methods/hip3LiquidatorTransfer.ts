@@ -7,25 +7,21 @@ import * as v from "@valibot/valibot";
 import { Hex, UnsignedInteger } from "../../_schemas.ts";
 
 /**
- * Set User abstraction mode (method for agent wallet).
- *
- * Like {@link userSetAbstraction} but signed as an L1 action by the agent wallet (instead of EIP-712 by the principal).
- *
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction-agent
+ * Deposit into or withdraw from the HIP-3 DEX backstop liquidator.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#hip-3-backstop-liquidator-transfer
  */
-export const AgentSetAbstractionRequest = /* @__PURE__ */ (() => {
+export const Hip3LiquidatorTransferRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Action to perform. */
     action: v.object({
       /** Type of action. */
-      type: v.literal("agentSetAbstraction"),
-      /**
-       * User abstraction mode.
-       * - `"i"`: disabled
-       * - `"u"`: unifiedAccount
-       * - `"p"`: portfolioMargin
-       */
-      abstraction: v.picklist(["i", "u", "p"]),
+      type: v.literal("hip3LiquidatorTransfer"),
+      /** Name of the HIP-3 DEX. */
+      dex: v.string(),
+      /** Amount in quote-token 1e-6 units (must be a multiple of 1000 quote tokens, i.e. 1_000_000_000). */
+      ntl: UnsignedInteger,
+      /** `true` for deposit, `false` for withdrawal. */
+      isDeposit: v.boolean(),
     }),
     /** Nonce (timestamp in ms) used to prevent replay attacks. */
     nonce: UnsignedInteger,
@@ -42,13 +38,13 @@ export const AgentSetAbstractionRequest = /* @__PURE__ */ (() => {
     expiresAfter: v.optional(UnsignedInteger),
   });
 })();
-export type AgentSetAbstractionRequest = v.InferOutput<typeof AgentSetAbstractionRequest>;
+export type Hip3LiquidatorTransferRequest = v.InferOutput<typeof Hip3LiquidatorTransferRequest>;
 
 /**
  * Successful response without specific data or error response.
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction-agent
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#hip-3-backstop-liquidator-transfer
  */
-export type AgentSetAbstractionResponse =
+export type Hip3LiquidatorTransferResponse =
   | {
     /** Successful status. */
     status: "ok";
@@ -79,25 +75,21 @@ import {
 } from "./_base/mod.ts";
 
 /** Schema for action fields (excludes request-level system fields). */
-const AgentSetAbstractionActionSchema = /* @__PURE__ */ (() => {
-  return v.object(AgentSetAbstractionRequest.entries.action.entries);
+const Hip3LiquidatorTransferActionSchema = /* @__PURE__ */ (() => {
+  return v.object(Hip3LiquidatorTransferRequest.entries.action.entries);
 })();
 
-/** Action parameters for the {@linkcode agentSetAbstraction} function. */
-export type AgentSetAbstractionParameters = Omit<v.InferInput<typeof AgentSetAbstractionActionSchema>, "type">;
+/** Action parameters for the {@linkcode hip3LiquidatorTransfer} function. */
+export type Hip3LiquidatorTransferParameters = Omit<v.InferInput<typeof Hip3LiquidatorTransferActionSchema>, "type">;
 
-/** Request options for the {@linkcode agentSetAbstraction} function. */
-export type AgentSetAbstractionOptions = ExtractRequestOptions<
-  v.InferInput<typeof AgentSetAbstractionRequest>
->;
+/** Request options for the {@linkcode hip3LiquidatorTransfer} function. */
+export type Hip3LiquidatorTransferOptions = ExtractRequestOptions<v.InferInput<typeof Hip3LiquidatorTransferRequest>>;
 
-/** Successful variant of {@linkcode AgentSetAbstractionResponse} without errors. */
-export type AgentSetAbstractionSuccessResponse = ExcludeErrorResponse<AgentSetAbstractionResponse>;
+/** Successful variant of {@linkcode Hip3LiquidatorTransferResponse} without errors. */
+export type Hip3LiquidatorTransferSuccessResponse = ExcludeErrorResponse<Hip3LiquidatorTransferResponse>;
 
 /**
- * Set User abstraction mode (method for agent wallet).
- *
- * Like {@link userSetAbstraction} but signed as an L1 action by the agent wallet (instead of EIP-712 by the principal).
+ * Deposit into or withdraw from the HIP-3 DEX backstop liquidator.
  *
  * Signing: L1 Action.
  *
@@ -113,27 +105,29 @@ export type AgentSetAbstractionSuccessResponse = ExcludeErrorResponse<AgentSetAb
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
- * import { agentSetAbstraction } from "@nktkas/hyperliquid/api/exchange";
+ * import { hip3LiquidatorTransfer } from "@nktkas/hyperliquid/api/exchange";
  * import { privateKeyToAccount } from "npm:viem/accounts";
  *
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await agentSetAbstraction({ transport, wallet }, {
- *   abstraction: "u",
+ * await hip3LiquidatorTransfer({ transport, wallet }, {
+ *   dex: "test",
+ *   ntl: 1_000_000_000, // 1000 quote tokens (1e-6 units)
+ *   isDeposit: true,
  * });
  * ```
  *
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction-agent
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#hip-3-backstop-liquidator-transfer
  */
-export function agentSetAbstraction(
+export function hip3LiquidatorTransfer(
   config: ExchangeConfig,
-  params: AgentSetAbstractionParameters,
-  opts?: AgentSetAbstractionOptions,
-): Promise<AgentSetAbstractionSuccessResponse> {
+  params: Hip3LiquidatorTransferParameters,
+  opts?: Hip3LiquidatorTransferOptions,
+): Promise<Hip3LiquidatorTransferSuccessResponse> {
   const action = canonicalize(
-    AgentSetAbstractionActionSchema,
-    parse(AgentSetAbstractionActionSchema, { type: "agentSetAbstraction", ...params }),
+    Hip3LiquidatorTransferActionSchema,
+    parse(Hip3LiquidatorTransferActionSchema, { type: "hip3LiquidatorTransfer", ...params }),
   );
   return executeL1Action(config, action, opts);
 }

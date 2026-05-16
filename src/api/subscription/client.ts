@@ -42,6 +42,7 @@ import { l2Book, type L2BookEvent, type L2BookParameters } from "./_methods/l2Bo
 import { notification, type NotificationEvent, type NotificationParameters } from "./_methods/notification.ts";
 import { openOrders, type OpenOrdersEvent, type OpenOrdersParameters } from "./_methods/openOrders.ts";
 import { orderUpdates, type OrderUpdatesEvent, type OrderUpdatesParameters } from "./_methods/orderUpdates.ts";
+import { outcomeMetaUpdates, type OutcomeMetaUpdatesEvent } from "./_methods/outcomeMetaUpdates.ts";
 import { spotAssetCtxs, type SpotAssetCtxsEvent } from "./_methods/spotAssetCtxs.ts";
 import { spotState, type SpotStateEvent, type SpotStateParameters } from "./_methods/spotState.ts";
 import { trades, type TradesEvent, type TradesParameters } from "./_methods/trades.ts";
@@ -611,6 +612,35 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   }
 
   /**
+   * Subscribe to prediction market outcome/question metadata updates.
+   *
+   * @param listener A callback function to be called when the event is received.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport();
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.outcomeMetaUpdates((data) => {
+   *   console.log(data);
+   * });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
+  outcomeMetaUpdates(
+    listener: (data: OutcomeMetaUpdatesEvent) => void,
+  ): Promise<ISubscription> {
+    return outcomeMetaUpdates(this.config_, listener);
+  }
+
+  /**
    * Subscribe to context updates for all spot assets.
    *
    * @param listener A callback function to be called when the event is received.
@@ -1061,6 +1091,7 @@ export type {
   OrderUpdatesEvent as OrderUpdatesWsEvent,
   OrderUpdatesParameters as OrderUpdatesWsParameters,
 } from "./_methods/orderUpdates.ts";
+export type { OutcomeMetaUpdatesEvent as OutcomeMetaUpdatesWsEvent } from "./_methods/outcomeMetaUpdates.ts";
 export type { SpotAssetCtxsEvent as SpotAssetCtxsWsEvent } from "./_methods/spotAssetCtxs.ts";
 export type {
   SpotStateEvent as SpotStateWsEvent,

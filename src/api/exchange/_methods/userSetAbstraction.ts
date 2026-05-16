@@ -8,6 +8,9 @@ import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Set user abstraction mode.
+ *
+ * Like {@link agentSetAbstraction} but signed via EIP-712 by the principal (instead of as an L1 action by the agent wallet).
+ *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction
  */
 export const UserSetAbstractionRequest = /* @__PURE__ */ (() => {
@@ -105,6 +108,8 @@ export const UserSetAbstractionTypes = {
 
 /**
  * Set user abstraction mode.
+ *
+ * Like {@link agentSetAbstraction} but signed via EIP-712 by the principal (instead of as an L1 action by the agent wallet).
  *
  * Signing: User-Signed EIP-712.
  *

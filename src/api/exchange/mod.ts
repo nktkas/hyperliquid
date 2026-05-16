@@ -45,6 +45,7 @@ export {
 } from "./_methods/_base/mod.ts";
 
 export * from "./_methods/agentEnableDexAbstraction.ts";
+export * from "./_methods/agentSendAsset.ts";
 export * from "./_methods/agentSetAbstraction.ts";
 export * from "./_methods/approveAgent.ts";
 export * from "./_methods/approveBuilderFee.ts";
@@ -61,6 +62,7 @@ export * from "./_methods/cSignerAction.ts";
 export * from "./_methods/cValidatorAction.ts";
 export * from "./_methods/cWithdraw.ts";
 export * from "./_methods/evmUserModify.ts";
+export * from "./_methods/hip3LiquidatorTransfer.ts";
 export * from "./_methods/linkStakingUser.ts";
 export * from "./_methods/modify.ts";
 export * from "./_methods/noop.ts";

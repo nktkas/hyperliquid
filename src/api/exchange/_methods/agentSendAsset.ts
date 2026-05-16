@@ -7,22 +7,18 @@ import * as v from "@valibot/valibot";
 import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
 
 /**
- * Transfer tokens between different perp DEXs, spot balance, users, and/or sub-accounts.
+ * Transfer tokens on behalf of the principal via an agent wallet.
  *
- * Like {@link agentSendAsset} but signed via EIP-712 by the principal (instead of as an L1 action by the agent wallet).
+ * Like {@link sendAsset} but signed as an L1 action by the agent wallet (instead of EIP-712 by the principal).
  *
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#agent-send-asset
  */
-export const SendAssetRequest = /* @__PURE__ */ (() => {
+export const AgentSendAssetRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Action to perform. */
     action: v.object({
       /** Type of action. */
-      type: v.literal("sendAsset"),
-      /** Chain ID in hex format for EIP-712 signing. */
-      signatureChainId: Hex,
-      /** HyperLiquid network type. */
-      hyperliquidChain: v.picklist(["Mainnet", "Testnet"]),
+      type: v.literal("agentSendAsset"),
       /** Destination address. */
       destination: Address,
       /** Source DEX ("" for default USDC perp DEX, "spot" for spot). */
@@ -38,7 +34,7 @@ export const SendAssetRequest = /* @__PURE__ */ (() => {
         v.union([v.literal(""), Address]),
         "",
       ),
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
+      /** Nonce (timestamp in ms). Equal to the envelope nonce; injected by the SDK. */
       nonce: UnsignedInteger,
     }),
     /** Nonce (timestamp in ms) used to prevent replay attacks. */
@@ -52,15 +48,17 @@ export const SendAssetRequest = /* @__PURE__ */ (() => {
       /** Recovery identifier. */
       v: v.picklist([27, 28]),
     }),
+    /** Expiration time of the action. */
+    expiresAfter: v.optional(UnsignedInteger),
   });
 })();
-export type SendAssetRequest = v.InferOutput<typeof SendAssetRequest>;
+export type AgentSendAssetRequest = v.InferOutput<typeof AgentSendAssetRequest>;
 
 /**
  * Successful response without specific data or error response.
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#agent-send-asset
  */
-export type SendAssetResponse =
+export type AgentSendAssetResponse =
   | {
     /** Successful status. */
     status: "ok";
@@ -86,47 +84,31 @@ import { canonicalize } from "../../../signing/mod.ts";
 import {
   type ExchangeConfig,
   type ExcludeErrorResponse,
-  executeUserSignedAction,
+  executeL1Action,
   type ExtractRequestOptions,
 } from "./_base/mod.ts";
+import { globalNonceManager } from "./_base/_nonce.ts";
 
 /** Schema for action fields (excludes request-level system fields). */
-const SendAssetActionSchema = /* @__PURE__ */ (() => {
-  return v.omit(
-    v.object(SendAssetRequest.entries.action.entries),
-    ["signatureChainId", "hyperliquidChain", "nonce"],
-  );
+const AgentSendAssetActionSchema = /* @__PURE__ */ (() => {
+  return v.object(AgentSendAssetRequest.entries.action.entries);
 })();
 
-/** Action parameters for the {@linkcode sendAsset} function. */
-export type SendAssetParameters = Omit<v.InferInput<typeof SendAssetActionSchema>, "type">;
+/** Action parameters for the {@linkcode agentSendAsset} function. */
+export type AgentSendAssetParameters = Omit<v.InferInput<typeof AgentSendAssetActionSchema>, "type" | "nonce">;
 
-/** Request options for the {@linkcode sendAsset} function. */
-export type SendAssetOptions = ExtractRequestOptions<v.InferInput<typeof SendAssetRequest>>;
+/** Request options for the {@linkcode agentSendAsset} function. */
+export type AgentSendAssetOptions = ExtractRequestOptions<v.InferInput<typeof AgentSendAssetRequest>>;
 
-/** Successful variant of {@linkcode SendAssetResponse} without errors. */
-export type SendAssetSuccessResponse = ExcludeErrorResponse<SendAssetResponse>;
-
-/** EIP-712 types for the {@linkcode sendAsset} function. */
-export const SendAssetTypes = {
-  "HyperliquidTransaction:SendAsset": [
-    { name: "hyperliquidChain", type: "string" },
-    { name: "destination", type: "string" },
-    { name: "sourceDex", type: "string" },
-    { name: "destinationDex", type: "string" },
-    { name: "token", type: "string" },
-    { name: "amount", type: "string" },
-    { name: "fromSubAccount", type: "string" },
-    { name: "nonce", type: "uint64" },
-  ],
-};
+/** Successful variant of {@linkcode AgentSendAssetResponse} without errors. */
+export type AgentSendAssetSuccessResponse = ExcludeErrorResponse<AgentSendAssetResponse>;
 
 /**
- * Transfer tokens between different perp DEXs, spot balance, users, and/or sub-accounts.
+ * Transfer tokens on behalf of the principal via an agent wallet.
  *
- * Like {@link agentSendAsset} but signed via EIP-712 by the principal (instead of as an L1 action by the agent wallet).
+ * Like {@link sendAsset} but signed as an L1 action by the agent wallet (instead of EIP-712 by the principal).
  *
- * Signing: User-Signed EIP-712.
+ * Signing: L1 Action.
  *
  * @param config General configuration for Exchange API requests.
  * @param params Parameters specific to the API request.
@@ -140,13 +122,13 @@ export const SendAssetTypes = {
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
- * import { sendAsset } from "@nktkas/hyperliquid/api/exchange";
+ * import { agentSendAsset } from "@nktkas/hyperliquid/api/exchange";
  * import { privateKeyToAccount } from "npm:viem/accounts";
  *
- * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+ * const agentWallet = privateKeyToAccount("0x..."); // approved agent's private key
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await sendAsset({ transport, wallet }, {
+ * await agentSendAsset({ transport, wallet: agentWallet }, {
  *   destination: "0x0000000000000000000000000000000000000001",
  *   sourceDex: "",
  *   destinationDex: "test",
@@ -155,16 +137,26 @@ export const SendAssetTypes = {
  * });
  * ```
  *
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#agent-send-asset
  */
-export function sendAsset(
+export function agentSendAsset(
   config: ExchangeConfig,
-  params: SendAssetParameters,
-  opts?: SendAssetOptions,
-): Promise<SendAssetSuccessResponse> {
+  params: AgentSendAssetParameters,
+  opts?: AgentSendAssetOptions,
+): Promise<AgentSendAssetSuccessResponse> {
   const action = canonicalize(
-    SendAssetActionSchema,
-    parse(SendAssetActionSchema, { type: "sendAsset", ...params }),
+    AgentSendAssetActionSchema,
+    parse(AgentSendAssetActionSchema, { type: "agentSendAsset", ...params, nonce: 0 }),
   );
-  return executeUserSignedAction(config, action, SendAssetTypes, opts);
+  return executeL1Action(
+    {
+      ...config,
+      nonceManager: async (addr) =>
+        // Patch action.nonce in-place so the body matches the envelope nonce (server requires equality).
+        action.nonce =
+          await (config.nonceManager?.(addr) ?? globalNonceManager.getNonce(`${addr}:${config.transport.isTestnet}`)),
+    },
+    action,
+    opts,
+  );
 }

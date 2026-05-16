@@ -41,6 +41,7 @@ export * from "./_methods/l2Book.ts";
 export * from "./_methods/notification.ts";
 export * from "./_methods/openOrders.ts";
 export * from "./_methods/orderUpdates.ts";
+export * from "./_methods/outcomeMetaUpdates.ts";
 export * from "./_methods/spotAssetCtxs.ts";
 export * from "./_methods/spotState.ts";
 export * from "./_methods/trades.ts";
