@@ -890,7 +890,6 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    *   name: "...",
    *   description: "...",
    *   initialUsd: 100 * 1e6,
-   *   nonce: Date.now(),
    * });
    * ```
    *
