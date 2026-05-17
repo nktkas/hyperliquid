@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Address, Hex, Percent, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
+import { Address, Hex, Integer, Percent, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Deploying HIP-1 and HIP-2 assets.
@@ -115,6 +115,27 @@ export const SpotDeployRequest = /* @__PURE__ */ (() => {
         enableAlignedQuoteToken: v.object({
           /** Token identifier to enable as aligned quote token. */
           token: UnsignedInteger,
+        }),
+      }),
+      v.object({
+        /** Type of action. */
+        type: v.literal("spotDeploy"),
+        /**
+         * Request link of a HyperCore spot token to an ERC-20 contract on the HyperEVM.
+         * Must be sent by the spot deployer. The link is finalized by the EVM deployer via {@link finalizeEvmContract}.
+         * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/hyperevm/hypercore-less-than-greater-than-hyperevm-transfers
+         */
+        requestEvmContract: v.object({
+          /** Token identifier to link. */
+          token: UnsignedInteger,
+          /** ERC-20 contract address on the HyperEVM. */
+          address: Address,
+          /**
+           * Difference in wei decimals between Core and EVM spot.
+           * E.g. Core PURR has 5 weiDecimals but EVM PURR has 18, so this would be `13`.
+           * Range: `[-2, 18]` inclusive.
+           */
+          evmExtraWeiDecimals: v.pipe(Integer, v.minValue(-2), v.maxValue(18)),
         }),
       }),
     ]),

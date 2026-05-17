@@ -79,6 +79,10 @@ import {
   type FundingHistoryParameters,
   type FundingHistoryResponse,
 } from "./_methods/fundingHistory.ts";
+import {
+  gossipPriorityAuctionStatus,
+  type GossipPriorityAuctionStatusResponse,
+} from "./_methods/gossipPriorityAuctionStatus.ts";
 import { gossipRootIps, type GossipRootIpsResponse } from "./_methods/gossipRootIps.ts";
 import {
   historicalOrders,
@@ -794,6 +798,33 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     signal?: AbortSignal,
   ): Promise<FundingHistoryResponse> {
     return fundingHistory(this.config_, params, signal);
+  }
+
+  /**
+   * Request gossip priority auction status (previous winners and current auctions).
+   *
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Gossip priority auction status.
+   *
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.gossipPriorityAuctionStatus();
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/priority-fees
+   */
+  gossipPriorityAuctionStatus(
+    signal?: AbortSignal,
+  ): Promise<GossipPriorityAuctionStatusResponse> {
+    return gossipPriorityAuctionStatus(this.config_, signal);
   }
 
   /**
@@ -2516,6 +2547,7 @@ export type { ExchangeStatusResponse } from "./_methods/exchangeStatus.ts";
 export type { ExtraAgentsParameters, ExtraAgentsResponse } from "./_methods/extraAgents.ts";
 export type { FrontendOpenOrdersParameters, FrontendOpenOrdersResponse } from "./_methods/frontendOpenOrders.ts";
 export type { FundingHistoryParameters, FundingHistoryResponse } from "./_methods/fundingHistory.ts";
+export type { GossipPriorityAuctionStatusResponse } from "./_methods/gossipPriorityAuctionStatus.ts";
 export type { GossipRootIpsResponse } from "./_methods/gossipRootIps.ts";
 export type { HistoricalOrdersParameters, HistoricalOrdersResponse } from "./_methods/historicalOrders.ts";
 export type { IsVipParameters, IsVipResponse } from "./_methods/isVip.ts";

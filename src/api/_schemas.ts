@@ -36,7 +36,7 @@ export const Decimal = /* @__PURE__ */ (() => {
 })();
 export type Decimal = v.InferOutput<typeof Decimal>;
 
-/** Safe integer number. */
+/** Safe integer number (>= Number.MIN_SAFE_INTEGER & <= Number.MAX_SAFE_INTEGER). */
 export const Integer = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([v.string(), v.number()]),
@@ -47,7 +47,7 @@ export const Integer = /* @__PURE__ */ (() => {
 })();
 export type Integer = v.InferOutput<typeof Integer>;
 
-/** Unsigned safe integer number (>= 0). */
+/** Unsigned safe integer number (>= 0 & <= Number.MAX_SAFE_INTEGER). */
 export const UnsignedInteger = /* @__PURE__ */ (() => {
   return v.pipe(
     v.union([v.string(), v.number()]),

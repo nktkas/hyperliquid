@@ -43,6 +43,7 @@ export * from "./_methods/exchangeStatus.ts";
 export * from "./_methods/extraAgents.ts";
 export * from "./_methods/frontendOpenOrders.ts";
 export * from "./_methods/fundingHistory.ts";
+export * from "./_methods/gossipPriorityAuctionStatus.ts";
 export * from "./_methods/gossipRootIps.ts";
 export * from "./_methods/historicalOrders.ts";
 export * from "./_methods/isVip.ts";

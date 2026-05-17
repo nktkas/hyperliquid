@@ -107,6 +107,18 @@ import {
   type EvmUserModifySuccessResponse,
 } from "./_methods/evmUserModify.ts";
 import {
+  finalizeEvmContract,
+  type FinalizeEvmContractOptions,
+  type FinalizeEvmContractParameters,
+  type FinalizeEvmContractSuccessResponse,
+} from "./_methods/finalizeEvmContract.ts";
+import {
+  gossipPriorityBid,
+  type GossipPriorityBidOptions,
+  type GossipPriorityBidParameters,
+  type GossipPriorityBidSuccessResponse,
+} from "./_methods/gossipPriorityBid.ts";
+import {
   hip3LiquidatorTransfer,
   type Hip3LiquidatorTransferOptions,
   type Hip3LiquidatorTransferParameters,
@@ -188,6 +200,12 @@ import {
   type SpotUserSuccessResponse,
 } from "./_methods/spotUser.ts";
 import {
+  stakingLinkDisableTradingUser,
+  type StakingLinkDisableTradingUserOptions,
+  type StakingLinkDisableTradingUserParameters,
+  type StakingLinkDisableTradingUserSuccessResponse,
+} from "./_methods/stakingLinkDisableTradingUser.ts";
+import {
   subAccountModify,
   type SubAccountModifyOptions,
   type SubAccountModifyParameters,
@@ -259,6 +277,12 @@ import {
   type UserDexAbstractionParameters,
   type UserDexAbstractionSuccessResponse,
 } from "./_methods/userDexAbstraction.ts";
+import {
+  userOutcome,
+  type UserOutcomeOptions,
+  type UserOutcomeParameters,
+  type UserOutcomeSuccessResponse,
+} from "./_methods/userOutcome.ts";
 import {
   userPortfolioMargin,
   type UserPortfolioMarginOptions,
@@ -1061,6 +1085,78 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   }
 
   /**
+   * Finalize the link between a HyperCore spot token and an ERC-20 contract on the HyperEVM.
+   *
+   * Signing: L1 Action.
+   *
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
+   *
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example Finalize from an EOA-deployed contract
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.finalizeEvmContract({ token: 200, input: { create: { nonce: 0 } } });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/hyperevm/hypercore-less-than-greater-than-hyperevm-transfers
+   */
+  finalizeEvmContract(
+    params: FinalizeEvmContractParameters,
+    opts?: FinalizeEvmContractOptions,
+  ): Promise<FinalizeEvmContractSuccessResponse> {
+    return finalizeEvmContract(this.config_, params, opts);
+  }
+
+  /**
+   * Bid in a gossip priority Dutch auction to receive prioritized mempool data for an IP.
+   *
+   * Signing: L1 Action.
+   *
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
+   *
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.gossipPriorityBid({
+   *   slotId: 0,
+   *   ip: "1.2.3.4",
+   *   maxGas: 100_000_000, // 1 HYPE
+   * });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/priority-fees
+   */
+  gossipPriorityBid(
+    params: GossipPriorityBidParameters,
+    opts?: GossipPriorityBidOptions,
+  ): Promise<GossipPriorityBidSuccessResponse> {
+    return gossipPriorityBid(this.config_, params, opts);
+  }
+
+  /**
    * Deposit into or withdraw from the HIP-3 DEX backstop liquidator.
    *
    * Signing: L1 Action.
@@ -1683,6 +1779,42 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   }
 
   /**
+   * Permanently disable a linked trading user, locking its funds.
+   * Sent by the staking user. After 1 year of locking, funds from the trading user are automatically
+   * transferred to the staking user. **This action is irreversible.**
+   *
+   * Signing: User-Signed EIP-712.
+   *
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
+   *
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.stakingLinkDisableTradingUser({ tradingUser: "0x..." });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/trading/fees#staking-linking
+   */
+  stakingLinkDisableTradingUser(
+    params: StakingLinkDisableTradingUserParameters,
+    opts?: StakingLinkDisableTradingUserOptions,
+  ): Promise<StakingLinkDisableTradingUserSuccessResponse> {
+    return stakingLinkDisableTradingUser(this.config_, params, opts);
+  }
+
+  /**
    * Modify a sub-account.
    *
    * Signing: L1 Action.
@@ -2115,6 +2247,40 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   }
 
   /**
+   * Manually split or merge outcome shares to convert between primary and dual balances.
+   *
+   * Signing: L1 Action.
+   *
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
+   *
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example Split outcome
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.userOutcome({ splitOutcome: { outcome: 0, amount: "1" } });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hyperliquid-improvement-proposals-hips/hip-4-outcome-markets
+   */
+  userOutcome(
+    params: UserOutcomeParameters,
+    opts?: UserOutcomeOptions,
+  ): Promise<UserOutcomeSuccessResponse> {
+    return userOutcome(this.config_, params, opts);
+  }
+
+  /**
    * Set user abstraction mode.
    *
    * Like {@link agentSetAbstraction} but signed via EIP-712 by the principal (instead of as an L1 action by the agent wallet).
@@ -2436,6 +2602,16 @@ export type {
   EvmUserModifySuccessResponse,
 } from "./_methods/evmUserModify.ts";
 export type {
+  FinalizeEvmContractOptions,
+  FinalizeEvmContractParameters,
+  FinalizeEvmContractSuccessResponse,
+} from "./_methods/finalizeEvmContract.ts";
+export type {
+  GossipPriorityBidOptions,
+  GossipPriorityBidParameters,
+  GossipPriorityBidSuccessResponse,
+} from "./_methods/gossipPriorityBid.ts";
+export type {
   Hip3LiquidatorTransferOptions,
   Hip3LiquidatorTransferParameters,
   Hip3LiquidatorTransferSuccessResponse,
@@ -2479,6 +2655,11 @@ export type { SetReferrerOptions, SetReferrerParameters, SetReferrerSuccessRespo
 export type { SpotDeployOptions, SpotDeployParameters, SpotDeploySuccessResponse } from "./_methods/spotDeploy.ts";
 export type { SpotSendOptions, SpotSendParameters, SpotSendSuccessResponse } from "./_methods/spotSend.ts";
 export type { SpotUserOptions, SpotUserParameters, SpotUserSuccessResponse } from "./_methods/spotUser.ts";
+export type {
+  StakingLinkDisableTradingUserOptions,
+  StakingLinkDisableTradingUserParameters,
+  StakingLinkDisableTradingUserSuccessResponse,
+} from "./_methods/stakingLinkDisableTradingUser.ts";
 export type {
   SubAccountModifyOptions,
   SubAccountModifyParameters,
@@ -2530,6 +2711,7 @@ export type {
   UserDexAbstractionSuccessResponse,
   UserDexAbstractionSuccessResponse as UserDexAbstractionExchangeSuccessResponse,
 } from "./_methods/userDexAbstraction.ts";
+export type { UserOutcomeOptions, UserOutcomeParameters, UserOutcomeSuccessResponse } from "./_methods/userOutcome.ts";
 export type {
   UserPortfolioMarginOptions,
   UserPortfolioMarginParameters,

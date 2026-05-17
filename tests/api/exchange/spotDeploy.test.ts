@@ -103,6 +103,13 @@ runTest({
           token: 0,
         },
       },
+      {
+        requestEvmContract: {
+          token: 0,
+          address: "0x0000000000000000000000000000000000000001",
+          evmExtraWeiDecimals: 0,
+        },
+      },
     ];
 
     await Promise.all(params.map((p) =>

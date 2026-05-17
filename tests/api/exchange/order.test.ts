@@ -1,6 +1,8 @@
+import { ApiRequestError } from "@nktkas/hyperliquid";
 import { type OrderParameters, OrderRequest } from "@nktkas/hyperliquid/api/exchange";
 import { formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
 import * as v from "@valibot/valibot";
+import { assertRejects } from "jsr:@std/assert@1";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
 import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
@@ -93,9 +95,24 @@ runTest({
       },
     ];
 
+    // Priority order: grouping={p:N} requires IOC on a perp asset; the temp account
+    // has no resting orders to match against, so this rejects with "Order could not
+    // immediately match". p=0 means no priority cost (no delegatable balance required).
+    const priorityParam: OrderParameters = {
+      orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Ioc" } } }],
+      grouping: { p: 0 },
+    };
+    await assertRejects(
+      async () => {
+        await exchClient.order(priorityParam);
+      },
+      ApiRequestError,
+      "Order could not immediately match",
+    );
+
     const data = await Promise.all(params.map((p) => exchClient.order(p)));
 
-    schemaCoverage(paramsSchema, params);
+    schemaCoverage(paramsSchema, [...params, priorityParam]);
     schemaCoverage(responseSchema, data, [
       "#/properties/response/properties/data/properties/statuses/items/anyOf/2", // "waitingForFill"
     ]);

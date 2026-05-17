@@ -31,8 +31,8 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
             oraclePx: UnsignedDecimal,
             /** Margin table identifier for risk management. */
             marginTableId: UnsignedInteger,
-            /** 'strictIsolated' does not allow withdrawing of isolated margin from open position. */
-            marginMode: v.picklist(["strictIsolated", "noCross"]),
+            /** `"strictIsolated"` does not allow withdrawing of isolated margin from open position. */
+            marginMode: v.picklist(["strictIsolated", "noCross", "normal"]),
           }),
           /** Name of the dex. */
           dex: v.string(),
