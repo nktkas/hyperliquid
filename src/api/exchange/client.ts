@@ -131,7 +131,7 @@ import {
   type LinkStakingUserSuccessResponse,
 } from "./_methods/linkStakingUser.ts";
 import { modify, type ModifyOptions, type ModifyParameters, type ModifySuccessResponse } from "./_methods/modify.ts";
-import { noop, type NoopOptions, type NoopSuccessResponse } from "./_methods/noop.ts";
+import { noop, type NoopOptions, type NoopParameters, type NoopSuccessResponse } from "./_methods/noop.ts";
 import { order, type OrderOptions, type OrderParameters, type OrderSuccessResponse } from "./_methods/order.ts";
 import {
   perpDeploy,
@@ -1323,6 +1323,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    *
    * Signing: L1 Action.
    *
+   * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
@@ -1339,15 +1340,16 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * await client.noop();
+   * await client.noop({ nonce: 1730000000000 });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#invalidate-pending-nonce-noop
    */
   noop(
+    params: NoopParameters,
     opts?: NoopOptions,
   ): Promise<NoopSuccessResponse> {
-    return noop(this.config_, opts);
+    return noop(this.config_, params, opts);
   }
 
   /**
@@ -2622,7 +2624,7 @@ export type {
   LinkStakingUserSuccessResponse,
 } from "./_methods/linkStakingUser.ts";
 export type { ModifyOptions, ModifyParameters, ModifySuccessResponse } from "./_methods/modify.ts";
-export type { NoopOptions, NoopSuccessResponse } from "./_methods/noop.ts";
+export type { NoopOptions, NoopParameters, NoopSuccessResponse } from "./_methods/noop.ts";
 export type { OrderOptions, OrderParameters, OrderSuccessResponse } from "./_methods/order.ts";
 export type { PerpDeployOptions, PerpDeployParameters, PerpDeploySuccessResponse } from "./_methods/perpDeploy.ts";
 export type {
