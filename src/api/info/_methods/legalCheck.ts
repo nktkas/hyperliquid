@@ -31,6 +31,7 @@ export type LegalCheckResponse = {
   acceptedTerms: boolean;
   /** Whether the user is allowed to use the platform. */
   userAllowed: boolean;
+  restrictions?: "n" | "a";
 };
 
 // ============================================================
