@@ -28,6 +28,20 @@ export type ValidatorL1VotesResponse = {
     D: string;
   } | {
     C: string[];
+  } | {
+    O: {
+      registerTokensAndStandaloneOutcome: {
+        quoteToken: number;
+        nameAndDescription: [string, string];
+      };
+    } | {
+      registerTokensAndQuestion: {
+        quoteToken: number;
+        questionNameAndDescription: [string, string];
+        fallbackNameAndDescription: [string, string];
+        namedOutcomes: [string, string][];
+      };
+    };
   };
   /**
    * List of validator addresses that cast this vote.
