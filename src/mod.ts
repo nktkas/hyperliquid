@@ -29,6 +29,7 @@
  */
 
 export { HyperliquidError, ValidationError } from "./_base.ts";
+export { AbstractWalletError } from "./signing/mod.ts";
 export * from "./transport/mod.ts";
 export * from "./api/exchange/client.ts";
 export * from "./api/info/client.ts";
