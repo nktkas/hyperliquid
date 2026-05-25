@@ -1,4 +1,4 @@
-# Hyperliquid API TypeScript SDK
+# Hyperliquid API TypeScript SDK.
 
 [![npm](https://img.shields.io/npm/v/@nktkas/hyperliquid?color=blue)](https://www.npmjs.com/package/@nktkas/hyperliquid)
 [![jsr](https://jsr.io/badges/@nktkas/hyperliquid)](https://jsr.io/@nktkas/hyperliquid)
