@@ -42,7 +42,7 @@ export type UserTwapSliceFillsEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription } from "../../../transport/mod.ts";
+import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode userTwapSliceFills} function. */
@@ -54,6 +54,7 @@ export type UserTwapSliceFillsParameters = Omit<v.InferInput<typeof UserTwapSlic
  * @param config General configuration for Subscription API subscriptions.
  * @param params Parameters specific to the API subscription.
  * @param listener A callback function to be called when the event is received.
+ * @param onError An optional callback function to be called when the subscription fails.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -79,11 +80,12 @@ export function userTwapSliceFills(
   config: SubscriptionConfig,
   params: UserTwapSliceFillsParameters,
   listener: (data: UserTwapSliceFillsEvent) => void,
+  onError?: (error: WebSocketRequestError) => void,
 ): Promise<ISubscription> {
   const payload = parse(UserTwapSliceFillsRequest, { type: "userTwapSliceFills", ...params });
   return config.transport.subscribe<UserTwapSliceFillsEvent>(payload.type, payload, (e) => {
     if (e.detail.user === payload.user) {
       listener(e.detail);
     }
-  });
+  }, onError);
 }

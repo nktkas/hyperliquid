@@ -44,7 +44,7 @@ export type ClearinghouseStateEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription } from "../../../transport/mod.ts";
+import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode clearinghouseState} function. */
@@ -56,6 +56,7 @@ export type ClearinghouseStateParameters = Omit<v.InferInput<typeof Clearinghous
  * @param config General configuration for Subscription API subscriptions.
  * @param params Parameters specific to the API subscription.
  * @param listener A callback function to be called when the event is received.
+ * @param onError An optional callback function to be called when the subscription fails.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -81,6 +82,7 @@ export function clearinghouseState(
   config: SubscriptionConfig,
   params: ClearinghouseStateParameters,
   listener: (data: ClearinghouseStateEvent) => void,
+  onError?: (error: WebSocketRequestError) => void,
 ): Promise<ISubscription> {
   const payload = parse(ClearinghouseStateRequest, {
     type: "clearinghouseState",
@@ -91,5 +93,5 @@ export function clearinghouseState(
     if (e.detail.user === payload.user && e.detail.dex === payload.dex) {
       listener(e.detail);
     }
-  });
+  }, onError);
 }

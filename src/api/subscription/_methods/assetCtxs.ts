@@ -36,7 +36,7 @@ export type AssetCtxsEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription } from "../../../transport/mod.ts";
+import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode assetCtxs} function. */
@@ -48,6 +48,7 @@ export type AssetCtxsParameters = Omit<v.InferInput<typeof AssetCtxsRequest>, "t
  * @param config General configuration for Subscription API subscriptions.
  * @param params Parameters specific to the API subscription.
  * @param listener A callback function to be called when the event is received.
+ * @param onError An optional callback function to be called when the subscription fails.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -71,19 +72,27 @@ export type AssetCtxsParameters = Omit<v.InferInput<typeof AssetCtxsRequest>, "t
 export function assetCtxs(
   config: SubscriptionConfig,
   listener: (data: AssetCtxsEvent) => void,
+  onError?: (error: WebSocketRequestError) => void,
 ): Promise<ISubscription>;
 export function assetCtxs(
   config: SubscriptionConfig,
   params: AssetCtxsParameters,
   listener: (data: AssetCtxsEvent) => void,
+  onError?: (error: WebSocketRequestError) => void,
 ): Promise<ISubscription>;
 export function assetCtxs(
   config: SubscriptionConfig,
   paramsOrListener: AssetCtxsParameters | ((data: AssetCtxsEvent) => void),
-  maybeListener?: (data: AssetCtxsEvent) => void,
+  listenerOrOnError?: ((data: AssetCtxsEvent) => void) | ((error: WebSocketRequestError) => void),
+  maybeOnError?: (error: WebSocketRequestError) => void,
 ): Promise<ISubscription> {
   const params = typeof paramsOrListener === "function" ? {} : paramsOrListener;
-  const listener = typeof paramsOrListener === "function" ? paramsOrListener : maybeListener!;
+  const listener = (typeof paramsOrListener === "function" ? paramsOrListener : listenerOrOnError) as (
+    data: AssetCtxsEvent,
+  ) => void;
+  const onError = (typeof paramsOrListener === "function" ? listenerOrOnError : maybeOnError) as
+    | ((error: WebSocketRequestError) => void)
+    | undefined;
 
   const payload = parse(AssetCtxsRequest, {
     type: "assetCtxs",
@@ -94,5 +103,5 @@ export function assetCtxs(
     if (e.detail.dex === payload.dex) {
       listener(e.detail);
     }
-  });
+  }, onError);
 }

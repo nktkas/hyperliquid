@@ -10,16 +10,24 @@ import type { HyperliquidEventTarget } from "./_events.ts";
 import { WebSocketDispatcher, WebSocketRequestError } from "./_dispatcher.ts";
 import { requestToId } from "./_id.ts";
 
+/** Per-listener registration: its unsubscribe handle and optional error callback. */
+interface ListenerRegistration {
+  /** Removes this listener and, if it is the last, unsubscribes from the channel. */
+  unsubscribe: () => Promise<void>;
+  /** Optional callback invoked once on subscription failure (see {@link WebSocketSubscriptionManager.subscribe}). */
+  onError?: (error: WebSocketRequestError) => void;
+}
+
 /** Internal state for managing a subscription. */
 interface SubscriptionState {
-  /** Map of event listeners to their unsubscribe functions. */
-  listeners: Map<(data: CustomEvent) => void, () => Promise<void>>;
+  /** Event channel name, used to detach listeners on teardown. */
+  channel: string;
+  /** Map of event listeners to their registration. */
+  listeners: Map<(data: CustomEvent) => void, ListenerRegistration>;
   /** Promise tracking the subscription request. */
   promise: Promise<unknown>;
   /** Whether the subscription request has completed. */
   promiseFinished: boolean;
-  /** Controller to signal subscription failure. */
-  failureController: AbortController;
 }
 
 /** Maximum number of subscriptions allowed by Hyperliquid. */
@@ -61,12 +69,16 @@ export class WebSocketSubscriptionManager {
   /**
    * Subscribes to a Hyperliquid event channel.
    *
+   * @param onError Optional callback invoked synchronously at most once, when the subscription fails — either a re-subscription after a reconnect is rejected, or the connection is permanently lost.
+   *                After it fires, the subscription is removed and no further events or errors follow; create a new subscription to continue.
+   *
    * @throws {WebSocketRequestError} When the subscription request fails or limits are exceeded.
    */
   async subscribe<T>(
     channel: string,
     payload: unknown,
     listener: (data: CustomEvent<T>) => void,
+    onError?: (error: WebSocketRequestError) => void,
   ): Promise<ISubscription> {
     const id = requestToId(payload);
 
@@ -84,18 +96,18 @@ export class WebSocketSubscriptionManager {
         .finally(() => subscription!.promiseFinished = true);
 
       subscription = {
+        channel,
         listeners: new Map(),
         promise,
         promiseFinished: false,
-        failureController: new AbortController(),
       };
       this._subscriptions.set(id, subscription);
     }
 
     // --- Get or create listener registration -----------------
-    let unsubscribe = subscription.listeners.get(listener);
-    if (!unsubscribe) {
-      unsubscribe = async () => {
+    let registration = subscription.listeners.get(listener);
+    if (!registration) {
+      const unsubscribe = async () => {
         this._hlEvents.removeEventListener(channel, listener);
         const subscription = this._subscriptions.get(id);
         subscription?.listeners.delete(listener);
@@ -110,15 +122,15 @@ export class WebSocketSubscriptionManager {
       };
 
       this._hlEvents.addEventListener(channel, listener);
-      subscription.listeners.set(listener, unsubscribe);
+      registration = { unsubscribe, onError };
+      subscription.listeners.set(listener, registration);
     }
 
     // --- Await server confirmation ---------------------------
     await subscription.promise;
 
     return {
-      unsubscribe,
-      failureSignal: subscription.failureController.signal,
+      unsubscribe: registration.unsubscribe,
     };
   }
 
@@ -130,24 +142,69 @@ export class WebSocketSubscriptionManager {
   private _handleOpen(): void {
     if (!this.resubscribe) return;
     for (const [id, subscription] of this._subscriptions.entries()) {
-      // Reconnect only previously connected subscriptions to avoid double subscriptions
-      // due to server-side message buffering during reconnect.
       if (subscription.promiseFinished) {
         subscription.promise = this._dispatcher.request("subscribe", JSON.parse(id))
-          .catch((error) => subscription.failureController.abort(error))
+          .catch((error) => {
+            this._failSubscription(id, subscription, error);
+          })
           .finally(() => subscription.promiseFinished = true);
         subscription.promiseFinished = false;
       }
     }
   }
 
-  /** Cleans up subscriptions if resubscribe is disabled or the socket is terminated. */
+  /**
+   * Cleans up subscriptions when resubscribe is disabled or the socket is terminated.
+   * On termination, notifies each listener's `onError` once before removing the subscription.
+   */
   private _handleClose(): void {
-    if (!this.resubscribe || this._socket.terminationSignal.aborted) {
-      for (const subscription of this._subscriptions.values()) {
-        for (const [, unsubscribe] of subscription.listeners) {
-          unsubscribe(); // does not throw when the connection is closed
-        }
+    const terminal = this._socket.terminationSignal.aborted;
+    if (this.resubscribe && !terminal) return;
+
+    // Wrap an external error in a WebSocketRequestError
+    let error: WebSocketRequestError | undefined;
+    if (terminal) {
+      error = new WebSocketRequestError("WebSocket connection permanently terminated", {
+        cause: this._socket.terminationSignal.reason,
+      });
+    }
+
+    // Snapshot before teardown: each call mutates `_subscriptions` during iteration.
+    for (const [id, subscription] of [...this._subscriptions.entries()]) {
+      if (terminal) {
+        this._failSubscription(id, subscription, error!);
+      } else {
+        // Clean close with resubscribe disabled: drop the subscription without notifying.
+        this._removeSubscription(id, subscription);
+      }
+    }
+  }
+
+  // ============================================================
+  // Teardown
+  // ============================================================
+
+  /**
+   * Detaches every listener of a subscription and removes it locally.
+   * Sends nothing to the server: this runs only when the connection is already gone.
+   */
+  private _removeSubscription(id: string, subscription: SubscriptionState): void {
+    if (this._subscriptions.get(id) !== subscription) return;
+    this._subscriptions.delete(id);
+    for (const listener of subscription.listeners.keys()) {
+      this._hlEvents.removeEventListener(subscription.channel, listener);
+    }
+  }
+
+  /** Notifies each listener's `onError` once, then removes the subscription. */
+  private _failSubscription(id: string, subscription: SubscriptionState, error: unknown): void {
+    if (this._subscriptions.get(id) !== subscription) return;
+    this._removeSubscription(id, subscription);
+    for (const registration of subscription.listeners.values()) {
+      try {
+        registration.onError?.(error as WebSocketRequestError);
+      } catch {
+        // A throwing onError must not affect other listeners.
       }
     }
   }

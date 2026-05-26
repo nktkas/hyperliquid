@@ -80,6 +80,10 @@ const RESPONSES = {
     channel,
     data,
   }),
+  errorChannel: (message: string) => ({
+    channel: "error",
+    data: message,
+  }),
 } as const;
 
 // ============================================================
@@ -272,24 +276,125 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
       socket.terminate();
     });
 
-    await t.step("handles resubscription errors", async () => {
+    await t.step("onError: rejected re-subscription notifies once, drops the channel, and is not retried", async () => {
       const { socket, manager } = createManager(true);
-
       const payload = { channel: "test", extra: "data" };
 
-      const subPromise = manager.subscribe("test", payload, () => {});
+      const errors: unknown[] = [];
+      const subPromise = manager.subscribe("test", payload, () => {}, (e) => errors.push(e));
       socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
-      const sub = await subPromise;
+      await subPromise;
 
-      // Simulate reconnection
+      // Reconnect, then the server rejects the re-subscription while the socket stays open.
       socket.close();
       socket.open();
-
-      // Resubscription fails (terminate connection)
-      socket.terminate(new Error("Connection terminated"));
-
+      socket.mockMessage(RESPONSES.errorChannel(JSON.stringify({ method: "subscribe", subscription: payload })));
       await new Promise((r) => setTimeout(r, 10));
-      assert(sub.failureSignal?.aborted);
+
+      assertEquals(errors.length, 1);
+      assert(errors[0] instanceof WebSocketRequestError);
+      assertEquals(socket.readyState, WebSocket.OPEN); // connection still live...
+      assertEquals(manager._subscriptions.size, 0); // ...but the failed channel is dropped
+
+      // Next reconnect does not retry the dropped channel: no new subscribe frame, no new onError.
+      const sentBefore = socket.sentMessages.length;
+      socket.close();
+      socket.open();
+      await new Promise((r) => setTimeout(r, 10));
+      assertEquals(socket.sentMessages.length, sentBefore);
+      assertEquals(errors.length, 1);
+
+      // A later terminal close does not re-notify the already-dropped channel.
+      socket.terminate(new Error("dead"));
+      await new Promise((r) => setTimeout(r, 10));
+      assertEquals(errors.length, 1);
+    });
+
+    await t.step("onError: terminal loss notifies every listener once with the reason, isolating throws", async () => {
+      const { socket, manager } = createManager(true);
+      const payload = { channel: "test", extra: "data" };
+
+      // Two listeners on one channel: the first throws after being called, the second records the reason.
+      let firstCalls = 0;
+      const seen: unknown[] = [];
+      const p1 = manager.subscribe("test", payload, () => {}, () => {
+        firstCalls++;
+        throw new Error("boom");
+      });
+      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+      await p1;
+      await manager.subscribe("test", payload, () => {}, (e) => seen.push(e));
+
+      const reason = new Error("gone for good");
+      socket.terminate(reason);
+      await new Promise((r) => setTimeout(r, 10));
+
+      assertEquals(firstCalls, 1); // first listener notified (fan-out)...
+      assertEquals(seen.length, 1);
+      assert(seen[0] instanceof WebSocketRequestError); // ...its throw didn't block the sibling, which got
+      assertEquals((seen[0] as WebSocketRequestError).cause, reason); // a wrapped error with the reason as cause
+      assertEquals(manager._subscriptions.size, 0); // teardown still ran
+    });
+
+    await t.step("onError: terminal also fires via the socket error event", async () => {
+      const { socket, manager } = createManager(true);
+      const payload = { channel: "test", extra: "data" };
+
+      const errors: unknown[] = [];
+      const subPromise = manager.subscribe("test", payload, () => {}, (e) => errors.push(e));
+      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+      await subPromise;
+
+      const reason = new Error("error-path");
+      socket.terminationController.abort(reason);
+      socket.dispatchEvent(new Event("error"));
+      await new Promise((r) => setTimeout(r, 10));
+
+      assertEquals(errors.length, 1);
+      assert(errors[0] instanceof WebSocketRequestError); // terminal-via-error is wrapped too...
+      assertEquals((errors[0] as WebSocketRequestError).cause, reason); // ...with the reason as cause
+    });
+
+    await t.step("onError: re-subscribing the same listener keeps its original onError (first-wins)", async () => {
+      const { socket, manager } = createManager(true);
+      const payload = { channel: "test", extra: "data" };
+
+      let first = 0;
+      let second = 0;
+      const listener = () => {};
+      const p1 = manager.subscribe("test", payload, listener, () => first++);
+      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+      await p1;
+
+      const sentBefore = socket.sentMessages.length;
+      await manager.subscribe("test", payload, listener, () => second++); // same listener, different onError
+
+      assertEquals(socket.sentMessages.length, sentBefore); // no new subscribe sent (dedup)
+      assertEquals(manager._subscriptions.get(JSON.stringify(payload))?.listeners.size, 1);
+
+      socket.terminate(new Error("x"));
+      await new Promise((r) => setTimeout(r, 10));
+
+      assertEquals(first, 1); // original onError fired
+      assertEquals(second, 0); // replacement ignored
+    });
+
+    await t.step("onError: not called on a clean resubscribe:false close", async () => {
+      const { socket, manager } = createManager(false);
+      const payload = { channel: "test", extra: "data" };
+
+      let errorCalls = 0;
+      const subPromise = manager.subscribe("test", payload, () => {}, () => errorCalls++);
+      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+      await subPromise;
+
+      socket.close(); // clean close, not a termination
+      await new Promise((r) => setTimeout(r, 10));
+
+      assertEquals(manager._subscriptions.size, 0); // torn down
+      assertEquals(errorCalls, 0); // no onError without a terminal reason
+
+      socket.terminate();
     });
 
     await t.step("resubscribe: false clears subscriptions on close", async () => {

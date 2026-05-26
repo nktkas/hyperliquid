@@ -36,7 +36,7 @@ export type AllMidsEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription } from "../../../transport/mod.ts";
+import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode allMids} function. */
@@ -48,6 +48,7 @@ export type AllMidsParameters = Omit<v.InferInput<typeof AllMidsRequest>, "type"
  * @param config General configuration for Subscription API subscriptions.
  * @param params Parameters specific to the API subscription.
  * @param listener A callback function to be called when the event is received.
+ * @param onError An optional callback function to be called when the subscription fails.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -71,19 +72,27 @@ export type AllMidsParameters = Omit<v.InferInput<typeof AllMidsRequest>, "type"
 export function allMids(
   config: SubscriptionConfig,
   listener: (data: AllMidsEvent) => void,
+  onError?: (error: WebSocketRequestError) => void,
 ): Promise<ISubscription>;
 export function allMids(
   config: SubscriptionConfig,
   params: AllMidsParameters,
   listener: (data: AllMidsEvent) => void,
+  onError?: (error: WebSocketRequestError) => void,
 ): Promise<ISubscription>;
 export function allMids(
   config: SubscriptionConfig,
   paramsOrListener: AllMidsParameters | ((data: AllMidsEvent) => void),
-  maybeListener?: (data: AllMidsEvent) => void,
+  listenerOrOnError?: ((data: AllMidsEvent) => void) | ((error: WebSocketRequestError) => void),
+  maybeOnError?: (error: WebSocketRequestError) => void,
 ): Promise<ISubscription> {
   const params = typeof paramsOrListener === "function" ? {} : paramsOrListener;
-  const listener = typeof paramsOrListener === "function" ? paramsOrListener : maybeListener!;
+  const listener = (typeof paramsOrListener === "function" ? paramsOrListener : listenerOrOnError) as (
+    data: AllMidsEvent,
+  ) => void;
+  const onError = (typeof paramsOrListener === "function" ? listenerOrOnError : maybeOnError) as
+    | ((error: WebSocketRequestError) => void)
+    | undefined;
 
   const payload = parse(AllMidsRequest, {
     type: "allMids",
@@ -94,5 +103,5 @@ export function allMids(
     if (e.detail.dex === payload.dex) {
       listener(e.detail);
     }
-  });
+  }, onError);
 }

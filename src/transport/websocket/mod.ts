@@ -155,8 +155,9 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
     channel: string,
     payload: unknown,
     listener: (data: CustomEvent<T>) => void,
+    onError?: (error: WebSocketRequestError) => void,
   ): Promise<ISubscription> {
-    return this._subscriptionManager.subscribe(channel, payload, listener);
+    return this._subscriptionManager.subscribe(channel, payload, listener, onError);
   }
 
   /**

@@ -60,7 +60,7 @@ export type L2BookEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription } from "../../../transport/mod.ts";
+import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode l2Book} function. */
@@ -72,6 +72,7 @@ export type L2BookParameters = Omit<v.InferInput<typeof L2BookRequest>, "type">;
  * @param config General configuration for Subscription API subscriptions.
  * @param params Parameters specific to the API subscription.
  * @param listener A callback function to be called when the event is received.
+ * @param onError An optional callback function to be called when the subscription fails.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -97,6 +98,7 @@ export function l2Book(
   config: SubscriptionConfig,
   params: L2BookParameters,
   listener: (data: L2BookEvent) => void,
+  onError?: (error: WebSocketRequestError) => void,
 ): Promise<ISubscription> {
   const payload = parse(L2BookRequest, {
     type: "l2Book",
@@ -108,5 +110,5 @@ export function l2Book(
     if (e.detail.coin === payload.coin) {
       listener(e.detail);
     }
-  });
+  }, onError);
 }
