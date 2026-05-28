@@ -81,7 +81,7 @@ export const TESTNET_RPC_WS_URL = "wss://rpc.hyperliquid-testnet.xyz/ws";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/post-requests
  */
-export class WebSocketTransport implements IRequestTransport, ISubscriptionTransport {
+export class WebSocketTransport implements IRequestTransport<"info" | "exchange">, ISubscriptionTransport {
   /** Indicates this transport uses testnet endpoint. */
   readonly isTestnet: boolean;
   /** The WebSocket that is used for communication. */
@@ -130,16 +130,17 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
   /**
    * Sends a request to the Hyperliquid API via WebSocket.
    *
-   * The `explorer` endpoint is HTTP-only and is not supported on the WebSocket transport.
+   * The `explorer` endpoint is HTTP-only and not supported by this transport.
    *
    * @throws {WebSocketRequestError} An error that occurs when a WebSocket request fails.
    */
   async request<T>(
-    endpoint: "info" | "exchange" | "explorer",
+    endpoint: "info" | "exchange",
     payload: unknown,
     signal?: AbortSignal,
   ): Promise<T> {
-    if (endpoint === "explorer") {
+    // `explorer` is HTTP-only and not supported on this transport
+    if ((endpoint as string) === "explorer") {
       throw new WebSocketRequestError("WebSocket transport does not support the `explorer` endpoint");
     }
     const wrapped = { type: endpoint === "exchange" ? "action" : endpoint, payload };

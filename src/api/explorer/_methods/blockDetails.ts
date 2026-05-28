@@ -56,7 +56,8 @@ export type BlockDetailsResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/mod.ts";
+import type { IRequestTransport } from "../../../transport/mod.ts";
+import type { ExplorerConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode blockDetails} function. */
 export type BlockDetailsParameters = Omit<v.InferInput<typeof BlockDetailsRequest>, "type">;
@@ -64,7 +65,7 @@ export type BlockDetailsParameters = Omit<v.InferInput<typeof BlockDetailsReques
 /**
  * Request block details by block height.
  *
- * @param config General configuration for Info API requests.
+ * @param config General configuration for Explorer API requests.
  * @param params Parameters specific to the API request.
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Response containing block information.
@@ -75,7 +76,7 @@ export type BlockDetailsParameters = Omit<v.InferInput<typeof BlockDetailsReques
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
- * import { blockDetails } from "@nktkas/hyperliquid/api/info";
+ * import { blockDetails } from "@nktkas/hyperliquid/api/explorer";
  *
  * const transport = new HttpTransport(); // only `HttpTransport` supports this API
  *
@@ -87,7 +88,7 @@ export type BlockDetailsParameters = Omit<v.InferInput<typeof BlockDetailsReques
  * @see null
  */
 export function blockDetails(
-  config: InfoConfig,
+  config: ExplorerConfig<IRequestTransport<"explorer">>,
   params: BlockDetailsParameters,
   signal?: AbortSignal,
 ): Promise<BlockDetailsResponse> {

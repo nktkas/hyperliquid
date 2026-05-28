@@ -24,6 +24,7 @@ import "jsr:@std/dotenv@^0.225.5/load";
 
 import * as hl from "@nktkas/hyperliquid";
 import * as hlExchange from "@nktkas/hyperliquid/api/exchange";
+import * as hlExplorer from "@nktkas/hyperliquid/api/explorer";
 import * as hlInfo from "@nktkas/hyperliquid/api/info";
 import * as hlSubscription from "@nktkas/hyperliquid/api/subscription";
 import type { AbstractWallet } from "@nktkas/hyperliquid/signing";
@@ -41,7 +42,7 @@ import { parseClassMethodJSDocFromFile, parseJSDocFromFile } from "./jsdocParser
 // =============================================================================
 
 /** API endpoint type */
-type Endpoint = "info" | "exchange" | "subscription";
+type Endpoint = "info" | "exchange" | "subscription" | "explorer";
 
 /** Collection of all schemas grouped by endpoint and method */
 type AllSchemas = Record<
@@ -57,14 +58,23 @@ type OpenAPISpecs = Record<Endpoint, Record<string, unknown>>;
 // =============================================================================
 
 /** Mapping of endpoints to their API modules */
-const API_MODULES: Record<Endpoint, typeof hlInfo | typeof hlExchange | typeof hlSubscription> = {
+const API_MODULES: Record<Endpoint, typeof hlInfo | typeof hlExchange | typeof hlSubscription | typeof hlExplorer> = {
   info: hlInfo,
   exchange: hlExchange,
   subscription: hlSubscription,
+  explorer: hlExplorer,
 };
 
 /** Ordered list of all endpoints */
-const ENDPOINTS: Endpoint[] = ["info", "exchange", "subscription"];
+const ENDPOINTS: Endpoint[] = ["info", "exchange", "subscription", "explorer"];
+
+/** Explorer methods served over WebSocket subscriptions; the rest of the explorer endpoint is HTTP REST. */
+const WS_METHODS = new Set(["explorerBlock", "explorerTxs"]);
+
+/** Whether a method is delivered over WebSocket: every `subscription` method, plus the explorer subscriptions. */
+function isWsMethod(endpoint: Endpoint, method: string): boolean {
+  return endpoint === "subscription" || WS_METHODS.has(method);
+}
 
 /** REST API server configurations */
 const REST_SERVERS = [
@@ -83,6 +93,7 @@ const SECTION_TITLES: Record<Endpoint, string> = {
   info: "Info Methods",
   exchange: "Exchange Methods",
   subscription: "Subscription Methods",
+  explorer: "Explorer Methods",
 };
 
 /** GitBook API base URL */
@@ -118,7 +129,7 @@ export function getAllSchemas(): AllSchemas {
 
   // Path to SDK source files
   const srcBasePath = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "../../src/api");
-  const results: AllSchemas = { info: {}, exchange: {}, subscription: {} };
+  const results: AllSchemas = { info: {}, exchange: {}, subscription: {}, explorer: {} };
 
   for (const endpoint of ENDPOINTS) {
     // Get the API module containing valibot request schemas (e.g., hlInfo, hlExchange)
@@ -150,7 +161,7 @@ export function getAllSchemas(): AllSchemas {
       // Convert response TypeScript type to JSON Schema
       // typeToJsonSchema extracts JSDoc tags (@description, @pattern, etc.) automatically
       // Note: Subscriptions use *Event suffix instead of *Response
-      const responseKey = endpoint === "subscription" ? "Event" : "Response";
+      const responseKey = isWsMethod(endpoint, method) ? "Event" : "Response";
       const responseJSchema = typeToJsonSchema(sourceFilePath, pascalMethod + responseKey);
 
       // Extract @example from Client class method JSDoc
@@ -176,10 +187,15 @@ export function getAllSchemas(): AllSchemas {
 function getAllMethodsFromClient(endpoint: Endpoint): string[] {
   // Factory functions to create dummy client instances for method introspection
   // We pass empty objects as transport/wallet since we only need the prototype
-  const clientFactories: Record<Endpoint, () => hl.InfoClient | hl.ExchangeClient | hl.SubscriptionClient> = {
+  const clientFactories: Record<
+    Endpoint,
+    () => hl.InfoClient | hl.ExchangeClient | hl.SubscriptionClient | hl.ExplorerClient
+  > = {
     info: () => new hl.InfoClient({ transport: {} as hl.HttpTransport }),
     exchange: () => new hl.ExchangeClient({ transport: {} as hl.HttpTransport, wallet: {} as AbstractWallet }),
     subscription: () => new hl.SubscriptionClient({ transport: {} as hl.WebSocketTransport }),
+    explorer: () =>
+      new hl.ExplorerClient({ transport: {} as (hl.IRequestTransport<"explorer"> & hl.ISubscriptionTransport) }),
   };
 
   const client = clientFactories[endpoint]();
@@ -211,8 +227,8 @@ function buildResponses(
     },
   };
 
-  // REST endpoints have additional error responses
-  if (endpoint !== "subscription") {
+  // Only the REST `info`/`exchange` endpoints document error responses
+  if (endpoint === "info" || endpoint === "exchange") {
     responses["422"] = {
       description: "Failed to deserialize the JSON body into the target type",
       content: { "text/plain": { schema: { type: "string" } } },
@@ -236,7 +252,7 @@ function buildResponses(
  */
 export async function jsonSchemasToOpenAPIs(schemas: AllSchemas): Promise<OpenAPISpecs> {
   console.log("[OpenAPI] Converting JSON schemas to OpenAPI specs...");
-  const result: OpenAPISpecs = { info: {}, exchange: {}, subscription: {} };
+  const result: OpenAPISpecs = { info: {}, exchange: {}, subscription: {}, explorer: {} };
 
   for (const endpoint of ENDPOINTS) {
     for (const method of Object.keys(schemas[endpoint])) {
@@ -246,9 +262,9 @@ export async function jsonSchemasToOpenAPIs(schemas: AllSchemas): Promise<OpenAP
       const openapiRequest = await convert(request);
       const openapiResponse = await convert(response);
 
-      const isSubscription = endpoint === "subscription";
+      const isWs = isWsMethod(endpoint, method);
       // WebSocket subscriptions use "/" path, REST endpoints use "/info" or "/exchange"
-      const pathKey = isSubscription ? "/" : `/${endpoint}`;
+      const pathKey = isWs ? "/" : `/${endpoint}`;
       const responses = buildResponses(endpoint, response?.description || "", openapiResponse);
 
       // Build x-codeSamples from function @example tags
@@ -258,17 +274,17 @@ export async function jsonSchemasToOpenAPIs(schemas: AllSchemas): Promise<OpenAP
       const spec = {
         openapi: "3.1.1",
         info: {
-          title: isSubscription ? `Hyperliquid Subscription - ${method}` : `Hyperliquid API - ${endpoint}/${method}`,
+          title: isWs ? `Hyperliquid Subscription - ${method}` : `Hyperliquid API - ${endpoint}/${method}`,
           version: "1.0.0",
         },
-        servers: isSubscription ? WEBSOCKET_SERVERS : REST_SERVERS,
+        servers: isWs ? WEBSOCKET_SERVERS : REST_SERVERS,
         // x-page-title and x-page-slug are GitBook-specific extensions for page generation
         tags: [{ name: method, "x-page-title": method, "x-page-slug": method }],
         paths: {
           [pathKey]: {
             post: {
               tags: [method],
-              ...(isSubscription ? { summary: `Subscribe to ${method}` } : {}),
+              ...(isWs ? { summary: `Subscribe to ${method}` } : {}),
               description: request.description || "",
               ...(xCodeSamples?.length ? { "x-codeSamples": xCodeSamples } : {}),
               requestBody: {

@@ -3,12 +3,13 @@
  *
  * The main entrypoint exports:
  * - Transports: {@link HttpTransport}, {@link WebSocketTransport}
- * - Clients: {@link InfoClient}, {@link ExchangeClient}, {@link SubscriptionClient}
+ * - Clients: {@link InfoClient}, {@link ExchangeClient}, {@link SubscriptionClient}, {@link ExplorerClient}
  *
  * For tree-shakeable, low-level access you can import request methods directly from:
  * - `@nktkas/hyperliquid/api/info`
  * - `@nktkas/hyperliquid/api/exchange`
  * - `@nktkas/hyperliquid/api/subscription`
+ * - `@nktkas/hyperliquid/api/explorer`
  *
  * Extra utilities are available in:
  * - `@nktkas/hyperliquid/utils` (formatting, symbol conversion)
@@ -32,5 +33,6 @@ export { HyperliquidError, ValidationError } from "./_base.ts";
 export { AbstractWalletError } from "./signing/mod.ts";
 export * from "./transport/mod.ts";
 export * from "./api/exchange/client.ts";
+export * from "./api/explorer/client.ts";
 export * from "./api/info/client.ts";
 export * from "./api/subscription/client.ts";

@@ -8,19 +8,18 @@ import type { WebSocketRequestError } from "./websocket/_dispatcher.ts";
  * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint | Exchange endpoint}
  * @see {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/post-requests | WebSocket POST requests}
  */
-export interface IRequestTransport {
+export interface IRequestTransport<E extends "info" | "exchange" | "explorer" = "info" | "exchange"> {
   /** Indicates this transport uses testnet endpoint(s). */
   isTestnet: boolean;
   /**
    * Sends a request to the Hyperliquid API.
    *
-   * @param endpoint The API endpoint to send the request to.
-   *                 The `explorer` endpoint is HTTP-only — calling it on a WebSocket transport will reject.
+   * @param endpoint The API endpoint to send the request to. `explorer` is HTTP-only.
    * @param payload The payload to send with the request.
    * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
    * @return A promise that resolves with the parsed JSON response body.
    */
-  request<T>(endpoint: "info" | "exchange" | "explorer", payload: unknown, signal?: AbortSignal): Promise<T>;
+  request<T>(endpoint: E, payload: unknown, signal?: AbortSignal): Promise<T>;
 }
 
 /**

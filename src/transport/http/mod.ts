@@ -86,7 +86,7 @@ export class HttpRequestError extends TransportError {
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint
  */
-export class HttpTransport implements IRequestTransport {
+export class HttpTransport implements IRequestTransport<"info" | "exchange" | "explorer"> {
   /** Indicates this transport uses testnet endpoint. */
   isTestnet: boolean;
   /** Request timeout in ms. Set to `null` to disable. */

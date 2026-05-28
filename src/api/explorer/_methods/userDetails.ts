@@ -37,7 +37,8 @@ export type UserDetailsResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/mod.ts";
+import type { IRequestTransport } from "../../../transport/mod.ts";
+import type { ExplorerConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode userDetails} function. */
 export type UserDetailsParameters = Omit<v.InferInput<typeof UserDetailsRequest>, "type">;
@@ -45,7 +46,7 @@ export type UserDetailsParameters = Omit<v.InferInput<typeof UserDetailsRequest>
 /**
  * Request array of user transaction details.
  *
- * @param config General configuration for Info API requests.
+ * @param config General configuration for Explorer API requests.
  * @param params Parameters specific to the API request.
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Array of user transaction details.
@@ -56,7 +57,7 @@ export type UserDetailsParameters = Omit<v.InferInput<typeof UserDetailsRequest>
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
- * import { userDetails } from "@nktkas/hyperliquid/api/info";
+ * import { userDetails } from "@nktkas/hyperliquid/api/explorer";
  *
  * const transport = new HttpTransport(); // only `HttpTransport` supports this API
  *
@@ -68,7 +69,7 @@ export type UserDetailsParameters = Omit<v.InferInput<typeof UserDetailsRequest>
  * @see null
  */
 export function userDetails(
-  config: InfoConfig,
+  config: ExplorerConfig<IRequestTransport<"explorer">>,
   params: UserDetailsParameters,
   signal?: AbortSignal,
 ): Promise<UserDetailsResponse> {

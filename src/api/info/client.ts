@@ -30,7 +30,6 @@ import {
   type ApprovedBuildersParameters,
   type ApprovedBuildersResponse,
 } from "./_methods/approvedBuilders.ts";
-import { blockDetails, type BlockDetailsParameters, type BlockDetailsResponse } from "./_methods/blockDetails.ts";
 import {
   borrowLendReserveState,
   type BorrowLendReserveStateParameters,
@@ -151,7 +150,6 @@ import { subAccounts, type SubAccountsParameters, type SubAccountsResponse } fro
 import { subAccounts2, type SubAccounts2Parameters, type SubAccounts2Response } from "./_methods/subAccounts2.ts";
 import { tokenDetails, type TokenDetailsParameters, type TokenDetailsResponse } from "./_methods/tokenDetails.ts";
 import { twapHistory, type TwapHistoryParameters, type TwapHistoryResponse } from "./_methods/twapHistory.ts";
-import { txDetails, type TxDetailsParameters, type TxDetailsResponse } from "./_methods/txDetails.ts";
 import {
   userAbstraction,
   type UserAbstractionParameters,
@@ -162,7 +160,6 @@ import {
   type UserBorrowLendInterestParameters,
   type UserBorrowLendInterestResponse,
 } from "./_methods/userBorrowLendInterest.ts";
-import { userDetails, type UserDetailsParameters, type UserDetailsResponse } from "./_methods/userDetails.ts";
 import {
   userDexAbstraction,
   type UserDexAbstractionParameters,
@@ -416,35 +413,6 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     signal?: AbortSignal,
   ): Promise<ApprovedBuildersResponse> {
     return approvedBuilders(this.config_, params, signal);
-  }
-
-  /**
-   * Request block details by block height.
-   *
-   * @param params Parameters specific to the API request.
-   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   * @return Response containing block information.
-   *
-   * @throws {ValidationError} When the request parameters fail validation (before sending).
-   * @throws {TransportError} When the transport layer throws an error.
-   *
-   * @example
-   * ```ts
-   * import * as hl from "@nktkas/hyperliquid";
-   *
-   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
-   * const client = new hl.InfoClient({ transport });
-   *
-   * const data = await client.blockDetails({ height: 123 });
-   * ```
-   *
-   * @see null
-   */
-  blockDetails(
-    params: BlockDetailsParameters,
-    signal?: AbortSignal,
-  ): Promise<BlockDetailsResponse> {
-    return blockDetails(this.config_, params, signal);
   }
 
   /**
@@ -1904,35 +1872,6 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   }
 
   /**
-   * Request transaction details by transaction hash.
-   *
-   * @param params Parameters specific to the API request.
-   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   * @return Transaction details.
-   *
-   * @throws {ValidationError} When the request parameters fail validation (before sending).
-   * @throws {TransportError} When the transport layer throws an error.
-   *
-   * @example
-   * ```ts
-   * import * as hl from "@nktkas/hyperliquid";
-   *
-   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
-   * const client = new hl.InfoClient({ transport });
-   *
-   * const data = await client.txDetails({ hash: "0x..." });
-   * ```
-   *
-   * @see null
-   */
-  txDetails(
-    params: TxDetailsParameters,
-    signal?: AbortSignal,
-  ): Promise<TxDetailsResponse> {
-    return txDetails(this.config_, params, signal);
-  }
-
-  /**
    * Request user abstraction state.
    *
    * @param params Parameters specific to the API request.
@@ -1991,35 +1930,6 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     signal?: AbortSignal,
   ): Promise<UserBorrowLendInterestResponse> {
     return userBorrowLendInterest(this.config_, params, signal);
-  }
-
-  /**
-   * Request array of user transaction details.
-   *
-   * @param params Parameters specific to the API request.
-   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   * @return Array of user transaction details.
-   *
-   * @throws {ValidationError} When the request parameters fail validation (before sending).
-   * @throws {TransportError} When the transport layer throws an error.
-   *
-   * @example
-   * ```ts
-   * import * as hl from "@nktkas/hyperliquid";
-   *
-   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
-   * const client = new hl.InfoClient({ transport });
-   *
-   * const data = await client.userDetails({ user: "0x..." });
-   * ```
-   *
-   * @see null
-   */
-  userDetails(
-    params: UserDetailsParameters,
-    signal?: AbortSignal,
-  ): Promise<UserDetailsResponse> {
-    return userDetails(this.config_, params, signal);
   }
 
   /**
@@ -2531,7 +2441,6 @@ export type { AllBorrowLendReserveStatesResponse } from "./_methods/allBorrowLen
 export type { AllMidsParameters, AllMidsResponse } from "./_methods/allMids.ts";
 export type { AllPerpMetasResponse } from "./_methods/allPerpMetas.ts";
 export type { ApprovedBuildersParameters, ApprovedBuildersResponse } from "./_methods/approvedBuilders.ts";
-export type { BlockDetailsParameters, BlockDetailsResponse } from "./_methods/blockDetails.ts";
 export type {
   BorrowLendReserveStateParameters,
   BorrowLendReserveStateResponse,
@@ -2591,13 +2500,11 @@ export type { SubAccountsParameters, SubAccountsResponse } from "./_methods/subA
 export type { SubAccounts2Parameters, SubAccounts2Response } from "./_methods/subAccounts2.ts";
 export type { TokenDetailsParameters, TokenDetailsResponse } from "./_methods/tokenDetails.ts";
 export type { TwapHistoryParameters, TwapHistoryResponse } from "./_methods/twapHistory.ts";
-export type { TxDetailsParameters, TxDetailsResponse } from "./_methods/txDetails.ts";
 export type { UserAbstractionParameters, UserAbstractionResponse } from "./_methods/userAbstraction.ts";
 export type {
   UserBorrowLendInterestParameters,
   UserBorrowLendInterestResponse,
 } from "./_methods/userBorrowLendInterest.ts";
-export type { UserDetailsParameters, UserDetailsResponse } from "./_methods/userDetails.ts";
 export type {
   UserDexAbstractionParameters as UserDexAbstractionInfoParameters,
   UserDexAbstractionResponse as UserDexAbstractionInfoResponse,

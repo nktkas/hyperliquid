@@ -1,14 +1,13 @@
-import type { ExplorerTxsEvent } from "@nktkas/hyperliquid/api/subscription";
+import type { ExplorerTxsEvent } from "@nktkas/hyperliquid/api/explorer";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
-import { collectEventsOverTime, runTest } from "./_t.ts";
+import { collectEventsOverTime, runSubscriptionTest } from "./_t.ts";
 
-const sourceFile = new URL("../../../src/api/subscription/_methods/explorerTxs.ts", import.meta.url).pathname;
+const sourceFile = new URL("../../../src/api/explorer/_methods/explorerTxs.ts", import.meta.url).pathname;
 const responseSchema = typeToJsonSchema(sourceFile, "ExplorerTxsEvent");
 
-runTest({
+runSubscriptionTest({
   name: "explorerTxs",
-  mode: "rpc",
   fn: async (_t, client) => {
     const data = await collectEventsOverTime<ExplorerTxsEvent>(async (cb) => {
       await client.explorerTxs(cb);

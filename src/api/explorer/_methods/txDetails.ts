@@ -37,7 +37,8 @@ export type TxDetailsResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/mod.ts";
+import type { IRequestTransport } from "../../../transport/mod.ts";
+import type { ExplorerConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode txDetails} function. */
 export type TxDetailsParameters = Omit<v.InferInput<typeof TxDetailsRequest>, "type">;
@@ -45,7 +46,7 @@ export type TxDetailsParameters = Omit<v.InferInput<typeof TxDetailsRequest>, "t
 /**
  * Request transaction details by transaction hash.
  *
- * @param config General configuration for Info API requests.
+ * @param config General configuration for Explorer API requests.
  * @param params Parameters specific to the API request.
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
  * @return Transaction details.
@@ -56,7 +57,7 @@ export type TxDetailsParameters = Omit<v.InferInput<typeof TxDetailsRequest>, "t
  * @example
  * ```ts
  * import { HttpTransport } from "@nktkas/hyperliquid";
- * import { txDetails } from "@nktkas/hyperliquid/api/info";
+ * import { txDetails } from "@nktkas/hyperliquid/api/explorer";
  *
  * const transport = new HttpTransport(); // only `HttpTransport` supports this API
  *
@@ -68,7 +69,7 @@ export type TxDetailsParameters = Omit<v.InferInput<typeof TxDetailsRequest>, "t
  * @see null
  */
 export function txDetails(
-  config: InfoConfig,
+  config: ExplorerConfig<IRequestTransport<"explorer">>,
   params: TxDetailsParameters,
   signal?: AbortSignal,
 ): Promise<TxDetailsResponse> {

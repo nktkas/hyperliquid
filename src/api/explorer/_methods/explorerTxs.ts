@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import type { ExplorerTransaction } from "../../info/_methods/_base/mod.ts";
+import type { ExplorerTransaction } from "./_base/mod.ts";
 
 /**
  * Subscription to explorer transaction events.
@@ -29,13 +29,13 @@ export type ExplorerTxsEvent = ExplorerTransaction[];
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_base/mod.ts";
+import type { ISubscription, ISubscriptionTransport, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ExplorerConfig } from "./_base/mod.ts";
 
 /**
  * Subscribe to explorer transaction updates.
  *
- * @param config General configuration for Subscription API subscriptions.
+ * @param config General configuration for Explorer API subscriptions.
  * @param listener A callback function to be called when the event is received.
  * @param onError An optional callback function to be called when the subscription fails.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
@@ -46,9 +46,9 @@ import type { SubscriptionConfig } from "./_base/mod.ts";
  * @example
  * ```ts
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
- * import { explorerTxs } from "@nktkas/hyperliquid/api/subscription";
+ * import { explorerTxs } from "@nktkas/hyperliquid/api/explorer";
  *
- * const transport = new WebSocketTransport({ url: "wss://rpc.hyperliquid.xyz/ws" }); // RPC endpoint
+ * const transport = new WebSocketTransport({ url: "wss://rpc.hyperliquid.xyz/ws" }); // only `WebSocketTransport` supports this API
  *
  * const sub = await explorerTxs(
  *   { transport },
@@ -59,12 +59,12 @@ import type { SubscriptionConfig } from "./_base/mod.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export function explorerTxs(
-  config: SubscriptionConfig,
+  config: ExplorerConfig<ISubscriptionTransport>,
   listener: (data: ExplorerTxsEvent) => void,
   onError?: (error: WebSocketRequestError) => void,
 ): Promise<ISubscription> {
   const payload = parse(ExplorerTxsRequest, { type: "explorerTxs" });
-  return config.transport.subscribe<ExplorerTxsEvent>("explorerTxs_", payload, (e) => { // Internal channel as it does not have its own channel
+  return config.transport.subscribe<ExplorerTxsEvent>("explorerTxs_", payload, (e) => { // Internal duck channel as it does not have its own channel
     listener(e.detail);
   }, onError);
 }

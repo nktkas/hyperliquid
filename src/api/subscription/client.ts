@@ -36,8 +36,6 @@ import {
   type ClearinghouseStateEvent,
   type ClearinghouseStateParameters,
 } from "./_methods/clearinghouseState.ts";
-import { explorerBlock, type ExplorerBlockEvent } from "./_methods/explorerBlock.ts";
-import { explorerTxs, type ExplorerTxsEvent } from "./_methods/explorerTxs.ts";
 import { l2Book, type L2BookEvent, type L2BookParameters } from "./_methods/l2Book.ts";
 import { notification, type NotificationEvent, type NotificationParameters } from "./_methods/notification.ts";
 import { openOrders, type OpenOrdersEvent, type OpenOrdersParameters } from "./_methods/openOrders.ts";
@@ -461,68 +459,6 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     onError?: (error: WebSocketRequestError) => void,
   ): Promise<ISubscription> {
     return clearinghouseState(this.config_, params, listener, onError);
-  }
-
-  /**
-   * Subscribe to explorer block updates.
-   *
-   * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
-   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
-   *
-   * @throws {ValidationError} When the request parameters fail validation (before sending).
-   * @throws {TransportError} When the transport layer throws an error.
-   *
-   * @example
-   * ```ts
-   * import * as hl from "@nktkas/hyperliquid";
-   *
-   * const transport = new hl.WebSocketTransport({ url: "wss://rpc.hyperliquid.xyz/ws" }); // RPC endpoint
-   * const client = new hl.SubscriptionClient({ transport });
-   *
-   * const sub = await client.explorerBlock((data) => {
-   *   console.log(data);
-   * });
-   * ```
-   *
-   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
-   */
-  explorerBlock(
-    listener: (data: ExplorerBlockEvent) => void,
-    onError?: (error: WebSocketRequestError) => void,
-  ): Promise<ISubscription> {
-    return explorerBlock(this.config_, listener, onError);
-  }
-
-  /**
-   * Subscribe to explorer transaction updates.
-   *
-   * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
-   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
-   *
-   * @throws {ValidationError} When the request parameters fail validation (before sending).
-   * @throws {TransportError} When the transport layer throws an error.
-   *
-   * @example
-   * ```ts
-   * import * as hl from "@nktkas/hyperliquid";
-   *
-   * const transport = new hl.WebSocketTransport({ url: "wss://rpc.hyperliquid.xyz/ws" }); // RPC endpoint
-   * const client = new hl.SubscriptionClient({ transport });
-   *
-   * const sub = await client.explorerTxs((data) => {
-   *   console.log(data);
-   * });
-   * ```
-   *
-   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
-   */
-  explorerTxs(
-    listener: (data: ExplorerTxsEvent) => void,
-    onError?: (error: WebSocketRequestError) => void,
-  ): Promise<ISubscription> {
-    return explorerTxs(this.config_, listener, onError);
   }
 
   /**
@@ -1150,8 +1086,6 @@ export type {
   ClearinghouseStateEvent as ClearinghouseStateWsEvent,
   ClearinghouseStateParameters as ClearinghouseStateWsParameters,
 } from "./_methods/clearinghouseState.ts";
-export type { ExplorerBlockEvent as ExplorerBlockWsEvent } from "./_methods/explorerBlock.ts";
-export type { ExplorerTxsEvent as ExplorerTxsWsEvent } from "./_methods/explorerTxs.ts";
 export type { L2BookEvent as L2BookWsEvent, L2BookParameters as L2BookWsParameters } from "./_methods/l2Book.ts";
 export type {
   NotificationEvent as NotificationWsEvent,

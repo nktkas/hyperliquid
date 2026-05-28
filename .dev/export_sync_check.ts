@@ -56,6 +56,12 @@ const API_ENDPOINTS: ApiEndpoint[] = [
     clientPath: "src/api/subscription/client.ts",
     modPath: "src/api/subscription/mod.ts",
   },
+  {
+    name: "explorer",
+    methodsDir: "src/api/explorer/_methods",
+    clientPath: "src/api/explorer/client.ts",
+    modPath: "src/api/explorer/mod.ts",
+  },
 ];
 
 // =============================================================================

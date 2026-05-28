@@ -44,13 +44,13 @@ export type ExplorerBlockEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_base/mod.ts";
+import type { ISubscription, ISubscriptionTransport, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ExplorerConfig } from "./_base/mod.ts";
 
 /**
  * Subscribe to explorer block updates.
  *
- * @param config General configuration for Subscription API subscriptions.
+ * @param config General configuration for Explorer API subscriptions.
  * @param listener A callback function to be called when the event is received.
  * @param onError An optional callback function to be called when the subscription fails.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
@@ -61,9 +61,9 @@ import type { SubscriptionConfig } from "./_base/mod.ts";
  * @example
  * ```ts
  * import { WebSocketTransport } from "@nktkas/hyperliquid";
- * import { explorerBlock } from "@nktkas/hyperliquid/api/subscription";
+ * import { explorerBlock } from "@nktkas/hyperliquid/api/explorer";
  *
- * const transport = new WebSocketTransport({ url: "wss://rpc.hyperliquid.xyz/ws" }); // RPC endpoint
+ * const transport = new WebSocketTransport({ url: "wss://rpc.hyperliquid.xyz/ws" }); // only `WebSocketTransport` supports this API
  *
  * const sub = await explorerBlock(
  *   { transport },
@@ -74,12 +74,12 @@ import type { SubscriptionConfig } from "./_base/mod.ts";
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export function explorerBlock(
-  config: SubscriptionConfig,
+  config: ExplorerConfig<ISubscriptionTransport>,
   listener: (data: ExplorerBlockEvent) => void,
   onError?: (error: WebSocketRequestError) => void,
 ): Promise<ISubscription> {
   const payload = parse(ExplorerBlockRequest, { type: "explorerBlock" });
-  return config.transport.subscribe<ExplorerBlockEvent>("explorerBlock_", payload, (e) => { // Internal channel as it does not have its own channel
+  return config.transport.subscribe<ExplorerBlockEvent>("explorerBlock_", payload, (e) => { // Internal duck channel as it does not have its own channel
     listener(e.detail);
   }, onError);
 }
