@@ -77,21 +77,17 @@ const StringMath = {
   log10Floor(value: string): number {
     const abs = value[0] === "-" ? value.slice(1) : value;
 
-    // Check if zero or invalid
-    const num = Number(abs);
-    if (num === 0 || isNaN(num)) return -Infinity;
-
-    const [int, dec] = abs.split(".");
+    const [int, dec = ""] = abs.split(".");
+    const trimmedInt = int.replace(/^0+/, "");
 
     // Number >= 1: magnitude = length of integer part - 1
-    if (Number(int) !== 0) {
-      const trimmed = int.replace(/^0+/, "");
-      return trimmed.length - 1;
+    if (trimmedInt.length > 0) {
+      return trimmedInt.length - 1;
     }
 
     // Number < 1: count leading zeros in decimal part
-    const leadingZeros = dec.match(/^0*/)?.[0].length ?? 0;
-    return -(leadingZeros + 1);
+    const firstNonZeroDecimal = dec.search(/[1-9]/);
+    return firstNonZeroDecimal === -1 ? -Infinity : -(firstNonZeroDecimal + 1);
   },
 
   /** Multiply by 10^exp: shift decimal point left (negative) or right (positive). */

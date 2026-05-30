@@ -36,6 +36,10 @@ Deno.test("formatPrice", async (t) => {
       assertEquals(formatPrice("12345.6", 0), "12345");
       assertEquals(formatPrice("0.00123456", 0), "0.001234");
     });
+
+    await t.step("handles very large decimal strings without precision loss", () => {
+      assertEquals(formatPrice("123456789012345678901234567890.123", 0), "123450000000000000000000000000");
+    });
   });
 
   await t.step("decimal limits", async (t) => {
