@@ -39,6 +39,8 @@ export type OutcomeMetaUpdatesEvent = {
           /** Token identifier for this side. */
           token?: number;
         }[];
+        /** Quote token for this outcome. */
+        quoteToken: string;
       };
     }
     | {
