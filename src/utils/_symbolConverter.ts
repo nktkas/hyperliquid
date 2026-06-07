@@ -211,6 +211,8 @@ export class SymbolConverter {
         if (!slug) return;
 
         this._nameToAssetId.set(slug, 100000000 + 10 * outcome.outcome + sideIdx);
+        // Outcome markets are absent from szDecimals metadata; they are all 5
+        this._nameToSzDecimals.set(slug, 5);
       });
     });
   }
@@ -330,6 +332,7 @@ export class SymbolConverter {
    * - For Perpetuals, use the coin name (e.g., "BTC").
    * - For Spots, use the "BASE/QUOTE" format (e.g., "HYPE/USDC").
    * - For Builder Dexs, use the "DEX_NAME:ASSET_NAME" format (e.g., "test:ABC").
+   * - For Outcome Markets, use the slug as in the URL (e.g., "btc-above-61720-yes-jun-08-0600").
    *
    * @example
    * ```ts
@@ -342,6 +345,7 @@ export class SymbolConverter {
    * converter.getSzDecimals("BTC"); // → 5
    * converter.getSzDecimals("HYPE/USDC"); // → 2
    * converter.getSzDecimals("test:ABC"); // → 0
+   * converter.getSzDecimals("btc-above-61720-yes-jun-08-0600"); // → 5
    * ```
    */
   getSzDecimals(name: string): number | undefined {
