@@ -36,6 +36,8 @@ export type OutcomeMetaResponse = {
       /** Token identifier for this side. */
       token?: number;
     }[];
+    /** Quote token for this outcome. */
+    quoteToken: string;
   }[];
   /** Array of prediction market questions. */
   questions: {
