@@ -193,126 +193,107 @@ export class SymbolConverter {
   // ============================================================
 
   private _processOutcomeMarkets(outcomeMetaData: OutcomeMetaResponse): void {
-    this._processBinaryOutcomeAssets(outcomeMetaData);
-    this._processRecurringBucketOutcomeAssets(outcomeMetaData);
-  }
+    // Map each named outcome to its owning question, which holds the price spec and bucket order
+    const questionByOutcome = new Map<number, OutcomeMetaResponse["questions"][number]>();
+    outcomeMetaData.questions.forEach((question) => {
+      question.namedOutcomes.forEach((outcomeId) => questionByOutcome.set(outcomeId, question));
+    });
 
-  /**
-   * Populates binary (`priceBinary`) outcome market slugs.
-   */
-  private _processBinaryOutcomeAssets(outcomeMetaData: OutcomeMetaResponse): void {
+    // Fallback outcomes are not tradable on their own and have no public slug
+    const fallbackOutcomes = new Set(outcomeMetaData.questions.map((question) => question.fallbackOutcome));
+
     outcomeMetaData.outcomes.forEach((outcome) => {
-      if (outcome.name !== "Recurring" || !outcome.description.includes("class:priceBinary")) return;
+      if (fallbackOutcomes.has(outcome.outcome)) return;
+      const question = questionByOutcome.get(outcome.outcome);
 
       outcome.sideSpecs.forEach((sideSpec, sideIdx) => {
-        this._populateIndividualBucketOutcome(
-          outcome.outcome,
-          sideSpec.name,
-          sideIdx,
-          outcome.description,
-          0,
-        );
+        const slug = this._outcomeSlug(outcome, sideSpec.name, question);
+        if (!slug) return;
+
+        this._nameToAssetId.set(slug, 100000000 + 10 * outcome.outcome + sideIdx);
       });
     });
   }
 
   /**
-   * Populates multi-price (`priceBucket`) outcome market slugs.
+   * Builds the URL slug for an outcome side.
+   *
+   * Recurring price markets encode their slug in a `class:price*` description; every other market
+   * derives it from the question, outcome, and side names (e.g. "nba-finals-game-3-san-antonio").
    */
-  private _processRecurringBucketOutcomeAssets(outcomeMetaData: OutcomeMetaResponse): void {
-    outcomeMetaData.questions.forEach((question) => {
-      if (question.name === "Recurring" && question.description.includes("class:priceBucket")) {
-        if (question.namedOutcomes.length !== 3) return;
-
-        question.namedOutcomes.forEach((outcomeId: number, outcomeIndex: number) => {
-          const outcomeObj = outcomeMetaData.outcomes.find((entry) => entry.outcome === outcomeId);
-
-          if (outcomeObj) {
-            outcomeObj.sideSpecs.forEach((sideSpec, sideIdx) => {
-              this._populateIndividualBucketOutcome(
-                outcomeObj.outcome,
-                sideSpec.name,
-                sideIdx,
-                question.description,
-                outcomeIndex,
-              );
-            });
-          }
-        });
-      }
-    });
+  private _outcomeSlug(
+    outcome: OutcomeMetaResponse["outcomes"][number],
+    side: string,
+    question?: OutcomeMetaResponse["questions"][number],
+  ): string | null {
+    if (outcome.description.includes("class:priceBinary")) {
+      return this._recurringPriceSlug(outcome.description, side, 0);
+    }
+    if (question?.description.includes("class:priceBucket")) {
+      return this._recurringPriceSlug(question.description, side, question.namedOutcomes.indexOf(outcome.outcome));
+    }
+    return [question?.name, outcome.name, side]
+      .filter((part) => part !== undefined)
+      .map((part) => this._slugify(part))
+      .join("-");
   }
 
   /**
-   * Maps the slug to the assetId as per the specification.
+   * Builds the slug for a recurring price market from its `class:price*` description.
    *
-   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/asset-ids
-   */
-  private _populateIndividualBucketOutcome(
-    outcomeId: number,
-    sideSpec: string,
-    sideIdx: number,
-    description: string,
-    outcomeIndex: number,
-  ): void {
-    const slug = this._descriptionToSlug(description, sideSpec, outcomeIndex);
-    if (!slug) return;
-    const encoding = 10 * outcomeId + sideIdx;
-    const assetId = 100000000 + encoding;
-
-    this._nameToAssetId.set(slug, assetId);
-  }
-
-  /**
-   * Generates the appropriate slug for binary and multi-price (bucket) outcome markets.
-   *
-   * @param description Complete description of an outcome.
-   * @param side Side name retrieved from the sideSpecs.
-   * @param outcomeIndex Bucket classification (0 = below, 1 = between, 2 = above).
-   * @return The generated slug.
+   * @param spec Pipe-delimited recurring market spec (e.g. "class:priceBinary|underlying:BTC|expiry:...").
+   * @param side Side name (e.g. "Yes").
+   * @param bucketIndex Price range position for `priceBucket` markets (0 = below, 1 = between, 2 = above).
+   * @return The generated slug, or `null` if the spec is incomplete or of an unknown class.
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/trading/contract-specifications
    */
-  private _descriptionToSlug(description: string, side: string, outcomeIndex: number): string | null {
-    const parts = description.split("|");
-    const lookup: Record<string, string> = {};
-
-    for (const part of parts) {
-      const [key, value] = part.split(":");
-      lookup[key] = value;
+  private _recurringPriceSlug(spec: string, side: string, bucketIndex: number): string | null {
+    const fields: Record<string, string> = {};
+    for (const part of spec.split("|")) {
+      const [key, ...value] = part.split(":");
+      fields[key] = value.join(":");
     }
 
-    const { class: assetClass, underlying, expiry } = lookup;
-
+    const { class: assetClass, underlying, expiry } = fields;
     if (!assetClass || !underlying || !expiry) return null;
 
+    // Expiry "YYYYMMDD-HHMM" becomes the slug date "mon-dd-HHMM"
     const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
-    const monthName = months[parseInt(expiry.slice(4, 6)) - 1];
-    const day = expiry.slice(6, 8);
-    const time = expiry.slice(9, 13);
-    const dateStr = `${monthName}-${day}-${time}`;
+    const date = `${months[Number(expiry.slice(4, 6)) - 1]}-${expiry.slice(6, 8)}-${expiry.slice(9, 13)}`;
 
     if (assetClass === "priceBinary") {
-      const { targetPrice } = lookup;
+      const { targetPrice } = fields;
       if (!targetPrice) return null;
-      return `${underlying}-above-${targetPrice}-${side}-${dateStr}`.toLowerCase();
+      return `${underlying}-above-${targetPrice}-${side}-${date}`.toLowerCase();
     }
 
     if (assetClass === "priceBucket") {
-      const { priceThresholds } = lookup;
-      if (!priceThresholds) return null;
-      const prices = priceThresholds.split(",");
-      if (prices.length !== 2) return null;
+      const prices = fields.priceThresholds?.split(",");
+      if (prices?.length !== 2) return null;
 
-      const bucketStr = outcomeIndex === 0
-        ? `below-${prices[0]}`
-        : outcomeIndex === 1
-        ? `${prices[0]}-to-${prices[1]}`
-        : `above-${prices[1]}`;
+      let range: string;
+      if (bucketIndex === 0) {
+        range = `below-${prices[0]}`;
+      } else if (bucketIndex === 1) {
+        range = `${prices[0]}-to-${prices[1]}`;
+      } else {
+        range = `above-${prices[1]}`;
+      }
 
-      return `${underlying}-price-range-${dateStr}-${bucketStr}-${side}`.toLowerCase();
+      return `${underlying}-price-range-${date}-${range}-${side}`.toLowerCase();
     }
+
     return null;
+  }
+
+  /** Converts a market or side name to a URL slug. */
+  private _slugify(name: string): string {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/[\s-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
   }
 
   // ============================================================
