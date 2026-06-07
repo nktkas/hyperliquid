@@ -20,7 +20,7 @@ export interface SymbolConverterOptions {
 
 /**
  * Utility class for converting asset symbols to their corresponding IDs and size decimals.
- * Supports perpetuals, spot markets, and optional builder dexs.
+ * Supports perpetuals, spots, optional builder dexs and outcome markets.
  *
  * @example
  * ```ts
@@ -34,11 +34,12 @@ export interface SymbolConverterOptions {
  * // const converter = await SymbolConverter.create({ transport, dexs: ["test"] });
  *
  * const btcId = converter.getAssetId("BTC"); // perpetual → 0
- * const hypeUsdcId = converter.getAssetId("HYPE/USDC"); // spot market → 10107
+ * const hypeUsdcId = converter.getAssetId("HYPE/USDC"); // spot → 10107
  * const dexAbcId = converter.getAssetId("test:ABC"); // builder dex (if enabled) → 110000
+ * const outcomeId = converter.getAssetId("btc-above-61720-yes-jun-08-0600"); // outcome market → 100002200
  *
  * const btcSzDecimals = converter.getSzDecimals("BTC"); // perpetual → 5
- * const hypeUsdcSzDecimals = converter.getSzDecimals("HYPE/USDC"); // spot market → 2
+ * const hypeUsdcSzDecimals = converter.getSzDecimals("HYPE/USDC"); // spot → 2
  * const dexAbcSzDecimals = converter.getSzDecimals("test:ABC"); // builder dex (if enabled) → 0
  *
  * const spotPairId = converter.getSpotPairId("HFUN/USDC"); // → "@2"
@@ -104,52 +105,68 @@ export class SymbolConverter {
       outcomeMeta(config),
     ]);
 
-    if (!perpMetaData?.universe?.length) {
-      throw new Error("Invalid perpetual metadata response");
-    }
-
-    if (!spotMetaData?.universe?.length || !spotMetaData?.tokens?.length) {
-      throw new Error("Invalid spot metadata response");
-    }
-
     this._nameToAssetId.clear();
     this._nameToSzDecimals.clear();
     this._nameToSpotPairId.clear();
     this._spotPairIdToName.clear();
 
-    this._processDefaultPerps(perpMetaData);
-    this._processSpotAssets(spotMetaData);
-    this._processAllRecurringOutcomeAssets(outcomeMetaData);
-
-    // Only process builder dexs if dex support is enabled
-    if (perpDexsData) {
-      await this._processBuilderDexs(perpDexsData);
-    }
+    this._processPerps(perpMetaData);
+    this._processSpot(spotMetaData);
+    this._processOutcomeMarkets(outcomeMetaData);
+    if (perpDexsData) await this._processBuilderDexs(perpDexsData);
   }
 
-  private _processDefaultPerps(perpMetaData: MetaResponse): void {
+  // ============================================================
+  // Perpetuals
+  // ============================================================
+
+  private _processPerps(perpMetaData: MetaResponse): void {
     perpMetaData.universe.forEach((asset, index) => {
       this._nameToAssetId.set(asset.name, index);
       this._nameToSzDecimals.set(asset.name, asset.szDecimals);
     });
   }
 
-  private async _processBuilderDexs(perpDexsData: PerpDexsResponse): Promise<void> {
-    if (!perpDexsData || perpDexsData.length <= 1) return;
+  // ============================================================
+  // Spot
+  // ============================================================
 
+  private _processSpot(spotMetaData: SpotMetaResponse): void {
+    const tokenMap = new Map<number, { name: string; szDecimals: number }>();
+    spotMetaData.tokens.forEach((token) => {
+      tokenMap.set(token.index, { name: token.name, szDecimals: token.szDecimals });
+    });
+
+    spotMetaData.universe.forEach((market) => {
+      const baseToken = tokenMap.get(market.tokens[0]);
+      const quoteToken = tokenMap.get(market.tokens[1]);
+      if (!baseToken || !quoteToken) return;
+
+      const assetId = 10000 + market.index;
+      const baseQuoteKey = `${baseToken.name}/${quoteToken.name}`;
+
+      this._nameToAssetId.set(baseQuoteKey, assetId);
+      this._nameToSzDecimals.set(baseQuoteKey, baseToken.szDecimals);
+      this._nameToSpotPairId.set(baseQuoteKey, market.name);
+      this._spotPairIdToName.set(market.name, baseQuoteKey);
+    });
+  }
+
+  // ============================================================
+  // Builder dexs
+  // ============================================================
+
+  private async _processBuilderDexs(perpDexsData: PerpDexsResponse): Promise<void> {
     const builderDexs = perpDexsData
       .map((dex, index) => ({ dex, index }))
       .filter((item): item is { dex: NonNullable<PerpDexsResponse[number]>; index: number } => {
         return item.index > 0 && item.dex !== null && item.dex.name.length > 0;
       });
-
     if (builderDexs.length === 0) return;
 
-    // Filter dexs based on the dexOption
     const dexsToProcess = Array.isArray(this._dexOption)
       ? builderDexs.filter((item) => (this._dexOption as string[]).includes(item.dex.name))
-      : builderDexs; // true means process all
-
+      : builderDexs;
     if (dexsToProcess.length === 0) return;
 
     const config = { transport: this._transport };
@@ -159,47 +176,29 @@ export class SymbolConverter {
 
     results.forEach((result, idx) => {
       if (result.status !== "fulfilled") return;
-      this._processBuilderDexResult(result.value, dexsToProcess[idx].index);
+
+      const dexIndex = dexsToProcess[idx].index;
+      const offset = 100000 + dexIndex * 10000;
+
+      result.value.universe.forEach((asset, index) => {
+        const assetId = offset + index;
+        this._nameToAssetId.set(asset.name, assetId);
+        this._nameToSzDecimals.set(asset.name, asset.szDecimals);
+      });
     });
   }
 
-  private _processBuilderDexResult(dexMeta: MetaResponse, perpDexIndex: number): void {
-    const offset = 100000 + perpDexIndex * 10000;
+  // ============================================================
+  // Outcome markets
+  // ============================================================
 
-    dexMeta.universe.forEach((asset, index) => {
-      const assetId = offset + index;
-      this._nameToAssetId.set(asset.name, assetId);
-      this._nameToSzDecimals.set(asset.name, asset.szDecimals);
-    });
-  }
-
-  private _processSpotAssets(spotMetaData: SpotMetaResponse): void {
-    const tokenMap = new Map<number, { name: string; szDecimals: number }>();
-    spotMetaData.tokens.forEach((token) => {
-      tokenMap.set(token.index, { name: token.name, szDecimals: token.szDecimals });
-    });
-
-    spotMetaData.universe.forEach((market) => {
-      if (market.tokens.length < 2) return;
-      const baseToken = tokenMap.get(market.tokens[0]);
-      const quoteToken = tokenMap.get(market.tokens[1]);
-      if (!baseToken || !quoteToken) return;
-
-      const assetId = 10000 + market.index;
-      const baseQuoteKey = `${baseToken.name}/${quoteToken.name}`;
-      this._nameToAssetId.set(baseQuoteKey, assetId);
-      this._nameToSzDecimals.set(baseQuoteKey, baseToken.szDecimals);
-      this._nameToSpotPairId.set(baseQuoteKey, market.name);
-      this._spotPairIdToName.set(market.name, baseQuoteKey);
-    });
-  }
-
-  private _processAllRecurringOutcomeAssets(outcomeMetaData: OutcomeMetaResponse): void {
+  private _processOutcomeMarkets(outcomeMetaData: OutcomeMetaResponse): void {
     this._processBinaryOutcomeAssets(outcomeMetaData);
     this._processRecurringBucketOutcomeAssets(outcomeMetaData);
   }
+
   /**
-   * Handle the population of binary(priceBinary) outcome market slugs
+   * Populates binary (`priceBinary`) outcome market slugs.
    */
   private _processBinaryOutcomeAssets(outcomeMetaData: OutcomeMetaResponse): void {
     outcomeMetaData.outcomes.forEach((outcome) => {
@@ -218,7 +217,7 @@ export class SymbolConverter {
   }
 
   /**
-   * Handle the population of multi-price(priceBucket) outcome market slugs
+   * Populates multi-price (`priceBucket`) outcome market slugs.
    */
   private _processRecurringBucketOutcomeAssets(outcomeMetaData: OutcomeMetaResponse): void {
     outcomeMetaData.questions.forEach((question) => {
@@ -245,8 +244,9 @@ export class SymbolConverter {
   }
 
   /**
-   * Map the slug to the assetId as per the specification:
-   * {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/asset-ids}
+   * Maps the slug to the assetId as per the specification.
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/asset-ids
    */
   private _populateIndividualBucketOutcome(
     outcomeId: number,
@@ -264,12 +264,14 @@ export class SymbolConverter {
   }
 
   /**
-   * Generate the appropiate slug for binary and multi-price(bucket) outcome markets
-   * {@link https://hyperliquid.gitbook.io/hyperliquid-docs/trading/contract-specifications}
-   * @param description complete description of an outcome
-   * @param side for the requested slug retrieved from the sideSpecs
-   * @param outcomeIndex for the classification of the bucket: (0 -> below, 1-between, 2-above)
-   * @returns the generated slug
+   * Generates the appropriate slug for binary and multi-price (bucket) outcome markets.
+   *
+   * @param description Complete description of an outcome.
+   * @param side Side name retrieved from the sideSpecs.
+   * @param outcomeIndex Bucket classification (0 = below, 1 = between, 2 = above).
+   * @return The generated slug.
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/trading/contract-specifications
    */
   private _descriptionToSlug(description: string, side: string, outcomeIndex: number): string | null {
     const parts = description.split("|");
@@ -313,11 +315,16 @@ export class SymbolConverter {
     return null;
   }
 
+  // ============================================================
+  // Public API
+  // ============================================================
+
   /**
    * Get asset ID for a coin.
    * - For Perpetuals, use the coin name (e.g., "BTC").
-   * - For Spot markets, use the "BASE/QUOTE" format (e.g., "HYPE/USDC").
-   * - For Builder Dex assets, use the "DEX_NAME:ASSET_NAME" format (e.g., "test:ABC").
+   * - For Spots, use the "BASE/QUOTE" format (e.g., "HYPE/USDC").
+   * - For Builder Dexs, use the "DEX_NAME:ASSET_NAME" format (e.g., "test:ABC").
+   * - For Outcome Markets, use the slug as in the URL (e.g., "btc-above-61720-yes-jun-08-0600").
    *
    * @example
    * ```ts
@@ -330,13 +337,7 @@ export class SymbolConverter {
    * converter.getAssetId("BTC"); // → 0
    * converter.getAssetId("HYPE/USDC"); // → 10107
    * converter.getAssetId("test:ABC"); // → 110000
-   * // Can also be used to retrieve the assetId of outcome markets using the same slug as in the URL
-   * // Examples:
-   * // For binary outcome markets: btc-above-81041-yes-may-08-0600
-   * // For multi-price outcome markets:
-   * //     btc-price-range-may-08-0600-below-79303-yes
-   * //     btc-price-range-may-08-0600-79303-to-82540-yes
-   * //     btc-price-range-may-08-0600-above-82540-yes
+   * converter.getAssetId("btc-above-61720-yes-jun-08-0600"); // → 100002200
    * ```
    */
   getAssetId(name: string): number | undefined {
@@ -346,8 +347,8 @@ export class SymbolConverter {
   /**
    * Get size decimals for a coin.
    * - For Perpetuals, use the coin name (e.g., "BTC").
-   * - For Spot markets, use the "BASE/QUOTE" format (e.g., "HYPE/USDC").
-   * - For Builder Dex assets, use the "DEX_NAME:ASSET_NAME" format (e.g., "test:ABC").
+   * - For Spots, use the "BASE/QUOTE" format (e.g., "HYPE/USDC").
+   * - For Builder Dexs, use the "DEX_NAME:ASSET_NAME" format (e.g., "test:ABC").
    *
    * @example
    * ```ts
@@ -367,9 +368,7 @@ export class SymbolConverter {
   }
 
   /**
-   * Get spot pair ID for info endpoints and subscriptions (e.g., l2book, trades).
-   *
-   * Accepts spot markets in the "BASE/QUOTE" format (e.g., "HFUN/USDC").
+   * Get spot pair ID (e.g., @2) for info endpoints and subscriptions (e.g., l2book, trades).
    *
    * @example
    * ```ts
@@ -388,9 +387,7 @@ export class SymbolConverter {
   }
 
   /**
-   * Get the symbol ("BASE/QUOTE") from a spot pair ID.
-   *
-   * Accepts pair IDs such as "@107" or "PURR/USDC".
+   * Get the symbol ("BASE/QUOTE") from a spot pair ID (e.g., @107).
    *
    * @example
    * ```ts
@@ -401,7 +398,7 @@ export class SymbolConverter {
    * const converter = await SymbolConverter.create({ transport });
    *
    * converter.getSymbolBySpotPairId("@107"); // → "HYPE/USDC"
-   * converter.getSymbolBySpotPairId("PURR/USDC"); // → "PURR/USDC"
+   * converter.getSymbolBySpotPairId("PURR/USDC"); // → "PURR/USDC" (exceptions exist for some pairs)
    * ```
    */
   getSymbolBySpotPairId(pairId: string): string | undefined {
