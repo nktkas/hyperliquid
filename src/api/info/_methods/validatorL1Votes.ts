@@ -41,6 +41,24 @@ export type ValidatorL1VotesResponse = {
         fallbackNameAndDescription: [string, string];
         namedOutcomes: [string, string][];
       };
+    } | {
+      settleOutcome: {
+        outcome: number;
+        settleFraction: string;
+        details: string;
+      };
+    };
+  } | {
+    E: {
+      token: number;
+      /** @pattern ^0x[a-fA-F0-9]{40}$ */
+      technicalStaker: `0x${string}`;
+      /** @pattern ^0x[a-fA-F0-9]{40}$ */
+      treasuryStaker: `0x${string}`;
+      /** @pattern ^0x[a-fA-F0-9]{40}$ */
+      treasuryEvmAddress: `0x${string}`;
+      /** @pattern ^0x[a-fA-F0-9]{40}$ */
+      evmRebalanceContract: `0x${string}`;
     };
   };
   /**
@@ -48,6 +66,8 @@ export type ValidatorL1VotesResponse = {
    * @pattern ^0x[a-fA-F0-9]{40}$
    */
   votes: `0x${string}`[];
+  /** Whether the vote reached quorum. */
+  quorumReached: boolean;
 }[];
 
 // ============================================================
