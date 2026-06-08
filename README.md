@@ -129,7 +129,7 @@ Full guides, examples, and API reference: [nktkas.gitbook.io/hyperliquid](https:
 
 ## License
 
-**Hyperliquid TS SDK** is licensed under the [MIT License](LICENSE).
+**@nktkas/hyperliquid** is licensed under the [MIT License](LICENSE).
 
-Copyright © 2024-2026 present [nktkas](https://github.com/nktkas) and
+Copyright © 2024-present [nktkas](https://github.com/nktkas) and
 [contributors](https://github.com/nktkas/hyperliquid/graphs/contributors).
