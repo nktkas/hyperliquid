@@ -8,7 +8,7 @@ import { Hex, UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Deposit into or withdraw from the HIP-3 DEX backstop liquidator.
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#hip-3-backstop-liquidator-transfer
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-an-hip-3-dexs-backstop-liquidator
  */
 export const Hip3LiquidatorTransferRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -42,7 +42,7 @@ export type Hip3LiquidatorTransferRequest = v.InferOutput<typeof Hip3LiquidatorT
 
 /**
  * Successful response without specific data or error response.
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#hip-3-backstop-liquidator-transfer
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-an-hip-3-dexs-backstop-liquidator
  */
 export type Hip3LiquidatorTransferResponse =
   | {
@@ -118,7 +118,7 @@ export type Hip3LiquidatorTransferSuccessResponse = ExcludeErrorResponse<Hip3Liq
  * });
  * ```
  *
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#hip-3-backstop-liquidator-transfer
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-an-hip-3-dexs-backstop-liquidator
  */
 export function hip3LiquidatorTransfer(
   config: ExchangeConfig,

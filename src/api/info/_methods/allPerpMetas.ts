@@ -8,7 +8,7 @@ import type { MetaResponse } from "./meta.ts";
 
 /**
  * Request trading metadata for all DEXes.
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-all-perpetuals-metadata-universe-and-margin-tables
  */
 export const AllPerpMetasRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -20,7 +20,7 @@ export type AllPerpMetasRequest = v.InferOutput<typeof AllPerpMetasRequest>;
 
 /**
  * Metadata for perpetual assets across all DEXes.
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-all-perpetuals-metadata-universe-and-margin-tables
  */
 export type AllPerpMetasResponse = MetaResponse[];
 
@@ -51,7 +51,7 @@ import type { InfoConfig } from "./_base/mod.ts";
  * const data = await allPerpMetas({ transport });
  * ```
  *
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-all-perpetuals-metadata-universe-and-margin-tables
  */
 export function allPerpMetas(
   config: InfoConfig,

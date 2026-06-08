@@ -8,7 +8,7 @@ import { UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Request supply, rate, and pending payment information for an aligned quote token.
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-aligned-quote-token-status
  */
 export const AlignedQuoteTokenInfoRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -22,7 +22,7 @@ export type AlignedQuoteTokenInfoRequest = v.InferOutput<typeof AlignedQuoteToke
 
 /**
  * Supply, rate, and pending payment information for an aligned quote token.
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-aligned-quote-token-status
  */
 export type AlignedQuoteTokenInfoResponse = {
   /** Whether the token is aligned. */
@@ -81,7 +81,7 @@ export type AlignedQuoteTokenInfoParameters = Omit<v.InferInput<typeof AlignedQu
  * });
  * ```
  *
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-aligned-quote-token-status
  */
 export function alignedQuoteTokenInfo(
   config: InfoConfig,

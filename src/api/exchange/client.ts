@@ -795,7 +795,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * await client.claimRewards();
    * ```
    *
-   * @see null
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#claim-rewards
    */
   claimRewards(
     opts?: ClaimRewardsOptions,
@@ -1185,7 +1185,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * });
    * ```
    *
-   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#hip-3-backstop-liquidator-transfer
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-an-hip-3-dexs-backstop-liquidator
    */
   hip3LiquidatorTransfer(
     params: Hip3LiquidatorTransferParameters,
@@ -2273,7 +2273,10 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * await client.userOutcome({ splitOutcome: { outcome: 0, amount: "1" } });
    * ```
    *
-   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hyperliquid-improvement-proposals-hips/hip-4-outcome-markets
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#split-outcome
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#merge-outcome
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#merge-question
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#negate-outcome
    */
   userOutcome(
     params: UserOutcomeParameters,

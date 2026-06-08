@@ -285,7 +285,7 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    * const data = await client.alignedQuoteTokenInfo({ token: 1328 });
    * ```
    *
-   * @see null
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-aligned-quote-token-status
    */
   alignedQuoteTokenInfo(
     params: AlignedQuoteTokenInfoParameters,
@@ -378,7 +378,7 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    * const data = await client.allPerpMetas();
    * ```
    *
-   * @see null
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-all-perpetuals-metadata-universe-and-margin-tables
    */
   allPerpMetas(
     signal?: AbortSignal,
@@ -1232,7 +1232,7 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    * const data = await client.outcomeMeta();
    * ```
    *
-   * @see null
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-outcome-metadata
    */
   outcomeMeta(
     signal?: AbortSignal,
@@ -1288,7 +1288,7 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    * const data = await client.perpCategories();
    * ```
    *
-   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetual-asset-categories
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perp-categories
    */
   perpCategories(
     signal?: AbortSignal,

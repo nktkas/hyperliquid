@@ -8,7 +8,7 @@ import { Hex, UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Claim rewards from referral program.
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#claim-rewards
  */
 export const ClaimRewardsRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -36,7 +36,7 @@ export type ClaimRewardsRequest = v.InferOutput<typeof ClaimRewardsRequest>;
 
 /**
  * Successful response without specific data or error response.
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#claim-rewards
  */
 export type ClaimRewardsResponse =
   | {
@@ -104,7 +104,7 @@ export type ClaimRewardsSuccessResponse = ExcludeErrorResponse<ClaimRewardsRespo
  * await claimRewards({ transport, wallet });
  * ```
  *
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#claim-rewards
  */
 export function claimRewards(
   config: ExchangeConfig,

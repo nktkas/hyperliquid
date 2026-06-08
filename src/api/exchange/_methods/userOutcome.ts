@@ -8,7 +8,11 @@ import { Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Manually split or merge outcome shares to convert between primary and dual balances.
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hyperliquid-improvement-proposals-hips/hip-4-outcome-markets
+ *
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#split-outcome
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#merge-outcome
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#merge-question
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#negate-outcome
  */
 export const UserOutcomeRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -83,7 +87,11 @@ export type UserOutcomeRequest = v.InferOutput<typeof UserOutcomeRequest>;
 
 /**
  * Successful response without specific data or error response.
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hyperliquid-improvement-proposals-hips/hip-4-outcome-markets
+ *
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#split-outcome
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#merge-outcome
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#merge-question
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#negate-outcome
  */
 export type UserOutcomeResponse =
   | {
@@ -159,7 +167,10 @@ export type UserOutcomeSuccessResponse = ExcludeErrorResponse<UserOutcomeRespons
  * });
  * ```
  *
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hyperliquid-improvement-proposals-hips/hip-4-outcome-markets
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#split-outcome
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#merge-outcome
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#merge-question
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#negate-outcome
  */
 export function userOutcome(
   config: ExchangeConfig,

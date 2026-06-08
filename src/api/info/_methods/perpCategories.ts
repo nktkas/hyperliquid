@@ -6,7 +6,7 @@ import * as v from "@valibot/valibot";
 
 /**
  * Request all perpetual asset categories.
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetual-asset-categories
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perp-categories
  */
 export const PerpCategoriesRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -18,7 +18,7 @@ export type PerpCategoriesRequest = v.InferOutput<typeof PerpCategoriesRequest>;
 
 /**
  * Array of tuples mapping coin names to their categories.
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetual-asset-categories
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perp-categories
  */
 export type PerpCategoriesResponse = [
   /** Coin symbol. */
@@ -54,7 +54,7 @@ import type { InfoConfig } from "./_base/mod.ts";
  * const data = await perpCategories({ transport });
  * ```
  *
- * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetual-asset-categories
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perp-categories
  */
 export function perpCategories(
   config: InfoConfig,
