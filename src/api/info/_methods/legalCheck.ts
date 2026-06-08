@@ -25,8 +25,6 @@ export type LegalCheckRequest = v.InferOutput<typeof LegalCheckRequest>;
  * @see null
  */
 export type LegalCheckResponse = {
-  /** Whether the user IP address is allowed. */
-  ipAllowed: boolean;
   /** Whether the user has accepted the terms of service. */
   acceptedTerms: boolean;
   /** Whether the user is allowed to use the platform. */
