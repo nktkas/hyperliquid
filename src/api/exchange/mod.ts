@@ -49,6 +49,7 @@ export * from "./_methods/agentSendAsset.ts";
 export * from "./_methods/agentSetAbstraction.ts";
 export * from "./_methods/approveAgent.ts";
 export * from "./_methods/approveBuilderFee.ts";
+export * from "./_methods/authorizeAqav2Role.ts";
 export * from "./_methods/batchModify.ts";
 export * from "./_methods/borrowLend.ts";
 export * from "./_methods/cancel.ts";

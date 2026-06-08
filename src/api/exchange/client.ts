@@ -39,6 +39,12 @@ import {
   type ApproveBuilderFeeSuccessResponse,
 } from "./_methods/approveBuilderFee.ts";
 import {
+  authorizeAqav2Role,
+  type AuthorizeAqav2RoleOptions,
+  type AuthorizeAqav2RoleParameters,
+  type AuthorizeAqav2RoleSuccessResponse,
+} from "./_methods/authorizeAqav2Role.ts";
+import {
   batchModify,
   type BatchModifyOptions,
   type BatchModifyParameters,
@@ -581,6 +587,43 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
     opts?: ApproveBuilderFeeOptions,
   ): Promise<ApproveBuilderFeeSuccessResponse> {
     return approveBuilderFee(this.config_, params, opts);
+  }
+
+  /**
+   * Authorize an AQAv2 role.
+   *
+   * Signing: L1 Action.
+   *
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
+   *
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.authorizeAqav2Role({
+   *   token: 0,
+   *   role: "technical",
+   * });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#authorize-aqav2-role
+   */
+  authorizeAqav2Role(
+    params: AuthorizeAqav2RoleParameters,
+    opts?: AuthorizeAqav2RoleOptions,
+  ): Promise<AuthorizeAqav2RoleSuccessResponse> {
+    return authorizeAqav2Role(this.config_, params, opts);
   }
 
   /**
@@ -2569,6 +2612,11 @@ export type {
   ApproveBuilderFeeParameters,
   ApproveBuilderFeeSuccessResponse,
 } from "./_methods/approveBuilderFee.ts";
+export type {
+  AuthorizeAqav2RoleOptions,
+  AuthorizeAqav2RoleParameters,
+  AuthorizeAqav2RoleSuccessResponse,
+} from "./_methods/authorizeAqav2Role.ts";
 export type { BatchModifyOptions, BatchModifyParameters, BatchModifySuccessResponse } from "./_methods/batchModify.ts";
 export type { BorrowLendOptions, BorrowLendParameters, BorrowLendSuccessResponse } from "./_methods/borrowLend.ts";
 export type { CancelOptions, CancelParameters, CancelSuccessResponse } from "./_methods/cancel.ts";
