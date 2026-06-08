@@ -71,6 +71,7 @@ export * from "./_methods/predictedFundings.ts";
 export * from "./_methods/preTransferCheck.ts";
 export * from "./_methods/recentTrades.ts";
 export * from "./_methods/referral.ts";
+export * from "./_methods/settledOutcome.ts";
 export * from "./_methods/spotClearinghouseState.ts";
 export * from "./_methods/spotDeployState.ts";
 export * from "./_methods/spotMeta.ts";

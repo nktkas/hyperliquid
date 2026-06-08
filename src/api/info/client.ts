@@ -131,6 +131,11 @@ import {
 import { recentTrades, type RecentTradesParameters, type RecentTradesResponse } from "./_methods/recentTrades.ts";
 import { referral, type ReferralParameters, type ReferralResponse } from "./_methods/referral.ts";
 import {
+  settledOutcome,
+  type SettledOutcomeParameters,
+  type SettledOutcomeResponse,
+} from "./_methods/settledOutcome.ts";
+import {
   spotClearinghouseState,
   type SpotClearinghouseStateParameters,
   type SpotClearinghouseStateResponse,
@@ -1617,6 +1622,35 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   }
 
   /**
+   * Request information about a settled outcome.
+   *
+   * @param params Parameters specific to the API request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Information about a settled outcome.
+   *
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.settledOutcome({ outcome: 0 });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-a-settled-outcome
+   */
+  settledOutcome(
+    params: SettledOutcomeParameters,
+    signal?: AbortSignal,
+  ): Promise<SettledOutcomeResponse> {
+    return settledOutcome(this.config_, params, signal);
+  }
+
+  /**
    * Request spot clearinghouse state.
    *
    * @param params Parameters specific to the API request.
@@ -2488,6 +2522,7 @@ export type { PredictedFundingsResponse } from "./_methods/predictedFundings.ts"
 export type { PreTransferCheckParameters, PreTransferCheckResponse } from "./_methods/preTransferCheck.ts";
 export type { RecentTradesParameters, RecentTradesResponse } from "./_methods/recentTrades.ts";
 export type { ReferralParameters, ReferralResponse } from "./_methods/referral.ts";
+export type { SettledOutcomeParameters, SettledOutcomeResponse } from "./_methods/settledOutcome.ts";
 export type {
   SpotClearinghouseStateParameters,
   SpotClearinghouseStateResponse,
