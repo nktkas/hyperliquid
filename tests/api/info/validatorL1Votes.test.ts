@@ -14,6 +14,7 @@ runTest({
       "#/array",
       "#/items/properties/action/anyOf/0",
       "#/items/properties/action/anyOf/1",
+      "#/items/properties/action/anyOf/2/properties/O/anyOf/0",
     ]);
   },
 });

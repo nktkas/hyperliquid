@@ -21,6 +21,8 @@ runTest({
     const data = await Promise.all(params.map((p) => client.spotClearinghouseState(p)));
 
     schemaCoverage(paramsSchema, params);
-    schemaCoverage(responseSchema, data);
+    schemaCoverage(responseSchema, data, [
+      "#/properties/balances/items/properties/token/missing",
+    ]);
   },
 });

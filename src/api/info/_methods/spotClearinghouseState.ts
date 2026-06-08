@@ -31,8 +31,8 @@ export type SpotClearinghouseStateResponse = {
   balances: {
     /** Asset symbol. */
     coin: string;
-    /** Unique identifier for the token. */
-    token: number;
+    /** Unique identifier for the token (undefined for outcome markets). */
+    token?: number;
     /**
      * Total balance.
      * @pattern ^[0-9]+(\.[0-9]+)?$
