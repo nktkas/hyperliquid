@@ -28,8 +28,8 @@ export type SpotClearinghouseStateRequest = v.InferOutput<typeof SpotClearinghou
  */
 export type SpotClearinghouseStateResponse = {
   /** Array of available token balances. */
-  balances: {
-    /** Asset symbol. */
+  balances: ({
+    /** Asset symbol (e.g., USDC). */
     coin: string;
     /** Unique identifier for the token. */
     token: number;
@@ -48,10 +48,28 @@ export type SpotClearinghouseStateResponse = {
      * @pattern ^[0-9]+(\.[0-9]+)?$
      */
     entryNtl: string;
-  }[];
+  } | {
+    /** Outcome market identifier ("+" followed by `assetId - 100000000`). */
+    coin: `+${number}`;
+    /**
+     * Total balance.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    total: string;
+    /**
+     * Amount on hold.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    hold: string;
+    /**
+     * Entry notional value.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    entryNtl: string;
+  })[];
   /** Array of escrowed balances. */
   evmEscrows?: {
-    /** Asset symbol. */
+    /** Asset symbol (e.g., USDC). */
     coin: string;
     /** Unique identifier for the token. */
     token: number;
@@ -68,7 +86,7 @@ export type SpotClearinghouseStateResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode spotClearinghouseState} function. */
 export type SpotClearinghouseStateParameters = Omit<v.InferInput<typeof SpotClearinghouseStateRequest>, "type">;

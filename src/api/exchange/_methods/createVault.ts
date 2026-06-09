@@ -22,7 +22,7 @@ export const CreateVaultRequest = /* @__PURE__ */ (() => {
       description: v.pipe(v.string(), v.minLength(10), v.maxLength(250)),
       /** Initial balance (float * 1e6). */
       initialUsd: v.pipe(UnsignedInteger, v.minValue(100 * 1e6)), // 100 USD
-      /** Nonce (timestamp in ms) used to prevent replay attacks. */
+      /** Nonce (timestamp in ms). Equal to the envelope nonce; injected by the SDK. */
       nonce: UnsignedInteger,
     }),
     /** Nonce (timestamp in ms) used to prevent replay attacks. */
@@ -72,8 +72,13 @@ export type CreateVaultResponse = {
 
 import { parse } from "../../../_base.ts";
 import { canonicalize } from "../../../signing/mod.ts";
-import type { ExcludeErrorResponse } from "./_base/errors.ts";
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
+import {
+  type ExchangeConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestOptions,
+} from "./_base/mod.ts";
+import { globalNonceManager } from "./_base/_nonce.ts";
 
 /** Schema for action fields (excludes request-level system fields). */
 const CreateVaultActionSchema = /* @__PURE__ */ (() => {
@@ -81,7 +86,7 @@ const CreateVaultActionSchema = /* @__PURE__ */ (() => {
 })();
 
 /** Action parameters for the {@linkcode createVault} function. */
-export type CreateVaultParameters = Omit<v.InferInput<typeof CreateVaultActionSchema>, "type">;
+export type CreateVaultParameters = Omit<v.InferInput<typeof CreateVaultActionSchema>, "type" | "nonce">;
 
 /** Request options for the {@linkcode createVault} function. */
 export type CreateVaultOptions = ExtractRequestOptions<v.InferInput<typeof CreateVaultRequest>>;
@@ -116,7 +121,6 @@ export type CreateVaultSuccessResponse = ExcludeErrorResponse<CreateVaultRespons
  *   name: "...",
  *   description: "...",
  *   initialUsd: 100 * 1e6,
- *   nonce: Date.now(),
  * });
  * ```
  *
@@ -129,7 +133,17 @@ export function createVault(
 ): Promise<CreateVaultSuccessResponse> {
   const action = canonicalize(
     CreateVaultActionSchema,
-    parse(CreateVaultActionSchema, { type: "createVault", ...params }),
+    parse(CreateVaultActionSchema, { type: "createVault", ...params, nonce: 0 }),
   );
-  return executeL1Action(config, action, opts);
+  return executeL1Action(
+    {
+      ...config,
+      nonceManager: async (addr) =>
+        // Patch action.nonce in-place so the body matches the envelope nonce.
+        action.nonce =
+          await (config.nonceManager?.(addr) ?? globalNonceManager.getNonce(`${addr}:${config.transport.isTestnet}`)),
+    },
+    action,
+    opts,
+  );
 }

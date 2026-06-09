@@ -17,17 +17,41 @@ export const LiquidatableRequest = /* @__PURE__ */ (() => {
 export type LiquidatableRequest = v.InferOutput<typeof LiquidatableRequest>;
 
 /**
- * Response for liquidatable request.
+ * Array of liquidatable positions.
  * @see null
  */
-export type LiquidatableResponse = unknown[];
+export type LiquidatableResponse = {
+  /**
+   * User address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  user: `0x${string}`;
+  /**
+   * Position index.
+   *
+   * FIXME: a `cross` variant may exist (unconfirmed).
+   */
+  positionIndex: {
+    /** Isolated position details. */
+    isolated: {
+      /** Asset index. */
+      asset: number;
+    };
+  };
+  /**
+   * Available margin.
+   *
+   * FIXME: meaning of the two values unconfirmed.
+   */
+  marginAvailable: [number, number];
+}[];
 
 // ============================================================
 // Execution Logic
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /**
  * Request liquidatable.

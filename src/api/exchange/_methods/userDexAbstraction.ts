@@ -18,7 +18,7 @@ export const UserDexAbstractionRequest = /* @__PURE__ */ (() => {
       type: v.literal("userDexAbstraction"),
       /** Chain ID in hex format for EIP-712 signing. */
       signatureChainId: Hex,
-      /** HyperLiquid network type. */
+      /** Hyperliquid network type. */
       hyperliquidChain: v.picklist(["Mainnet", "Testnet"]),
       /** User address. */
       user: Address,
@@ -69,8 +69,12 @@ export type UserDexAbstractionResponse =
 
 import { parse } from "../../../_base.ts";
 import { canonicalize } from "../../../signing/mod.ts";
-import type { ExcludeErrorResponse } from "./_base/errors.ts";
-import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
+import {
+  type ExchangeConfig,
+  type ExcludeErrorResponse,
+  executeUserSignedAction,
+  type ExtractRequestOptions,
+} from "./_base/mod.ts";
 
 /** Schema for action fields (excludes request-level system fields). */
 const UserDexAbstractionActionSchema = /* @__PURE__ */ (() => {
@@ -106,6 +110,8 @@ export const UserDexAbstractionTypes = {
  *
  * Signing: User-Signed EIP-712.
  *
+ * @deprecated use {@linkcode userSetAbstraction} instead.
+ *
  * @param config General configuration for Exchange API requests.
  * @param params Parameters specific to the API request.
  * @param opts Request execution options.
@@ -131,8 +137,6 @@ export const UserDexAbstractionTypes = {
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction
- *
- * @deprecated Use {@link userSetAbstraction} instead.
  */
 export function userDexAbstraction(
   config: ExchangeConfig,

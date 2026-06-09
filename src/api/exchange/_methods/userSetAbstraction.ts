@@ -8,6 +8,9 @@ import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Set user abstraction mode.
+ *
+ * Like {@link agentSetAbstraction} but signed via EIP-712 by the principal (instead of as an L1 action by the agent wallet).
+ *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction
  */
 export const UserSetAbstractionRequest = /* @__PURE__ */ (() => {
@@ -18,7 +21,7 @@ export const UserSetAbstractionRequest = /* @__PURE__ */ (() => {
       type: v.literal("userSetAbstraction"),
       /** Chain ID in hex format for EIP-712 signing. */
       signatureChainId: Hex,
-      /** HyperLiquid network type. */
+      /** Hyperliquid network type. */
       hyperliquidChain: v.picklist(["Mainnet", "Testnet"]),
       /** User address. */
       user: Address,
@@ -69,8 +72,12 @@ export type UserSetAbstractionResponse =
 
 import { parse } from "../../../_base.ts";
 import { canonicalize } from "../../../signing/mod.ts";
-import type { ExcludeErrorResponse } from "./_base/errors.ts";
-import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
+import {
+  type ExchangeConfig,
+  type ExcludeErrorResponse,
+  executeUserSignedAction,
+  type ExtractRequestOptions,
+} from "./_base/mod.ts";
 
 /** Schema for action fields (excludes request-level system fields). */
 const UserSetAbstractionActionSchema = /* @__PURE__ */ (() => {
@@ -101,6 +108,8 @@ export const UserSetAbstractionTypes = {
 
 /**
  * Set user abstraction mode.
+ *
+ * Like {@link agentSetAbstraction} but signed via EIP-712 by the principal (instead of as an L1 action by the agent wallet).
  *
  * Signing: User-Signed EIP-712.
  *

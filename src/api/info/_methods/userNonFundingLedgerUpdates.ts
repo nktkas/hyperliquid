@@ -116,13 +116,13 @@ export type UserNonFundingLedgerUpdatesResponse = {
        * @pattern ^[0-9]+(\.[0-9]+)?$
        */
       amount: string;
-      /** Token symbol. */
+      /** Token symbol (e.g., USDC). */
       token: string;
     }
     | {
       /** Update type. */
       type: "spotTransfer";
-      /** Token symbol. */
+      /** Token symbol (e.g., USDC). */
       token: string;
       /**
        * Amount transferred.
@@ -156,7 +156,7 @@ export type UserNonFundingLedgerUpdatesResponse = {
       nativeTokenFee: string;
       /** Nonce of the transfer. */
       nonce: number | null;
-      /** Token in which the fee is denominated (e.g., "USDC"). */
+      /** Token in which the fee is denominated (e.g., USDC). */
       feeToken: string;
     }
     | {
@@ -297,7 +297,7 @@ export type UserNonFundingLedgerUpdatesResponse = {
       sourceDex: string;
       /** Destination DEX ("" for default USDC perp DEX, "spot" for spot). */
       destinationDex: string;
-      /** Token identifier. */
+      /** Token symbol (e.g., USDC). */
       token: string;
       /**
        * Amount to send (not in wei).
@@ -321,13 +321,13 @@ export type UserNonFundingLedgerUpdatesResponse = {
       nativeTokenFee: string;
       /** Nonce of the transfer. */
       nonce: number;
-      /** Token in which the fee is denominated (e.g., "USDC"). */
+      /** Token in which the fee is denominated (e.g., USDC). */
       feeToken: string;
     }
     | {
       /** Update type. */
       type: "deployGasAuction";
-      /** Token symbol. */
+      /** Token symbol (e.g., USDC). */
       token: string;
       /**
        * Amount in the specified token.
@@ -338,7 +338,7 @@ export type UserNonFundingLedgerUpdatesResponse = {
     | {
       /** Update type. */
       type: "cStakingTransfer";
-      /** Token symbol. */
+      /** Token symbol (e.g., USDC). */
       token: string;
       /**
        * Amount in the specified token.
@@ -351,7 +351,7 @@ export type UserNonFundingLedgerUpdatesResponse = {
     | {
       /** Update type. */
       type: "borrowLend";
-      /** Token symbol. */
+      /** Token symbol (e.g., USDC). */
       token: string;
       /** Operation type. */
       operation: "supply" | "withdraw" | "repay" | "borrow";
@@ -369,7 +369,7 @@ export type UserNonFundingLedgerUpdatesResponse = {
     | {
       /** Update type. */
       type: "spotGenesis";
-      /** Token symbol. */
+      /** Token symbol (e.g., USDC). */
       token: string;
       /**
        * Amount in the specified token.
@@ -380,9 +380,9 @@ export type UserNonFundingLedgerUpdatesResponse = {
     | {
       /** Update type. */
       type: "activateDexAbstraction";
-      /** Name of the dex. */
+      /** DEX name (empty string for main dex). */
       dex: string;
-      /** Token symbol. */
+      /** Token symbol (e.g., USDC). */
       token: string;
       /**
        * Amount in the specified token.
@@ -411,7 +411,7 @@ export type UserNonFundingLedgerUpdatesResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode userNonFundingLedgerUpdates} function. */
 export type UserNonFundingLedgerUpdatesParameters = Omit<

@@ -15,7 +15,7 @@ export const Promise_ = /* @__PURE__ */ (() => {
 
 /** @see https://developer.mozilla.org/en-US/docs/Web/API/DOMException */
 export const DOMException_ = /* @__PURE__ */ (() => {
-  return globalThis.DOMException || class DOMExceptionPolyfill extends Error {
+  return globalThis.DOMException || class DOMException extends Error {
     constructor(message = "", name = "Error") {
       super(message);
       this.name = name;
@@ -54,11 +54,12 @@ export const AbortSignal_ = /* @__PURE__ */ (() => {
 
 /** @see https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent */
 export const CustomEvent_ = /* @__PURE__ */ (() => {
-  return globalThis.CustomEvent || class CustomEventPolyfill<T> extends Event {
+  return globalThis.CustomEvent || class CustomEvent<T> extends Event {
     readonly detail: T | null;
     constructor(type: string, eventInitDict?: CustomEventInit<T>) {
       super(type, eventInitDict);
       this.detail = eventInitDict?.detail ?? null;
     }
+    initCustomEvent(): void {}
   };
 })();

@@ -17,9 +17,12 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: "24.x"
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
 
       - name: Build package
-        run: npx deno run -A .github/scripts/build_npm.ts
+        run: deno run -A .github/scripts/build_npm.ts
 
       - name: Determine npm tag
         id: tag
@@ -34,5 +37,5 @@ jobs:
           echo "value=${TAG:-latest}" >> $GITHUB_OUTPUT
 
       - name: Publish package
-        working-directory: ./build/npm
+        working-directory: ./dist
         run: npm publish --tag ${{ steps.tag.outputs.value }}

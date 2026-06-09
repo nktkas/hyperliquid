@@ -18,7 +18,7 @@ export const ApproveBuilderFeeRequest = /* @__PURE__ */ (() => {
       type: v.literal("approveBuilderFee"),
       /** Chain ID in hex format for EIP-712 signing. */
       signatureChainId: Hex,
-      /** HyperLiquid network type. */
+      /** Hyperliquid network type. */
       hyperliquidChain: v.picklist(["Mainnet", "Testnet"]),
       /** Max fee rate (e.g., "0.01%"). */
       maxFeeRate: Percent,
@@ -69,8 +69,12 @@ export type ApproveBuilderFeeResponse =
 
 import { parse } from "../../../_base.ts";
 import { canonicalize } from "../../../signing/mod.ts";
-import type { ExcludeErrorResponse } from "./_base/errors.ts";
-import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
+import {
+  type ExchangeConfig,
+  type ExcludeErrorResponse,
+  executeUserSignedAction,
+  type ExtractRequestOptions,
+} from "./_base/mod.ts";
 
 /** Schema for action fields (excludes request-level system fields). */
 const ApproveBuilderFeeActionSchema = /* @__PURE__ */ (() => {

@@ -24,7 +24,7 @@ export interface HttpTransportOptions {
   /**
    * Indicates this transport uses testnet endpoint.
    *
-   * Default: false
+   * Default: `false`
    */
   isTestnet?: boolean;
   /**
@@ -34,13 +34,13 @@ export interface HttpTransportOptions {
    */
   timeout?: number | null;
   /**
-   * Custom API URL for requests.
+   * Custom API URL for `info` and `exchange` requests.
    *
    * Default: `https://api.hyperliquid.xyz` for mainnet, `https://api.hyperliquid-testnet.xyz` for testnet.
    */
   apiUrl?: string | URL;
   /**
-   * Custom RPC URL for explorer requests.
+   * Custom RPC URL for `explorer` requests.
    *
    * Default: `https://rpc.hyperliquid.xyz` for mainnet, `https://rpc.hyperliquid-testnet.xyz` for testnet.
    */
@@ -63,14 +63,6 @@ export class HttpRequestError extends TransportError {
   /** The HTTP response that caused the error. */
   response?: Response;
 
-  /**
-   * Creates a new HTTP request error.
-   *
-   * @param args The error arguments.
-   * @param args.response The HTTP response that caused the error.
-   * @param args.message Optional message to append after the status line.
-   * @param options The error options.
-   */
   constructor(args?: { response?: Response; message?: string }, options?: ErrorOptions) {
     const { response, message: detail } = args ?? {};
 
@@ -89,12 +81,12 @@ export class HttpRequestError extends TransportError {
 }
 
 /**
- * HTTP transport for Hyperliquid API.
+ * HTTP transport for the Hyperliquid API.
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint
  */
-export class HttpTransport implements IRequestTransport {
+export class HttpTransport implements IRequestTransport<"info" | "exchange" | "explorer"> {
   /** Indicates this transport uses testnet endpoint. */
   isTestnet: boolean;
   /** Request timeout in ms. Set to `null` to disable. */
@@ -106,11 +98,6 @@ export class HttpTransport implements IRequestTransport {
   /** A custom {@link https://developer.mozilla.org/en-US/docs/Web/API/RequestInit | RequestInit} that is merged with a fetch request. */
   fetchOptions: Omit<RequestInit, "body" | "method">;
 
-  /**
-   * Creates a new HTTP transport instance.
-   *
-   * @param options Configuration options for the HTTP transport layer.
-   */
   constructor(options?: HttpTransportOptions) {
     this.isTestnet = options?.isTestnet ?? false;
     this.timeout = options?.timeout === undefined ? 10_000 : options.timeout;
@@ -120,20 +107,21 @@ export class HttpTransport implements IRequestTransport {
   }
 
   /**
-   * Sends a request to the Hyperliquid API via {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API | fetch}.
+   * Sends a request to the Hyperliquid API.
    *
-   * @param endpoint The API endpoint to send the request to.
-   * @param payload The payload to send with the request.
-   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   * @return A promise that resolves with parsed JSON response body.
+   * Routes to {@linkcode apiUrl} for `info`/`exchange` and {@linkcode rpcUrl} for `explorer`.
    *
-   * @throws {HttpRequestError} Thrown when the HTTP request fails.
+   * @throws {HttpRequestError} When the HTTP request fails.
    */
-  async request<T>(endpoint: "info" | "exchange" | "explorer", payload: unknown, signal?: AbortSignal): Promise<T> {
+  async request<T>(
+    endpoint: "info" | "exchange" | "explorer",
+    payload: unknown,
+    signal?: AbortSignal,
+  ): Promise<T> {
     try {
-      // Construct a Request
+      // --- Build URL and request init ------------------------
       const url = new URL(endpoint, endpoint === "explorer" ? this.rpcUrl : this.apiUrl);
-      const init = this._mergeRequestInit(
+      const init = mergeRequestInit(
         {
           body: JSON.stringify(payload),
           headers: {
@@ -148,59 +136,59 @@ export class HttpTransport implements IRequestTransport {
         { signal },
       );
 
-      // Send the Request and wait for a Response
+      // --- Send -----------------------------------------------
       const response = await fetch(url, init);
 
-      // Validate the Response
+      // --- Reject non-OK or non-JSON responses ---------------
       if (!response.ok || !response.headers.get("Content-Type")?.includes("application/json")) {
         const clone = response.clone();
         const body = await response.text().catch(() => undefined); // releases connection, clone stays readable
         throw new HttpRequestError({ response: clone, message: body });
       }
 
-      // Parse the response body
+      // --- Parse and check application-level error -----------
       const clone = response.clone();
       const body = await response.json();
 
-      // Check if the response is an error
       if (body?.type === "error") {
         throw new HttpRequestError({ response: clone, message: body?.message });
       }
 
-      // Return the response body
       return body;
     } catch (error) {
-      if (error instanceof TransportError) throw error; // Re-throw known errors
+      if (error instanceof TransportError) throw error;
       throw new HttpRequestError(undefined, { cause: error });
     }
   }
+}
 
-  /** Merges multiple `HeadersInit` into one {@link https://developer.mozilla.org/en-US/docs/Web/API/Headers/Headers | Headers}. */
-  protected _mergeHeadersInit(...inits: HeadersInit[]): Headers {
-    const merged = new Headers();
-    for (const headers of inits) {
-      const entries = Symbol.iterator in headers ? headers : Object.entries(headers);
-      for (const [key, value] of entries) {
-        merged.set(key, value);
-      }
+// ============================================================
+// Helpers
+// ============================================================
+
+function mergeHeadersInit(...inits: HeadersInit[]): Headers {
+  const merged = new Headers();
+  for (const headers of inits) {
+    const entries = Symbol.iterator in headers ? headers : Object.entries(headers);
+    for (const [key, value] of entries) {
+      merged.set(key, value);
     }
-    return merged;
   }
+  return merged;
+}
 
-  /** Merges multiple {@link https://developer.mozilla.org/en-US/docs/Web/API/RequestInit | RequestInit} into one {@link https://developer.mozilla.org/en-US/docs/Web/API/RequestInit | RequestInit}. */
-  protected _mergeRequestInit(...inits: RequestInit[]): RequestInit {
-    const merged: RequestInit = {};
-    const headersList: HeadersInit[] = [];
-    const signals: AbortSignal[] = [];
+function mergeRequestInit(...inits: RequestInit[]): RequestInit {
+  const merged: RequestInit = {};
+  const headersList: HeadersInit[] = [];
+  const signals: AbortSignal[] = [];
 
-    for (const init of inits) {
-      Object.assign(merged, init);
-      if (init.headers) headersList.push(init.headers);
-      if (init.signal) signals.push(init.signal);
-    }
-    if (headersList.length > 0) merged.headers = this._mergeHeadersInit(...headersList);
-    if (signals.length > 0) merged.signal = signals.length > 1 ? AbortSignal_.any(signals) : signals[0];
-
-    return merged;
+  for (const init of inits) {
+    Object.assign(merged, init);
+    if (init.headers) headersList.push(init.headers);
+    if (init.signal) signals.push(init.signal);
   }
+  if (headersList.length > 0) merged.headers = mergeHeadersInit(...headersList);
+  if (signals.length > 0) merged.signal = signals.length > 1 ? AbortSignal_.any(signals) : signals[0];
+
+  return merged;
 }

@@ -37,13 +37,19 @@
  * @module
  */
 
-export { ApiRequestError } from "./_methods/_base/errors.ts";
-export type { ExchangeConfig, ExchangeMultiSigConfig, ExchangeSingleWalletConfig } from "./_methods/_base/execute.ts";
+export {
+  ApiRequestError,
+  type ExchangeConfig,
+  type ExchangeMultiSigConfig,
+  type ExchangeSingleWalletConfig,
+} from "./_methods/_base/mod.ts";
 
 export * from "./_methods/agentEnableDexAbstraction.ts";
+export * from "./_methods/agentSendAsset.ts";
 export * from "./_methods/agentSetAbstraction.ts";
 export * from "./_methods/approveAgent.ts";
 export * from "./_methods/approveBuilderFee.ts";
+export * from "./_methods/authorizeAqav2Role.ts";
 export * from "./_methods/batchModify.ts";
 export * from "./_methods/borrowLend.ts";
 export * from "./_methods/cancel.ts";
@@ -57,6 +63,9 @@ export * from "./_methods/cSignerAction.ts";
 export * from "./_methods/cValidatorAction.ts";
 export * from "./_methods/cWithdraw.ts";
 export * from "./_methods/evmUserModify.ts";
+export * from "./_methods/finalizeEvmContract.ts";
+export * from "./_methods/gossipPriorityBid.ts";
+export * from "./_methods/hip3LiquidatorTransfer.ts";
 export * from "./_methods/linkStakingUser.ts";
 export * from "./_methods/modify.ts";
 export * from "./_methods/noop.ts";
@@ -72,6 +81,7 @@ export * from "./_methods/setReferrer.ts";
 export * from "./_methods/spotDeploy.ts";
 export * from "./_methods/spotSend.ts";
 export * from "./_methods/spotUser.ts";
+export * from "./_methods/stakingLinkDisableTradingUser.ts";
 export * from "./_methods/subAccountModify.ts";
 export * from "./_methods/subAccountSpotTransfer.ts";
 export * from "./_methods/subAccountTransfer.ts";
@@ -84,6 +94,7 @@ export * from "./_methods/updateLeverage.ts";
 export * from "./_methods/usdClassTransfer.ts";
 export * from "./_methods/usdSend.ts";
 export * from "./_methods/userDexAbstraction.ts";
+export * from "./_methods/userOutcome.ts";
 export * from "./_methods/userPortfolioMargin.ts";
 export * from "./_methods/userSetAbstraction.ts";
 export * from "./_methods/validatorL1Stream.ts";

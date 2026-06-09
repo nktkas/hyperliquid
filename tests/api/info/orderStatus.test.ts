@@ -48,7 +48,7 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data, [
-      "#/anyOf/0/properties/order/properties/order/properties/children/array",
+      "#/anyOf/0/properties/order/properties/order/properties/children/*",
       "#/anyOf/0/properties/order/properties/order/properties/tif/enum/5",
       "#/anyOf/0/properties/order/properties/status/enum/3",
       "#/anyOf/0/properties/order/properties/status/enum/5",

@@ -1,0 +1,24 @@
+import { type BlockDetailsParameters, BlockDetailsRequest } from "@nktkas/hyperliquid/api/explorer";
+import * as v from "@valibot/valibot";
+import { schemaCoverage } from "../_utils/schemaCoverage.ts";
+import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
+import { runRequestTest } from "./_t.ts";
+
+const sourceFile = new URL("../../../src/api/explorer/_methods/blockDetails.ts", import.meta.url).pathname;
+const responseSchema = typeToJsonSchema(sourceFile, "BlockDetailsResponse");
+const paramsSchema = valibotToJsonSchema(v.omit(BlockDetailsRequest, ["type"]));
+
+runRequestTest({
+  name: "blockDetails",
+  fn: async (_t, client) => {
+    const params: BlockDetailsParameters[] = [
+      { height: 300836507 },
+    ];
+
+    const data = await Promise.all(params.map((p) => client.blockDetails(p)));
+
+    schemaCoverage(paramsSchema, params);
+    schemaCoverage(responseSchema, data);
+  },
+});

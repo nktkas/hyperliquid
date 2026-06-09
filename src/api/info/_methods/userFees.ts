@@ -208,7 +208,7 @@ export type UserFeesResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode userFees} function. */
 export type UserFeesParameters = Omit<v.InferInput<typeof UserFeesRequest>, "type">;

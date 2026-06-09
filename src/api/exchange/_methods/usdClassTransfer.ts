@@ -7,7 +7,7 @@ import * as v from "@valibot/valibot";
 import { Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
 
 /**
- * Transfer funds between Spot account and Perp account.
+ * Transfer funds between spot account and perp account.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa
  */
 export const UsdClassTransferRequest = /* @__PURE__ */ (() => {
@@ -18,11 +18,11 @@ export const UsdClassTransferRequest = /* @__PURE__ */ (() => {
       type: v.literal("usdClassTransfer"),
       /** Chain ID in hex format for EIP-712 signing. */
       signatureChainId: Hex,
-      /** HyperLiquid network type. */
+      /** Hyperliquid network type. */
       hyperliquidChain: v.picklist(["Mainnet", "Testnet"]),
       /** Amount to transfer (1 = $1). */
       amount: UnsignedDecimal,
-      /** `true` for Spot to Perp, `false` for Perp to Spot. */
+      /** `true` for spot to perp, `false` for perp to spot. */
       toPerp: v.boolean(),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
       nonce: UnsignedInteger,
@@ -69,8 +69,12 @@ export type UsdClassTransferResponse =
 
 import { parse } from "../../../_base.ts";
 import { canonicalize } from "../../../signing/mod.ts";
-import type { ExcludeErrorResponse } from "./_base/errors.ts";
-import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
+import {
+  type ExchangeConfig,
+  type ExcludeErrorResponse,
+  executeUserSignedAction,
+  type ExtractRequestOptions,
+} from "./_base/mod.ts";
 
 /** Schema for action fields (excludes request-level system fields). */
 const UsdClassTransferActionSchema = /* @__PURE__ */ (() => {
@@ -100,7 +104,7 @@ export const UsdClassTransferTypes = {
 };
 
 /**
- * Transfer funds between Spot account and Perp account.
+ * Transfer funds between spot account and perp account.
  *
  * Signing: User-Signed EIP-712.
  *

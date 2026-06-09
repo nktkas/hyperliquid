@@ -21,7 +21,7 @@ export type PerpConciseAnnotationsRequest = v.InferOutput<typeof PerpConciseAnno
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-concise-perp-annotations
  */
 export type PerpConciseAnnotationsResponse = [
-  /** Coin symbol. */
+  /** Asset symbol (e.g., BTC). */
   coin: string,
   /** Concise annotation. */
   annotation: {
@@ -39,7 +39,7 @@ export type PerpConciseAnnotationsResponse = [
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /**
  * Request concise annotations for all perpetual assets.

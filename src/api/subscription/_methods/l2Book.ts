@@ -42,12 +42,17 @@ type L2BookLevel = {
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export type L2BookEvent = {
-  /** Asset symbol. */
+  /** Asset symbol (e.g., BTC). */
   coin: string;
   /** Timestamp of the snapshot (in ms since epoch). */
   time: number;
   /** Bid and ask levels (index 0 = bids, index 1 = asks). */
-  levels: [bids: L2BookLevel[], asks: L2BookLevel[]];
+  levels: [
+    /** Bid levels. */
+    bids: L2BookLevel[],
+    /** Ask levels. */
+    asks: L2BookLevel[],
+  ];
   /**
    * Spread (only present when `nSigFigs` is non-null).
    * @pattern ^[0-9]+(\.[0-9]+)?$
@@ -60,8 +65,8 @@ export type L2BookEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_types.ts";
+import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode l2Book} function. */
 export type L2BookParameters = Omit<v.InferInput<typeof L2BookRequest>, "type">;
@@ -72,6 +77,7 @@ export type L2BookParameters = Omit<v.InferInput<typeof L2BookRequest>, "type">;
  * @param config General configuration for Subscription API subscriptions.
  * @param params Parameters specific to the API subscription.
  * @param listener A callback function to be called when the event is received.
+ * @param onError An optional callback function to be called when the subscription fails.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -97,6 +103,7 @@ export function l2Book(
   config: SubscriptionConfig,
   params: L2BookParameters,
   listener: (data: L2BookEvent) => void,
+  onError?: (error: WebSocketRequestError) => void,
 ): Promise<ISubscription> {
   const payload = parse(L2BookRequest, {
     type: "l2Book",
@@ -108,5 +115,5 @@ export function l2Book(
     if (e.detail.coin === payload.coin) {
       listener(e.detail);
     }
-  });
+  }, onError);
 }

@@ -12,7 +12,7 @@ export const PerpAnnotationRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of request. */
     type: v.literal("perpAnnotation"),
-    /** Coin symbol for the perpetual asset. */
+    /** Asset symbol (e.g., BTC). */
     coin: v.string(),
   });
 })();
@@ -38,7 +38,7 @@ export type PerpAnnotationResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode perpAnnotation} function. */
 export type PerpAnnotationParameters = Omit<v.InferInput<typeof PerpAnnotationRequest>, "type">;

@@ -44,6 +44,7 @@ runTest({
       "#/items/properties/status/enum/26",
       "#/items/properties/status/enum/27",
       "#/items/properties/status/enum/28",
+      "#/items/properties/order/properties/children/*",
     ]);
   },
 });

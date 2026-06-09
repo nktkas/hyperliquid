@@ -8,7 +8,7 @@ import { Hex, UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Claim rewards from referral program.
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#claim-rewards
  */
 export const ClaimRewardsRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -36,7 +36,7 @@ export type ClaimRewardsRequest = v.InferOutput<typeof ClaimRewardsRequest>;
 
 /**
  * Successful response without specific data or error response.
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#claim-rewards
  */
 export type ClaimRewardsResponse =
   | {
@@ -61,8 +61,12 @@ export type ClaimRewardsResponse =
 
 import { parse } from "../../../_base.ts";
 import { canonicalize } from "../../../signing/mod.ts";
-import type { ExcludeErrorResponse } from "./_base/errors.ts";
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
+import {
+  type ExchangeConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestOptions,
+} from "./_base/mod.ts";
 
 /** Schema for action fields (excludes request-level system fields). */
 const ClaimRewardsActionSchema = /* @__PURE__ */ (() => {
@@ -100,7 +104,7 @@ export type ClaimRewardsSuccessResponse = ExcludeErrorResponse<ClaimRewardsRespo
  * await claimRewards({ transport, wallet });
  * ```
  *
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#claim-rewards
  */
 export function claimRewards(
   config: ExchangeConfig,

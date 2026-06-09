@@ -38,7 +38,7 @@ export type PerpDeployAuctionStatusResponse = {
    * @pattern ^[0-9]+(\.[0-9]+)?$
    */
   startGas: string;
-  /** Auction start time (seconds since epoch). */
+  /** Auction start time (in seconds since epoch). */
   startTimeSeconds: number;
 };
 
@@ -47,7 +47,7 @@ export type PerpDeployAuctionStatusResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /**
  * Request for the status of the perpetual deploy auction.

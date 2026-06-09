@@ -23,7 +23,7 @@
  * @module
  */
 
-export type { SubscriptionConfig } from "./_methods/_types.ts";
+export type { SubscriptionConfig } from "./_methods/_base/mod.ts";
 
 export * from "./_methods/activeAssetCtx.ts";
 export * from "./_methods/activeAssetData.ts";
@@ -35,12 +35,11 @@ export * from "./_methods/assetCtxs.ts";
 export * from "./_methods/bbo.ts";
 export * from "./_methods/candle.ts";
 export * from "./_methods/clearinghouseState.ts";
-export * from "./_methods/explorerBlock.ts";
-export * from "./_methods/explorerTxs.ts";
 export * from "./_methods/l2Book.ts";
 export * from "./_methods/notification.ts";
 export * from "./_methods/openOrders.ts";
 export * from "./_methods/orderUpdates.ts";
+export * from "./_methods/outcomeMetaUpdates.ts";
 export * from "./_methods/spotAssetCtxs.ts";
 export * from "./_methods/spotState.ts";
 export * from "./_methods/trades.ts";

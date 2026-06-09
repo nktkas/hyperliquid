@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import type { PerpAssetCtxSchema, SpotAssetCtxSchema, TwapStateSchema } from "./_base/commonSchemas.ts";
+import type { PerpAssetCtx, SpotAssetCtx, TwapState } from "./_base/mod.ts";
 import type { ClearinghouseStateResponse } from "./clearinghouseState.ts";
 import type { FrontendOpenOrdersResponse } from "./frontendOpenOrders.ts";
 import type { LeadingVaultsResponse } from "./leadingVaults.ts";
@@ -48,7 +48,7 @@ export type WebData2Response = {
    * @pattern ^0x[a-fA-F0-9]{40}$
    */
   agentAddress: `0x${string}` | null;
-  /** Timestamp until which the agent is valid. */
+  /** Timestamp until which the agent is valid (in ms since epoch). */
   agentValidUntil: number | null;
   /**
    * Cumulative ledger value.
@@ -58,7 +58,7 @@ export type WebData2Response = {
   /** Metadata for perpetual assets. */
   meta: MetaResponse;
   /** Array of contexts for each perpetual asset. */
-  assetCtxs: PerpAssetCtxSchema[];
+  assetCtxs: PerpAssetCtx[];
   /** Server timestamp (in ms since epoch). */
   serverTime: number;
   /** Whether this account is a vault. */
@@ -69,11 +69,16 @@ export type WebData2Response = {
    */
   user: `0x${string}`;
   /** Array of tuples containing TWAP order ID and its state. */
-  twapStates: [id: number, state: TwapStateSchema][];
+  twapStates: [
+    /** ID of the TWAP. */
+    id: number,
+    /** TWAP order state. */
+    state: TwapState,
+  ][];
   /** Account summary for spot trading. */
   spotState?: SpotClearinghouseStateResponse;
   /** Asset context for each spot asset. */
-  spotAssetCtxs: SpotAssetCtxSchema[];
+  spotAssetCtxs: SpotAssetCtx[];
   /** Whether the user has opted out of spot dusting. */
   optOutOfSpotDusting?: true;
   /** Assets currently at their open interest cap. */
@@ -85,13 +90,15 @@ export type WebData2Response = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode webData2} function. */
 export type WebData2Parameters = Omit<v.InferInput<typeof WebData2Request>, "type">;
 
 /**
  * Request comprehensive user and market data.
+ *
+ * @deprecated use `webData3` and other component subscriptions instead.
  *
  * @param config General configuration for Info API requests.
  * @param params Parameters specific to the API request.

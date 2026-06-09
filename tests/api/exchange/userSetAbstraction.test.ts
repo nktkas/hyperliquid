@@ -19,7 +19,6 @@ runTest({
   name: "userSetAbstraction",
   codeTestFn: async (_t, exchClient) => {
     // FIXME: Multisig does not support this method.
-    //        Unknown whether this is an SDK issue or a Hyperliquid limitation.
     if ("signers" in exchClient.config_) return;
 
     const params: UserSetAbstractionParameters[] = [

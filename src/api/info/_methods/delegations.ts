@@ -44,7 +44,7 @@ export type DelegationsResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode delegations} function. */
 export type DelegationsParameters = Omit<v.InferInput<typeof DelegationsRequest>, "type">;

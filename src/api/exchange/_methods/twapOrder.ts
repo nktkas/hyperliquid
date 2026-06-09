@@ -24,7 +24,7 @@ export const TwapOrderRequest = /* @__PURE__ */ (() => {
         b: v.boolean(),
         /** Size (in base currency units). */
         s: UnsignedDecimal,
-        /** Is reduce-only? */
+        /** Whether the order is reduce-only. */
         r: v.boolean(),
         /** TWAP duration in minutes. */
         m: v.pipe(UnsignedInteger, v.minValue(5), v.maxValue(1440)),
@@ -85,8 +85,12 @@ export type TwapOrderResponse = {
 
 import { parse } from "../../../_base.ts";
 import { canonicalize } from "../../../signing/mod.ts";
-import type { ExcludeErrorResponse } from "./_base/errors.ts";
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
+import {
+  type ExchangeConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestOptions,
+} from "./_base/mod.ts";
 
 /** Schema for action fields (excludes request-level system fields). */
 const TwapOrderActionSchema = /* @__PURE__ */ (() => {

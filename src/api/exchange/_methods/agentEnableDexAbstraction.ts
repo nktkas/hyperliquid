@@ -61,8 +61,12 @@ export type AgentEnableDexAbstractionResponse =
 
 import { parse } from "../../../_base.ts";
 import { canonicalize } from "../../../signing/mod.ts";
-import type { ExcludeErrorResponse } from "./_base/errors.ts";
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
+import {
+  type ExchangeConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestOptions,
+} from "./_base/mod.ts";
 
 /** Schema for action fields (excludes request-level system fields). */
 const AgentEnableDexAbstractionActionSchema = /* @__PURE__ */ (() => {
@@ -81,6 +85,8 @@ export type AgentEnableDexAbstractionSuccessResponse = ExcludeErrorResponse<Agen
  * Enable HIP-3 DEX abstraction.
  *
  * Signing: L1 Action.
+ *
+ * @deprecated use {@linkcode agentSetAbstraction} instead.
  *
  * @param config General configuration for Exchange API requests.
  * @param opts Request execution options.
@@ -103,8 +109,6 @@ export type AgentEnableDexAbstractionSuccessResponse = ExcludeErrorResponse<Agen
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction-agent
- *
- * @deprecated Use {@link agentSetAbstraction} instead.
  */
 export function agentEnableDexAbstraction(
   config: ExchangeConfig,

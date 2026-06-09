@@ -23,8 +23,8 @@
 import { ReconnectingWebSocket, type ReconnectingWebSocketOptions } from "@nktkas/rews";
 import type { IRequestTransport, ISubscription, ISubscriptionTransport } from "../_base.ts";
 import { AbortSignal_ } from "../_polyfills.ts";
-import { HyperliquidEventTarget } from "./_hyperliquidEventTarget.ts";
-import { WebSocketPostRequest, WebSocketRequestError } from "./_postRequest.ts";
+import { WebSocketDispatcher, WebSocketRequestError } from "./_dispatcher.ts";
+import { HyperliquidEventTarget } from "./_events.ts";
 import { WebSocketSubscriptionManager } from "./_subscriptionManager.ts";
 
 export { WebSocketRequestError };
@@ -75,13 +75,13 @@ export const MAINNET_RPC_WS_URL = "wss://rpc.hyperliquid.xyz/ws";
 export const TESTNET_RPC_WS_URL = "wss://rpc.hyperliquid-testnet.xyz/ws";
 
 /**
- * WebSocket transport for Hyperliquid API.
+ * WebSocket transport for the Hyperliquid API.
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/post-requests
  */
-export class WebSocketTransport implements IRequestTransport, ISubscriptionTransport {
+export class WebSocketTransport implements IRequestTransport<"info" | "exchange">, ISubscriptionTransport {
   /** Indicates this transport uses testnet endpoint. */
   readonly isTestnet: boolean;
   /** The WebSocket that is used for communication. */
@@ -95,22 +95,16 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
   }
   /** Timeout for requests in ms. Set to `null` to disable. */
   get timeout(): number | null {
-    return this._postRequest.timeout;
+    return this._dispatcher.timeout;
   }
   set timeout(value: number | null) {
-    this._postRequest.timeout = value;
+    this._dispatcher.timeout = value;
   }
 
-  protected readonly _postRequest: WebSocketPostRequest;
-  protected readonly _hlEvents: HyperliquidEventTarget;
-  protected readonly _subscriptionManager: WebSocketSubscriptionManager;
-  protected _keepAliveInterval: ReturnType<typeof setInterval> | undefined;
+  private readonly _hlEvents: HyperliquidEventTarget;
+  private readonly _dispatcher: WebSocketDispatcher;
+  private readonly _subscriptionManager: WebSocketSubscriptionManager;
 
-  /**
-   * Creates a new WebSocket transport instance.
-   *
-   * @param options Configuration options for the WebSocket transport layer.
-   */
   constructor(options?: WebSocketTransportOptions) {
     this.isTestnet = options?.isTestnet ?? false;
 
@@ -120,48 +114,41 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
     );
 
     this._hlEvents = new HyperliquidEventTarget(this.socket);
-    this._postRequest = new WebSocketPostRequest(
+    this._dispatcher = new WebSocketDispatcher(
       this.socket,
       this._hlEvents,
       options?.timeout === undefined ? 10_000 : options.timeout,
     );
     this._subscriptionManager = new WebSocketSubscriptionManager(
       this.socket,
-      this._postRequest,
+      this._dispatcher,
       this._hlEvents,
       options?.resubscribe ?? true,
     );
-
-    this._initKeepAlive();
   }
-
-  // ============================================================
-  // Public methods
-  // ============================================================
 
   /**
    * Sends a request to the Hyperliquid API via WebSocket.
    *
-   * @param endpoint The API endpoint to send the request to.
-   * @param payload The payload to send with the request.
-   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   * @return A promise that resolves with parsed JSON response body.
+   * The `explorer` endpoint is HTTP-only and not supported by this transport.
    *
    * @throws {WebSocketRequestError} An error that occurs when a WebSocket request fails.
    */
-  async request<T>(endpoint: "info" | "exchange", payload: unknown, signal?: AbortSignal): Promise<T> {
-    const payload_ = { type: endpoint === "exchange" ? "action" : endpoint, payload };
-    return await this._postRequest.request<T>("post", payload_, signal);
+  async request<T>(
+    endpoint: "info" | "exchange",
+    payload: unknown,
+    signal?: AbortSignal,
+  ): Promise<T> {
+    // `explorer` is HTTP-only and not supported on this transport
+    if ((endpoint as string) === "explorer") {
+      throw new WebSocketRequestError("WebSocket transport does not support the `explorer` endpoint");
+    }
+    const wrapped = { type: endpoint === "exchange" ? "action" : endpoint, payload };
+    return await this._dispatcher.request<T>("post", wrapped, signal);
   }
 
   /**
    * Subscribes to a Hyperliquid event channel.
-   * Sends a subscription request to the server and listens for events.
-   *
-   * @param channel The event channel to listen to.
-   * @param payload A payload to send with the subscription request.
-   * @param listener A function to call when the event is dispatched.
-   * @return A promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {WebSocketRequestError} An error that occurs when a WebSocket request fails.
    */
@@ -169,36 +156,33 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
     channel: string,
     payload: unknown,
     listener: (data: CustomEvent<T>) => void,
+    onError?: (error: WebSocketRequestError) => void,
   ): Promise<ISubscription> {
-    return this._subscriptionManager.subscribe(channel, payload, listener);
+    return this._subscriptionManager.subscribe(channel, payload, listener, onError);
   }
 
   /**
    * Waits until the WebSocket connection is ready.
    *
-   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the promise.
-   * @return A promise that resolves when the connection is ready.
-   *
    * @throws {WebSocketRequestError} When the connection cannot be established.
    */
   ready(signal?: AbortSignal): Promise<void> {
     return new Promise((resolve, reject) => {
-      // Combine the provided signal with the socket's termination signal
+      // --- Combine user + termination signals ----------------
       const combinedSignal = signal
         ? AbortSignal_.any([this.socket.terminationSignal, signal])
         : this.socket.terminationSignal;
 
-      // Check if already aborted
+      // --- Fast-paths ----------------------------------------
       if (combinedSignal.aborted) {
         return reject(
           new WebSocketRequestError("Failed to establish WebSocket connection", { cause: combinedSignal.reason }),
         );
       }
 
-      // Check if already open
       if (this.socket.readyState === ReconnectingWebSocket.OPEN) return resolve();
 
-      // Set up event listeners
+      // --- Wait for "open" or abort --------------------------
       const handleOpen = () => {
         combinedSignal.removeEventListener("abort", handleAbort);
         resolve();
@@ -218,24 +202,20 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
   /**
    * Closes the WebSocket connection and waits until it is fully closed.
    *
-   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the promise.
-   * @return A promise that resolves when the connection is fully closed.
-   *
    * @throws {WebSocketRequestError} When the connection cannot be closed.
    */
   close(signal?: AbortSignal): Promise<void> {
     return new Promise((resolve, reject) => {
-      // Check if already aborted
+      // --- Fast-paths ----------------------------------------
       if (signal?.aborted) {
         return reject(
           new WebSocketRequestError("Failed to close WebSocket connection", { cause: signal.reason }),
         );
       }
 
-      // Check if already closed
       if (this.socket.readyState === ReconnectingWebSocket.CLOSED) return resolve();
 
-      // Set up event listeners
+      // --- Wait for "close"/"error" or abort -----------------
       const handleClose = () => {
         signal?.removeEventListener("abort", handleAbort);
         resolve();
@@ -250,29 +230,8 @@ export class WebSocketTransport implements IRequestTransport, ISubscriptionTrans
       this.socket.addEventListener("error", handleClose, { once: true, signal });
       signal?.addEventListener("abort", handleAbort, { once: true });
 
-      // Initiate close
+      // --- Initiate close ------------------------------------
       this.socket.close();
     });
-  }
-
-  // ============================================================
-  // Keep-Alive Logic
-  // ============================================================
-
-  protected _initKeepAlive(): void {
-    const start = () => {
-      if (this._keepAliveInterval) return;
-      this._keepAliveInterval = setInterval(() => {
-        this.socket.send('{"method":"ping"}');
-      }, 30_000);
-    };
-    const stop = () => {
-      clearInterval(this._keepAliveInterval);
-      this._keepAliveInterval = undefined;
-    };
-
-    this.socket.addEventListener("open", start);
-    this.socket.addEventListener("close", stop);
-    this.socket.addEventListener("error", stop);
   }
 }

@@ -31,7 +31,7 @@ export type IsVipResponse = boolean | null;
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode isVip} function. */
 export type IsVipParameters = Omit<v.InferInput<typeof IsVipRequest>, "type">;

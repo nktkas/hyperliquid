@@ -61,13 +61,23 @@ export type NoopResponse =
 
 import { parse } from "../../../_base.ts";
 import { canonicalize } from "../../../signing/mod.ts";
-import type { ExcludeErrorResponse } from "./_base/errors.ts";
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
+import {
+  type ExchangeConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestOptions,
+} from "./_base/mod.ts";
 
 /** Schema for action fields (excludes request-level system fields). */
 const NoopActionSchema = /* @__PURE__ */ (() => {
   return v.object(NoopRequest.entries.action.entries);
 })();
+
+/** Action parameters for the {@linkcode noop} function. */
+export type NoopParameters = {
+  /** Nonce used for this call; takes precedence over `nonceManager`. */
+  nonce: number;
+};
 
 /** Request options for the {@linkcode noop} function. */
 export type NoopOptions = ExtractRequestOptions<v.InferInput<typeof NoopRequest>>;
@@ -81,6 +91,7 @@ export type NoopSuccessResponse = ExcludeErrorResponse<NoopResponse>;
  * Signing: L1 Action.
  *
  * @param config General configuration for Exchange API requests.
+ * @param params Parameters specific to the API request.
  * @param opts Request execution options.
  * @return Successful response without specific data.
  *
@@ -97,18 +108,22 @@ export type NoopSuccessResponse = ExcludeErrorResponse<NoopResponse>;
  * const wallet = privateKeyToAccount("0x..."); // viem or ethers
  * const transport = new HttpTransport(); // or `WebSocketTransport`
  *
- * await noop({ transport, wallet });
+ * await noop(
+ *   { transport, wallet },
+ *   { nonce: 1730000000000 },
+ * );
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#invalidate-pending-nonce-noop
  */
 export function noop(
   config: ExchangeConfig,
+  params: NoopParameters,
   opts?: NoopOptions,
 ): Promise<NoopSuccessResponse> {
   const action = canonicalize(
     NoopActionSchema,
     parse(NoopActionSchema, { type: "noop" }),
   );
-  return executeL1Action(config, action, opts);
+  return executeL1Action({ ...config, nonceManager: () => params.nonce }, action, opts);
 }

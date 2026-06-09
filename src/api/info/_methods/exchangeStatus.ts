@@ -24,7 +24,7 @@ export type ExchangeStatusResponse = {
   /** Server time (in ms since epoch). */
   time: number;
   /** Special statuses of the exchange system. */
-  specialStatuses: unknown | null;
+  specialStatuses: string | null;
 };
 
 // ============================================================
@@ -32,7 +32,7 @@ export type ExchangeStatusResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /**
  * Request exchange system status information.

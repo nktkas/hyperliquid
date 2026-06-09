@@ -30,7 +30,7 @@ export const OrderRequest = /* @__PURE__ */ (() => {
           ),
           /** Size (in base currency units). */
           s: UnsignedDecimal,
-          /** Is reduce-only? */
+          /** Whether the order is reduce-only. */
           r: v.boolean(),
           /** Order type (`limit` for limit orders, `trigger` for stop-loss/take-profit orders). */
           t: v.union([
@@ -50,7 +50,7 @@ export const OrderRequest = /* @__PURE__ */ (() => {
             v.object({
               /** Trigger order parameters. */
               trigger: v.object({
-                /** Is market order? */
+                /** Whether the order is a market order. */
                 isMarket: v.boolean(),
                 /** Trigger price. */
                 triggerPx: v.pipe(
@@ -68,12 +68,20 @@ export const OrderRequest = /* @__PURE__ */ (() => {
       ),
       /**
        * Order grouping strategy:
-       * - `na`: Standard order without grouping.
-       * - `normalTpsl`: TP/SL order with fixed size that doesn't adjust with position changes.
-       * - `positionTpsl`: TP/SL order that adjusts proportionally with the position size.
+       * - `"na"`: Standard order without grouping.
+       * - `"normalTpsl"`: TP/SL order with fixed size that doesn't adjust with position changes.
+       * - `"positionTpsl"`: TP/SL order that adjusts proportionally with the position size.
+       * - `{ p: number }`: Order priority rate as a fraction `p / 1e8` (max `p = 80000`, i.e. 8 bps).
+       *   Only valid when every order is IOC on a perp asset.
        */
       grouping: v.optional(
-        v.picklist(["na", "normalTpsl", "positionTpsl"]),
+        v.union([
+          v.picklist(["na", "normalTpsl", "positionTpsl"]),
+          v.object({
+            /** Priority rate as a fraction `p / 1e8` (max `80000`, i.e. 8 bps). */
+            p: v.pipe(UnsignedInteger, v.maxValue(80000)),
+          }),
+        ]),
         "na",
       ),
       /** Builder fee. */
@@ -171,8 +179,12 @@ export type OrderResponse = {
 
 import { parse } from "../../../_base.ts";
 import { canonicalize } from "../../../signing/mod.ts";
-import type { ExcludeErrorResponse } from "./_base/errors.ts";
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
+import {
+  type ExchangeConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestOptions,
+} from "./_base/mod.ts";
 
 /** Schema for action fields (excludes request-level system fields). */
 const OrderActionSchema = /* @__PURE__ */ (() => {

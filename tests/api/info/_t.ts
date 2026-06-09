@@ -22,15 +22,17 @@ const client = new InfoClient({ transport });
  *
  * @param options Test options including name and test function
  * @param options.name Name of the test
+ * @param options.ignore Whether to skip the test
  * @param options.codeTestFn Async function containing the test code, receives Deno.TestContext and shared InfoClient
  */
 export function runTest(options: {
   name: string;
+  ignore?: boolean;
   codeTestFn: (t: Deno.TestContext, client_: typeof client) => Promise<void>;
 }): void {
-  const { name, codeTestFn } = options;
+  const { name, ignore, codeTestFn } = options;
 
-  Deno.test(name, async (t) => {
+  Deno.test(name, { ignore }, async (t) => {
     await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
     await codeTestFn(t, client);

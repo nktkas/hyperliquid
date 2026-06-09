@@ -40,16 +40,24 @@ export type PerpDexsResponse = (/** Perpetual dex metadata. */ {
    * @pattern ^0x[a-fA-F0-9]{40}$
    */
   feeRecipient: `0x${string}` | null;
-  /** Mapping of asset names to their streaming open interest caps. */
+  /** Mapping of asset symbols to their streaming open interest caps. */
   assetToStreamingOiCap: [
+    /** Asset symbol (e.g., xyz:AAPL). */
     asset: string,
-    /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+    /**
+     * Streaming open interest cap.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     oiCap: string,
   ][];
   /** List of delegated function names and their authorized executor addresses. */
   subDeployers: [
+    /** Function name. */
     functionName: string,
-    /** @pattern ^0x[a-fA-F0-9]{40}$ */
+    /**
+     * Authorized executor addresses.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
     executors: `0x${string}`[],
   ][];
   /**
@@ -62,16 +70,24 @@ export type PerpDexsResponse = (/** Perpetual dex metadata. */ {
    * @pattern ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?$
    */
   lastDeployerFeeScaleChangeTime: string;
-  /** Array of tuples mapping asset names to their funding multipliers. */
+  /** Array of tuples mapping asset symbols to their funding multipliers. */
   assetToFundingMultiplier: [
+    /** Asset symbol (e.g., xyz:AAPL). */
     asset: string,
-    /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+    /**
+     * Funding multiplier.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     multiplier: string,
   ][];
-  /** Array of tuples mapping asset names to their funding interest rates. */
+  /** Array of tuples mapping asset symbols to their funding interest rates. */
   assetToFundingInterestRate: [
+    /** Asset symbol (e.g., xyz:AAPL). */
     asset: string,
-    /** @pattern ^-?[0-9]+(\.[0-9]+)?$ */
+    /**
+     * Funding interest rate.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
     rate: string,
   ][];
 } | null)[];
@@ -81,7 +97,7 @@ export type PerpDexsResponse = (/** Perpetual dex metadata. */ {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /**
  * Request all perpetual dexs.

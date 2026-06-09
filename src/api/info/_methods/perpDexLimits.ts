@@ -40,8 +40,12 @@ export type PerpDexLimitsResponse = {
   maxTransferNtl: string;
   /** Coin to open interest cap mapping. */
   coinToOiCap: [
+    /** Asset symbol (e.g., xyz:AAPL). */
     coin: string,
-    /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+    /**
+     * Open interest cap.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     oiCap: string,
   ][];
 } | null;
@@ -51,7 +55,7 @@ export type PerpDexLimitsResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode perpDexLimits} function. */
 export type PerpDexLimitsParameters = Omit<v.InferInput<typeof PerpDexLimitsRequest>, "type">;

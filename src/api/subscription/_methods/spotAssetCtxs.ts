@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import type { SpotAssetCtxSchema } from "../../info/_methods/_base/commonSchemas.ts";
+import type { SpotAssetCtx } from "../../info/_methods/_base/mod.ts";
 
 /**
  * Subscription to context events for all spot assets.
@@ -22,21 +22,22 @@ export type SpotAssetCtxsRequest = v.InferOutput<typeof SpotAssetCtxsRequest>;
  * Event of spot asset contexts.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
-export type SpotAssetCtxsEvent = SpotAssetCtxSchema[];
+export type SpotAssetCtxsEvent = SpotAssetCtx[];
 
 // ============================================================
 // Execution Logic
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_types.ts";
+import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /**
  * Subscribe to context updates for all spot assets.
  *
  * @param config General configuration for Subscription API subscriptions.
  * @param listener A callback function to be called when the event is received.
+ * @param onError An optional callback function to be called when the subscription fails.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -60,9 +61,10 @@ import type { SubscriptionConfig } from "./_types.ts";
 export function spotAssetCtxs(
   config: SubscriptionConfig,
   listener: (data: SpotAssetCtxsEvent) => void,
+  onError?: (error: WebSocketRequestError) => void,
 ): Promise<ISubscription> {
   const payload = parse(SpotAssetCtxsRequest, { type: "spotAssetCtxs" });
   return config.transport.subscribe<SpotAssetCtxsEvent>(payload.type, payload, (e) => {
     listener(e.detail);
-  });
+  }, onError);
 }

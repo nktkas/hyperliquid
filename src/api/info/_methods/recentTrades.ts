@@ -48,9 +48,15 @@ export type RecentTradesResponse = {
   tid: number;
   /** Addresses of users involved in the trade [Maker, Taker]. */
   users: [
-    /** @pattern ^0x[a-fA-F0-9]{40}$ */
+    /**
+     * Maker address.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
     maker: `0x${string}`,
-    /** @pattern ^0x[a-fA-F0-9]{40}$ */
+    /**
+     * Taker address.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
     taker: `0x${string}`,
   ];
 }[];
@@ -60,7 +66,7 @@ export type RecentTradesResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode recentTrades} function. */
 export type RecentTradesParameters = Omit<v.InferInput<typeof RecentTradesRequest>, "type">;

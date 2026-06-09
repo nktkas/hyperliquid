@@ -24,6 +24,7 @@ runTest({
       "#/anyOf/0/items/properties/clearinghouseState/properties/assetPositions/items/properties/position/properties/leverage/anyOf/0",
       "#/anyOf/0/items/properties/clearinghouseState/properties/assetPositions/items/properties/position/properties/liquidationPx/defined",
       "#/anyOf/0/items/properties/spotState/properties/evmEscrows/present",
+      "#/anyOf/0/items/properties/spotState/properties/balances/items/anyOf/1",
     ]);
   },
 });

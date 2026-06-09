@@ -63,6 +63,12 @@ const API_ENDPOINTS: ApiEndpoint[] = [
     methodsDir: "src/api/subscription/_methods",
     className: "SubscriptionClient",
   },
+  {
+    name: "explorer",
+    clientPath: "src/api/explorer/client.ts",
+    methodsDir: "src/api/explorer/_methods",
+    className: "ExplorerClient",
+  },
 ];
 
 // =============================================================================
@@ -273,6 +279,7 @@ function normalizeExample(example: string, isFunction: boolean, methodName: stri
     if (trimmed.includes("new hl.InfoClient")) return false;
     if (trimmed.includes("new hl.ExchangeClient")) return false;
     if (trimmed.includes("new hl.SubscriptionClient")) return false;
+    if (trimmed.includes("new hl.ExplorerClient")) return false;
     if (trimmed.includes("privateKeyToAccount")) return false;
     return true;
   });

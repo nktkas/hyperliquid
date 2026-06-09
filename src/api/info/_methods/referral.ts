@@ -91,7 +91,9 @@ export type ReferralResponse = {
         user: `0x${string}`;
         /** Mapping of token IDs to referral reward states. */
         tokenToState: [
+          /** Token identifier. */
           tokenId: number,
+          /** Referral reward state. */
           state: {
             /**
              * Cumulative traded volume.
@@ -149,7 +151,9 @@ export type ReferralResponse = {
   }[];
   /** Mapping of token IDs to referral reward states. */
   tokenToState: [
+    /** Token identifier. */
     tokenId: number,
+    /** Referral reward state. */
     state: {
       /**
        * Cumulative traded volume.
@@ -180,7 +184,7 @@ export type ReferralResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode referral} function. */
 export type ReferralParameters = Omit<v.InferInput<typeof ReferralRequest>, "type">;

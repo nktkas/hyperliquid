@@ -22,14 +22,19 @@ export type AllBorrowLendReserveStatesRequest = v.InferOutput<typeof AllBorrowLe
  * Array of tuples of reserve IDs and their borrow/lend reserve state.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-all-borrow-lend-reserve-states
  */
-export type AllBorrowLendReserveStatesResponse = [reserveId: number, state: BorrowLendReserveStateResponse][];
+export type AllBorrowLendReserveStatesResponse = [
+  /** Reserve ID. */
+  reserveId: number,
+  /** Borrow/lend reserve state. */
+  state: BorrowLendReserveStateResponse,
+][];
 
 // ============================================================
 // Execution Logic
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /**
  * Request all borrow/lend reserve states.

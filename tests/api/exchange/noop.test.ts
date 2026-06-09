@@ -8,7 +8,7 @@ const responseSchema = typeToJsonSchema(sourceFile, "NoopSuccessResponse");
 runTest({
   name: "noop",
   codeTestFn: async (_t, exchClient) => {
-    const data = await Promise.all([exchClient.noop()]);
+    const data = await Promise.all([exchClient.noop({ nonce: Date.now() })]);
 
     schemaCoverage(responseSchema, data);
   },

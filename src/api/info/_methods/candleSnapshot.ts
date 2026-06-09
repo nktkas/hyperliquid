@@ -34,11 +34,11 @@ export type CandleSnapshotRequest = v.InferOutput<typeof CandleSnapshotRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#candle-snapshot
  */
 export type CandleSnapshotResponse = {
-  /** Opening timestamp (ms since epoch). */
+  /** Opening timestamp (in ms since epoch). */
   t: number;
-  /** Closing timestamp (ms since epoch). */
+  /** Closing timestamp (in ms since epoch). */
   T: number;
-  /** Asset symbol. */
+  /** Asset symbol (e.g., BTC). */
   s: string;
   /** Time interval. */
   i: "1m" | "3m" | "5m" | "15m" | "30m" | "1h" | "2h" | "4h" | "8h" | "12h" | "1d" | "3d" | "1w" | "1M";
@@ -76,7 +76,7 @@ export type CandleSnapshotResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode candleSnapshot} function. */
 export type CandleSnapshotParameters = v.InferInput<typeof CandleSnapshotRequest>["req"];

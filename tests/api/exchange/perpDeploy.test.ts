@@ -67,6 +67,20 @@ runTest({
         },
       },
       {
+        registerAsset2: {
+          maxGas: null,
+          assetRequest: {
+            coin: "4",
+            szDecimals: 1,
+            oraclePx: "1",
+            marginTableId: 1,
+            marginMode: "normal",
+          },
+          dex: "test",
+          schema: null,
+        },
+      },
+      {
         registerAsset: {
           maxGas: 1000000000000,
           assetRequest: {

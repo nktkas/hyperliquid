@@ -7,7 +7,10 @@ import * as v from "@valibot/valibot";
 import { Hex, UnsignedInteger } from "../../_schemas.ts";
 
 /**
- * Set User abstraction mode (method for agent wallet).
+ * Set user abstraction mode (method for agent wallet).
+ *
+ * Like {@link userSetAbstraction} but signed as an L1 action by the agent wallet (instead of EIP-712 by the principal).
+ *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction-agent
  */
 export const AgentSetAbstractionRequest = /* @__PURE__ */ (() => {
@@ -68,8 +71,12 @@ export type AgentSetAbstractionResponse =
 
 import { parse } from "../../../_base.ts";
 import { canonicalize } from "../../../signing/mod.ts";
-import type { ExcludeErrorResponse } from "./_base/errors.ts";
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
+import {
+  type ExchangeConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestOptions,
+} from "./_base/mod.ts";
 
 /** Schema for action fields (excludes request-level system fields). */
 const AgentSetAbstractionActionSchema = /* @__PURE__ */ (() => {
@@ -88,7 +95,9 @@ export type AgentSetAbstractionOptions = ExtractRequestOptions<
 export type AgentSetAbstractionSuccessResponse = ExcludeErrorResponse<AgentSetAbstractionResponse>;
 
 /**
- * Set User abstraction mode (method for agent wallet).
+ * Set user abstraction mode (method for agent wallet).
+ *
+ * Like {@link userSetAbstraction} but signed as an L1 action by the agent wallet (instead of EIP-712 by the principal).
  *
  * Signing: L1 Action.
  *

@@ -6,7 +6,7 @@ import * as v from "@valibot/valibot";
 
 /**
  * Request prediction market outcome metadata.
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-outcome-metadata
  */
 export const OutcomeMetaRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -18,7 +18,7 @@ export type OutcomeMetaRequest = v.InferOutput<typeof OutcomeMetaRequest>;
 
 /**
  * Prediction market outcome metadata including outcomes and questions.
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-outcome-metadata
  */
 export type OutcomeMetaResponse = {
   /** Array of prediction market outcomes. */
@@ -36,6 +36,8 @@ export type OutcomeMetaResponse = {
       /** Token identifier for this side. */
       token?: number;
     }[];
+    /** Quote token for this outcome. */
+    quoteToken: string;
   }[];
   /** Array of prediction market questions. */
   questions: {
@@ -59,7 +61,7 @@ export type OutcomeMetaResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /**
  * Request prediction market outcome metadata.
@@ -81,7 +83,7 @@ import type { InfoConfig } from "./_base/types.ts";
  * const data = await outcomeMeta({ transport });
  * ```
  *
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-outcome-metadata
  */
 export function outcomeMeta(
   config: InfoConfig,

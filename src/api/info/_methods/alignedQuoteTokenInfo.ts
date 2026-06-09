@@ -8,7 +8,7 @@ import { UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Request supply, rate, and pending payment information for an aligned quote token.
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-aligned-quote-token-status
  */
 export const AlignedQuoteTokenInfoRequest = /* @__PURE__ */ (() => {
   return v.object({
@@ -22,7 +22,7 @@ export type AlignedQuoteTokenInfoRequest = v.InferOutput<typeof AlignedQuoteToke
 
 /**
  * Supply, rate, and pending payment information for an aligned quote token.
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-aligned-quote-token-status
  */
 export type AlignedQuoteTokenInfoResponse = {
   /** Whether the token is aligned. */
@@ -38,7 +38,10 @@ export type AlignedQuoteTokenInfoResponse = {
   dailyAmountOwed: [
     /** Date in YYYY-MM-DD format. */
     date: string,
-    /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+    /**
+     * Amount owed.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     amount: string,
   ][];
   /**
@@ -53,7 +56,7 @@ export type AlignedQuoteTokenInfoResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode alignedQuoteTokenInfo} function. */
 export type AlignedQuoteTokenInfoParameters = Omit<v.InferInput<typeof AlignedQuoteTokenInfoRequest>, "type">;
@@ -81,7 +84,7 @@ export type AlignedQuoteTokenInfoParameters = Omit<v.InferInput<typeof AlignedQu
  * });
  * ```
  *
- * @see null
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-aligned-quote-token-status
  */
 export function alignedQuoteTokenInfo(
   config: InfoConfig,

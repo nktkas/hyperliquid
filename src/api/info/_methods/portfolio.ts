@@ -24,14 +24,22 @@ export type PortfolioRequest = v.InferOutput<typeof PortfolioRequest>;
 type Portfolio = {
   /** History entries for account value as [timestamp, value]. */
   accountValueHistory: [
+    /** Timestamp (in ms since epoch). */
     timestamp: number,
-    /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+    /**
+     * Account value.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     value: string,
   ][];
   /** History entries for profit and loss as [timestamp, value]. */
   pnlHistory: [
+    /** Timestamp (in ms since epoch). */
     timestamp: number,
-    /** @pattern ^-?[0-9]+(\.[0-9]+)?$ */
+    /**
+     * Profit and loss.
+     * @pattern ^-?[0-9]+(\.[0-9]+)?$
+     */
     value: string,
   ][];
   /**
@@ -61,7 +69,7 @@ export type PortfolioResponse = [
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode portfolio} function. */
 export type PortfolioParameters = Omit<v.InferInput<typeof PortfolioRequest>, "type">;

@@ -47,7 +47,12 @@ export type MetaResponse = {
     lastGrowthModeChangeTime?: string;
   }[];
   /** Margin requirement tables for different leverage tiers. */
-  marginTables: [id: number, table: MarginTableResponse][];
+  marginTables: [
+    /** Margin requirements table ID. */
+    id: number,
+    /** Margin requirements table. */
+    table: MarginTableResponse,
+  ][];
   /** Collateral token index. */
   collateralToken: number;
 };
@@ -57,7 +62,7 @@ export type MetaResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode meta} function. */
 export type MetaParameters = Omit<v.InferInput<typeof MetaRequest>, "type">;

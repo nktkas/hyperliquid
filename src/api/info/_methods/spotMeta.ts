@@ -44,7 +44,7 @@ export type SpotMetaResponse = {
     index: number;
     /**
      * Token ID.
-     * @pattern ^0[xX][0-9a-fA-F]{32}$
+     * @pattern ^0x[a-fA-F0-9]{32}$
      */
     tokenId: `0x${string}`;
     /** Indicates if the token is the primary representation in the system. */
@@ -74,7 +74,7 @@ export type SpotMetaResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /**
  * Request spot trading metadata.

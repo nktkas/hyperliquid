@@ -25,12 +25,16 @@ export type LegalCheckRequest = v.InferOutput<typeof LegalCheckRequest>;
  * @see null
  */
 export type LegalCheckResponse = {
-  /** Whether the user IP address is allowed. */
-  ipAllowed: boolean;
   /** Whether the user has accepted the terms of service. */
   acceptedTerms: boolean;
   /** Whether the user is allowed to use the platform. */
   userAllowed: boolean;
+  /**
+   * Restriction code.
+   *
+   * FIXME: meaning of `"n"` / `"a"` unconfirmed.
+   */
+  restrictions?: "n" | "a";
 };
 
 // ============================================================
@@ -38,7 +42,7 @@ export type LegalCheckResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode legalCheck} function. */
 export type LegalCheckParameters = Omit<v.InferInput<typeof LegalCheckRequest>, "type">;

@@ -8,6 +8,9 @@ import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.t
 
 /**
  * Transfer tokens between different perp DEXs, spot balance, users, and/or sub-accounts.
+ *
+ * Like {@link agentSendAsset} but signed via EIP-712 by the principal (instead of as an L1 action by the agent wallet).
+ *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset
  */
 export const SendAssetRequest = /* @__PURE__ */ (() => {
@@ -18,7 +21,7 @@ export const SendAssetRequest = /* @__PURE__ */ (() => {
       type: v.literal("sendAsset"),
       /** Chain ID in hex format for EIP-712 signing. */
       signatureChainId: Hex,
-      /** HyperLiquid network type. */
+      /** Hyperliquid network type. */
       hyperliquidChain: v.picklist(["Mainnet", "Testnet"]),
       /** Destination address. */
       destination: Address,
@@ -80,8 +83,12 @@ export type SendAssetResponse =
 
 import { parse } from "../../../_base.ts";
 import { canonicalize } from "../../../signing/mod.ts";
-import type { ExcludeErrorResponse } from "./_base/errors.ts";
-import { type ExchangeConfig, executeUserSignedAction, type ExtractRequestOptions } from "./_base/execute.ts";
+import {
+  type ExchangeConfig,
+  type ExcludeErrorResponse,
+  executeUserSignedAction,
+  type ExtractRequestOptions,
+} from "./_base/mod.ts";
 
 /** Schema for action fields (excludes request-level system fields). */
 const SendAssetActionSchema = /* @__PURE__ */ (() => {
@@ -116,6 +123,8 @@ export const SendAssetTypes = {
 
 /**
  * Transfer tokens between different perp DEXs, spot balance, users, and/or sub-accounts.
+ *
+ * Like {@link agentSendAsset} but signed via EIP-712 by the principal (instead of as an L1 action by the agent wallet).
  *
  * Signing: User-Signed EIP-712.
  *

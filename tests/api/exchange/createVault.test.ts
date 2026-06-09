@@ -6,7 +6,9 @@ import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { valibotToJsonSchema } from "../_utils/valibotToJsonSchema.ts";
 import { runTest } from "./_t.ts";
 
-const paramsSchema = valibotToJsonSchema(v.omit(v.object(CreateVaultRequest.entries.action.entries), ["type"]));
+const paramsSchema = valibotToJsonSchema(
+  v.omit(v.object(CreateVaultRequest.entries.action.entries), ["type", "nonce"]),
+);
 
 runTest({
   name: "createVault",
@@ -16,7 +18,6 @@ runTest({
         name: "test",
         description: "1234567890",
         initialUsd: Number.MAX_SAFE_INTEGER,
-        nonce: Date.now(),
       },
     ];
 

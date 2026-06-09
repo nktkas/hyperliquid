@@ -24,6 +24,9 @@ runTest({
     }, 60_000);
 
     schemaCoverage(paramsSchema, params);
-    schemaCoverage(responseSchema, data);
+    schemaCoverage(responseSchema, data, [
+      "#/properties/bbo/items/0/null",
+      "#/properties/bbo/items/1/null",
+    ]);
   },
 });

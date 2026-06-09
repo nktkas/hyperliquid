@@ -5,7 +5,7 @@ import * as v from "@valibot/valibot";
 // ============================================================
 
 import { Address } from "../../_schemas.ts";
-import type { OpenOrderSchema, OrderProcessingStatusSchema } from "../../info/_methods/_base/commonSchemas.ts";
+import type { OpenOrder, OrderProcessingStatus } from "../../info/_methods/_base/mod.ts";
 
 /**
  * Subscription to order updates for a specific user.
@@ -27,9 +27,9 @@ export type OrderUpdatesRequest = v.InferOutput<typeof OrderUpdatesRequest>;
  */
 export type OrderUpdatesEvent = {
   /** Order details. */
-  order: OpenOrderSchema;
+  order: OpenOrder;
   /**
-   * Order processing status.
+   * Order processing status:
    * - `"open"`: Order active and waiting to be filled.
    * - `"filled"`: Order fully executed.
    * - `"canceled"`: Order canceled by the user.
@@ -60,7 +60,7 @@ export type OrderUpdatesEvent = {
    * - `"oracleRejected"`: Rejected due to price too far from oracle.
    * - `"perpMaxPositionRejected"`: Rejected due to exceeding margin tier limit at current leverage.
    */
-  status: OrderProcessingStatusSchema;
+  status: OrderProcessingStatus;
   /** Timestamp when the status was last updated (in ms since epoch). */
   statusTimestamp: number;
 }[];
@@ -70,8 +70,8 @@ export type OrderUpdatesEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_types.ts";
+import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode orderUpdates} function. */
 export type OrderUpdatesParameters = Omit<v.InferInput<typeof OrderUpdatesRequest>, "type">;
@@ -82,6 +82,7 @@ export type OrderUpdatesParameters = Omit<v.InferInput<typeof OrderUpdatesReques
  * @param config General configuration for Subscription API subscriptions.
  * @param params Parameters specific to the API subscription.
  * @param listener A callback function to be called when the event is received.
+ * @param onError An optional callback function to be called when the subscription fails.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -107,9 +108,10 @@ export function orderUpdates(
   config: SubscriptionConfig,
   params: OrderUpdatesParameters,
   listener: (data: OrderUpdatesEvent) => void,
+  onError?: (error: WebSocketRequestError) => void,
 ): Promise<ISubscription> {
   const payload = parse(OrderUpdatesRequest, { type: "orderUpdates", ...params });
   return config.transport.subscribe<OrderUpdatesEvent>(payload.type, payload, (e) => {
     listener(e.detail);
-  });
+  }, onError);
 }

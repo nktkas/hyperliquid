@@ -21,7 +21,7 @@ export type PredictedFundingsRequest = v.InferOutput<typeof PredictedFundingsReq
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-predicted-funding-rates-for-different-venues
  */
 export type PredictedFundingsResponse = [
-  /** Asset symbol. */
+  /** Asset symbol (e.g., BTC). */
   asset: string,
   /** Array of predicted funding data for each exchange. */
   exchanges: [
@@ -34,7 +34,7 @@ export type PredictedFundingsResponse = [
        * @pattern ^-?[0-9]+(\.[0-9]+)?$
        */
       fundingRate: string;
-      /** Next funding time (ms since epoch). */
+      /** Next funding time (in ms since epoch). */
       nextFundingTime: number;
       /** Funding interval in hours. */
       fundingIntervalHours?: number;
@@ -47,7 +47,7 @@ export type PredictedFundingsResponse = [
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /**
  * Request predicted funding rates.

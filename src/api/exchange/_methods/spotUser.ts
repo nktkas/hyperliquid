@@ -7,7 +7,7 @@ import * as v from "@valibot/valibot";
 import { Hex, UnsignedInteger } from "../../_schemas.ts";
 
 /**
- * Opt Out of Spot Dusting.
+ * Opt out of spot dusting.
  * @see null
  */
 export const SpotUserRequest = /* @__PURE__ */ (() => {
@@ -66,8 +66,12 @@ export type SpotUserResponse =
 
 import { parse } from "../../../_base.ts";
 import { canonicalize } from "../../../signing/mod.ts";
-import type { ExcludeErrorResponse } from "./_base/errors.ts";
-import { type ExchangeConfig, executeL1Action, type ExtractRequestOptions } from "./_base/execute.ts";
+import {
+  type ExchangeConfig,
+  type ExcludeErrorResponse,
+  executeL1Action,
+  type ExtractRequestOptions,
+} from "./_base/mod.ts";
 
 /** Schema for action fields (excludes request-level system fields). */
 const SpotUserActionSchema = /* @__PURE__ */ (() => {
@@ -84,7 +88,7 @@ export type SpotUserOptions = ExtractRequestOptions<v.InferInput<typeof SpotUser
 export type SpotUserSuccessResponse = ExcludeErrorResponse<SpotUserResponse>;
 
 /**
- * Opt Out of Spot Dusting.
+ * Opt out of spot dusting.
  *
  * Signing: L1 Action.
  *

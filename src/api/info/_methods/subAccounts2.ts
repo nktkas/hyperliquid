@@ -40,7 +40,12 @@ export type SubAccounts2Response = {
    */
   master: `0x${string}`;
   /** DEX to clearinghouse state mapping. Always includes the main DEX (empty dex name). */
-  dexToClearinghouseState: [dex: string, state: ClearinghouseStateResponse][];
+  dexToClearinghouseState: [
+    /** DEX name (empty string for main dex). */
+    dex: string,
+    /** Clearinghouse state. */
+    state: ClearinghouseStateResponse,
+  ][];
   /** Spot tokens clearinghouse state. */
   spotState: SpotClearinghouseStateResponse;
 }[] | null;
@@ -50,7 +55,7 @@ export type SubAccounts2Response = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode subAccounts2} function. */
 export type SubAccounts2Parameters = Omit<v.InferInput<typeof SubAccounts2Request>, "type">;

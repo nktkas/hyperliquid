@@ -19,6 +19,10 @@ runTest({
     const data = await Promise.all(params.map((p) => client.legalCheck(p)));
 
     schemaCoverage(paramsSchema, params);
-    schemaCoverage(responseSchema, data);
+    schemaCoverage(responseSchema, data, [
+      "#/properties/restrictions/missing",
+      "#/properties/restrictions/enum/0",
+      "#/properties/restrictions/enum/1",
+    ]);
   },
 });

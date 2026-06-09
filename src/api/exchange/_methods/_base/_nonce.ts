@@ -3,31 +3,45 @@
  * @module
  */
 
-/**
- * Nonce manager for generating unique nonces per wallet address and network.
- * Uses lazy cleanup: removes entries when Date.now() > lastNonce.
- */
-class NonceManager {
-  private _map = new Map<string, number>();
+/** Default upper bound on map size before stale entries are pruned. */
+const DEFAULT_MAX_ENTRIES = 10_000;
 
-  getNonce(key: string): number {
-    const now = Date.now();
-    this._cleanup(now);
-
-    const lastNonce = this._map.get(key) ?? 0;
-    const nonce = now > lastNonce ? now : lastNonce + 1;
-    this._map.set(key, nonce);
-    return nonce;
-  }
-
-  private _cleanup(now: number): void {
-    for (const [key, lastNonce] of this._map) {
-      if (now > lastNonce) {
-        this._map.delete(key);
-      }
-    }
-  }
+/** Nonce manager interface. */
+export interface NonceManager {
+  /** Returns a unique nonce for the given key, monotonically increasing per key. */
+  getNonce(key: string): number;
 }
 
-/** Global nonce manager instance. */
-export const globalNonceManager = /* @__PURE__ */ new NonceManager();
+/**
+ * Creates a nonce manager that issues unique, monotonically increasing nonces per key.
+ *
+ * Uses `Date.now()` in ms; if the previous nonce for the key is greater than or equal to
+ * `Date.now()`, increments by 1 to maintain monotonicity.
+ *
+ * To bound memory under high-cardinality workloads (e.g., a server proxying many wallets),
+ * stale entries are pruned when the internal map grows beyond `maxEntries`. An entry is
+ * considered stale if `Date.now()` has advanced past its last issued nonce.
+ *
+ * @param maxEntries Upper bound on map size before stale entries are pruned. Default: `10000`.
+ * @return A {@linkcode NonceManager}.
+ */
+export function createNonceManager(maxEntries: number = DEFAULT_MAX_ENTRIES): NonceManager {
+  const map = new Map<string, number>();
+  return {
+    getNonce(key: string): number {
+      const now = Date.now();
+      if (map.size > maxEntries) {
+        for (const [k, last] of map) {
+          if (now > last) map.delete(k);
+        }
+      }
+      const last = map.get(key) ?? 0;
+      const nonce = now > last ? now : last + 1;
+      map.set(key, nonce);
+      return nonce;
+    },
+  };
+}
+
+/** Default global nonce manager instance. */
+export const globalNonceManager: NonceManager = /* @__PURE__ */ createNonceManager();

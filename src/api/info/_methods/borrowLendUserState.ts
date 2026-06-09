@@ -27,7 +27,9 @@ export type BorrowLendUserStateRequest = v.InferOutput<typeof BorrowLendUserStat
 export type BorrowLendUserStateResponse = {
   /** Array of tuples of token IDs and their borrow/lend state. */
   tokenToState: [
+    /** Token identifier. */
     tokenId: number,
+    /** Borrow/lend state. */
     state: {
       /** Borrow state for the token. */
       borrow: {
@@ -57,9 +59,17 @@ export type BorrowLendUserStateResponse = {
       };
     },
   ][];
-  /** Account health status. */
-  health: "healthy"; // FIXME: Presumably there are other literals
-  /** Health factor. */
+  /**
+   * Account health status.
+   *
+   * FIXME: other literals may exist (unconfirmed).
+   */
+  health: "healthy";
+  /**
+   * Health factor.
+   *
+   * FIXME: non-null value not found (unconfirmed).
+   */
   healthFactor: null;
 };
 
@@ -68,7 +78,7 @@ export type BorrowLendUserStateResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode borrowLendUserState} function. */
 export type BorrowLendUserStateParameters = Omit<v.InferInput<typeof BorrowLendUserStateRequest>, "type">;

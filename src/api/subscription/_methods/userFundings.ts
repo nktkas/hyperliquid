@@ -34,7 +34,7 @@ export type UserFundingsEvent = {
   fundings: {
     /** Timestamp of the update (in ms since epoch). */
     time: number;
-    /** Asset symbol. */
+    /** Asset symbol (e.g., BTC). */
     coin: string;
     /**
      * Amount transferred in USDC.
@@ -63,8 +63,8 @@ export type UserFundingsEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_types.ts";
+import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode userFundings} function. */
 export type UserFundingsParameters = Omit<v.InferInput<typeof UserFundingsRequest>, "type">;
@@ -75,6 +75,7 @@ export type UserFundingsParameters = Omit<v.InferInput<typeof UserFundingsReques
  * @param config General configuration for Subscription API subscriptions.
  * @param params Parameters specific to the API subscription.
  * @param listener A callback function to be called when the event is received.
+ * @param onError An optional callback function to be called when the subscription fails.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -100,11 +101,12 @@ export function userFundings(
   config: SubscriptionConfig,
   params: UserFundingsParameters,
   listener: (data: UserFundingsEvent) => void,
+  onError?: (error: WebSocketRequestError) => void,
 ): Promise<ISubscription> {
   const payload = parse(UserFundingsRequest, { type: "userFundings", ...params });
   return config.transport.subscribe<UserFundingsEvent>(payload.type, payload, (e) => {
     if (e.detail.user === payload.user) {
       listener(e.detail);
     }
-  });
+  }, onError);
 }

@@ -126,3 +126,10 @@ Full guides, examples, and API reference: [nktkas.gitbook.io/hyperliquid](https:
    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=nktkas/hyperliquid&type=date&legend=top-left" />
  </picture>
 </a>
+
+## License
+
+**@nktkas/hyperliquid** is licensed under the [MIT License](LICENSE).
+
+Copyright © 2024-present [nktkas](https://github.com/nktkas) and
+[contributors](https://github.com/nktkas/hyperliquid/graphs/contributors).

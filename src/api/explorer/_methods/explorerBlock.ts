@@ -1,0 +1,85 @@
+import * as v from "@valibot/valibot";
+
+// ============================================================
+// API Schemas
+// ============================================================
+
+/**
+ * Subscription to explorer block events.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+ */
+export const ExplorerBlockRequest = /* @__PURE__ */ (() => {
+  return v.object({
+    /** Type of subscription. */
+    type: v.literal("explorerBlock"),
+  });
+})();
+export type ExplorerBlockRequest = v.InferOutput<typeof ExplorerBlockRequest>;
+
+/**
+ * Event of array of block details.
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+ */
+export type ExplorerBlockEvent = {
+  /** Block creation timestamp. */
+  blockTime: number;
+  /**
+   * Block hash.
+   * @pattern ^0x[a-fA-F0-9]{64}$
+   */
+  hash: `0x${string}`;
+  /** Block height in chain. */
+  height: number;
+  /** Total transactions in block. */
+  numTxs: number;
+  /**
+   * Block proposer address.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  proposer: `0x${string}`;
+}[];
+
+// ============================================================
+// Execution Logic
+// ============================================================
+
+import { parse } from "../../../_base.ts";
+import type { ISubscription, ISubscriptionTransport, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ExplorerConfig } from "./_base/mod.ts";
+
+/**
+ * Subscribe to explorer block updates.
+ *
+ * @param config General configuration for Explorer API subscriptions.
+ * @param listener A callback function to be called when the event is received.
+ * @param onError An optional callback function to be called when the subscription fails.
+ * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+ *
+ * @throws {ValidationError} When the request parameters fail validation (before sending).
+ * @throws {TransportError} When the transport layer throws an error.
+ *
+ * @example
+ * ```ts
+ * import { WebSocketTransport } from "@nktkas/hyperliquid";
+ * import { explorerBlock } from "@nktkas/hyperliquid/api/explorer";
+ *
+ * const transport = new WebSocketTransport({ url: "wss://rpc.hyperliquid.xyz/ws" }); // only `WebSocketTransport` supports this API
+ *
+ * const sub = await explorerBlock(
+ *   { transport },
+ *   (data) => console.log(data),
+ * );
+ * ```
+ *
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+ */
+export function explorerBlock(
+  config: ExplorerConfig<ISubscriptionTransport>,
+  listener: (data: ExplorerBlockEvent) => void,
+  onError?: (error: WebSocketRequestError) => void,
+): Promise<ISubscription> {
+  const payload = parse(ExplorerBlockRequest, { type: "explorerBlock" });
+  return config.transport.subscribe<ExplorerBlockEvent>("explorerBlock_", payload, (e) => { // Internal duck channel as it does not have its own channel
+    listener(e.detail);
+  }, onError);
+}

@@ -65,15 +65,25 @@ export type TokenDetailsResponse = {
   genesis: {
     /** User balances. */
     userBalances: [
-      /** @pattern ^0x[a-fA-F0-9]{40}$ */
+      /**
+       * User address.
+       * @pattern ^0x[a-fA-F0-9]{40}$
+       */
       address: `0x${string}`,
-      /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+      /**
+       * Balance.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
       balance: string,
     ][];
     /** Existing token balances. */
     existingTokenBalances: [
+      /** Token identifier. */
       token: number,
-      /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+      /**
+       * Balance.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
       balance: string,
     ][];
     /**
@@ -104,9 +114,15 @@ export type TokenDetailsResponse = {
   seededUsdc: string;
   /** Non-circulating user balances of the token. */
   nonCirculatingUserBalances: [
-    /** @pattern ^0x[a-fA-F0-9]{40}$ */
+    /**
+     * User address.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
     address: `0x${string}`,
-    /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+    /**
+     * Balance.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     balance: string,
   ][];
   /**
@@ -121,7 +137,7 @@ export type TokenDetailsResponse = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { InfoConfig } from "./_base/types.ts";
+import type { InfoConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode tokenDetails} function. */
 export type TokenDetailsParameters = Omit<v.InferInput<typeof TokenDetailsRequest>, "type">;

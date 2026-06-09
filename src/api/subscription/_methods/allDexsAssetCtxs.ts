@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import type { PerpAssetCtxSchema } from "../../info/_methods/_base/commonSchemas.ts";
+import type { PerpAssetCtx } from "../../info/_methods/_base/mod.ts";
 
 /**
  * Subscription to asset context events for all DEXs.
@@ -24,7 +24,12 @@ export type AllDexsAssetCtxsRequest = v.InferOutput<typeof AllDexsAssetCtxsReque
  */
 export type AllDexsAssetCtxsEvent = {
   /** Array of tuples of dex names and contexts for each perpetual asset. */
-  ctxs: [dex: string, ctx: PerpAssetCtxSchema[]][];
+  ctxs: [
+    /** DEX name (empty string for main dex). */
+    dex: string,
+    /** Asset contexts. */
+    ctx: PerpAssetCtx[],
+  ][];
 };
 
 // ============================================================
@@ -32,14 +37,15 @@ export type AllDexsAssetCtxsEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_types.ts";
+import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /**
  * Subscribe to asset contexts for all DEXs.
  *
  * @param config General configuration for Subscription API subscriptions.
  * @param listener A callback function to be called when the event is received.
+ * @param onError An optional callback function to be called when the subscription fails.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -63,11 +69,12 @@ import type { SubscriptionConfig } from "./_types.ts";
 export function allDexsAssetCtxs(
   config: SubscriptionConfig,
   listener: (data: AllDexsAssetCtxsEvent) => void,
+  onError?: (error: WebSocketRequestError) => void,
 ): Promise<ISubscription> {
   const payload = parse(AllDexsAssetCtxsRequest, {
     type: "allDexsAssetCtxs",
   });
   return config.transport.subscribe<AllDexsAssetCtxsEvent>(payload.type, payload, (e) => {
     listener(e.detail);
-  });
+  }, onError);
 }

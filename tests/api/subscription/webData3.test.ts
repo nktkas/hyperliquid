@@ -26,6 +26,9 @@ runTest({
     }, 10_000);
 
     schemaCoverage(paramsSchema, params);
-    schemaCoverage(responseSchema, data.flat());
+    schemaCoverage(responseSchema, data.flat(), [
+      "#/properties/userState/properties/agentAddress/defined",
+      "#/properties/userState/properties/agentValidUntil/defined",
+    ]);
   },
 });

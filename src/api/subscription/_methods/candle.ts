@@ -25,11 +25,11 @@ export type CandleRequest = v.InferOutput<typeof CandleRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export type CandleEvent = {
-  /** Opening timestamp (ms since epoch). */
+  /** Opening timestamp (in ms since epoch). */
   t: number;
-  /** Closing timestamp (ms since epoch). */
+  /** Closing timestamp (in ms since epoch). */
   T: number;
-  /** Asset symbol. */
+  /** Asset symbol (e.g., BTC). */
   s: string;
   /** Time interval. */
   i: "1m" | "3m" | "5m" | "15m" | "30m" | "1h" | "2h" | "4h" | "8h" | "12h" | "1d" | "3d" | "1w" | "1M";
@@ -67,8 +67,8 @@ export type CandleEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_types.ts";
+import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode candle} function. */
 export type CandleParameters = Omit<v.InferInput<typeof CandleRequest>, "type">;
@@ -79,6 +79,7 @@ export type CandleParameters = Omit<v.InferInput<typeof CandleRequest>, "type">;
  * @param config General configuration for Subscription API subscriptions.
  * @param params Parameters specific to the API subscription.
  * @param listener A callback function to be called when the event is received.
+ * @param onError An optional callback function to be called when the subscription fails.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -104,11 +105,12 @@ export function candle(
   config: SubscriptionConfig,
   params: CandleParameters,
   listener: (data: CandleEvent) => void,
+  onError?: (error: WebSocketRequestError) => void,
 ): Promise<ISubscription> {
   const payload = parse(CandleRequest, { type: "candle", ...params });
   return config.transport.subscribe<CandleEvent>(payload.type, payload, (e) => {
     if (e.detail.s === payload.coin && e.detail.i === payload.interval) {
       listener(e.detail);
     }
-  });
+  }, onError);
 }

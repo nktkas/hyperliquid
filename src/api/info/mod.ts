@@ -22,7 +22,7 @@
  * @module
  */
 
-export type { InfoConfig } from "./_methods/_base/types.ts";
+export type { InfoConfig } from "./_methods/_base/mod.ts";
 
 export * from "./_methods/activeAssetData.ts";
 export * from "./_methods/alignedQuoteTokenInfo.ts";
@@ -30,7 +30,6 @@ export * from "./_methods/allBorrowLendReserveStates.ts";
 export * from "./_methods/allMids.ts";
 export * from "./_methods/allPerpMetas.ts";
 export * from "./_methods/approvedBuilders.ts";
-export * from "./_methods/blockDetails.ts";
 export * from "./_methods/borrowLendReserveState.ts";
 export * from "./_methods/borrowLendUserState.ts";
 export * from "./_methods/candleSnapshot.ts";
@@ -43,6 +42,7 @@ export * from "./_methods/exchangeStatus.ts";
 export * from "./_methods/extraAgents.ts";
 export * from "./_methods/frontendOpenOrders.ts";
 export * from "./_methods/fundingHistory.ts";
+export * from "./_methods/gossipPriorityAuctionStatus.ts";
 export * from "./_methods/gossipRootIps.ts";
 export * from "./_methods/historicalOrders.ts";
 export * from "./_methods/isVip.ts";
@@ -71,6 +71,7 @@ export * from "./_methods/predictedFundings.ts";
 export * from "./_methods/preTransferCheck.ts";
 export * from "./_methods/recentTrades.ts";
 export * from "./_methods/referral.ts";
+export * from "./_methods/settledOutcome.ts";
 export * from "./_methods/spotClearinghouseState.ts";
 export * from "./_methods/spotDeployState.ts";
 export * from "./_methods/spotMeta.ts";
@@ -80,10 +81,8 @@ export * from "./_methods/subAccounts.ts";
 export * from "./_methods/subAccounts2.ts";
 export * from "./_methods/tokenDetails.ts";
 export * from "./_methods/twapHistory.ts";
-export * from "./_methods/txDetails.ts";
 export * from "./_methods/userAbstraction.ts";
 export * from "./_methods/userBorrowLendInterest.ts";
-export * from "./_methods/userDetails.ts";
 export * from "./_methods/userDexAbstraction.ts";
 export * from "./_methods/userFees.ts";
 export * from "./_methods/userFills.ts";
