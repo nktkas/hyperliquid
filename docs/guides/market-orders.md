@@ -8,8 +8,8 @@ Hyperliquid doesn't have a dedicated market order type. Simulate market orders u
 An IoC order fills immediately at the best available price and cancels any unfilled portion. Set the price aggressively
 to ensure a fill:
 
-- **Buy:** price above current mid (for example, +1%)
-- **Sell:** price below current mid (for example, -1%)
+- **Buy:** price above current mid (e.g., +1%)
+- **Sell:** price below current mid (e.g., -1%)
 
 The 1% buffer is a starting point. Volatile markets or large orders may need a wider margin.
 
@@ -38,7 +38,7 @@ const mids = await info.allMids();
 const mid = parseFloat(mids[coin]);
 const price = mid * (1 + (isBuy ? tolerance : -tolerance));
 
-// ! asserts the symbol exists - handle undefined in production
+// `!` asserts the symbol exists — in production, handle `undefined` explicitly
 const assetId = converter.getAssetId(coin)!;
 const szDecimals = converter.getSzDecimals(coin)!;
 

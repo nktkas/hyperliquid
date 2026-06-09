@@ -1,8 +1,8 @@
 # Signing
 
-Every exchange action on Hyperliquid requires an [EIP-712](https://eips.ethereum.org/EIPS/eip-712) signature.
-[`ExchangeClient`](clients.md#trading) handles this automatically. The following functions are for custom integrations
-or actions not yet supported by `ExchangeClient`.
+Low-level signing helpers from `@nktkas/hyperliquid/signing` for building signed
+[EIP-712](https://eips.ethereum.org/EIPS/eip-712) payloads outside [`ExchangeClient`](clients.md#exchange-endpoint) —
+for custom integrations or actions not yet covered by the high-level client.
 
 ## How signing works
 
@@ -28,7 +28,7 @@ The action is never signed directly. Instead, a **phantom agent** is constructed
    [`expiresAfter`](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#expires-after)
    is set, append `0x00` + the timestamp as uint64 big-endian
 5. [Keccak-256](https://en.wikipedia.org/wiki/SHA-3#Instances) hash the concatenated bytes. This is the `connectionId`
-6. Sign an [EIP-712](https://eips.ethereum.org/EIPS/eip-712) message with:
+6. Sign an EIP-712 message with:
    - Domain: `{ name: "Exchange", version: "1", chainId: 1337, verifyingContract: 0x0...0 }`
    - Type: `Agent { source: string, connectionId: bytes32 }`
    - Message: `{ source: "a" (mainnet) or "b" (testnet), connectionId }` where `connectionId` is the hash from step 5
@@ -43,7 +43,7 @@ recovers the signer from the `Agent` message, then verifies that the `connection
 The action fields are placed directly into the EIP-712 message, with no hashing or phantom agent:
 
 1. Each action type defines its own
-   [typed data](https://eips.ethereum.org/EIPS/eip-712#definition-of-typed-structured-data-𝕊) structure (for example,
+   [typed data](https://eips.ethereum.org/EIPS/eip-712#definition-of-typed-structured-data-𝕊) structure (e.g.,
    `HyperliquidTransaction:ApproveAgent`)
 2. Sign an EIP-712 message with:
    - Domain:
@@ -53,22 +53,30 @@ The action fields are placed directly into the EIP-712 message, with no hashing 
 
 The `signatureChainId` field in the action (hex, such as `"0x66eee"`) sets the EIP-712 domain chain ID.
 
-### Common rules
+### Shared rules
 
-Both flows share:
+Both flows produce the same envelope: `{ action, signature, nonce }`.
 
-- **Nonce:** current timestamp in milliseconds. Hyperliquid stores the 100 highest nonces per signer and rejects
-  duplicates. See [Nonces](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/nonces-and-api-wallets).
-- **Signature:** ECDSA `{ r, s, v }` where `v` is `27` or `28`
-- **Hex strings:** lowercase all hex values before signing
+The signature is ECDSA `{ r, s, v }` with `v` equal to `27` or `28` — wallets that return a raw recovery value of
+`0`/`1` are normalized by the SDK.
 
-The following functions implement these flows. Each accepts any [compatible wallet](#wallet-compatibility).
+The nonce is a unix millisecond timestamp. Hyperliquid stores the 100 highest nonces per signer: a new one must be
+larger than the smallest stored, never repeat, and fall within `(T - 2 days, T + 1 day)` of the block timestamp. See
+[Nonces](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/nonces-and-api-wallets).
+
+Hex is case-sensitive for signing. The SDK lowercases the values it generates (wallet addresses, multi-sig fields); any
+hex you place into an action yourself must already be lowercase, or the signature won't verify server-side.
 
 ## L1 actions
 
-`signL1Action` signs an [L1 action](#l1-action) and returns an ECDSA signature.
+The action is hashed, not signed directly — its key order is what the signature commits to, so build it in schema order
+(see [L1 action](#l1-action)), or let [`canonicalize`](#canonicalize) build it for you.
 
-Use `isTestnet: true` when signing for the testnet — this changes the EIP-712 source from `"a"` to `"b"`.
+Three optional parameters:
+
+- `isTestnet` — switch the EIP-712 source to the testnet (`"b"` instead of `"a"`).
+- `vaultAddress` — sign through a vault; folded into the hash.
+- `expiresAfter` — reject the action after this timestamp; folded into the hash.
 
 {% tabs %}
 
@@ -123,10 +131,8 @@ import { signL1Action } from "@nktkas/hyperliquid/signing";
 import { createWalletClient, custom } from "viem";
 import { arbitrum } from "viem/chains";
 
-const wallet = createWalletClient({
-  chain: arbitrum,
-  transport: custom(window.ethereum!),
-});
+const [account] = await window.ethereum!.request({ method: "eth_requestAccounts" }) as `0x${string}`[];
+const wallet = createWalletClient({ account, chain: arbitrum, transport: custom(window.ethereum!) });
 
 const action = { type: "cancel", cancels: [{ a: 0, o: 12345 }] };
 const nonce = Date.now();
@@ -197,11 +203,12 @@ await fetch("https://api.hyperliquid.xyz/exchange", {
 
 ## User-signed actions
 
-`signUserSignedAction` signs a [user-signed action](#user-signed-action) and returns an ECDSA signature.
+The action fields are signed directly as EIP-712 typed data (see [user-signed action](#user-signed-action)) — no
+hashing, so you must hand it the `types` that match the action.
 
-Each action type has its own EIP-712 types, exported from `@nktkas/hyperliquid/api/exchange` using the convention
-`PascalCase(actionType) + "Types"` (for example, `Withdraw3Types` for `withdraw3`, `ApproveAgentTypes` for
-`approveAgent`).
+Each action type has its own types, exported from `@nktkas/hyperliquid/api/exchange` under the convention
+`PascalCase(actionType) + "Types"` — `ApproveAgentTypes` for `approveAgent`, `Withdraw3Types` for `withdraw3`, and so
+on.
 
 {% tabs %}
 
@@ -216,8 +223,8 @@ const wallet = privateKeyToAccount("0x...");
 
 const action = {
   type: "approveAgent",
-  signatureChainId: "0x66eee",
-  hyperliquidChain: "Mainnet",
+  signatureChainId: "0x66eee" as const,
+  hyperliquidChain: "Mainnet", // or "Testnet"
   agentAddress: "0x...",
   agentName: "Agent",
   nonce: Date.now(),
@@ -245,8 +252,8 @@ const wallet = new Wallet("0x...");
 
 const action = {
   type: "approveAgent",
-  signatureChainId: "0x66eee",
-  hyperliquidChain: "Mainnet",
+  signatureChainId: "0x66eee" as const,
+  hyperliquidChain: "Mainnet", // or "Testnet"
   agentAddress: "0x...",
   agentName: "Agent",
   nonce: Date.now(),
@@ -271,15 +278,13 @@ import { ApproveAgentTypes } from "@nktkas/hyperliquid/api/exchange";
 import { createWalletClient, custom } from "viem";
 import { arbitrum } from "viem/chains";
 
-const wallet = createWalletClient({
-  chain: arbitrum,
-  transport: custom(window.ethereum!),
-});
+const [account] = await window.ethereum!.request({ method: "eth_requestAccounts" }) as `0x${string}`[];
+const wallet = createWalletClient({ account, chain: arbitrum, transport: custom(window.ethereum!) });
 
 const action = {
   type: "approveAgent",
-  signatureChainId: "0x66eee",
-  hyperliquidChain: "Mainnet",
+  signatureChainId: "0x66eee" as const,
+  hyperliquidChain: "Mainnet", // or "Testnet"
   agentAddress: "0x...",
   agentName: "Agent",
   nonce: Date.now(),
@@ -308,8 +313,8 @@ const wallet = await provider.getSigner();
 
 const action = {
   type: "approveAgent",
-  signatureChainId: "0x66eee",
-  hyperliquidChain: "Mainnet",
+  signatureChainId: "0x66eee" as const,
+  hyperliquidChain: "Mainnet", // or "Testnet"
   agentAddress: "0x...",
   agentName: "Agent",
   nonce: Date.now(),
@@ -343,8 +348,8 @@ const wallet: AbstractViemLocalAccount = {
 
 const action = {
   type: "approveAgent",
-  signatureChainId: "0x66eee",
-  hyperliquidChain: "Mainnet",
+  signatureChainId: "0x66eee" as const,
+  hyperliquidChain: "Mainnet", // or "Testnet"
   agentAddress: "0x...",
   agentName: "Agent",
   nonce: Date.now(),
@@ -365,8 +370,9 @@ await fetch("https://api.hyperliquid.xyz/exchange", {
 
 ## Action hashing
 
-`createL1ActionHash` produces the keccak256 hash used as `connectionId` in L1 signing. Use it to verify that your action
-serialization matches what the SDK produces:
+`createL1ActionHash` is the keccak256 `connectionId` that `signL1Action` signs internally — `vaultAddress` and
+`expiresAfter` feed into it exactly as they do when signing. Compute the hash yourself to verify that your action
+serialization matches the SDK's:
 
 ```ts
 import { createL1ActionHash } from "@nktkas/hyperliquid/signing";
@@ -377,66 +383,71 @@ const hash = createL1ActionHash({
 });
 ```
 
-{% hint style="warning" %} The hash depends on key order in the action object. The expected order varies by action type.
+{% hint style="warning" %}
+
+The hash depends on key order in the action object. The expected order varies by action type — look it up in that
+action's valibot schema (e.g., `CancelRequest` for `cancel`), or hand the action to [`canonicalize`](#canonicalize).
+
 {% endhint %}
 
-Optional parameters `vaultAddress` and `expiresAfter` are included in the hash when present.
+## Canonicalize
+
+`canonicalize` reorders an action's keys to match its valibot schema — the order an [L1 signature](#l1-action) commits
+to. The signing functions don't reorder for you, so an action you build by hand must already be in schema order;
+`canonicalize` guarantees it:
+
+```ts
+import { canonicalize } from "@nktkas/hyperliquid/signing";
+import { CancelRequest } from "@nktkas/hyperliquid/api/exchange";
+
+const action = canonicalize(CancelRequest.entries.action, {
+  cancels: [{ o: 12345, a: 0 }],
+  type: "cancel",
+});
+// → { type: "cancel", cancels: [{ a: 0, o: 12345 }] }
+
+// `action` is now in schema order — pass it to `signL1Action` or `createL1ActionHash`
+```
+
+Each action's request schema is exported from `@nktkas/hyperliquid/api/exchange` under the convention
+`PascalCase(actionType) + "Request"` — `CancelRequest` for `cancel`, `OrderRequest` for `order`, and so on; pass its
+`.entries.action`. It throws [`CanonicalizeError`](error-handling.md#canonicalizeerror) if the object has an unexpected
+key or is missing a required one.
 
 ## Multi-sig actions
 
-`signMultiSigAction` signs the [multi-sig](https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig) wrapper
-after all signers have signed the inner action. The inner signing differs for L1 and user-signed actions. Use
-`isTestnet: true` when signing for the testnet, as with `signL1Action`.
+### signMultiSigL1
 
-For convenience, `signMultiSigL1` and `signMultiSigUserSigned` orchestrate the full multi-sig flow (collecting
-signatures, building the wrapper, and signing it) in a single call. The examples below show the manual low-level flow.
+One call runs the whole L1 multi-sig flow: it collects an inner signature from every signer, wraps them, and signs the
+wrapper with the leader (the first signer in the array).
 
-### L1 actions
+It returns `{ action, signature }`, where `action` is the multi-sig wrapper — send that, not your original action.
 
-Each signer signs the `[multiSigUser, outerSigner, action]` tuple via `signL1Action`. The leader (first signer) then
-signs the wrapper via `signMultiSigAction`:
+Optional `isTestnet`, `vaultAddress`, and `expiresAfter` behave as in [`signL1Action`](#l1-actions).
+
+{% tabs %}
+
+{% tab title="viem" %}
 
 ```ts
-import { signL1Action, signMultiSigAction, trimSignature } from "@nktkas/hyperliquid/signing";
+import { signMultiSigL1 } from "@nktkas/hyperliquid/signing";
 import { privateKeyToAccount } from "viem/accounts";
 
+const multiSigUser = "0x..."; // the multi-sig account address
 const signers = [
   privateKeyToAccount("0x..."), // leader — signs the wrapper
   privateKeyToAccount("0x..."),
-];
-const multiSigUser = "0x..."; // the multi-sig account address
+] as const;
 
 const action = { type: "scheduleCancel", time: Date.now() + 10_000 };
 const nonce = Date.now();
 
-// 1. All signers sign the [user, leader, action] tuple
-const signatures = await Promise.all(signers.map(async (signer) => {
-  const sig = await signL1Action({
-    wallet: signer,
-    action: [multiSigUser.toLowerCase(), signers[0].address.toLowerCase(), action],
-    nonce,
-    // isTestnet: true,
-  });
-  return trimSignature(sig);
-}));
-
-// 2. Wrap and sign with leader
-const multiSigAction = {
-  type: "multiSig" as const,
-  signatureChainId: "0x66eee" as const,
-  signatures,
-  payload: {
-    multiSigUser: multiSigUser.toLowerCase(),
-    outerSigner: signers[0].address.toLowerCase(),
-    action,
-  },
-};
-
-const signature = await signMultiSigAction({
-  wallet: signers[0],
-  action: multiSigAction,
+const { action: multiSigAction, signature } = await signMultiSigL1({
+  signers,
+  multiSigUser,
+  signatureChainId: "0x66eee",
+  action,
   nonce,
-  // isTestnet: true,
 });
 
 await fetch("https://api.hyperliquid.xyz/exchange", {
@@ -446,76 +457,185 @@ await fetch("https://api.hyperliquid.xyz/exchange", {
 });
 ```
 
-### User-signed
+{% endtab %}
 
-Each signer signs the action with embedded `payloadMultiSigUser` and `outerSigner` fields via `signUserSignedAction`.
-The EIP-712 types must be extended with these fields (inserted after `hyperliquidChain`). The leader then signs the
-wrapper via `signMultiSigAction`:
+{% tab title="ethers" %}
 
 ```ts
-import { signMultiSigAction, signUserSignedAction, trimSignature } from "@nktkas/hyperliquid/signing";
+import { signMultiSigL1 } from "@nktkas/hyperliquid/signing";
+import { Wallet } from "ethers";
+
+const multiSigUser = "0x..."; // the multi-sig account address
+const signers = [
+  new Wallet("0x..."), // leader
+  new Wallet("0x..."),
+] as const;
+
+const action = { type: "scheduleCancel", time: Date.now() + 10_000 };
+const nonce = Date.now();
+
+const { action: multiSigAction, signature } = await signMultiSigL1({
+  signers,
+  multiSigUser,
+  signatureChainId: "0x66eee",
+  action,
+  nonce,
+});
+
+await fetch("https://api.hyperliquid.xyz/exchange", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ action: multiSigAction, signature, nonce }),
+});
+```
+
+{% endtab %}
+
+{% tab title="Browser (viem)" %}
+
+```ts
+import { signMultiSigL1 } from "@nktkas/hyperliquid/signing";
+import { createWalletClient, custom } from "viem";
+import { arbitrum } from "viem/chains";
+
+const [account] = await window.ethereum!.request({ method: "eth_requestAccounts" }) as `0x${string}`[];
+const leader = createWalletClient({
+  account,
+  chain: arbitrum,
+  transport: custom(window.ethereum!),
+});
+
+const multiSigUser = "0x..."; // the multi-sig account address
+const signers = [leader /* additional signers */] as const;
+
+const action = { type: "scheduleCancel", time: Date.now() + 10_000 };
+const nonce = Date.now();
+
+const { action: multiSigAction, signature } = await signMultiSigL1({
+  signers,
+  multiSigUser,
+  signatureChainId: "0x66eee",
+  action,
+  nonce,
+});
+
+await fetch("https://api.hyperliquid.xyz/exchange", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ action: multiSigAction, signature, nonce }),
+});
+```
+
+{% endtab %}
+
+{% tab title="Browser (ethers)" %}
+
+```ts
+import { signMultiSigL1 } from "@nktkas/hyperliquid/signing";
+import { BrowserProvider } from "ethers";
+
+const provider = new BrowserProvider(window.ethereum!);
+const leader = await provider.getSigner();
+
+const multiSigUser = "0x..."; // the multi-sig account address
+const signers = [leader /* additional signers */] as const;
+
+const action = { type: "scheduleCancel", time: Date.now() + 10_000 };
+const nonce = Date.now();
+
+const { action: multiSigAction, signature } = await signMultiSigL1({
+  signers,
+  multiSigUser,
+  signatureChainId: "0x66eee",
+  action,
+  nonce,
+});
+
+await fetch("https://api.hyperliquid.xyz/exchange", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ action: multiSigAction, signature, nonce }),
+});
+```
+
+{% endtab %}
+
+{% tab title="Custom" %}
+
+```ts
+import { signMultiSigL1 } from "@nktkas/hyperliquid/signing";
+import type { AbstractViemLocalAccount } from "@nktkas/hyperliquid/signing";
+
+const leader: AbstractViemLocalAccount = {
+  address: "0x...",
+  async signTypedData({ domain, types, primaryType, message }) {
+    // Your EIP-712 signing logic (HSM, MPC, remote signer, etc.)
+    return "0x...";
+  },
+};
+
+const multiSigUser = "0x..."; // the multi-sig account address
+const signers = [leader /* additional signers */] as const;
+
+const action = { type: "scheduleCancel", time: Date.now() + 10_000 };
+const nonce = Date.now();
+
+const { action: multiSigAction, signature } = await signMultiSigL1({
+  signers,
+  multiSigUser,
+  signatureChainId: "0x66eee",
+  action,
+  nonce,
+});
+
+await fetch("https://api.hyperliquid.xyz/exchange", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ action: multiSigAction, signature, nonce }),
+});
+```
+
+{% endtab %}
+
+{% endtabs %}
+
+### signMultiSigUserSigned
+
+The user-signed counterpart: one call collects each signer's contribution, wraps it, and signs the wrapper with the
+leader (the first signer). For the inner signatures it extends the action's `types` with the multi-sig fields, so you
+pass the same `types` as the single-signer call.
+
+It returns `{ action, signature }` — `action` is the wrapper to send, not your original action.
+
+{% tabs %}
+
+{% tab title="viem" %}
+
+```ts
+import { signMultiSigUserSigned } from "@nktkas/hyperliquid/signing";
 import { UsdSendTypes } from "@nktkas/hyperliquid/api/exchange";
 import { privateKeyToAccount } from "viem/accounts";
 
-const signers = [
-  privateKeyToAccount("0x..."), // leader — signs the wrapper
-  privateKeyToAccount("0x..."),
-];
 const multiSigUser = "0x..."; // the multi-sig account address
+const signers = [
+  privateKeyToAccount("0x..."), // leader
+  privateKeyToAccount("0x..."),
+] as const;
 
 const action = {
   type: "usdSend",
   signatureChainId: "0x66eee" as const,
-  hyperliquidChain: "Mainnet", // "Testnet" for testnet
+  hyperliquidChain: "Mainnet" as const, // or "Testnet"
   destination: "0x...",
   amount: "100",
   time: Date.now(),
 };
 
-// Extend types with multi-sig fields
-const primaryType = Object.keys(UsdSendTypes)[0];
-const primaryTypeArray = UsdSendTypes[primaryType];
-const extendedTypes = {
-  ...UsdSendTypes,
-  [primaryType]: [
-    primaryTypeArray[0], // after hyperliquidChain
-    { name: "payloadMultiSigUser", type: "address" },
-    { name: "outerSigner", type: "address" },
-    ...primaryTypeArray.slice(1),
-  ],
-};
-
-// 1. All signers sign the action with multi-sig fields
-const signatures = await Promise.all(signers.map(async (signer) => {
-  const sig = await signUserSignedAction({
-    wallet: signer,
-    action: {
-      payloadMultiSigUser: multiSigUser.toLowerCase() as `0x${string}`,
-      outerSigner: signers[0].address.toLowerCase() as `0x${string}`,
-      ...action,
-    },
-    types: extendedTypes,
-  });
-  return trimSignature(sig);
-}));
-
-// 2. Wrap and sign with leader
-const multiSigAction = {
-  type: "multiSig",
-  signatureChainId: "0x66eee" as const,
-  signatures,
-  payload: {
-    multiSigUser: multiSigUser.toLowerCase(),
-    outerSigner: signers[0].address.toLowerCase(),
-    action,
-  },
-};
-
-const signature = await signMultiSigAction({
-  wallet: signers[0],
-  action: multiSigAction,
-  nonce: action.time,
-  // isTestnet: true,
+const { action: multiSigAction, signature } = await signMultiSigUserSigned({
+  signers,
+  multiSigUser,
+  action,
+  types: UsdSendTypes,
 });
 
 await fetch("https://api.hyperliquid.xyz/exchange", {
@@ -524,6 +644,172 @@ await fetch("https://api.hyperliquid.xyz/exchange", {
   body: JSON.stringify({ action: multiSigAction, signature, nonce: action.time }),
 });
 ```
+
+{% endtab %}
+
+{% tab title="ethers" %}
+
+```ts
+import { signMultiSigUserSigned } from "@nktkas/hyperliquid/signing";
+import { UsdSendTypes } from "@nktkas/hyperliquid/api/exchange";
+import { Wallet } from "ethers";
+
+const multiSigUser = "0x..."; // the multi-sig account address
+const signers = [
+  new Wallet("0x..."), // leader
+  new Wallet("0x..."),
+] as const;
+
+const action = {
+  type: "usdSend",
+  signatureChainId: "0x66eee" as const,
+  hyperliquidChain: "Mainnet" as const, // or "Testnet"
+  destination: "0x...",
+  amount: "100",
+  time: Date.now(),
+};
+
+const { action: multiSigAction, signature } = await signMultiSigUserSigned({
+  signers,
+  multiSigUser,
+  action,
+  types: UsdSendTypes,
+});
+
+await fetch("https://api.hyperliquid.xyz/exchange", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ action: multiSigAction, signature, nonce: action.time }),
+});
+```
+
+{% endtab %}
+
+{% tab title="Browser (viem)" %}
+
+```ts
+import { signMultiSigUserSigned } from "@nktkas/hyperliquid/signing";
+import { UsdSendTypes } from "@nktkas/hyperliquid/api/exchange";
+import { createWalletClient, custom } from "viem";
+import { arbitrum } from "viem/chains";
+
+const [account] = await window.ethereum!.request({ method: "eth_requestAccounts" }) as `0x${string}`[];
+
+const leader = createWalletClient({
+  account,
+  chain: arbitrum,
+  transport: custom(window.ethereum!),
+});
+
+const multiSigUser = "0x..."; // the multi-sig account address
+const signers = [leader /* additional signers */] as const;
+
+const action = {
+  type: "usdSend",
+  signatureChainId: "0x66eee" as const,
+  hyperliquidChain: "Mainnet" as const, // or "Testnet"
+  destination: "0x...",
+  amount: "100",
+  time: Date.now(),
+};
+
+const { action: multiSigAction, signature } = await signMultiSigUserSigned({
+  signers,
+  multiSigUser,
+  action,
+  types: UsdSendTypes,
+});
+
+await fetch("https://api.hyperliquid.xyz/exchange", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ action: multiSigAction, signature, nonce: action.time }),
+});
+```
+
+{% endtab %}
+
+{% tab title="Browser (ethers)" %}
+
+```ts
+import { signMultiSigUserSigned } from "@nktkas/hyperliquid/signing";
+import { UsdSendTypes } from "@nktkas/hyperliquid/api/exchange";
+import { BrowserProvider } from "ethers";
+
+const provider = new BrowserProvider(window.ethereum!);
+const leader = await provider.getSigner();
+
+const multiSigUser = "0x..."; // the multi-sig account address
+const signers = [leader /* additional signers */] as const;
+
+const action = {
+  type: "usdSend",
+  signatureChainId: "0x66eee" as const,
+  hyperliquidChain: "Mainnet" as const, // or "Testnet"
+  destination: "0x...",
+  amount: "100",
+  time: Date.now(),
+};
+
+const { action: multiSigAction, signature } = await signMultiSigUserSigned({
+  signers,
+  multiSigUser,
+  action,
+  types: UsdSendTypes,
+});
+
+await fetch("https://api.hyperliquid.xyz/exchange", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ action: multiSigAction, signature, nonce: action.time }),
+});
+```
+
+{% endtab %}
+
+{% tab title="Custom" %}
+
+```ts
+import { signMultiSigUserSigned } from "@nktkas/hyperliquid/signing";
+import { UsdSendTypes } from "@nktkas/hyperliquid/api/exchange";
+import type { AbstractViemLocalAccount } from "@nktkas/hyperliquid/signing";
+
+const leader: AbstractViemLocalAccount = {
+  address: "0x...",
+  async signTypedData({ domain, types, primaryType, message }) {
+    return "0x...";
+  },
+};
+
+const multiSigUser = "0x..."; // the multi-sig account address
+const signers = [leader /* additional signers */] as const;
+
+const action = {
+  type: "usdSend",
+  signatureChainId: "0x66eee" as const,
+  hyperliquidChain: "Mainnet" as const, // or "Testnet"
+  destination: "0x...",
+  amount: "100",
+  time: Date.now(),
+};
+
+const { action: multiSigAction, signature } = await signMultiSigUserSigned({
+  signers,
+  multiSigUser,
+  action,
+  types: UsdSendTypes,
+});
+
+await fetch("https://api.hyperliquid.xyz/exchange", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ action: multiSigAction, signature, nonce: action.time }),
+});
+```
+
+{% endtab %}
+
+{% endtabs %}
 
 ## Wallet compatibility
 
@@ -535,9 +821,10 @@ All signing functions accept `AbstractWallet` — a union of supported wallet in
 | [viem JSON-RPC Account](https://viem.sh/docs/clients/wallet#json-rpc-accounts) | 1 param (object) | `getAddresses()`   | `getChainId()`          |
 | [ethers Signer](https://docs.ethers.org/v6/api/providers/#Signer)              | 3 params         | `getAddress()`     | `provider.getNetwork()` |
 
-Any object matching one of these interfaces works. See the [Custom tab](#l1-actions) in signing examples.
+Any object matching one of these interfaces works — for a custom signer (HSM, MPC, remote service), implement the viem
+Local Account shape (`address` and `signTypedData`), as in the [Custom tab](#l1-actions).
 
-### Helpers
+## Helpers
 
 These functions work with any supported wallet type:
 

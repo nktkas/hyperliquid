@@ -15,10 +15,8 @@ import { ExchangeClient, HttpTransport } from "@nktkas/hyperliquid";
 import { createWalletClient, custom } from "viem";
 import { arbitrum } from "viem/chains";
 
-const wallet = createWalletClient({
-  chain: arbitrum,
-  transport: custom(window.ethereum!),
-});
+const [account] = await window.ethereum!.request({ method: "eth_requestAccounts" }) as `0x${string}`[];
+const wallet = createWalletClient({ account, chain: arbitrum, transport: custom(window.ethereum!) });
 
 const transport = new HttpTransport();
 const client = new ExchangeClient({ transport, wallet });
@@ -49,26 +47,36 @@ const client = new ExchangeClient({ transport, wallet });
 
 Every exchange action triggers a wallet popup that the user must approve. [L1 actions](../signing.md#l1-action) (trading
 and position management) show a [phantom agent](../signing.md#l1-action) hash instead of human-readable details — this
-is by design, because the action is never signed directly.
+is by Hyperliquid design.
 
 To avoid repeated popups and hide unreadable L1 signatures from users, approve an
 [agent wallet](agent-wallets-and-vaults.md#agent-wallets) once with the browser wallet, then use the agent's private key
 for all subsequent trades:
 
 ```ts
-// 1. Approve agent once (triggers wallet popup)
+import { ExchangeClient, HttpTransport } from "@nktkas/hyperliquid";
+import { createWalletClient, custom } from "viem";
+import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
+import { arbitrum } from "viem/chains";
+
+// Browser wallet (MetaMask, etc.)
+const [account] = await window.ethereum!.request({ method: "eth_requestAccounts" }) as `0x${string}`[];
+const wallet = createWalletClient({ account, chain: arbitrum, transport: custom(window.ethereum!) });
+
+const transport = new HttpTransport();
+const client = new ExchangeClient({ transport, wallet });
+
+// Agent — persist the key to reuse the agent
+const agentPrivateKey = generatePrivateKey();
+const agentSigner = privateKeyToAccount(agentPrivateKey);
+
+// 1. Approve agent once (triggers browser wallet popup)
 await client.approveAgent({
-  agentAddress: "0x...",
+  agentAddress: agentSigner.address,
   agentName: "browser-agent",
 });
 
 // 2. Trade with agent (no popups)
-import { privateKeyToAccount } from "viem/accounts";
-
-const agentClient = new ExchangeClient({
-  transport,
-  wallet: privateKeyToAccount("0x..."), // agent's private key
-});
-
+const agentClient = new ExchangeClient({ transport, wallet: agentSigner });
 await agentClient.order({ orders: [/* ... */], grouping: "na" });
 ```
