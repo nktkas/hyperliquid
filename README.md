@@ -117,6 +117,15 @@ await subs.l2Book({ coin: "ETH" }, (data) => {
 
 Full guides, examples, and API reference: [nktkas.gitbook.io/hyperliquid](https://nktkas.gitbook.io/hyperliquid)
 
+## Versioning
+
+This SDK follows [Semantic Versioning](https://semver.org/). While it is on `0.x.y`, a breaking change bumps the minor
+version and every other change bumps the patch version.
+
+The exception is the request, response, and event types that mirror the Hyperliquid API. The API is unversioned and
+always serves its latest shape, so changes to these types ship in **patch** releases even when breaking — the break
+comes from Hyperliquid, not the SDK.
+
 ## Star History
 
 <a href="https://www.star-history.com/#nktkas/hyperliquid&type=date&legend=top-left">
