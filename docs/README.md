@@ -47,12 +47,18 @@ deno add jsr:@nktkas/hyperliquid
 
 {% endtab %}
 
-{% tab title="CDN" %}
+{% tab title="React Native" %}
 
-```html
-<script type="module">
-  import * as hl from "https://esm.sh/jsr/@nktkas/hyperliquid";
-</script>
+```sh
+npm i @nktkas/hyperliquid event-target-shim
+```
+
+Hermes lacks the global `EventTarget` and `Event` the SDK relies on — polyfill them before importing the SDK:
+
+```ts
+import { Event, EventTarget } from "event-target-shim";
+if (!globalThis.EventTarget) globalThis.EventTarget = EventTarget;
+if (!globalThis.Event) globalThis.Event = Event;
 ```
 
 {% endtab %}
@@ -65,7 +71,7 @@ deno add jsr:@nktkas/hyperliquid
 
 {% tab title="InfoClient" %}
 
-Read market data, account state, order book. [Learn more](clients.md#read-data)
+Read market data, account state, order book. [Learn more](clients.md#info-endpoint)
 
 ```ts
 import { HttpTransport, InfoClient } from "@nktkas/hyperliquid";
@@ -80,7 +86,7 @@ const mids = await client.allMids();
 
 {% tab title="ExchangeClient" %}
 
-Place orders, transfer funds, manage accounts. [Learn more](clients.md#trading)
+Place orders, transfer funds, manage accounts. [Learn more](clients.md#exchange-endpoint)
 
 ```ts
 import { ExchangeClient, HttpTransport } from "@nktkas/hyperliquid";
@@ -108,7 +114,7 @@ await client.order({
 
 {% tab title="SubscriptionClient" %}
 
-Receive real-time updates via WebSocket. [Learn more](clients.md#real-time-updates)
+Receive real-time updates via WebSocket. [Learn more](clients.md#websocket-subscriptions)
 
 ```ts
 import { SubscriptionClient, WebSocketTransport } from "@nktkas/hyperliquid";
@@ -123,4 +129,28 @@ await client.allMids((data) => {
 
 {% endtab %}
 
+{% tab title="ExplorerClient" %}
+
+Look up blocks, transactions, and addresses. [Learn more](clients.md#explorer-endpoint)
+
+```ts
+import { ExplorerClient, HttpTransport } from "@nktkas/hyperliquid";
+
+const transport = new HttpTransport();
+const client = new ExplorerClient({ transport });
+
+const block = await client.blockDetails({ height: 123 });
+```
+
+{% endtab %}
+
 {% endtabs %}
+
+## Versioning
+
+This SDK follows [Semantic Versioning](https://semver.org/). While it is on `0.x.y`, a breaking change bumps the minor
+version and every other change bumps the patch version.
+
+The exception is the request, response, and event types that mirror the Hyperliquid API. The API is unversioned and
+always serves its latest shape, so changes to these types ship in **patch** releases even when breaking — the break
+comes from Hyperliquid, not the SDK.

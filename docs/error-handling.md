@@ -1,7 +1,6 @@
 # Error handling
 
-The SDK throws a small, typed set of exceptions so you can route error handling by **class**. Read this page when you
-are writing a `try/catch` around a client call, wiring observability, or deciding what to retry.
+Typed exceptions thrown by `@nktkas/hyperliquid` so you can route error handling by **class**.
 
 ## Class hierarchy
 
@@ -49,13 +48,10 @@ try {
 }
 ```
 
-Defined in [`src/_base.ts`](../src/_base.ts).
-
 ## `ApiRequestError`
 
 Thrown when Hyperliquid's API processed the request and returned an error response. The raw payload is attached as
-`response`, and `message` is its error text. Server messages have no stability guarantee, so avoid branching on their
-exact text.
+`response`, and `message` is its error text.
 
 <!-- deno-fmt-ignore -->
 ```ts
@@ -70,8 +66,6 @@ try {
   }
 }
 ```
-
-Defined in [`src/api/exchange/_methods/_base/errors.ts`](../src/api/exchange/_methods/_base/errors.ts).
 
 ## `AbstractWalletError`
 
@@ -92,13 +86,11 @@ try {
 }
 ```
 
-Defined in [`src/signing/_abstractWallet.ts`](../src/signing/_abstractWallet.ts).
-
 ## `CanonicalizeError`
 
-Thrown by the [`canonicalize`](signing.md#canonicalize) helper when the payload does not match the schema — an extra
-field or a missing required field. You only hit this when you are building your own signed action; the built-in
-`ExchangeClient` methods never reach this path with their own payloads.
+Thrown by the `canonicalize` helper when the payload does not match the schema — an extra field or a missing required
+field. You only hit this when you are building your own signed action; the built-in `ExchangeClient` methods never reach
+this path with their own payloads.
 
 ```ts
 import { CancelRequest } from "@nktkas/hyperliquid/api/exchange";
@@ -116,8 +108,6 @@ try {
   }
 }
 ```
-
-Defined in [`src/signing/_canonicalize.ts`](../src/signing/_canonicalize.ts).
 
 ## Transport errors
 
@@ -161,8 +151,6 @@ try {
 }
 ```
 
-Defined in [`src/transport/http/mod.ts`](../src/transport/http/mod.ts).
-
 ### `WebSocketRequestError`
 
 Thrown by `WebSocketTransport` when the WebSocket connection cannot be used, or when a request or subscription receives
@@ -182,9 +170,7 @@ try {
 }
 ```
 
-Defined in [`src/transport/websocket/_postRequest.ts`](../src/transport/websocket/_postRequest.ts).
-
-## Timeouts and cancellation
+### Timeouts and cancellation
 
 Both transports use [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) under the hood. The
 default request timeout (10s) is built with `AbortSignal.timeout()`, and any `signal` you pass into a
@@ -240,6 +226,8 @@ try {
       } else if (error instanceof WebSocketRequestError) {
         // WebSocket transport failed — inspect error.cause
       }
+    } else {
+      // Unknown SDK error
     }
   } else {
     throw error; // not ours — let it propagate

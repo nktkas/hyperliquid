@@ -2,15 +2,17 @@
 
 A client uses a [transport](transports.md) to call a specific part of the Hyperliquid API:
 
-- **Info:** market data, account state, blockchain explorer
-- **Exchange:** trading, fund management, account configuration
-- **Subscription:** real-time updates via WebSocket
+| API                                                                                                            | What it covers                                  | Client                                           |
+| -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- | ------------------------------------------------ |
+| [**Info**](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint)                   | market data, account state                      | [`InfoClient`](#info-endpoint)                   |
+| [**Exchange**](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint)           | trading, fund management, account configuration | [`ExchangeClient`](#exchange-endpoint)           |
+| [**Subscription**](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions) | real-time updates via WebSocket                 | [`SubscriptionClient`](#websocket-subscriptions) |
+| [**Explorer**](https://app.hyperliquid.xyz/explorer)                                                           | blocks, transactions, and address activity      | [`ExplorerClient`](#explorer-endpoint)           |
 
-## Read data
+## Info endpoint
 
-`InfoClient` gives read-only access to the
-[Info endpoint](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint). Works with any
-transport.
+`InfoClient` is read-only and works with any transport. See all
+[Info methods](https://nktkas.gitbook.io/hyperliquid/api-reference/info-methods).
 
 ```ts
 import { HttpTransport, InfoClient } from "@nktkas/hyperliquid";
@@ -18,16 +20,13 @@ import { HttpTransport, InfoClient } from "@nktkas/hyperliquid";
 const transport = new HttpTransport();
 const client = new InfoClient({ transport });
 
-const mids = await client.allMids();
 const book = await client.l2Book({ coin: "ETH" });
 ```
 
-## Trading
+## Exchange endpoint
 
-`ExchangeClient` executes actions on the
-[Exchange endpoint](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint): trading, fund
-management, and account configuration. Requires a wallet for [signing](signing.md#wallet-compatibility) and works with
-any transport.
+`ExchangeClient` requires a wallet for [signing](signing.md#wallet-compatibility) and works with any transport. See all
+[Exchange methods](https://nktkas.gitbook.io/hyperliquid/api-reference/exchange-methods).
 
 {% tabs %}
 
@@ -37,11 +36,12 @@ any transport.
 import { ExchangeClient, HttpTransport } from "@nktkas/hyperliquid";
 import { privateKeyToAccount } from "viem/accounts";
 
+const wallet = privateKeyToAccount("0x...");
+
 const transport = new HttpTransport();
-const client = new ExchangeClient({
-  transport,
-  wallet: privateKeyToAccount("0x..."),
-});
+const client = new ExchangeClient({ transport, wallet });
+
+await client.order({ orders: [/* ... */], grouping: "na" });
 ```
 
 {% endtab %}
@@ -52,40 +52,35 @@ const client = new ExchangeClient({
 import { ExchangeClient, HttpTransport } from "@nktkas/hyperliquid";
 import { Wallet } from "ethers";
 
+const wallet = new Wallet("0x...");
+
 const transport = new HttpTransport();
-const client = new ExchangeClient({
-  transport,
-  wallet: new Wallet("0x..."),
-});
+const client = new ExchangeClient({ transport, wallet });
+
+await client.order({ orders: [/* ... */], grouping: "na" });
 ```
 
 {% endtab %}
 
 {% tab title="Browser (viem)" %}
 
-Use a [JSON-RPC Account](https://viem.sh/docs/clients/wallet#json-rpc-accounts) to connect browser extensions like
-MetaMask:
-
 ```ts
 import { ExchangeClient, HttpTransport } from "@nktkas/hyperliquid";
 import { createWalletClient, custom } from "viem";
 import { arbitrum } from "viem/chains";
 
-const wallet = createWalletClient({
-  chain: arbitrum,
-  transport: custom(window.ethereum!),
-});
+const [account] = await window.ethereum!.request({ method: "eth_requestAccounts" }) as `0x${string}`[];
+const wallet = createWalletClient({ account, chain: arbitrum, transport: custom(window.ethereum!) });
 
 const transport = new HttpTransport();
 const client = new ExchangeClient({ transport, wallet });
+
+await client.order({ orders: [/* ... */], grouping: "na" });
 ```
 
 {% endtab %}
 
 {% tab title="Browser (ethers)" %}
-
-Use a [BrowserProvider](https://docs.ethers.org/v6/api/providers/#BrowserProvider) to connect browser extensions like
-MetaMask:
 
 ```ts
 import { ExchangeClient, HttpTransport } from "@nktkas/hyperliquid";
@@ -96,6 +91,8 @@ const wallet = await provider.getSigner();
 
 const transport = new HttpTransport();
 const client = new ExchangeClient({ transport, wallet });
+
+await client.order({ orders: [/* ... */], grouping: "na" });
 ```
 
 {% endtab %}
@@ -103,7 +100,7 @@ const client = new ExchangeClient({ transport, wallet });
 {% tab title="Custom" %}
 
 Any object matching one of the [supported wallet interfaces](signing.md#wallet-compatibility) works. The minimum
-requirement is [`signTypedData`](https://eips.ethereum.org/EIPS/eip-712) and an address:
+requirement is [`signTypedData`](https://eips.ethereum.org/EIPS/eip-712) and an `address`:
 
 ```ts
 import { ExchangeClient, HttpTransport } from "@nktkas/hyperliquid";
@@ -119,27 +116,13 @@ const wallet: AbstractViemLocalAccount = {
 
 const transport = new HttpTransport();
 const client = new ExchangeClient({ transport, wallet });
+
+await client.order({ orders: [/* ... */], grouping: "na" });
 ```
 
 {% endtab %}
 
 {% endtabs %}
-
-Place an order:
-
-```ts
-await client.order({
-  orders: [{
-    a: 0, // asset index
-    b: true, // buy
-    p: "50000", // price
-    s: "0.01", // size
-    r: false, // not reduce-only
-    t: { limit: { tif: "Gtc" } }, // Good 'til Cancelled
-  }],
-  grouping: "na",
-});
-```
 
 ### Multi-sig
 
@@ -151,41 +134,50 @@ submits the final transaction — only the leader's nonce is validated by the se
 import { ExchangeClient, HttpTransport } from "@nktkas/hyperliquid";
 import { privateKeyToAccount } from "viem/accounts";
 
+const multiSigUser = "0x..."; // the multi-sig account address
+const signers = [
+  privateKeyToAccount("0x..."), // leader — signs the wrapper
+  privateKeyToAccount("0x..."),
+] as const;
+
 const transport = new HttpTransport();
-const client = new ExchangeClient({
-  transport,
-  signers: [
-    privateKeyToAccount("0x..."), // leader — submits the transaction
-    privateKeyToAccount("0x..."),
-  ],
-  multiSigUser: "0x...", // the multi-sig account address
-});
+const client = new ExchangeClient({ transport, signers, multiSigUser });
+
+// Use the client as usual
+await client.order({ orders: [/* ... */], grouping: "na" });
 ```
 
 ### Vault and sub-account trading
 
-To trade on behalf of a
-[vault or sub-account](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#subaccounts-and-vaults),
-set a default or pass `vaultAddress` per-request:
+To trade on behalf of a vault or sub-account, set a default or pass `vaultAddress` per-request. See
+[Subaccounts and vaults](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#subaccounts-and-vaults).
 
 ```ts
 const client = new ExchangeClient({
   transport,
   wallet,
-  defaultVaultAddress: "0x...",
+  defaultVaultAddress: "0x...", // is included in every API request that supports this feature
 });
 ```
 
 ```ts
 await client.order({ orders: [/* ... */], grouping: "na" }, {
-  vaultAddress: "0x...",
+  vaultAddress: "0x...", // takes precedence over `defaultVaultAddress`
 });
 ```
 
 ### Expiration
 
-A server-side guard. The API rejects the action after this timestamp (milliseconds). See
+A server-side guard. The API rejects the action after this timestamp. See
 [Expires After](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#expires-after).
+
+```ts
+const client = new ExchangeClient({
+  transport,
+  wallet,
+  defaultExpiresAfter: Date.now() + 60_000, // is included in every API request that supports this feature
+});
+```
 
 ```ts
 const client = new ExchangeClient({
@@ -196,26 +188,17 @@ const client = new ExchangeClient({
 ```
 
 ```ts
-const client = new ExchangeClient({
-  transport,
-  wallet,
-  defaultExpiresAfter: Date.now() + 60_000, // static - fixed at construction time
-});
-```
-
-```ts
 await client.order({ orders: [/* ... */], grouping: "na" }, {
-  expiresAfter: Date.now() + 60_000, // per-request override
+  expiresAfter: Date.now() + 60_000, // takes precedence over `defaultExpiresAfter`
 });
 ```
 
 ### Signature chain ID
 
-Sets the EIP-712 domain `chainId` for [user-signed actions](signing.md#user-signed-action-protocol). Defaults to the
-wallet's provider chain ID. Local wallets without a provider (e.g.,
+Sets the EIP-712 domain `chainId` for [user-signed actions](signing.md#user-signed-action). Defaults to the wallet's
+provider chain ID. Local wallets without a provider (e.g.,
 [`privateKeyToAccount`](https://viem.sh/docs/accounts/local/privateKeyToAccount),
-[`new Wallet()`](https://docs.ethers.org/v6/api/wallet/#Wallet)) fall back to `0x1` (Ethereum mainnet). Override to set
-the correct chain:
+[`new Wallet()`](https://docs.ethers.org/v6/api/wallet/#Wallet)) fall back to `0x1`. Override to set a different chain:
 
 ```ts
 const client = new ExchangeClient({
@@ -237,7 +220,7 @@ const client = new ExchangeClient({
 
 The SDK generates
 [nonces](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/nonces-and-api-wallets#hyperliquid-nonces)
-automatically using timestamps with auto-increment. Replace it if you need custom logic:
+automatically using the `Date.now()` function with auto-increment on duplicates. Replace it if you need custom logic:
 
 ```ts
 const client = new ExchangeClient({
@@ -247,11 +230,10 @@ const client = new ExchangeClient({
 });
 ```
 
-## Real-time updates
+## WebSocket subscriptions
 
-`SubscriptionClient` streams live data via
-[WebSocket subscriptions](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions).
-Requires [`WebSocketTransport`](transports.md#websocket).
+`SubscriptionClient` requires a [`WebSocketTransport`](transports.md#websocket) — subscriptions can't run over HTTP. See
+all [Subscription methods](https://nktkas.gitbook.io/hyperliquid/api-reference/subscription-methods).
 
 ```ts
 import { SubscriptionClient, WebSocketTransport } from "@nktkas/hyperliquid";
@@ -262,6 +244,23 @@ const client = new SubscriptionClient({ transport });
 const subscription = await client.allMids((data) => {
   console.log(data.mids);
 });
+```
+
+### Errors
+
+Each subscription method takes an optional `onError` callback as its last argument, invoked once if the subscription is
+dropped — a failed [resubscribe](transports.md#resubscription) or a permanently lost connection:
+
+```ts
+const subscription = await client.allMids(
+  (data) => {
+    console.log(data.mids);
+  },
+  (error) => {
+    // The subscription is gone — inspect the error and re-subscribe if needed
+    console.error(error);
+  },
+);
 ```
 
 ### Unsubscribe
@@ -290,19 +289,32 @@ await sub1.unsubscribe(); // removes listener A, subscription stays active
 await sub2.unsubscribe(); // removes listener B, channel closed
 ```
 
-### Handle failures
+## Explorer endpoint
 
-When the WebSocket [reconnects](transports.md#reconnection), the SDK automatically resubscribes to all active channels.
-If resubscription fails for a channel, its `failureSignal` aborts with the error:
+`ExplorerClient` reads the Hyperliquid blockchain [explorer](https://app.hyperliquid.xyz/explorer), which lives on the
+RPC endpoint. See all [Explorer methods](https://nktkas.gitbook.io/hyperliquid/api-reference/explorer-methods).
+
+Requests take an `HttpTransport`:
 
 ```ts
-const subscription = await client.allMids((data) => {
-  console.log(data.mids);
-});
+import { ExplorerClient, HttpTransport } from "@nktkas/hyperliquid";
 
-subscription.failureSignal.addEventListener("abort", () => {
-  console.error("Resubscription failed:", subscription.failureSignal.reason);
-  // Create a new subscription or explore the error...
+const transport = new HttpTransport();
+const client = new ExplorerClient({ transport });
+
+const block = await client.blockDetails({ height: 123 });
+```
+
+Subscriptions take a [`WebSocketTransport`](transports.md#websocket) pointed at the RPC WebSocket URL:
+
+```ts
+import { ExplorerClient, WebSocketTransport } from "@nktkas/hyperliquid";
+
+const transport = new WebSocketTransport({ url: "wss://rpc.hyperliquid.xyz/ws" });
+const client = new ExplorerClient({ transport });
+
+const sub = await client.explorerBlock((data) => {
+  console.log(data);
 });
 ```
 
@@ -310,16 +322,17 @@ subscription.failureSignal.addEventListener("abort", () => {
 
 ### Cancellation
 
-`InfoClient` methods accept an optional [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) as
-the last argument:
+Request methods of [`InfoClient`](#info-endpoint) and [`ExplorerClient`](#explorer-endpoint) accept an optional
+[`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) as the last argument:
 
 ```ts
 const controller = new AbortController();
 const mids = await client.allMids(controller.signal);
 ```
 
-`ExchangeClient` methods accept it inside the options object (also last argument). Unlike [Expiration](#expiration),
-which is a server-side guard, cancellation aborts the request on the client side before or during delivery:
+---
+
+[`ExchangeClient`](#exchange-endpoint) methods accept it inside the options object (last argument):
 
 ```ts
 const controller = new AbortController();
@@ -327,3 +340,6 @@ await client.order({ orders: [/* ... */], grouping: "na" }, {
   signal: controller.signal,
 });
 ```
+
+Unlike [`Expiration`](#expiration), which is a server-side guard, cancellation aborts the request on the client side
+before or during delivery.
