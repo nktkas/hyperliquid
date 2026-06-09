@@ -44,6 +44,7 @@ export type ValidatorL1VotesResponse = {
     } | {
       settleOutcome: {
         outcome: number;
+        /** @pattern ^[0-9]+(\.[0-9]+)?$ */
         settleFraction: string;
         details: string;
       };

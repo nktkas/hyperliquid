@@ -29,6 +29,7 @@ runTest({
       "#/items/properties/tif/enum/4",
       "#/items/properties/tif/enum/5",
       "#/items/properties/cloid/defined",
+      "#/items/properties/children/*",
     ]);
   },
 });

@@ -57,9 +57,17 @@ export type BorrowLendUserStateResponse = {
       };
     },
   ][];
-  /** Account health status. */
-  health: "healthy"; // FIXME: Presumably there are other literals
-  /** Health factor. */
+  /**
+   * Account health status.
+   *
+   * FIXME: other literals may exist (unconfirmed).
+   */
+  health: "healthy";
+  /**
+   * Health factor.
+   *
+   * FIXME: non-null value not found (unconfirmed).
+   */
   healthFactor: null;
 };
 

@@ -38,6 +38,7 @@ runTest({
       "#/properties/perpsAtOpenInterestCap/present",
       "#/properties/agentAddress/defined",
       "#/properties/agentValidUntil/defined",
+      "#/properties/openOrders/items/properties/children/*",
     ]);
   },
 });

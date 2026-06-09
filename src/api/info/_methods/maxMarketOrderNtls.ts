@@ -17,10 +17,18 @@ export const MaxMarketOrderNtlsRequest = /* @__PURE__ */ (() => {
 export type MaxMarketOrderNtlsRequest = v.InferOutput<typeof MaxMarketOrderNtlsRequest>;
 
 /**
- * Array of tuples containing maximum market order notionals and their corresponding asset symbols.
+ * Array of tuples of maximum leverage and its corresponding maximum market order notional.
  * @see null
  */
-export type MaxMarketOrderNtlsResponse = [notional: number, symbol: string][];
+export type MaxMarketOrderNtlsResponse = [
+  /** Maximum leverage. */
+  maxLeverage: number,
+  /**
+   * Maximum market order notional.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  maxMarketOrderNtl: string,
+][];
 
 // ============================================================
 // Execution Logic

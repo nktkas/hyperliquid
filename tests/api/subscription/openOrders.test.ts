@@ -36,6 +36,7 @@ runTest({
       "#/properties/orders/items/properties/tif/enum/4",
       "#/properties/orders/items/properties/tif/enum/5",
       "#/properties/orders/items/properties/cloid/defined",
+      "#/properties/orders/items/properties/children/*",
     ]);
   },
 });

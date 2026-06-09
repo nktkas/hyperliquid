@@ -24,7 +24,7 @@ export type ExchangeStatusResponse = {
   /** Server time (in ms since epoch). */
   time: number;
   /** Special statuses of the exchange system. */
-  specialStatuses: unknown | null;
+  specialStatuses: string | null;
 };
 
 // ============================================================

@@ -101,14 +101,19 @@ export interface CoverageIssue {
   message: string;
 }
 
+/** Matches coverage paths against ignore patterns, where `*` matches any characters (including `/`). */
+interface IgnoreMatcher {
+  has(path: string): boolean;
+}
+
 /** Internal context threaded through recursive coverage checking. */
 interface CoverageContext {
   /** Ajv instance for branch matching validation. */
   ajv: InstanceType<typeof Ajv.default>;
   /** Top-level definitions for $ref resolution. */
   defs?: Record<string, JsonSchema>;
-  /** Set of paths to skip during coverage checking. */
-  ignorePaths: Set<string>;
+  /** Matcher for paths to skip during coverage checking. */
+  ignorePaths: IgnoreMatcher;
   /** Cache of compiled Ajv validators keyed by original schema object. */
   validatorCache: Map<JsonSchema, (data: unknown) => boolean>;
 }
@@ -141,7 +146,7 @@ export class SchemaCoverageError extends Error {
  *
  * @param schema The JSON Schema to validate against
  * @param samples Array of data samples to check
- * @param ignorePaths Paths to skip during coverage checking
+ * @param ignorePaths Paths to skip during coverage checking (supports `*` wildcard, which matches any characters)
  *
  * @throws {Error} If samples are empty or fail schema validation
  * @throws {SchemaCoverageError} If coverage issues are found
@@ -173,7 +178,7 @@ export function schemaCoverage(
   const ctx: CoverageContext = {
     ajv,
     defs: schema["definitions"] as Record<string, JsonSchema> | undefined,
-    ignorePaths: new Set(ignorePaths),
+    ignorePaths: createIgnoreMatcher(ignorePaths),
     validatorCache: new Map(),
   };
 
@@ -615,6 +620,26 @@ function handleIfThenElse(
 // ============================================================
 // Utilities
 // ============================================================
+
+/**
+ * Builds an {@link IgnoreMatcher} from ignore patterns.
+ * Patterns without `*` are matched exactly; patterns with `*` match any characters (including `/`).
+ */
+function createIgnoreMatcher(patterns: string[]): IgnoreMatcher {
+  const exact = new Set<string>();
+  const wildcards: RegExp[] = [];
+  for (const pattern of patterns) {
+    if (pattern.includes("*")) {
+      const source = pattern.split("*").map((part) => part.replace(/[.+?^${}()|[\]\\]/g, "\\$&")).join(".*");
+      wildcards.push(new RegExp(`^${source}$`));
+    } else {
+      exact.add(pattern);
+    }
+  }
+  return {
+    has: (path: string): boolean => exact.has(path) || wildcards.some((re) => re.test(path)),
+  };
+}
 
 /**
  * Filters AJV errors to reduce noise from anyOf/oneOf branches.

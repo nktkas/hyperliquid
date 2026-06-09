@@ -27,34 +27,36 @@ export type BboEvent = {
   coin: string;
   /** Time of the BBO update (in ms since epoch). */
   time: number;
-  /** Best bid and offer tuple [bid, offer], either can be undefined if unavailable. */
-  bbo: [{
-    /**
-     * Price.
-     * @pattern ^[0-9]+(\.[0-9]+)?$
-     */
-    px: string;
-    /**
-     * Total size.
-     * @pattern ^[0-9]+(\.[0-9]+)?$
-     */
-    sz: string;
-    /** Number of individual orders. */
-    n: number;
-  }, {
-    /**
-     * Price.
-     * @pattern ^[0-9]+(\.[0-9]+)?$
-     */
-    px: string;
-    /**
-     * Total size.
-     * @pattern ^[0-9]+(\.[0-9]+)?$
-     */
-    sz: string;
-    /** Number of individual orders. */
-    n: number;
-  }];
+  bbo: [
+    bid: {
+      /**
+       * Price.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      px: string;
+      /**
+       * Total size.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      sz: string;
+      /** Number of individual orders. */
+      n: number;
+    } | null,
+    offer: {
+      /**
+       * Price.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      px: string;
+      /**
+       * Total size.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
+      sz: string;
+      /** Number of individual orders. */
+      n: number;
+    } | null,
+  ];
 };
 
 // ============================================================

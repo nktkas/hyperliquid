@@ -11,7 +11,7 @@ const paramsSchema = valibotToJsonSchema(v.omit(AlignedQuoteTokenInfoRequest, ["
 
 runTest({
   name: "alignedQuoteTokenInfo",
-  // FIXME: API returns 422 error, but the official documentation still lists this API
+  // FIXME: API returns 422 error, but the official documentation still lists this API.
   ignore: true,
   codeTestFn: async (_t, client) => {
     const params: AlignedQuoteTokenInfoParameters[] = [

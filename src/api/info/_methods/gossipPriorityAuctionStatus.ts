@@ -29,7 +29,7 @@ export type GossipPriorityAuctionStatusRequest = v.InferOutput<typeof GossipPrio
  */
 export type GossipPriorityAuctionStatusResponse = [
   /** Previous auction winner IPs per slot, or `null` if no previous winner. */
-  (string | null)[],
+  (`${number}.${number}.${number}.${number}` | null)[],
   /** Current auction statuses per slot. */
   PerpDeployAuctionStatusResponse[],
 ];

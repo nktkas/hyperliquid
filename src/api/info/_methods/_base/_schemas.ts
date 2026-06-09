@@ -45,11 +45,15 @@ export type PerpAssetCtx = {
    * @pattern ^[0-9]+(\.[0-9]+)?$
    */
   oraclePx: string;
-  /**
-   * Array of impact prices.
-   * @pattern ^[0-9]+(\.[0-9]+)?$
-   */
-  impactPxs: string[] | null;
+  /** Impact prices [bid, ask]. */
+  impactPxs:
+    | [
+      /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+      bid: string,
+      /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+      ask: string,
+    ]
+    | null;
   /**
    * Daily volume in base currency.
    * @pattern ^[0-9]+(\.[0-9]+)?$
@@ -133,7 +137,7 @@ export type FrontendOpenOrder = {
    */
   triggerPx: string;
   /** Child orders associated with this order. */
-  children: unknown[];
+  children: FrontendOpenOrder[];
   /** Indicates if the order is a position TP/SL order. */
   isPositionTpsl: boolean;
   /** Indicates whether the order is reduce-only. */

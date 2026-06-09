@@ -28,11 +28,11 @@ export type SpotClearinghouseStateRequest = v.InferOutput<typeof SpotClearinghou
  */
 export type SpotClearinghouseStateResponse = {
   /** Array of available token balances. */
-  balances: {
+  balances: ({
     /** Asset symbol. */
     coin: string;
-    /** Unique identifier for the token (undefined for outcome markets). */
-    token?: number;
+    /** Unique identifier for the token. */
+    token: number;
     /**
      * Total balance.
      * @pattern ^[0-9]+(\.[0-9]+)?$
@@ -48,7 +48,25 @@ export type SpotClearinghouseStateResponse = {
      * @pattern ^[0-9]+(\.[0-9]+)?$
      */
     entryNtl: string;
-  }[];
+  } | {
+    /** Outcome market identifier ("+" followed by `assetId - 100000000`). */
+    coin: `+${number}`;
+    /**
+     * Total balance.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    total: string;
+    /**
+     * Amount on hold.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    hold: string;
+    /**
+     * Entry notional value.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    entryNtl: string;
+  })[];
   /** Array of escrowed balances. */
   evmEscrows?: {
     /** Asset symbol. */

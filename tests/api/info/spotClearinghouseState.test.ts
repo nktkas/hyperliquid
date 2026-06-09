@@ -22,7 +22,7 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data, [
-      "#/properties/balances/items/properties/token/missing",
+      "#/properties/balances/items/anyOf/1",
     ]);
   },
 });
