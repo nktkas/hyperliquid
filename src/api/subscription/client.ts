@@ -988,6 +988,8 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to comprehensive user and market data updates.
    *
+   * @deprecated use {@linkcode webData3} and other component subscriptions instead.
+   *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
    * @param onError An optional callback function to be called when the subscription fails.

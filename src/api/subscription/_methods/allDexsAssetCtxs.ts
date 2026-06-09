@@ -24,7 +24,12 @@ export type AllDexsAssetCtxsRequest = v.InferOutput<typeof AllDexsAssetCtxsReque
  */
 export type AllDexsAssetCtxsEvent = {
   /** Array of tuples of dex names and contexts for each perpetual asset. */
-  ctxs: [dex: string, ctx: PerpAssetCtx[]][];
+  ctxs: [
+    /** DEX name (empty string for main dex). */
+    dex: string,
+    /** Asset contexts. */
+    ctx: PerpAssetCtx[],
+  ][];
 };
 
 // ============================================================

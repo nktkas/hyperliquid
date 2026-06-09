@@ -27,7 +27,9 @@ export type BboEvent = {
   coin: string;
   /** Time of the BBO update (in ms since epoch). */
   time: number;
+  /** Best bid and offer. */
   bbo: [
+    /** Best bid. */
     bid: {
       /**
        * Price.
@@ -42,6 +44,7 @@ export type BboEvent = {
       /** Number of individual orders. */
       n: number;
     } | null,
+    /** Best offer. */
     offer: {
       /**
        * Price.

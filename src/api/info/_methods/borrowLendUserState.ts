@@ -27,7 +27,9 @@ export type BorrowLendUserStateRequest = v.InferOutput<typeof BorrowLendUserStat
 export type BorrowLendUserStateResponse = {
   /** Array of tuples of token IDs and their borrow/lend state. */
   tokenToState: [
+    /** Token identifier. */
     tokenId: number,
+    /** Borrow/lend state. */
     state: {
       /** Borrow state for the token. */
       borrow: {

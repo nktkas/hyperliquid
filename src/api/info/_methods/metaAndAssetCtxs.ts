@@ -25,7 +25,12 @@ export type MetaAndAssetCtxsRequest = v.InferOutput<typeof MetaAndAssetCtxsReque
  * Tuple containing metadata and array of asset contexts.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-asset-contexts-includes-mark-price-current-funding-open-interest-etc
  */
-export type MetaAndAssetCtxsResponse = [meta: MetaResponse, assetCtxs: PerpAssetCtx[]];
+export type MetaAndAssetCtxsResponse = [
+  /** Trading metadata. */
+  meta: MetaResponse,
+  /** Asset contexts. */
+  assetCtxs: PerpAssetCtx[],
+];
 
 // ============================================================
 // Execution Logic

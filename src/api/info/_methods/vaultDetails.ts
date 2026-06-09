@@ -71,9 +71,9 @@ export type VaultDetailsResponse = {
     allTimePnl: string;
     /** Subscription duration in days. */
     daysFollowing: number;
-    /** Vault entry timestamp. */
+    /** Vault entry timestamp (in ms since epoch). */
     vaultEntryTime: number;
-    /** Timestamp when funds become unlocked. */
+    /** Timestamp when funds become unlocked (in ms since epoch). */
     lockupUntil: number;
   } | null;
   /** Ownership percentage held by leader. */
@@ -104,9 +104,9 @@ export type VaultDetailsResponse = {
     allTimePnl: string;
     /** Subscription duration in days. */
     daysFollowing: number;
-    /** Vault entry timestamp. */
+    /** Vault entry timestamp (in ms since epoch). */
     vaultEntryTime: number;
-    /** Timestamp when funds become unlocked. */
+    /** Timestamp when funds become unlocked (in ms since epoch). */
     lockupUntil: number;
   }[];
   /** Maximum distributable amount. */

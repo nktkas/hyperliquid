@@ -31,7 +31,7 @@ export type UserBorrowLendInterestRequest = v.InferOutput<typeof UserBorrowLendI
 export type UserBorrowLendInterestResponse = {
   /** Timestamp of the update (in ms since epoch). */
   time: number;
-  /** Token symbol. */
+  /** Token symbol (e.g., USDC). */
   token: string;
   /**
    * Borrow interest amount.

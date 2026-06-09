@@ -7,7 +7,7 @@ import * as v from "@valibot/valibot";
 import type { MetaResponse } from "./meta.ts";
 
 /**
- * Request trading metadata for all DEXes.
+ * Request trading metadata for all DEXs.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-all-perpetuals-metadata-universe-and-margin-tables
  */
 export const AllPerpMetasRequest = /* @__PURE__ */ (() => {
@@ -19,7 +19,7 @@ export const AllPerpMetasRequest = /* @__PURE__ */ (() => {
 export type AllPerpMetasRequest = v.InferOutput<typeof AllPerpMetasRequest>;
 
 /**
- * Metadata for perpetual assets across all DEXes.
+ * Metadata for perpetual assets across all DEXs.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-all-perpetuals-metadata-universe-and-margin-tables
  */
 export type AllPerpMetasResponse = MetaResponse[];
@@ -32,11 +32,11 @@ import { parse } from "../../../_base.ts";
 import type { InfoConfig } from "./_base/mod.ts";
 
 /**
- * Request trading metadata for all DEXes.
+ * Request trading metadata for all DEXs.
  *
  * @param config General configuration for Info API requests.
  * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
- * @return Metadata for perpetual assets across all DEXes.
+ * @return Metadata for perpetual assets across all DEXs.
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.

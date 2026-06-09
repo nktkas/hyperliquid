@@ -65,15 +65,25 @@ export type SpotDeployStateResponse = {
     totalGenesisBalanceWei: string;
     /** User genesis balances for the token. */
     userGenesisBalances: [
-      /** @pattern ^0x[a-fA-F0-9]{40}$ */
+      /**
+       * User address.
+       * @pattern ^0x[a-fA-F0-9]{40}$
+       */
       address: `0x${string}`,
-      /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+      /**
+       * Balance.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
       balance: string,
     ][];
     /** Existing token genesis balances for the token. */
     existingTokenGenesisBalances: [
+      /** Token identifier. */
       token: number,
-      /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+      /**
+       * Balance.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
       balance: string,
     ][];
     /**

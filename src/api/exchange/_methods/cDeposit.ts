@@ -18,7 +18,7 @@ export const CDepositRequest = /* @__PURE__ */ (() => {
       type: v.literal("cDeposit"),
       /** Chain ID in hex format for EIP-712 signing. */
       signatureChainId: Hex,
-      /** HyperLiquid network type. */
+      /** Hyperliquid network type. */
       hyperliquidChain: v.picklist(["Mainnet", "Testnet"]),
       /** Amount of wei to deposit into staking balance (float * 1e8). */
       wei: v.pipe(UnsignedInteger, v.minValue(1)),

@@ -41,6 +41,8 @@ export type WebData2Parameters = Omit<v.InferInput<typeof WebData2Request>, "typ
 /**
  * Subscribe to comprehensive user and market data updates.
  *
+ * @deprecated use {@linkcode webData3} and other component subscriptions instead.
+ *
  * @param config General configuration for Subscription API subscriptions.
  * @param params Parameters specific to the API subscription.
  * @param listener A callback function to be called when the event is received.

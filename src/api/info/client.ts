@@ -365,10 +365,10 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
   }
 
   /**
-   * Request trading metadata for all DEXes.
+   * Request trading metadata for all DEXs.
    *
    * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   * @return Metadata for perpetual assets across all DEXes.
+   * @return Metadata for perpetual assets across all DEXs.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
@@ -2432,6 +2432,8 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
 
   /**
    * Request comprehensive user and market data.
+   *
+   * @deprecated use `webData3` and other component subscriptions instead.
    *
    * @param params Parameters specific to the API request.
    * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.

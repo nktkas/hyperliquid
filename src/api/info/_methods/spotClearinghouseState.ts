@@ -29,7 +29,7 @@ export type SpotClearinghouseStateRequest = v.InferOutput<typeof SpotClearinghou
 export type SpotClearinghouseStateResponse = {
   /** Array of available token balances. */
   balances: ({
-    /** Asset symbol. */
+    /** Asset symbol (e.g., USDC). */
     coin: string;
     /** Unique identifier for the token. */
     token: number;
@@ -69,7 +69,7 @@ export type SpotClearinghouseStateResponse = {
   })[];
   /** Array of escrowed balances. */
   evmEscrows?: {
-    /** Asset symbol. */
+    /** Asset symbol (e.g., USDC). */
     coin: string;
     /** Unique identifier for the token. */
     token: number;

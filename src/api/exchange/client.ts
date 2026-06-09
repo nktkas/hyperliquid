@@ -399,6 +399,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    *
    * Signing: L1 Action.
    *
+   * @deprecated use {@linkcode agentSetAbstraction} instead.
+   *
    * @param opts Request execution options.
    * @return Successful response without specific data.
    *
@@ -419,8 +421,6 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction-agent
-   *
-   * @deprecated Use {@link agentSetAbstraction} instead.
    */
   agentEnableDexAbstraction(
     opts?: AgentEnableDexAbstractionOptions,
@@ -471,7 +471,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   }
 
   /**
-   * Set User abstraction mode (method for agent wallet).
+   * Set user abstraction mode (method for agent wallet).
    *
    * Like {@link userSetAbstraction} but signed as an L1 action by the agent wallet (instead of EIP-712 by the principal).
    *
@@ -1790,7 +1790,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   }
 
   /**
-   * Opt Out of Spot Dusting.
+   * Opt out of spot dusting.
    *
    * Signing: L1 Action.
    *
@@ -2188,7 +2188,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   }
 
   /**
-   * Transfer funds between Spot account and Perp account.
+   * Transfer funds between spot account and perp account.
    *
    * Signing: User-Signed EIP-712.
    *
@@ -2222,7 +2222,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
   }
 
   /**
-   * Send usd to another address.
+   * Send USD to another address.
    *
    * Signing: User-Signed EIP-712.
    *
@@ -2260,6 +2260,8 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    *
    * Signing: User-Signed EIP-712.
    *
+   * @deprecated use {@linkcode userSetAbstraction} instead.
+   *
    * @param params Parameters specific to the API request.
    * @param opts Request execution options.
    * @return Successful response without specific data.
@@ -2281,8 +2283,6 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction
-   *
-   * @deprecated Use {@link userSetAbstraction} instead.
    */
   userDexAbstraction(
     params: UserDexAbstractionParameters,

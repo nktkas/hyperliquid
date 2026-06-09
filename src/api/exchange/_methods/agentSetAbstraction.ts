@@ -7,7 +7,7 @@ import * as v from "@valibot/valibot";
 import { Hex, UnsignedInteger } from "../../_schemas.ts";
 
 /**
- * Set User abstraction mode (method for agent wallet).
+ * Set user abstraction mode (method for agent wallet).
  *
  * Like {@link userSetAbstraction} but signed as an L1 action by the agent wallet (instead of EIP-712 by the principal).
  *
@@ -95,7 +95,7 @@ export type AgentSetAbstractionOptions = ExtractRequestOptions<
 export type AgentSetAbstractionSuccessResponse = ExcludeErrorResponse<AgentSetAbstractionResponse>;
 
 /**
- * Set User abstraction mode (method for agent wallet).
+ * Set user abstraction mode (method for agent wallet).
  *
  * Like {@link userSetAbstraction} but signed as an L1 action by the agent wallet (instead of EIP-712 by the principal).
  *

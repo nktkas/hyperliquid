@@ -47,7 +47,12 @@ export type MetaResponse = {
     lastGrowthModeChangeTime?: string;
   }[];
   /** Margin requirement tables for different leverage tiers. */
-  marginTables: [id: number, table: MarginTableResponse][];
+  marginTables: [
+    /** Margin requirements table ID. */
+    id: number,
+    /** Margin requirements table. */
+    table: MarginTableResponse,
+  ][];
   /** Collateral token index. */
   collateralToken: number;
 };

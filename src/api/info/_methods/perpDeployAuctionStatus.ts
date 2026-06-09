@@ -38,7 +38,7 @@ export type PerpDeployAuctionStatusResponse = {
    * @pattern ^[0-9]+(\.[0-9]+)?$
    */
   startGas: string;
-  /** Auction start time (seconds since epoch). */
+  /** Auction start time (in seconds since epoch). */
   startTimeSeconds: number;
 };
 

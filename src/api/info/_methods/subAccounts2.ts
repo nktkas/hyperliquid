@@ -40,7 +40,12 @@ export type SubAccounts2Response = {
    */
   master: `0x${string}`;
   /** DEX to clearinghouse state mapping. Always includes the main DEX (empty dex name). */
-  dexToClearinghouseState: [dex: string, state: ClearinghouseStateResponse][];
+  dexToClearinghouseState: [
+    /** DEX name (empty string for main dex). */
+    dex: string,
+    /** Clearinghouse state. */
+    state: ClearinghouseStateResponse,
+  ][];
   /** Spot tokens clearinghouse state. */
   spotState: SpotClearinghouseStateResponse;
 }[] | null;

@@ -29,7 +29,7 @@ export type FundingHistoryRequest = v.InferOutput<typeof FundingHistoryRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-historical-funding-rates
  */
 export type FundingHistoryResponse = {
-  /** Asset symbol. */
+  /** Asset symbol (e.g., BTC). */
   coin: string;
   /**
    * Funding rate.
@@ -41,7 +41,7 @@ export type FundingHistoryResponse = {
    * @pattern ^-?[0-9]+(\.[0-9]+)?$
    */
   premium: string;
-  /** Funding record timestamp (ms since epoch). */
+  /** Funding record timestamp (in ms since epoch). */
   time: number;
 }[];
 

@@ -36,7 +36,12 @@ export type TwapStatesEvent = {
    */
   user: `0x${string}`;
   /** Array of tuples of TWAP ID and TWAP state. */
-  states: [twapId: number, state: TwapState][];
+  states: [
+    /** ID of the TWAP. */
+    twapId: number,
+    /** TWAP order state. */
+    state: TwapState,
+  ][];
 };
 
 // ============================================================

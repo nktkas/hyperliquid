@@ -18,7 +18,7 @@ export const LinkStakingUserRequest = /* @__PURE__ */ (() => {
       type: v.literal("linkStakingUser"),
       /** Chain ID in hex format for EIP-712 signing. */
       signatureChainId: Hex,
-      /** HyperLiquid network type. */
+      /** Hyperliquid network type. */
       hyperliquidChain: v.picklist(["Mainnet", "Testnet"]),
       /**
        * Target account address.

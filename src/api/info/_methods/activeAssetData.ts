@@ -53,16 +53,28 @@ export type ActiveAssetDataResponse = {
   };
   /** Maximum trade size range [min, max]. */
   maxTradeSzs: [
-    /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+    /**
+     * Minimum trade size.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     min: string,
-    /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+    /**
+     * Maximum trade size.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     max: string,
   ];
   /** Available to trade range [min, max]. */
   availableToTrade: [
-    /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+    /**
+     * Minimum available to trade.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     min: string,
-    /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+    /**
+     * Maximum available to trade.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     max: string,
   ];
   /**

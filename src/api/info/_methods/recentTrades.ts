@@ -48,9 +48,15 @@ export type RecentTradesResponse = {
   tid: number;
   /** Addresses of users involved in the trade [Maker, Taker]. */
   users: [
-    /** @pattern ^0x[a-fA-F0-9]{40}$ */
+    /**
+     * Maker address.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
     maker: `0x${string}`,
-    /** @pattern ^0x[a-fA-F0-9]{40}$ */
+    /**
+     * Taker address.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
     taker: `0x${string}`,
   ];
 }[];

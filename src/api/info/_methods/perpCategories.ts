@@ -21,7 +21,7 @@ export type PerpCategoriesRequest = v.InferOutput<typeof PerpCategoriesRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perp-categories
  */
 export type PerpCategoriesResponse = [
-  /** Coin symbol. */
+  /** Asset symbol (e.g., BTC). */
   coin: string,
   /** Category name. */
   category: string,

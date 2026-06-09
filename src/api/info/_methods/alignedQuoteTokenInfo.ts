@@ -38,7 +38,10 @@ export type AlignedQuoteTokenInfoResponse = {
   dailyAmountOwed: [
     /** Date in YYYY-MM-DD format. */
     date: string,
-    /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+    /**
+     * Amount owed.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     amount: string,
   ][];
   /**

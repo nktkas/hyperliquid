@@ -31,7 +31,7 @@ export type TwapHistoryResponse = {
   /** State of the TWAP order. */
   state: TwapState;
   /**
-   * Current status of the TWAP order.
+   * Current status of the TWAP order:
    * - `"finished"`: Fully executed.
    * - `"activated"`: Active and executing.
    * - `"terminated"`: Terminated.

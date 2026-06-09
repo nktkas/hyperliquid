@@ -35,7 +35,7 @@ export type UserVaultEquitiesResponse = {
    * @pattern ^[0-9]+(\.[0-9]+)?$
    */
   equity: string;
-  /** Timestamp when the user can withdraw their equity. */
+  /** Timestamp when the user can withdraw their equity (in ms since epoch). */
   lockedUntilTimestamp: number;
 }[];
 

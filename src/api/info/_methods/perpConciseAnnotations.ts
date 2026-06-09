@@ -21,7 +21,7 @@ export type PerpConciseAnnotationsRequest = v.InferOutput<typeof PerpConciseAnno
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-concise-perp-annotations
  */
 export type PerpConciseAnnotationsResponse = [
-  /** Coin symbol. */
+  /** Asset symbol (e.g., BTC). */
   coin: string,
   /** Concise annotation. */
   annotation: {

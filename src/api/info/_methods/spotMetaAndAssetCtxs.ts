@@ -23,7 +23,12 @@ export type SpotMetaAndAssetCtxsRequest = v.InferOutput<typeof SpotMetaAndAssetC
  * Tuple of spot metadata and asset contexts.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-asset-contexts
  */
-export type SpotMetaAndAssetCtxsResponse = [meta: SpotMetaResponse, assetCtxs: SpotAssetCtx[]];
+export type SpotMetaAndAssetCtxsResponse = [
+  /** Spot metadata. */
+  meta: SpotMetaResponse,
+  /** Asset contexts. */
+  assetCtxs: SpotAssetCtx[],
+];
 
 // ============================================================
 // Execution Logic

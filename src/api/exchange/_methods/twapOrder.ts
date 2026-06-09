@@ -24,7 +24,7 @@ export const TwapOrderRequest = /* @__PURE__ */ (() => {
         b: v.boolean(),
         /** Size (in base currency units). */
         s: UnsignedDecimal,
-        /** Is reduce-only? */
+        /** Whether the order is reduce-only. */
         r: v.boolean(),
         /** TWAP duration in minutes. */
         m: v.pipe(UnsignedInteger, v.minValue(5), v.maxValue(1440)),

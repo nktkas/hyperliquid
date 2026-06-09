@@ -40,8 +40,12 @@ export type PerpDexLimitsResponse = {
   maxTransferNtl: string;
   /** Coin to open interest cap mapping. */
   coinToOiCap: [
+    /** Asset symbol (e.g., xyz:AAPL). */
     coin: string,
-    /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+    /**
+     * Open interest cap.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
     oiCap: string,
   ][];
 } | null;

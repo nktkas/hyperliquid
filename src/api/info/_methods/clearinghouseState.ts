@@ -89,7 +89,7 @@ export type ClearinghouseStateResponse = {
     type: "oneWay";
     /** Position details. */
     position: {
-      /** Asset symbol. */
+      /** Asset symbol (e.g., BTC). */
       coin: string;
       /**
        * Signed position size.

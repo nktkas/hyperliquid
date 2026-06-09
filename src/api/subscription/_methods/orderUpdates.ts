@@ -29,7 +29,7 @@ export type OrderUpdatesEvent = {
   /** Order details. */
   order: OpenOrder;
   /**
-   * Order processing status.
+   * Order processing status:
    * - `"open"`: Order active and waiting to be filled.
    * - `"filled"`: Order fully executed.
    * - `"canceled"`: Order canceled by the user.

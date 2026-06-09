@@ -48,9 +48,15 @@ export type PerpAssetCtx = {
   /** Impact prices [bid, ask]. */
   impactPxs:
     | [
-      /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+      /**
+       * Impact bid price.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
       bid: string,
-      /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+      /**
+       * Impact ask price.
+       * @pattern ^[0-9]+(\.[0-9]+)?$
+       */
       ask: string,
     ]
     | null;
@@ -88,7 +94,7 @@ export type SpotAssetCtx = {
    * @pattern ^[0-9]+(\.[0-9]+)?$
    */
   circulatingSupply: string;
-  /** Asset symbol. */
+  /** Asset symbol (e.g., BTC). */
   coin: string;
   /**
    * Total supply.
@@ -104,7 +110,7 @@ export type SpotAssetCtx = {
 
 /** Open order with additional display information. */
 export type FrontendOpenOrder = {
-  /** Asset symbol. */
+  /** Asset symbol (e.g., BTC). */
   coin: string;
   /** Order side ("B" = Bid/Buy, "A" = Ask/Sell). */
   side: "B" | "A";
@@ -143,7 +149,7 @@ export type FrontendOpenOrder = {
   /** Indicates whether the order is reduce-only. */
   reduceOnly: boolean;
   /**
-   * Order type for market execution.
+   * Order type for market execution:
    * - `"Market"`: Executes immediately at the market price.
    * - `"Limit"`: Executes at the specified limit price or better.
    * - `"Stop Market"`: Activates as a market order when a stop price is reached.
@@ -183,7 +189,7 @@ export type FrontendOpenOrder = {
 
 /** Open order. */
 export type OpenOrder = {
-  /** Asset symbol. */
+  /** Asset symbol (e.g., BTC). */
   coin: string;
   /** Order side ("B" = Bid/Buy, "A" = Ask/Sell). */
   side: "B" | "A";
@@ -217,7 +223,7 @@ export type OpenOrder = {
 
 /** TWAP order state. */
 export type TwapState = {
-  /** Asset symbol. */
+  /** Asset symbol (e.g., BTC). */
   coin: string;
   /**
    * Executed notional value.
@@ -270,7 +276,7 @@ export type VaultRelationship = {
 
 /** User fill. */
 export type UserFill = {
-  /** Asset symbol. */
+  /** Asset symbol (e.g., BTC). */
   coin: string;
   /**
    * Price.
@@ -319,7 +325,7 @@ export type UserFill = {
   builderFee?: string;
   /** Unique transaction identifier for a partial fill of an order. */
   tid: number;
-  /** Token in which the fee is denominated (e.g., "USDC"). */
+  /** Token in which the fee is denominated (e.g., USDC). */
   feeToken: string;
   /** ID of the TWAP. */
   twapId: number | null;

@@ -42,12 +42,17 @@ type L2BookLevel = {
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
  */
 export type L2BookEvent = {
-  /** Asset symbol. */
+  /** Asset symbol (e.g., BTC). */
   coin: string;
   /** Timestamp of the snapshot (in ms since epoch). */
   time: number;
   /** Bid and ask levels (index 0 = bids, index 1 = asks). */
-  levels: [bids: L2BookLevel[], asks: L2BookLevel[]];
+  levels: [
+    /** Bid levels. */
+    bids: L2BookLevel[],
+    /** Ask levels. */
+    asks: L2BookLevel[],
+  ];
   /**
    * Spread (only present when `nSigFigs` is non-null).
    * @pattern ^[0-9]+(\.[0-9]+)?$

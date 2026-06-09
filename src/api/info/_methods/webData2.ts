@@ -48,7 +48,7 @@ export type WebData2Response = {
    * @pattern ^0x[a-fA-F0-9]{40}$
    */
   agentAddress: `0x${string}` | null;
-  /** Timestamp until which the agent is valid. */
+  /** Timestamp until which the agent is valid (in ms since epoch). */
   agentValidUntil: number | null;
   /**
    * Cumulative ledger value.
@@ -69,7 +69,12 @@ export type WebData2Response = {
    */
   user: `0x${string}`;
   /** Array of tuples containing TWAP order ID and its state. */
-  twapStates: [id: number, state: TwapState][];
+  twapStates: [
+    /** ID of the TWAP. */
+    id: number,
+    /** TWAP order state. */
+    state: TwapState,
+  ][];
   /** Account summary for spot trading. */
   spotState?: SpotClearinghouseStateResponse;
   /** Asset context for each spot asset. */
@@ -92,6 +97,8 @@ export type WebData2Parameters = Omit<v.InferInput<typeof WebData2Request>, "typ
 
 /**
  * Request comprehensive user and market data.
+ *
+ * @deprecated use `webData3` and other component subscriptions instead.
  *
  * @param config General configuration for Info API requests.
  * @param params Parameters specific to the API request.

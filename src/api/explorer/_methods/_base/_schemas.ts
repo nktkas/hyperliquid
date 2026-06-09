@@ -9,6 +9,7 @@ export type ExplorerTransaction = {
   action: {
     /** Action type. */
     type: string;
+    /** Additional action-specific fields. */
     [key: string]: unknown;
   };
   /** Block number where transaction was included. */

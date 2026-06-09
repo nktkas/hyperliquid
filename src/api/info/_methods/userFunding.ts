@@ -40,7 +40,7 @@ export type UserFundingResponse = {
   delta: {
     /** Update type. */
     type: "funding";
-    /** Asset symbol. */
+    /** Asset symbol (e.g., BTC). */
     coin: string;
     /**
      * Amount transferred in USDC.

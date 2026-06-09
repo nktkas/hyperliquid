@@ -35,7 +35,7 @@ export const BatchModifyRequest = /* @__PURE__ */ (() => {
             ),
             /** Size (in base currency units). */
             s: UnsignedDecimal,
-            /** Is reduce-only? */
+            /** Whether the order is reduce-only. */
             r: v.boolean(),
             /** Order type (`limit` for limit orders, `trigger` for stop-loss/take-profit orders). */
             t: v.union([
@@ -55,7 +55,7 @@ export const BatchModifyRequest = /* @__PURE__ */ (() => {
               v.object({
                 /** Trigger order parameters. */
                 trigger: v.object({
-                  /** Is market order? */
+                  /** Whether the order is a market order. */
                   isMarket: v.boolean(),
                   /** Trigger price. */
                   triggerPx: v.pipe(

@@ -12,7 +12,7 @@ export const PerpAnnotationRequest = /* @__PURE__ */ (() => {
   return v.object({
     /** Type of request. */
     type: v.literal("perpAnnotation"),
-    /** Coin symbol for the perpetual asset. */
+    /** Asset symbol (e.g., BTC). */
     coin: v.string(),
   });
 })();

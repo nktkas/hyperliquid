@@ -18,7 +18,7 @@ export const SendToEvmWithDataRequest = /* @__PURE__ */ (() => {
       type: v.literal("sendToEvmWithData"),
       /** Chain ID in hex format for EIP-712 signing. */
       signatureChainId: Hex,
-      /** HyperLiquid network type. */
+      /** Hyperliquid network type. */
       hyperliquidChain: v.picklist(["Mainnet", "Testnet"]),
       /** Token identifier (e.g., "USDC"). */
       token: v.string(),

@@ -91,7 +91,9 @@ export type ReferralResponse = {
         user: `0x${string}`;
         /** Mapping of token IDs to referral reward states. */
         tokenToState: [
+          /** Token identifier. */
           tokenId: number,
+          /** Referral reward state. */
           state: {
             /**
              * Cumulative traded volume.
@@ -149,7 +151,9 @@ export type ReferralResponse = {
   }[];
   /** Mapping of token IDs to referral reward states. */
   tokenToState: [
+    /** Token identifier. */
     tokenId: number,
+    /** Referral reward state. */
     state: {
       /**
        * Cumulative traded volume.

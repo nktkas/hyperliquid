@@ -34,7 +34,7 @@ export type UserFundingsEvent = {
   fundings: {
     /** Timestamp of the update (in ms since epoch). */
     time: number;
-    /** Asset symbol. */
+    /** Asset symbol (e.g., BTC). */
     coin: string;
     /**
      * Amount transferred in USDC.

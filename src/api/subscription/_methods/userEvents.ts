@@ -35,7 +35,7 @@ export type UserEventsEvent =
   | {
     /** Funding update details. */
     funding: {
-      /** Asset symbol. */
+      /** Asset symbol (e.g., BTC). */
       coin: string;
       /**
        * Amount transferred in USDC.

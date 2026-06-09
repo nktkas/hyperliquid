@@ -34,7 +34,7 @@ export type WebData3Event = {
      * @pattern ^0x[a-fA-F0-9]{40}$
      */
     agentAddress: `0x${string}` | null;
-    /** Timestamp until which the agent is valid. */
+    /** Timestamp until which the agent is valid (in ms since epoch). */
     agentValidUntil: number | null;
     /**
      * Cumulative ledger value.

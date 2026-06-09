@@ -38,7 +38,11 @@ export type LiquidatableResponse = {
       asset: number;
     };
   };
-  /** Available margin. */
+  /**
+   * Available margin.
+   *
+   * FIXME: meaning of the two values unconfirmed.
+   */
   marginAvailable: [number, number];
 }[];
 

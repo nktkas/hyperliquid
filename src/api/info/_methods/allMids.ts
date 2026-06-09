@@ -23,7 +23,10 @@ export type AllMidsRequest = v.InferOutput<typeof AllMidsRequest>;
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-mids-for-all-coins
  */
 export type AllMidsResponse = {
-  /** @pattern ^[0-9]+(\.[0-9]+)?$ */
+  /**
+   * Mid price.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
   [x: string]: string;
 };
 

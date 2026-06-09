@@ -86,6 +86,8 @@ export type AgentEnableDexAbstractionSuccessResponse = ExcludeErrorResponse<Agen
  *
  * Signing: L1 Action.
  *
+ * @deprecated use {@linkcode agentSetAbstraction} instead.
+ *
  * @param config General configuration for Exchange API requests.
  * @param opts Request execution options.
  * @return Successful response without specific data.
@@ -107,8 +109,6 @@ export type AgentEnableDexAbstractionSuccessResponse = ExcludeErrorResponse<Agen
  * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction-agent
- *
- * @deprecated Use {@link agentSetAbstraction} instead.
  */
 export function agentEnableDexAbstraction(
   config: ExchangeConfig,

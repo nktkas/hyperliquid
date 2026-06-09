@@ -32,7 +32,12 @@ export type AllDexsClearinghouseStateEvent = {
    */
   user: `0x${string}`;
   /** Array of tuples of dex names and clearinghouse states. */
-  clearinghouseStates: [dex: string, state: ClearinghouseStateResponse][];
+  clearinghouseStates: [
+    /** DEX name (empty string for main dex). */
+    dex: string,
+    /** Clearinghouse state. */
+    state: ClearinghouseStateResponse,
+  ][];
 };
 
 // ============================================================

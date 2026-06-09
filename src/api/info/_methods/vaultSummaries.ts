@@ -44,7 +44,7 @@ export type VaultSummariesResponse = {
   isClosed: boolean;
   /** Vault relationship type. */
   relationship: VaultRelationship;
-  /** Creation timestamp. */
+  /** Creation timestamp (in ms since epoch). */
   createTimeMillis: number;
 }[];
 

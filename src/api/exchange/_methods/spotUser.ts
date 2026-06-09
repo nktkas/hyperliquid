@@ -7,7 +7,7 @@ import * as v from "@valibot/valibot";
 import { Hex, UnsignedInteger } from "../../_schemas.ts";
 
 /**
- * Opt Out of Spot Dusting.
+ * Opt out of spot dusting.
  * @see null
  */
 export const SpotUserRequest = /* @__PURE__ */ (() => {
@@ -88,7 +88,7 @@ export type SpotUserOptions = ExtractRequestOptions<v.InferInput<typeof SpotUser
 export type SpotUserSuccessResponse = ExcludeErrorResponse<SpotUserResponse>;
 
 /**
- * Opt Out of Spot Dusting.
+ * Opt out of spot dusting.
  *
  * Signing: L1 Action.
  *

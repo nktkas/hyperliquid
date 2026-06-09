@@ -7,7 +7,7 @@ import * as v from "@valibot/valibot";
 import { Address, Hex, UnsignedDecimal, UnsignedInteger } from "../../_schemas.ts";
 
 /**
- * Send usd to another address.
+ * Send USD to another address.
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-usdc-transfer
  */
 export const UsdSendRequest = /* @__PURE__ */ (() => {
@@ -18,7 +18,7 @@ export const UsdSendRequest = /* @__PURE__ */ (() => {
       type: v.literal("usdSend"),
       /** Chain ID in hex format for EIP-712 signing. */
       signatureChainId: Hex,
-      /** HyperLiquid network type. */
+      /** Hyperliquid network type. */
       hyperliquidChain: v.picklist(["Mainnet", "Testnet"]),
       /** Destination address. */
       destination: Address,
@@ -104,7 +104,7 @@ export const UsdSendTypes = {
 };
 
 /**
- * Send usd to another address.
+ * Send USD to another address.
  *
  * Signing: User-Signed EIP-712.
  *
