@@ -38,7 +38,7 @@ export type UserDetailsResponse = {
 
 import { parse } from "../../../_base.ts";
 import type { IRequestTransport } from "../../../transport/mod.ts";
-import type { ExplorerConfig } from "./_base/mod.ts";
+import { assertSuccessResponse, type ExplorerConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode userDetails} function. */
 export type UserDetailsParameters = Omit<v.InferInput<typeof UserDetailsRequest>, "type">;
@@ -53,6 +53,7 @@ export type UserDetailsParameters = Omit<v.InferInput<typeof UserDetailsRequest>
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
+ * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
  * @example
  * ```ts
@@ -68,7 +69,7 @@ export type UserDetailsParameters = Omit<v.InferInput<typeof UserDetailsRequest>
  *
  * @see null
  */
-export function userDetails(
+export async function userDetails(
   config: ExplorerConfig<IRequestTransport<"explorer">>,
   params: UserDetailsParameters,
   signal?: AbortSignal,
@@ -77,5 +78,7 @@ export function userDetails(
     type: "userDetails",
     ...params,
   });
-  return config.transport.request("explorer", request, signal);
+  const response = await config.transport.request<UserDetailsResponse>("explorer", request, signal);
+  assertSuccessResponse(response);
+  return response;
 }

@@ -17,7 +17,7 @@
  */
 
 import { type IRequestTransport, TransportError } from "../_base.ts";
-import { AbortSignal_ } from "../_polyfills.ts";
+import { DOMException_ } from "../_polyfills.ts";
 
 /** Configuration options for the HTTP transport layer. */
 export interface HttpTransportOptions {
@@ -62,21 +62,32 @@ export const TESTNET_RPC_URL = "https://rpc.hyperliquid-testnet.xyz";
 export class HttpRequestError extends TransportError {
   /** The HTTP response that caused the error. */
   response?: Response;
+  /** The original request payload that triggered the error, if available. */
+  request?: unknown;
 
-  constructor(args?: { response?: Response; message?: string }, options?: ErrorOptions) {
+  constructor(
+    args?: { response?: Response; message?: string },
+    options?: ErrorOptions & { request?: unknown },
+  ) {
     const { response, message: detail } = args ?? {};
 
     let message: string;
     if (response) {
       message = `${response.status} ${response.statusText}`.trim();
       if (detail) message += ` - ${detail}`;
+    } else if (detail) {
+      message = detail;
     } else {
-      message = `Unknown HTTP request error: ${options?.cause}`;
+      const cause = options?.cause;
+      message = cause === undefined
+        ? "Unknown HTTP request error"
+        : `Unknown HTTP request error: ${cause instanceof Error ? cause.message : String(cause)}`;
     }
 
     super(message, options);
     this.name = "HttpRequestError";
     this.response = response;
+    this.request = options?.request;
   }
 }
 
@@ -88,7 +99,7 @@ export class HttpRequestError extends TransportError {
  */
 export class HttpTransport implements IRequestTransport<"info" | "exchange" | "explorer"> {
   /** Indicates this transport uses testnet endpoint. */
-  isTestnet: boolean;
+  readonly isTestnet: boolean;
   /** Request timeout in ms. Set to `null` to disable. */
   timeout: number | null;
   /** Custom API URL for requests. */
@@ -118,22 +129,25 @@ export class HttpTransport implements IRequestTransport<"info" | "exchange" | "e
     payload: unknown,
     signal?: AbortSignal,
   ): Promise<T> {
+    // One controller per request: the timeout timer and all user signals relay into it,
+    // and `finally` detaches everything, so no listener or timer outlives the request.
+    const controller = new AbortController();
+    const timeout = this.timeout !== null ? scheduleTimeoutAbort(controller, this.timeout) : undefined;
+    const detachRelay = relayAbort([signal, this.fetchOptions.signal], controller);
+
     try {
       // --- Build URL and request init ------------------------
-      const url = new URL(endpoint, endpoint === "explorer" ? this.rpcUrl : this.apiUrl);
+      const url = buildEndpointUrl(endpoint === "explorer" ? this.rpcUrl : this.apiUrl, endpoint);
       const init = mergeRequestInit(
         {
           body: JSON.stringify(payload),
           headers: {
-            "Accept-Encoding": "gzip, deflate, br, zstd",
             "Content-Type": "application/json",
           },
-          keepalive: true,
           method: "POST",
-          signal: this.timeout ? AbortSignal_.timeout(this.timeout) : undefined,
         },
         this.fetchOptions,
-        { signal },
+        { signal: controller.signal },
       );
 
       // --- Send -----------------------------------------------
@@ -143,21 +157,37 @@ export class HttpTransport implements IRequestTransport<"info" | "exchange" | "e
       if (!response.ok || !response.headers.get("Content-Type")?.includes("application/json")) {
         const clone = response.clone();
         const body = await response.text().catch(() => undefined); // releases connection, clone stays readable
-        throw new HttpRequestError({ response: clone, message: body });
+        throw new HttpRequestError(
+          { response: clone, message: body ? truncate(body) : undefined },
+          { request: payload },
+        );
       }
 
-      // --- Parse and check application-level error -----------
-      const clone = response.clone();
-      const body = await response.json();
-
-      if (body?.type === "error") {
-        throw new HttpRequestError({ response: clone, message: body?.message });
+      // --- Parse ----------------------------------------------
+      const text = await response.text();
+      try {
+        return JSON.parse(text);
+      } catch (error) {
+        throw new HttpRequestError(
+          { response: recreateResponse(response, text), message: "Invalid JSON response body" },
+          { cause: error, request: payload },
+        );
       }
-
-      return body;
     } catch (error) {
       if (error instanceof TransportError) throw error;
-      throw new HttpRequestError(undefined, { cause: error });
+      if (timeout !== undefined && error === timeout.reason) {
+        throw new HttpRequestError(
+          { message: `Request timed out after ${this.timeout} ms` },
+          { cause: error, request: payload },
+        );
+      }
+      if (controller.signal.aborted && error === controller.signal.reason) {
+        throw new HttpRequestError({ message: "Request aborted" }, { cause: error, request: payload });
+      }
+      throw new HttpRequestError(undefined, { cause: error, request: payload });
+    } finally {
+      timeout?.cancel();
+      detachRelay();
     }
   }
 }
@@ -166,29 +196,74 @@ export class HttpTransport implements IRequestTransport<"info" | "exchange" | "e
 // Helpers
 // ============================================================
 
+function truncate(text: string, limit = 1024): string {
+  if (text.length <= limit) return text;
+  return `${text.slice(0, limit)}… (${text.length} chars total)`;
+}
+
+/** Resolves an endpoint against a base URL without dropping the base path or query. */
+function buildEndpointUrl(base: string | URL, endpoint: string): URL {
+  const baseUrl = new URL(base);
+  if (!baseUrl.pathname.endsWith("/")) baseUrl.pathname += "/";
+  const url = new URL(endpoint, baseUrl);
+  url.search = baseUrl.search; // relative resolution drops the base query
+  return url;
+}
+
+/** Rebuilds a response whose body has already been consumed, so `error.response` stays readable. */
+function recreateResponse(original: Response, text: string): Response {
+  return new Response(text || null, {
+    status: original.status,
+    statusText: original.statusText,
+    headers: original.headers,
+  });
+}
+
 function mergeHeadersInit(...inits: HeadersInit[]): Headers {
   const merged = new Headers();
-  for (const headers of inits) {
-    const entries = Symbol.iterator in headers ? headers : Object.entries(headers);
-    for (const [key, value] of entries) {
+  for (const init of inits) {
+    for (const [key, value] of new Headers(init)) {
       merged.set(key, value);
     }
   }
   return merged;
 }
 
+/** Merges request inits left to right: `headers` are combined, every other field is last-init-wins. */
 function mergeRequestInit(...inits: RequestInit[]): RequestInit {
   const merged: RequestInit = {};
   const headersList: HeadersInit[] = [];
-  const signals: AbortSignal[] = [];
 
   for (const init of inits) {
     Object.assign(merged, init);
     if (init.headers) headersList.push(init.headers);
-    if (init.signal) signals.push(init.signal);
   }
   if (headersList.length > 0) merged.headers = mergeHeadersInit(...headersList);
-  if (signals.length > 0) merged.signal = signals.length > 1 ? AbortSignal_.any(signals) : signals[0];
 
   return merged;
+}
+
+/** Aborts `target` with a `TimeoutError` after `ms`; `cancel` clears the timer, `reason` identifies the abort. */
+function scheduleTimeoutAbort(target: AbortController, ms: number): { reason: Error; cancel: () => void } {
+  const reason = new DOMException_("Signal timed out.", "TimeoutError");
+  const timeoutId = setTimeout(() => target.abort(reason), ms);
+  return { reason, cancel: () => clearTimeout(timeoutId) };
+}
+
+/** Relays abort events from `sources` into `target` and returns a detach function. */
+function relayAbort(sources: (AbortSignal | null | undefined)[], target: AbortController): () => void {
+  const detachers: (() => void)[] = [];
+  for (const source of sources) {
+    if (!source) continue;
+    if (source.aborted) {
+      target.abort(source.reason);
+      break;
+    }
+    const onAbort = () => target.abort(source.reason);
+    source.addEventListener("abort", onAbort, { once: true });
+    detachers.push(() => source.removeEventListener("abort", onAbort));
+  }
+  return () => {
+    for (const detach of detachers) detach();
+  };
 }

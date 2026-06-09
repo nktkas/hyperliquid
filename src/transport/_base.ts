@@ -10,7 +10,7 @@ import type { WebSocketRequestError } from "./websocket/_dispatcher.ts";
  */
 export interface IRequestTransport<E extends "info" | "exchange" | "explorer" = "info" | "exchange"> {
   /** Indicates this transport uses testnet endpoint(s). */
-  isTestnet: boolean;
+  readonly isTestnet: boolean;
   /**
    * Sends a request to the Hyperliquid API.
    *

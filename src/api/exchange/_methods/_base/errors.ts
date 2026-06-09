@@ -3,28 +3,9 @@
  * @module
  */
 
-import { HyperliquidError } from "../../../../_base.ts";
+import { ApiRequestError } from "../../../_errors.ts";
 
-// ============================================================
-// Error Class
-// ============================================================
-
-/** Thrown when the Exchange API returns an error response. */
-export class ApiRequestError extends HyperliquidError {
-  /** Raw API response that contains the error. */
-  readonly response: unknown;
-
-  /**
-   * @param response Raw API response that contains the error.
-   */
-  constructor(response: unknown) {
-    const message = getErrorMessage(response) ??
-      "An unknown error occurred while processing an API request. See `response` for more details.";
-    super(message);
-    this.name = "ApiRequestError";
-    this.response = response;
-  }
-}
+export { ApiRequestError };
 
 // ============================================================
 // Detection (duck-typed)
@@ -105,7 +86,7 @@ function getErrorMessage(r: unknown): string | undefined {
  */
 export function assertSuccessResponse(response: unknown): void {
   if (isErrorResponse(response)) {
-    throw new ApiRequestError(response);
+    throw new ApiRequestError(response, getErrorMessage(response));
   }
 }
 

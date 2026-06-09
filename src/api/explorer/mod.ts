@@ -36,6 +36,7 @@
  * @module
  */
 
+export { ApiRequestError } from "./_methods/_base/mod.ts";
 export type { ExplorerConfig } from "./_methods/_base/mod.ts";
 
 export * from "./_methods/blockDetails.ts";

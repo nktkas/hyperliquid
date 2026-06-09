@@ -65,6 +65,7 @@ export class ExplorerClient<
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
    * @example
    * ```ts
@@ -159,6 +160,7 @@ export class ExplorerClient<
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
    * @example
    * ```ts
@@ -189,6 +191,7 @@ export class ExplorerClient<
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
    * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
    *
    * @example
    * ```ts

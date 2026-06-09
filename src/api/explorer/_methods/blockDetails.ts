@@ -57,7 +57,7 @@ export type BlockDetailsResponse = {
 
 import { parse } from "../../../_base.ts";
 import type { IRequestTransport } from "../../../transport/mod.ts";
-import type { ExplorerConfig } from "./_base/mod.ts";
+import { assertSuccessResponse, type ExplorerConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode blockDetails} function. */
 export type BlockDetailsParameters = Omit<v.InferInput<typeof BlockDetailsRequest>, "type">;
@@ -72,6 +72,7 @@ export type BlockDetailsParameters = Omit<v.InferInput<typeof BlockDetailsReques
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
+ * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
  * @example
  * ```ts
@@ -87,7 +88,7 @@ export type BlockDetailsParameters = Omit<v.InferInput<typeof BlockDetailsReques
  *
  * @see null
  */
-export function blockDetails(
+export async function blockDetails(
   config: ExplorerConfig<IRequestTransport<"explorer">>,
   params: BlockDetailsParameters,
   signal?: AbortSignal,
@@ -96,5 +97,7 @@ export function blockDetails(
     type: "blockDetails",
     ...params,
   });
-  return config.transport.request("explorer", request, signal);
+  const response = await config.transport.request<BlockDetailsResponse>("explorer", request, signal);
+  assertSuccessResponse(response);
+  return response;
 }

@@ -98,6 +98,16 @@ Deno.test("HttpTransport", async (t) => {
       });
       await transport.request("explorer", {});
     });
+
+    await t.step("custom URL with path and query keeps both", async () => {
+      const transport = new HttpTransport({ apiUrl: "https://proxy.example.com/hl?key=secret" });
+
+      mockFetch((req) => {
+        assertEquals(new Request(req).url, "https://proxy.example.com/hl/info?key=secret");
+        return jsonResponse();
+      });
+      await transport.request("info", {});
+    });
   });
 
   await t.step("request()", async (t) => {
@@ -128,11 +138,31 @@ Deno.test("HttpTransport", async (t) => {
         await assertRejects(() => transport.request("info", {}), HttpRequestError);
       });
 
-      await t.step("error type in body throws HttpRequestError", async () => {
-        mockFetch(() => jsonResponse({ type: "error", message: "test error" }));
+      await t.step("invalid JSON in 2xx response throws HttpRequestError with readable response", async () => {
+        mockFetch(() => new Response("not json", { status: 200, headers: { "Content-Type": "application/json" } }));
 
         const transport = new HttpTransport();
-        await assertRejects(() => transport.request("info", {}), HttpRequestError);
+        const error = await assertRejects(() => transport.request("info", {}), HttpRequestError, "Invalid JSON");
+        assert(error.response);
+        assertEquals(await error.response.text(), "not json");
+      });
+
+      await t.step("error message truncates large response bodies", async () => {
+        mockFetch(() => new Response("x".repeat(5000), { status: 500 }));
+
+        const transport = new HttpTransport();
+        const error = await assertRejects(() => transport.request("info", {}), HttpRequestError);
+        assert(error.message.includes("(5000 chars total)"));
+        assert(error.message.length < 1200);
+        assertEquals(await error.response?.text(), "x".repeat(5000)); // full body stays readable
+      });
+
+      await t.step("error carries the original request payload", async () => {
+        mockFetch(() => new Response("", { status: 500 }));
+
+        const transport = new HttpTransport();
+        const error = await assertRejects(() => transport.request("info", { type: "test" }), HttpRequestError);
+        assertEquals(error.request, { type: "test" });
       });
 
       await t.step("response body is readable on error", async () => {
@@ -185,13 +215,31 @@ Deno.test("HttpTransport", async (t) => {
       });
       await transport.request("info", {});
     });
+
+    await t.step("headers as array joins duplicate keys", async () => {
+      mockFetch((_req, init) => {
+        assertEquals(new Headers(init?.headers).get("X-Multi"), "a, b");
+        return jsonResponse();
+      });
+
+      const transport = new HttpTransport({
+        fetchOptions: { headers: [["X-Multi", "a"], ["X-Multi", "b"]] },
+      });
+      await transport.request("info", {});
+    });
   });
 
   await t.step("AbortSignal", async (t) => {
     await t.step("internal timeout triggers TimeoutError", async () => {
+      mockFetch((_req, init) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => reject(init.signal!.reason));
+        })
+      );
+
       const transport = new HttpTransport({ timeout: 1 });
 
-      const error = await assertRejects(() => transport.request("info", {}), HttpRequestError);
+      const error = await assertRejects(() => transport.request("info", {}), HttpRequestError, "Request timed out");
       assertIsError(error.cause, DOMException);
       assertEquals(error.cause.name, "TimeoutError");
     });
@@ -206,22 +254,76 @@ Deno.test("HttpTransport", async (t) => {
       assertIsError(error.cause, CustomAbortError);
     });
 
+    await t.step("in-flight abort rejects with 'Request aborted'", async () => {
+      mockFetch((_req, init) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => reject(init.signal!.reason));
+        })
+      );
+
+      const controller = new AbortController();
+      const transport = new HttpTransport();
+      const promise = transport.request("info", {}, controller.signal);
+      controller.abort(new DOMException("user cancel", "AbortError"));
+
+      const error = await assertRejects(() => promise, HttpRequestError, "Request aborted");
+      assertIsError(error.cause, DOMException);
+      assertEquals(error.cause.name, "AbortError");
+    });
+
+    await t.step("timeout: 0 aborts immediately with TimeoutError", async () => {
+      mockFetch((_req, init) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => reject(init.signal!.reason));
+        })
+      );
+
+      const transport = new HttpTransport({ timeout: 0 });
+      const error = await assertRejects(() => transport.request("info", {}), HttpRequestError, "Request timed out");
+      assertIsError(error.cause, DOMException);
+      assertEquals(error.cause.name, "TimeoutError");
+    });
+
     await t.step("timeout: null disables internal timeout", async () => {
-      const originalTimeout = AbortSignal.timeout;
-      let timeoutCalled = false;
-      AbortSignal.timeout = (ms: number) => {
-        timeoutCalled = true;
-        return originalTimeout(ms);
+      mockFetch(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        return jsonResponse();
+      });
+
+      const transport = new HttpTransport({ timeout: null });
+      await transport.request("info", {});
+    });
+
+    await t.step("fetchOptions.signal is respected", async () => {
+      mockFetch((_req, init) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => reject(init.signal!.reason));
+        })
+      );
+
+      const controller = new AbortController();
+      const transport = new HttpTransport({ fetchOptions: { signal: controller.signal } });
+      const promise = transport.request("info", {});
+      controller.abort(new DOMException("user cancel", "AbortError"));
+
+      const error = await assertRejects(() => promise, HttpRequestError, "Request aborted");
+      assertIsError(error.cause, DOMException);
+    });
+
+    await t.step("does not leak abort listeners on a long-lived user signal", async () => {
+      // `getEventListeners` supports EventTarget at runtime but is missing from the Deno type stubs.
+      const { getEventListeners } = await import("node:events") as unknown as {
+        getEventListeners: (target: EventTarget, type: string) => unknown[];
       };
 
-      try {
+      const controller = new AbortController();
+      const transport = new HttpTransport();
+      for (let i = 0; i < 100; i++) {
         mockFetch(() => jsonResponse());
-        const transport = new HttpTransport({ timeout: null });
-        await transport.request("info", {});
-        assertEquals(timeoutCalled, false);
-      } finally {
-        AbortSignal.timeout = originalTimeout;
+        await transport.request("info", {}, controller.signal);
       }
+
+      assertEquals(getEventListeners(controller.signal, "abort").length, 0);
     });
   });
 });

@@ -38,7 +38,7 @@ export type TxDetailsResponse = {
 
 import { parse } from "../../../_base.ts";
 import type { IRequestTransport } from "../../../transport/mod.ts";
-import type { ExplorerConfig } from "./_base/mod.ts";
+import { assertSuccessResponse, type ExplorerConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode txDetails} function. */
 export type TxDetailsParameters = Omit<v.InferInput<typeof TxDetailsRequest>, "type">;
@@ -53,6 +53,7 @@ export type TxDetailsParameters = Omit<v.InferInput<typeof TxDetailsRequest>, "t
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
  * @throws {TransportError} When the transport layer throws an error.
+ * @throws {ApiRequestError} When the API returns an unsuccessful response.
  *
  * @example
  * ```ts
@@ -68,7 +69,7 @@ export type TxDetailsParameters = Omit<v.InferInput<typeof TxDetailsRequest>, "t
  *
  * @see null
  */
-export function txDetails(
+export async function txDetails(
   config: ExplorerConfig<IRequestTransport<"explorer">>,
   params: TxDetailsParameters,
   signal?: AbortSignal,
@@ -77,5 +78,7 @@ export function txDetails(
     type: "txDetails",
     ...params,
   });
-  return config.transport.request("explorer", request, signal);
+  const response = await config.transport.request<TxDetailsResponse>("explorer", request, signal);
+  assertSuccessResponse(response);
+  return response;
 }
