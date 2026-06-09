@@ -92,17 +92,6 @@
       spec:
         ref:
           kind: openapi
-          spec: hl-info-blockDetails
-    ```
-  - ```yaml
-    type: builtin:openapi
-    props:
-      models: false
-      downloadLink: false
-    dependencies:
-      spec:
-        ref:
-          kind: openapi
           spec: hl-info-borrowLendReserveState
     ```
   - ```yaml
@@ -225,6 +214,17 @@
         ref:
           kind: openapi
           spec: hl-info-fundingHistory
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-info-gossipPriorityAuctionStatus
     ```
   - ```yaml
     type: builtin:openapi
@@ -543,6 +543,17 @@
       spec:
         ref:
           kind: openapi
+          spec: hl-info-settledOutcome
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
           spec: hl-info-spotClearinghouseState
     ```
   - ```yaml
@@ -642,17 +653,6 @@
       spec:
         ref:
           kind: openapi
-          spec: hl-info-txDetails
-    ```
-  - ```yaml
-    type: builtin:openapi
-    props:
-      models: false
-      downloadLink: false
-    dependencies:
-      spec:
-        ref:
-          kind: openapi
           spec: hl-info-userAbstraction
     ```
   - ```yaml
@@ -665,17 +665,6 @@
         ref:
           kind: openapi
           spec: hl-info-userBorrowLendInterest
-    ```
-  - ```yaml
-    type: builtin:openapi
-    props:
-      models: false
-      downloadLink: false
-    dependencies:
-      spec:
-        ref:
-          kind: openapi
-          spec: hl-info-userDetails
     ```
   - ```yaml
     type: builtin:openapi
@@ -886,6 +875,17 @@
       spec:
         ref:
           kind: openapi
+          spec: hl-exchange-agentSendAsset
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
           spec: hl-exchange-agentSetAbstraction
     ```
   - ```yaml
@@ -909,6 +909,17 @@
         ref:
           kind: openapi
           spec: hl-exchange-approveBuilderFee
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-exchange-authorizeAqav2Role
     ```
   - ```yaml
     type: builtin:openapi
@@ -1052,6 +1063,39 @@
         ref:
           kind: openapi
           spec: hl-exchange-evmUserModify
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-exchange-finalizeEvmContract
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-exchange-gossipPriorityBid
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-exchange-hip3LiquidatorTransfer
     ```
   - ```yaml
     type: builtin:openapi
@@ -1227,6 +1271,17 @@
       spec:
         ref:
           kind: openapi
+          spec: hl-exchange-stakingLinkDisableTradingUser
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
           spec: hl-exchange-subAccountModify
     ```
   - ```yaml
@@ -1349,6 +1404,17 @@
         ref:
           kind: openapi
           spec: hl-exchange-userDexAbstraction
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-exchange-userOutcome
     ```
   - ```yaml
     type: builtin:openapi
@@ -1548,28 +1614,6 @@
       spec:
         ref:
           kind: openapi
-          spec: hl-subscription-explorerBlock
-    ```
-  - ```yaml
-    type: builtin:openapi
-    props:
-      models: false
-      downloadLink: false
-    dependencies:
-      spec:
-        ref:
-          kind: openapi
-          spec: hl-subscription-explorerTxs
-    ```
-  - ```yaml
-    type: builtin:openapi
-    props:
-      models: false
-      downloadLink: false
-    dependencies:
-      spec:
-        ref:
-          kind: openapi
           spec: hl-subscription-l2Book
     ```
   - ```yaml
@@ -1604,6 +1648,17 @@
         ref:
           kind: openapi
           spec: hl-subscription-orderUpdates
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-subscription-outcomeMetaUpdates
     ```
   - ```yaml
     type: builtin:openapi
@@ -1747,4 +1802,61 @@
         ref:
           kind: openapi
           spec: hl-subscription-webData3
+    ```
+
+- Explorer Methods
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-explorer-blockDetails
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-explorer-explorerBlock
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-explorer-explorerTxs
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-explorer-txDetails
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-explorer-userDetails
     ```
