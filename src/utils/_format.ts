@@ -29,6 +29,14 @@ export function formatPrice(price: string | number, szDecimals: number, type: "p
   const maxDecimals = Math.max((type === "perp" ? 6 : 8) - szDecimals, 0);
   price = StringMath.toFixedTruncate(price, maxDecimals);
 
+  // Integer prices are always allowed, including values that become integers
+  // after decimal truncation (e.g. "100001.0" -> "100001"). Without this
+  // re-check the significant-figure step below would truncate them (-> "100000").
+  // A value that truncated all the way to zero is left for the zero check below.
+  if (/^-?\d+$/.test(price) && !/^-?0+$/.test(price)) {
+    return formatDecimalString(price);
+  }
+
   // Apply sig figs limit: max 5 significant figures
   price = StringMath.toPrecisionTruncate(price, 5);
 

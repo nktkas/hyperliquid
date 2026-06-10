@@ -32,6 +32,14 @@ Deno.test("formatPrice", async (t) => {
       assertEquals(formatPrice("1234567", 0), "1234567");
     });
 
+    await t.step("integer value with trailing decimal zeros bypasses limit", () => {
+      assertEquals(formatPrice("100001.0", 0), "100001");
+      assertEquals(formatPrice("123456.0", 0), "123456");
+      assertEquals(formatPrice("100001.00", 0), "100001");
+      assertEquals(formatPrice("-123456.0", 0), "-123456");
+      assertEquals(formatPrice("100001.0", 0, "spot"), "100001");
+    });
+
     await t.step("truncates to 5 sig figs", () => {
       assertEquals(formatPrice("12345.6", 0), "12345");
       assertEquals(formatPrice("0.00123456", 0), "0.001234");
