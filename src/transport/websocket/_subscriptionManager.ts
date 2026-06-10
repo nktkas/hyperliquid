@@ -62,9 +62,9 @@ export class WebSocketSubscriptionManager {
     socket.addEventListener("error", () => this._handleClose());
   }
 
-  // ============================================================
+  // ===========================================================================
   // Public API
-  // ============================================================
+  // ===========================================================================
 
   /**
    * Subscribes to a Hyperliquid event channel.
@@ -82,7 +82,7 @@ export class WebSocketSubscriptionManager {
   ): Promise<ISubscription> {
     const id = requestToId(payload);
 
-    // --- Get or create subscription state --------------------
+    // --- Get or create subscription state ------------------------------------
     let subscription = this._subscriptions.get(id);
     if (!subscription) {
       if (this._subscriptions.size >= MAX_SUBSCRIPTIONS) {
@@ -104,7 +104,7 @@ export class WebSocketSubscriptionManager {
       this._subscriptions.set(id, subscription);
     }
 
-    // --- Get or create listener registration -----------------
+    // --- Get or create listener registration ---------------------------------
     let registration = subscription.listeners.get(listener);
     if (!registration) {
       const unsubscribe = async () => {
@@ -126,7 +126,7 @@ export class WebSocketSubscriptionManager {
       subscription.listeners.set(listener, registration);
     }
 
-    // --- Await server confirmation ---------------------------
+    // --- Await server confirmation -------------------------------------------
     await subscription.promise;
 
     return {
@@ -134,9 +134,9 @@ export class WebSocketSubscriptionManager {
     };
   }
 
-  // ============================================================
+  // ===========================================================================
   // Event handlers
-  // ============================================================
+  // ===========================================================================
 
   /** Resubscribes to all completed subscriptions when the socket re-opens. */
   private _handleOpen(): void {
@@ -180,9 +180,9 @@ export class WebSocketSubscriptionManager {
     }
   }
 
-  // ============================================================
+  // ===========================================================================
   // Teardown
-  // ============================================================
+  // ===========================================================================
 
   /**
    * Detaches every listener of a subscription and removes it locally.
@@ -209,9 +209,9 @@ export class WebSocketSubscriptionManager {
     }
   }
 
-  // ============================================================
+  // ===========================================================================
   // Subscription limit checks
-  // ============================================================
+  // ===========================================================================
 
   private _hasUserParam(payload: unknown): boolean {
     return typeof payload === "object" && payload !== null && "user" in payload;

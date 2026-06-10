@@ -6,9 +6,9 @@ import { WebSocketDispatcher, WebSocketRequestError } from "../../../src/transpo
 import { HyperliquidEventTarget } from "../../../src/transport/websocket/_events.ts";
 import { requestToId } from "../../../src/transport/websocket/_id.ts";
 
-// ============================================================
+// =============================================================================
 // Helpers
-// ============================================================
+// =============================================================================
 
 // @ts-expect-error: Mocking WebSocket for testing purposes
 class MockWebSocket extends EventTarget implements ReconnectingWebSocket {
@@ -55,9 +55,9 @@ function getLastSent(socket: MockWebSocket): Record<string, unknown> {
   return JSON.parse(socket.sentMessages[socket.sentMessages.length - 1]);
 }
 
-// ============================================================
+// =============================================================================
 // Test Data
-// ============================================================
+// =============================================================================
 
 const RESPONSES = {
   info: (id: number, data: unknown) => ({
@@ -85,9 +85,9 @@ const RESPONSES = {
   }),
 } as const;
 
-// ============================================================
+// =============================================================================
 // Tests
-// ============================================================
+// =============================================================================
 
 Deno.test("WebSocketDispatcher", async (t) => {
   await t.step("request()", async (t) => {

@@ -6,9 +6,9 @@ import { WebSocketDispatcher, WebSocketRequestError } from "../../../src/transpo
 import { HyperliquidEventTarget } from "../../../src/transport/websocket/_events.ts";
 import { WebSocketSubscriptionManager } from "../../../src/transport/websocket/_subscriptionManager.ts";
 
-// ============================================================
+// =============================================================================
 // Helpers
-// ============================================================
+// =============================================================================
 
 // @ts-expect-error: Mocking WebSocket for testing purposes
 class MockWebSocket extends EventTarget implements ReconnectingWebSocket {
@@ -67,9 +67,9 @@ function createManager(resubscribe = true): {
   };
 }
 
-// ============================================================
+// =============================================================================
 // Test Data
-// ============================================================
+// =============================================================================
 
 const RESPONSES = {
   subscriptionResponse: (method: string, subscription: unknown) => ({
@@ -86,9 +86,9 @@ const RESPONSES = {
   }),
 } as const;
 
-// ============================================================
+// =============================================================================
 // Tests
-// ============================================================
+// =============================================================================
 
 Deno.test("WebSocketSubscriptionManager", async (t) => {
   await t.step("subscribe()", async (t) => {

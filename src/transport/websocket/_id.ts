@@ -44,9 +44,9 @@ export function isSubset(subset: unknown, superset: unknown): boolean {
   return Object.keys(sub).every((key) => key in sup && isSubset(sub[key], sup[key]));
 }
 
-// ============================================================
+// =============================================================================
 // Internal
-// ============================================================
+// =============================================================================
 
 function recursiveSortObjectKeys<T>(obj: T): T {
   if (Array.isArray(obj)) {

@@ -10,9 +10,9 @@ import { AbortSignal_, Promise_ } from "../_polyfills.ts";
 import type { HyperliquidEventTarget, PostResponse, SubscribeUnsubscribeResponse } from "./_events.ts";
 import { isSubset, requestToId } from "./_id.ts";
 
-// ============================================================
+// =============================================================================
 // Errors
-// ============================================================
+// =============================================================================
 
 /** Error thrown when a WebSocket request fails. */
 export class WebSocketRequestError extends TransportError {
@@ -26,9 +26,9 @@ export class WebSocketRequestError extends TransportError {
   }
 }
 
-// ============================================================
+// =============================================================================
 // Internal types
-// ============================================================
+// =============================================================================
 
 interface PostRequest {
   method: "post";
@@ -54,9 +54,9 @@ interface PendingRequest {
 
 const KEEP_ALIVE_INTERVAL_MS = 30_000;
 
-// ============================================================
+// =============================================================================
 // Dispatcher
-// ============================================================
+// =============================================================================
 
 /**
  * Owns the WebSocket request queue and matches server responses back to in-flight
@@ -75,13 +75,13 @@ export class WebSocketDispatcher {
     this.timeout = timeout;
     this._socket = socket;
 
-    // --- Hyperliquid event handlers --------------------------
+    // --- Hyperliquid event handlers ------------------------------------------
     hlEvents.addEventListener("subscriptionResponse", (event) => this._handleSubscriptionResponse(event.detail));
     hlEvents.addEventListener("post", (event) => this._handlePostResponse(event.detail));
     hlEvents.addEventListener("pong", () => this._handlePong());
     hlEvents.addEventListener("error", (event) => this._handleErrorEvent(event.detail));
 
-    // --- Reject pending requests on disconnect ---------------
+    // --- Reject pending requests on disconnect -------------------------------
     const handleClose = () => {
       this._queue.forEach(({ reject }) => reject(new WebSocketRequestError("WebSocket connection closed")));
       this._queue = [];
@@ -89,15 +89,15 @@ export class WebSocketDispatcher {
     socket.addEventListener("close", handleClose);
     socket.addEventListener("error", handleClose);
 
-    // --- Keep-alive lifecycle --------------------------------
+    // --- Keep-alive lifecycle ------------------------------------------------
     socket.addEventListener("open", () => this._startKeepAlive());
     socket.addEventListener("close", () => this._stopKeepAlive());
     socket.addEventListener("error", () => this._stopKeepAlive());
   }
 
-  // ============================================================
+  // ===========================================================================
   // Public API
-  // ============================================================
+  // ===========================================================================
 
   request(method: "ping", signal?: AbortSignal): Promise<void>;
   request<T>(method: "post" | "subscribe" | "unsubscribe", payload: unknown, signal?: AbortSignal): Promise<T>;
@@ -107,23 +107,23 @@ export class WebSocketDispatcher {
     maybeSignal?: AbortSignal,
   ): Promise<T> {
     try {
-      // --- Resolve overload arguments ------------------------
+      // --- Resolve overload arguments ----------------------------------------
       const payload = payloadOrSignal instanceof AbortSignal ? undefined : payloadOrSignal;
       const userSignal = payloadOrSignal instanceof AbortSignal ? payloadOrSignal : maybeSignal;
 
-      // --- Combine user + timeout signals --------------------
+      // --- Combine user + timeout signals ------------------------------------
       const timeoutSignal = this.timeout ? AbortSignal_.timeout(this.timeout) : undefined;
       const signal = userSignal && timeoutSignal
         ? AbortSignal_.any([userSignal, timeoutSignal])
         : userSignal ?? timeoutSignal;
 
-      // --- Fast-fail on aborted/terminated state -------------
+      // --- Fast-fail on aborted/terminated state -----------------------------
       if (signal?.aborted) return Promise.reject(signal.reason);
       if (this._socket.terminationSignal.aborted) {
         return Promise.reject(this._socket.terminationSignal.reason);
       }
 
-      // --- Build request envelope ----------------------------
+      // --- Build request envelope --------------------------------------------
       let id: string | number;
       let request: SubscribeUnsubscribeRequest | PostRequest | PingRequest;
       if (method === "post") {
@@ -137,7 +137,7 @@ export class WebSocketDispatcher {
         id = requestToId(request);
       }
 
-      // --- Send and register pending response ----------------
+      // --- Send and register pending response --------------------------------
       this._socket.send(JSON.stringify(request));
 
       const { promise, resolve, reject } = Promise_.withResolvers<T>();
@@ -146,7 +146,7 @@ export class WebSocketDispatcher {
       const onAbort = () => reject(signal?.reason);
       signal?.addEventListener("abort", onAbort, { once: true });
 
-      // --- Await with cleanup --------------------------------
+      // --- Await with cleanup ------------------------------------------------
       return await promise.finally(() => {
         const index = this._queue.findIndex((item) => item.id === id);
         if (index !== -1) this._queue.splice(index, 1);
@@ -162,9 +162,9 @@ export class WebSocketDispatcher {
     }
   }
 
-  // ============================================================
+  // ===========================================================================
   // Keep-Alive
-  // ============================================================
+  // ===========================================================================
 
   private _startKeepAlive(): void {
     if (this._keepAliveInterval) return;
@@ -178,9 +178,9 @@ export class WebSocketDispatcher {
     this._keepAliveInterval = undefined;
   }
 
-  // ============================================================
+  // ===========================================================================
   // Event handlers
-  // ============================================================
+  // ===========================================================================
 
   private _handleSubscriptionResponse(detail: SubscribeUnsubscribeResponse): void {
     this._queue
@@ -215,18 +215,18 @@ export class WebSocketDispatcher {
         return;
       }
 
-      // --- Parse embedded JSON --------------------------------
+      // --- Parse embedded JSON -----------------------------------------------
       const requestMatch = detail.match(/{.*}/)?.[0];
       if (!requestMatch) return;
       const parsedRequest = JSON.parse(requestMatch);
 
-      // --- `post` requests ------------------------------------
+      // --- `post` requests ---------------------------------------------------
       if ("id" in parsedRequest && typeof parsedRequest.id === "number") {
         this._reject(parsedRequest.id, detail);
         return;
       }
 
-      // --- `subscribe` / `unsubscribe` requests ---------------
+      // --- `subscribe` / `unsubscribe` requests ------------------------------
       if (
         "subscription" in parsedRequest &&
         typeof parsedRequest.subscription === "object" && parsedRequest.subscription !== null
@@ -235,19 +235,19 @@ export class WebSocketDispatcher {
         return;
       }
 
-      // --- `Already subscribed` / `Invalid subscription` ------
+      // --- `Already subscribed` / `Invalid subscription` ---------------------
       if (detail.startsWith("Already subscribed") || detail.startsWith("Invalid subscription")) {
         this._reject(requestToId({ method: "subscribe", subscription: parsedRequest }), detail);
         return;
       }
 
-      // --- `Already unsubscribed` -----------------------------
+      // --- `Already unsubscribed` --------------------------------------------
       if (detail.startsWith("Already unsubscribed")) {
         this._reject(requestToId({ method: "unsubscribe", subscription: parsedRequest }), detail);
         return;
       }
 
-      // --- Unknown shape: best-effort match by full body ------
+      // --- Unknown shape: best-effort match by full body ---------------------
       this._reject(requestToId(parsedRequest), detail);
     } catch {
       // Ignore JSON parsing errors

@@ -136,7 +136,7 @@ export class HttpTransport implements IRequestTransport<"info" | "exchange" | "e
     const detachRelay = relayAbort([signal, this.fetchOptions.signal], controller);
 
     try {
-      // --- Build URL and request init ------------------------
+      // --- Build URL and request init ----------------------------------------
       const url = buildEndpointUrl(endpoint === "explorer" ? this.rpcUrl : this.apiUrl, endpoint);
       const init = mergeRequestInit(
         {
@@ -150,10 +150,10 @@ export class HttpTransport implements IRequestTransport<"info" | "exchange" | "e
         { signal: controller.signal },
       );
 
-      // --- Send -----------------------------------------------
+      // --- Send --------------------------------------------------------------
       const response = await fetch(url, init);
 
-      // --- Reject non-OK or non-JSON responses ---------------
+      // --- Reject non-OK or non-JSON responses -------------------------------
       if (!response.ok || !response.headers.get("Content-Type")?.includes("application/json")) {
         const clone = response.clone();
         const body = await response.text().catch(() => undefined); // releases connection, clone stays readable
@@ -163,7 +163,7 @@ export class HttpTransport implements IRequestTransport<"info" | "exchange" | "e
         );
       }
 
-      // --- Parse ----------------------------------------------
+      // --- Parse -------------------------------------------------------------
       const text = await response.text();
       try {
         return JSON.parse(text);
@@ -192,9 +192,9 @@ export class HttpTransport implements IRequestTransport<"info" | "exchange" | "e
   }
 }
 
-// ============================================================
+// =============================================================================
 // Helpers
-// ============================================================
+// =============================================================================
 
 function truncate(text: string, limit = 1024): string {
   if (text.length <= limit) return text;

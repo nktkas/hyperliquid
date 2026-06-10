@@ -168,12 +168,12 @@ export class WebSocketTransport implements IRequestTransport<"info" | "exchange"
    */
   ready(signal?: AbortSignal): Promise<void> {
     return new Promise((resolve, reject) => {
-      // --- Combine user + termination signals ----------------
+      // --- Combine user + termination signals --------------------------------
       const combinedSignal = signal
         ? AbortSignal_.any([this.socket.terminationSignal, signal])
         : this.socket.terminationSignal;
 
-      // --- Fast-paths ----------------------------------------
+      // --- Fast-paths --------------------------------------------------------
       if (combinedSignal.aborted) {
         return reject(
           new WebSocketRequestError("Failed to establish WebSocket connection", { cause: combinedSignal.reason }),
@@ -182,7 +182,7 @@ export class WebSocketTransport implements IRequestTransport<"info" | "exchange"
 
       if (this.socket.readyState === ReconnectingWebSocket.OPEN) return resolve();
 
-      // --- Wait for "open" or abort --------------------------
+      // --- Wait for "open" or abort ------------------------------------------
       const handleOpen = () => {
         combinedSignal.removeEventListener("abort", handleAbort);
         resolve();
@@ -206,7 +206,7 @@ export class WebSocketTransport implements IRequestTransport<"info" | "exchange"
    */
   close(signal?: AbortSignal): Promise<void> {
     return new Promise((resolve, reject) => {
-      // --- Fast-paths ----------------------------------------
+      // --- Fast-paths --------------------------------------------------------
       if (signal?.aborted) {
         return reject(
           new WebSocketRequestError("Failed to close WebSocket connection", { cause: signal.reason }),
@@ -215,7 +215,7 @@ export class WebSocketTransport implements IRequestTransport<"info" | "exchange"
 
       if (this.socket.readyState === ReconnectingWebSocket.CLOSED) return resolve();
 
-      // --- Wait for "close"/"error" or abort -----------------
+      // --- Wait for "close"/"error" or abort ---------------------------------
       const handleClose = () => {
         signal?.removeEventListener("abort", handleAbort);
         resolve();
@@ -230,7 +230,7 @@ export class WebSocketTransport implements IRequestTransport<"info" | "exchange"
       this.socket.addEventListener("error", handleClose, { once: true, signal });
       signal?.addEventListener("abort", handleAbort, { once: true });
 
-      // --- Initiate close ------------------------------------
+      // --- Initiate close ----------------------------------------------------
       this.socket.close();
     });
   }
