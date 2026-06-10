@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-import-prefix
 
 import { assertEquals, assertRejects } from "jsr:@std/assert@1";
-import type { ReconnectingWebSocket } from "@nktkas/rews";
+import { ReconnectingWebSocket } from "@nktkas/rews";
 import { WebSocketDispatcher, WebSocketRequestError } from "../../../src/transport/websocket/_dispatcher.ts";
 import { HyperliquidEventTarget } from "../../../src/transport/websocket/_events.ts";
 import { requestToId } from "../../../src/transport/websocket/_id.ts";
@@ -13,7 +13,7 @@ import { requestToId } from "../../../src/transport/websocket/_id.ts";
 // @ts-expect-error: Mocking WebSocket for testing purposes
 class MockWebSocket extends EventTarget implements ReconnectingWebSocket {
   sentMessages: string[] = [];
-  readyState = WebSocket.CONNECTING;
+  readyState: 0 | 1 | 2 | 3 = ReconnectingWebSocket.CONNECTING;
   terminationController = new AbortController();
   terminationSignal = this.terminationController.signal;
 
@@ -22,7 +22,7 @@ class MockWebSocket extends EventTarget implements ReconnectingWebSocket {
   }
 
   close(): void {
-    this.readyState = WebSocket.CLOSED;
+    this.readyState = ReconnectingWebSocket.CLOSED;
     this.dispatchEvent(new CloseEvent("close"));
   }
 

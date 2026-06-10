@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-import-prefix
 
 import { assert, assertEquals, assertFalse, assertRejects } from "jsr:@std/assert@1";
-import type { ReconnectingWebSocket } from "@nktkas/rews";
+import { ReconnectingWebSocket } from "@nktkas/rews";
 import { WebSocketDispatcher, WebSocketRequestError } from "../../../src/transport/websocket/_dispatcher.ts";
 import { HyperliquidEventTarget } from "../../../src/transport/websocket/_events.ts";
 import { WebSocketSubscriptionManager } from "../../../src/transport/websocket/_subscriptionManager.ts";
@@ -13,7 +13,7 @@ import { WebSocketSubscriptionManager } from "../../../src/transport/websocket/_
 // @ts-expect-error: Mocking WebSocket for testing purposes
 class MockWebSocket extends EventTarget implements ReconnectingWebSocket {
   sentMessages: string[] = [];
-  readyState = WebSocket.OPEN;
+  readyState: 0 | 1 | 2 | 3 = ReconnectingWebSocket.OPEN;
   terminationController = new AbortController();
   terminationSignal = this.terminationController.signal;
 
@@ -22,12 +22,12 @@ class MockWebSocket extends EventTarget implements ReconnectingWebSocket {
   }
 
   close(): void {
-    this.readyState = WebSocket.CLOSED;
+    this.readyState = ReconnectingWebSocket.CLOSED;
     this.dispatchEvent(new CloseEvent("close"));
   }
 
   open(): void {
-    this.readyState = WebSocket.OPEN;
+    this.readyState = ReconnectingWebSocket.OPEN;
     this.dispatchEvent(new Event("open"));
   }
 
@@ -293,7 +293,7 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
 
       assertEquals(errors.length, 1);
       assert(errors[0] instanceof WebSocketRequestError);
-      assertEquals(socket.readyState, WebSocket.OPEN); // connection still live...
+      assertEquals(socket.readyState, ReconnectingWebSocket.OPEN); // connection still live...
       assertEquals(manager._subscriptions.size, 0); // ...but the failed channel is dropped
 
       // Next reconnect does not retry the dropped channel: no new subscribe frame, no new onError.
