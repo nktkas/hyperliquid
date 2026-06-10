@@ -106,7 +106,7 @@ export type UserEventsEvent =
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, TransportError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode userEvents} function. */
@@ -144,7 +144,7 @@ export function userEvents(
   config: SubscriptionConfig,
   params: UserEventsParameters,
   listener: (data: UserEventsEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const payload = parse(UserEventsRequest, { type: "userEvents", ...params });
   return config.transport.subscribe<UserEventsEvent>("user", payload, (e) => {

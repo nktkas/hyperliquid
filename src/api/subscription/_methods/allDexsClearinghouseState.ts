@@ -45,7 +45,7 @@ export type AllDexsClearinghouseStateEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, TransportError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode allDexsClearinghouseState} function. */
@@ -83,7 +83,7 @@ export function allDexsClearinghouseState(
   config: SubscriptionConfig,
   params: AllDexsClearinghouseStateParameters,
   listener: (data: AllDexsClearinghouseStateEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const payload = parse(AllDexsClearinghouseStateRequest, {
     type: "allDexsClearinghouseState",

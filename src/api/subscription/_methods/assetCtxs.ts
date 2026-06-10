@@ -36,7 +36,7 @@ export type AssetCtxsEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, TransportError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode assetCtxs} function. */
@@ -72,26 +72,26 @@ export type AssetCtxsParameters = Omit<v.InferInput<typeof AssetCtxsRequest>, "t
 export function assetCtxs(
   config: SubscriptionConfig,
   listener: (data: AssetCtxsEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription>;
 export function assetCtxs(
   config: SubscriptionConfig,
   params: AssetCtxsParameters,
   listener: (data: AssetCtxsEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription>;
 export function assetCtxs(
   config: SubscriptionConfig,
   paramsOrListener: AssetCtxsParameters | ((data: AssetCtxsEvent) => void),
-  listenerOrOnError?: ((data: AssetCtxsEvent) => void) | ((error: WebSocketRequestError) => void),
-  maybeOnError?: (error: WebSocketRequestError) => void,
+  listenerOrOnError?: ((data: AssetCtxsEvent) => void) | ((error: TransportError) => void),
+  maybeOnError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const params = typeof paramsOrListener === "function" ? {} : paramsOrListener;
   const listener = (typeof paramsOrListener === "function" ? paramsOrListener : listenerOrOnError) as (
     data: AssetCtxsEvent,
   ) => void;
   const onError = (typeof paramsOrListener === "function" ? listenerOrOnError : maybeOnError) as
-    | ((error: WebSocketRequestError) => void)
+    | ((error: TransportError) => void)
     | undefined;
 
   const payload = parse(AssetCtxsRequest, {

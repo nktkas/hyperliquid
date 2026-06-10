@@ -76,7 +76,7 @@ export type WebData3Event = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, TransportError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode webData3} function. */
@@ -114,7 +114,7 @@ export function webData3(
   config: SubscriptionConfig,
   params: WebData3Parameters,
   listener: (data: WebData3Event) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const payload = parse(WebData3Request, { type: "webData3", ...params });
   return config.transport.subscribe<WebData3Event>(payload.type, payload, (e) => {

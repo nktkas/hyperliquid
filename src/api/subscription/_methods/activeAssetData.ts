@@ -34,7 +34,7 @@ export type ActiveAssetDataEvent = ActiveAssetDataResponse;
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, TransportError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode activeAssetData} function. */
@@ -72,7 +72,7 @@ export function activeAssetData(
   config: SubscriptionConfig,
   params: ActiveAssetDataParameters,
   listener: (data: ActiveAssetDataEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const payload = parse(ActiveAssetDataRequest, { type: "activeAssetData", ...params });
   return config.transport.subscribe<ActiveAssetDataEvent>(payload.type, payload, (e) => {

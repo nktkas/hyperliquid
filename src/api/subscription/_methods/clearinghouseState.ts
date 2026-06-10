@@ -44,7 +44,7 @@ export type ClearinghouseStateEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, TransportError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode clearinghouseState} function. */
@@ -82,7 +82,7 @@ export function clearinghouseState(
   config: SubscriptionConfig,
   params: ClearinghouseStateParameters,
   listener: (data: ClearinghouseStateEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const payload = parse(ClearinghouseStateRequest, {
     type: "clearinghouseState",

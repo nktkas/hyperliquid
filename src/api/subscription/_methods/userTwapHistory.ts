@@ -42,7 +42,7 @@ export type UserTwapHistoryEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, TransportError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode userTwapHistory} function. */
@@ -80,7 +80,7 @@ export function userTwapHistory(
   config: SubscriptionConfig,
   params: UserTwapHistoryParameters,
   listener: (data: UserTwapHistoryEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const payload = parse(UserTwapHistoryRequest, { type: "userTwapHistory", ...params });
   return config.transport.subscribe<UserTwapHistoryEvent>(payload.type, payload, (e) => {

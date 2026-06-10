@@ -49,7 +49,7 @@ export type TwapStatesEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, TransportError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode twapStates} function. */
@@ -87,7 +87,7 @@ export function twapStates(
   config: SubscriptionConfig,
   params: TwapStatesParameters,
   listener: (data: TwapStatesEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const payload = parse(TwapStatesRequest, {
     type: "twapStates",

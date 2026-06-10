@@ -44,7 +44,7 @@ export type ExplorerBlockEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, ISubscriptionTransport, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, ISubscriptionTransport, TransportError } from "../../../transport/mod.ts";
 import type { ExplorerConfig } from "./_base/mod.ts";
 
 /**
@@ -76,7 +76,7 @@ import type { ExplorerConfig } from "./_base/mod.ts";
 export function explorerBlock(
   config: ExplorerConfig<ISubscriptionTransport>,
   listener: (data: ExplorerBlockEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const payload = parse(ExplorerBlockRequest, { type: "explorerBlock" });
   return config.transport.subscribe<ExplorerBlockEvent>("explorerBlock_", payload, (e) => { // Internal duck channel as it does not have its own channel

@@ -36,7 +36,7 @@ export type ActiveSpotAssetCtxEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, TransportError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode activeSpotAssetCtx} function. */
@@ -74,7 +74,7 @@ export function activeSpotAssetCtx(
   config: SubscriptionConfig,
   params: ActiveSpotAssetCtxParameters,
   listener: (data: ActiveSpotAssetCtxEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const payload = parse(ActiveSpotAssetCtxRequest, { type: "activeAssetCtx", ...params });
   return config.transport.subscribe<ActiveSpotAssetCtxEvent>("activeSpotAssetCtx", payload, (e) => {

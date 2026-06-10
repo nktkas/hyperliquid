@@ -3,12 +3,7 @@
  * @module
  */
 
-import type {
-  IRequestTransport,
-  ISubscription,
-  ISubscriptionTransport,
-  WebSocketRequestError,
-} from "../../transport/mod.ts";
+import type { IRequestTransport, ISubscription, ISubscriptionTransport, TransportError } from "../../transport/mod.ts";
 import type { ExplorerConfig } from "./_methods/_base/mod.ts";
 
 // ============================================================
@@ -114,7 +109,7 @@ export class ExplorerClient<
   explorerBlock(
     this: ExplorerClient<ISubscriptionTransport>,
     listener: (data: ExplorerBlockEvent) => void,
-    onError?: (error: WebSocketRequestError) => void,
+    onError?: (error: TransportError) => void,
   ): Promise<ISubscription> {
     return explorerBlock(this.config_, listener, onError);
   }
@@ -146,7 +141,7 @@ export class ExplorerClient<
   explorerTxs(
     this: ExplorerClient<ISubscriptionTransport>,
     listener: (data: ExplorerTxsEvent) => void,
-    onError?: (error: WebSocketRequestError) => void,
+    onError?: (error: TransportError) => void,
   ): Promise<ISubscription> {
     return explorerTxs(this.config_, listener, onError);
   }

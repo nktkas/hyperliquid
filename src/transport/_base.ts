@@ -1,5 +1,4 @@
 import { HyperliquidError } from "../_base.ts";
-import type { WebSocketRequestError } from "./websocket/_dispatcher.ts";
 
 /**
  * Transport interface for executing requests to the Hyperliquid API.
@@ -14,7 +13,7 @@ export interface IRequestTransport<E extends "info" | "exchange" | "explorer" = 
   /**
    * Sends a request to the Hyperliquid API.
    *
-   * @param endpoint The API endpoint to send the request to. `explorer` is HTTP-only.
+   * @param endpoint The API endpoint to send the request to.
    * @param payload The payload to send with the request.
    * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
    * @return A promise that resolves with the parsed JSON response body.
@@ -42,11 +41,11 @@ export interface ISubscriptionTransport {
     channel: string,
     payload: unknown,
     listener: (data: CustomEvent<T>) => void,
-    onError?: (error: WebSocketRequestError) => void,
+    onError?: (error: TransportError) => void,
   ): Promise<ISubscription>;
 }
 
-/** WebSocket subscription handle. */
+/** Subscription handle. */
 export interface ISubscription {
   /** Removes the event listener and unsubscribes from the event channel. */
   unsubscribe(): Promise<void>;

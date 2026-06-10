@@ -31,7 +31,7 @@ export type TradesEvent = RecentTradesResponse;
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, TransportError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode trades} function. */
@@ -69,7 +69,7 @@ export function trades(
   config: SubscriptionConfig,
   params: TradesParameters,
   listener: (data: TradesEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const payload = parse(TradesRequest, { type: "trades", ...params });
   return config.transport.subscribe<TradesEvent>(payload.type, payload, (e) => {

@@ -67,7 +67,7 @@ export type CandleEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, TransportError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode candle} function. */
@@ -105,7 +105,7 @@ export function candle(
   config: SubscriptionConfig,
   params: CandleParameters,
   listener: (data: CandleEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const payload = parse(CandleRequest, { type: "candle", ...params });
   return config.transport.subscribe<CandleEvent>(payload.type, payload, (e) => {
