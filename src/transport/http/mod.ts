@@ -142,7 +142,8 @@ export class HttpTransport implements IRequestTransport<"info" | "exchange" | "e
     // One controller per request: the timeout timer and all user signals relay into it,
     // and `finally` detaches everything, so no listener or timer outlives the request.
     const controller = new AbortController();
-    const timeout = this.timeout !== null ? abort.scheduleTimeout(controller, this.timeout) : undefined;
+    const timeoutMs = this.timeout; // for correct error message after user changes
+    const timeout = timeoutMs !== null ? abort.scheduleTimeout(controller, timeoutMs) : undefined;
     const detachRelay = abort.relay([signal, this.fetchOptions.signal], controller);
 
     try {
@@ -187,7 +188,7 @@ export class HttpTransport implements IRequestTransport<"info" | "exchange" | "e
       if (error instanceof TransportError) throw error;
       if (timeout !== undefined && error === timeout.reason) {
         throw new HttpRequestError(
-          { message: `Request timed out after ${this.timeout} ms` },
+          { message: `Request timed out after ${timeoutMs} ms` },
           { cause: error, request: payload },
         );
       }

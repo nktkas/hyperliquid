@@ -1,5 +1,12 @@
 // deno-lint-ignore-file no-import-prefix
 
+/**
+ * Tests for HttpTransport against a mocked global fetch: URL routing,
+ * error wrapping, fetch options merging, and abort/timeout handling.
+ * @module
+ */
+
+import { getEventListeners } from "node:events";
 import { assert, assertEquals, assertIsError, assertRejects } from "jsr:@std/assert@1";
 import { HttpRequestError, HttpTransport } from "@nktkas/hyperliquid";
 
@@ -294,6 +301,20 @@ Deno.test("HttpTransport", async (t) => {
       await transport.request("info", {});
     });
 
+    await t.step("the timeout message reports the value the timer was armed with", async () => {
+      mockFetch((_req, init) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => reject(init.signal!.reason));
+        })
+      );
+
+      const transport = new HttpTransport({ timeout: 30 });
+      const promise = transport.request("info", {});
+      transport.timeout = null;
+
+      await assertRejects(() => promise, HttpRequestError, "Request timed out after 30 ms");
+    });
+
     await t.step("fetchOptions.signal is respected", async () => {
       mockFetch((_req, init) =>
         new Promise((_resolve, reject) => {
@@ -311,11 +332,6 @@ Deno.test("HttpTransport", async (t) => {
     });
 
     await t.step("does not leak abort listeners on a long-lived user signal", async () => {
-      // `getEventListeners` supports EventTarget at runtime but is missing from the Deno type stubs.
-      const { getEventListeners } = await import("node:events") as unknown as {
-        getEventListeners: (target: EventTarget, type: string) => unknown[];
-      };
-
       const controller = new AbortController();
       const transport = new HttpTransport();
       for (let i = 0; i < 100; i++) {
