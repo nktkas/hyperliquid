@@ -155,15 +155,47 @@ export class WebSocketTransport implements IRequestTransport<"info" | "exchange"
   /**
    * Subscribes to a Hyperliquid event channel.
    *
-   * @throws {WebSocketRequestError} An error that occurs when a WebSocket request fails.
+   * @param channel The event channel to listen to.
+   * @param payload The payload to send with the subscription request.
+   * @param listener The function to call when the event is dispatched.
+   * @param options Subscription options; see {@linkcode WebSocketSubscriptionManager.subscribe}.
+   * @return A promise that resolves with a subscription handle once the server confirms the subscription.
+   *
+   * @throws {WebSocketRequestError} An error that occurs when the subscription request fails.
+   *
+   * @example
+   * ```ts
+   * import { WebSocketTransport } from "@nktkas/hyperliquid";
+   *
+   * const transport = new WebSocketTransport();
+   * const subscription = await transport.subscribe("allMids", { type: "allMids" }, (event) => {
+   *   console.log(event.detail);
+   * });
+   *
+   * await subscription.unsubscribe();
+   * ```
    */
   subscribe<T>(
     channel: string,
     payload: unknown,
     listener: (data: CustomEvent<T>) => void,
-    onError?: (error: WebSocketRequestError) => void,
+    options?: {
+      /** Stops waiting for the confirmation and detaches the listener. */
+      signal?: AbortSignal;
+      /**
+       * Callback invoked at most once, when an already confirmed subscription fails:
+       * - the server rejects a re-subscription after a reconnect;
+       * - the connection is permanently terminated;
+       * - the connection goes down while re-subscription is disabled.
+       *
+       * Failures before the confirmation reject the `subscribe()` promise instead.
+       * After the callback fires, the subscription is removed and no further
+       * events or errors follow.
+       */
+      onError?: (error: WebSocketRequestError) => void;
+    },
   ): Promise<ISubscription> {
-    return this._subscriptionManager.subscribe(channel, payload, listener, onError);
+    return this._subscriptionManager.subscribe(channel, payload, listener, options);
   }
 
   /**

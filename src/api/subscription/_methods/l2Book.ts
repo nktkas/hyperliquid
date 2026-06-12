@@ -115,5 +115,5 @@ export function l2Book(
     if (e.detail.coin === payload.coin) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

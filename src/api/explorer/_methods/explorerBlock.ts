@@ -81,5 +81,5 @@ export function explorerBlock(
   const payload = parse(ExplorerBlockRequest, { type: "explorerBlock" });
   return config.transport.subscribe<ExplorerBlockEvent>("explorerBlock_", payload, (e) => { // Internal duck channel as it does not have its own channel
     listener(e.detail);
-  }, onError);
+  }, { onError });
 }

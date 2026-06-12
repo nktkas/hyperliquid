@@ -87,5 +87,5 @@ export function spotState(
     if (e.detail.user === payload.user) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

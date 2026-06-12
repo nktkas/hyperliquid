@@ -108,5 +108,5 @@ export function userFundings(
     if (e.detail.user === payload.user) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

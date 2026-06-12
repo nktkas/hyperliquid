@@ -112,5 +112,5 @@ export function bbo(
     if (e.detail.coin === payload.coin) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

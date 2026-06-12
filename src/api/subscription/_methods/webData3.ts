@@ -121,5 +121,5 @@ export function webData3(
     if (e.detail.userState.user === payload.user) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

@@ -66,5 +66,5 @@ export function spotAssetCtxs(
   const payload = parse(SpotAssetCtxsRequest, { type: "spotAssetCtxs" });
   return config.transport.subscribe<SpotAssetCtxsEvent>(payload.type, payload, (e) => {
     listener(e.detail);
-  }, onError);
+  }, { onError });
 }

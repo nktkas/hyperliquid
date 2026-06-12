@@ -77,5 +77,5 @@ export function notification(
   const payload = parse(NotificationRequest, { type: "notification", ...params });
   return config.transport.subscribe<NotificationEvent>(payload.type, payload, (e) => {
     listener(e.detail);
-  }, onError);
+  }, { onError });
 }

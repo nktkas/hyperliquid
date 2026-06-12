@@ -103,5 +103,5 @@ export function assetCtxs(
     if (e.detail.dex === payload.dex) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

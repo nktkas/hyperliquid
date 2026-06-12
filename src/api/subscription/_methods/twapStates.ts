@@ -98,5 +98,5 @@ export function twapStates(
     if (e.detail.user === payload.user && e.detail.dex === payload.dex) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

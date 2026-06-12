@@ -93,5 +93,5 @@ export function clearinghouseState(
     if (e.detail.user === payload.user && e.detail.dex === payload.dex) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

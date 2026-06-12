@@ -76,5 +76,5 @@ export function allDexsAssetCtxs(
   });
   return config.transport.subscribe<AllDexsAssetCtxsEvent>(payload.type, payload, (e) => {
     listener(e.detail);
-  }, onError);
+  }, { onError });
 }

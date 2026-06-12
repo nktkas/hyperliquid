@@ -66,5 +66,5 @@ export function explorerTxs(
   const payload = parse(ExplorerTxsRequest, { type: "explorerTxs" });
   return config.transport.subscribe<ExplorerTxsEvent>("explorerTxs_", payload, (e) => { // Internal duck channel as it does not have its own channel
     listener(e.detail);
-  }, onError);
+  }, { onError });
 }

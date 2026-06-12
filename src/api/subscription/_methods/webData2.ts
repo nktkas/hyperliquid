@@ -79,5 +79,5 @@ export function webData2(
     if (e.detail.user === payload.user) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

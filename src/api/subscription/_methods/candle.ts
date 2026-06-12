@@ -112,5 +112,5 @@ export function candle(
     if (e.detail.s === payload.coin && e.detail.i === payload.interval) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

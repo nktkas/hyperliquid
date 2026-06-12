@@ -87,5 +87,5 @@ export function userTwapHistory(
     if (e.detail.user === payload.user) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

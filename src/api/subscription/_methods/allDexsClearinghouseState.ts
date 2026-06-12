@@ -93,5 +93,5 @@ export function allDexsClearinghouseState(
     if (e.detail.user === payload.user) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

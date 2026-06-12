@@ -90,5 +90,5 @@ export function userNonFundingLedgerUpdates(
     if (e.detail.user === payload.user) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

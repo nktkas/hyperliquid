@@ -81,5 +81,5 @@ export function activeSpotAssetCtx(
     if (e.detail.coin === payload.coin) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

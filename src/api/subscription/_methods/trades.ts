@@ -76,5 +76,5 @@ export function trades(
     if (e.detail[0]?.coin === payload.coin) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

@@ -1,90 +1,39 @@
 // deno-lint-ignore-file no-import-prefix
 
+/**
+ * Tests for the subscription lifecycle manager: listener registration,
+ * resubscription across reconnects, failure reporting, and server-side limits.
+ * @module
+ */
+
 import { assert, assertEquals, assertFalse, assertRejects } from "jsr:@std/assert@1";
 import { ReconnectingWebSocket } from "@nktkas/rews";
 import { WebSocketDispatcher, WebSocketRequestError } from "../../../src/transport/websocket/_dispatcher.ts";
 import { HyperliquidEventTarget } from "../../../src/transport/websocket/_events.ts";
 import { WebSocketSubscriptionManager } from "../../../src/transport/websocket/_subscriptionManager.ts";
+import { drain, MockWebSocket, RESPONSES } from "./_mock.ts";
 
 // =============================================================================
 // Helpers
 // =============================================================================
 
-// @ts-expect-error: Mocking WebSocket for testing purposes
-class MockWebSocket extends EventTarget implements ReconnectingWebSocket {
-  sentMessages: string[] = [];
-  readyState: 0 | 1 | 2 | 3 = ReconnectingWebSocket.OPEN;
-  terminationController = new AbortController();
-  terminationSignal = this.terminationController.signal;
-
-  send(data: string): void {
-    this.sentMessages.push(data);
-  }
-
-  close(): void {
-    this.readyState = ReconnectingWebSocket.CLOSED;
-    this.dispatchEvent(new CloseEvent("close"));
-  }
-
-  open(): void {
-    this.readyState = ReconnectingWebSocket.OPEN;
-    this.dispatchEvent(new Event("open"));
-  }
-
-  terminate(reason?: unknown): void {
-    this.terminationController.abort(reason);
-    this.close();
-  }
-
-  mockMessage(data: unknown): void {
-    this.dispatchEvent(new MessageEvent("message", { data: JSON.stringify(data) }));
-  }
-}
-
 /** Strips private/protected modifiers so intersections with internal-state types don't collapse to `never`. */
 type Public<T> = { [K in keyof T]: T[K] };
-type RequesterWithInternals = Public<WebSocketDispatcher> & { _queue: unknown[] };
 type ManagerWithInternals = Public<WebSocketSubscriptionManager> & {
   _subscriptions: Map<string, { listeners: Map<unknown, unknown> }>;
 };
 
 /** Creates a new WebSocketSubscriptionManager with mock socket. */
-function createManager(resubscribe = true): {
-  socket: MockWebSocket;
-  requester: RequesterWithInternals;
-  hlEvents: HyperliquidEventTarget;
-  manager: ManagerWithInternals;
-} {
+function createManager(resubscribe = true): { socket: MockWebSocket; manager: ManagerWithInternals } {
   const socket = new MockWebSocket() as ReconnectingWebSocket & MockWebSocket;
   const hlEvents = new HyperliquidEventTarget(socket);
-  const requester = new WebSocketDispatcher(socket, hlEvents, 10_000);
-  const manager = new WebSocketSubscriptionManager(socket, requester, hlEvents, resubscribe);
+  const dispatcher = new WebSocketDispatcher(socket, hlEvents, 10_000);
+  const manager = new WebSocketSubscriptionManager(socket, dispatcher, hlEvents, resubscribe);
   return {
     socket,
-    requester: requester as unknown as RequesterWithInternals,
-    hlEvents,
     manager: manager as unknown as ManagerWithInternals,
   };
 }
-
-// =============================================================================
-// Test Data
-// =============================================================================
-
-const RESPONSES = {
-  subscriptionResponse: (method: string, subscription: unknown) => ({
-    channel: "subscriptionResponse",
-    data: { method, subscription },
-  }),
-  channelEvent: (channel: string, data: unknown) => ({
-    channel,
-    data,
-  }),
-  errorChannel: (message: string) => ({
-    channel: "error",
-    data: message,
-  }),
-} as const;
 
 // =============================================================================
 // Tests
@@ -103,15 +52,12 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
       const payload = { channel: "test", extra: "data" };
       const subPromise = manager.subscribe("test", payload, listener);
 
-      // Confirm subscription
       socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
       const sub = await subPromise;
 
-      // Send event
       socket.mockMessage(RESPONSES.channelEvent("test", { update: "subscription update" }));
       assertEquals(eventReceived, true);
 
-      // Unsubscribe
       const unsubPromise = sub.unsubscribe();
       socket.mockMessage(RESPONSES.subscriptionResponse("unsubscribe", payload));
       await unsubPromise;
@@ -150,30 +96,15 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
       assertEquals(manager._subscriptions.get(JSON.stringify(payload))?.listeners.size, 2);
     });
 
-    await t.step("returns same subscription object for same payload", async () => {
+    await t.step("second listener does not send subscription request", () => {
       const { socket, manager } = createManager();
 
       const payload = { channel: "test", extra: "data" };
-      const listener = () => {};
-
-      const sub1Promise = manager.subscribe("test", payload, listener);
-      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
-      const sub1 = await sub1Promise;
-
-      const sub2 = await manager.subscribe("test", payload, listener);
-
-      assertEquals(sub1.unsubscribe, sub2.unsubscribe);
-    });
-
-    await t.step("second listener does not send subscription request", () => {
-      const { manager, requester } = createManager();
-
-      const payload = { channel: "test", extra: "data" };
 
       manager.subscribe("test", payload, () => {}).catch(() => {});
       manager.subscribe("test", payload, () => {}).catch(() => {});
 
-      assertEquals(requester._queue.length, 1);
+      assertEquals(socket.sentMessages.length, 1);
     });
 
     await t.step("new listeners wait for pending subscription", async () => {
@@ -185,16 +116,110 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
       let secondCompleted = false;
       manager.subscribe("test", payload, () => {}).then(() => secondCompleted = true);
 
-      // Both should be waiting
-      await new Promise((r) => setTimeout(r, 10));
+      await drain();
       assertFalse(secondCompleted);
 
-      // Confirm subscription - both should complete
       socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
       await subPromise1;
 
-      await new Promise((r) => setTimeout(r, 10));
+      await drain();
       assert(secondCompleted);
+    });
+
+    await t.step("rejected confirmation removes the subscription", async () => {
+      const { socket, manager } = createManager();
+      const payload = { channel: "test", extra: "data" };
+
+      let events = 0;
+      const promise = manager.subscribe("test", payload, () => events++);
+      socket.mockMessage(RESPONSES.errorChannel(`Already subscribed: ${JSON.stringify(payload)}`));
+      await assertRejects(() => promise, WebSocketRequestError, "Already subscribed");
+
+      // The listener is detached and the entry is gone.
+      socket.mockMessage(RESPONSES.channelEvent("test", { update: "x" }));
+      assertEquals(events, 0);
+      assertEquals(manager._subscriptions.size, 0);
+
+      // A retry is no longer poisoned by the cached rejection.
+      const retry = manager.subscribe("test", payload, () => {});
+      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+      await retry;
+    });
+
+    await t.step("limit errors carry the request payload", async () => {
+      const { socket, manager } = createManager();
+
+      for (let i = 0; i < 15; i++) {
+        const payload = { type: "userEvents", user: `0x${i.toString().padStart(40, "0")}` };
+        const promise = manager.subscribe("userEvents", payload, () => {});
+        socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+        await promise;
+      }
+
+      const payload16 = { type: "userEvents", user: "0x000000000000000000000000000000000000000f" };
+      const err = await assertRejects(
+        () => manager.subscribe("userEvents", payload16, () => {}),
+        WebSocketRequestError,
+      );
+      assertEquals(err.request, payload16);
+    });
+  });
+
+  await t.step("AbortSignal", async (t) => {
+    await t.step("rejects without sending when already aborted", async () => {
+      const { socket, manager } = createManager();
+      const payload = { channel: "test", extra: "data" };
+
+      const signal = AbortSignal.abort(new Error("pre-aborted"));
+      const err = await assertRejects(
+        () => manager.subscribe("test", payload, () => {}, { signal }),
+        WebSocketRequestError,
+        "Subscription was aborted",
+      );
+      assertEquals(err.cause, signal.reason);
+      assertEquals(socket.sentMessages.length, 0);
+    });
+
+    await t.step("abort while the confirmation is pending detaches the listener", async () => {
+      const { socket, manager } = createManager();
+      const payload = { channel: "test", extra: "data" };
+
+      let events = 0;
+      const controller = new AbortController();
+      const promise = manager.subscribe("test", payload, () => events++, { signal: controller.signal });
+
+      controller.abort(new Error("stop waiting"));
+      const err = await assertRejects(() => promise, WebSocketRequestError, "Subscription was aborted");
+      assertEquals(err.cause, controller.signal.reason);
+      assertEquals(manager._subscriptions.size, 0);
+
+      // The in-flight request may still confirm: the slot is freed server-side.
+      assertEquals(JSON.parse(socket.sentMessages[1]).method, "unsubscribe");
+
+      // A late confirmation does not resurrect the subscription.
+      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+      socket.mockMessage(RESPONSES.channelEvent("test", { update: "x" }));
+      assertEquals(events, 0);
+    });
+
+    await t.step("abort of one waiter does not affect the others", async () => {
+      const { socket, manager } = createManager();
+      const payload = { channel: "test", extra: "data" };
+
+      let events = 0;
+      const promise = manager.subscribe("test", payload, () => events++);
+
+      const controller = new AbortController();
+      const joiner = manager.subscribe("test", payload, () => {}, { signal: controller.signal });
+      controller.abort(new Error("changed my mind"));
+      await assertRejects(() => joiner, WebSocketRequestError, "Subscription was aborted");
+
+      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+      await promise;
+
+      socket.mockMessage(RESPONSES.channelEvent("test", { update: "x" }));
+      assertEquals(events, 1);
+      assertEquals(manager._subscriptions.get(JSON.stringify(payload))?.listeners.size, 1);
     });
   });
 
@@ -225,7 +250,6 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
 
       await manager.subscribe("test", payload, () => {});
 
-      // First unsubscribe - should not send request
       await sub1.unsubscribe();
 
       assertEquals(manager._subscriptions.get(JSON.stringify(payload))?.listeners.size, 1);
@@ -242,7 +266,6 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
       const payload1 = { channel: "test1", extra: "data1" };
       const payload2 = { channel: "test2", extra: "data2" };
 
-      // Subscribe to both channels
       const sub1Promise = manager.subscribe("test1", payload1, () => eventCount1++);
       socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload1));
       await sub1Promise;
@@ -256,19 +279,16 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
       assertEquals(eventCount1, 1);
       assertEquals(eventCount2, 1);
 
-      // Simulate reconnection
-      socket.close();
+      socket.disconnect();
       socket.open();
 
-      // Confirm resubscriptions
       socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload1));
       socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload2));
 
-      // Send events again
       socket.mockMessage(RESPONSES.channelEvent("test1", { update: "event" }));
       socket.mockMessage(RESPONSES.channelEvent("test2", { update: "event" }));
 
-      await new Promise((r) => setTimeout(r, 10));
+      await drain();
 
       assertEquals(eventCount1, 2);
       assertEquals(eventCount2, 2);
@@ -281,33 +301,141 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
       const payload = { channel: "test", extra: "data" };
 
       const errors: unknown[] = [];
-      const subPromise = manager.subscribe("test", payload, () => {}, (e) => errors.push(e));
+      const subPromise = manager.subscribe("test", payload, () => {}, { onError: (e) => errors.push(e) });
       socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
       await subPromise;
 
       // Reconnect, then the server rejects the re-subscription while the socket stays open.
-      socket.close();
+      socket.disconnect();
       socket.open();
       socket.mockMessage(RESPONSES.errorChannel(JSON.stringify({ method: "subscribe", subscription: payload })));
-      await new Promise((r) => setTimeout(r, 10));
+      await drain();
 
       assertEquals(errors.length, 1);
       assert(errors[0] instanceof WebSocketRequestError);
-      assertEquals(socket.readyState, ReconnectingWebSocket.OPEN); // connection still live...
-      assertEquals(manager._subscriptions.size, 0); // ...but the failed channel is dropped
+      // The connection is still live, but the failed channel is dropped.
+      assertEquals(socket.readyState, ReconnectingWebSocket.OPEN);
+      assertEquals(manager._subscriptions.size, 0);
 
       // Next reconnect does not retry the dropped channel: no new subscribe frame, no new onError.
       const sentBefore = socket.sentMessages.length;
-      socket.close();
+      socket.disconnect();
       socket.open();
-      await new Promise((r) => setTimeout(r, 10));
+      await drain();
       assertEquals(socket.sentMessages.length, sentBefore);
       assertEquals(errors.length, 1);
 
       // A later terminal close does not re-notify the already-dropped channel.
       socket.terminate(new Error("dead"));
-      await new Promise((r) => setTimeout(r, 10));
+      await drain();
       assertEquals(errors.length, 1);
+    });
+
+    await t.step("a subscriber joining an in-flight resubscribe shares its failure", async () => {
+      const { socket, manager } = createManager(true);
+      const payload = { channel: "test", extra: "data" };
+
+      const subPromise = manager.subscribe("test", payload, () => {});
+      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+      await subPromise;
+
+      // Reconnect; the re-subscription is in flight when a new subscriber joins.
+      socket.disconnect();
+      socket.open();
+      const joiner = manager.subscribe("test", payload, () => {});
+
+      // The server rejects the re-subscription on the live socket.
+      socket.mockMessage(RESPONSES.errorChannel(JSON.stringify({ method: "subscribe", subscription: payload })));
+
+      await assertRejects(() => joiner, WebSocketRequestError);
+      assertEquals(manager._subscriptions.size, 0);
+    });
+
+    await t.step("a joiner rejected by a disconnect does not keep a zombie listener", async () => {
+      const { socket, manager } = createManager(true);
+      const payload = { channel: "test", extra: "data" };
+
+      let survivorEvents = 0;
+      let joinerEvents = 0;
+      const subPromise = manager.subscribe("test", payload, () => survivorEvents++);
+      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+      await subPromise;
+
+      // Reconnect; a joiner subscribes while the re-subscription is in flight,
+      // then the connection drops again before the confirmation.
+      socket.disconnect();
+      socket.open();
+      const joiner = manager.subscribe("test", payload, () => joinerEvents++);
+      socket.disconnect();
+      await assertRejects(() => joiner, WebSocketRequestError, "WebSocket connection closed");
+
+      // The survivor keeps the entry; the joiner's listener is gone with its rejection.
+      assertEquals(manager._subscriptions.size, 1);
+      assertEquals(manager._subscriptions.get(JSON.stringify(payload))?.listeners.size, 1);
+
+      socket.open();
+      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+      socket.mockMessage(RESPONSES.channelEvent("test", { update: "x" }));
+      await drain();
+      assertEquals(survivorEvents, 1);
+      assertEquals(joinerEvents, 0);
+    });
+
+    await t.step("a subscriber hitting a poisoned cached rejection does not leak its listener", async () => {
+      const { socket, manager } = createManager(true);
+      const payload = { channel: "test", extra: "data" };
+
+      const subPromise = manager.subscribe("test", payload, () => {});
+      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+      await subPromise;
+
+      // The connection flaps: the re-subscription is rejected by the disconnect
+      // and its rejection stays cached in the surviving entry.
+      socket.disconnect();
+      socket.open();
+      socket.disconnect();
+      await drain();
+
+      // A subscriber in the disconnected window hits the cached rejection.
+      let lateEvents = 0;
+      const late = manager.subscribe("test", payload, () => lateEvents++);
+      await assertRejects(() => late, WebSocketRequestError, "WebSocket connection closed");
+      assertEquals(manager._subscriptions.get(JSON.stringify(payload))?.listeners.size, 1);
+
+      socket.open();
+      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+      socket.mockMessage(RESPONSES.channelEvent("test", { update: "x" }));
+      await drain();
+      assertEquals(lateEvents, 0);
+    });
+
+    await t.step("a re-subscription rejected by a disconnect survives for the next open", async () => {
+      const { socket, manager } = createManager(true);
+      const payload = { channel: "test", extra: "data" };
+
+      let events = 0;
+      let onErrorCalled = false;
+      const subPromise = manager.subscribe("test", payload, () => events++, {
+        onError: () => onErrorCalled = true,
+      });
+      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+      await subPromise;
+
+      // The connection flaps while the re-subscription is in flight:
+      // the dispatcher rejects its queue, but the channel must survive.
+      socket.disconnect();
+      socket.open();
+      socket.disconnect();
+      await drain();
+
+      assertFalse(onErrorCalled);
+      assertEquals(manager._subscriptions.size, 1);
+
+      // The next open retries and the channel keeps working.
+      socket.open();
+      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+      socket.mockMessage(RESPONSES.channelEvent("test", { update: "x" }));
+      assertEquals(events, 1);
     });
 
     await t.step("onError: terminal loss notifies every listener once with the reason, isolating throws", async () => {
@@ -317,23 +445,26 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
       // Two listeners on one channel: the first throws after being called, the second records the reason.
       let firstCalls = 0;
       const seen: unknown[] = [];
-      const p1 = manager.subscribe("test", payload, () => {}, () => {
-        firstCalls++;
-        throw new Error("boom");
+      const p1 = manager.subscribe("test", payload, () => {}, {
+        onError: () => {
+          firstCalls++;
+          throw new Error("boom");
+        },
       });
       socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
       await p1;
-      await manager.subscribe("test", payload, () => {}, (e) => seen.push(e));
+      await manager.subscribe("test", payload, () => {}, { onError: (e) => seen.push(e) });
 
-      const reason = new Error("gone for good");
-      socket.terminate(reason);
-      await new Promise((r) => setTimeout(r, 10));
+      socket.terminate(new Error("gone for good"));
+      await drain();
 
-      assertEquals(firstCalls, 1); // first listener notified (fan-out)...
+      // The first listener's throw does not block the sibling, which receives
+      // a wrapped error whose cause is the termination reason.
+      assertEquals(firstCalls, 1);
       assertEquals(seen.length, 1);
-      assert(seen[0] instanceof WebSocketRequestError); // ...its throw didn't block the sibling, which got
-      assertEquals((seen[0] as WebSocketRequestError).cause, reason); // a wrapped error with the reason as cause
-      assertEquals(manager._subscriptions.size, 0); // teardown still ran
+      assert(seen[0] instanceof WebSocketRequestError);
+      assertEquals((seen[0] as WebSocketRequestError).cause, socket.terminationSignal.reason);
+      assertEquals(manager._subscriptions.size, 0);
     });
 
     await t.step("onError: terminal also fires via the socket error event", async () => {
@@ -341,18 +472,18 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
       const payload = { channel: "test", extra: "data" };
 
       const errors: unknown[] = [];
-      const subPromise = manager.subscribe("test", payload, () => {}, (e) => errors.push(e));
+      const subPromise = manager.subscribe("test", payload, () => {}, { onError: (e) => errors.push(e) });
       socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
       await subPromise;
 
-      const reason = new Error("error-path");
-      socket.terminationController.abort(reason);
+      socket.terminationController.abort(new Error("error-path"));
       socket.dispatchEvent(new Event("error"));
-      await new Promise((r) => setTimeout(r, 10));
+      await drain();
 
+      // The terminal-via-error failure is wrapped too, with the reason as cause.
       assertEquals(errors.length, 1);
-      assert(errors[0] instanceof WebSocketRequestError); // terminal-via-error is wrapped too...
-      assertEquals((errors[0] as WebSocketRequestError).cause, reason); // ...with the reason as cause
+      assert(errors[0] instanceof WebSocketRequestError);
+      assertEquals((errors[0] as WebSocketRequestError).cause, socket.terminationSignal.reason);
     });
 
     await t.step("onError: re-subscribing the same listener keeps its original onError (first-wins)", async () => {
@@ -362,39 +493,101 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
       let first = 0;
       let second = 0;
       const listener = () => {};
-      const p1 = manager.subscribe("test", payload, listener, () => first++);
+      const p1 = manager.subscribe("test", payload, listener, { onError: () => first++ });
       socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
       await p1;
 
       const sentBefore = socket.sentMessages.length;
-      await manager.subscribe("test", payload, listener, () => second++); // same listener, different onError
+      await manager.subscribe("test", payload, listener, { onError: () => second++ }); // same listener, different onError
 
       assertEquals(socket.sentMessages.length, sentBefore); // no new subscribe sent (dedup)
       assertEquals(manager._subscriptions.get(JSON.stringify(payload))?.listeners.size, 1);
 
       socket.terminate(new Error("x"));
-      await new Promise((r) => setTimeout(r, 10));
+      await drain();
 
       assertEquals(first, 1); // original onError fired
       assertEquals(second, 0); // replacement ignored
     });
 
-    await t.step("onError: not called on a clean resubscribe:false close", async () => {
+    await t.step("onError: called once when the connection drops with resubscribe disabled", async () => {
       const { socket, manager } = createManager(false);
       const payload = { channel: "test", extra: "data" };
 
       let errorCalls = 0;
-      const subPromise = manager.subscribe("test", payload, () => {}, () => errorCalls++);
+      const subPromise = manager.subscribe("test", payload, () => {}, { onError: () => errorCalls++ });
       socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
       await subPromise;
 
-      socket.close(); // clean close, not a termination
-      await new Promise((r) => setTimeout(r, 10));
+      // Not a termination, but the subscription cannot be served anymore.
+      socket.disconnect();
+      await drain();
 
-      assertEquals(manager._subscriptions.size, 0); // torn down
-      assertEquals(errorCalls, 0); // no onError without a terminal reason
+      assertEquals(manager._subscriptions.size, 0);
+      assertEquals(errorCalls, 1);
 
+      // The already-failed subscription is not re-notified on termination.
       socket.terminate();
+      await drain();
+      assertEquals(errorCalls, 1);
+    });
+
+    await t.step("a failure before the confirmation rejects subscribe() without firing onError", async () => {
+      const { socket, manager } = createManager(false);
+      const payload = { channel: "test", extra: "data" };
+
+      let errorCalls = 0;
+      const subPromise = manager.subscribe("test", payload, () => {}, { onError: () => errorCalls++ });
+
+      socket.disconnect();
+      await assertRejects(() => subPromise, WebSocketRequestError, "WebSocket connection closed");
+      await drain();
+
+      // One failure, one reporting channel: the rejection. No onError.
+      assertEquals(errorCalls, 0);
+      assertEquals(manager._subscriptions.size, 0);
+    });
+
+    await t.step("a termination before the confirmation rejects subscribe() without firing onError", async () => {
+      const { socket, manager } = createManager(true);
+      const payload = { channel: "test", extra: "data" };
+
+      let errorCalls = 0;
+      const subPromise = manager.subscribe("test", payload, () => {}, { onError: () => errorCalls++ });
+
+      socket.terminate(new Error("gone"));
+      await assertRejects(() => subPromise, WebSocketRequestError);
+      await drain();
+
+      assertEquals(errorCalls, 0);
+      assertEquals(manager._subscriptions.size, 0);
+    });
+
+    await t.step("disabling resubscribe while disconnected fails the stranded subscriptions at open", async () => {
+      const { socket, manager } = createManager(true);
+      const payload = { channel: "test", extra: "data" };
+
+      const errors: unknown[] = [];
+      let events = 0;
+      const subPromise = manager.subscribe("test", payload, () => events++, { onError: (e) => errors.push(e) });
+      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+      await subPromise;
+
+      // The subscription survives the drop, but re-subscription is switched
+      // off while the socket is down — it cannot be served after the reopen.
+      socket.disconnect();
+      manager.resubscribe = false;
+      const sentBefore = socket.sentMessages.length;
+      socket.open();
+      await drain();
+
+      assertEquals(socket.sentMessages.length, sentBefore);
+      assertEquals(errors.length, 1);
+      assert(errors[0] instanceof WebSocketRequestError);
+      assertEquals(manager._subscriptions.size, 0);
+
+      socket.mockMessage(RESPONSES.channelEvent("test", { update: "x" }));
+      assertEquals(events, 0);
     });
 
     await t.step("resubscribe: false clears subscriptions on close", async () => {
@@ -406,7 +599,6 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
       const payload1 = { channel: "test1", extra: "data1" };
       const payload2 = { channel: "test2", extra: "data2" };
 
-      // Subscribe to both channels
       const sub1Promise = manager.subscribe("test1", payload1, () => eventCount1++);
       socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload1));
       await sub1Promise;
@@ -421,21 +613,16 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
       assertEquals(eventCount2, 1);
       assertEquals(manager._subscriptions.size, 2);
 
-      // Close connection - should clear subscriptions
-      socket.close();
-
-      await new Promise((r) => setTimeout(r, 10));
+      socket.disconnect();
+      await drain();
 
       assertEquals(manager._subscriptions.size, 0);
 
-      // Reopen - no resubscription
+      // After the reopen no resubscription happens and no events are delivered.
       socket.open();
-
-      // Send events - should not be received (listeners removed)
       socket.mockMessage(RESPONSES.channelEvent("test1", { update: "event" }));
       socket.mockMessage(RESPONSES.channelEvent("test2", { update: "event" }));
-
-      await new Promise((r) => setTimeout(r, 10));
+      await drain();
 
       assertEquals(eventCount1, 1);
       assertEquals(eventCount2, 1);
@@ -445,56 +632,50 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
   });
 
   await t.step("unique user subscription limit", async (t) => {
-    await t.step("rejects when exceeding 10 unique user subscriptions", async () => {
+    await t.step("rejects when exceeding 15 unique users", async () => {
       const { socket, manager } = createManager();
 
-      // Subscribe to 10 users
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 15; i++) {
         const payload = { type: "userEvents", user: `0x${i.toString().padStart(40, "0")}` };
         const promise = manager.subscribe("userEvents", payload, () => {});
         socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
         await promise;
       }
 
-      // 11th subscription should fail
-      const payload11 = { type: "userEvents", user: "0x000000000000000000000000000000000000000a" };
+      const payload16 = { type: "userEvents", user: "0x000000000000000000000000000000000000000f" };
       await assertRejects(
-        () => manager.subscribe("userEvents", payload11, () => {}),
+        () => manager.subscribe("userEvents", payload16, () => {}),
         WebSocketRequestError,
-        "Cannot track more than 10 unique users",
+        "Cannot track more than 15 total users.",
       );
     });
 
     await t.step("allows subscription after unsubscribing", async () => {
       const { socket, manager } = createManager();
 
-      // Subscribe to 10 users
       const subs = [];
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 15; i++) {
         const payload = { type: "userEvents", user: `0x${i.toString().padStart(40, "0")}` };
         const promise = manager.subscribe("userEvents", payload, () => {});
         socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
         subs.push({ sub: await promise, payload });
       }
 
-      // Unsubscribe one
       const unsubPromise = subs[0].sub.unsubscribe();
       socket.mockMessage(RESPONSES.subscriptionResponse("unsubscribe", subs[0].payload));
       await unsubPromise;
 
-      // New subscription should succeed
-      const payload11 = { type: "userEvents", user: "0x000000000000000000000000000000000000000a" };
-      const promise = manager.subscribe("userEvents", payload11, () => {});
-      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload11));
+      const newUserPayload = { type: "userEvents", user: "0x000000000000000000000000000000000000000f" };
+      const promise = manager.subscribe("userEvents", newUserPayload, () => {});
+      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", newUserPayload));
       await promise;
 
-      assertEquals(manager._subscriptions.size, 10);
+      assertEquals(manager._subscriptions.size, 15);
     });
 
     await t.step("does not count subscriptions without user parameter", async () => {
       const { socket, manager } = createManager();
 
-      // Subscribe to 10 channels without user parameter
       for (let i = 0; i < 10; i++) {
         const payload = { type: "allMids" };
         const promise = manager.subscribe("allMids", payload, () => {});
@@ -502,25 +683,57 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
         await promise;
       }
 
-      // User subscription should still succeed
       const userPayload = { type: "userEvents", user: "0x0000000000000000000000000000000000000001" };
       const promise = manager.subscribe("userEvents", userPayload, () => {});
       socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", userPayload));
       await promise;
     });
 
-    await t.step("allows multiple listeners on same user subscription", async () => {
+    await t.step("allows a new channel of an already tracked user at the limit", async () => {
       const { socket, manager } = createManager();
 
-      // Subscribe to 10 users
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 15; i++) {
         const payload = { type: "userEvents", user: `0x${i.toString().padStart(40, "0")}` };
         const promise = manager.subscribe("userEvents", payload, () => {});
         socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
         await promise;
       }
 
-      // Adding another listener to existing subscription should succeed
+      // A new channel of user 0 does not add a 16th user.
+      const payload = { type: "userFills", user: `0x${"0".padStart(40, "0")}` };
+      const promise = manager.subscribe("userFills", payload, () => {});
+      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+      await promise;
+    });
+
+    await t.step("matches tracked users case-insensitively", async () => {
+      const { socket, manager } = createManager();
+
+      const mixedCase = "0x00000000000000000000000000000000000000AB";
+      for (const user of [mixedCase, ...Array.from({ length: 14 }, (_, i) => `0x${`${i}`.padStart(40, "0")}`)]) {
+        const payload = { type: "userEvents", user };
+        const promise = manager.subscribe("userEvents", payload, () => {});
+        socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+        await promise;
+      }
+
+      // The same address in a different case is not a 16th user.
+      const payload = { type: "userFills", user: mixedCase.toLowerCase() };
+      const promise = manager.subscribe("userFills", payload, () => {});
+      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+      await promise;
+    });
+
+    await t.step("allows multiple listeners on same user subscription", async () => {
+      const { socket, manager } = createManager();
+
+      for (let i = 0; i < 15; i++) {
+        const payload = { type: "userEvents", user: `0x${i.toString().padStart(40, "0")}` };
+        const promise = manager.subscribe("userEvents", payload, () => {});
+        socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+        await promise;
+      }
+
       const existingPayload = { type: "userEvents", user: "0x0000000000000000000000000000000000000000" };
       await manager.subscribe("userEvents", existingPayload, () => {});
     });
@@ -528,7 +741,7 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
     await t.step("allows multiple subscriptions for same user", async () => {
       const { socket, manager } = createManager();
 
-      // Subscribe to multiple channels for the same user (should count as 1 unique user)
+      // Many channels of one user count as a single unique user.
       const user = "0x0000000000000000000000000000000000000001";
       for (let i = 0; i < 10; i++) {
         const payload = { type: `channel${i}`, user };
@@ -537,7 +750,6 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
         await promise;
       }
 
-      // Subscription for a second unique user should succeed (only 2 unique users total)
       const newUserPayload = { type: "userEvents", user: "0x0000000000000000000000000000000000000002" };
       const promise = manager.subscribe("userEvents", newUserPayload, () => {});
       socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", newUserPayload));
@@ -551,7 +763,6 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
     await t.step("rejects when exceeding 1000 subscriptions", async () => {
       const { socket, manager } = createManager();
 
-      // Subscribe to 1000 channels
       for (let i = 0; i < 1000; i++) {
         const payload = { type: "allMids", id: i };
         const promise = manager.subscribe("allMids", payload, () => {});
@@ -559,19 +770,17 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
         await promise;
       }
 
-      // 1001st subscription should fail
       const payload1001 = { type: "allMids", id: 1000 };
       await assertRejects(
         () => manager.subscribe("allMids", payload1001, () => {}),
         WebSocketRequestError,
-        "Cannot subscribe to more than 1000 channels",
+        "Cannot subscribe to more than 1000 channels.",
       );
     });
 
     await t.step("allows subscription after unsubscribing", async () => {
       const { socket, manager } = createManager();
 
-      // Subscribe to 1000 channels
       const subs = [];
       for (let i = 0; i < 1000; i++) {
         const payload = { type: "allMids", id: i };
@@ -580,12 +789,10 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
         subs.push({ sub: await promise, payload });
       }
 
-      // Unsubscribe one
       const unsubPromise = subs[0].sub.unsubscribe();
       socket.mockMessage(RESPONSES.subscriptionResponse("unsubscribe", subs[0].payload));
       await unsubPromise;
 
-      // New subscription should succeed
       const payload1001 = { type: "allMids", id: 1000 };
       const promise = manager.subscribe("allMids", payload1001, () => {});
       socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload1001));
@@ -597,7 +804,6 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
     await t.step("allows multiple listeners on same subscription", async () => {
       const { socket, manager } = createManager();
 
-      // Subscribe to 1000 channels
       for (let i = 0; i < 1000; i++) {
         const payload = { type: "allMids", id: i };
         const promise = manager.subscribe("allMids", payload, () => {});
@@ -605,7 +811,6 @@ Deno.test("WebSocketSubscriptionManager", async (t) => {
         await promise;
       }
 
-      // Adding another listener to existing subscription should succeed
       const existingPayload = { type: "allMids", id: 0 };
       await manager.subscribe("allMids", existingPayload, () => {});
 

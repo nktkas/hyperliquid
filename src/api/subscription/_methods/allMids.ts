@@ -103,5 +103,5 @@ export function allMids(
     if (e.detail.dex === payload.dex) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

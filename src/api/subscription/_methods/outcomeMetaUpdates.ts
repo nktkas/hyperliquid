@@ -117,5 +117,5 @@ export function outcomeMetaUpdates(
   const payload = parse(OutcomeMetaUpdatesRequest, { type: "outcomeMetaUpdates" });
   return config.transport.subscribe<OutcomeMetaUpdatesEvent>(payload.type, payload, (e) => {
     listener(e.detail);
-  }, onError);
+  }, { onError });
 }

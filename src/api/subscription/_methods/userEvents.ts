@@ -149,5 +149,5 @@ export function userEvents(
   const payload = parse(UserEventsRequest, { type: "userEvents", ...params });
   return config.transport.subscribe<UserEventsEvent>("user", payload, (e) => {
     listener(e.detail);
-  }, onError);
+  }, { onError });
 }

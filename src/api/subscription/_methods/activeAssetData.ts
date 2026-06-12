@@ -79,5 +79,5 @@ export function activeAssetData(
     if (e.detail.coin === payload.coin && e.detail.user === payload.user) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

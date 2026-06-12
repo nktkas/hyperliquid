@@ -113,5 +113,5 @@ export function orderUpdates(
   const payload = parse(OrderUpdatesRequest, { type: "orderUpdates", ...params });
   return config.transport.subscribe<OrderUpdatesEvent>(payload.type, payload, (e) => {
     listener(e.detail);
-  }, onError);
+  }, { onError });
 }
