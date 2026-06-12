@@ -54,10 +54,10 @@ export function runSubscriptionTest(options: {
     // --- Test ------------------------------------------------
 
     await fn(t, client)
-      .finally(async () => {
+      .finally(() => {
         // --- Cleanup ------------------------------------------------
 
-        await transport.close();
+        transport.close();
       });
   });
 }

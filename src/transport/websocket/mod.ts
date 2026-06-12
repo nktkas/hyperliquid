@@ -3,7 +3,7 @@
  *
  * Use {@link WebSocketTransport} for real-time subscriptions and for lower-latency API requests.
  *
- * @example Subscriptions
+ * @example
  * ```ts
  * import { SubscriptionClient, WebSocketTransport } from "@nktkas/hyperliquid";
  *
@@ -22,7 +22,6 @@
 
 import { ReconnectingWebSocket, type ReconnectingWebSocketOptions } from "@nktkas/rews";
 import type { IRequestTransport, ISubscription, ISubscriptionTransport } from "../_base.ts";
-import { AbortSignal_ } from "../_polyfills.ts";
 import { WebSocketDispatcher, WebSocketRequestError } from "./_dispatcher.ts";
 import { HyperliquidEventTarget } from "./_events.ts";
 import { WebSocketKeepAlive, type WebSocketKeepAliveOptions } from "./_keepAlive.ts";
@@ -80,6 +79,15 @@ export const TESTNET_RPC_WS_URL = "wss://rpc.hyperliquid-testnet.xyz/ws";
 /**
  * WebSocket transport for the Hyperliquid API.
  *
+ * @example
+ * ```ts
+ * import { WebSocketTransport } from "@nktkas/hyperliquid";
+ *
+ * const transport = new WebSocketTransport();
+ * const mids = await transport.request("info", { type: "allMids" });
+ * transport.close();
+ * ```
+ *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/post-requests
@@ -109,6 +117,7 @@ export class WebSocketTransport implements IRequestTransport<"info" | "exchange"
   private readonly _keepAlive: WebSocketKeepAlive; // self-contained
   private readonly _subscriptionManager: WebSocketSubscriptionManager;
 
+  /** Creates the transport and immediately starts connecting. */
   constructor(options?: WebSocketTransportOptions) {
     this.isTestnet = options?.isTestnet ?? false;
 
@@ -137,17 +146,22 @@ export class WebSocketTransport implements IRequestTransport<"info" | "exchange"
    *
    * The `explorer` endpoint is HTTP-only and not supported by this transport.
    *
+   * @param endpoint The API endpoint to send the request to.
+   * @param payload The payload to send with the request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return A promise that resolves with the parsed response payload.
+   *
    * @throws {WebSocketRequestError} An error that occurs when a WebSocket request fails.
+   *
+   * @example
+   * ```ts
+   * import { WebSocketTransport } from "@nktkas/hyperliquid";
+   *
+   * const transport = new WebSocketTransport();
+   * const mids = await transport.request("info", { type: "allMids" });
+   * ```
    */
-  async request<T>(
-    endpoint: "info" | "exchange",
-    payload: unknown,
-    signal?: AbortSignal,
-  ): Promise<T> {
-    // `explorer` is HTTP-only and not supported on this transport
-    if ((endpoint as string) === "explorer") {
-      throw new WebSocketRequestError("WebSocket transport does not support the `explorer` endpoint");
-    }
+  async request<T>(endpoint: "info" | "exchange", payload: unknown, signal?: AbortSignal): Promise<T> {
     const wrapped = { type: endpoint === "exchange" ? "action" : endpoint, payload };
     return await this._dispatcher.request<T>("post", wrapped, signal);
   }
@@ -201,74 +215,65 @@ export class WebSocketTransport implements IRequestTransport<"info" | "exchange"
   /**
    * Waits until the WebSocket connection is ready.
    *
-   * @throws {WebSocketRequestError} When the connection cannot be established.
+   * @param signal Stops waiting for the connection; the connection itself keeps establishing.
+   * @return A promise that resolves once the connection is open.
+   *
+   * @throws {WebSocketRequestError} When the connection is permanently terminated, or when `signal` aborts the waiting.
+   *
+   * @example
+   * ```ts
+   * import { WebSocketTransport } from "@nktkas/hyperliquid";
+   *
+   * const transport = new WebSocketTransport();
+   * await transport.ready(AbortSignal.timeout(5_000));
+   * ```
    */
   ready(signal?: AbortSignal): Promise<void> {
     return new Promise((resolve, reject) => {
-      // --- Combine user + termination signals --------------------------------
-      const combinedSignal = signal
-        ? AbortSignal_.any([this.socket.terminationSignal, signal])
-        : this.socket.terminationSignal;
-
-      // --- Fast-paths --------------------------------------------------------
-      if (combinedSignal.aborted) {
-        return reject(
-          new WebSocketRequestError("Failed to establish WebSocket connection", { cause: combinedSignal.reason }),
+      const failTerminated = () =>
+        reject(
+          new WebSocketRequestError("Failed to establish WebSocket connection", {
+            cause: this.socket.terminationSignal.reason,
+          }),
         );
-      }
+      const failAborted = () =>
+        reject(new WebSocketRequestError("Waiting for the connection was aborted", { cause: signal?.reason }));
 
+      if (signal?.aborted) return failAborted();
+      if (this.socket.terminationSignal.aborted) return failTerminated();
       if (this.socket.readyState === ReconnectingWebSocket.OPEN) return resolve();
 
-      // --- Wait for "open" or abort ------------------------------------------
-      const handleOpen = () => {
-        combinedSignal.removeEventListener("abort", handleAbort);
-        resolve();
-      };
-      const handleAbort = () => {
-        this.socket.removeEventListener("open", handleOpen);
-        return reject(
-          new WebSocketRequestError("Failed to establish WebSocket connection", { cause: combinedSignal.reason }),
-        );
+      const done = new AbortController();
+      const settle = (fn: () => void) => () => {
+        done.abort();
+        fn();
       };
 
-      this.socket.addEventListener("open", handleOpen, { once: true });
-      combinedSignal.addEventListener("abort", handleAbort, { once: true });
+      this.socket.addEventListener("open", settle(resolve), { signal: done.signal });
+      this.socket.terminationSignal.addEventListener("abort", settle(failTerminated), { signal: done.signal });
+      signal?.addEventListener("abort", settle(failAborted), { signal: done.signal });
     });
   }
 
   /**
-   * Closes the WebSocket connection and waits until it is fully closed.
+   * Permanently closes the WebSocket connection.
    *
-   * @throws {WebSocketRequestError} When the connection cannot be closed.
+   * @example
+   * ```ts
+   * import { WebSocketTransport } from "@nktkas/hyperliquid";
+   *
+   * const transport = new WebSocketTransport();
+   * transport.close();
+   * ```
    */
-  close(signal?: AbortSignal): Promise<void> {
-    return new Promise((resolve, reject) => {
-      // --- Fast-paths --------------------------------------------------------
-      if (signal?.aborted) {
-        return reject(
-          new WebSocketRequestError("Failed to close WebSocket connection", { cause: signal.reason }),
-        );
-      }
-
-      if (this.socket.readyState === ReconnectingWebSocket.CLOSED) return resolve();
-
-      // --- Wait for "close"/"error" or abort ---------------------------------
-      const handleClose = () => {
-        signal?.removeEventListener("abort", handleAbort);
-        resolve();
-      };
-      const handleAbort = () => {
-        return reject(
-          new WebSocketRequestError("Failed to close WebSocket connection", { cause: signal?.reason }),
-        );
-      };
-
-      this.socket.addEventListener("close", handleClose, { once: true, signal });
-      this.socket.addEventListener("error", handleClose, { once: true, signal });
-      signal?.addEventListener("abort", handleAbort, { once: true });
-
-      // --- Initiate close ----------------------------------------------------
-      this.socket.close();
-    });
+  close(): void {
+    // socket.close() terminates synchronously on every path: when it returns,
+    // the termination signal is already aborted — there is nothing to await.
+    //
+    // Subscribing to the final "close" event instead would deadlock in one
+    // case: when this method runs inside a "close" listener, the socket treats
+    // the event being dispatched as its final one and never fires another, so
+    // a listener added here would never be invoked.
+    this.socket.close();
   }
 }

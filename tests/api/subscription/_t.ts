@@ -37,10 +37,10 @@ export function runTest(options: {
     // --- Test ------------------------------------------------
 
     await fn(t, subsClient)
-      .finally(async () => {
+      .finally(() => {
         // --- Cleanup ------------------------------------------------
 
-        await transport.close();
+        transport.close();
       });
   });
 }
@@ -77,7 +77,7 @@ export function runTestWithExchange(options: {
         // --- Cleanup ------------------------------------------------
 
         await cleanupTempExchangeClient(exchClient);
-        await transport.close();
+        transport.close();
       });
   });
 }
