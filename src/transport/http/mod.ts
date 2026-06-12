@@ -3,6 +3,16 @@
  *
  * Use {@link HttpTransport} for simple requests via HTTP POST.
  *
+ * ---
+ *
+ * ```text
+ * HttpTransport.request():
+ *   controller ◄─ timeout / user signal / fetchOptions.signal
+ *    └─► fetch ┬─► non-OK or non-JSON body ─► HttpRequestError(response, detail)
+ *              └─► parse JSON ─► T
+ *     catch: classify by reference ─► finally: cancel timer, detach
+ * ```
+ *
  * @example
  * ```ts
  * import { HttpTransport, InfoClient } from "@nktkas/hyperliquid";
@@ -17,7 +27,7 @@
  */
 
 import { type IRequestTransport, TransportError } from "../_base.ts";
-import { DOMException_ } from "../_polyfills.ts";
+import * as abort from "../_abort.ts";
 
 /** Configuration options for the HTTP transport layer. */
 export interface HttpTransportOptions {
@@ -132,8 +142,8 @@ export class HttpTransport implements IRequestTransport<"info" | "exchange" | "e
     // One controller per request: the timeout timer and all user signals relay into it,
     // and `finally` detaches everything, so no listener or timer outlives the request.
     const controller = new AbortController();
-    const timeout = this.timeout !== null ? scheduleTimeoutAbort(controller, this.timeout) : undefined;
-    const detachRelay = relayAbort([signal, this.fetchOptions.signal], controller);
+    const timeout = this.timeout !== null ? abort.scheduleTimeout(controller, this.timeout) : undefined;
+    const detachRelay = abort.relay([signal, this.fetchOptions.signal], controller);
 
     try {
       // --- Build URL and request init ----------------------------------------
@@ -241,29 +251,4 @@ function mergeRequestInit(...inits: RequestInit[]): RequestInit {
   if (headersList.length > 0) merged.headers = mergeHeadersInit(...headersList);
 
   return merged;
-}
-
-/** Aborts `target` with a `TimeoutError` after `ms`; `cancel` clears the timer, `reason` identifies the abort. */
-function scheduleTimeoutAbort(target: AbortController, ms: number): { reason: Error; cancel: () => void } {
-  const reason = new DOMException_("Signal timed out.", "TimeoutError");
-  const timeoutId = setTimeout(() => target.abort(reason), ms);
-  return { reason, cancel: () => clearTimeout(timeoutId) };
-}
-
-/** Relays abort events from `sources` into `target` and returns a detach function. */
-function relayAbort(sources: (AbortSignal | null | undefined)[], target: AbortController): () => void {
-  const detachers: (() => void)[] = [];
-  for (const source of sources) {
-    if (!source) continue;
-    if (source.aborted) {
-      target.abort(source.reason);
-      break;
-    }
-    const onAbort = () => target.abort(source.reason);
-    source.addEventListener("abort", onAbort, { once: true });
-    detachers.push(() => source.removeEventListener("abort", onAbort));
-  }
-  return () => {
-    for (const detach of detachers) detach();
-  };
 }
