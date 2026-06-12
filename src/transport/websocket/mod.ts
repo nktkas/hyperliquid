@@ -25,6 +25,7 @@ import type { IRequestTransport, ISubscription, ISubscriptionTransport } from ".
 import { AbortSignal_ } from "../_polyfills.ts";
 import { WebSocketDispatcher, WebSocketRequestError } from "./_dispatcher.ts";
 import { HyperliquidEventTarget } from "./_events.ts";
+import { WebSocketKeepAlive, type WebSocketKeepAliveOptions } from "./_keepAlive.ts";
 import { WebSocketSubscriptionManager } from "./_subscriptionManager.ts";
 
 export { WebSocketRequestError };
@@ -57,6 +58,8 @@ export interface WebSocketTransportOptions {
   timeout?: number | null;
   /** Reconnection policy configuration for closed connections. */
   reconnect?: ReconnectingWebSocketOptions;
+  /** Keep-alive ping/pong watchdog configuration. */
+  keepAlive?: WebSocketKeepAliveOptions;
   /**
    * Enable automatic re-subscription to Hyperliquid subscription after reconnection.
    *
@@ -103,6 +106,7 @@ export class WebSocketTransport implements IRequestTransport<"info" | "exchange"
 
   private readonly _hlEvents: HyperliquidEventTarget;
   private readonly _dispatcher: WebSocketDispatcher;
+  private readonly _keepAlive: WebSocketKeepAlive; // self-contained
   private readonly _subscriptionManager: WebSocketSubscriptionManager;
 
   constructor(options?: WebSocketTransportOptions) {
@@ -119,6 +123,7 @@ export class WebSocketTransport implements IRequestTransport<"info" | "exchange"
       this._hlEvents,
       options?.timeout === undefined ? 10_000 : options.timeout,
     );
+    this._keepAlive = new WebSocketKeepAlive(this.socket, this._hlEvents, options?.keepAlive);
     this._subscriptionManager = new WebSocketSubscriptionManager(
       this.socket,
       this._dispatcher,
