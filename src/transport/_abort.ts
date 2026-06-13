@@ -6,11 +6,11 @@
 import { DOMException_, Promise_ } from "./_polyfills.ts";
 
 /** Aborts `target` with a `TimeoutError` after `ms`; `cancel` clears the timer, `reason` identifies the abort. */
-export function scheduleTimeout(target: AbortController, ms: number): { reason: Error; cancel: () => void } {
+export function scheduleTimeout(target: AbortController, ms: number | null): { reason: Error; cancel: () => void } {
   const reason = new DOMException_("Signal timed out.", "TimeoutError");
-  // setTimeout clamps a non-finite delay to 1 ms, which would turn `Infinity`
-  // ("never time out") into an instant abort of every request.
-  const timeoutId = Number.isFinite(ms) ? setTimeout(() => target.abort(reason), ms) : undefined;
+  // `null` disables the timeout. setTimeout also clamps a non-finite delay to
+  // 1 ms, which would turn `Infinity` ("never time out") into an instant abort.
+  const timeoutId = ms !== null && Number.isFinite(ms) ? setTimeout(() => target.abort(reason), ms) : undefined;
   return { reason, cancel: () => clearTimeout(timeoutId) };
 }
 

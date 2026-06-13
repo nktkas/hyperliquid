@@ -156,7 +156,7 @@ export class WebSocketDispatcher {
     // no listener or timer outlives the request.
     const controller = new AbortController();
     const timeoutMs = this.timeout; // for correct error message after user changes
-    const timeout = timeoutMs !== null ? abort.scheduleTimeout(controller, timeoutMs) : undefined;
+    const timeout = abort.scheduleTimeout(controller, timeoutMs);
     const detachRelay = abort.relay([signal, this._socket.terminationSignal], controller);
 
     let entry: PendingRequest | undefined;
@@ -189,7 +189,7 @@ export class WebSocketDispatcher {
       return await promise;
     } catch (error) {
       if (error instanceof TransportError) throw error;
-      if (timeout !== undefined && error === timeout.reason) {
+      if (error === timeout.reason) {
         throw new WebSocketRequestError(`Request timed out after ${timeoutMs} ms`, {
           cause: error,
           request: payload,
@@ -213,7 +213,7 @@ export class WebSocketDispatcher {
         const index = this._queue.indexOf(entry);
         if (index !== -1) this._queue.splice(index, 1);
       }
-      timeout?.cancel();
+      timeout.cancel();
       detachRelay();
     }
   }
