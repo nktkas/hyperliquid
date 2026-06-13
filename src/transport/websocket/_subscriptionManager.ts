@@ -94,8 +94,7 @@ export class WebSocketSubscriptionManager {
    *                        - the connection goes down while re-subscription is disabled.
    *
    *                        Failures before the confirmation reject the `subscribe()` promise instead.
-   *                        After the callback fires, the subscription is removed and no further events
-   *                        or errors follow.
+   *                        After the callback fires, the subscription is removed and no further events or errors follow.
    *
    * @throws {WebSocketRequestError} When the subscription request fails or limits are exceeded.
    */

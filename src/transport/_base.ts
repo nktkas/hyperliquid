@@ -56,8 +56,7 @@ export interface ISubscriptionTransport {
        * - the connection goes down while re-subscription is disabled.
        *
        * Failures before the confirmation reject the `subscribe()` promise instead.
-       * After the callback fires, the subscription is removed and no further
-       * events or errors follow.
+       * After the callback fires, the subscription is removed and no further events or errors follow.
        */
       onError?: (error: TransportError) => void;
     },

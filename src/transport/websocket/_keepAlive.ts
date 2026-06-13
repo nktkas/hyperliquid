@@ -11,8 +11,9 @@ import type { HyperliquidEventTarget } from "./_events.ts";
 /** Configuration options for the keep-alive watchdog. */
 export interface WebSocketKeepAliveOptions {
   /**
-   * Interval between pings in ms. The server closes a connection that has
-   * been silent for ~60 s, so pings must come more often than that.
+   * Interval between pings in ms.
+   *
+   * The server closes a connection that has been silent for ~60 s, so pings must come more often than that.
    *
    * Default: `30_000`
    */

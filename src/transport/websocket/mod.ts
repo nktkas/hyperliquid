@@ -1,5 +1,6 @@
 /**
- * WebSocket transport for {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | subscriptions} and {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/post-requests | POST requests}.
+ * WebSocket transport for {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions | subscriptions}
+ * and {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/post-requests | POST requests}.
  *
  * Use {@link WebSocketTransport} for real-time subscriptions and for lower-latency API requests.
  *
@@ -203,8 +204,7 @@ export class WebSocketTransport implements IRequestTransport<"info" | "exchange"
        * - the connection goes down while re-subscription is disabled.
        *
        * Failures before the confirmation reject the `subscribe()` promise instead.
-       * After the callback fires, the subscription is removed and no further
-       * events or errors follow.
+       * After the callback fires, the subscription is removed and no further events or errors follow.
        */
       onError?: (error: WebSocketRequestError) => void;
     },
