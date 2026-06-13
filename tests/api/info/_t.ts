@@ -5,6 +5,7 @@ import { HttpTransport, InfoClient } from "@nktkas/hyperliquid";
 // ============================================================
 
 const WAIT = 5000;
+const OFFLINE = Deno.args.includes("--offline");
 
 // ============================================================
 // Preparation
@@ -32,7 +33,7 @@ export function runTest(options: {
 }): void {
   const { name, ignore, codeTestFn } = options;
 
-  Deno.test(name, { ignore }, async (t) => {
+  Deno.test(name, { ignore: OFFLINE || ignore }, async (t) => {
     await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
     await codeTestFn(t, client);

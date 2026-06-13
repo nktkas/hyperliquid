@@ -13,6 +13,7 @@ import { cleanupTempExchangeClient, createTempExchangeClient } from "../exchange
 // =============================================================
 
 const WAIT = 5000;
+const OFFLINE = Deno.args.includes("--offline");
 
 // =============================================================
 // Test
@@ -25,7 +26,7 @@ export function runTest(options: {
 }): void {
   const { name, mode, fn } = options;
 
-  Deno.test(name, async (t) => {
+  Deno.test(name, { ignore: OFFLINE }, async (t) => {
     await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
     // --- Preparation ------------------------------------------------
@@ -58,7 +59,7 @@ export function runTestWithExchange(options: {
 }): void {
   const { name, fn } = options;
 
-  Deno.test(name, async (t) => {
+  Deno.test(name, { ignore: OFFLINE }, async (t) => {
     await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
     // --- Preparation ------------------------------------------------

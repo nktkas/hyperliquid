@@ -5,6 +5,7 @@ import { ExplorerClient, HttpTransport, WebSocketTransport } from "@nktkas/hyper
 // =============================================================
 
 const WAIT = 5000;
+const OFFLINE = Deno.args.includes("--offline");
 
 // =============================================================
 // Test
@@ -19,7 +20,7 @@ export function runRequestTest(options: {
 }): void {
   const { name, fn } = options;
 
-  Deno.test(name, async (t) => {
+  Deno.test(name, { ignore: OFFLINE }, async (t) => {
     await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
     // --- Preparation ------------------------------------------------
@@ -42,7 +43,7 @@ export function runSubscriptionTest(options: {
 }): void {
   const { name, fn } = options;
 
-  Deno.test(name, async (t) => {
+  Deno.test(name, { ignore: OFFLINE }, async (t) => {
     await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
     // --- Preparation ------------------------------------------------

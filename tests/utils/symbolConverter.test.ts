@@ -5,6 +5,8 @@ import { HttpTransport, type IRequestTransport } from "@nktkas/hyperliquid";
 import { SymbolConverter } from "@nktkas/hyperliquid/utils";
 import type { OutcomeMetaResponse } from "@nktkas/hyperliquid/api/info";
 
+const OFFLINE = Deno.args.includes("--offline");
+
 // ============================================================
 // Helpers
 // ============================================================
@@ -150,7 +152,7 @@ const OUTCOME_META: OutcomeMetaResponse = {
 // Tests
 // ============================================================
 
-Deno.test("SymbolConverter", async (t) => {
+Deno.test("SymbolConverter", { ignore: OFFLINE }, async (t) => {
   const transport = new HttpTransport();
   const converter = await SymbolConverter.create({ transport });
 
