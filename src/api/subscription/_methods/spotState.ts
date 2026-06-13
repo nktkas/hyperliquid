@@ -42,7 +42,7 @@ export type SpotStateEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, TransportError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode spotState} function. */
@@ -80,12 +80,12 @@ export function spotState(
   config: SubscriptionConfig,
   params: SpotStateParameters,
   listener: (data: SpotStateEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const payload = parse(SpotStateRequest, { type: "spotState", ...params });
   return config.transport.subscribe<SpotStateEvent>(payload.type, payload, (e) => {
     if (e.detail.user === payload.user) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

@@ -1,16 +1,30 @@
 /**
  * Typed event target for Hyperliquid WebSocket messages.
+ *
+ * The frame types below are a trusted contract with the server: handlers
+ * consume them without re-validating the shape.
+ *
  * @module
  */
 
 import { CustomEvent_ } from "../_polyfills.ts";
 
+/**
+ * Confirmation frame of a `subscribe` / `unsubscribe` request.
+ *
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+ */
 export interface SubscribeUnsubscribeResponse {
   method: "subscribe" | "unsubscribe";
-  /** Original subscription request payload. */
+  /** Subscription payload echoed by the server: normalized, possibly with server-added fields. */
   subscription: unknown;
 }
 
+/**
+ * Response frame of a `post` request.
+ *
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/post-requests
+ */
 export interface PostResponse {
   id: number;
   response:
@@ -29,11 +43,16 @@ export interface PostResponse {
     }
     | {
       type: "error";
-      /** Error message, e.g. "Cannot track more than 10 total users." */
+      /** Error message, e.g. "Cannot track more than 15 total users." */
       payload: string;
     };
 }
 
+/**
+ * Block summary pushed by the explorer RPC.
+ *
+ * @see null
+ */
 interface BlockDetails {
   blockTime: number;
   hash: string;
@@ -42,6 +61,11 @@ interface BlockDetails {
   proposer: string;
 }
 
+/**
+ * Transaction details pushed by the explorer RPC.
+ *
+ * @see null
+ */
 interface TxDetails {
   action: {
     type: string;
@@ -58,6 +82,7 @@ interface TxDetails {
 interface HyperliquidEventMap {
   subscriptionResponse: CustomEvent<SubscribeUnsubscribeResponse>;
   post: CustomEvent<PostResponse>;
+  /** Error text; any embedded `{…}` body is valid JSON. */
   error: CustomEvent<string>;
   pong: CustomEvent<undefined>;
   explorerBlock_: CustomEvent<BlockDetails[]>;
@@ -66,17 +91,14 @@ interface HyperliquidEventMap {
   [key: string]: CustomEvent<any>;
 }
 
-function isHyperliquidEvent(msg: unknown): msg is { channel: string; data: unknown } {
+/** Matches the `{ channel, data? }` envelope; `pong` is the only frame without `data`. */
+function isHyperliquidEvent(msg: unknown): msg is { channel: string; data?: unknown } {
   return typeof msg === "object" && msg !== null &&
-    "channel" in msg && typeof msg.channel === "string" &&
-    "data" in msg;
+    "channel" in msg && typeof msg.channel === "string";
 }
 
-function isPongEvent(msg: unknown): msg is { channel: "pong" } {
-  return typeof msg === "object" && msg !== null &&
-    "channel" in msg && msg.channel === "pong";
-}
-
+// The explorer RPC pushes raw arrays without a { channel, data } envelope:
+// detect them by shape and route them to synthetic "_"-suffixed channels.
 function isExplorerBlockEvent(msg: unknown): msg is BlockDetails[] {
   return Array.isArray(msg) && msg.length > 0 &&
     typeof msg[0] === "object" && msg[0] !== null &&
@@ -93,7 +115,17 @@ function isExplorerTxsEvent(msg: unknown): msg is TxDetails[] {
     "time" in msg[0] && "user" in msg[0];
 }
 
-/** Listens for WebSocket messages and re-dispatches them as typed Hyperliquid events. */
+/**
+ * Listens for WebSocket messages and re-dispatches them as typed Hyperliquid events.
+ *
+ * @example
+ * ```ts ignore
+ * const hlEvents = new HyperliquidEventTarget(socket);
+ * hlEvents.addEventListener("l2Book", (event) => {
+ *   event.detail; // data of every '{"channel":"l2Book","data":{...}}' frame
+ * });
+ * ```
+ */
 export interface HyperliquidEventTarget {
   addEventListener<K extends keyof HyperliquidEventMap>(
     type: K,
@@ -105,25 +137,24 @@ export interface HyperliquidEventTarget {
     listener: ((event: HyperliquidEventMap[K]) => void) | EventListenerObject | null,
     options?: boolean | EventListenerOptions,
   ): void;
-  dispatchEvent(event: HyperliquidEventMap[keyof HyperliquidEventMap]): boolean;
 }
 export class HyperliquidEventTarget extends EventTarget {
   constructor(socket: WebSocket) {
     super();
     socket.addEventListener("message", (event) => {
+      let msg: unknown;
       try {
-        const msg = JSON.parse(event.data);
-        if (isHyperliquidEvent(msg)) {
-          this.dispatchEvent(new CustomEvent_(msg.channel, { detail: msg.data }));
-        } else if (isPongEvent(msg)) {
-          this.dispatchEvent(new CustomEvent_("pong", { detail: undefined }));
-        } else if (isExplorerBlockEvent(msg)) {
-          this.dispatchEvent(new CustomEvent_("explorerBlock_", { detail: msg }));
-        } else if (isExplorerTxsEvent(msg)) {
-          this.dispatchEvent(new CustomEvent_("explorerTxs_", { detail: msg }));
-        }
+        msg = JSON.parse(event.data);
       } catch {
-        // Ignore JSON parsing errors
+        return; // Ignore non-JSON frames
+      }
+
+      if (isHyperliquidEvent(msg)) {
+        this.dispatchEvent(new CustomEvent_(msg.channel, { detail: msg.data }));
+      } else if (isExplorerBlockEvent(msg)) {
+        this.dispatchEvent(new CustomEvent_("explorerBlock_", { detail: msg }));
+      } else if (isExplorerTxsEvent(msg)) {
+        this.dispatchEvent(new CustomEvent_("explorerTxs_", { detail: msg }));
       }
     });
   }

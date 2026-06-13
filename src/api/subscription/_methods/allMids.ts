@@ -36,7 +36,7 @@ export type AllMidsEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, TransportError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode allMids} function. */
@@ -72,26 +72,26 @@ export type AllMidsParameters = Omit<v.InferInput<typeof AllMidsRequest>, "type"
 export function allMids(
   config: SubscriptionConfig,
   listener: (data: AllMidsEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription>;
 export function allMids(
   config: SubscriptionConfig,
   params: AllMidsParameters,
   listener: (data: AllMidsEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription>;
 export function allMids(
   config: SubscriptionConfig,
   paramsOrListener: AllMidsParameters | ((data: AllMidsEvent) => void),
-  listenerOrOnError?: ((data: AllMidsEvent) => void) | ((error: WebSocketRequestError) => void),
-  maybeOnError?: (error: WebSocketRequestError) => void,
+  listenerOrOnError?: ((data: AllMidsEvent) => void) | ((error: TransportError) => void),
+  maybeOnError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const params = typeof paramsOrListener === "function" ? {} : paramsOrListener;
   const listener = (typeof paramsOrListener === "function" ? paramsOrListener : listenerOrOnError) as (
     data: AllMidsEvent,
   ) => void;
   const onError = (typeof paramsOrListener === "function" ? listenerOrOnError : maybeOnError) as
-    | ((error: WebSocketRequestError) => void)
+    | ((error: TransportError) => void)
     | undefined;
 
   const payload = parse(AllMidsRequest, {
@@ -103,5 +103,5 @@ export function allMids(
     if (e.detail.dex === payload.dex) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

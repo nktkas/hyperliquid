@@ -42,7 +42,7 @@ export type UserTwapSliceFillsEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, TransportError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode userTwapSliceFills} function. */
@@ -80,12 +80,12 @@ export function userTwapSliceFills(
   config: SubscriptionConfig,
   params: UserTwapSliceFillsParameters,
   listener: (data: UserTwapSliceFillsEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const payload = parse(UserTwapSliceFillsRequest, { type: "userTwapSliceFills", ...params });
   return config.transport.subscribe<UserTwapSliceFillsEvent>(payload.type, payload, (e) => {
     if (e.detail.user === payload.user) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

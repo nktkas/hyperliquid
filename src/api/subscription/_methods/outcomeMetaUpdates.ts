@@ -80,7 +80,7 @@ export type OutcomeMetaUpdatesEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, TransportError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /**
@@ -112,10 +112,10 @@ import type { SubscriptionConfig } from "./_base/mod.ts";
 export function outcomeMetaUpdates(
   config: SubscriptionConfig,
   listener: (data: OutcomeMetaUpdatesEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const payload = parse(OutcomeMetaUpdatesRequest, { type: "outcomeMetaUpdates" });
   return config.transport.subscribe<OutcomeMetaUpdatesEvent>(payload.type, payload, (e) => {
     listener(e.detail);
-  }, onError);
+  }, { onError });
 }

@@ -36,7 +36,7 @@ export type ActiveAssetCtxEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, TransportError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode activeAssetCtx} function. */
@@ -74,12 +74,12 @@ export function activeAssetCtx(
   config: SubscriptionConfig,
   params: ActiveAssetCtxParameters,
   listener: (data: ActiveAssetCtxEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const payload = parse(ActiveAssetCtxRequest, { type: "activeAssetCtx", ...params });
   return config.transport.subscribe<ActiveAssetCtxEvent>(payload.type, payload, (e) => {
     if (e.detail.coin === payload.coin) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

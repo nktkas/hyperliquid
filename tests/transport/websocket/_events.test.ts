@@ -1,11 +1,17 @@
 // deno-lint-ignore-file no-import-prefix
 
-import { assertEquals, assertFalse } from "jsr:@std/assert@1";
+/**
+ * Tests for the typed event target: routing of Hyperliquid envelopes and
+ * explorer pushes, and tolerance to malformed frames.
+ * @module
+ */
+
+import { assert, assertEquals, assertFalse } from "jsr:@std/assert@1";
 import { HyperliquidEventTarget } from "../../../src/transport/websocket/_events.ts";
 
-// ============================================================
+// =============================================================================
 // Helpers
-// ============================================================
+// =============================================================================
 
 /** Creates a fake WebSocket for testing. */
 function createFakeSocket(): WebSocket {
@@ -17,9 +23,9 @@ function dispatchMessage(socket: WebSocket, data: string): void {
   socket.dispatchEvent(new MessageEvent("message", { data }));
 }
 
-// ============================================================
+// =============================================================================
 // Test Data
-// ============================================================
+// =============================================================================
 
 const MESSAGES = {
   hyperliquidEvent: {
@@ -43,9 +49,9 @@ const MESSAGES = {
   }],
 } as const;
 
-// ============================================================
+// =============================================================================
 // Tests
-// ============================================================
+// =============================================================================
 
 Deno.test("HyperliquidEventTarget", async (t) => {
   await t.step("message parsing", async (t) => {
@@ -86,6 +92,19 @@ Deno.test("HyperliquidEventTarget", async (t) => {
 
       dispatchMessage(socket, JSON.stringify(MESSAGES.explorerTxs));
       assertEquals(received, MESSAGES.explorerTxs);
+    });
+
+    await t.step("pong dispatches to pong channel", () => {
+      const socket = createFakeSocket();
+      const target = new HyperliquidEventTarget(socket);
+
+      let received = false;
+      target.addEventListener("pong", () => {
+        received = true;
+      });
+
+      dispatchMessage(socket, '{"channel":"pong"}');
+      assert(received);
     });
   });
 

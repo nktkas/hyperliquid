@@ -29,7 +29,7 @@ export type ExplorerTxsEvent = ExplorerTransaction[];
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, ISubscriptionTransport, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, ISubscriptionTransport, TransportError } from "../../../transport/mod.ts";
 import type { ExplorerConfig } from "./_base/mod.ts";
 
 /**
@@ -61,10 +61,10 @@ import type { ExplorerConfig } from "./_base/mod.ts";
 export function explorerTxs(
   config: ExplorerConfig<ISubscriptionTransport>,
   listener: (data: ExplorerTxsEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const payload = parse(ExplorerTxsRequest, { type: "explorerTxs" });
   return config.transport.subscribe<ExplorerTxsEvent>("explorerTxs_", payload, (e) => { // Internal duck channel as it does not have its own channel
     listener(e.detail);
-  }, onError);
+  }, { onError });
 }

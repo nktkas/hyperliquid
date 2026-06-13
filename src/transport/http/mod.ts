@@ -3,6 +3,16 @@
  *
  * Use {@link HttpTransport} for simple requests via HTTP POST.
  *
+ * ---
+ *
+ * ```text
+ * HttpTransport.request():
+ *   controller ◄─ timeout / user signal / fetchOptions.signal
+ *    └─► fetch ┬─► non-OK or non-JSON body ─► HttpRequestError(response, detail)
+ *              └─► parse JSON ─► T
+ *     catch: classify by reference ─► finally: cancel timer, detach
+ * ```
+ *
  * @example
  * ```ts
  * import { HttpTransport, InfoClient } from "@nktkas/hyperliquid";
@@ -17,7 +27,7 @@
  */
 
 import { type IRequestTransport, TransportError } from "../_base.ts";
-import { DOMException_ } from "../_polyfills.ts";
+import * as abort from "../_abort.ts";
 
 /** Configuration options for the HTTP transport layer. */
 export interface HttpTransportOptions {
@@ -58,18 +68,38 @@ export const MAINNET_RPC_URL = "https://rpc.hyperliquid.xyz";
 /** Testnet RPC URL. */
 export const TESTNET_RPC_URL = "https://rpc.hyperliquid-testnet.xyz";
 
-/** Error thrown when an HTTP request fails. */
+/**
+ * Error thrown when an HTTP request fails.
+ *
+ * @example
+ * ```ts
+ * import { HttpRequestError, HttpTransport } from "@nktkas/hyperliquid";
+ *
+ * const transport = new HttpTransport();
+ * try {
+ *   // Throws on a non-OK response, a timeout, an abort, or a network failure.
+ *   await transport.request("info", { type: "allMids" });
+ * } catch (error) {
+ *   if (error instanceof HttpRequestError) {
+ *     console.error(error.message, error.response?.status);
+ *   }
+ * }
+ * ```
+ */
 export class HttpRequestError extends TransportError {
   /** The HTTP response that caused the error. */
   response?: Response;
   /** The original request payload that triggered the error, if available. */
   request?: unknown;
 
-  constructor(
-    args?: { response?: Response; message?: string },
-    options?: ErrorOptions & { request?: unknown },
-  ) {
-    const { response, message: detail } = args ?? {};
+  /**
+   * Creates an HTTP request error.
+   *
+   * The message is the response status line, extended with `detail` when given;
+   * without a response, `detail` alone or a description of `cause` is used.
+   */
+  constructor(options?: ErrorOptions & { detail?: string; response?: Response; request?: unknown }) {
+    const { detail, response, request, ...errorOptions } = options ?? {};
 
     let message: string;
     if (response) {
@@ -78,21 +108,29 @@ export class HttpRequestError extends TransportError {
     } else if (detail) {
       message = detail;
     } else {
-      const cause = options?.cause;
+      const cause = errorOptions.cause;
       message = cause === undefined
         ? "Unknown HTTP request error"
         : `Unknown HTTP request error: ${cause instanceof Error ? cause.message : String(cause)}`;
     }
 
-    super(message, options);
+    super(message, errorOptions);
     this.name = "HttpRequestError";
     this.response = response;
-    this.request = options?.request;
+    this.request = request;
   }
 }
 
 /**
  * HTTP transport for the Hyperliquid API.
+ *
+ * @example
+ * ```ts
+ * import { HttpTransport } from "@nktkas/hyperliquid";
+ *
+ * const transport = new HttpTransport();
+ * const mids = await transport.request("info", { type: "allMids" });
+ * ```
  *
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint
  * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint
@@ -122,7 +160,20 @@ export class HttpTransport implements IRequestTransport<"info" | "exchange" | "e
    *
    * Routes to {@linkcode apiUrl} for `info`/`exchange` and {@linkcode rpcUrl} for `explorer`.
    *
+   * @param endpoint The API endpoint to send the request to.
+   * @param payload The payload to send with the request.
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return A promise that resolves with the parsed JSON response body.
+   *
    * @throws {HttpRequestError} When the HTTP request fails.
+   *
+   * @example
+   * ```ts
+   * import { HttpTransport } from "@nktkas/hyperliquid";
+   *
+   * const transport = new HttpTransport();
+   * const mids = await transport.request("info", { type: "allMids" });
+   * ```
    */
   async request<T>(
     endpoint: "info" | "exchange" | "explorer",
@@ -132,11 +183,12 @@ export class HttpTransport implements IRequestTransport<"info" | "exchange" | "e
     // One controller per request: the timeout timer and all user signals relay into it,
     // and `finally` detaches everything, so no listener or timer outlives the request.
     const controller = new AbortController();
-    const timeout = this.timeout !== null ? scheduleTimeoutAbort(controller, this.timeout) : undefined;
-    const detachRelay = relayAbort([signal, this.fetchOptions.signal], controller);
+    const timeoutMs = this.timeout; // for correct error message after user changes
+    const timeout = abort.scheduleTimeout(controller, timeoutMs);
+    const detachRelay = abort.relay([signal, this.fetchOptions.signal], controller);
 
     try {
-      // --- Build URL and request init ------------------------
+      // --- Request init ------------------------------------------------------
       const url = buildEndpointUrl(endpoint === "explorer" ? this.rpcUrl : this.apiUrl, endpoint);
       const init = mergeRequestInit(
         {
@@ -150,52 +202,55 @@ export class HttpTransport implements IRequestTransport<"info" | "exchange" | "e
         { signal: controller.signal },
       );
 
-      // --- Send -----------------------------------------------
+      // --- Send and validate -------------------------------------------------
       const response = await fetch(url, init);
-
-      // --- Reject non-OK or non-JSON responses ---------------
       if (!response.ok || !response.headers.get("Content-Type")?.includes("application/json")) {
         const clone = response.clone();
         const body = await response.text().catch(() => undefined); // releases connection, clone stays readable
-        throw new HttpRequestError(
-          { response: clone, message: body ? truncate(body) : undefined },
-          { request: payload },
-        );
+        throw new HttpRequestError({
+          response: clone,
+          detail: body ? truncate(body) : undefined,
+          request: payload,
+        });
       }
 
-      // --- Parse ----------------------------------------------
+      // --- Parse -------------------------------------------------------------
       const text = await response.text();
       try {
         return JSON.parse(text);
       } catch (error) {
-        throw new HttpRequestError(
-          { response: recreateResponse(response, text), message: "Invalid JSON response body" },
-          { cause: error, request: payload },
-        );
+        throw new HttpRequestError({
+          response: recreateResponse(response, text),
+          detail: "Invalid JSON response body",
+          cause: error,
+          request: payload,
+        });
       }
     } catch (error) {
       if (error instanceof TransportError) throw error;
-      if (timeout !== undefined && error === timeout.reason) {
-        throw new HttpRequestError(
-          { message: `Request timed out after ${this.timeout} ms` },
-          { cause: error, request: payload },
-        );
+      if (error === timeout.reason) {
+        throw new HttpRequestError({
+          detail: `Request timed out after ${timeoutMs} ms`,
+          cause: error,
+          request: payload,
+        });
       }
       if (controller.signal.aborted && error === controller.signal.reason) {
-        throw new HttpRequestError({ message: "Request aborted" }, { cause: error, request: payload });
+        throw new HttpRequestError({ detail: "Request aborted", cause: error, request: payload });
       }
-      throw new HttpRequestError(undefined, { cause: error, request: payload });
+      throw new HttpRequestError({ cause: error, request: payload });
     } finally {
-      timeout?.cancel();
+      timeout.cancel();
       detachRelay();
     }
   }
 }
 
-// ============================================================
+// =============================================================================
 // Helpers
-// ============================================================
+// =============================================================================
 
+/** Truncates `text` to `limit` characters, appending the original length. */
 function truncate(text: string, limit = 1024): string {
   if (text.length <= limit) return text;
   return `${text.slice(0, limit)}… (${text.length} chars total)`;
@@ -219,6 +274,7 @@ function recreateResponse(original: Response, text: string): Response {
   });
 }
 
+/** Merges headers inits left to right: a later occurrence of a key overwrites the earlier one. */
 function mergeHeadersInit(...inits: HeadersInit[]): Headers {
   const merged = new Headers();
   for (const init of inits) {
@@ -241,29 +297,4 @@ function mergeRequestInit(...inits: RequestInit[]): RequestInit {
   if (headersList.length > 0) merged.headers = mergeHeadersInit(...headersList);
 
   return merged;
-}
-
-/** Aborts `target` with a `TimeoutError` after `ms`; `cancel` clears the timer, `reason` identifies the abort. */
-function scheduleTimeoutAbort(target: AbortController, ms: number): { reason: Error; cancel: () => void } {
-  const reason = new DOMException_("Signal timed out.", "TimeoutError");
-  const timeoutId = setTimeout(() => target.abort(reason), ms);
-  return { reason, cancel: () => clearTimeout(timeoutId) };
-}
-
-/** Relays abort events from `sources` into `target` and returns a detach function. */
-function relayAbort(sources: (AbortSignal | null | undefined)[], target: AbortController): () => void {
-  const detachers: (() => void)[] = [];
-  for (const source of sources) {
-    if (!source) continue;
-    if (source.aborted) {
-      target.abort(source.reason);
-      break;
-    }
-    const onAbort = () => target.abort(source.reason);
-    source.addEventListener("abort", onAbort, { once: true });
-    detachers.push(() => source.removeEventListener("abort", onAbort));
-  }
-  return () => {
-    for (const detach of detachers) detach();
-  };
 }

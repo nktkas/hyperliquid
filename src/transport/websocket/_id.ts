@@ -7,17 +7,44 @@
 const HEX_REGEX = /^0x[0-9a-f]+$/i;
 
 /**
- * Builds a stable string identifier from an arbitrary value.
+ * Builds a stable string identifier from an arbitrary value: payloads with
+ * the same logical content produce the same id.
  *
- * Sorts object keys recursively and lowercases hex addresses, so payloads
- * with the same logical content but different ordering or casing produce
- * the same id.
+ * Sorts object keys recursively and lowercases hex addresses.
+ *
+ * @example
+ * ```ts ignore
+ * requestToId({ user: "0xAbC123", type: "userFills" });
+ * // => '{"type":"userFills","user":"0xabc123"}'
+ * ```
  */
 export function requestToId(value: unknown): string {
-  return JSON.stringify(recursiveHexToLowercase(recursiveSortObjectKeys(value)));
+  return JSON.stringify(normalize(value));
 }
 
-/** Returns true if every field of `subset` is present in `superset` with an equal value. */
+/**
+ * Counts the leaf values in `value`; a higher count means a more specific payload.
+ *
+ * @example
+ * ```ts ignore
+ * specificity({ type: "candle", coin: "ETH", interval: "1m" });
+ * // => 3
+ * ```
+ */
+export function specificity(value: unknown): number {
+  if (typeof value !== "object" || value === null) return 1;
+  return Object.values(value).reduce((sum: number, item) => sum + specificity(item), 0);
+}
+
+/**
+ * Returns true if every field of `subset` is present in `superset` with an equal value.
+ *
+ * @example
+ * ```ts ignore
+ * isSubset({ coin: "BTC" }, { coin: "BTC", nSigFigs: null }); // => true
+ * isSubset({ coin: "BTC", nSigFigs: 5 }, { coin: "BTC" }); // => false
+ * ```
+ */
 export function isSubset(subset: unknown, superset: unknown): boolean {
   // Strings: compare hex addresses case-insensitively, others strictly
   if (typeof subset === "string" && typeof superset === "string") {
@@ -44,35 +71,18 @@ export function isSubset(subset: unknown, superset: unknown): boolean {
   return Object.keys(sub).every((key) => key in sup && isSubset(sub[key], sup[key]));
 }
 
-// ============================================================
-// Internal
-// ============================================================
-
-function recursiveSortObjectKeys<T>(obj: T): T {
-  if (Array.isArray(obj)) {
-    return obj.map(recursiveSortObjectKeys) as T;
-  }
-  if (typeof obj === "object" && obj !== null) {
-    const result: Record<string, unknown> = {};
-    for (const key of Object.keys(obj).sort()) {
-      result[key] = recursiveSortObjectKeys((obj as Record<string, unknown>)[key]);
-    }
-    return result as T;
-  }
-  return obj;
-}
-
-function recursiveHexToLowercase(value: unknown): unknown {
+/** Recursively sorts object keys and lowercases hex strings. */
+function normalize(value: unknown): unknown {
   if (typeof value === "string" && HEX_REGEX.test(value)) {
     return value.toLowerCase();
   }
   if (Array.isArray(value)) {
-    return value.map(recursiveHexToLowercase);
+    return value.map(normalize);
   }
   if (typeof value === "object" && value !== null) {
     const result: Record<string, unknown> = {};
-    for (const key in value) {
-      result[key] = recursiveHexToLowercase((value as Record<string, unknown>)[key]);
+    for (const key of Object.keys(value).sort()) {
+      result[key] = normalize((value as Record<string, unknown>)[key]);
     }
     return result;
   }

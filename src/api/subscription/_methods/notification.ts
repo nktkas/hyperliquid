@@ -34,7 +34,7 @@ export type NotificationEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, TransportError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode notification} function. */
@@ -72,10 +72,10 @@ export function notification(
   config: SubscriptionConfig,
   params: NotificationParameters,
   listener: (data: NotificationEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const payload = parse(NotificationRequest, { type: "notification", ...params });
   return config.transport.subscribe<NotificationEvent>(payload.type, payload, (e) => {
     listener(e.detail);
-  }, onError);
+  }, { onError });
 }

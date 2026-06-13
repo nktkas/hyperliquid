@@ -67,7 +67,7 @@ export type BboEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, TransportError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode bbo} function. */
@@ -105,12 +105,12 @@ export function bbo(
   config: SubscriptionConfig,
   params: BboParameters,
   listener: (data: BboEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const payload = parse(BboRequest, { type: "bbo", ...params });
   return config.transport.subscribe<BboEvent>(payload.type, payload, (e) => {
     if (e.detail.coin === payload.coin) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

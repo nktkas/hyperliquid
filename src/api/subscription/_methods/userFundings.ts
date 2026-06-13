@@ -63,7 +63,7 @@ export type UserFundingsEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, TransportError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode userFundings} function. */
@@ -101,12 +101,12 @@ export function userFundings(
   config: SubscriptionConfig,
   params: UserFundingsParameters,
   listener: (data: UserFundingsEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const payload = parse(UserFundingsRequest, { type: "userFundings", ...params });
   return config.transport.subscribe<UserFundingsEvent>(payload.type, payload, (e) => {
     if (e.detail.user === payload.user) {
       listener(e.detail);
     }
-  }, onError);
+  }, { onError });
 }

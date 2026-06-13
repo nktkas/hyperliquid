@@ -1,43 +1,20 @@
 // deno-lint-ignore-file no-import-prefix
 
+/**
+ * Tests for the WebSocket request dispatcher: request/response matching,
+ * server error parsing, and queueing across reconnects.
+ * @module
+ */
+
 import { assertEquals, assertRejects } from "jsr:@std/assert@1";
-import type { ReconnectingWebSocket } from "@nktkas/rews";
+import { ReconnectingWebSocket } from "@nktkas/rews";
 import { WebSocketDispatcher, WebSocketRequestError } from "../../../src/transport/websocket/_dispatcher.ts";
 import { HyperliquidEventTarget } from "../../../src/transport/websocket/_events.ts";
-import { requestToId } from "../../../src/transport/websocket/_id.ts";
+import { getLastSent, MockWebSocket, RESPONSES } from "./_mock.ts";
 
-// ============================================================
+// =============================================================================
 // Helpers
-// ============================================================
-
-// @ts-expect-error: Mocking WebSocket for testing purposes
-class MockWebSocket extends EventTarget implements ReconnectingWebSocket {
-  sentMessages: string[] = [];
-  readyState = WebSocket.CONNECTING;
-  terminationController = new AbortController();
-  terminationSignal = this.terminationController.signal;
-
-  send(data: string): void {
-    this.sentMessages.push(data);
-  }
-
-  close(): void {
-    this.readyState = WebSocket.CLOSED;
-    this.dispatchEvent(new CloseEvent("close"));
-  }
-
-  error(): void {
-    this.dispatchEvent(new Event("error"));
-  }
-
-  terminate(reason?: unknown): void {
-    this.terminationController.abort(reason);
-  }
-
-  mockMessage(data: unknown): void {
-    this.dispatchEvent(new MessageEvent("message", { data: JSON.stringify(data) }));
-  }
-}
+// =============================================================================
 
 /** Creates a new WebSocketDispatcher with mock socket. */
 function createRequester(timeout: number | null = 10_000): {
@@ -50,44 +27,9 @@ function createRequester(timeout: number | null = 10_000): {
   return { socket, requester };
 }
 
-/** Gets the last sent message as parsed JSON. */
-function getLastSent(socket: MockWebSocket): Record<string, unknown> {
-  return JSON.parse(socket.sentMessages[socket.sentMessages.length - 1]);
-}
-
-// ============================================================
-// Test Data
-// ============================================================
-
-const RESPONSES = {
-  info: (id: number, data: unknown) => ({
-    channel: "post",
-    data: { id, response: { type: "info", payload: { data } } },
-  }),
-  action: (id: number, payload: unknown) => ({
-    channel: "post",
-    data: { id, response: { type: "action", payload } },
-  }),
-  error: (id: number, message: string) => ({
-    channel: "post",
-    data: { id, response: { type: "error", payload: message } },
-  }),
-  subscriptionResponse: (method: string, subscription: unknown) => ({
-    channel: "subscriptionResponse",
-    data: { method, subscription },
-  }),
-  errorChannel: (message: string) => ({
-    channel: "error",
-    data: message,
-  }),
-  pong: () => ({
-    channel: "pong",
-  }),
-} as const;
-
-// ============================================================
+// =============================================================================
 // Tests
-// ============================================================
+// =============================================================================
 
 Deno.test("WebSocketDispatcher", async (t) => {
   await t.step("request()", async (t) => {
@@ -123,7 +65,8 @@ Deno.test("WebSocketDispatcher", async (t) => {
         const sent = getLastSent(socket);
 
         socket.mockMessage(RESPONSES.error(sent.id as number, "Operation failed"));
-        await assertRejects(() => promise, WebSocketRequestError, "Operation failed");
+        const err = await assertRejects(() => promise, WebSocketRequestError, "Operation failed");
+        assertEquals((err as WebSocketRequestError).request, { test: true });
       });
 
       await t.step("rejects on error channel", async () => {
@@ -134,6 +77,16 @@ Deno.test("WebSocketDispatcher", async (t) => {
 
         socket.mockMessage(RESPONSES.errorChannel(`Something failed: {"id":${sent.id}}`));
         await assertRejects(() => promise, WebSocketRequestError);
+      });
+
+      await t.step("rejects by the trailing id of a body-less error", async () => {
+        const { socket, requester } = createRequester();
+
+        const promise = requester.request("post", { test: true });
+        const sent = getLastSent(socket);
+
+        socket.mockMessage(RESPONSES.errorChannel(`too many pending post requests id=${sent.id}`));
+        await assertRejects(() => promise, WebSocketRequestError, "too many pending post requests");
       });
     });
 
@@ -174,12 +127,23 @@ Deno.test("WebSocketDispatcher", async (t) => {
         await assertRejects(() => promise, WebSocketRequestError, errorMsg);
       });
 
+      await t.step("rejects when the echo carries server-added fields", async () => {
+        const { socket, requester } = createRequester();
+        const payload = { type: "userFills", user: "0xabc" };
+
+        const promise = requester.request("subscribe", payload);
+        const echoed = JSON.stringify({ type: "userFills", user: "0xabc", aggregateByTime: false });
+
+        socket.mockMessage(RESPONSES.errorChannel(`Already subscribed: ${echoed}`));
+        await assertRejects(() => promise, WebSocketRequestError, "Already subscribed");
+      });
+
       await t.step("rejects on Invalid subscription", async () => {
         const { socket, requester } = createRequester();
         const payload = { channel: "invalid", param: "test" };
 
         const promise = requester.request("subscribe", payload);
-        const errorMsg = `Invalid subscription: ${JSON.stringify(payload)}`;
+        const errorMsg = `Invalid subscription ${JSON.stringify(payload)}`;
 
         socket.mockMessage(RESPONSES.errorChannel(errorMsg));
         await assertRejects(() => promise, WebSocketRequestError, errorMsg);
@@ -195,18 +159,51 @@ Deno.test("WebSocketDispatcher", async (t) => {
         socket.mockMessage(RESPONSES.errorChannel(errorMsg));
         await assertRejects(() => promise, WebSocketRequestError, errorMsg);
       });
-    });
 
-    await t.step("ping", async () => {
-      const { socket, requester } = createRequester();
+      await t.step("an echo matches the most specific pending payload", async (t) => {
+        await t.step("confirmation of the superset does not resolve the subset", async () => {
+          const { socket, requester } = createRequester();
+          const subset = { type: "l2Book", coin: "BTC" };
+          const superset = { type: "l2Book", coin: "BTC", nSigFigs: 5 };
 
-      const promise = requester.request("ping");
-      const sent = getLastSent(socket);
+          const subsetPromise = requester.request("subscribe", subset);
+          const supersetPromise = requester.request("subscribe", superset);
 
-      assertEquals(sent.method, "ping");
+          socket.mockMessage(
+            RESPONSES.subscriptionResponse("subscribe", { type: "l2Book", coin: "BTC", nSigFigs: 5, mantissa: null }),
+          );
+          const supersetResult = await supersetPromise as Record<string, unknown>;
+          assertEquals((supersetResult.subscription as Record<string, unknown>).nSigFigs, 5);
 
-      socket.mockMessage(RESPONSES.pong());
-      await promise;
+          socket.mockMessage(
+            RESPONSES.subscriptionResponse("subscribe", {
+              type: "l2Book",
+              coin: "BTC",
+              nSigFigs: null,
+              mantissa: null,
+            }),
+          );
+          const subsetResult = await subsetPromise as Record<string, unknown>;
+          assertEquals((subsetResult.subscription as Record<string, unknown>).nSigFigs, null);
+        });
+
+        await t.step("an error echo of the superset does not reject the subset", async () => {
+          const { socket, requester } = createRequester();
+          const subset = { type: "l2Book", coin: "BTC" };
+          const superset = { type: "l2Book", coin: "BTC", nSigFigs: 999 };
+
+          const subsetPromise = requester.request("subscribe", subset);
+          const supersetPromise = requester.request("subscribe", superset);
+
+          const echo = JSON.stringify({ method: "subscribe", subscription: superset });
+          socket.mockMessage(RESPONSES.errorChannel(`Error parsing JSON into valid websocket request: ${echo}`));
+          await assertRejects(() => supersetPromise, WebSocketRequestError);
+
+          socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", subset));
+          const result = await subsetPromise as Record<string, unknown>;
+          assertEquals(result.method, "subscribe");
+        });
+      });
     });
 
     await t.step("connection close", async () => {
@@ -215,7 +212,7 @@ Deno.test("WebSocketDispatcher", async (t) => {
       const p1 = requester.request("post", { foo: "bar1" });
       const p2 = requester.request("subscribe", { sub: "bar2" });
 
-      socket.close();
+      socket.disconnect();
 
       await assertRejects(() => p1, WebSocketRequestError, "WebSocket connection closed");
       await assertRejects(() => p2, WebSocketRequestError, "WebSocket connection closed");
@@ -231,12 +228,57 @@ Deno.test("WebSocketDispatcher", async (t) => {
       await assertRejects(() => promise, WebSocketRequestError, "WebSocket connection closed");
     });
 
+    await t.step("queues the request until the connection opens", async () => {
+      const { socket, requester } = createRequester();
+      socket.readyState = ReconnectingWebSocket.CONNECTING;
+
+      const promise = requester.request("post", { foo: "bar" });
+      assertEquals(socket.sentMessages.length, 0);
+
+      socket.open();
+      assertEquals(socket.sentMessages.length, 1);
+
+      socket.mockMessage(RESPONSES.info(getLastSent(socket).id as number, "late-open"));
+      assertEquals(await promise, "late-open");
+    });
+
+    await t.step("a queued request cannot reach the server after a disconnect", async () => {
+      const { socket, requester } = createRequester();
+      socket.readyState = ReconnectingWebSocket.CONNECTING;
+
+      const promise = requester.request("post", { foo: "bar" });
+      socket.disconnect();
+      await assertRejects(() => promise, WebSocketRequestError, "closed before the request was sent");
+
+      socket.open();
+      assertEquals(socket.sentMessages.length, 0);
+    });
+
     await t.step("rejects if permanently closed", async () => {
       const { socket, requester } = createRequester();
 
       socket.terminate(new Error("Permanently closed"));
 
-      await assertRejects(() => requester.request("post", { foo: "bar" }), Error, "Permanently closed");
+      const err = await assertRejects(
+        () => requester.request("post", { foo: "bar" }),
+        WebSocketRequestError,
+        "WebSocket connection permanently terminated",
+      );
+      assertEquals(err.cause, socket.terminationSignal.reason);
+    });
+
+    await t.step("rejects an in-flight request when permanently closed", async () => {
+      const { socket, requester } = createRequester();
+
+      const promise = requester.request("post", { foo: "bar" });
+      socket.terminate(new Error("Permanently closed"));
+
+      const err = await assertRejects(
+        () => promise,
+        WebSocketRequestError,
+        "WebSocket connection permanently terminated",
+      );
+      assertEquals(err.cause, socket.terminationSignal.reason);
     });
 
     await t.step("AbortSignal", async (t) => {
@@ -247,7 +289,8 @@ Deno.test("WebSocketDispatcher", async (t) => {
         controller.abort(new Error("Aborted pre-emptively"));
 
         const promise = requester.request("post", { foo: "bar" }, controller.signal);
-        await assertRejects(() => promise, Error, "Aborted pre-emptively");
+        const err = await assertRejects(() => promise, WebSocketRequestError, "Request aborted");
+        assertEquals((err.cause as Error).message, "Aborted pre-emptively");
       });
 
       await t.step("rejects if aborted after sending", async () => {
@@ -258,7 +301,21 @@ Deno.test("WebSocketDispatcher", async (t) => {
         assertEquals(socket.sentMessages.length, 1);
 
         controller.abort(new Error("Aborted after sending"));
-        await assertRejects(() => promise, Error, "Aborted after sending");
+        const err = await assertRejects(() => promise, WebSocketRequestError, "Request aborted");
+        assertEquals((err.cause as Error).message, "Aborted after sending");
+      });
+
+      await t.step("an aborted queued request is never flushed on open", async () => {
+        const { socket, requester } = createRequester();
+        socket.readyState = ReconnectingWebSocket.CONNECTING;
+
+        const controller = new AbortController();
+        const promise = requester.request("post", { foo: "bar" }, controller.signal);
+        controller.abort(new Error("changed my mind"));
+        socket.open();
+
+        assertEquals(socket.sentMessages.length, 0);
+        await assertRejects(() => promise, WebSocketRequestError, "Request aborted");
       });
 
       await t.step("rejects after timeout expires", async () => {
@@ -266,8 +323,16 @@ Deno.test("WebSocketDispatcher", async (t) => {
 
         const promise = requester.request("post", { foo: "bar" });
 
-        const err = await assertRejects(() => promise, WebSocketRequestError);
+        const err = await assertRejects(() => promise, WebSocketRequestError, "Request timed out after 30 ms");
         assertEquals((err.cause as Error)?.name, "TimeoutError");
+      });
+
+      await t.step("timeout: 0 expires immediately", async () => {
+        const { requester } = createRequester(0);
+
+        const promise = requester.request("post", { foo: "bar" });
+
+        await assertRejects(() => promise, WebSocketRequestError, "Request timed out after 0 ms");
       });
 
       await t.step("timeout: null disables timeout", async () => {
@@ -282,50 +347,44 @@ Deno.test("WebSocketDispatcher", async (t) => {
 
         assertEquals(await promise, "late-success");
       });
+
+      await t.step("timeout: Infinity never fires", async () => {
+        const { socket, requester } = createRequester(Infinity);
+
+        const promise = requester.request("post", { foo: "bar" });
+        const sent = getLastSent(socket);
+
+        setTimeout(() => {
+          socket.mockMessage(RESPONSES.info(sent.id as number, "late-success"));
+        }, 50);
+
+        assertEquals(await promise, "late-success");
+      });
+
+      await t.step("the timeout message reports the value the timer was armed with", async () => {
+        const { requester } = createRequester(30);
+
+        const promise = requester.request("post", { foo: "bar" });
+        requester.timeout = null;
+
+        await assertRejects(() => promise, WebSocketRequestError, "Request timed out after 30 ms");
+      });
     });
-  });
 
-  await t.step("requestToId()", () => {
-    const input = {
-      Z: "0xABC123",
-      boolVal: true,
-      textVal: "SOME Text Not Hex",
-      nested: {
-        aNumber: 123,
-        hexString: "0xFFFfFf",
-        randomStr: "NotHex0123",
-      },
-      arr: [10, "0xF00D", false],
-    };
+    await t.step("cleanup of a finished request keeps its duplicate pending", async () => {
+      const { socket, requester } = createRequester();
+      const payload = { channel: "x" };
 
-    const result = JSON.parse(requestToId(input));
+      const p1 = requester.request("subscribe", payload);
+      const controller = new AbortController();
+      const p2 = requester.request("subscribe", payload, controller.signal);
 
-    // Keys sorted alphabetically
-    assertEquals(Object.keys(result), ["Z", "arr", "boolVal", "nested", "textVal"]);
+      controller.abort(new Error("cancel the duplicate"));
+      await assertRejects(() => p2, WebSocketRequestError, "Request aborted");
 
-    // Hex strings lowercased
-    assertEquals(result.Z, "0xabc123");
-    assertEquals(result.arr[1], "0xf00d");
-    assertEquals(result.nested.hexString, "0xffffff");
-
-    // Non-hex unchanged
-    assertEquals(result.boolVal, true);
-    assertEquals(result.textVal, "SOME Text Not Hex");
-    assertEquals(result.nested.aNumber, 123);
-    assertEquals(result.nested.randomStr, "NotHex0123");
-  });
-
-  await t.step("invalid JSON in error channel is ignored", async () => {
-    const { socket, requester } = createRequester();
-
-    const promise = requester.request("post", { test: "jsonErrorIgnore" });
-    const sent = getLastSent(socket);
-
-    // Invalid JSON in error - should be ignored
-    socket.mockMessage(RESPONSES.errorChannel(`Something failed: {"id":${sent.id}, 12312312312}`));
-
-    // Valid response should still work
-    socket.mockMessage(RESPONSES.info(sent.id as number, "Success"));
-    assertEquals(await promise, "Success");
+      socket.mockMessage(RESPONSES.subscriptionResponse("subscribe", payload));
+      const result = await p1 as Record<string, unknown>;
+      assertEquals(result.method, "subscribe");
+    });
   });
 });

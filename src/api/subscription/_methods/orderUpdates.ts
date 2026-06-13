@@ -70,7 +70,7 @@ export type OrderUpdatesEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, WebSocketRequestError } from "../../../transport/mod.ts";
+import type { ISubscription, TransportError } from "../../../transport/mod.ts";
 import type { SubscriptionConfig } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode orderUpdates} function. */
@@ -108,10 +108,10 @@ export function orderUpdates(
   config: SubscriptionConfig,
   params: OrderUpdatesParameters,
   listener: (data: OrderUpdatesEvent) => void,
-  onError?: (error: WebSocketRequestError) => void,
+  onError?: (error: TransportError) => void,
 ): Promise<ISubscription> {
   const payload = parse(OrderUpdatesRequest, { type: "orderUpdates", ...params });
   return config.transport.subscribe<OrderUpdatesEvent>(payload.type, payload, (e) => {
     listener(e.detail);
-  }, onError);
+  }, { onError });
 }
