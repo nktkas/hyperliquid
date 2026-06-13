@@ -36,16 +36,17 @@ hype-spot.
 
 ### Add a new API method
 
-1. Create a file with the method name in the appropriate directory:
-   `src/api/[exchange|info|subscription]/[methodName].ts`
-2. Implement the logic related to the new API (using ready-made patterns from other method files).
-3. Update the `client.ts` file to include the new method.
-4. Add the raw function export to `mod.ts`.
-5. Create a test (use patterns from other tests) and run the test.
+1. Create a file named after the method in the matching group's `_methods` directory:
+   `src/api/[exchange|info|subscription|explorer]/_methods/[methodName].ts`
+2. Implement it using the patterns from existing method files.
+3. Re-export the file from the group barrel: add `export * from "./_methods/[methodName].ts";` to
+   `src/api/[group]/mod.ts`.
+4. Add the matching wrapper method to the client in `src/api/[group]/client.ts`.
+5. Create a test at `tests/api/[group]/[methodName].test.ts` (use patterns from other tests) and run it.
+6. Run the `deno task check` command and fix any errors that are reported.
 
 ### Update API schemas/types
 
-1. Go to `src/api/[exchange|info|subscription]/[methodName].ts`
+1. Go to `src/api/[group]/_methods/[methodName].ts`
 2. Update the [valibot](https://valibot.dev/) schemas in the "Schemas" section (types are inferred from schemas).
-3. Run the test at `tests/api/[exchange|info|subscription]/[methodName].ts` to check the schemas against the actual API
-   response.
+3. Run the test at `tests/api/[group]/[methodName].test.ts` to check the schemas against the actual API response.
