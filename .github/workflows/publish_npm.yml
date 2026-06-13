@@ -14,6 +14,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+      # npm publishes via OIDC trusted publishing (no token here), which needs npm >= 11.5.1.
       - uses: actions/setup-node@v6
         with:
           node-version: "24.x"
@@ -28,7 +29,7 @@ jobs:
         id: tag
         run: |
           # Read version from deno.json
-          VERSION=$(node -p "require('./deno.json').version")
+          VERSION=$(jq -r .version deno.json)
           # Extract tag (alpha, beta, rc) from version string if present
           TAG=$(echo "$VERSION" | sed -n 's/.*-\(alpha\|beta\|rc\).*/\1/p')
           # If no known tag found but version contains hyphen, use "prerelease"
