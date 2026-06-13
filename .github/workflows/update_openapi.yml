@@ -16,6 +16,8 @@ jobs:
         with:
           ref: main
       - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
 
       - name: Update OpenAPI specs and sync to GitBook
         env:
