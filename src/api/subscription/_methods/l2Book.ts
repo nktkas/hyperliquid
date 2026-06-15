@@ -18,6 +18,8 @@ export const L2BookRequest = /* @__PURE__ */ (() => {
     nSigFigs: v.nullish(v.picklist([2, 3, 4, 5])),
     /** Mantissa for aggregation (if `nSigFigs` is 5). */
     mantissa: v.nullish(v.picklist([2, 5])),
+    //** How fast the snapshots should be pushed (if `fast` is true 5 levels every 0.5 seconds else 20 levels every 2 seconds) */
+    fast: v.nullish(v.boolean(), false),
   });
 })();
 export type L2BookRequest = v.InferOutput<typeof L2BookRequest>;
@@ -110,6 +112,7 @@ export function l2Book(
     ...params,
     nSigFigs: params.nSigFigs ?? null,
     mantissa: params.mantissa ?? null,
+    fast: params.fast ?? null,
   });
   return config.transport.subscribe<L2BookEvent>(payload.type, payload, (e) => {
     if (e.detail.coin === payload.coin) {
