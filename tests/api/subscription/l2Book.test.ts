@@ -21,6 +21,8 @@ runTest({
       { coin: "BTC", nSigFigs: 5, mantissa: 2 },
       { coin: "BTC", nSigFigs: 5, mantissa: 5 },
       { coin: "BTC", nSigFigs: null, mantissa: null },
+      { coin: "ETH", fast: false },
+      { coin: "ETH", fast: true },
     ];
 
     const data = await collectEventsOverTime<L2BookEvent>(async (cb) => {

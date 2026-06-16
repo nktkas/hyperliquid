@@ -18,6 +18,12 @@ export const L2BookRequest = /* @__PURE__ */ (() => {
     nSigFigs: v.nullish(v.picklist([2, 3, 4, 5])),
     /** Mantissa for aggregation (if `nSigFigs` is 5). */
     mantissa: v.nullish(v.picklist([2, 5])),
+    /**
+     * Whether to receive faster, shallower order book snapshots.
+     * - `true`: 5 levels every 0.5 seconds.
+     * - `false`: 20 levels every 5 seconds.
+     */
+    fast: v.optional(v.boolean()),
   });
 })();
 export type L2BookRequest = v.InferOutput<typeof L2BookRequest>;
@@ -58,6 +64,8 @@ export type L2BookEvent = {
    * @pattern ^[0-9]+(\.[0-9]+)?$
    */
   spread?: string;
+  /** Indicates a fast-mode snapshot (only present when subscribed with `fast: true`). */
+  fast?: true;
 };
 
 // ============================================================
