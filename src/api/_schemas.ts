@@ -6,7 +6,6 @@
  */
 
 import * as v from "@valibot/valibot";
-import { formatDecimalString } from "../utils/_format.ts";
 
 // ============================================================
 // Number
@@ -18,7 +17,7 @@ export const UnsignedDecimal = /* @__PURE__ */ (() => {
     v.union([v.string(), v.number()]),
     v.toString(),
     v.string(), // HACK: for correct JSONSchema generation
-    v.transform((value) => formatDecimalString(value)),
+    v.transform((value) => normalizeDecimalString(value)),
     v.regex(/^[0-9]+(\.[0-9]+)?$/),
   );
 })();
@@ -30,7 +29,7 @@ export const Decimal = /* @__PURE__ */ (() => {
     v.union([v.string(), v.number()]),
     v.toString(),
     v.string(), // HACK: for correct JSONSchema generation
-    v.transform((value) => formatDecimalString(value)),
+    v.transform((value) => normalizeDecimalString(value)),
     v.regex(/^-?[0-9]+(\.[0-9]+)?$/),
   );
 })();
@@ -58,6 +57,35 @@ export const UnsignedInteger = /* @__PURE__ */ (() => {
   );
 })();
 export type UnsignedInteger = v.InferOutput<typeof UnsignedInteger>;
+
+/**
+ * Normalize a decimal string: drop redundant leading and trailing zeros and collapse negative zero.
+ * A string that is not a well-formed decimal is returned unchanged.
+ *
+ * @example
+ * ```ts ignore
+ * normalizeDecimalString("00123");  // => "123"
+ * normalizeDecimalString("1.2000"); // => "1.2"
+ * normalizeDecimalString(".5");     // => "0.5"
+ * normalizeDecimalString("-0.0");   // => "0"
+ * normalizeDecimalString("1.0.0");  // => "1.0.0" (not a decimal — unchanged)
+ * ```
+ */
+function normalizeDecimalString(value: string): string {
+  const match = value.match(/^(-?)([0-9]*)(?:\.([0-9]*))?$/);
+  if (!match) return value;
+  const [, sign, intRaw, fracRaw = ""] = match;
+  if (intRaw === "" && fracRaw === "") return value;
+
+  const int = intRaw.replace(/^0+/, "") || "0";
+
+  let fracEnd = fracRaw.length;
+  while (fracEnd > 0 && fracRaw[fracEnd - 1] === "0") fracEnd--;
+  const frac = fracRaw.slice(0, fracEnd);
+
+  const body = frac === "" ? int : `${int}.${frac}`;
+  return sign === "-" && body !== "0" ? `-${body}` : body;
+}
 
 // ============================================================
 // Hex

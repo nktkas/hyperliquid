@@ -11,6 +11,7 @@ Every exception the SDK itself throws extends `HyperliquidError`. One `instanceo
 Error
 └─ HyperliquidError
    ├─ ValidationError
+   ├─ FormatError
    ├─ AbstractWalletError
    ├─ CanonicalizeError
    ├─ ApiRequestError
@@ -22,6 +23,7 @@ Error
 | Class                   | Thrown from                                      | Inspect                   |
 | ----------------------- | ------------------------------------------------ | ------------------------- |
 | `ValidationError`       | Schema parsing, before any network I/O           | `message`, `cause.issues` |
+| `FormatError`           | `formatPrice` / `formatSize`, before network I/O | `message`                 |
 | `AbstractWalletError`   | Signing layer (viem / ethers / custom adapter)   | `cause`                   |
 | `CanonicalizeError`     | `canonicalize()` helper during low-level signing | `message`                 |
 | `ApiRequestError`       | Hyperliquid API returned an error response       | `message`, `response`     |
@@ -44,6 +46,23 @@ try {
   if (error instanceof ValidationError) {
     console.error(error.message);      // human-readable summary
     console.error(error.cause.issues); // path + expected + received per issue
+  }
+}
+```
+
+## `FormatError`
+
+Thrown by the [`formatPrice` and `formatSize`](utilities.md) helpers when a value cannot be turned into a valid
+Hyperliquid price or size — the input is not a finite number, or truncation collapses it to `0`.
+
+```ts
+import { FormatError, formatPrice } from "@nktkas/hyperliquid/utils";
+
+try {
+  formatPrice("not a number", 0);
+} catch (error) {
+  if (error instanceof FormatError) {
+    console.error(error.message); // what was invalid
   }
 }
 ```
@@ -209,13 +228,17 @@ import {
   ValidationError,
   WebSocketRequestError,
 } from "@nktkas/hyperliquid";
+import { FormatError, formatPrice } from "@nktkas/hyperliquid/utils";
 
 try {
-  await client.order({ orders: [/* ... */], grouping: "na" });
+  const price = formatPrice("65000.1", 3);
+  await client.order({ orders: [{ p: price /* ... */ }] });
 } catch (error) {
   if (error instanceof HyperliquidError) {
     if (error instanceof ValidationError) {
       // invalid parameters — inspect error.message
+    } else if (error instanceof FormatError) {
+      // price or size could not be formatted — inspect error.message
     } else if (error instanceof ApiRequestError) {
       // API rejected the action — inspect error.message
     } else if (error instanceof AbstractWalletError) {

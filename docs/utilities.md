@@ -21,7 +21,7 @@ Hyperliquid's tick and lot size rules constrain every order price to three condi
 - At most **`6 − szDecimals`** decimals for perpetuals, **`8 − szDecimals`** for spot.
 - Integer prices are always valid, regardless of significant figures.
 
-Use `formatPrice` — it applies both rules as a string operation, so arbitrary-precision inputs survive intact:
+Use `formatPrice` — it applies both rules with exact decimal arithmetic, so arbitrary-precision inputs survive intact:
 
 <!-- deno-fmt-ignore -->
 ```ts
@@ -47,7 +47,7 @@ rounds instead of truncating, ignores the significant-figures ceiling and has is
 {% hint style="warning" %}
 
 `formatPrice` **truncates**, it does not round. If truncation collapses a very small price to `0`, it throws
-`RangeError`.
+`FormatError`.
 
 {% endhint %}
 
@@ -70,8 +70,8 @@ formatSize("100", 0);         // "100"
 {% hint style="warning" %}
 
 Hyperliquid treats a literal `"0"` size on a reduce-only order as "close the whole position". `formatSize` refuses to
-return `"0"` (it throws `RangeError`), so if you actually want that behavior, pass `"0"` directly into the order payload
-instead of routing it through `formatSize`.
+return `"0"` (it throws `FormatError`), so if you actually want that behavior, pass `"0"` directly into the order
+payload instead of routing it through `formatSize`.
 
 {% endhint %}
 
