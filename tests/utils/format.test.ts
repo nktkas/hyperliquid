@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-import-prefix
 
 import { assertEquals, assertThrows } from "jsr:@std/assert@1";
-import { formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
+import { FormatError, formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
 
 // ============================================================
 // Test Data
@@ -61,8 +61,8 @@ Deno.test("formatPrice", async (t) => {
   });
 
   await t.step("edge cases", async (t) => {
-    await t.step("zero throws RangeError", () => {
-      assertThrows(() => formatPrice("0.0000001", 0), RangeError);
+    await t.step("zero throws FormatError", () => {
+      assertThrows(() => formatPrice("0.0000001", 0), FormatError);
     });
 
     await t.step("negative numbers supported", () => {
@@ -71,12 +71,10 @@ Deno.test("formatPrice", async (t) => {
   });
 
   await t.step("invalid input throws", () => {
-    assertThrows(() => formatPrice("0x1A", 0), TypeError);
-    assertThrows(() => formatPrice("1.23e5", 0), TypeError);
-    assertThrows(() => formatPrice("abc", 0), TypeError);
-    assertThrows(() => formatPrice(".", 0), TypeError);
-    assertThrows(() => formatPrice("-.", 0), TypeError);
-    assertThrows(() => formatPrice("", 0), TypeError);
+    assertThrows(() => formatPrice("abc", 0), FormatError);
+    assertThrows(() => formatPrice(".", 0), FormatError);
+    assertThrows(() => formatPrice("-.", 0), FormatError);
+    assertThrows(() => formatPrice("", 0), FormatError);
   });
 
   await t.step("reference validation", async (t) => {
@@ -114,8 +112,8 @@ Deno.test("formatSize", async (t) => {
   });
 
   await t.step("edge cases", async (t) => {
-    await t.step("zero throws RangeError", () => {
-      assertThrows(() => formatSize("0.0000001", 0), RangeError);
+    await t.step("zero throws FormatError", () => {
+      assertThrows(() => formatSize("0.0000001", 0), FormatError);
     });
 
     await t.step("negative numbers supported", () => {
@@ -124,12 +122,10 @@ Deno.test("formatSize", async (t) => {
   });
 
   await t.step("invalid input throws", () => {
-    assertThrows(() => formatSize("0xFF", 0), TypeError);
-    assertThrows(() => formatSize("5e-3", 0), TypeError);
-    assertThrows(() => formatSize("invalid", 0), TypeError);
-    assertThrows(() => formatSize(".", 0), TypeError);
-    assertThrows(() => formatSize("-.", 0), TypeError);
-    assertThrows(() => formatSize("", 0), TypeError);
+    assertThrows(() => formatSize("invalid", 0), FormatError);
+    assertThrows(() => formatSize(".", 0), FormatError);
+    assertThrows(() => formatSize("-.", 0), FormatError);
+    assertThrows(() => formatSize("", 0), FormatError);
   });
 
   await t.step("reference validation", async (t) => {

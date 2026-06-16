@@ -1,4 +1,59 @@
 /**
+ * Price and size formatting per Hyperliquid tick and lot size rules.
+ *
+ * @module
+ */
+
+import { Decimal } from "decimal.js";
+import { HyperliquidError } from "../_base.ts";
+
+/**
+ * Thrown when a price or size value cannot be formatted to a valid decimal.
+ *
+ * @example
+ * ```ts
+ * import { formatPrice, FormatError } from "@nktkas/hyperliquid/utils";
+ *
+ * try {
+ *   formatPrice("not a number", 0);
+ * } catch (error) {
+ *   if (error instanceof FormatError) {
+ *     console.error(error.message);
+ *   }
+ * }
+ * ```
+ */
+export class FormatError extends HyperliquidError {
+  constructor(message: string, options?: ErrorOptions) {
+    super(message, options);
+    this.name = "FormatError";
+  }
+}
+
+// A cloned constructor isolates our rounding mode from the global decimal.js
+// config, which any other consumer in the process could mutate via Decimal.set.
+const D = Decimal.clone({ rounding: Decimal.ROUND_DOWN });
+
+/**
+ * Parse a string or number into a finite decimal.js value.
+ *
+ * @throws {FormatError} If the value is unparsable or not finite.
+ */
+function toDecimal(value: string | number, field: "price" | "size"): Decimal {
+  let d: Decimal;
+  try {
+    d = new D(value);
+  } catch (cause) {
+    throw new FormatError(`Invalid ${field}: ${JSON.stringify(value)}`, { cause });
+  }
+  // decimal.js accepts NaN and Infinity as valid Decimals, so guard finiteness.
+  if (!d.isFinite()) {
+    throw new FormatError(`Invalid ${field}: ${String(value)} is not finite`);
+  }
+  return d;
+}
+
+/**
  * Format price according to Hyperliquid {@link https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/tick-and-lot-size | rules}:
  * - Maximum 5 significant figures
  * - Maximum 6 (for perp) or 8 (for spot) - `szDecimals` decimal places
@@ -9,34 +64,33 @@
  * @param type The market type: "perp" for perpetuals or "spot" for spot markets. Default: `"perp"`.
  * @return Formatted price string
  *
- * @throws {TypeError} If price is not a valid number string
- * @throws {RangeError} If the formatted price is 0
+ * @throws {FormatError} If the price is not a valid finite number, or is truncated to 0.
  *
  * @example
  * ```ts
  * import { formatPrice } from "@nktkas/hyperliquid/utils";
- * const price = formatPrice("0.0000123456789", 0, "spot"); // → "0.00001234"
+ *
+ * formatPrice("97123.456789", 0); // → "97123" (perp, szDecimals=0)
+ * formatPrice("1.23456789", 5); // → "1.2" (perp, szDecimals=5)
+ * formatPrice("0.0000123456789", 0, "spot"); // → "0.00001234" (spot, 8-decimal ceiling)
  * ```
  */
 export function formatPrice(price: string | number, szDecimals: number, type: "perp" | "spot" = "perp"): string {
-  price = price.toString().trim();
-  assertNumberString(price);
+  const d = toDecimal(price, "price");
 
-  // Integer prices are always allowed
-  if (/^-?\d+$/.test(price)) return formatDecimalString(price);
-
-  // Apply decimal limit: max 6 (perp) or 8 (spot) - szDecimals
   const maxDecimals = Math.max((type === "perp" ? 6 : 8) - szDecimals, 0);
-  price = StringMath.toFixedTruncate(price, maxDecimals);
+  let result = d.toDecimalPlaces(maxDecimals);
 
-  // Apply sig figs limit: max 5 significant figures
-  price = StringMath.toPrecisionTruncate(price, 5);
-
-  if (price === "0") {
-    throw new RangeError("Price is too small and was truncated to 0");
+  // Integers are exempt from the 5-sig-fig cap.
+  if (!result.isInteger()) {
+    result = result.toSignificantDigits(5);
   }
 
-  return price;
+  if (result.isZero()) {
+    throw new FormatError("Price is too small and was truncated to 0");
+  }
+
+  return result.toFixed();
 }
 
 /**
@@ -47,151 +101,25 @@ export function formatPrice(price: string | number, szDecimals: number, type: "p
  * @param szDecimals The size decimals of the asset.
  * @return Formatted size string
  *
- * @throws {TypeError} If size is not a valid number string
- * @throws {RangeError} If the formatted size is 0
+ * @throws {FormatError} If the size is not a valid finite number, or is truncated to 0.
  *
  * @example
  * ```ts
  * import { formatSize } from "@nktkas/hyperliquid/utils";
  *
- * const size = formatSize("1.23456789", 5); // → "1.23456"
+ * formatSize("1.23456789", 5); // → "1.23456"
+ * formatSize("0.123456789", 2); // → "0.12"
+ * formatSize("100", 0); // → "100"
  * ```
  */
 export function formatSize(size: string | number, szDecimals: number): string {
-  size = size.toString().trim();
-  assertNumberString(size);
+  const d = toDecimal(size, "size");
 
-  // Apply decimal limit: szDecimals
-  size = StringMath.toFixedTruncate(size, szDecimals);
+  const result = d.toDecimalPlaces(szDecimals);
 
-  if (size === "0") {
-    throw new RangeError("Size is too small and was truncated to 0");
+  if (result.isZero()) {
+    throw new FormatError("Size is too small and was truncated to 0");
   }
 
-  return size;
-}
-
-/** String-based Math operations for arbitrary precision. */
-const StringMath = {
-  /** Floor log10 (magnitude): position of most significant digit. */
-  log10Floor(value: string): number {
-    const abs = value[0] === "-" ? value.slice(1) : value;
-
-    // Check if zero or invalid
-    const num = Number(abs);
-    if (num === 0 || isNaN(num)) return -Infinity;
-
-    const [int, dec] = abs.split(".");
-
-    // Number >= 1: magnitude = length of integer part - 1
-    if (Number(int) !== 0) {
-      const trimmed = int.replace(/^0+/, "");
-      return trimmed.length - 1;
-    }
-
-    // Number < 1: count leading zeros in decimal part
-    const leadingZeros = dec.match(/^0*/)?.[0].length ?? 0;
-    return -(leadingZeros + 1);
-  },
-
-  /** Multiply by 10^exp: shift decimal point left (negative) or right (positive). */
-  multiplyByPow10(value: string, exp: number): string {
-    if (!Number.isInteger(exp)) throw new RangeError("Exponent must be an integer");
-    if (exp === 0) return formatDecimalString(value);
-
-    const neg = value[0] === "-";
-    const abs = neg ? value.slice(1) : value;
-    const [intRaw, dec = ""] = abs.split(".");
-    // Normalize empty integer part to "0" (handles ".5" → "0.5")
-    const int = intRaw || "0";
-
-    let result: string;
-
-    if (exp > 0) {
-      // Shift right: move digits from decimal to integer
-      if (exp >= dec.length) {
-        result = int + dec + "0".repeat(exp - dec.length);
-      } else {
-        result = int + dec.slice(0, exp) + "." + dec.slice(exp);
-      }
-    } else {
-      // Shift left: move digits from integer to decimal
-      const absExp = -exp;
-      if (absExp >= int.length) {
-        result = "0." + "0".repeat(absExp - int.length) + int + dec;
-      } else {
-        result = int.slice(0, -absExp) + "." + int.slice(-absExp) + dec;
-      }
-    }
-
-    return formatDecimalString((neg ? "-" : "") + result);
-  },
-
-  /** Returns the integer part of a number by removing any fractional digits. */
-  trunc(value: string): string {
-    const dotIndex = value.indexOf(".");
-    return dotIndex === -1 ? value : value.slice(0, dotIndex) || "0";
-  },
-
-  /** Truncate to a certain number of significant figures. */
-  toPrecisionTruncate(value: string, precision: number): string {
-    if (!Number.isInteger(precision)) throw new RangeError("Precision must be an integer");
-    if (precision < 1) throw new RangeError("Precision must be positive");
-    if (/^-?0+(\.0*)?$/.test(value)) return "0"; // zero is special case (don't work with log10)
-
-    const neg = value[0] === "-";
-    const abs = neg ? value.slice(1) : value;
-
-    // Calculate how much to shift: align most significant digit to ones place + (maxSigFigs-1)
-    const magnitude = StringMath.log10Floor(abs);
-    const shiftAmount = precision - magnitude - 1;
-
-    // Shift right, truncate integer part, shift back
-    const shifted = StringMath.multiplyByPow10(abs, shiftAmount);
-    const truncated = StringMath.trunc(shifted);
-    const result = StringMath.multiplyByPow10(truncated, -shiftAmount);
-
-    // Build final result and trim zeros
-    return formatDecimalString(neg ? "-" + result : result);
-  },
-
-  /** Truncate to a certain number of decimal places. */
-  toFixedTruncate(value: string, decimals: number): string {
-    if (!Number.isInteger(decimals)) throw new RangeError("Decimals must be an integer");
-    if (decimals < 0) throw new RangeError("Decimals must be non-negative");
-
-    // Match number with up to `decimals` decimal places
-    const regex = new RegExp(`^-?(?:\\d+)?(?:\\.\\d{0,${decimals}})?`);
-    const result = value.match(regex)?.[0];
-
-    if (!result) {
-      throw new TypeError("Invalid number format");
-    }
-
-    // Trim zeros after truncation
-    return formatDecimalString(result);
-  },
-};
-
-/** Normalize a decimal string by trimming unnecessary zeros and formatting edge cases. */
-export function formatDecimalString(value: string): string {
-  return value
-    // remove leading/trailing whitespace
-    .trim() // "  123.45  " → "123.45"
-    // remove leading zeros
-    .replace(/^(-?)0+(?=\d)/, "$1") // "00123" → "123", "-00.5" → "-0.5"
-    // remove trailing zeros
-    .replace(/\.0*$|(\.\d+?)0+$/, "$1") // "1.2000" → "1.2", "5.0" → "5"
-    // add leading zero if starts with decimal point
-    .replace(/^(-?)\./, "$10.") // ".5" → "0.5", "-.5" → "-0.5"
-    // add "0" if string is empty after trimming
-    .replace(/^-?$/, "0") // "" → "0", "-" → "0"
-    // normalize negative zero
-    .replace(/^-0$/, "0"); // "-0" → "0"
-}
-
-function assertNumberString(value: string): void {
-  if (!/^-?(\d+\.?\d*|\.\d+)$/.test(value)) {
-    throw new TypeError("Invalid number format");
-  }
+  return result.toFixed();
 }
