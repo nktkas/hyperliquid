@@ -34,8 +34,8 @@ export type NotificationEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, TransportError } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_base/mod.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig, SubscriptionOptions } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode notification} function. */
 export type NotificationParameters = Omit<v.InferInput<typeof NotificationRequest>, "type">;
@@ -46,7 +46,7 @@ export type NotificationParameters = Omit<v.InferInput<typeof NotificationReques
  * @param config General configuration for Subscription API subscriptions.
  * @param params Parameters specific to the API subscription.
  * @param listener A callback function to be called when the event is received.
- * @param onError An optional callback function to be called when the subscription fails.
+ * @param options Options to control the subscription lifecycle.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -72,10 +72,10 @@ export function notification(
   config: SubscriptionConfig,
   params: NotificationParameters,
   listener: (data: NotificationEvent) => void,
-  onError?: (error: TransportError) => void,
+  options?: SubscriptionOptions,
 ): Promise<ISubscription> {
   const payload = parse(NotificationRequest, { type: "notification", ...params });
   return config.transport.subscribe<NotificationEvent>(payload.type, payload, (e) => {
     listener(e.detail);
-  }, { onError });
+  }, options);
 }

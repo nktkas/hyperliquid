@@ -67,8 +67,8 @@ export type BboEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, TransportError } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_base/mod.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig, SubscriptionOptions } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode bbo} function. */
 export type BboParameters = Omit<v.InferInput<typeof BboRequest>, "type">;
@@ -79,7 +79,7 @@ export type BboParameters = Omit<v.InferInput<typeof BboRequest>, "type">;
  * @param config General configuration for Subscription API subscriptions.
  * @param params Parameters specific to the API subscription.
  * @param listener A callback function to be called when the event is received.
- * @param onError An optional callback function to be called when the subscription fails.
+ * @param options Options to control the subscription lifecycle.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -105,12 +105,12 @@ export function bbo(
   config: SubscriptionConfig,
   params: BboParameters,
   listener: (data: BboEvent) => void,
-  onError?: (error: TransportError) => void,
+  options?: SubscriptionOptions,
 ): Promise<ISubscription> {
   const payload = parse(BboRequest, { type: "bbo", ...params });
   return config.transport.subscribe<BboEvent>(payload.type, payload, (e) => {
     if (e.detail.coin === payload.coin) {
       listener(e.detail);
     }
-  }, { onError });
+  }, options);
 }

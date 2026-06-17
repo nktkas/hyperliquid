@@ -3,4 +3,4 @@
  * @module
  */
 
-export type { SubscriptionConfig } from "./_config.ts";
+export type { SubscriptionConfig, SubscriptionOptions } from "./_config.ts";

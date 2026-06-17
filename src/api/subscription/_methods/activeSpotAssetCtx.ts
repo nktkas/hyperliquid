@@ -36,8 +36,8 @@ export type ActiveSpotAssetCtxEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, TransportError } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_base/mod.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig, SubscriptionOptions } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode activeSpotAssetCtx} function. */
 export type ActiveSpotAssetCtxParameters = Omit<v.InferInput<typeof ActiveSpotAssetCtxRequest>, "type">;
@@ -48,7 +48,7 @@ export type ActiveSpotAssetCtxParameters = Omit<v.InferInput<typeof ActiveSpotAs
  * @param config General configuration for Subscription API subscriptions.
  * @param params Parameters specific to the API subscription.
  * @param listener A callback function to be called when the event is received.
- * @param onError An optional callback function to be called when the subscription fails.
+ * @param options Options to control the subscription lifecycle.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -74,12 +74,12 @@ export function activeSpotAssetCtx(
   config: SubscriptionConfig,
   params: ActiveSpotAssetCtxParameters,
   listener: (data: ActiveSpotAssetCtxEvent) => void,
-  onError?: (error: TransportError) => void,
+  options?: SubscriptionOptions,
 ): Promise<ISubscription> {
   const payload = parse(ActiveSpotAssetCtxRequest, { type: "activeAssetCtx", ...params });
   return config.transport.subscribe<ActiveSpotAssetCtxEvent>("activeSpotAssetCtx", payload, (e) => {
     if (e.detail.coin === payload.coin) {
       listener(e.detail);
     }
-  }, { onError });
+  }, options);
 }

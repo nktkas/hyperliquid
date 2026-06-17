@@ -3,8 +3,8 @@
  * @module
  */
 
-import type { ISubscription, TransportError } from "../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_methods/_base/mod.ts";
+import type { ISubscription } from "../../transport/mod.ts";
+import type { SubscriptionConfig, SubscriptionOptions } from "./_methods/_base/mod.ts";
 
 // ============================================================
 // Methods Imports
@@ -107,7 +107,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -130,9 +130,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   activeAssetCtx(
     params: ActiveAssetCtxParameters,
     listener: (data: ActiveAssetCtxEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return activeAssetCtx(this.config_, params, listener, onError);
+    return activeAssetCtx(this.config_, params, listener, options);
   }
 
   /**
@@ -140,7 +140,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -163,9 +163,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   activeAssetData(
     params: ActiveAssetDataParameters,
     listener: (data: ActiveAssetDataEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return activeAssetData(this.config_, params, listener, onError);
+    return activeAssetData(this.config_, params, listener, options);
   }
 
   /**
@@ -173,7 +173,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -196,16 +196,16 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   activeSpotAssetCtx(
     params: ActiveSpotAssetCtxParameters,
     listener: (data: ActiveSpotAssetCtxEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return activeSpotAssetCtx(this.config_, params, listener, onError);
+    return activeSpotAssetCtx(this.config_, params, listener, options);
   }
 
   /**
    * Subscribe to asset contexts for all DEXs.
    *
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -227,9 +227,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    */
   allDexsAssetCtxs(
     listener: (data: AllDexsAssetCtxsEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return allDexsAssetCtxs(this.config_, listener, onError);
+    return allDexsAssetCtxs(this.config_, listener, options);
   }
 
   /**
@@ -237,7 +237,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -260,9 +260,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   allDexsClearinghouseState(
     params: AllDexsClearinghouseStateParameters,
     listener: (data: AllDexsClearinghouseStateEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return allDexsClearinghouseState(this.config_, params, listener, onError);
+    return allDexsClearinghouseState(this.config_, params, listener, options);
   }
 
   /**
@@ -270,7 +270,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -292,26 +292,23 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    */
   allMids(
     listener: (data: AllMidsEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription>;
   allMids(
     params: AllMidsParameters,
     listener: (data: AllMidsEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription>;
   allMids(
     paramsOrListener: AllMidsParameters | ((data: AllMidsEvent) => void),
-    listenerOrOnError?: ((data: AllMidsEvent) => void) | ((error: TransportError) => void),
-    maybeOnError?: (error: TransportError) => void,
+    listenerOrOptions?: ((data: AllMidsEvent) => void) | SubscriptionOptions,
+    maybeOptions?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    const params = typeof paramsOrListener === "function" ? {} : paramsOrListener;
-    const listener = (typeof paramsOrListener === "function" ? paramsOrListener : listenerOrOnError) as (
-      data: AllMidsEvent,
-    ) => void;
-    const onError = (typeof paramsOrListener === "function" ? listenerOrOnError : maybeOnError) as
-      | ((error: TransportError) => void)
-      | undefined;
-    return allMids(this.config_, params, listener, onError);
+    const isListenerFirst = typeof paramsOrListener === "function";
+    const params = isListenerFirst ? {} : paramsOrListener;
+    const listener = isListenerFirst ? paramsOrListener : listenerOrOptions as (data: AllMidsEvent) => void;
+    const options = isListenerFirst ? listenerOrOptions as SubscriptionOptions | undefined : maybeOptions;
+    return allMids(this.config_, params, listener, options);
   }
 
   /**
@@ -319,7 +316,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -341,26 +338,23 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    */
   assetCtxs(
     listener: (data: AssetCtxsEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription>;
   assetCtxs(
     params: AssetCtxsParameters,
     listener: (data: AssetCtxsEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription>;
   assetCtxs(
     paramsOrListener: AssetCtxsParameters | ((data: AssetCtxsEvent) => void),
-    listenerOrOnError?: ((data: AssetCtxsEvent) => void) | ((error: TransportError) => void),
-    maybeOnError?: (error: TransportError) => void,
+    listenerOrOptions?: ((data: AssetCtxsEvent) => void) | SubscriptionOptions,
+    maybeOptions?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    const params = typeof paramsOrListener === "function" ? {} : paramsOrListener;
-    const listener = (typeof paramsOrListener === "function" ? paramsOrListener : listenerOrOnError) as (
-      data: AssetCtxsEvent,
-    ) => void;
-    const onError = (typeof paramsOrListener === "function" ? listenerOrOnError : maybeOnError) as
-      | ((error: TransportError) => void)
-      | undefined;
-    return assetCtxs(this.config_, params, listener, onError);
+    const isListenerFirst = typeof paramsOrListener === "function";
+    const params = isListenerFirst ? {} : paramsOrListener;
+    const listener = isListenerFirst ? paramsOrListener : listenerOrOptions as (data: AssetCtxsEvent) => void;
+    const options = isListenerFirst ? listenerOrOptions as SubscriptionOptions | undefined : maybeOptions;
+    return assetCtxs(this.config_, params, listener, options);
   }
 
   /**
@@ -368,7 +362,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -391,9 +385,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   bbo(
     params: BboParameters,
     listener: (data: BboEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return bbo(this.config_, params, listener, onError);
+    return bbo(this.config_, params, listener, options);
   }
 
   /**
@@ -401,7 +395,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -424,9 +418,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   candle(
     params: CandleParameters,
     listener: (data: CandleEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return candle(this.config_, params, listener, onError);
+    return candle(this.config_, params, listener, options);
   }
 
   /**
@@ -434,7 +428,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -457,9 +451,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   clearinghouseState(
     params: ClearinghouseStateParameters,
     listener: (data: ClearinghouseStateEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return clearinghouseState(this.config_, params, listener, onError);
+    return clearinghouseState(this.config_, params, listener, options);
   }
 
   /**
@@ -469,7 +463,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    * which React Native does not provide; add a [polyfill](https://www.npmjs.com/package/compression-streams-polyfill) to use this subscription there.
    *
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -491,9 +485,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    */
   fastAssetCtxs(
     listener: (data: FastAssetCtxsEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return fastAssetCtxs(this.config_, listener, onError);
+    return fastAssetCtxs(this.config_, listener, options);
   }
 
   /**
@@ -501,7 +495,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -524,9 +518,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   l2Book(
     params: L2BookParameters,
     listener: (data: L2BookEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return l2Book(this.config_, params, listener, onError);
+    return l2Book(this.config_, params, listener, options);
   }
 
   /**
@@ -534,7 +528,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -557,9 +551,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   notification(
     params: NotificationParameters,
     listener: (data: NotificationEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return notification(this.config_, params, listener, onError);
+    return notification(this.config_, params, listener, options);
   }
 
   /**
@@ -567,7 +561,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -590,9 +584,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   openOrders(
     params: OpenOrdersParameters,
     listener: (data: OpenOrdersEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return openOrders(this.config_, params, listener, onError);
+    return openOrders(this.config_, params, listener, options);
   }
 
   /**
@@ -600,7 +594,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -623,16 +617,16 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   orderUpdates(
     params: OrderUpdatesParameters,
     listener: (data: OrderUpdatesEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return orderUpdates(this.config_, params, listener, onError);
+    return orderUpdates(this.config_, params, listener, options);
   }
 
   /**
    * Subscribe to prediction market outcome/question metadata updates.
    *
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -654,16 +648,16 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    */
   outcomeMetaUpdates(
     listener: (data: OutcomeMetaUpdatesEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return outcomeMetaUpdates(this.config_, listener, onError);
+    return outcomeMetaUpdates(this.config_, listener, options);
   }
 
   /**
    * Subscribe to context updates for all spot assets.
    *
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -685,9 +679,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    */
   spotAssetCtxs(
     listener: (data: SpotAssetCtxsEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return spotAssetCtxs(this.config_, listener, onError);
+    return spotAssetCtxs(this.config_, listener, options);
   }
 
   /**
@@ -695,7 +689,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -718,9 +712,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   spotState(
     params: SpotStateParameters,
     listener: (data: SpotStateEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return spotState(this.config_, params, listener, onError);
+    return spotState(this.config_, params, listener, options);
   }
 
   /**
@@ -728,7 +722,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -751,9 +745,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   trades(
     params: TradesParameters,
     listener: (data: TradesEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return trades(this.config_, params, listener, onError);
+    return trades(this.config_, params, listener, options);
   }
 
   /**
@@ -761,7 +755,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -784,9 +778,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   twapStates(
     params: TwapStatesParameters,
     listener: (data: TwapStatesEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return twapStates(this.config_, params, listener, onError);
+    return twapStates(this.config_, params, listener, options);
   }
 
   /**
@@ -794,7 +788,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -817,9 +811,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   userEvents(
     params: UserEventsParameters,
     listener: (data: UserEventsEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return userEvents(this.config_, params, listener, onError);
+    return userEvents(this.config_, params, listener, options);
   }
 
   /**
@@ -827,7 +821,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -850,9 +844,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   userFills(
     params: UserFillsParameters,
     listener: (data: UserFillsEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return userFills(this.config_, params, listener, onError);
+    return userFills(this.config_, params, listener, options);
   }
 
   /**
@@ -860,7 +854,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -883,9 +877,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   userFundings(
     params: UserFundingsParameters,
     listener: (data: UserFundingsEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return userFundings(this.config_, params, listener, onError);
+    return userFundings(this.config_, params, listener, options);
   }
 
   /**
@@ -893,7 +887,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -916,9 +910,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   userHistoricalOrders(
     params: UserHistoricalOrdersParameters,
     listener: (data: UserHistoricalOrdersEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return userHistoricalOrders(this.config_, params, listener, onError);
+    return userHistoricalOrders(this.config_, params, listener, options);
   }
 
   /**
@@ -926,7 +920,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -949,9 +943,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   userNonFundingLedgerUpdates(
     params: UserNonFundingLedgerUpdatesParameters,
     listener: (data: UserNonFundingLedgerUpdatesEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return userNonFundingLedgerUpdates(this.config_, params, listener, onError);
+    return userNonFundingLedgerUpdates(this.config_, params, listener, options);
   }
 
   /**
@@ -959,7 +953,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -982,9 +976,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   userTwapHistory(
     params: UserTwapHistoryParameters,
     listener: (data: UserTwapHistoryEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return userTwapHistory(this.config_, params, listener, onError);
+    return userTwapHistory(this.config_, params, listener, options);
   }
 
   /**
@@ -992,7 +986,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -1015,9 +1009,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   userTwapSliceFills(
     params: UserTwapSliceFillsParameters,
     listener: (data: UserTwapSliceFillsEvent) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return userTwapSliceFills(this.config_, params, listener, onError);
+    return userTwapSliceFills(this.config_, params, listener, options);
   }
 
   /**
@@ -1027,7 +1021,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -1050,9 +1044,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   webData2(
     params: WebData2Parameters,
     listener: (data: WebData2Event) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return webData2(this.config_, params, listener, onError);
+    return webData2(this.config_, params, listener, options);
   }
 
   /**
@@ -1060,7 +1054,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
    *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
-   * @param onError An optional callback function to be called when the subscription fails.
+   * @param options Options to control the subscription lifecycle.
    * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
    *
    * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -1083,9 +1077,9 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   webData3(
     params: WebData3Parameters,
     listener: (data: WebData3Event) => void,
-    onError?: (error: TransportError) => void,
+    options?: SubscriptionOptions,
   ): Promise<ISubscription> {
-    return webData3(this.config_, params, listener, onError);
+    return webData3(this.config_, params, listener, options);
   }
 }
 
@@ -1093,7 +1087,7 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
 // Type Re-exports
 // ============================================================
 
-export type { SubscriptionConfig } from "./_methods/_base/mod.ts";
+export type { SubscriptionConfig, SubscriptionOptions } from "./_methods/_base/mod.ts";
 
 export type {
   ActiveAssetCtxEvent as ActiveAssetCtxWsEvent,

@@ -36,8 +36,8 @@ export type AllMidsEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, TransportError } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_base/mod.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig, SubscriptionOptions } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode allMids} function. */
 export type AllMidsParameters = Omit<v.InferInput<typeof AllMidsRequest>, "type">;
@@ -48,7 +48,7 @@ export type AllMidsParameters = Omit<v.InferInput<typeof AllMidsRequest>, "type"
  * @param config General configuration for Subscription API subscriptions.
  * @param params Parameters specific to the API subscription.
  * @param listener A callback function to be called when the event is received.
- * @param onError An optional callback function to be called when the subscription fails.
+ * @param options Options to control the subscription lifecycle.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -72,27 +72,24 @@ export type AllMidsParameters = Omit<v.InferInput<typeof AllMidsRequest>, "type"
 export function allMids(
   config: SubscriptionConfig,
   listener: (data: AllMidsEvent) => void,
-  onError?: (error: TransportError) => void,
+  options?: SubscriptionOptions,
 ): Promise<ISubscription>;
 export function allMids(
   config: SubscriptionConfig,
   params: AllMidsParameters,
   listener: (data: AllMidsEvent) => void,
-  onError?: (error: TransportError) => void,
+  options?: SubscriptionOptions,
 ): Promise<ISubscription>;
 export function allMids(
   config: SubscriptionConfig,
   paramsOrListener: AllMidsParameters | ((data: AllMidsEvent) => void),
-  listenerOrOnError?: ((data: AllMidsEvent) => void) | ((error: TransportError) => void),
-  maybeOnError?: (error: TransportError) => void,
+  listenerOrOptions?: ((data: AllMidsEvent) => void) | SubscriptionOptions,
+  maybeOptions?: SubscriptionOptions,
 ): Promise<ISubscription> {
-  const params = typeof paramsOrListener === "function" ? {} : paramsOrListener;
-  const listener = (typeof paramsOrListener === "function" ? paramsOrListener : listenerOrOnError) as (
-    data: AllMidsEvent,
-  ) => void;
-  const onError = (typeof paramsOrListener === "function" ? listenerOrOnError : maybeOnError) as
-    | ((error: TransportError) => void)
-    | undefined;
+  const isListenerFirst = typeof paramsOrListener === "function";
+  const params = isListenerFirst ? {} : paramsOrListener;
+  const listener = isListenerFirst ? paramsOrListener : listenerOrOptions as (data: AllMidsEvent) => void;
+  const options = isListenerFirst ? listenerOrOptions as SubscriptionOptions | undefined : maybeOptions;
 
   const payload = parse(AllMidsRequest, {
     type: "allMids",
@@ -103,5 +100,5 @@ export function allMids(
     if (e.detail.dex === payload.dex) {
       listener(e.detail);
     }
-  }, { onError });
+  }, options);
 }

@@ -49,8 +49,8 @@ export type TwapStatesEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, TransportError } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_base/mod.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig, SubscriptionOptions } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode twapStates} function. */
 export type TwapStatesParameters = Omit<v.InferInput<typeof TwapStatesRequest>, "type">;
@@ -61,7 +61,7 @@ export type TwapStatesParameters = Omit<v.InferInput<typeof TwapStatesRequest>, 
  * @param config General configuration for Subscription API subscriptions.
  * @param params Parameters specific to the API subscription.
  * @param listener A callback function to be called when the event is received.
- * @param onError An optional callback function to be called when the subscription fails.
+ * @param options Options to control the subscription lifecycle.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -87,7 +87,7 @@ export function twapStates(
   config: SubscriptionConfig,
   params: TwapStatesParameters,
   listener: (data: TwapStatesEvent) => void,
-  onError?: (error: TransportError) => void,
+  options?: SubscriptionOptions,
 ): Promise<ISubscription> {
   const payload = parse(TwapStatesRequest, {
     type: "twapStates",
@@ -98,5 +98,5 @@ export function twapStates(
     if (e.detail.user === payload.user && e.detail.dex === payload.dex) {
       listener(e.detail);
     }
-  }, { onError });
+  }, options);
 }
