@@ -248,17 +248,26 @@ const subscription = await client.allMids((data) => {
 
 ### Errors
 
-Each subscription method takes an optional `onError` callback as its last argument, invoked once if the subscription is
-dropped — a failed [resubscribe](transports.md#resubscription) or a permanently lost connection:
+Each subscription method takes an optional `options` argument — `{ signal?, onError? }`. The `onError` callback runs at
+most once, when an already confirmed subscription fails:
+
+- the server rejects a re-subscription after a [reconnect](transports.md#reconnection);
+- the connection is permanently terminated;
+- the connection goes down while [re-subscription](transports.md#resubscription) is disabled.
+
+Failures before confirmation reject the subscribe promise instead. After `onError` fires, the subscription is removed
+and no further events arrive:
 
 ```ts
 const subscription = await client.allMids(
   (data) => {
     console.log(data.mids);
   },
-  (error) => {
-    // The subscription is gone — inspect the error and re-subscribe if needed
-    console.error(error);
+  {
+    onError: (error: TransportError) => {
+      // The subscription is gone — inspect the error and re-subscribe if needed
+      console.error(error);
+    },
   },
 );
 ```

@@ -145,20 +145,3 @@ const transport = new WebSocketTransport({ resubscribe: false });
 
 If a subscription then fails to re-establish, its `onError` callback is invoked — handle it as shown in
 [Handle failures](#handle-failures).
-
-### Handle failures
-
-Resubscription rarely fails. When it does, or when the connection is lost for good, the `onError` callback fires once
-and that channel is dropped. It's the optional last argument of every subscription method:
-
-```ts
-await client.allMids(
-  (data) => {
-    console.log(data.mids);
-  },
-  (error: WebSocketRequestError) => {
-    console.error("Subscription error:", error);
-    // The subscription is gone — check the error and/or subscribe again
-  },
-);
-```

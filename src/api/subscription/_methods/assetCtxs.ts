@@ -36,8 +36,8 @@ export type AssetCtxsEvent = {
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, TransportError } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_base/mod.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig, SubscriptionOptions } from "./_base/mod.ts";
 
 /** Request parameters for the {@linkcode assetCtxs} function. */
 export type AssetCtxsParameters = Omit<v.InferInput<typeof AssetCtxsRequest>, "type">;
@@ -48,7 +48,7 @@ export type AssetCtxsParameters = Omit<v.InferInput<typeof AssetCtxsRequest>, "t
  * @param config General configuration for Subscription API subscriptions.
  * @param params Parameters specific to the API subscription.
  * @param listener A callback function to be called when the event is received.
- * @param onError An optional callback function to be called when the subscription fails.
+ * @param options Options to control the subscription lifecycle.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -72,36 +72,33 @@ export type AssetCtxsParameters = Omit<v.InferInput<typeof AssetCtxsRequest>, "t
 export function assetCtxs(
   config: SubscriptionConfig,
   listener: (data: AssetCtxsEvent) => void,
-  onError?: (error: TransportError) => void,
+  options?: SubscriptionOptions,
 ): Promise<ISubscription>;
 export function assetCtxs(
   config: SubscriptionConfig,
   params: AssetCtxsParameters,
   listener: (data: AssetCtxsEvent) => void,
-  onError?: (error: TransportError) => void,
+  options?: SubscriptionOptions,
 ): Promise<ISubscription>;
 export function assetCtxs(
   config: SubscriptionConfig,
   paramsOrListener: AssetCtxsParameters | ((data: AssetCtxsEvent) => void),
-  listenerOrOnError?: ((data: AssetCtxsEvent) => void) | ((error: TransportError) => void),
-  maybeOnError?: (error: TransportError) => void,
+  listenerOrOptions?: ((data: AssetCtxsEvent) => void) | SubscriptionOptions,
+  maybeOptions?: SubscriptionOptions,
 ): Promise<ISubscription> {
-  const params = typeof paramsOrListener === "function" ? {} : paramsOrListener;
-  const listener = (typeof paramsOrListener === "function" ? paramsOrListener : listenerOrOnError) as (
-    data: AssetCtxsEvent,
-  ) => void;
-  const onError = (typeof paramsOrListener === "function" ? listenerOrOnError : maybeOnError) as
-    | ((error: TransportError) => void)
-    | undefined;
+  const isListenerFirst = typeof paramsOrListener === "function";
+  const params = isListenerFirst ? {} : paramsOrListener;
+  const listener = isListenerFirst ? paramsOrListener : listenerOrOptions as (data: AssetCtxsEvent) => void;
+  const options = isListenerFirst ? listenerOrOptions as SubscriptionOptions | undefined : maybeOptions;
 
   const payload = parse(AssetCtxsRequest, {
     type: "assetCtxs",
     ...params,
-    dex: params.dex ?? "", // Same value as in response
+    dex: params.dex ?? "", // same value as in response
   });
   return config.transport.subscribe<AssetCtxsEvent>(payload.type, payload, (e) => {
     if (e.detail.dex === payload.dex) {
       listener(e.detail);
     }
-  }, { onError });
+  }, options);
 }

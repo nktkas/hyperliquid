@@ -29,15 +29,15 @@ export type SpotAssetCtxsEvent = SpotAssetCtx[];
 // ============================================================
 
 import { parse } from "../../../_base.ts";
-import type { ISubscription, TransportError } from "../../../transport/mod.ts";
-import type { SubscriptionConfig } from "./_base/mod.ts";
+import type { ISubscription } from "../../../transport/mod.ts";
+import type { SubscriptionConfig, SubscriptionOptions } from "./_base/mod.ts";
 
 /**
  * Subscribe to context updates for all spot assets.
  *
  * @param config General configuration for Subscription API subscriptions.
  * @param listener A callback function to be called when the event is received.
- * @param onError An optional callback function to be called when the subscription fails.
+ * @param options Options to control the subscription lifecycle.
  * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
  *
  * @throws {ValidationError} When the request parameters fail validation (before sending).
@@ -61,10 +61,10 @@ import type { SubscriptionConfig } from "./_base/mod.ts";
 export function spotAssetCtxs(
   config: SubscriptionConfig,
   listener: (data: SpotAssetCtxsEvent) => void,
-  onError?: (error: TransportError) => void,
+  options?: SubscriptionOptions,
 ): Promise<ISubscription> {
   const payload = parse(SpotAssetCtxsRequest, { type: "spotAssetCtxs" });
   return config.transport.subscribe<SpotAssetCtxsEvent>(payload.type, payload, (e) => {
     listener(e.detail);
-  }, { onError });
+  }, options);
 }
