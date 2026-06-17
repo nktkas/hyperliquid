@@ -36,6 +36,7 @@ import {
   type ClearinghouseStateEvent,
   type ClearinghouseStateParameters,
 } from "./_methods/clearinghouseState.ts";
+import { fastAssetCtxs, type FastAssetCtxsEvent } from "./_methods/fastAssetCtxs.ts";
 import { l2Book, type L2BookEvent, type L2BookParameters } from "./_methods/l2Book.ts";
 import { notification, type NotificationEvent, type NotificationParameters } from "./_methods/notification.ts";
 import { openOrders, type OpenOrdersEvent, type OpenOrdersParameters } from "./_methods/openOrders.ts";
@@ -459,6 +460,40 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
     onError?: (error: TransportError) => void,
   ): Promise<ISubscription> {
     return clearinghouseState(this.config_, params, listener, onError);
+  }
+
+  /**
+   * Subscribe to mark and mid prices for all assets.
+   *
+   * NOTE: payloads are decompressed with [`DecompressionStream`](https://developer.mozilla.org/en-US/docs/Web/API/DecompressionStream),
+   * which React Native does not provide; add a [polyfill](https://www.npmjs.com/package/compression-streams-polyfill) to use this subscription there.
+   *
+   * @param listener A callback function to be called when the event is received.
+   * @param onError An optional callback function to be called when the subscription fails.
+   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
+   *
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.WebSocketTransport();
+   * const client = new hl.SubscriptionClient({ transport });
+   *
+   * const sub = await client.fastAssetCtxs((data) => {
+   *   console.log(data);
+   * });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
+   */
+  fastAssetCtxs(
+    listener: (data: FastAssetCtxsEvent) => void,
+    onError?: (error: TransportError) => void,
+  ): Promise<ISubscription> {
+    return fastAssetCtxs(this.config_, listener, onError);
   }
 
   /**
@@ -1088,6 +1123,7 @@ export type {
   ClearinghouseStateEvent as ClearinghouseStateWsEvent,
   ClearinghouseStateParameters as ClearinghouseStateWsParameters,
 } from "./_methods/clearinghouseState.ts";
+export type { FastAssetCtxsEvent as FastAssetCtxsWsEvent } from "./_methods/fastAssetCtxs.ts";
 export type { L2BookEvent as L2BookWsEvent, L2BookParameters as L2BookWsParameters } from "./_methods/l2Book.ts";
 export type {
   NotificationEvent as NotificationWsEvent,
