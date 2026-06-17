@@ -205,6 +205,12 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
           keywords: v.array(v.string()),
         }),
       }),
+      v.object({
+        /** Type of action. */
+        type: v.literal("perpDeploy"),
+        /** Name of the perp dex to disable. */
+        disableDex: v.string(),
+      }),
     ]),
     /** Nonce (timestamp in ms) used to prevent replay attacks. */
     nonce: UnsignedInteger,
