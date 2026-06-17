@@ -72,6 +72,13 @@ export const BatchModifyRequest = /* @__PURE__ */ (() => {
           }),
         }),
       ),
+      /**
+       * Always place the resulting orders, even if the cancels did not succeed.
+       *
+       * When `false`, each new order must be a non-trigger order with TIF `Alo`, or a non-executable order with TIF
+       * `Gtc`. Must be omitted when `false` (actions hashed with `a: false` are rejected).
+       */
+      a: v.optional(v.boolean()),
     }),
     /** Nonce (timestamp in ms) used to prevent replay attacks. */
     nonce: UnsignedInteger,
