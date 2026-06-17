@@ -35,6 +35,8 @@ export type UserEventsEvent =
   | {
     /** Funding update details. */
     funding: {
+      /** Timestamp of the funding event (in ms since epoch). */
+      time: number;
       /** Asset symbol (e.g., BTC). */
       coin: string;
       /**

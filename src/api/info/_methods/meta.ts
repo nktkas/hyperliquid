@@ -35,7 +35,11 @@ export type MetaResponse = {
     maxLeverage: number;
     /** Unique identifier for the margin requirements table. */
     marginTableId: number;
-    /** Indicates if only isolated margin trading is allowed. */
+    /**
+     * Indicates if only isolated margin trading is allowed.
+     *
+     * @deprecated use `marginMode` instead.
+     */
     onlyIsolated?: true;
     /** Indicates if the universe is delisted. */
     isDelisted?: true;
