@@ -148,8 +148,9 @@ const block = await client.blockDetails({ height: 123 });
 
 ## Versioning
 
-This SDK follows [Semantic Versioning](https://semver.org/). While it is on `0.x.y`, a breaking change bumps the minor
-version and every other change bumps the patch version.
+This SDK follows [Semantic Versioning](https://semver.org/). Until `1.0.0`, breaking changes bump the minor version and
+everything else bumps the patch — the [caret-range](https://github.com/npm/node-semver#caret-ranges-123-025-004)
+convention.
 
 The exception is the request, response, and event types that mirror the Hyperliquid API. The API is unversioned and
 always serves its latest shape, so changes to these types ship in **patch** releases even when breaking — the break
