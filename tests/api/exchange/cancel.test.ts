@@ -12,13 +12,21 @@ const paramsSchema = valibotToJsonSchema(v.omit(v.object(CancelRequest.entries.a
 runTest({
   name: "cancel",
   codeTestFn: async (_t, exchClient) => {
-    const data = await Promise.all([
-      (async () => {
-        const order = await openOrder(exchClient, "limit");
-        const params: CancelParameters = { cancels: [{ a: order.a, o: order.oid }] };
-        return { params, result: await exchClient.cancel(params) };
-      })(),
-    ]);
+    // standard
+    const standard = await (async () => {
+      const order = await openOrder(exchClient, "limit");
+      const params: CancelParameters = { cancels: [{ a: order.a, o: order.oid }] };
+      return { params, result: await exchClient.cancel(params) };
+    })();
+
+    // fast
+    const fast = await (async () => {
+      const order = await openOrder(exchClient, "limit");
+      const params: CancelParameters = { cancels: [{ a: order.a, o: order.oid }], f: true };
+      return { params, result: await exchClient.cancel(params) };
+    })();
+
+    const data = [standard, fast];
 
     schemaCoverage(paramsSchema, data.map((d) => d.params));
     schemaCoverage(responseSchema, data.map((d) => d.result));

@@ -12,13 +12,21 @@ const paramsSchema = valibotToJsonSchema(v.omit(v.object(CancelByCloidRequest.en
 runTest({
   name: "cancelByCloid",
   codeTestFn: async (_t, exchClient) => {
-    const data = await Promise.all([
-      (async () => {
-        const order = await openOrder(exchClient, "limit");
-        const params: CancelByCloidParameters = { cancels: [{ asset: order.a, cloid: order.cloid }] };
-        return { params, result: await exchClient.cancelByCloid(params) };
-      })(),
-    ]);
+    // standard
+    const standard = await (async () => {
+      const order = await openOrder(exchClient, "limit");
+      const params: CancelByCloidParameters = { cancels: [{ asset: order.a, cloid: order.cloid }] };
+      return { params, result: await exchClient.cancelByCloid(params) };
+    })();
+
+    // fast
+    const fast = await (async () => {
+      const order = await openOrder(exchClient, "limit");
+      const params: CancelByCloidParameters = { cancels: [{ asset: order.a, cloid: order.cloid }], f: true };
+      return { params, result: await exchClient.cancelByCloid(params) };
+    })();
+
+    const data = [standard, fast];
 
     schemaCoverage(paramsSchema, data.map((d) => d.params));
     schemaCoverage(responseSchema, data.map((d) => d.result));
