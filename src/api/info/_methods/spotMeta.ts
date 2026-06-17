@@ -24,7 +24,7 @@ export type SpotMetaResponse = {
   /** Trading universes available for spot trading. */
   universe: {
     /** Token indices included in this universe. */
-    tokens: number[];
+    tokens: [baseToken: number, quoteToken: number];
     /** Name of the universe. */
     name: string;
     /** Unique identifier of the universe. */

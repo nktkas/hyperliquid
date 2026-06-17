@@ -63,6 +63,8 @@ export type OutcomeMetaUpdatesEvent = {
         fallbackOutcome: number;
         /** Array of named outcome identifiers. */
         namedOutcomes: number[];
+        /** Array of settled named outcome identifiers. */
+        settledNamedOutcomes: number[];
       };
     }
     | {
