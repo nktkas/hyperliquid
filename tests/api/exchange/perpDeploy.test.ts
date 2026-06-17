@@ -180,6 +180,7 @@ runTest({
           keywords: ["perp", "other"],
         },
       },
+      { disableDex: "test" },
     ];
 
     await Promise.all(params.map((p) =>
