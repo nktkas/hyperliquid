@@ -111,9 +111,9 @@ export const SpotDeployRequest = /* @__PURE__ */ (() => {
       v.object({
         /** Type of action. */
         type: v.literal("spotDeploy"),
-        /** Enable aligned quote token parameters. */
-        enableAlignedQuoteToken: v.object({
-          /** Token identifier to enable as aligned quote token. */
+        /** Disable quote token parameters. */
+        disableQuoteToken: v.object({
+          /** Token identifier to disable as quote token. */
           token: UnsignedInteger,
         }),
       }),

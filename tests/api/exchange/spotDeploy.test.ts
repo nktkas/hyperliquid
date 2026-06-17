@@ -98,12 +98,11 @@ runTest({
           token: 0,
         },
       },
-      // FIXME: API returns 422 error, but the official documentation still lists this API.
-      // {
-      //   enableAlignedQuoteToken: {
-      //     token: 0,
-      //   },
-      // },
+      {
+        disableQuoteToken: {
+          token: 0,
+        },
+      },
       {
         requestEvmContract: {
           token: 0,
@@ -122,8 +121,6 @@ runTest({
       )
     ));
 
-    schemaCoverage(paramsSchema, params, [
-      "#/anyOf/7", // FIXME: enableAlignedQuoteToken — omitted from params above.
-    ]);
+    schemaCoverage(paramsSchema, params);
   },
 });
