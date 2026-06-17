@@ -112,7 +112,25 @@ runTest({
       return { params, result: await exchClient.modify(params) };
     })();
 
-    const data = [restingGtc, restingAlo, ioc, frontendMarket, triggerTp, triggerSl];
+    // resting | trigger | tp | always place
+    const triggerAlwaysPlace = await (async () => {
+      const order = await openOrder(exchClient, "limit");
+      const params: ModifyParameters = {
+        oid: order.oid,
+        order: {
+          a: order.a,
+          b: order.b,
+          p: order.p,
+          s: order.s,
+          r: false,
+          t: { trigger: { isMarket: true, triggerPx: order.pxUp, tpsl: "tp" } },
+        },
+        a: true,
+      };
+      return { params, result: await exchClient.modify(params) };
+    })();
+
+    const data = [restingGtc, restingAlo, ioc, frontendMarket, triggerTp, triggerSl, triggerAlwaysPlace];
 
     schemaCoverage(paramsSchema, data.map((d) => d.params));
     schemaCoverage(responseSchema, data.map((d) => d.result));

@@ -66,6 +66,13 @@ export const ModifyRequest = /* @__PURE__ */ (() => {
         /** Client Order ID. */
         c: v.optional(Cloid),
       }),
+      /**
+       * Always place the resulting order, even if the cancel did not succeed.
+       *
+       * Omit the field otherwise; the default behavior requires the new order to be a non-trigger order with TIF
+       * `Alo`, or a non-executable order with TIF `Gtc`.
+       */
+      a: v.optional(v.literal(true)),
     }),
     /** Nonce (timestamp in ms) used to prevent replay attacks. */
     nonce: UnsignedInteger,
