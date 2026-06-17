@@ -35,6 +35,7 @@ export * from "./_methods/assetCtxs.ts";
 export * from "./_methods/bbo.ts";
 export * from "./_methods/candle.ts";
 export * from "./_methods/clearinghouseState.ts";
+export * from "./_methods/fastAssetCtxs.ts";
 export * from "./_methods/l2Book.ts";
 export * from "./_methods/notification.ts";
 export * from "./_methods/openOrders.ts";
