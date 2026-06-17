@@ -25,6 +25,8 @@ export const CancelRequest = /* @__PURE__ */ (() => {
           o: UnsignedInteger,
         }),
       ),
+      /** Prioritize this cancel in the mempool (fast cancel). */
+      f: v.optional(v.literal(true)),
     }),
     /** Nonce (timestamp in ms) used to prevent replay attacks. */
     nonce: UnsignedInteger,
