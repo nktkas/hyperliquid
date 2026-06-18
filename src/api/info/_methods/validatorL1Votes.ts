@@ -73,6 +73,27 @@ export type ValidatorL1VotesResponse = {
         /** Settlement details. */
         details: string;
       };
+    } | {
+      /** Settle a question across its named outcomes. */
+      settleQuestion: {
+        /** Question identifier. */
+        question: number;
+        /** Settlement fraction and details per outcome. */
+        settleFractionsAndDetails: [
+          /** Outcome identifier. */
+          outcome: number,
+          /** Settlement fraction and details. */
+          fractionAndDetails: [
+            /**
+             * Settlement fraction.
+             * @pattern ^[0-9]+(\.[0-9]+)?$
+             */
+            settleFraction: string,
+            /** Settlement details. */
+            details: string,
+          ],
+        ][];
+      };
     };
   } | {
     /** Token and treasury governance action. */
