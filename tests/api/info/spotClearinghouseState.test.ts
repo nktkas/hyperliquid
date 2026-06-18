@@ -22,7 +22,15 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data, [
+      "#/properties/portfolioMarginEnabled/present",
+      "#/properties/balances/items/anyOf/0/properties/spotHold/present",
+      "#/properties/balances/items/anyOf/0/properties/ltv/present",
+      "#/properties/balances/items/anyOf/0/properties/borrowed/present",
+      "#/properties/balances/items/anyOf/0/properties/supplied/present",
       "#/properties/balances/items/anyOf/1",
+      "#/properties/portfolioMarginRatio/present",
+      "#/properties/tokenToPortfolioBorrowRatio/present",
+      "#/properties/tokenToAvailableAfterMaintenance/present",
     ]);
   },
 });
