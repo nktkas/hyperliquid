@@ -177,7 +177,7 @@ export async function openOrder(
   midPx: string;
 }> {
   // Top-up account
-  await topUpPerp(client, "13");
+  await topUpPerp(client, "20");
 
   // Get market data
   const id = symbolConverter.getAssetId(symbol)!;
@@ -187,7 +187,7 @@ export async function openOrder(
   // Calculate order parameters
   const pxDown = formatPrice(Number(midPx) * (1 - slippage), szDecimals);
   const pxUp = formatPrice(Number(midPx) * (1 + slippage), szDecimals);
-  const sz = formatSize(11 / Number(midPx), szDecimals);
+  const sz = formatSize(15 / Number(midPx), szDecimals);
 
   let executionPx: string;
   if (type === "market") {

@@ -41,6 +41,15 @@ runTest({
       "#/properties/perpsAtOpenInterestCap/present",
       "#/properties/agentAddress/defined",
       "#/properties/agentValidUntil/defined",
+      "#/properties/openOrders/items/properties/children/*",
+      "#/properties/spotState/properties/portfolioMarginEnabled/present",
+      "#/properties/spotState/properties/portfolioMarginRatio/present",
+      "#/properties/spotState/properties/tokenToPortfolioBorrowRatio/present",
+      "#/properties/spotState/properties/tokenToAvailableAfterMaintenance/present",
+      "#/properties/spotState/properties/balances/items/anyOf/0/properties/spotHold/present",
+      "#/properties/spotState/properties/balances/items/anyOf/0/properties/ltv/present",
+      "#/properties/spotState/properties/balances/items/anyOf/0/properties/borrowed/present",
+      "#/properties/spotState/properties/balances/items/anyOf/0/properties/supplied/present",
     ]);
   },
 });

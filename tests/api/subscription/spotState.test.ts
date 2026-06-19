@@ -25,6 +25,15 @@ runTest({
     }, 10_000);
 
     schemaCoverage(paramsSchema, params);
-    schemaCoverage(responseSchema, data);
+    schemaCoverage(responseSchema, data, [
+      "#/properties/spotState/properties/portfolioMarginEnabled/present",
+      "#/properties/spotState/properties/portfolioMarginRatio/present",
+      "#/properties/spotState/properties/tokenToPortfolioBorrowRatio/present",
+      "#/properties/spotState/properties/tokenToAvailableAfterMaintenance/present",
+      "#/properties/spotState/properties/balances/items/anyOf/0/properties/spotHold/present",
+      "#/properties/spotState/properties/balances/items/anyOf/0/properties/ltv/present",
+      "#/properties/spotState/properties/balances/items/anyOf/0/properties/borrowed/present",
+      "#/properties/spotState/properties/balances/items/anyOf/0/properties/supplied/present",
+    ]);
   },
 });
