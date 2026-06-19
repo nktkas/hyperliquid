@@ -46,18 +46,12 @@ export type RecentTradesResponse = {
   hash: `0x${string}`;
   /** Trade ID. */
   tid: number;
-  /** Addresses of users involved in the trade [Maker, Taker]. */
+  /** Addresses of the two users involved in the trade `[buyer, seller]`. */
   users: [
-    /**
-     * Maker address.
-     * @pattern ^0x[a-fA-F0-9]{40}$
-     */
-    maker: `0x${string}`,
-    /**
-     * Taker address.
-     * @pattern ^0x[a-fA-F0-9]{40}$
-     */
-    taker: `0x${string}`,
+    /** @pattern ^0x[a-fA-F0-9]{40}$ */
+    buyer: `0x${string}`,
+    /** @pattern ^0x[a-fA-F0-9]{40}$ */
+    seller: `0x${string}`,
   ];
 }[];
 
