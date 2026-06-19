@@ -19,6 +19,8 @@ runTest({
     const data = await Promise.all(params.map((p) => client.extraAgents(p)));
 
     schemaCoverage(paramsSchema, params);
-    schemaCoverage(responseSchema, data);
+    schemaCoverage(responseSchema, data, [
+      "#/items/properties/validUntil/null", // null is account-state-gated, observed on mainnet only
+    ]);
   },
 });

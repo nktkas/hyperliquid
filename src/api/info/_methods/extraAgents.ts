@@ -32,8 +32,8 @@ export type ExtraAgentsResponse = {
   address: `0x${string}`;
   /** Extra agent name. */
   name: string;
-  /** Validity period as a timestamp (in ms since epoch). */
-  validUntil: number;
+  /** Validity period as a timestamp (in ms since epoch); `null` when the agent has no expiry. */
+  validUntil: number | null;
 }[];
 
 // ============================================================

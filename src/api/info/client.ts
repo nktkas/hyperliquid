@@ -15,11 +15,6 @@ import {
   type ActiveAssetDataResponse,
 } from "./_methods/activeAssetData.ts";
 import {
-  alignedQuoteTokenInfo,
-  type AlignedQuoteTokenInfoParameters,
-  type AlignedQuoteTokenInfoResponse,
-} from "./_methods/alignedQuoteTokenInfo.ts";
-import {
   allBorrowLendReserveStates,
   type AllBorrowLendReserveStatesResponse,
 } from "./_methods/allBorrowLendReserveStates.ts";
@@ -268,35 +263,6 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     signal?: AbortSignal,
   ): Promise<ActiveAssetDataResponse> {
     return activeAssetData(this.config_, params, signal);
-  }
-
-  /**
-   * Request supply, rate, and pending payment information for an aligned quote token.
-   *
-   * @param params Parameters specific to the API request.
-   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
-   * @return Supply, rate, and pending payment information for an aligned quote token.
-   *
-   * @throws {ValidationError} When the request parameters fail validation (before sending).
-   * @throws {TransportError} When the transport layer throws an error.
-   *
-   * @example
-   * ```ts
-   * import * as hl from "@nktkas/hyperliquid";
-   *
-   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
-   * const client = new hl.InfoClient({ transport });
-   *
-   * const data = await client.alignedQuoteTokenInfo({ token: 1328 });
-   * ```
-   *
-   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-aligned-quote-token-status
-   */
-  alignedQuoteTokenInfo(
-    params: AlignedQuoteTokenInfoParameters,
-    signal?: AbortSignal,
-  ): Promise<AlignedQuoteTokenInfoResponse> {
-    return alignedQuoteTokenInfo(this.config_, params, signal);
   }
 
   /**
@@ -1957,7 +1923,7 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
    * });
    * ```
    *
-   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-borrow-lend-user-state
+   * @see null
    */
   userBorrowLendInterest(
     params: UserBorrowLendInterestParameters,
@@ -2469,10 +2435,6 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
 export type { InfoConfig } from "./_methods/_base/mod.ts";
 
 export type { ActiveAssetDataParameters, ActiveAssetDataResponse } from "./_methods/activeAssetData.ts";
-export type {
-  AlignedQuoteTokenInfoParameters,
-  AlignedQuoteTokenInfoResponse,
-} from "./_methods/alignedQuoteTokenInfo.ts";
 export type { AllBorrowLendReserveStatesResponse } from "./_methods/allBorrowLendReserveStates.ts";
 export type { AllMidsParameters, AllMidsResponse } from "./_methods/allMids.ts";
 export type { AllPerpMetasResponse } from "./_methods/allPerpMetas.ts";

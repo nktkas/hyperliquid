@@ -140,7 +140,7 @@ export type UserFeesResponse = {
   userCrossRate: string;
   /**
    * User add-liquidity rate.
-   * @pattern ^[0-9]+(\.[0-9]+)?$
+   * @pattern ^-?[0-9]+(\.[0-9]+)?$
    */
   userAddRate: string;
   /**
@@ -150,7 +150,7 @@ export type UserFeesResponse = {
   userSpotCrossRate: string;
   /**
    * User spot add-liquidity rate.
-   * @pattern ^[0-9]+(\.[0-9]+)?$
+   * @pattern ^-?[0-9]+(\.[0-9]+)?$
    */
   userSpotAddRate: string;
   /**
