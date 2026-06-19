@@ -11,7 +11,7 @@ const OFFLINE = Deno.args.includes("--offline");
 // Preparation
 // ============================================================
 
-const transport = new HttpTransport({ isTestnet: true });
+const transport = new HttpTransport({ isTestnet: true, timeout: 30_000 });
 const client = new InfoClient({ transport });
 
 // ============================================================

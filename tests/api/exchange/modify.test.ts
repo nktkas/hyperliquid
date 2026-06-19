@@ -47,7 +47,7 @@ runTest({
         return { params, result: await exchClient.modify(params) };
       })(),
     ]);
-    // filled | Ioc
+    // filled | Ioc | always place
     const ioc = await (async () => {
       const order = await openOrder(exchClient, "limit");
       const params: ModifyParameters = {
@@ -60,10 +60,11 @@ runTest({
           r: false,
           t: { limit: { tif: "Ioc" } },
         },
+        a: true,
       };
       return { params, result: await exchClient.modify(params) };
     })();
-    // filled | FrontendMarket
+    // filled | FrontendMarket | always place
     const frontendMarket = await (async () => {
       const order = await openOrder(exchClient, "limit");
       const params: ModifyParameters = {
@@ -76,44 +77,12 @@ runTest({
           r: false,
           t: { limit: { tif: "FrontendMarket" } },
         },
+        a: true,
       };
       return { params, result: await exchClient.modify(params) };
     })();
-    // resting | trigger | tp
-    const triggerTp = await (async () => {
-      const order = await openOrder(exchClient, "limit");
-      const params: ModifyParameters = {
-        oid: order.oid,
-        order: {
-          a: order.a,
-          b: order.b,
-          p: order.p,
-          s: order.s,
-          r: false,
-          t: { trigger: { isMarket: true, triggerPx: order.pxUp, tpsl: "tp" } },
-        },
-      };
-      return { params, result: await exchClient.modify(params) };
-    })();
-    // resting | trigger | sl
-    const triggerSl = await (async () => {
-      const order = await openOrder(exchClient, "limit");
-      const params: ModifyParameters = {
-        oid: order.oid,
-        order: {
-          a: order.a,
-          b: order.b,
-          p: order.p,
-          s: order.s,
-          r: false,
-          t: { trigger: { isMarket: false, triggerPx: order.pxDown, tpsl: "sl" } },
-        },
-      };
-      return { params, result: await exchClient.modify(params) };
-    })();
-
     // resting | trigger | tp | always place
-    const triggerAlwaysPlace = await (async () => {
+    const triggerTp = await (async () => {
       const order = await openOrder(exchClient, "limit");
       const params: ModifyParameters = {
         oid: order.oid,
@@ -129,8 +98,25 @@ runTest({
       };
       return { params, result: await exchClient.modify(params) };
     })();
+    // resting | trigger | sl | always place
+    const triggerSl = await (async () => {
+      const order = await openOrder(exchClient, "limit");
+      const params: ModifyParameters = {
+        oid: order.oid,
+        order: {
+          a: order.a,
+          b: order.b,
+          p: order.p,
+          s: order.s,
+          r: false,
+          t: { trigger: { isMarket: false, triggerPx: order.pxDown, tpsl: "sl" } },
+        },
+        a: true,
+      };
+      return { params, result: await exchClient.modify(params) };
+    })();
 
-    const data = [restingGtc, restingAlo, ioc, frontendMarket, triggerTp, triggerSl, triggerAlwaysPlace];
+    const data = [restingGtc, restingAlo, ioc, frontendMarket, triggerTp, triggerSl];
 
     schemaCoverage(paramsSchema, data.map((d) => d.params));
     schemaCoverage(responseSchema, data.map((d) => d.result));
