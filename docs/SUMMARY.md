@@ -37,17 +37,6 @@
       spec:
         ref:
           kind: openapi
-          spec: hl-info-alignedQuoteTokenInfo
-    ```
-  - ```yaml
-    type: builtin:openapi
-    props:
-      models: false
-      downloadLink: false
-    dependencies:
-      spec:
-        ref:
-          kind: openapi
           spec: hl-info-allBorrowLendReserveStates
     ```
   - ```yaml
@@ -1604,6 +1593,17 @@
         ref:
           kind: openapi
           spec: hl-subscription-clearinghouseState
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-subscription-fastAssetCtxs
     ```
   - ```yaml
     type: builtin:openapi
