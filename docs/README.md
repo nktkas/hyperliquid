@@ -7,7 +7,7 @@ major JS runtimes, written in TypeScript.
 
 {% tabs %}
 
-{% tab title="npm" %}
+{% tab title="Node.js 22.12+" %}
 
 ```sh
 npm i @nktkas/hyperliquid
@@ -15,23 +15,7 @@ npm i @nktkas/hyperliquid
 
 {% endtab %}
 
-{% tab title="pnpm" %}
-
-```sh
-pnpm add @nktkas/hyperliquid
-```
-
-{% endtab %}
-
-{% tab title="yarn" %}
-
-```sh
-yarn add @nktkas/hyperliquid
-```
-
-{% endtab %}
-
-{% tab title="bun" %}
+{% tab title="Bun 1.3.3+" %}
 
 ```sh
 bun add @nktkas/hyperliquid
@@ -39,7 +23,7 @@ bun add @nktkas/hyperliquid
 
 {% endtab %}
 
-{% tab title="deno" %}
+{% tab title="Deno 1.23+" %}
 
 ```sh
 deno add jsr:@nktkas/hyperliquid
@@ -47,19 +31,48 @@ deno add jsr:@nktkas/hyperliquid
 
 {% endtab %}
 
-{% tab title="React Native" %}
+{% tab title="React Native 0.86+" %}
 
 ```sh
-npm i @nktkas/hyperliquid event-target-shim
+npm i @nktkas/hyperliquid
 ```
 
-Hermes lacks the global `EventTarget` and `Event` the SDK relies on — polyfill them before importing the SDK:
+The `fastAssetCtxs` subscription additionally needs `DecompressionStream`, Web Streams, and `TextDecoder`, none of which
+Hermes provides:
+
+```sh
+npm i text-encoding-polyfill web-streams-polyfill compression-streams-polyfill
+```
+
+```ts
+import "text-encoding-polyfill";
+import "web-streams-polyfill/polyfill";
+import "compression-streams-polyfill";
+```
+
+On **React Native < 0.86** the global `Event`/`EventTarget` is missing — polyfill it:
+
+```sh
+npm i event-target-shim
+```
 
 ```ts
 import { Event, EventTarget } from "event-target-shim";
 if (!globalThis.EventTarget) globalThis.EventTarget = EventTarget;
 if (!globalThis.Event) globalThis.Event = Event;
 ```
+
+On **React Native < 0.84** the native `URL` is incomplete — add `react-native-url-polyfill`:
+
+```sh
+npm i react-native-url-polyfill
+```
+
+```ts
+import "react-native-url-polyfill/auto";
+```
+
+Import every polyfill before `@nktkas/hyperliquid` (e.g. at the top of `index.js`).
 
 {% endtab %}
 

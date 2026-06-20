@@ -49,9 +49,6 @@ import type { SubscriptionConfig, SubscriptionOptions } from "./_base/mod.ts";
 /**
  * Subscribe to mark and mid prices for all assets.
  *
- * NOTE: payloads are decompressed with [`DecompressionStream`](https://developer.mozilla.org/en-US/docs/Web/API/DecompressionStream),
- * which React Native does not provide; add a [polyfill](https://www.npmjs.com/package/compression-streams-polyfill) to use this subscription there.
- *
  * @param config General configuration for Subscription API subscriptions.
  * @param listener A callback function to be called when the event is received.
  * @param options Options to control the subscription lifecycle.

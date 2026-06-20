@@ -18,13 +18,21 @@ major JS runtimes, written in TypeScript.
 - 🔧 **Integratable**: Easy to use with wallet providers ([viem](https://github.com/wevm/viem) or
   [ethers](https://github.com/ethers-io/ethers.js)).
 
-## Installation (choose your package manager)
+## Installation
 
+```sh
+# Node.js 22.12+ / React Native 0.86+
+npm i @nktkas/hyperliquid
+
+# Deno 1.23+ 
+deno add jsr:@nktkas/hyperliquid
+
+# Bun 1.3.3+
+bun add @nktkas/hyperliquid
 ```
-npm i @nktkas/hyperliquid        # npm / pnpm / yarn
-deno add jsr:@nktkas/hyperliquid # Deno
-bun add @nktkas/hyperliquid      # Bun
-```
+
+> React Native needs polyfills for the `fastAssetCtxs` subscription and for versions below 0.86 — see the
+> [documentation](https://nktkas.gitbook.io/hyperliquid).
 
 ## Quick Example
 
