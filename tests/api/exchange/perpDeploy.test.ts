@@ -143,6 +143,18 @@ runTest({
       { haltTrading: { coin: "TEST0", isHalted: true } },
       { setMarginTableIds: [["TEST0", 1]] },
       {
+        insertMarginTable: {
+          dex: "test",
+          marginTable: {
+            description: "test",
+            marginTiers: [
+              { lowerBound: 0, maxLeverage: 50 },
+              { lowerBound: 1000000, maxLeverage: 10 },
+            ],
+          },
+        },
+      },
+      {
         setFeeRecipient: {
           dex: "test",
           feeRecipient: "0x0000000000000000000000000000000000000000",

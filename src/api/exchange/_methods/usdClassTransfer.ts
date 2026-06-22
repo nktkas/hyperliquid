@@ -20,8 +20,19 @@ export const UsdClassTransferRequest = /* @__PURE__ */ (() => {
       signatureChainId: Hex,
       /** Hyperliquid network type. */
       hyperliquidChain: v.picklist(["Mainnet", "Testnet"]),
-      /** Amount to transfer (1 = $1). */
-      amount: UnsignedDecimal,
+      /**
+       * Amount to transfer (1 = $1).
+       *
+       * To transfer on behalf of a subaccount, suffix the amount with ` subaccount:<address>`,
+       * e.g. `"1 subaccount:0x0000000000000000000000000000000000000000"`.
+       */
+      amount: v.union([
+        UnsignedDecimal,
+        v.pipe(
+          v.string(),
+          v.regex(/^[0-9]+(\.[0-9]+)?\s+subaccount:0x[0-9a-fA-F]{40}$/),
+        ),
+      ]),
       /** `true` for spot to perp, `false` for perp to spot. */
       toPerp: v.boolean(),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */

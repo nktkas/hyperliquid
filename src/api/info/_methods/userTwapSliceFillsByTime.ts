@@ -21,8 +21,6 @@ export const UserTwapSliceFillsByTimeRequest = /* @__PURE__ */ (() => {
     startTime: UnsignedInteger,
     /** End time (in ms since epoch). */
     endTime: v.nullish(UnsignedInteger),
-    /** If true, partial fills are aggregated when a crossing order fills multiple resting orders. */
-    aggregateByTime: v.optional(v.boolean()),
   });
 })();
 export type UserTwapSliceFillsByTimeRequest = v.InferOutput<typeof UserTwapSliceFillsByTimeRequest>;
