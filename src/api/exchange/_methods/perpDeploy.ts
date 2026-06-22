@@ -131,6 +131,35 @@ export const PerpDeployRequest = /* @__PURE__ */ (() => {
       v.object({
         /** Type of action. */
         type: v.literal("perpDeploy"),
+        /** Parameters for inserting a margin table into a dex. */
+        insertMarginTable: v.object({
+          /** DEX name. */
+          dex: v.string(),
+          /** Margin table to insert. */
+          marginTable: v.object({
+            /** Description of the margin table. */
+            description: v.string(),
+            /**
+             * Margin tiers, sorted by increasing lower bound and decreasing max leverage.
+             * A maximum of 3 tiers is allowed.
+             */
+            marginTiers: v.pipe(
+              v.array(
+                v.object({
+                  /** Position notional value above which leverage is constrained by `maxLeverage`. */
+                  lowerBound: UnsignedInteger,
+                  /** Maximum leverage (between `1` and `50`). */
+                  maxLeverage: v.pipe(UnsignedInteger, v.minValue(1), v.maxValue(50)),
+                }),
+              ),
+              v.maxLength(3),
+            ),
+          }),
+        }),
+      }),
+      v.object({
+        /** Type of action. */
+        type: v.literal("perpDeploy"),
         /** Parameters for setting the fee recipient. */
         setFeeRecipient: v.object({
           /** DEX name. */

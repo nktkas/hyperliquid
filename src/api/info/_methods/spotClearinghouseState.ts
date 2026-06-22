@@ -16,8 +16,6 @@ export const SpotClearinghouseStateRequest = /* @__PURE__ */ (() => {
     type: v.literal("spotClearinghouseState"),
     /** User address. */
     user: Address,
-    /** DEX name (empty string for main dex). */
-    dex: v.optional(v.string()),
   });
 })();
 export type SpotClearinghouseStateRequest = v.InferOutput<typeof SpotClearinghouseStateRequest>;

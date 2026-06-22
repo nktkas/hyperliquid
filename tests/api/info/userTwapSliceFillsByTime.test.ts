@@ -15,11 +15,9 @@ runTest({
     const now = Date.now();
     const fiveYears = 1000 * 60 * 60 * 24 * 365 * 5;
     const params: UserTwapSliceFillsByTimeParameters[] = [
-      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", startTime: now - fiveYears }, // endTime absent, aggregateByTime absent
+      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", startTime: now - fiveYears }, // endTime absent
       { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", startTime: now - fiveYears, endTime: now }, // endTime present
       { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", startTime: now - fiveYears, endTime: null }, // endTime null
-      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", startTime: now - fiveYears, aggregateByTime: true }, // aggregateByTime true
-      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", startTime: now - fiveYears, aggregateByTime: false }, // aggregateByTime false
     ];
 
     const data = await Promise.all(params.map((p) => client.userTwapSliceFillsByTime(p)));
