@@ -13,7 +13,7 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       # npm publishes via OIDC trusted publishing (no token here), which needs npm >= 11.5.1.
       - uses: actions/setup-node@v6
         with:
