@@ -47,7 +47,7 @@
     "exclude": [".dev", ".github", "docs", "tests"]
   },
   "imports": {
-    "@nktkas/rews": "jsr:@nktkas/rews@^4.0.1",
+    "@nktkas/rews": "jsr:@nktkas/rews@^4.1.0",
     "@noble/hashes": "jsr:@noble/hashes@^2.2.0",
     "@std/async/unstable-semaphore": "jsr:@std/async@1.5.0/unstable-semaphore",
     "@std/msgpack/encode": "jsr:@std/msgpack@^1.0.3/encode",
