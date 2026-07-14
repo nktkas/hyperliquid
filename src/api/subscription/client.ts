@@ -69,7 +69,6 @@ import {
   type UserTwapSliceFillsEvent,
   type UserTwapSliceFillsParameters,
 } from "./_methods/userTwapSliceFills.ts";
-import { webData2, type WebData2Event, type WebData2Parameters } from "./_methods/webData2.ts";
 import { webData3, type WebData3Event, type WebData3Parameters } from "./_methods/webData3.ts";
 
 // ============================================================
@@ -1014,41 +1013,6 @@ export class SubscriptionClient<C extends SubscriptionConfig = SubscriptionConfi
   /**
    * Subscribe to comprehensive user and market data updates.
    *
-   * @deprecated use {@linkcode webData3} and other component subscriptions instead.
-   *
-   * @param params Parameters specific to the API subscription.
-   * @param listener A callback function to be called when the event is received.
-   * @param options Options to control the subscription lifecycle.
-   * @return A request-promise that resolves with a {@link ISubscription} object to manage the subscription lifecycle.
-   *
-   * @throws {ValidationError} When the request parameters fail validation (before sending).
-   * @throws {TransportError} When the transport layer throws an error.
-   *
-   * @example
-   * ```ts
-   * import * as hl from "@nktkas/hyperliquid";
-   *
-   * const transport = new hl.WebSocketTransport();
-   * const client = new hl.SubscriptionClient({ transport });
-   *
-   * const sub = await client.webData2({ user: "0x..." }, (data) => {
-   *   console.log(data);
-   * });
-   * ```
-   *
-   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions
-   */
-  webData2(
-    params: WebData2Parameters,
-    listener: (data: WebData2Event) => void,
-    options?: SubscriptionOptions,
-  ): Promise<ISubscription> {
-    return webData2(this.config_, params, listener, options);
-  }
-
-  /**
-   * Subscribe to comprehensive user and market data updates.
-   *
    * @param params Parameters specific to the API subscription.
    * @param listener A callback function to be called when the event is received.
    * @param options Options to control the subscription lifecycle.
@@ -1167,10 +1131,6 @@ export type {
   UserTwapSliceFillsEvent as UserTwapSliceFillsWsEvent,
   UserTwapSliceFillsParameters as UserTwapSliceFillsWsParameters,
 } from "./_methods/userTwapSliceFills.ts";
-export type {
-  WebData2Event as WebData2WsEvent,
-  WebData2Parameters as WebData2WsParameters,
-} from "./_methods/webData2.ts";
 export type {
   WebData3Event as WebData3WsEvent,
   WebData3Parameters as WebData3WsParameters,
