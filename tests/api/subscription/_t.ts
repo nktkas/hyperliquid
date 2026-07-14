@@ -89,13 +89,13 @@ export function runTestWithExchange(options: {
 
 export { createTWAP, openOrder } from "../exchange/_t.ts";
 
-export function collectEventsOverTime<T>(
-  fn: (cb: (event: T) => void) => unknown,
+/** Collects events for a fixed interval after asynchronous setup completes. */
+export async function collectEventsOverTime<T>(
+  fn: (cb: (event: T) => void) => void | Promise<void>,
   durationMs: number,
 ): Promise<T[]> {
-  return new Promise((resolve) => {
-    const data: T[] = [];
-    fn((event) => data.push(event));
-    setTimeout(() => resolve(data), durationMs);
-  });
+  const data: T[] = [];
+  await fn((event) => data.push(event));
+  await new Promise((resolve) => setTimeout(resolve, durationMs));
+  return data;
 }
