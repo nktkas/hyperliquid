@@ -9,7 +9,7 @@
  * ```
  */
 
-import { build } from "jsr:@nktkas/dtn@^1";
+import { build } from "jsr:@nktkas/dtn@^2";
 import denoJson from "../../deno.json" with { type: "json" };
 
 if (import.meta.main) {
