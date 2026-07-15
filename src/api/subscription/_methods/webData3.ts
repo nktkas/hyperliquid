@@ -55,7 +55,7 @@ export type WebData3Event = {
     /** Whether DEX abstraction is enabled. */
     dexAbstractionEnabled?: boolean;
     /** Abstraction mode for the user account. */
-    abstraction?: "dexAbstraction" | "unifiedAccount" | "portfolioMargin" | "disabled";
+    abstraction?: "unifiedAccount" | "portfolioMargin" | "disabled";
   };
   /** Array of perpetual DEX states. */
   perpDexStates: {

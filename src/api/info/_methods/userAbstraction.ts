@@ -28,8 +28,7 @@ export type UserAbstractionResponse =
   | "unifiedAccount"
   | "portfolioMargin"
   | "disabled"
-  | "default"
-  | "dexAbstraction";
+  | "default";
 
 // ============================================================
 // Execution Logic

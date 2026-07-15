@@ -14,16 +14,14 @@ runTest({
   codeTestFn: async (_t, client) => {
     const params: UserAbstractionParameters[] = [
       { user: "0x0000000000000000000000000000000000000001" }, // "default"
-      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" }, // "dexAbstraction"
+      { user: "0xe019d6167E7e324aEd003d94098496b6d986aB05" }, // "disabled"
+      { user: "0x6b043579b088d44400dffa1ef1c5e3e3bfbdf9d2" }, // "portfolioMargin"
+      { user: "0x8c9c52889ab9d259195a52fd412c250f8183c960" }, // "unifiedAccount"
     ];
 
     const data = await Promise.all(params.map((p) => client.userAbstraction(p)));
 
     schemaCoverage(paramsSchema, params);
-    schemaCoverage(responseSchema, data, [
-      "#/enum/0", // "unifiedAccount" — not tested
-      "#/enum/1", // "portfolioMargin" — not tested
-      "#/enum/2", // "disabled" — not tested
-    ]);
+    schemaCoverage(responseSchema, data);
   },
 });
