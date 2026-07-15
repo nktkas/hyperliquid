@@ -1,15 +1,16 @@
-import { schemaCoverage } from "../_utils/schemaCoverage.ts";
-import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
+import { ApiRequestError } from "@nktkas/hyperliquid";
+import { assertRejects } from "jsr:@std/assert@1";
 import { runTest } from "./_t.ts";
-
-const sourceFile = new URL("../../../src/api/exchange/_methods/agentEnableDexAbstraction.ts", import.meta.url).pathname;
-const responseSchema = typeToJsonSchema(sourceFile, "AgentEnableDexAbstractionSuccessResponse");
 
 runTest({
   name: "agentEnableDexAbstraction",
   codeTestFn: async (_t, exchClient) => {
-    const data = await Promise.all([exchClient.agentEnableDexAbstraction()]);
+    await exchClient.agentSetAbstraction({ abstraction: "u" });
 
-    schemaCoverage(responseSchema, data);
+    await assertRejects(
+      () => exchClient.agentEnableDexAbstraction(),
+      ApiRequestError,
+      "Abstraction transition not allowed",
+    );
   },
 });

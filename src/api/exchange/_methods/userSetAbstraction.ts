@@ -26,7 +26,7 @@ export const UserSetAbstractionRequest = /* @__PURE__ */ (() => {
       /** User address. */
       user: Address,
       /** Abstraction mode to set. */
-      abstraction: v.picklist(["dexAbstraction", "unifiedAccount", "portfolioMargin", "disabled"]),
+      abstraction: v.picklist(["disabled", "unifiedAccount", "portfolioMargin"]),
       /** Nonce (timestamp in ms) used to prevent replay attacks. */
       nonce: UnsignedInteger,
     }),
@@ -106,6 +106,14 @@ export const UserSetAbstractionTypes = {
   ],
 };
 
+/** Produces the action representation serialized into a multi-sig payload. */
+function toMultiSigPayloadAction(action: Readonly<Record<string, unknown>>): Record<string, unknown> {
+  if (action.abstraction === "disabled") return { ...action, abstraction: "i" };
+  if (action.abstraction === "unifiedAccount") return { ...action, abstraction: "u" };
+  if (action.abstraction === "portfolioMargin") return { ...action, abstraction: "p" };
+  return action;
+}
+
 /**
  * Set user abstraction mode.
  *
@@ -133,7 +141,7 @@ export const UserSetAbstractionTypes = {
  *
  * await userSetAbstraction({ transport, wallet }, {
  *   user: "0x...",
- *   abstraction: "dexAbstraction",
+ *   abstraction: "unifiedAccount",
  * });
  * ```
  *
@@ -148,5 +156,10 @@ export function userSetAbstraction(
     UserSetAbstractionActionSchema,
     parse(UserSetAbstractionActionSchema, { type: "userSetAbstraction", ...params }),
   );
-  return executeUserSignedAction(config, action, UserSetAbstractionTypes, opts);
+  return executeUserSignedAction(
+    config,
+    action,
+    UserSetAbstractionTypes,
+    { ...opts, toMultiSigPayloadAction },
+  );
 }

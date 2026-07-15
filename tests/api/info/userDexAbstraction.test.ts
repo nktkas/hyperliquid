@@ -14,7 +14,7 @@ runTest({
   codeTestFn: async (_t, client) => {
     const params: UserDexAbstractionParameters[] = [
       { user: "0x0000000000000000000000000000000000000001" }, // null
-      { user: "0x187e15e124b8297a01c355b6a87ae74dd4c0069f" }, // boolean
+      { user: "0xe019d6167E7e324aEd003d94098496b6d986aB05" }, // false
     ];
 
     const data = await Promise.all(params.map((p) => client.userDexAbstraction(p)));
