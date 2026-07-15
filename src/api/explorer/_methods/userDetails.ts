@@ -22,6 +22,18 @@ export const UserDetailsRequest = /* @__PURE__ */ (() => {
 export type UserDetailsRequest = v.InferOutput<typeof UserDetailsRequest>;
 
 /**
+ * Transaction returned by {@linkcode userDetails}.
+ *
+ * Historical entries may use a positional action tuple.
+ */
+type UserDetailsTransaction =
+  & Omit<ExplorerTransaction, "action">
+  & {
+    /** Action payload. */
+    action: ExplorerTransaction["action"] | unknown[];
+  };
+
+/**
  * Response array of user transaction details.
  * @see null
  */
@@ -29,7 +41,7 @@ export type UserDetailsResponse = {
   /** Type of response. */
   type: "userDetails";
   /** Array of user transaction details. */
-  txs: ExplorerTransaction[];
+  txs: UserDetailsTransaction[];
 };
 
 // ============================================================

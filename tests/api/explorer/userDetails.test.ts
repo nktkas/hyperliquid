@@ -11,6 +11,7 @@ const paramsSchema = valibotToJsonSchema(v.omit(UserDetailsRequest, ["type"]));
 
 runRequestTest({
   name: "userDetails",
+  isTestnet: false,
   fn: async (_t, client) => {
     const params: UserDetailsParameters[] = [
       { user: "0x9150749C4cec13Dc7c1555D0d664F08d4d81Be83" },
