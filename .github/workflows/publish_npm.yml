@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       # npm publishes via OIDC trusted publishing (no token here), which needs npm >= 11.5.1.
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: "24.x"
       - uses: denoland/setup-deno@v2
