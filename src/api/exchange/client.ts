@@ -2352,7 +2352,7 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
    * const client = new hl.ExchangeClient({ transport, wallet });
    *
-   * await client.userSetAbstraction({ user: "0x...", abstraction: "dexAbstraction" });
+   * await client.userSetAbstraction({ user: "0x...", abstraction: "unifiedAccount" });
    * ```
    *
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction
