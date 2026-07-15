@@ -105,6 +105,8 @@ export function executeUserSignedAction<T>(
   action: Record<string, unknown>,
   types: Record<string, readonly { name: string; type: string }[]>,
   options?: {
+    /** Transforms the completed action into its outer multi-sig payload representation. */
+    toMultiSigPayloadAction?: (action: Readonly<Record<string, unknown>>) => Record<string, unknown>;
     signal?: AbortSignal;
   },
 ): Promise<T> {
@@ -130,10 +132,12 @@ export function executeUserSignedAction<T>(
       });
       return { action: fullAction, signature };
     } else {
+      const payloadAction = options?.toMultiSigPayloadAction?.(fullAction) ?? fullAction;
       const { action: wrapper, signature } = await signMultiSigUserSigned({
         signers: config.signers,
         multiSigUser: config.multiSigUser,
         action: fullAction,
+        payloadAction,
         types,
       });
       return { action: wrapper, signature };

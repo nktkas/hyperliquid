@@ -304,6 +304,8 @@ export async function signMultiSigL1(args: {
  * });
  * const body = await response.json();
  * ```
+ *
+ * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/multi-sig
  */
 export async function signMultiSigUserSigned(args: {
   /** Array of wallets for multi-sig. First wallet is the leader. */
@@ -321,6 +323,8 @@ export async function signMultiSigUserSigned(args: {
       | { nonce: number; time?: never }
       | { time: number; nonce?: never }
     );
+  /** Action serialized into the outer multi-sig payload; defaults to `action`. */
+  payloadAction?: Record<string, unknown>;
   /** [EIP-712](https://eips.ethereum.org/EIPS/eip-712) type definitions. */
   types: Record<string, readonly { name: string; type: string }[]>;
 }): Promise<{ action: MultiSigAction; signature: Signature }> {
@@ -346,7 +350,7 @@ export async function signMultiSigUserSigned(args: {
     payload: {
       multiSigUser: args.multiSigUser.toLowerCase() as `0x${string}`,
       outerSigner,
-      action: args.action,
+      action: args.payloadAction ?? args.action,
     },
   };
 

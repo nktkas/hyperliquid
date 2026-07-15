@@ -135,6 +135,62 @@ const MULTI_SIG_USER_SIGNED = {
   },
 } as const;
 
+const MULTI_SIG_USER_SET_ABSTRACTION = {
+  multiSigUser: "0x1234567890123456789012345678901234567890",
+  action: {
+    type: "userSetAbstraction",
+    signatureChainId: "0x66eee",
+    hyperliquidChain: "Testnet",
+    user: "0x3b4d2cc2e144a0044002506c8b44508e9ace82e9",
+    abstraction: "disabled",
+    nonce: 1780130409592,
+  },
+  payloadAction: {
+    type: "userSetAbstraction",
+    signatureChainId: "0x66eee",
+    hyperliquidChain: "Testnet",
+    user: "0x3b4d2cc2e144a0044002506c8b44508e9ace82e9",
+    abstraction: "i",
+    nonce: 1780130409592,
+  },
+  types: {
+    "HyperliquidTransaction:UserSetAbstraction": [
+      { name: "hyperliquidChain", type: "string" },
+      { name: "user", type: "address" },
+      { name: "abstraction", type: "string" },
+      { name: "nonce", type: "uint64" },
+    ],
+  },
+  result: {
+    action: {
+      type: "multiSig",
+      signatureChainId: "0x66eee",
+      signatures: [{
+        r: "0xbeaaefe1f198650d10751bde2d398f2c27b00ce27df76b02a49e01b6cf674a0c",
+        s: "0x918a44e4ec29e6cba349ee48a177490d04e7b01ea23fd6845c274dc7150e91c",
+        v: 27,
+      }],
+      payload: {
+        multiSigUser: "0x1234567890123456789012345678901234567890",
+        outerSigner: "0xe5ca49fb3bd9a581f0d1ef9cb5d7177da08bf901",
+        action: {
+          type: "userSetAbstraction",
+          signatureChainId: "0x66eee",
+          hyperliquidChain: "Testnet",
+          user: "0x3b4d2cc2e144a0044002506c8b44508e9ace82e9",
+          abstraction: "i",
+          nonce: 1780130409592,
+        },
+      },
+    },
+    signature: {
+      r: "0x28159b1dc1496ca8d81c2aee9f2f73882b6f6f7f6a54509010cbdb08c5302699",
+      s: "0x0d6832d115cd3149302afcbe1189875bc46e12f025d59aa618676f29cdc4ce6f",
+      v: 28,
+    },
+  },
+} as const;
+
 // ============================================================
 // Tests
 // ============================================================
@@ -256,6 +312,24 @@ Deno.test("signing", async (t) => {
         const expected = MULTI_SIG_USER_SIGNED.result;
 
         assertEquals(result, expected);
+      });
+    }
+  });
+
+  await t.step("signMultiSigUserSigned() with distinct payload action", async (t) => {
+    for (const [name, wallet] of wallets) {
+      await t.step(name, async () => {
+        const result = await signMultiSigUserSigned({
+          signers: [wallet],
+          multiSigUser: MULTI_SIG_USER_SET_ABSTRACTION.multiSigUser,
+          action: MULTI_SIG_USER_SET_ABSTRACTION.action,
+          payloadAction: MULTI_SIG_USER_SET_ABSTRACTION.payloadAction,
+          types: MULTI_SIG_USER_SET_ABSTRACTION.types,
+        });
+        const expected = MULTI_SIG_USER_SET_ABSTRACTION.result;
+
+        assertEquals(result, expected);
+        assertEquals(MULTI_SIG_USER_SET_ABSTRACTION.action.abstraction, "disabled");
       });
     }
   });
