@@ -1790,17 +1790,6 @@
       spec:
         ref:
           kind: openapi
-          spec: hl-subscription-webData2
-    ```
-  - ```yaml
-    type: builtin:openapi
-    props:
-      models: false
-      downloadLink: false
-    dependencies:
-      spec:
-        ref:
-          kind: openapi
           spec: hl-subscription-webData3
     ```
 
