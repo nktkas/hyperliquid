@@ -32,7 +32,14 @@ runTest({
     const params: OrderParameters[] = [
       // resting | limit | Gtc | no cloid | grouping=default
       {
-        orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
+        orders: [{
+          a: id,
+          b: true,
+          p: pxDown,
+          s: sz,
+          r: false,
+          t: { limit: { tif: "Gtc" } },
+        }],
       },
       // resting | limit | Alo | cloid
       {
@@ -62,7 +69,14 @@ runTest({
       },
       // filled | limit | FrontendMarket | b=false | builder
       {
-        orders: [{ a: id, b: false, p: pxDown, s: sz, r: false, t: { limit: { tif: "FrontendMarket" } } }],
+        orders: [{
+          a: id,
+          b: false,
+          p: pxDown,
+          s: sz,
+          r: false,
+          t: { limit: { tif: "FrontendMarket" } },
+        }],
         grouping: "na",
         builder: { b: "0xe019d6167E7e324aEd003d94098496b6d986aB05", f: 1 },
       },
@@ -95,19 +109,25 @@ runTest({
       },
     ];
 
-    // Priority order: grouping={p:N} requires IOC on a perp asset; the temp account
-    // has no resting orders to match against, so this rejects with "Order could not
-    // immediately match". p=0 means no priority cost (no delegatable balance required).
+    // Priority order at the maximum rate: the fee is charged from undelegated staking
+    // balance, which a freshly created temp account does not have.
     const priorityParam: OrderParameters = {
-      orders: [{ a: id, b: true, p: pxDown, s: sz, r: false, t: { limit: { tif: "Ioc" } } }],
-      grouping: { p: 0 },
+      orders: [{
+        a: id,
+        b: true,
+        p: pxDown,
+        s: sz,
+        r: false,
+        t: { limit: { tif: "Ioc" } },
+      }],
+      grouping: { p: 100_000_000 },
     };
     await assertRejects(
       async () => {
         await exchClient.order(priorityParam);
       },
       ApiRequestError,
-      "Order could not immediately match",
+      "Insufficient delegatable balance for priority order",
     );
 
     const data = await Promise.all(params.map((p) => exchClient.order(p)));

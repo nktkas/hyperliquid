@@ -71,15 +71,16 @@ export const OrderRequest = /* @__PURE__ */ (() => {
        * - `"na"`: Standard order without grouping.
        * - `"normalTpsl"`: TP/SL order with fixed size that doesn't adjust with position changes.
        * - `"positionTpsl"`: TP/SL order that adjusts proportionally with the position size.
-       * - `{ p: number }`: Order priority rate as a fraction `p / 1e8` (max `p = 80000`, i.e. 8 bps).
-       *   Only valid when every order is IOC on a perp asset.
+       * - `{ p: number }`: Order priority rate as a fraction `p / 1e8`.
+       *   Only valid when every order is on a non-outcome asset and either every order is IOC
+       *   or every order is a non-reduce-only ALO.
        */
       grouping: v.optional(
         v.union([
           v.picklist(["na", "normalTpsl", "positionTpsl"]),
           v.object({
-            /** Priority rate as a fraction `p / 1e8` (max `80000`, i.e. 8 bps). */
-            p: v.pipe(UnsignedInteger, v.maxValue(80000)),
+            /** Priority rate as a fraction `p / 1e8`. */
+            p: v.pipe(UnsignedInteger, v.maxValue(100_000_000)),
           }),
         ]),
         "na",
