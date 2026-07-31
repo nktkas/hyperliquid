@@ -15,7 +15,10 @@ runTest({
   name: "reserveRequestWeight",
   codeTestFn: async (_t, exchClient) => {
     const params: ReserveRequestWeightParameters[] = [
+      // no destination
       { weight: 1 },
+      // destination
+      { weight: 1, destination: "0xe019d6167e7e324aed003d94098496b6d986ab05" },
     ];
 
     const data = await Promise.all(params.map((p) => exchClient.reserveRequestWeight(p)));
