@@ -100,6 +100,7 @@ import {
 import { openOrders, type OpenOrdersParameters, type OpenOrdersResponse } from "./_methods/openOrders.ts";
 import { orderStatus, type OrderStatusParameters, type OrderStatusResponse } from "./_methods/orderStatus.ts";
 import { outcomeMeta, type OutcomeMetaResponse } from "./_methods/outcomeMeta.ts";
+import { outcomeTemplates, type OutcomeTemplatesResponse } from "./_methods/outcomeTemplates.ts";
 import {
   perpAnnotation,
   type PerpAnnotationParameters,
@@ -1209,6 +1210,33 @@ export class InfoClient<C extends InfoConfig = InfoConfig> {
     signal?: AbortSignal,
   ): Promise<OutcomeMetaResponse> {
     return outcomeMeta(this.config_, signal);
+  }
+
+  /**
+   * Request outcome templates.
+   *
+   * @param signal {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to cancel the request.
+   * @return Array of templates that outcome deployers instantiate.
+   *
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   *
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.InfoClient({ transport });
+   *
+   * const data = await client.outcomeTemplates();
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-4-deployer-actions#read-api
+   */
+  outcomeTemplates(
+    signal?: AbortSignal,
+  ): Promise<OutcomeTemplatesResponse> {
+    return outcomeTemplates(this.config_, signal);
   }
 
   /**
@@ -2470,6 +2498,7 @@ export type { MetaAndAssetCtxsParameters, MetaAndAssetCtxsResponse } from "./_me
 export type { OpenOrdersParameters, OpenOrdersResponse } from "./_methods/openOrders.ts";
 export type { OrderStatusParameters, OrderStatusResponse } from "./_methods/orderStatus.ts";
 export type { OutcomeMetaResponse } from "./_methods/outcomeMeta.ts";
+export type { OutcomeTemplatesResponse } from "./_methods/outcomeTemplates.ts";
 export type { PerpAnnotationParameters, PerpAnnotationResponse } from "./_methods/perpAnnotation.ts";
 export type { PerpCategoriesResponse } from "./_methods/perpCategories.ts";
 export type { PerpConciseAnnotationsResponse } from "./_methods/perpConciseAnnotations.ts";
