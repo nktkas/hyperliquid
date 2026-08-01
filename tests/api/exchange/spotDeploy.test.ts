@@ -110,6 +110,58 @@ runTest({
           evmExtraWeiDecimals: 0,
         },
       },
+      {
+        outcome: {
+          registerStandaloneOutcomeFromTemplate: {
+            id: "binaryPrice",
+            keywordToValue: [["perp", "BTC"], ["threshold", "1000000"], ["time", "20260901-0600"]],
+          },
+        },
+      },
+      {
+        outcome: {
+          registerQuestionFromTemplate: {
+            questionTemplateInstance: {
+              id: "binaryPrice",
+              keywordToValue: [["perp", "BTC"], ["threshold", "1000000"], ["time", "20260901-0600"]],
+            },
+            namedOutcomeTemplateInstances: [
+              {
+                id: "binaryPrice",
+                keywordToValue: [["perp", "BTC"], ["threshold", "1000000"], ["time", "20260901-0600"]],
+              },
+            ],
+          },
+        },
+      },
+      {
+        outcome: {
+          settleOutcome: {
+            outcome: 0,
+            settleFraction: "1",
+            details: "",
+            nameAndDescription: ["template:binaryPrice", "perp:BTC"],
+            sideNames: ["Yes", "No"],
+          },
+        },
+      },
+      {
+        outcome: {
+          settleQuestion2: {
+            question: 0,
+            outcomeSettlements: [
+              {
+                outcome: 0,
+                settleFraction: "1",
+                details: "",
+                nameAndDescription: ["template:binaryPrice", "perp:BTC"],
+                sideNames: ["Yes", "No"],
+              },
+            ],
+            nameAndDescription: ["template:binaryPrice", "perp:BTC"],
+          },
+        },
+      },
     ];
 
     await Promise.all(params.map((p) =>
