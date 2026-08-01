@@ -11,8 +11,8 @@ const OFFLINE = Deno.args.includes("--offline");
 // Preparation
 // ============================================================
 
-const transport = new HttpTransport({ isTestnet: true, timeout: 30_000 });
-const client = new InfoClient({ transport });
+const testnetClient = new InfoClient({ transport: new HttpTransport({ isTestnet: true, timeout: 30_000 }) });
+const mainnetClient = new InfoClient({ transport: new HttpTransport({ timeout: 30_000 }) });
 
 // ============================================================
 // Test
@@ -24,18 +24,20 @@ const client = new InfoClient({ transport });
  * @param options Test options including name and test function
  * @param options.name Name of the test
  * @param options.ignore Whether to skip the test
+ * @param options.isTestnet Uses the testnet API when true; defaults to `true`
  * @param options.codeTestFn Async function containing the test code, receives Deno.TestContext and shared InfoClient
  */
 export function runTest(options: {
   name: string;
   ignore?: boolean;
-  codeTestFn: (t: Deno.TestContext, client_: typeof client) => Promise<void>;
+  isTestnet?: boolean;
+  codeTestFn: (t: Deno.TestContext, client_: typeof testnetClient) => Promise<void>;
 }): void {
-  const { name, ignore, codeTestFn } = options;
+  const { name, ignore, isTestnet = true, codeTestFn } = options;
 
   Deno.test(name, { ignore: OFFLINE || ignore }, async (t) => {
     await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
-    await codeTestFn(t, client);
+    await codeTestFn(t, isTestnet ? testnetClient : mainnetClient);
   });
 }

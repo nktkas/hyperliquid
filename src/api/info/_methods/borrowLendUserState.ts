@@ -60,17 +60,18 @@ export type BorrowLendUserStateResponse = {
     },
   ][];
   /**
-   * Account health status.
-   *
-   * FIXME: other literals may exist (unconfirmed).
+   * Account health status:
+   * - `"healthy"`: Collateral covers the debt.
+   * - `"atRisk"`: Health factor approached the liquidation threshold.
+   * - `"marketLiquidatable"`: Debt is being liquidated through the order book.
+   * - `"backstopLiquidatable"`: Debt is taken over by the liquidator vault.
    */
-  health: "healthy";
+  health: "healthy" | "atRisk" | "marketLiquidatable" | "backstopLiquidatable";
   /**
-   * Health factor.
-   *
-   * FIXME: non-null value not found (unconfirmed).
+   * Health factor; `null` when the account has no borrow position.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
    */
-  healthFactor: null;
+  healthFactor: string | null;
 };
 
 // ============================================================
