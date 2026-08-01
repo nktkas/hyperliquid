@@ -38,6 +38,11 @@ export type OutcomeMetaResponse = {
     }[];
     /** Quote token for this outcome. */
     quoteToken: string;
+    /**
+     * Address of the deployer; absent for outcomes not deployed from a template.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
+    deployer?: `0x${string}`;
   }[];
   /** Array of prediction market questions. */
   questions: {
