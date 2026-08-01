@@ -18,6 +18,8 @@ runTest({
       "#/items/properties/action/anyOf/2/properties/O/anyOf/1",
       "#/items/properties/action/anyOf/2/properties/O/anyOf/2",
       "#/items/properties/action/anyOf/2/properties/O/anyOf/3",
+      "#/items/properties/action/anyOf/2/properties/O/anyOf/4",
+      "#/items/properties/action/anyOf/2/properties/O/anyOf/5",
       "#/items/properties/action/anyOf/3",
     ]);
   },

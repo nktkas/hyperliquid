@@ -61,6 +61,30 @@ export type ValidatorL1VotesResponse = {
         namedOutcomes: [string, string][];
       };
     } | {
+      /** Register an outcome template. */
+      registerTemplate: {
+        /** Template identifier. */
+        id: string;
+        /** Role of the template. */
+        role: {
+          /** Deploys a single outcome. */
+          standaloneOutcome: {
+            /** Names of the Yes and No sides. */
+            sideNames: [string, string];
+          };
+        };
+        /** Name and description containing `{keyword}` placeholders. */
+        nameAndDescription: [string, string];
+        /**
+         * Keywords of the template and the value format of each:
+         * - `dateTime` = `%Y%m%d-%H%M`, within the next year; e.g. `20260712-1830`.
+         * - `date` = `YYYYMMDD` (end of day), within the next year; e.g. `20260712`.
+         * - `string` = free text.
+         * - `hlPerp` = coin name of an existing perp; e.g. `ABC` or `test:ABC`.
+         */
+        keywordToHint: [string, "dateTime" | "date" | "string" | "hlPerp"][];
+      };
+    } | {
       /** Settle an outcome. */
       settleOutcome: {
         /** Outcome identifier. */
@@ -93,6 +117,30 @@ export type ValidatorL1VotesResponse = {
             details: string,
           ],
         ][];
+      };
+    } | {
+      /** Settle all remaining named outcomes of a question. */
+      settleQuestion2: {
+        /** Question identifier. */
+        question: number;
+        /** Settlement of each remaining active named outcome. */
+        outcomeSettlements: {
+          /** Outcome identifier. */
+          outcome: number;
+          /**
+           * Payout fraction of the Yes side (between 0 and 1).
+           * @pattern ^[0-9]+(\.[0-9]+)?$
+           */
+          settleFraction: string;
+          /** Settlement details. */
+          details: string;
+          /** Name and description of the outcome being settled. */
+          nameAndDescription: [string, string];
+          /** Names of the Yes and No sides of the outcome being settled. */
+          sideNames: [string, string];
+        }[];
+        /** Name and description of the question being settled. */
+        nameAndDescription: [string, string];
       };
     };
   } | {
