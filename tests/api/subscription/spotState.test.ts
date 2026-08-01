@@ -29,6 +29,7 @@ runTest({
       "#/properties/spotState/properties/portfolioMarginEnabled/present",
       "#/properties/spotState/properties/portfolioMarginRatio/present",
       "#/properties/spotState/properties/tokenToPortfolioBorrowRatio/present",
+      "#/properties/spotState/properties/tokenToPortfolioSupplyRatio/present",
       "#/properties/spotState/properties/tokenToAvailableAfterMaintenance/present",
       "#/properties/spotState/properties/balances/items/anyOf/0/properties/spotHold/present",
       "#/properties/spotState/properties/balances/items/anyOf/0/properties/ltv/present",
