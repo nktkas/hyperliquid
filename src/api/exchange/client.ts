@@ -10,6 +10,12 @@ import type { ExchangeConfig, ExchangeSingleWalletConfig } from "./_methods/_bas
 // ============================================================
 
 import {
+  activateOutcomeDeployer,
+  type ActivateOutcomeDeployerOptions,
+  type ActivateOutcomeDeployerParameters,
+  type ActivateOutcomeDeployerSuccessResponse,
+} from "./_methods/activateOutcomeDeployer.ts";
+import {
   agentEnableDexAbstraction,
   type AgentEnableDexAbstractionOptions,
   type AgentEnableDexAbstractionSuccessResponse,
@@ -392,6 +398,40 @@ export class ExchangeClient<C extends ExchangeConfig = ExchangeSingleWalletConfi
    */
   constructor(config: C) {
     this.config_ = config;
+  }
+
+  /**
+   * Activate or deactivate the signer as an outcome deployer.
+   *
+   * Signing: L1 Action.
+   *
+   * @param params Parameters specific to the API request.
+   * @param opts Request execution options.
+   * @return Successful response without specific data.
+   *
+   * @throws {ValidationError} When the request parameters fail validation (before sending).
+   * @throws {TransportError} When the transport layer throws an error.
+   * @throws {ApiRequestError} When the API returns an unsuccessful response.
+   *
+   * @example
+   * ```ts
+   * import * as hl from "@nktkas/hyperliquid";
+   * import { privateKeyToAccount } from "npm:viem/accounts";
+   *
+   * const wallet = privateKeyToAccount("0x..."); // viem or ethers
+   * const transport = new hl.HttpTransport(); // or `WebSocketTransport`
+   * const client = new hl.ExchangeClient({ transport, wallet });
+   *
+   * await client.activateOutcomeDeployer({ isDeactivate: false });
+   * ```
+   *
+   * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-4-deployer-actions#activation
+   */
+  activateOutcomeDeployer(
+    params: ActivateOutcomeDeployerParameters,
+    opts?: ActivateOutcomeDeployerOptions,
+  ): Promise<ActivateOutcomeDeployerSuccessResponse> {
+    return activateOutcomeDeployer(this.config_, params, opts);
   }
 
   /**
@@ -2588,6 +2628,11 @@ export {
   type ExchangeSingleWalletConfig,
 } from "./_methods/_base/mod.ts";
 
+export type {
+  ActivateOutcomeDeployerOptions,
+  ActivateOutcomeDeployerParameters,
+  ActivateOutcomeDeployerSuccessResponse,
+} from "./_methods/activateOutcomeDeployer.ts";
 export type {
   AgentEnableDexAbstractionOptions,
   AgentEnableDexAbstractionSuccessResponse,
