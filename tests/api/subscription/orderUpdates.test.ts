@@ -60,6 +60,9 @@ runTestWithExchange({
       "#/items/properties/status/enum/26",
       "#/items/properties/status/enum/27",
       "#/items/properties/status/enum/28",
+      "#/items/properties/status/enum/29",
+      "#/items/properties/status/enum/30",
+      "#/items/properties/status/enum/31",
     ]);
   },
 });

@@ -51,7 +51,9 @@ export type OrderStatusResponse = {
      * - `"siblingFilledCanceled"`: Canceled due to sibling ordering being filled.
      * - `"delistedCanceled"`: Canceled due to asset delisting.
      * - `"liquidatedCanceled"`: Canceled due to liquidation.
+     * - `"outcomeSettledCanceled"`: Canceled due to outcome market settlement.
      * - `"scheduledCancel"`: Canceled due to exceeding scheduled cancel deadline (dead man's switch).
+     * - `"internalCancel"`: Canceled due to an internal error.
      * - `"tickRejected"`: Rejected due to invalid tick price.
      * - `"minTradeNtlRejected"`: Rejected due to order notional below minimum.
      * - `"perpMarginRejected"`: Rejected due to insufficient margin.
@@ -67,6 +69,7 @@ export type OrderStatusResponse = {
      * - `"insufficientSpotBalanceRejected"`: Rejected due to insufficient spot balance.
      * - `"oracleRejected"`: Rejected due to price too far from oracle.
      * - `"perpMaxPositionRejected"`: Rejected due to exceeding margin tier limit at current leverage.
+     * - `"tooManyOpenOrdersRejected"`: Rejected due to exceeding the open order limit.
      */
     status: OrderProcessingStatus;
     /** Timestamp when the status was last updated (in ms since epoch). */
