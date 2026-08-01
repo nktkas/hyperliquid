@@ -138,6 +138,85 @@ export const SpotDeployRequest = /* @__PURE__ */ (() => {
           evmExtraWeiDecimals: v.pipe(Integer, v.minValue(-2), v.maxValue(18)),
         }),
       }),
+      v.object({
+        /** Type of action. */
+        type: v.literal("spotDeploy"),
+        /**
+         * Outcome deployer parameters.
+         * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-4-deployer-actions
+         */
+        outcome: v.union([
+          v.object({
+            /** Deploy a standalone Yes/No market from a standalone outcome template. */
+            registerStandaloneOutcomeFromTemplate: v.object({
+              /** Template identifier. */
+              id: v.string(),
+              /** A list (sorted by key) of template keyword and value. */
+              keywordToValue: v.array(v.tuple([v.string(), v.string()])),
+            }),
+          }),
+          v.object({
+            /** Deploy a question and its named outcomes. */
+            registerQuestionFromTemplate: v.object({
+              /** Instantiation of the question template. */
+              questionTemplateInstance: v.object({
+                /** Template identifier. */
+                id: v.string(),
+                /** A list (sorted by key) of template keyword and value. */
+                keywordToValue: v.array(v.tuple([v.string(), v.string()])),
+              }),
+              /** Instantiations of the named outcome templates (at most 100). */
+              namedOutcomeTemplateInstances: v.array(
+                v.object({
+                  /** Template identifier. */
+                  id: v.string(),
+                  /** A list (sorted by key) of template keyword and value. */
+                  keywordToValue: v.array(v.tuple([v.string(), v.string()])),
+                }),
+              ),
+            }),
+          }),
+          v.object({
+            /** Settle one outcome of the deployer. */
+            settleOutcome: v.object({
+              /** Outcome identifier. */
+              outcome: UnsignedInteger,
+              /** Payout fraction of the Yes side (between 0 and 1). */
+              settleFraction: UnsignedDecimal,
+              /** Settlement details. Must be empty. */
+              details: v.string(),
+              /** Name and description of the outcome being settled. */
+              nameAndDescription: v.tuple([v.string(), v.string()]),
+              /** Names of the Yes and No sides of the outcome being settled. */
+              sideNames: v.tuple([v.string(), v.string()]),
+            }),
+          }),
+          v.object({
+            /** Settle all remaining named outcomes of a question. */
+            settleQuestion2: v.object({
+              /** Question identifier. */
+              question: UnsignedInteger,
+              /** Settlement of each remaining active named outcome. */
+              outcomeSettlements: v.array(
+                v.object({
+                  /** Outcome identifier. */
+                  outcome: UnsignedInteger,
+                  /** Payout fraction of the Yes side (between 0 and 1). */
+                  settleFraction: UnsignedDecimal,
+                  /** Settlement details. Must be empty. */
+                  details: v.string(),
+                  /** Name and description of the outcome being settled. */
+                  nameAndDescription: v.tuple([v.string(), v.string()]),
+                  /** Names of the Yes and No sides of the outcome being settled. */
+                  sideNames: v.tuple([v.string(), v.string()]),
+                }),
+              ),
+              /** Name and description of the question being settled. */
+              nameAndDescription: v.tuple([v.string(), v.string()]),
+            }),
+          }),
+        ]),
+      }),
     ]),
     /** Nonce (timestamp in ms) used to prevent replay attacks. */
     nonce: UnsignedInteger,
