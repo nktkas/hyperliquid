@@ -30,11 +30,13 @@ export type LegalCheckResponse = {
   /** Whether the user is allowed to use the platform. */
   userAllowed: boolean;
   /**
-   * Restriction code.
-   *
-   * FIXME: meaning of `"n"` / `"a"` unconfirmed.
+   * Restriction code:
+   * - `"n"`: No restrictions.
+   * - `"a"`: Platform actions are blocked.
+   * - `"o"`: Outcome markets are hidden.
+   * - `"u"`: Restricted as a UK user.
    */
-  restrictions?: "n" | "a";
+  restrictions: "n" | "a" | "o" | "u";
 };
 
 // ============================================================
