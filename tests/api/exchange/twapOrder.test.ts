@@ -1,5 +1,5 @@
 import { type TwapOrderParameters, TwapOrderRequest } from "@nktkas/hyperliquid/api/exchange";
-import { formatSize } from "@nktkas/hyperliquid/utils";
+import { formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
 import * as v from "@valibot/valibot";
 import { schemaCoverage } from "../_utils/schemaCoverage.ts";
 import { typeToJsonSchema } from "../_utils/typeToJsonSchema.ts";
@@ -20,12 +20,20 @@ runTest({
     const midPx = allMids["SOL"];
 
     const sz = formatSize(110 / parseFloat(midPx), szDecimals);
+    const pxUp = formatPrice(parseFloat(midPx) * 1.5, szDecimals);
+    const pxDown = formatPrice(parseFloat(midPx) * 0.5, szDecimals);
 
     const params: TwapOrderParameters[] = [
       // b=true | r=false | t=false
       { twap: { a: id, b: true, s: sz, r: false, m: 5, t: false } },
       // b=false | t=true
       { twap: { a: id, b: false, s: sz, r: false, m: 5, t: true } },
+      // details.t | a=true
+      { twap: { a: id, b: true, s: sz, r: false, m: 5, t: false }, details: { t: { p: pxUp, a: true }, s: null } },
+      // details.t | a=false
+      { twap: { a: id, b: false, s: sz, r: false, m: 5, t: false }, details: { t: { p: pxDown, a: false }, s: null } },
+      // details.s
+      { twap: { a: id, b: true, s: sz, r: false, m: 5, t: false }, details: { t: null, s: pxUp } },
     ];
 
     const data = await Promise.all(params.map((p) => exchClient.twapOrder(p)));

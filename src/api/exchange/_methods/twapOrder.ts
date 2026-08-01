@@ -31,6 +31,18 @@ export const TwapOrderRequest = /* @__PURE__ */ (() => {
         /** Enable random order timing. */
         t: v.boolean(),
       }),
+      /** Trigger and stop prices. */
+      details: v.optional(v.object({
+        /** Condition that activates the order. */
+        t: v.nullable(v.object({
+          /** Trigger price. */
+          p: UnsignedDecimal,
+          /** Activate when the mark price is above (`true`) or below (`false`) the trigger price. */
+          a: v.boolean(),
+        })),
+        /** Price at which the order is terminated. */
+        s: v.nullable(UnsignedDecimal),
+      })),
     }),
     /** Nonce (timestamp in ms) used to prevent replay attacks. */
     nonce: UnsignedInteger,
