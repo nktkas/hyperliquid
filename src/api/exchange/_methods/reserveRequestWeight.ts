@@ -4,7 +4,7 @@ import * as v from "@valibot/valibot";
 // API Schemas
 // ============================================================
 
-import { Hex, UnsignedInteger } from "../../_schemas.ts";
+import { Address, Hex, UnsignedInteger } from "../../_schemas.ts";
 
 /**
  * Reserve additional rate-limited actions for a fee.
@@ -18,6 +18,8 @@ export const ReserveRequestWeightRequest = /* @__PURE__ */ (() => {
       type: v.literal("reserveRequestWeight"),
       /** Amount of request weight to reserve. */
       weight: v.pipe(UnsignedInteger, v.maxValue(1844674407370955)), // Truncated max uint64 / 1000
+      /** Address of an existing user to reserve the weight for. */
+      destination: v.optional(Address),
     }),
     /** Nonce (timestamp in ms) used to prevent replay attacks. */
     nonce: UnsignedInteger,
