@@ -15,6 +15,8 @@ runTest({
     const params: UserFeesParameters[] = [
       { user: "0xe973105a27e17350500926ae664dfcfe6006d924" },
       { user: "0x768484f7e2ebb675c57838366c02ae99ba2a9b08" }, // userAddRate/userSpotAddRate negative
+      { user: "0xeffb9c711ec1d3e551a7391dd848290a614c2e63" }, // stakingLink.type = tradingUser
+      { user: "0xc066dda6748bc50b4fa17720b215783f5d60045f" }, // stakingLink.type = stakingUser
     ];
 
     const data = await Promise.all(params.map((p) => client.userFees(p)));
@@ -22,8 +24,7 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data, [
       "#/properties/trial/defined",
-      "#/properties/nextTrialAvailableTimestamp/defined",
-      "#/properties/stakingLink/defined",
+      "#/properties/stakingLink/anyOf/0/properties/type/enum/0",
     ]);
   },
 });
