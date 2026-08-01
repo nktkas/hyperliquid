@@ -15,21 +15,17 @@ runTest({
     const params: SpotClearinghouseStateParameters[] = [
       { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" }, // balances.length > 0
       { user: "0x1defed46db35334232b9f5fd2e5c6180276fb99d" }, // evmEscrows.length > 0
+      { user: "0x8c967e73e7b15087c42a10d344cff4c96d877f1d" }, // balances with an outcome market identifier
+      { user: "0x6b043579b088d44400dffa1ef1c5e3e3bfbdf9d2" }, // portfolio margin enabled
     ];
 
     const data = await Promise.all(params.map((p) => client.spotClearinghouseState(p)));
 
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data, [
-      "#/properties/portfolioMarginEnabled/present",
       "#/properties/balances/items/anyOf/0/properties/spotHold/present",
-      "#/properties/balances/items/anyOf/0/properties/ltv/present",
       "#/properties/balances/items/anyOf/0/properties/borrowed/present",
-      "#/properties/balances/items/anyOf/0/properties/supplied/present",
-      "#/properties/balances/items/anyOf/1",
-      "#/properties/portfolioMarginRatio/present",
-      "#/properties/tokenToPortfolioBorrowRatio/present",
-      "#/properties/tokenToAvailableAfterMaintenance/present",
+      "#/properties/tokenToPortfolioSupplyRatio/array",
     ]);
   },
 });
