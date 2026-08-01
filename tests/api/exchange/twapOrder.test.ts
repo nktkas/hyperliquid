@@ -19,7 +19,7 @@ runTest({
     const szDecimals = symbolConverter.getSzDecimals("SOL")!;
     const midPx = allMids["SOL"];
 
-    const sz = formatSize(60 / parseFloat(midPx), szDecimals);
+    const sz = formatSize(110 / parseFloat(midPx), szDecimals);
 
     const params: TwapOrderParameters[] = [
       // b=true | r=false | t=false

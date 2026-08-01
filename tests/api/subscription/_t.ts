@@ -22,16 +22,18 @@ const OFFLINE = Deno.args.includes("--offline");
 export function runTest(options: {
   name: string;
   mode: "api" | "rpc";
+  isTestnet?: boolean;
   fn: (t: Deno.TestContext, client: SubscriptionClient) => Promise<void>;
 }): void {
-  const { name, mode, fn } = options;
+  const { name, mode, isTestnet = true, fn } = options;
 
   Deno.test(name, { ignore: OFFLINE }, async (t) => {
     await new Promise((r) => setTimeout(r, WAIT)); // delay to avoid rate limits
 
     // --- Preparation ------------------------------------------------
 
-    const transport = new WebSocketTransport({ url: `wss://${mode}.hyperliquid-testnet.xyz/ws`, isTestnet: true });
+    const domain = isTestnet ? "hyperliquid-testnet.xyz" : "hyperliquid.xyz";
+    const transport = new WebSocketTransport({ url: `wss://${mode}.${domain}/ws`, isTestnet });
     await transport.ready();
     const subsClient = new SubscriptionClient({ transport });
 
