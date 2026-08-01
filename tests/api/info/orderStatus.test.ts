@@ -23,6 +23,7 @@ runTest({
       { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 14940693141 }, // order.order.orderType = Stop Limit
       { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 27379010444 }, // order.order.orderType = Take Profit Market
       { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 27379156434 }, // order.order.orderType = Take Profit Limit
+      { user: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", oid: 57286378520 }, // order.order.orderType = Spot Dust Conversion
 
       { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 15030144135 }, // order.order.tif = null
       { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", oid: 15029784876 }, // order.order.tif = Gtc
@@ -49,6 +50,8 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data, [
       "#/anyOf/0/properties/order/properties/order/properties/children/*",
+      "#/anyOf/0/properties/order/properties/order/properties/orderType/enum/6",
+      "#/anyOf/0/properties/order/properties/order/properties/orderType/enum/7",
       "#/anyOf/0/properties/order/properties/order/properties/tif/enum/5",
       "#/anyOf/0/properties/order/properties/status/enum/3",
       "#/anyOf/0/properties/order/properties/status/enum/5",
@@ -74,6 +77,9 @@ runTest({
       "#/anyOf/0/properties/order/properties/status/enum/26",
       "#/anyOf/0/properties/order/properties/status/enum/27",
       "#/anyOf/0/properties/order/properties/status/enum/28",
+      "#/anyOf/0/properties/order/properties/status/enum/29",
+      "#/anyOf/0/properties/order/properties/status/enum/30",
+      "#/anyOf/0/properties/order/properties/status/enum/31",
     ]);
   },
 });

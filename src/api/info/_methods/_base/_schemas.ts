@@ -156,6 +156,9 @@ export type FrontendOpenOrder = {
    * - `"Stop Limit"`: Activates as a limit order when a stop price is reached.
    * - `"Take Profit Market"`: Executes as a market order when a take profit price is reached.
    * - `"Take Profit Limit"`: Executes as a limit order when a take profit price is reached.
+   * - `"Twap Slice"`: Executes a single slice of a TWAP order.
+   * - `"Vault Close"`: Closes a vault position.
+   * - `"Spot Dust Conversion"`: Converts residual spot balances.
    * @see https://hyperliquid.gitbook.io/hyperliquid-docs/trading/order-types
    */
   orderType:
@@ -164,7 +167,10 @@ export type FrontendOpenOrder = {
     | "Stop Market"
     | "Stop Limit"
     | "Take Profit Market"
-    | "Take Profit Limit";
+    | "Take Profit Limit"
+    | "Twap Slice"
+    | "Vault Close"
+    | "Spot Dust Conversion";
   /**
    * Time-in-force:
    * - `"Gtc"`: Remains active until filled or canceled.
@@ -361,7 +367,9 @@ export type UserFill = {
  * - `"siblingFilledCanceled"`: Canceled due to sibling ordering being filled.
  * - `"delistedCanceled"`: Canceled due to asset delisting.
  * - `"liquidatedCanceled"`: Canceled due to liquidation.
+ * - `"outcomeSettledCanceled"`: Canceled due to outcome market settlement.
  * - `"scheduledCancel"`: Canceled due to exceeding scheduled cancel deadline (dead man's switch).
+ * - `"internalCancel"`: Canceled due to an internal error.
  * - `"tickRejected"`: Rejected due to invalid tick price.
  * - `"minTradeNtlRejected"`: Rejected due to order notional below minimum.
  * - `"perpMarginRejected"`: Rejected due to insufficient margin.
@@ -377,6 +385,7 @@ export type UserFill = {
  * - `"insufficientSpotBalanceRejected"`: Rejected due to insufficient spot balance.
  * - `"oracleRejected"`: Rejected due to price too far from oracle.
  * - `"perpMaxPositionRejected"`: Rejected due to exceeding margin tier limit at current leverage.
+ * - `"tooManyOpenOrdersRejected"`: Rejected due to exceeding the open order limit.
  */
 export type OrderProcessingStatus =
   | "open"
@@ -392,7 +401,9 @@ export type OrderProcessingStatus =
   | "siblingFilledCanceled"
   | "delistedCanceled"
   | "liquidatedCanceled"
+  | "outcomeSettledCanceled"
   | "scheduledCancel"
+  | "internalCancel"
   | "tickRejected"
   | "minTradeNtlRejected"
   | "perpMarginRejected"
@@ -407,4 +418,5 @@ export type OrderProcessingStatus =
   | "openInterestIncreaseRejected"
   | "insufficientSpotBalanceRejected"
   | "oracleRejected"
-  | "perpMaxPositionRejected";
+  | "perpMaxPositionRejected"
+  | "tooManyOpenOrdersRejected";
