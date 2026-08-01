@@ -35,11 +35,13 @@ export type TwapHistoryResponse = {
    * - `"finished"`: Fully executed.
    * - `"activated"`: Active and executing.
    * - `"terminated"`: Terminated.
+   * - `"waitingForTrigger"`: Awaiting the trigger price.
+   * - `"stopped"`: Terminated by the stop price.
    * - `"error"`: An error occurred.
    */
   status: {
     /** Status of the TWAP order. */
-    status: "finished" | "activated" | "terminated";
+    status: "finished" | "activated" | "terminated" | "waitingForTrigger" | "stopped";
   } | {
     /** Status of the TWAP order. */
     status: "error";

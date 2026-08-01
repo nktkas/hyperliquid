@@ -16,10 +16,13 @@ const paramsSchema = valibotToJsonSchema(v.omit(UserTwapHistoryRequest, ["type"]
 runTest({
   name: "userTwapHistory",
   mode: "api",
+  isTestnet: false,
   fn: async (_t, client) => {
     const params: UserTwapHistoryParameters[] = [
-      { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" },
-      { user: "0xe019d6167E7e324aEd003d94098496b6d986aB05" },
+      { user: "0x03ce7863a2b62f4e227fd98605b79beb32618c76" }, // trigger.above: true
+      { user: "0x0132157369b0d073dd99011da1777920a025fd77" }, // trigger.above: false
+      { user: "0x051748895c6ed4fab50828bebe8e62e665134d23" }, // "stopped"
+      { user: "0x06d5af06a3a7d29909e1cdc7a9deded2fb14ab57" }, // "error"
     ];
 
     const data = await collectEventsOverTime<UserTwapHistoryEvent>(async (cb) => {
@@ -29,6 +32,7 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data, [
       "#/properties/isSnapshot/missing",
+      "#/properties/history/items/properties/twapId/missing",
     ]);
   },
 });

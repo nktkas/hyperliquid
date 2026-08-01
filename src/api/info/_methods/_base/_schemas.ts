@@ -244,12 +244,27 @@ export type TwapState = {
   /** Order side ("B" = Bid/Buy, "A" = Ask/Sell). */
   side: "B" | "A";
   /**
+   * Price at which the order is terminated; `null` when unset.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  stopPx: string | null;
+  /**
    * Order size.
    * @pattern ^[0-9]+(\.[0-9]+)?$
    */
   sz: string;
   /** Start time of the TWAP order (in ms since epoch). */
   timestamp: number;
+  /** Condition that activates the order; `null` when unset. */
+  trigger: {
+    /**
+     * Trigger price.
+     * @pattern ^[0-9]+(\.[0-9]+)?$
+     */
+    px: string;
+    /** Activates when the mark price is above (`true`) or below (`false`) the trigger price. */
+    above: boolean;
+  } | null;
   /**
    * User address.
    * @pattern ^0x[a-fA-F0-9]{40}$

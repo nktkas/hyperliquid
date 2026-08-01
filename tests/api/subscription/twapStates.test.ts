@@ -33,6 +33,8 @@ runTestWithExchange({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data, [
       "#/properties/states/items/items/1/properties/side/enum/1",
+      "#/properties/states/items/items/1/properties/stopPx/defined",
+      "#/properties/states/items/items/1/properties/trigger/defined",
     ]);
   },
 });

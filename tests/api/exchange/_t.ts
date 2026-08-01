@@ -242,7 +242,7 @@ export async function createTWAP(
   const midPx = allMids[symbol];
 
   // Calculate order parameters
-  const sz = formatSize(55 / Number(midPx), szDecimals);
+  const sz = formatSize(110 / Number(midPx), szDecimals);
 
   // Place TWAP order
   const result = await client.twapOrder({
