@@ -348,6 +348,11 @@ export type UserFill = {
   tid: number;
   /** Token in which the fee is denominated (e.g., USDC). */
   feeToken: string;
+  /**
+   * Fee trial escrow amount.
+   * @pattern ^[0-9]+(\.[0-9]+)?$
+   */
+  feeTrialEscrow?: string;
   /** ID of the TWAP. */
   twapId: number | null;
 };

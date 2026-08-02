@@ -16,6 +16,7 @@ runTest({
       { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" },
       { user: "0x8172cc20bc3a55dcd07c75dd37ac0c2534de3b84", aggregateByTime: true },
       { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", aggregateByTime: false },
+      { user: "0xd8cb8d9747f50be8e423c698f9104ee090540961" }, // feeTrialEscrow present
     ];
 
     const data = await Promise.all(params.map((p) => client.userFills(p)));
@@ -23,6 +24,7 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data, [
       "#/items/properties/twapId/defined",
+      "#/items/properties/liquidation/properties/liquidatedUser/missing",
     ]);
   },
 });

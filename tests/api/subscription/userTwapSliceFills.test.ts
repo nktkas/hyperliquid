@@ -29,6 +29,7 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data, [
       "#/properties/twapSliceFills/items/properties/fill/properties/builderFee/present",
+      "#/properties/twapSliceFills/items/properties/fill/properties/feeTrialEscrow/present",
       "#/properties/twapSliceFills/items/properties/fill/properties/twapId/defined",
       "#/properties/isSnapshot/missing",
     ]);

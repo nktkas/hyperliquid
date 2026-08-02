@@ -39,7 +39,7 @@ export type UserFillsResponse = (UserFill & {
      * Address of the liquidated user.
      * @pattern ^0x[a-fA-F0-9]{40}$
      */
-    liquidatedUser: `0x${string}`;
+    liquidatedUser?: `0x${string}`;
     /**
      * Mark price at the time of liquidation.
      * @pattern ^[0-9]+(\.[0-9]+)?$

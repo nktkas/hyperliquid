@@ -44,6 +44,7 @@ runTestWithExchange({
       "#/anyOf/4/properties/twapHistory/items/properties/twapId/missing",
       "#/anyOf/5/properties/twapSliceFills/items/properties/fill/properties/side/enum/1",
       "#/anyOf/5/properties/twapSliceFills/items/properties/fill/properties/builderFee/present",
+      "#/anyOf/5/properties/twapSliceFills/items/properties/fill/properties/feeTrialEscrow/present",
       "#/anyOf/5/properties/twapSliceFills/items/properties/fill/properties/twapId/defined",
     ]);
   },
