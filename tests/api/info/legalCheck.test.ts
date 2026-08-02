@@ -14,15 +14,16 @@ runTest({
   codeTestFn: async (_t, client) => {
     const params: LegalCheckParameters[] = [
       { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" },
+      { user: "0x0000000000000000000000000000000000000001" }, // acceptedTerms/userAllowed = false
     ];
 
     const data = await Promise.all(params.map((p) => client.legalCheck(p)));
 
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data, [
-      "#/properties/restrictions/missing",
-      "#/properties/restrictions/enum/0",
       "#/properties/restrictions/enum/1",
+      "#/properties/restrictions/enum/2",
+      "#/properties/restrictions/enum/3",
     ]);
   },
 });
