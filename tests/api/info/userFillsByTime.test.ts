@@ -23,6 +23,8 @@ runTest({
       { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", startTime: now - fiveYears, aggregateByTime: false },
       { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", startTime: now - fiveYears, reversed: true },
       { user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9", startTime: now - fiveYears, reversed: false },
+      { user: "0xd8cb8d9747f50be8e423c698f9104ee090540961", startTime: now - fiveYears }, // liquidation without liquidatedUser
+      { user: "0xd8cb8d9747f50be8e423c698f9104ee090540961", startTime: now - fiveYears, reversed: true }, // feeTrialEscrow present
     ];
 
     const data = await Promise.all(params.map((p) => client.userFillsByTime(p)));
