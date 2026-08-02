@@ -1,6 +1,6 @@
 {
   "name": "@nktkas/hyperliquid",
-  "version": "0.33.2",
+  "version": "0.33.3",
   "license": "MIT",
   "imports": {
     "@nktkas/rews": "jsr:@nktkas/rews@^4.1.0",
