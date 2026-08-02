@@ -121,7 +121,7 @@ export type VaultDetailsResponse = {
   allowDeposits: boolean;
   /** Position closure policy on withdrawal. */
   alwaysCloseOnWithdraw: boolean;
-};
+} | null;
 
 // ============================================================
 // Execution Logic
