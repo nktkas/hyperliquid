@@ -389,6 +389,17 @@
       spec:
         ref:
           kind: openapi
+          spec: hl-info-outcomeTemplates
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
           spec: hl-info-perpAnnotation
     ```
   - ```yaml
@@ -642,6 +653,17 @@
       spec:
         ref:
           kind: openapi
+          spec: hl-info-usdcRouting
+    ```
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
           spec: hl-info-userAbstraction
     ```
   - ```yaml
@@ -844,6 +866,17 @@
     ```
 
 - Exchange Methods
+  - ```yaml
+    type: builtin:openapi
+    props:
+      models: false
+      downloadLink: false
+    dependencies:
+      spec:
+        ref:
+          kind: openapi
+          spec: hl-exchange-activateOutcomeDeployer
+    ```
   - ```yaml
     type: builtin:openapi
     props:
