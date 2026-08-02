@@ -19,6 +19,7 @@ runTest({
         vaultAddress: "0xa15099a30bbf2e68942d6f4c43d70d04faeab0a0",
         user: "0xe019d6167E7e324aEd003d94098496b6d986aB05",
       }, // relationship.type = parent, user present
+      { vaultAddress: "0x0000000000000000000000000000000000000001" }, // vault does not exist
     ];
 
     const data = await Promise.all(params.map((p) => client.vaultDetails(p)));
