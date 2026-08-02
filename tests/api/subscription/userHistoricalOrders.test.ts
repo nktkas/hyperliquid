@@ -29,6 +29,9 @@ runTest({
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data, [
       "#/properties/orderHistory/items/properties/order/properties/orderType/enum/3",
+      "#/properties/orderHistory/items/properties/order/properties/orderType/enum/6",
+      "#/properties/orderHistory/items/properties/order/properties/orderType/enum/7",
+      "#/properties/orderHistory/items/properties/order/properties/orderType/enum/8",
       "#/properties/orderHistory/items/properties/order/properties/tif/enum/1",
       "#/properties/orderHistory/items/properties/order/properties/tif/enum/5",
       "#/properties/orderHistory/items/properties/order/properties/children/*",
@@ -56,6 +59,9 @@ runTest({
       "#/properties/orderHistory/items/properties/status/enum/26",
       "#/properties/orderHistory/items/properties/status/enum/27",
       "#/properties/orderHistory/items/properties/status/enum/28",
+      "#/properties/orderHistory/items/properties/status/enum/29",
+      "#/properties/orderHistory/items/properties/status/enum/30",
+      "#/properties/orderHistory/items/properties/status/enum/31",
       "#/properties/isSnapshot/missing",
     ]);
   },
