@@ -21,6 +21,7 @@ runTest({
 
     schemaCoverage(paramsSchema, params);
     schemaCoverage(responseSchema, data, [
+      "#/properties/restrictions/enum/0",
       "#/properties/restrictions/enum/1",
       "#/properties/restrictions/enum/2",
       "#/properties/restrictions/enum/3",
