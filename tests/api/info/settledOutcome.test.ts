@@ -15,6 +15,10 @@ runTest({
     const params: SettledOutcomeParameters[] = [
       { outcome: 100 },
       { outcome: 999999999 },
+      { outcome: 10200 }, // question absent
+      { outcome: 10207 }, // question.question = settled
+      { outcome: 10235 }, // question.question = active
+      { outcome: 10970 }, // spec.deployer present
     ];
 
     const data = await Promise.all(params.map((p) => client.settledOutcome(p)));
