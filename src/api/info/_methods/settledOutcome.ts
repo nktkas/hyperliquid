@@ -42,6 +42,11 @@ export type SettledOutcomeResponse = {
     }[];
     /** Quote token for this outcome. */
     quoteToken: string;
+    /**
+     * Address of the deployer; absent for outcomes not deployed from a template.
+     * @pattern ^0x[a-fA-F0-9]{40}$
+     */
+    deployer?: `0x${string}`;
   };
   /**
    * Settlement fraction.
@@ -50,6 +55,21 @@ export type SettledOutcomeResponse = {
   settleFraction: string;
   /** Settlement details. */
   details: string;
+  /** Question that the outcome is a named outcome of. */
+  question?: {
+    /** Question identifier, keyed by whether the question is still active or already settled. */
+    question: {
+      /** Identifier of an active question. */
+      active: number;
+    } | {
+      /** Identifier of a settled question. */
+      settled: number;
+    };
+    /** Name of the question. */
+    name: string;
+    /** Description of the question. */
+    description: string;
+  };
 } | null;
 
 // ============================================================
