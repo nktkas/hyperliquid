@@ -14,6 +14,8 @@ runTest({
   codeTestFn: async (_t, client) => {
     const params: MarginTableParameters[] = [
       { id: 1 },
+      { id: 51, dex: "" }, // main dex
+      { id: 51, dex: "flx" }, // other dex
     ];
 
     const data = await Promise.all(params.map((p) => client.marginTable(p)));

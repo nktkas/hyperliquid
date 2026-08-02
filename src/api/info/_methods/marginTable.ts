@@ -16,6 +16,8 @@ export const MarginTableRequest = /* @__PURE__ */ (() => {
     type: v.literal("marginTable"),
     /** Margin requirements table. */
     id: UnsignedInteger,
+    /** DEX name (empty string for main dex). */
+    dex: v.optional(v.string()),
   });
 })();
 
