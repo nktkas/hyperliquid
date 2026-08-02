@@ -7,6 +7,7 @@ import * as v from "@valibot/valibot";
 import { Address } from "../../_schemas.ts";
 import type { ClearinghouseStateResponse } from "./clearinghouseState.ts";
 import type { SpotClearinghouseStateResponse } from "./spotClearinghouseState.ts";
+import type { UserAbstractionResponse } from "./userAbstraction.ts";
 
 /**
  * Request user sub-accounts (V2).
@@ -48,6 +49,8 @@ export type SubAccounts2Response = {
   ][];
   /** Spot tokens clearinghouse state. */
   spotState: SpotClearinghouseStateResponse;
+  /** Abstraction state of the sub-account; absent when the sub-account uses the default state. */
+  abstraction?: Exclude<UserAbstractionResponse, "default">;
 }[] | null;
 
 // ============================================================
