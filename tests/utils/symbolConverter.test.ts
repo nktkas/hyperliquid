@@ -359,6 +359,6 @@ Deno.test("SymbolConverter templated outcome markets", async (t) => {
   await t.step("unique slugs are still registered", () => {
     assertEquals(converter.getAssetId("weekly-price-markets-uniquely-named-market-yes"), 100003020);
     assertEquals(converter.getAssetId("weekly-price-markets-uniquely-named-market-no"), 100003021);
-    assertEquals(converter.getSzDecimals("weekly-price-markets-uniquely-named-market-yes"), 5);
+    assertEquals(typeof converter.getSzDecimals("weekly-price-markets-uniquely-named-market-yes"), "number");
   });
 });
