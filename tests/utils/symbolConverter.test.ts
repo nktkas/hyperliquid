@@ -148,6 +148,53 @@ const OUTCOME_META: OutcomeMetaResponse = {
   ],
 };
 
+/**
+ * An `outcomeMeta` response modeled on templated mainnet markets. Their display names are template
+ * ids rather than the market's own name, so distinct markets slugify to the same string.
+ */
+const TEMPLATED_OUTCOME_META: OutcomeMetaResponse = {
+  outcomes: [
+    {
+      outcome: 300,
+      name: "template:binaryPrice",
+      description: "perp:BTC|threshold:61720|time:20260608-0600",
+      sideSpecs: [{ name: "template:Yes" }, { name: "template:No" }],
+      quoteToken: "USDC",
+    },
+    {
+      outcome: 301,
+      name: "template:binaryPrice",
+      description: "perp:ETH|threshold:2400|time:20260608-0600",
+      sideSpecs: [{ name: "template:Yes" }, { name: "template:No" }],
+      quoteToken: "USDC",
+    },
+    {
+      outcome: 302,
+      name: "Uniquely Named Market",
+      description: "",
+      sideSpecs: [{ name: "Yes" }, { name: "No" }],
+      quoteToken: "USDC",
+    },
+    {
+      outcome: 303,
+      name: "Fallback",
+      description: "",
+      sideSpecs: [{ name: "Yes" }, { name: "No" }],
+      quoteToken: "USDC",
+    },
+  ],
+  questions: [
+    {
+      question: 40,
+      name: "Weekly Price Markets",
+      description: "",
+      fallbackOutcome: 303,
+      namedOutcomes: [302],
+      settledNamedOutcomes: [],
+    },
+  ],
+};
+
 // ============================================================
 // Tests
 // ============================================================
@@ -295,5 +342,23 @@ Deno.test("SymbolConverter outcome markets", async (t) => {
   await t.step("getSzDecimals()", () => {
     assertEquals(converter.getSzDecimals("nba-finals-game-3-san-antonio"), 5);
     assertEquals(converter.getSzDecimals("2026-world-cup-champion-argentina-yes"), 5);
+  });
+});
+
+Deno.test("SymbolConverter templated outcome markets", async (t) => {
+  const converter = await SymbolConverter.create({ transport: createOutcomeTransport(TEMPLATED_OUTCOME_META) });
+
+  await t.step("ambiguous slugs are not registered", () => {
+    // Outcomes 300 and 301 are different markets that slugify identically, so neither may win the
+    // lookup: before this was handled, the id of whichever loaded last was returned for both.
+    assertEquals(converter.getAssetId("templatebinaryprice-templateyes"), undefined);
+    assertEquals(converter.getAssetId("templatebinaryprice-templateno"), undefined);
+    assertEquals(converter.getSzDecimals("templatebinaryprice-templateyes"), undefined);
+  });
+
+  await t.step("unique slugs are still registered", () => {
+    assertEquals(converter.getAssetId("weekly-price-markets-uniquely-named-market-yes"), 100003020);
+    assertEquals(converter.getAssetId("weekly-price-markets-uniquely-named-market-no"), 100003021);
+    assertEquals(typeof converter.getSzDecimals("weekly-price-markets-uniquely-named-market-yes"), "number");
   });
 });

@@ -212,6 +212,12 @@ export class SymbolConverter {
     // Fallback outcomes are not tradable on their own and have no public slug
     const fallbackOutcomes = new Set(outcomeMetaData.questions.map((question) => question.fallbackOutcome));
 
+    // Markets deployed from a template share their question, outcome and side names, so several
+    // tradable sides can slugify to the same string. Such a slug is unregistered below, so a lookup
+    // returns `undefined` instead of whichever market was loaded last.
+    const seenSlugs = new Set<string>();
+    const ambiguousSlugs = new Set<string>();
+
     outcomeMetaData.outcomes.forEach((outcome) => {
       if (fallbackOutcomes.has(outcome.outcome)) return;
       const question = questionByOutcome.get(outcome.outcome);
@@ -219,11 +225,18 @@ export class SymbolConverter {
       outcome.sideSpecs.forEach((sideSpec, sideIdx) => {
         const slug = this._outcomeSlug(outcome, sideSpec.name, question);
         if (!slug) return;
+        if (seenSlugs.has(slug)) ambiguousSlugs.add(slug);
+        seenSlugs.add(slug);
 
         this._nameToAssetId.set(slug, 100000000 + 10 * outcome.outcome + sideIdx);
         // Outcome markets are absent from szDecimals metadata; they are all 5
         this._nameToSzDecimals.set(slug, 5);
       });
+    });
+
+    ambiguousSlugs.forEach((slug) => {
+      this._nameToAssetId.delete(slug);
+      this._nameToSzDecimals.delete(slug);
     });
   }
 
