@@ -27,7 +27,7 @@ export const TwapOrderRequest = /* @__PURE__ */ (() => {
         /** Whether the order is reduce-only. */
         r: v.boolean(),
         /** TWAP duration in minutes. */
-        m: v.pipe(UnsignedInteger, v.minValue(5), v.maxValue(1440)),
+        m: v.pipe(UnsignedInteger, v.minValue(5), v.maxValue(10080)), // 5 minutes to 7 days
         /** Enable random order timing. */
         t: v.boolean(),
       }),
