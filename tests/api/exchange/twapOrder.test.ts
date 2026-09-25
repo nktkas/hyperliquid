@@ -1,3 +1,4 @@
+import { assertEquals } from "jsr:@std/assert@1";
 import { type TwapOrderParameters, TwapOrderRequest } from "@nktkas/hyperliquid/api/exchange";
 import { formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
 import * as v from "@valibot/valibot";
@@ -43,4 +44,15 @@ runTest({
     ]);
     schemaCoverage(responseSchema, data);
   },
+});
+
+Deno.test("twapOrder: duration bounds (5 minutes to 7 days)", () => {
+  const twapSchema = TwapOrderRequest.entries.action.entries.twap;
+  const twap = { a: 0, b: true, s: "1", r: false, t: false };
+  for (const m of [5, 1440, 1441, 10080]) {
+    assertEquals(v.safeParse(twapSchema, { ...twap, m }).success, true, `m=${m} should be accepted`);
+  }
+  for (const m of [4, 10081]) {
+    assertEquals(v.safeParse(twapSchema, { ...twap, m }).success, false, `m=${m} should be rejected`);
+  }
 });
