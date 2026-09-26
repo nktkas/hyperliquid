@@ -36,6 +36,23 @@ Deno.test("formatPrice", async (t) => {
       assertEquals(formatPrice("12345.6", 0), "12345");
       assertEquals(formatPrice("0.00123456", 0), "0.001234");
     });
+
+    await t.step("drops the fraction instead of integer digits past 5 sig figs", () => {
+      // Docs: "123456 is a valid price even though 12345.6 is not".
+      assertEquals(formatPrice("123456.7", 0), "123456");
+      assertEquals(formatPrice("1234567.8", 0), "1234567");
+      assertEquals(formatPrice("999999.9", 0), "999999");
+      assertEquals(formatPrice("123456.789", 5), "123456");
+      assertEquals(formatPrice("123456.7", 0, "spot"), "123456");
+      // Negative prices truncate toward zero the same way.
+      assertEquals(formatPrice("-123456.7", 0), "-123456");
+    });
+
+    await t.step("keeps sig figs when they are finer than a whole number", () => {
+      assertEquals(formatPrice("1234.56", 0), "1234.5");
+      assertEquals(formatPrice("99999.9", 0), "99999");
+      assertEquals(formatPrice("100000.5", 0), "100000");
+    });
   });
 
   await t.step("decimal limits", async (t) => {
