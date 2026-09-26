@@ -81,9 +81,13 @@ export function formatPrice(price: string | number, szDecimals: number, type: "p
   const maxDecimals = Math.max((type === "perp" ? 6 : 8) - szDecimals, 0);
   let result = d.toDecimalPlaces(maxDecimals);
 
-  // Integers are exempt from the 5-sig-fig cap.
   if (!result.isInteger()) {
-    result = result.toSignificantDigits(5);
+    // Two valid forms: 5 significant figures, or a whole number (always allowed,
+    // whatever its significant figures). Both truncate toward zero, so whichever
+    // sits further from zero kept more of the price.
+    const sigFigs = result.toSignificantDigits(5);
+    const integer = result.toDecimalPlaces(0);
+    result = integer.abs().greaterThan(sigFigs.abs()) ? integer : sigFigs;
   }
 
   if (result.isZero()) {
