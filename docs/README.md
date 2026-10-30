@@ -23,7 +23,7 @@ bun add @nktkas/hyperliquid
 
 {% endtab %}
 
-{% tab title="Deno 1.23+" %}
+{% tab title="Deno 1.42+" %}
 
 ```sh
 deno add jsr:@nktkas/hyperliquid
