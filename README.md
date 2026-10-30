@@ -24,7 +24,7 @@ major JS runtimes, written in TypeScript.
 # Node.js 22.12+ / React Native 0.86+
 npm i @nktkas/hyperliquid
 
-# Deno 1.23+ 
+# Deno 1.42+
 deno add jsr:@nktkas/hyperliquid
 
 # Bun 1.3.3+
