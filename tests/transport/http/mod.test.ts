@@ -130,6 +130,13 @@ Deno.test("HttpTransport", async (t) => {
       assertEquals(result, { data: "test" });
     });
 
+    await t.step("accepts a case-insensitive JSON media type with parameters", async () => {
+      mockFetch(() =>
+        new Response('{"ok":true}', { headers: { "Content-Type": 'Application/JSON ; profile="a\\",b"' } })
+      );
+      assertEquals(await new HttpTransport().request("info", {}), { ok: true });
+    });
+
     await t.step("error responses", async (t) => {
       await t.step("non-200 status throws HttpRequestError", async () => {
         mockFetch(() => new Response("", { status: 500 }));
@@ -144,6 +151,29 @@ Deno.test("HttpTransport", async (t) => {
         const transport = new HttpTransport();
         await assertRejects(() => transport.request("info", {}), HttpRequestError);
       });
+
+      for (
+        const contentType of [
+          'text/plain; profile="application/json"',
+          "application/json-seq",
+          "application/problem+json",
+          "text/json",
+          "application/json, application/json",
+          "application/json; charset=utf-8, application/json; charset=utf-8",
+          'application/json; profile="a,b", text/plain',
+          'application/json; charset="a',
+          null,
+        ]
+      ) {
+        await t.step(`rejects ${contentType} even when the body is valid JSON`, async () => {
+          const headers = new Headers();
+          if (contentType !== null) headers.set("Content-Type", contentType);
+          mockFetch(() => new Response(new TextEncoder().encode("{}"), { headers }));
+          const error = await assertRejects(() => new HttpTransport().request("info", {}), HttpRequestError);
+          assert(error.response);
+          assertEquals(await error.response.text(), "{}");
+        });
+      }
 
       await t.step("invalid JSON in 2xx response throws HttpRequestError with readable response", async () => {
         mockFetch(() => new Response("not json", { status: 200, headers: { "Content-Type": "application/json" } }));
