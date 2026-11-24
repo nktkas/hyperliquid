@@ -204,7 +204,7 @@ export class HttpTransport implements IRequestTransport<"info" | "exchange" | "e
 
       // --- Send and validate -------------------------------------------------
       const response = await fetch(url, init);
-      if (!response.ok || !response.headers.get("Content-Type")?.includes("application/json")) {
+      if (!response.ok || !isJsonContentType(response.headers.get("Content-Type"))) {
         const clone = response.clone();
         const body = await response.text().catch(() => undefined); // releases connection, clone stays readable
         throw new HttpRequestError({
@@ -249,6 +249,22 @@ export class HttpTransport implements IRequestTransport<"info" | "exchange" | "e
 // =============================================================================
 // Helpers
 // =============================================================================
+
+/** Content-Type is a singleton field; commas are data only inside quoted parameters. */
+function isJsonContentType(value: string | null): boolean {
+  if (value === null) return false;
+  const [mediaType] = value.split(";", 1);
+  if (!/^application\/json[ \t]*$/i.test(mediaType)) return false;
+
+  let quoted = false;
+  for (let i = mediaType.length; i < value.length; i++) {
+    const c = value[i];
+    if (quoted && c === "\\") i++; // quoted-pair
+    else if (c === '"') quoted = !quoted;
+    else if (!quoted && c === ",") return false;
+  }
+  return !quoted;
+}
 
 /** Truncates `text` to `limit` characters, appending the original length. */
 function truncate(text: string, limit = 1024): string {
